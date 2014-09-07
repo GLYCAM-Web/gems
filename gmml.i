@@ -93,14 +93,14 @@
 #include "gmml/includes/Geometry/InternalCoordinate/dihedral.hpp"
 #include "gmml/includes/Geometry/InternalCoordinate/distance.hpp"
 
-#include "gmml/includes/MolecularModeling/assembly.hpp"
-#include "gmml/includes/MolecularModeling/atom.hpp"
 #include "gmml/includes/MolecularModeling/element.hpp"
 #include "gmml/includes/MolecularModeling/dockingatom.hpp"
 #include "gmml/includes/MolecularModeling/moleculardynamicatom.hpp"
 #include "gmml/includes/MolecularModeling/quantommechanicatom.hpp"
+#include "gmml/includes/MolecularModeling/atom.hpp"
 #include "gmml/includes/MolecularModeling/residue.hpp"
 #include "gmml/includes/MolecularModeling/atomnode.hpp"
+#include "gmml/includes/MolecularModeling/assembly.hpp"
 
 #include "gmml/includes/FileSet/TopologyFileSpace/topologyangle.hpp"
 #include "gmml/includes/FileSet/TopologyFileSpace/topologyangletype.hpp"
@@ -206,14 +206,14 @@ std::ostream & get_cout() { return std::cout; }
 %include "gmml/includes/Geometry/InternalCoordinate/dihedral.hpp"
 %include "gmml/includes/Geometry/InternalCoordinate/distance.hpp"
 
-%include "gmml/includes/MolecularModeling/assembly.hpp"
-%include "gmml/includes/MolecularModeling/atom.hpp"
 %include "gmml/includes/MolecularModeling/element.hpp"
 %include "gmml/includes/MolecularModeling/dockingatom.hpp"
 %include "gmml/includes/MolecularModeling/moleculardynamicatom.hpp"
 %include "gmml/includes/MolecularModeling/quantommechanicatom.hpp"
+%include "gmml/includes/MolecularModeling/atom.hpp"
 %include "gmml/includes/MolecularModeling/residue.hpp"
 %include "gmml/includes/MolecularModeling/atomnode.hpp"
+%include "gmml/includes/MolecularModeling/assembly.hpp"
 
 %include "gmml/includes/FileSet/TopologyFileSpace/topologyangle.hpp"
 %include "gmml/includes/FileSet/TopologyFileSpace/topologyangletype.hpp"
