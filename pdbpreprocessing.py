@@ -20,15 +20,16 @@ for i, arg in enumerate(sys.argv):
     elif arg == '-pdb':
 		pdb = sys.argv[i+1]
 
-temp.Preprocess(pdb, libs, prep)
-
 pdbfile = gmml.PdbFile(pdb)
+
+temp.Preprocess(pdbfile, libs, prep)
 
 ###IN ORDER TO UPDATE EACH PARTS OF THE PDB FILE YOU CAN USE THE SAME CODE FROM ANY OF THE SAMPLE FILES, i.e. cysresidues.py
 ###UPDATING CYS RESIDUES###
-disulfide_bonds = temp.GetDisulfideBonds()
-disulfide_bonds[0].SetIsBonded(False)
+#disulfide_bonds = temp.GetDisulfideBonds()
+#disulfide_bonds[0].SetIsBonded(False)
 
 ###THIS FUNCTIONS WILL APPLY ALL THE UPDATED INFORMATION
 temp.ApplyPreprocessing(pdbfile, libs)
+temp.Print()
 pdbfile.Write('updated_pdb.txt')

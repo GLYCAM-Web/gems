@@ -20,8 +20,8 @@ for i, arg in enumerate(sys.argv):
     elif arg == '-pdb':
 		pdb = sys.argv[i+1]
 
-
-temp.ExtractUnrecognizedResidues(pdb, libs, prep)	
+pdbfile = gmml.PdbFile(pdb)
+temp.ExtractUnrecognizedResidues(pdbfile, libs, prep)	
 
 
 ###FOR GIVING THE FILES MANUALLY AND THROUGH THE COMMAND LINE USE THE FOLOWIG SECTION
@@ -37,7 +37,6 @@ for x in xrange(0, unrecognized_residues.size()):
         unrecognized_residues[x].Print()
 
 
-pdbfile = gmml.PdbFile(pdb)
 temp.RemoveUnrecognizedResidues(pdbfile, unrecognized_residues)
 pdbfile.Write('1Z7E-unrecognizedresidue-update.pdb')
 
