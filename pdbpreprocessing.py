@@ -30,6 +30,6 @@ temp.Preprocess(pdbfile, libs, prep)
 #disulfide_bonds[0].SetIsBonded(False)
 
 ###THIS FUNCTIONS WILL APPLY ALL THE UPDATED INFORMATION
-temp.ApplyPreprocessing(pdbfile, libs)
+temp.ApplyPreprocessingWithTheGivenModelNumber(pdbfile, libs)
 temp.Print()
-pdbfile.Write('updated_pdb.txt')
+pdbfile.WriteWithTheGivenModelNumber('updated_pdb.txt')

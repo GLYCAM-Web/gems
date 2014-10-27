@@ -88,6 +88,7 @@
 #include "gmml/includes/Resolver/PdbPreprocessor/pdbpreprocessorunrecognizedheavyatom.hpp"
 #include "gmml/includes/Resolver/PdbPreprocessor/pdbpreprocessorunrecognizedresidue.hpp"
 #include "gmml/includes/Resolver/PdbPreprocessor/pdbpreprocessoralternateresidue.hpp"
+#include "gmml/includes/Resolver/PdbPreprocessor/pdbpreprocessorresidueinfo.hpp"
 
 #include "gmml/includes/Geometry/InternalCoordinate/angle.hpp"
 #include "gmml/includes/Geometry/InternalCoordinate/dihedral.hpp"
@@ -201,6 +202,7 @@ std::ostream & get_cout() { return std::cout; }
 %include "gmml/includes/Resolver/PdbPreprocessor/pdbpreprocessorunrecognizedheavyatom.hpp"
 %include "gmml/includes/Resolver/PdbPreprocessor/pdbpreprocessorunrecognizedresidue.hpp"
 %include "gmml/includes/Resolver/PdbPreprocessor/pdbpreprocessoralternateresidue.hpp"
+%include "gmml/includes/Resolver/PdbPreprocessor/pdbpreprocessorresidueinfo.hpp"
 
 %include "gmml/includes/Geometry/InternalCoordinate/angle.hpp"
 %include "gmml/includes/Geometry/InternalCoordinate/dihedral.hpp"
@@ -399,6 +401,10 @@ std::ostream & get_cout() { return std::cout; }
 //typedef std::map<std::string, PdbPreprocessorAlternateResidue*> PdbPreprocessorAlternateResidueMap;
 %template() std::pair<std::string, PdbPreprocessorSpace::PdbPreprocessorAlternateResidue*>;
 %template(alternate_residue_map_pdbpreprocessor_file) std::map<std::string, PdbPreprocessorSpace::PdbPreprocessorAlternateResidue*>;
+
+//typedef std::map<std::string, PdbPreprocessorResidueInfo*> PdbPreprocessorResidueInfoMap;
+%template() std::pair<std::string, PdbPreprocessorSpace::PdbPreprocessorResidueInfo*>;
+%template(residue_info_map_pdbpreprocessor_file) std::map<std::string, PdbPreprocessorSpace::PdbPreprocessorResidueInfo*>;
 
 
 ///MolecularModeling///
