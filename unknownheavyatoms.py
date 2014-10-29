@@ -21,9 +21,11 @@ for i, arg in enumerate(sys.argv):
     elif arg == '-pdb':
 		pdb = sys.argv[i+1]
 
-temp.ExtractUnknownHeavyAtoms(pdb, libs, prep)	
+pdbfile = gmml.PdbFile(pdb)
 
-###FOR GIVING THE FILES MANUALLY AND THROUGH THE COMMAND LINE USE THE FOLOWIG SECTION
+temp.ExtractUnknownHeavyAtoms(pdbpdbfile, libs, prep)	
+
+###FOR GIVING THE FILES MANUALLY AND THROUGH THE COMMAND LINE USE THE FOLOWING SECTION
 #libs.push_back("gmml/dat/lib/GLYCAM_amino_06h.lib")
 #libs.push_back("gmml/dat/lib/GLYCAM_aminoct_06h.lib")
 #libs.push_back("gmml/dat/lib/GLYCAM_aminont_06h.lib")
@@ -34,10 +36,9 @@ unrecognized_heavy_atoms = temp.GetUnrecognizedHeavyAtoms()
 for x in xrange(0, unrecognized_heavy_atoms.size()):
         unrecognized_heavy_atoms[x].Print()
 
-pdbfile = gmml.PdbFile(pdb)
 
 temp.RemoveUnknownHeavyAtoms(pdbfile, unrecognized_heavy_atoms)
 
-pdbfile.Write('sucros-unknownheavyatoms-update.pdb')
+pdbfile.Write('unknownheavyatoms-update.pdb')
 
 

@@ -16,14 +16,15 @@ for i, arg in enumerate(sys.argv):
     elif arg == '-pdb':
 		pdb = sys.argv[i+1]
 
-temp.ExtractAminoAcidChains(pdb)
+pdbfile = gmml.PdbFile(pdb)
+
+temp.ExtractAminoAcidChains(pdbfile)
 
 chain_terminations = temp.GetChainTerminations()
 
 for x in xrange(0, chain_terminations.size()):
         chain_terminations[x].Print()
 
-pdbfile = gmml.PdbFile(pdb)
 
 ###UPDATING AMINO ACID CHAINS###
 chain_terminations[0].SetSelectedNTermination(gmml.NH3)
@@ -34,4 +35,4 @@ for x in xrange(0, chain_terminations.size()):
 
 temp.UpdateAminoAcidChains(pdbfile, libs, chain_terminations)
 
-pdbfile.Write('1Z7E-aminoacidchain-update.pdb')
+pdbfile.Write('aminoacidchain-update.pdb')

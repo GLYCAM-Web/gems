@@ -16,13 +16,14 @@ for i, arg in enumerate(sys.argv):
     elif arg == '-pdb':
 		pdb = sys.argv[i+1]
 
-temp.ExtractGapsInAminoAcidChains(pdb)
+pdbfile = gmml.PdbFile(pdb)
+
+temp.ExtractGapsInAminoAcidChains(pdbfile)
 
 missing_residues = temp.GetMissingResidues()
 for x in xrange(0, missing_residues.size()):
         missing_residues[x].Print()
 
-pdbfile = gmml.PdbFile(pdb)
 
 ###UPDATING GAPS IN AMINO ACID CHAINS###
 #MODIFYING n_termination and c_termination ATTRIBUTES OF THE CHAIN TERMINATIONS VECTOR:
@@ -33,5 +34,5 @@ missing_residues[0].SetSelectedCTermination(gmml.NH2)
 
 temp.UpdateGapsInAminoAcidChains(pdbfile, libs, missing_residues)
 
-pdbfile.Write('1Z7E-gapsinaminoacidchains-update.pdb')
+pdbfile.Write('gapsinaminoacidchains-update.pdb')
 

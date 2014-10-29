@@ -38,5 +38,5 @@ for x in xrange(0, unrecognized_residues.size()):
 
 
 temp.RemoveUnrecognizedResidues(pdbfile, unrecognized_residues)
-pdbfile.Write('1Z7E-unrecognizedresidue-update.pdb')
+pdbfile.Write('unrecognizedresidue-update.pdb')
 
