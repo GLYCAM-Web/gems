@@ -43,10 +43,10 @@ temp.Preprocess(pdbfile, amino_libs, glycam_libs, other_libs, prep)
 
 ###FIRST OPTION:
 ###THIS FUNCTIONS WILL APPLY ALL THE UPDATED INFORMATION ON THE SELECTED MODEL.
-###THE DEFAULT MODEL IS THE FIRST ONE, IN ORDER TO CHANGE IT GIVE ANOTHER MODEL NUMBER AS THE 3RD ARGUMENT TO THE FOLLOWING FUNCTION i.e. temp.ApplyPreprocessingWithTheGivenModelNumber(pdbfile, amino_libs, glycam_libs, prep, 2)
+###THE DEFAULT MODEL IS THE FIRST ONE, IN ORDER TO CHANGE IT GIVE ANOTHER MODEL NUMBER AS THE 5th ARGUMENT TO THE FOLLOWING FUNCTION i.e. temp.ApplyPreprocessingWithTheGivenModelNumber(pdbfile, amino_libs, glycam_libs, prep, 2)
 temp.ApplyPreprocessingWithTheGivenModelNumber(pdbfile, amino_libs, glycam_libs, prep)
 temp.Print()
-###THE DEFAULT MODEL IS THE FIRST ONE, IN ORDER TO CHANGE IT GIVE ANOTHER MODEL NUMBER AS THE 3RD ARGUMENT TO THE FOLLOWING FUNCTION i.e. pdbfile.WriteWithTheGivenModelNumber('updated_pdb.txt', 2). THE GIVEN NUMBER SHOULD MATCH THE PREVIOUS MODEL NUMBER WHICH HAS BEEN GIVEN TO THE ApplyPreprocessingWithTheGivenModelNumber FUNCTION.
+###THE DEFAULT MODEL IS THE FIRST ONE, IN ORDER TO CHANGE IT GIVE ANOTHER MODEL NUMBER AS THE 2ND ARGUMENT TO THE FOLLOWING FUNCTION i.e. pdbfile.WriteWithTheGivenModelNumber('updated_pdb.txt', 2). THE GIVEN NUMBER SHOULD MATCH THE PREVIOUS MODEL NUMBER WHICH HAS BEEN GIVEN TO THE ApplyPreprocessingWithTheGivenModelNumber FUNCTION.
 pdbfile.WriteWithTheGivenModelNumber('updated_pdb.txt')
 
 ###SECOND OPTION:
