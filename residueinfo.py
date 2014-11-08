@@ -28,6 +28,10 @@ for i, arg in enumerate(sys.argv):
 		arguments = sys.argv[i+1].split(',')
 		for argument in arguments:
 			other_libs.push_back(argument)
+    elif arg == '-prep':
+		arguments = sys.argv[i+1].split(',')
+		for argument in arguments:
+			prep.push_back(argument)
 	elif arg == '-pdb':
 		pdb = sys.argv[i+1]
 
