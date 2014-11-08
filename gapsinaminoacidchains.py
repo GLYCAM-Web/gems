@@ -1,18 +1,20 @@
 ###FOR FURTHER INSTRUCTIONS PLEASE REFER TO alternateresidues.py SAMPLE FILE
 #SAMPLE COMMAND :
-# python gapsinaminoacidchains.py -libs "gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/amino12.lib","gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminont12.lib","gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminoct12.lib" -pdb "gmml/example/pdb/1Z7E.pdb"
+# python gapsinaminoacidchains.py -amino_libs "gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/amino12.lib","gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminont12.lib","gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminoct12.lib" -pdb "gmml/example/pdb/1Z7E.pdb"
+
 
 import gmml
 import sys
 
 temp = gmml.PdbPreprocessor()
-libs = gmml.string_vector()
+amino_libs = gmml.string_vector()
+
 
 for i, arg in enumerate(sys.argv):	
-    if arg == '-libs':                       
+    if arg == '-amino_libs':                       
 		arguments = sys.argv[i+1].split(',')
 		for argument in arguments:
-			libs.push_back(argument)
+			amino_libs.push_back(argument)
     elif arg == '-pdb':
 		pdb = sys.argv[i+1]
 
@@ -32,7 +34,7 @@ for x in xrange(0, missing_residues.size()):
 missing_residues[0].SetSelectedNTermination(gmml.NH3)
 missing_residues[0].SetSelectedCTermination(gmml.NH2)
 
-temp.UpdateGapsInAminoAcidChains(pdbfile, libs, missing_residues)
+temp.UpdateGapsInAminoAcidChains(pdbfile, amino_libs, missing_residues)
 
 pdbfile.Write('gapsinaminoacidchains-update.pdb')
 

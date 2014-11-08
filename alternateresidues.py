@@ -1,5 +1,6 @@
 ###SAMPLE COMMAND 
 # python alternateresidues.py gmml/example/pdb/1Z7E-Mod.pdb
+
 ###IMPORTING THE GMML LIBRARY
 import gmml
 import sys
