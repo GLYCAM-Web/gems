@@ -51,7 +51,7 @@ residue_info = temp.GetResidueInfoMap()
 for x in residue_info:
 	residue_info[x].Print()
 
-print 'Model charge is: ' ,temp.CalculateModelCharge(pdbfile, libamino_libs, glycam_libs, other_libs, prep)
+print 'Model charge is: ' ,temp.CalculateModelCharge(pdbfile, libamino_libs, glycam_libs, other_libs)
 
 pdbfile.Write('residueinfo-update.pdb')
 
