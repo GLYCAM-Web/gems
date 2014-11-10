@@ -35,7 +35,7 @@ for i, arg in enumerate(sys.argv):
 
 pdbfile = gmml.PdbFile(pdb)
 
-temp.ExtractUnknownHeavyAtoms(pdbpdbfile, amino_libs, glycam_libs, other_libs, prep)	
+temp.ExtractUnknownHeavyAtoms(pdbfile, amino_libs, glycam_libs, other_libs, prep)	
 
 ###FOR GIVING THE FILES MANUALLY AND THROUGH THE COMMAND LINE USE THE FOLOWING SECTION
 #amino_libs.push_back("gmml/dat/lib/GLYCAM_amino_06h.lib")
