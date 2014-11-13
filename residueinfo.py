@@ -1,5 +1,5 @@
 ###SAMPLE COMMAND 
-# python residueinfo.py -amino_libs "gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/amino12.lib","gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminont12.lib","gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminoct12.lib" -pdb "gmml/example/pdb/1NXC.pdb"
+# python residueinfo.py -amino_libs "gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/amino12.lib","gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminont12.lib","gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminoct12.lib" -prep "gmml/dat/CurrentParams/leaprc_GLYCAM_06j-1_2014-03-14/GLYCAM_06j-1.prep" -pdb "gmml/example/pdb/1NXC.pdb"
 
 #If you need to add other libraries for glycam and other residues there are -glycam_libs and -other_libs options available for the command.
 
@@ -37,21 +37,21 @@ for i, arg in enumerate(sys.argv):
 
 pdbfile = gmml.PdbFile(pdb)
 
-temp.ExtractResidueInfo(pdbfile, amino_libs, glycam_libs, other_libs)
+temp.ExtractResidueInfo(pdbfile, amino_libs, glycam_libs, other_libs, prep)
 
 
 ###FOR GIVING THE FILES MANUALLY AND THROUGH THE COMMAND LINE USE THE FOLOWIG SECTION
 #amino_libs.push_back("gmml/dat/lib/GLYCAM_amino_06h.lib")
 #amino_libs.push_back("gmml/dat/lib/GLYCAM_aminoct_06h.lib")
 #amino_libs.push_back("gmml/dat/lib/GLYCAM_aminont_06h.lib")
-#temp.ExtractRemovedHydrogens("gmml/example/pdb/1Z7E-Mod.pdb, amino_libs, glycam_libs, other_libs)
+#temp.ExtractRemovedHydrogens("gmml/example/pdb/1Z7E-Mod.pdb, amino_libs, glycam_libs, other_libs, prep)
 
 
 residue_info = temp.GetResidueInfoMap()
 for x in residue_info:
 	residue_info[x].Print()
 
-print 'Model charge is: ' ,temp.CalculateModelCharge(pdbfile, amino_libs, glycam_libs, other_libs)
+print 'Model charge is: ' ,temp.CalculateModelCharge(pdbfile, amino_libs, glycam_libs, other_libs, prep)
 
 pdbfile.Write('residueinfo-update.pdb')
 
