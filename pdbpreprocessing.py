@@ -46,6 +46,10 @@ temp.Preprocess(pdbfile, amino_libs, glycam_libs, other_libs, prep)
 ###THE DEFAULT MODEL IS THE FIRST ONE, IN ORDER TO CHANGE IT GIVE ANOTHER MODEL NUMBER AS THE 5th ARGUMENT TO THE FOLLOWING FUNCTION i.e. temp.ApplyPreprocessingWithTheGivenModelNumber(pdbfile, amino_libs, glycam_libs, prep, 2)
 temp.ApplyPreprocessingWithTheGivenModelNumber(pdbfile, amino_libs, glycam_libs, prep)
 temp.Print()
+seq_map = pdbfile.GetSequenceNumberMapping()
+print seq_map.size()
+for x in seq_map:
+	print x, seq_map[x]
 ###THE DEFAULT MODEL IS THE FIRST ONE, IN ORDER TO CHANGE IT GIVE ANOTHER MODEL NUMBER AS THE 2ND ARGUMENT TO THE FOLLOWING FUNCTION i.e. pdbfile.WriteWithTheGivenModelNumber('updated_pdb.txt', 2). THE GIVEN NUMBER SHOULD MATCH THE PREVIOUS MODEL NUMBER WHICH HAS BEEN GIVEN TO THE ApplyPreprocessingWithTheGivenModelNumber FUNCTION.
 pdbfile.WriteWithTheGivenModelNumber('updated_pdb.txt')
 
