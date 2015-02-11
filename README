@@ -35,7 +35,8 @@ Change to directory in which you want GEMS to exist
 	2. Change directory to gems
 		cd gems
 	3. Get GMML from git repo
-		git clone https://github.com/GLYCAM-Web/gmml.git
+		git clone https://github.com/GLYCAM-Web/gmml.git gmml
+		(you need the repo to be gmml rather than GMML as with the default clone)
 		
 ============================
 Compiling and Installing:
