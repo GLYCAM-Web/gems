@@ -1,38 +1,77 @@
+============================
 Prerequisites:
-Use root user in order to install the packages
-	1. Install openssl
-		apt-get install openssl
-	2. Install git
-		apt-get install git
-	3. Install Python
-		apt-get install python2.7
-	4. Install swig
-		apt-get install swig
-	5. Install essential packages
-		apt-get install build-essential
-	6. Install qmake
-		apt-get install qt4-qmake
-	7. Install qt4-dev-tools
-		apt-get install qt4-dev-tools
-	8. Install boost library
-		apt-get install libboost-all-dev
-		
-How to access to libraries and how to put them together:
-Switch to your user and change directory to an arbitrary one
+============================
+
+Installing some prerequisites will probably require root access.
+
+You need these packages to use GEMS:
+
+	* openssl 
+	* git 
+	* python 
+	* swig 
+	* kernel headers
+	* qmake
+	* qt4-dev-tools
+	* boost
+
+Installation instructions will vary according to system.  If you use
+ubuntu, you should be able to use a command like this:
+
+sudo apt-get install openssl git python2.7 swig build-essential qt4-qmake qt4-dev-tools libboost-all-dev 
+
+If you use another operating system, please check the installation instructions for it.
+
+============================
+Obtaining the software:
+============================
+
+The following does not require root access.
+
+Change to directory in which you want GEMS to exist
+
 	1. Get GEMS from git repo
-		git clone https://github.com/alirezakh/gems.git
+		git clone https://github.com/GLYCAM-Web/gems.git
 	2. Change directory to gems
 		cd gems
 	3. Get GMML from git repo
-		git clone https://github.com/alirezakh/gmml.git
+		git clone https://github.com/GLYCAM-Web/gmml.git
 		
-How to Install packages:
-	1. Change directory to gems
-		cd ..
+============================
+Compiling and Installing:
+============================
+
+	1. You should still be in the gems directory.
 	2. Run make.sh file in order to compile gmml and create gems interface
 		./make.sh
-		
-How to use the software:
-	1. Use one of the samples in gems directory to write your own python script
-		(In order to run the sample files use the line following the #SAMPLE COMMAND section, if there is no such section simply write the name of the file after the python command)
-	2. Run the written python script
+
+============================
+Testing the Installation:
+============================
+
+Testing the installation requires BASH.  This is already installed on most 
+systems.  If the command "which bash" returns no information, contact your
+system administrator.
+
+	1. Run the following command:
+		./test_installation.bash
+	2. See the output.
+
+============================
+Example Use:
+============================
+
+Make sure you are still in the gems directory where you typed make and tested
+the installation.
+
+	1. Try the command that was used for the test:
+
+python2.7 pdbpreprocessing.py -amino_libs "gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/amino12.lib","gmml/dat/CurrentParams/leaprc.ff12SB_2014-0
+4-24/aminont12.lib","gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminoct12.lib" -prep "gmml/dat/CurrentParams/leaprc_GLYCAM_06j-1_2014-03-14/GLY
+CAM_06j-1.prep" -pdb "gmml/example/pdb/Small_to_test.pdb" > testing.log 2> testing.error
+
+	2. Try similar sample commands at the tops of files named *.py.  They will
+		be in the comments near the top of the file and will come just after
+		a line that says "#SAMPLE COMMAND :".
+
+
