@@ -417,6 +417,9 @@ std::ostream & get_cout() { return std::cout; }
 //typedef std::vector<Atom*> AtomVector;
 %template(atom_vector) std::vector<MolecularModeling::Atom* >;  
 
+//typedef std::vector<AtomVector > AtomVectorVector;
+%template(atom_vector_vector) std::vector<std::vector<MolecularModeling::Atom* > >;
+
 
 ///Topology File///
 //typedef std::map<std::string, TopologyResidue*> TopologyResidueMap;
@@ -454,8 +457,6 @@ std::ostream & get_cout() { return std::cout; }
 //typedef std::map<int, TopologyDihedralType*> TopologyDihedralTypeMap;
 %template() std::pair<int, TopologyFileSpace::TopologyDihedralType*>;
 %template(dihedral_type_map_Topology_file) std::map<int, TopologyFileSpace::TopologyDihedralType*>;
-
-
 
 
 
