@@ -1,9 +1,6 @@
 cd gmml
 make clean
 make distclean
-rm -rf gmml.pro*
-qmake -project -t lib
-qmake -o
 make 
 cd ..
 swig -c++ -python gmml.i
