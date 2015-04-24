@@ -4,8 +4,8 @@ import gmml
 import sys
 
 temp = gmml.PdbPreprocessor()
-
-pdbfile = gmml.PdbFile("gmml/example/pdb/1RVZ_New.pdb")
+st = gmml.PdbFile()
+pdbfile = st.LoadPdbFile("gmml/example/pdb/1RVZ_New.pdb")
 #pdbfile = gmml.PdbFile(sys.argv[1])
 
 temp.ExtractHISResidues(pdbfile)
