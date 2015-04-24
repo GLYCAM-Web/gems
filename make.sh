@@ -1,4 +1,4 @@
-cd gmml
+cd GMML
 make clean
 #make distclean
 #rm -rf gmml.pro*
