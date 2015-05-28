@@ -1,7 +1,9 @@
 import gmml
 het = gmml.string_vector()
+het.push_back("../../Downloads/1.pdb")
 #het.push_back("../../Documents/PDB/4A2G.pdb")
-het.push_back("../../Documents/PDB/1G1Y.pdb")
+#het.push_back("../../Documents/PDB/1G1Y.pdb")
+#het.push_back("../../Documents/PDB/1RVZ.pdb")
 #het.push_back("../../Documents/PDB/3C43.pdb")
 #het.push_back("../../Documents/PDB/6CPP.pdb")
 #het.push_back("../../Documents/PDB/1DMT.pdb")
@@ -19,5 +21,5 @@ temp = gmml.Assembly(het, gmml.PDB)
 empty = gmml.string_vector()
 temp.BuildStructure(gmml.DISTANCE, empty, empty)
 
-temp.ExtractMonosaccharides()
+temp.ExtractSugars()
 
