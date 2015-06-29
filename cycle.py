@@ -1,6 +1,12 @@
 import gmml
 het = gmml.string_vector()
-het.push_back("../../Downloads/1.pdb")
+amino_libs = gmml.string_vector()
+amino_libs.push_back("gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/amino12.lib");
+
+#het.push_back("../../Downloads/DAldoHexaF/DGlcfb.pdb")
+#het.push_back("../../Downloads/glycam_gg_gg_gg_gg.pdb")
+#het.push_back("../../Downloads/1 (7).pdb")
+het.push_back("../../Downloads/1 (7).pdb")
 #het.push_back("../../Documents/PDB/4A2G.pdb")
 #het.push_back("../../Documents/PDB/1G1Y.pdb")
 #het.push_back("../../Documents/PDB/1RVZ.pdb")
@@ -21,5 +27,5 @@ temp = gmml.Assembly(het, gmml.PDB)
 empty = gmml.string_vector()
 temp.BuildStructure(gmml.DISTANCE, empty, empty)
 
-temp.ExtractSugars()
+temp.ExtractSugars(amino_libs)
 
