@@ -1,7 +1,19 @@
+###FOR FURTHER INSTRUCTIONS PLEASE REFER TO alternateresidues.py SAMPLE FILE
+#SAMPLE COMMAND :
+# python cycle.py -amino_libs ""gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/amino12.lib""
+
 import gmml
 het = gmml.string_vector()
 amino_libs = gmml.string_vector()
-amino_libs.push_back("gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/amino12.lib");
+
+i = 1
+if sys.argv[0] == '-amino_libs':  
+	for i, arg in enumerate(sys.argv):
+		arguments = sys.argv[i+1].split(',')
+		for argument in arguments:
+			amino_libs.push_back(argument)
+
+amino_libs.push_back(amino_libs);
 
 #het.push_back("../../Downloads/DAldoHexaF/DGlcfb.pdb")
 #het.push_back("../../Downloads/glycam_gg_gg_gg_gg.pdb")
