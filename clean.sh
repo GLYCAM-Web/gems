@@ -1,5 +1,5 @@
-#cd gmml
-#make clean
+cd gmml
+make clean
 #make distclean
 #rm -rf gmml.pro*
 cd ..
