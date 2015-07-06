@@ -1,6 +1,6 @@
 ###FOR FURTHER INSTRUCTIONS PLEASE REFER TO alternateresidues.py SAMPLE FILE
 #SAMPLE COMMAND :
-# python cycle.py -amino_libs "gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/amino12.lib" -pdb "../../Downloads/1.pdb"
+# python cycle.py -amino_libs "gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/amino12.lib" -pdb "../../Downloads/1.pdb" &> output_file_name
 
 
 import gmml
@@ -56,4 +56,5 @@ if pdb_file != '':
 	temp.BuildStructure(gmml.DISTANCE, empty, empty)
 
 	temp.ExtractSugars(amino_libs)
+
 
