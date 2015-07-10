@@ -146,7 +146,10 @@ outf.write(file_stuff.format(**file_stuff_context))
 
 #print outsplit
 
-# generate some structures for holding information
+###############################################
+##  Generate classes for holding information
+###############################################
+
 class AtomID(object):
     """Holds sufficent information to uniquely identify an atom."""
     def __init__(self,name="",serial="",resname="",chain="",resnum="",altloc="",inscode=""):
@@ -181,13 +184,13 @@ class LinkAtomInfo(object):
     def parselinkatomstring(self,linkatomstring):
         splitatomstring=re.split("[()]",linkatomstring)
         self.resname=splitatomstring[0]
-        Oi = splitatomstring[1].find("-")
+        Oi = splitatomstring[1].find("_")
         if Oi == -1:
-            #self.resnum=int(splitatomstring[1])
-            self.resnum=splitatomstring[1]
+            self.resnum=int(splitatomstring[1])
+            #self.resnum=splitatomstring[1]
         else :
-            #self.resnum=int(splitatomstring[1][:Oi])
-            self.resnum=splitatomstring[1][:Oi]
+            self.resnum=int(splitatomstring[1][:Oi])
+            #self.resnum=splitatomstring[1][:Oi]
             self.chain=splitatomstring[1][Oi+1]
         self.atomname=splitatomstring[2]
         return self
@@ -235,6 +238,10 @@ class Oligosaccharide(object):
     def setsize(self,numberoflinkages):
         self.sacchsize=numberoflinkages
         return self
+
+###############################################
+##  Parse the output from detect_sugars
+###############################################
 
 oligo = []
 saccharide = []
@@ -296,7 +303,9 @@ for i  in range(len(outsplit)):
             generalerrors.append(("Unknown formatting found: a line in 'Oligosaccharides' begins with '"+outsplit[i][0]+"'.  Forging ahead anyway."))
 
 
-
+###############################################
+##  Write the rest of the output file
+###############################################
 
 file_stuff="""
 ===========================================
@@ -304,9 +313,9 @@ file_stuff="""
 ===========================================
 
 This section contains the list of saccharide molecules that were found.  They 
-are given in glycam condensed notation.  For oligosaccharides, the identity 
-of the linking atoms are listed below, for each linkage.  For complete details
-about the saccharide residues in the molecules, see section 3.
+are given in glycam condensed notation.  For each linkage in an oligosaccharide, 
+the identity of the inter-residue linking atom is also given.  For complete 
+details about the saccharide residues in the molecules, see section 3.
 
 Linking atoms, where relevant, are identified by:
         Linkage Index
@@ -316,7 +325,6 @@ Linking atoms, where relevant, are identified by:
         Atom Name
 
 {nummol} saccharide molecule(s) were detected:
-
 """
 file_context={"nummol":len(oligo)}
 outf.write(file_stuff.format(**file_context))
@@ -327,11 +335,17 @@ for i in range(len(oligo)):
 sorted_oligo=sorted(oligo,key=lambda oligo: oligo.sacchsize) 
 for i in range(len(sorted_oligo)):
     outf.write("    "+sorted_oligo[i].oligosaccharidestring+"\n")
+    if len(sorted_oligo[i].linkages) !=0:
+        outf.write("        Linkage atom(s):\n")
     for j in range(len(sorted_oligo[i].linkages)):
-        outstuff="""        {linkID:3s}  {chainID:3s}  {ResName:4s}  {ResNum:4s}  {AtName:4s} \n"""
+        if len(sorted_oligo[i].linkages[j].glycosidicO.chain) == 0:
+            chainID="n/a"
+        else:
+            chainID=sorted_oligo[i].linkages[j].glycosidicO.chain
+        outstuff="""        {linkID:3s}  {chainID:4s}  {ResName:4s}  {ResNum:4d}  {AtName:4s} \n"""
         outcontext={
                 "linkID":sorted_oligo[i].linkages[j].linkID,
-                "chainID":sorted_oligo[i].linkages[j].glycosidicO.chain,
+                "chainID":chainID,
                 "ResName":sorted_oligo[i].linkages[j].glycosidicO.resname,
                 "ResNum":sorted_oligo[i].linkages[j].glycosidicO.resnum,
                 "AtName":sorted_oligo[i].linkages[j].glycosidicO.atomname
@@ -365,16 +379,32 @@ outf.write(file_stuff.format(**file_context))
 
 sorted_saccharides=sorted(saccharide,key=attrgetter('ringoxygen.chain','ringoxygen.serial'))
 for i in range(len(sorted_saccharides)):
+    if len(sorted_saccharides[i].completename) == 0:
+        glycanName="unknown"
+    else:
+        glycanName=sorted_saccharides[i].completename
+    if sorted_saccharides[i].ringoxygen.chain == "?":
+        Chain="n/a"
+    else:
+        Chain=sorted_saccharides[i].ringoxygen.chain
+    if sorted_saccharides[i].ringoxygen.altloc == "?":
+        AltLoc="n/a"
+    else:
+        AltLoc=sorted_saccharides[i].ringoxygen.altloc
+    if sorted_saccharides[i].ringoxygen.inscode == "?":
+        InsCode="n/a"
+    else:
+        InsCode=sorted_saccharides[i].ringoxygen.inscode
     outstuff="""{glycanName:30s} {Name:5s} {Serial:6d} {ResName:7s} {Chain:5s} {ResNum:6d} {InsCode:7s} {AltLoc:6s}\n"""
     outcontext={
-            "glycanName":sorted_saccharides[i].completename,
+            "glycanName":glycanName,
             "Name":sorted_saccharides[i].ringoxygen.name,
             "Serial":sorted_saccharides[i].ringoxygen.serial,
             "ResName":sorted_saccharides[i].ringoxygen.resname,
-            "Chain":sorted_saccharides[i].ringoxygen.chain,
+            "Chain":Chain,
             "ResNum":sorted_saccharides[i].ringoxygen.resnum,
-            "AltLoc":sorted_saccharides[i].ringoxygen.altloc,
-            "InsCode":sorted_saccharides[i].ringoxygen.inscode
+            "AltLoc":AltLoc,
+            "InsCode":InsCode
             }
     outf.write(outstuff.format(**outcontext))
 
