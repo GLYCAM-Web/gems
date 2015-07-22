@@ -24,7 +24,7 @@ TEST FAILURE:
 fi
 
 
-for i in pdbpreprocessing.py gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/amino12.lib gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminont12.lib gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminoct12.lib gmml/dat/CurrentParams/leaprc_GLYCAM_06j-1_2014-03-14/GLYCAM_06j-1.prep gmml/example/pdb/Small_to_test.pdb test_pdb.txt.save ; do 
+for i in test_installation.py gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/amino12.lib gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminont12.lib gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminoct12.lib gmml/dat/CurrentParams/leaprc_GLYCAM_06j-1_2014-03-14/GLYCAM_06j-1.prep gmml/example/pdb/Small_to_test.pdb test_pdb.txt.save ; do 
 	if [ ! -e "${i}" ] ; then
 		echo "
 
@@ -50,7 +50,7 @@ This test will compare these files:
 Beginning test.
 "
 
-python2.7 pdbpreprocessing.py -amino_libs "gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/amino12.lib","gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminont12.lib","gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminoct12.lib" -prep "gmml/dat/CurrentParams/leaprc_GLYCAM_06j-1_2014-03-14/GLYCAM_06j-1.prep" -pdb "gmml/example/pdb/Small_to_test.pdb" > testing.log 2> testing.error
+python2.7 test_installation.py -amino_libs "gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/amino12.lib","gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminont12.lib","gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminoct12.lib" -prep "gmml/dat/CurrentParams/leaprc_GLYCAM_06j-1_2014-03-14/GLYCAM_06j-1.prep" -pdb "gmml/example/pdb/Small_to_test.pdb" > testing.log 2> testing.error
 
 echo "
 
