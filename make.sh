@@ -39,7 +39,7 @@ fi
 PYTHON_FILE="$PYTHON_HOME/Python.h"
 if [ -f $PYTHON_FILE ]; then
 	if [ -f "gmml_wrap.cxx" ]; then
-		g++ -O2 -fPIC -c gmml_wrap.cxx -I"$PYTHON_HOME"
+		g++ -O3 -fPIC -c gmml_wrap.cxx -I"$PYTHON_HOME"
 	else
 		echo "gmml_wrap.cxx does not exist"
 	fi
