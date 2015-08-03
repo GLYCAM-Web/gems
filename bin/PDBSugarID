@@ -1,0 +1,430 @@
+#!/usr/bin/python2.7
+import sys
+import os
+import subprocess
+import re
+import hashlib
+import time
+from operator import itemgetter, attrgetter, methodcaller
+
+###############################################
+##  Check sanity 
+###############################################
+
+###  General stuff
+
+# Set the usage statement
+USAGE = """
+Usage:
+
+    PDBSugarID PDB_file.pdb Outfile [keep] [details_file_name]
+
+        where:
+
+            PDB_file.pdb is a properly formatted PDB file 
+                possibly containing carbohydrate residues.
+
+            Outfile is your preferred output file name.
+
+            keep is the literal word 'keep'.  It is optional.
+                If specified, the raw, verbose output from 
+                detect_sugars will be saved.  By default, it 
+                is not saved.  
+
+                If keep is used, but details_file_name is not
+                set, the filename is:
+
+                    Outfile_sugar-details
+
+                ... where Outfile is replaced with the
+                filename you specified on the command line.
+
+           details_file_name is the name of the file into which
+                you want the details to be saved.  This is 
+                optional.  See further info above, with keep.
+
+"""
+
+# check out the command line
+if len(sys.argv)<3:
+    print """
+
+Error:  Insufficient number of arguments.
+
+"""
+    print USAGE
+    sys.exit(1)
+
+###  Make sure the gems/gmml environment is set
+
+# check out the environment
+GemsPath = os.environ.get('GEMSHOME')
+if GemsPath == None:
+    print """
+
+Must set GEMSHOME environment variable
+
+    BASH:  export GEMSHOME=/path/to/gems
+    SH:    setenv GEMSHOME /path/to/gems
+
+"""
+    sys.exit(1)
+
+# import gems/gmml stuff
+sys.path.append(GemsPath)
+import gmml
+
+
+###############################################
+##  Initialize stuff and run program to wrap
+###############################################
+
+### Set up and run detect_sugars and store the output
+
+basecommand = GemsPath+"/bin/detect_sugars "
+if len(sys.argv)>=4 :
+    if sys.argv[3] != "keep" :
+        print """
+
+Error:  The fourth argument must be 'keep' or it must be omitted.
+
+"""
+        print USAGE 
+        sys.exit(1)
+    if len(sys.argv)>5 :
+        print """
+
+Error:  Too many arguments on the command line.
+
+"""
+        print USAGE 
+        sys.exit(1)
+    if len(sys.argv)==5 :
+        command=basecommand + sys.argv[1] + " | tee " + sys.argv[4] 
+    else :
+        command=basecommand + sys.argv[1] + " | tee " + sys.argv[2] + "_sugar-details"
+else :
+    command=basecommand + sys.argv[1] 
+#print " the command is >>>" + command + "<<<"
+  
+p = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
+(output, err) = p.communicate()
+outsplit=output.splitlines()
+#print outsplit
+
+## The output file
+outf=open(sys.argv[2],'w')
+thecommand=""
+for i in range(len(sys.argv)):
+    thecommand=thecommand+" "+sys.argv[i]
+
+md5_for_file=hashlib.md5(open(sys.argv[1]).read()).hexdigest()
+thedate=(time.strftime("%Y-%m-%d %H:%M:%S"))
+file_stuff="""File written by GEMS/GMML PDB glycan detection package.
+
+Contents:
+    1.  Analysis parameters
+    2.  Saccharide molecules detected
+    3.  Saccharide residues detected
+    4.  Error and warning messages
+
+===========================================
+1.  Analysis parameters
+===========================================
+
+Analysis completed on: {thedate}
+The command line was: {thecommand}
+The md5sum for the analyzed file was: {md5_for_file}
+
+"""
+file_stuff_context = {
+        "thedate":thedate,
+        "thecommand":thecommand,
+        "md5_for_file":md5_for_file
+        }
+outf.write(file_stuff.format(**file_stuff_context))
+
+#print outsplit
+
+###############################################
+##  Generate classes for holding information
+###############################################
+
+class AtomID(object):
+    """Holds sufficent information to uniquely identify an atom."""
+    def __init__(self,name="",serial="",resname="",chain="",resnum="",altloc="",inscode=""):
+        self.name=name
+        self.serial=serial
+        self.resname=resname
+        self.chain=chain
+        self.resnum=resnum
+        self.altloc=altloc
+        self.inscode=inscode
+    def parseatomstring(self,atomstring):
+        splitatomstring=atomstring.split("_")
+        if (len(splitatomstring)<7):
+            print("Problem parsing the atom string >>>"+atomstring+"<<< -- the length is less than 7")
+        self.name=splitatomstring[0]
+        self.serial=int(splitatomstring[1])
+        self.resname=splitatomstring[2]
+        self.chain=splitatomstring[3]
+        self.resnum=int(splitatomstring[4])
+        self.altloc=splitatomstring[5]
+        self.inscode=splitatomstring[6]
+        return self
+
+class LinkAtomInfo(object):
+    """Contains information about atoms involved in linkages."""
+    def __init__(self,role="",resname="",resnum="",chain="",atomname=""):
+        self.role=role
+        self.resname=resname
+        self.resnum=resnum
+        self.chain=chain
+        self.atomname=atomname
+    def parselinkatomstring(self,linkatomstring):
+        splitatomstring=re.split("[()]",linkatomstring)
+        self.resname=splitatomstring[0]
+        Oi = splitatomstring[1].find("_")
+        if Oi == -1:
+            self.resnum=int(splitatomstring[1])
+            #self.resnum=splitatomstring[1]
+        else :
+            self.resnum=int(splitatomstring[1][:Oi])
+            #self.resnum=splitatomstring[1][:Oi]
+            self.chain=splitatomstring[1][Oi+1]
+        self.atomname=splitatomstring[2]
+        return self
+
+class GlycosidicLinkage(object):
+    """Information regarding the atoms immediately relevant to a glycosidic linkage."""
+    def __init__(self,linkID="",reducingC="",nonreducingC="",glycosidicO=""):
+        self.linkID=linkID
+        self.reducingC=LinkAtomInfo(self)
+        self.nonreducingC=LinkAtomInfo(self)
+        self.glycosidicO=LinkAtomInfo(self)
+    def parselinkstring(self,linkstring):
+        splitlinkstring=re.split("[{}\-, ]",linkstring)
+        self.linkID=splitlinkstring[1]
+        self.reducingC=LinkAtomInfo.parselinkatomstring(self.reducingC,splitlinkstring[2])
+        self.nonreducingC=LinkAtomInfo.parselinkatomstring(self.nonreducingC,splitlinkstring[3])
+        self.glycosidicO=LinkAtomInfo.parselinkatomstring(self.glycosidicO,splitlinkstring[7])
+        #for li in range(len(splitlinkstring)):
+            #print "entry ",li," is >>>"+splitlinkstring[li]
+        #exit(0)
+        return self
+
+class SaccharideResidue(object):
+    """Contains information about saccharide residues."""
+    def __init__(self,completename="",stereochemistryname=""):
+        self.anomericcarbon = AtomID(self)
+        self.ringoxygen = AtomID(self)
+        self.completename=completename
+        self.stereochemistryname=stereochemistryname
+    def setanomericcarbon(self, anomericstring):
+        if len(anomericstring) != 0:
+            self.anomericcarbon=self.anomericcarbon.parseatomstring(anomericstring)
+        return self
+    def setringoxygen(self, oxygenstring):
+        if  len(oxygenstring) !=0:
+            self.ringoxygen=self.ringoxygen.parseatomstring(oxygenstring)
+        return self
+
+class Oligosaccharide(object):
+    """Information about the reported oligosaccharides."""
+    def __init__(self,oligosaccharidestring="",sacchsize=""):
+        self.oligosaccharidestring=oligosaccharidestring
+        self.sacchsize=sacchsize
+        self.linkages=[]
+    def setsize(self,numberoflinkages):
+        self.sacchsize=numberoflinkages
+        return self
+
+###############################################
+##  Parse the output from detect_sugars
+###############################################
+
+oligo = []
+saccharide = []
+generalerrors = []
+
+State="new"
+for i  in range(len(outsplit)):
+    #print "This split bit is: >>>"+outsplit[i]+"<<<"
+    if outsplit[i] == "Detailed information of sorted cycles after discarding fused or oxygenless rings: ":
+        State="residues"
+        continue
+    if State == "residues":
+        testtxt="Ring atoms"
+        if outsplit[i][:len(testtxt)] == testtxt: 
+            Oi=outsplit[i].rfind("-")
+            if ( Oi == len(outsplit[i])-1 ):
+                    Oi=outsplit[i].rfind("-",0,len(outsplit[i])-2)
+            if ( Oi == -1 ) | ( len(outsplit[i][Oi+1:]) == 0 ) :
+                generalerrors.append(("The Ring atoms line below appears not to contain a ring of atoms.\n\t>>"+outsplit[i]+"<<"))
+                generalerrors.append( "\tForging on anyway, though that might be a bad idea.")
+            saccharide.append(SaccharideResidue())
+            saccharide[-1].setringoxygen(outsplit[i][Oi+1:])
+        testtxt="Anomeric carbon"
+        if outsplit[i][:len(testtxt)] == testtxt: 
+            Oi=outsplit[i].rfind(":")
+            if ( Oi == -1 ) | ( len(outsplit[i][Oi+2:]) == 0 ) :
+                generalerrors.append(("The anomeric carbon cannot be determined in line number ",i,":\n\t>>"+outsplit[i]+"<<"))
+            else :
+                saccharide[-1].setanomericcarbon(outsplit[i][Oi+2:])
+        testtxt="Stereochemistry name"
+        if outsplit[i][:len(testtxt)] == testtxt:
+            Oi=outsplit[i].rfind(":")
+            if ( Oi == -1 ) | ( len(outsplit[i][Oi+2:]) == 0 ) :
+                generalerrors.append(("The stereochemistry name cannot be determined in line number ",i,":\n\t>>"+outsplit[i]+"<<"))
+                saccharide[-1].stereochemistryname="Unknown"
+            else :
+                saccharide[-1].stereochemistryname=outsplit[i][Oi+2:]
+        testtxt="Complete name"
+        if outsplit[i][:len(testtxt)] == testtxt:
+            Oi=outsplit[i].rfind(":")
+            if ( Oi == -1 ) | ( len(outsplit[i][Oi+2:]) == 0 ) :
+                generalerrors.append(("The complete name cannot be determined in line number ",i,":\n\t>>"+outsplit[i]+"<<"))
+                saccharide[-1].completename="Unknown"
+            else :
+                saccharide[-1].completename=outsplit[i][Oi+2:]
+        testtxt="Oligosaccharides:"
+        if outsplit[i][:len(testtxt)] == testtxt:
+            State="oligosaccharides"
+            continue
+    if State=="oligosaccharides":
+        if (len(outsplit[i]) == 0 ):
+            continue
+        if (outsplit[i][0] != "{" ):
+            oligo.append(Oligosaccharide(oligosaccharidestring=outsplit[i]))
+        elif  outsplit[i][0] == "{":
+            oligo[-1].linkages.append(GlycosidicLinkage())
+            oligo[-1].linkages[-1].parselinkstring(outsplit[i])
+        else :
+            generalerrors.append(("Unknown formatting found: a line in 'Oligosaccharides' begins with '"+outsplit[i][0]+"'.  Forging ahead anyway."))
+
+
+###############################################
+##  Write the rest of the output file
+###############################################
+
+file_stuff="""
+===========================================
+2.  Saccharide molecules detected
+===========================================
+
+This section contains the list of saccharide molecules that were found.  They 
+are given in glycam condensed notation.  For each linkage in an oligosaccharide, 
+the identity of the inter-residue linking atom is also given.  For complete 
+details about the saccharide residues in the molecules, see section 3.
+
+Linking atoms, where relevant, are identified by:
+        Linkage Index
+        Chain ID
+        Residue Name
+        Residue Number
+        Atom Name
+
+{nummol} saccharide molecule(s) were detected:
+"""
+file_context={"nummol":len(oligo)}
+outf.write(file_stuff.format(**file_context))
+
+for i in range(len(oligo)):
+    oligo[i].setsize(len(oligo[i].linkages))
+
+sorted_oligo=sorted(oligo,key=lambda oligo: oligo.sacchsize) 
+for i in range(len(sorted_oligo)):
+    outf.write("    "+sorted_oligo[i].oligosaccharidestring+"\n")
+    if len(sorted_oligo[i].linkages) !=0:
+        outf.write("        Linkage atom(s):\n")
+    for j in range(len(sorted_oligo[i].linkages)):
+        if len(sorted_oligo[i].linkages[j].glycosidicO.chain) == 0:
+            chainID="n/a"
+        else:
+            chainID=sorted_oligo[i].linkages[j].glycosidicO.chain
+        outstuff="""        {linkID:3s}  {chainID:4s}  {ResName:4s}  {ResNum:4d}  {AtName:4s} \n"""
+        outcontext={
+                "linkID":sorted_oligo[i].linkages[j].linkID,
+                "chainID":chainID,
+                "ResName":sorted_oligo[i].linkages[j].glycosidicO.resname,
+                "ResNum":sorted_oligo[i].linkages[j].glycosidicO.resnum,
+                "AtName":sorted_oligo[i].linkages[j].glycosidicO.atomname
+                }
+        outf.write(outstuff.format(**outcontext))
+
+file_stuff="""
+===========================================
+3.  Saccharide residues detected
+===========================================
+
+The following is a list of all saccharide residues found in the file.  Most of
+them will also be contained in the list of oligosaccharides above.
+
+The identity of the ring oxygen for each residue is also given.
+Ring oxygens are identified by:
+        Atom Name
+        Serial
+        Residue Name
+        Chain ID
+        Residue Serial
+        Alternate Location
+        Insertion Code
+
+{numsacch} saccharide residue(s) were detected:
+
+Residue Identity               Name  Serial ResName Chain ResSer InsCode AltLoc
+"""
+file_context={"numsacch":len(saccharide)}
+outf.write(file_stuff.format(**file_context))
+
+sorted_saccharides=sorted(saccharide,key=attrgetter('ringoxygen.chain','ringoxygen.serial'))
+for i in range(len(sorted_saccharides)):
+    if len(sorted_saccharides[i].completename) == 0:
+        glycanName="unknown"
+    else:
+        glycanName=sorted_saccharides[i].completename
+    if sorted_saccharides[i].ringoxygen.chain == "?":
+        Chain="n/a"
+    else:
+        Chain=sorted_saccharides[i].ringoxygen.chain
+    if sorted_saccharides[i].ringoxygen.altloc == "?":
+        AltLoc="n/a"
+    else:
+        AltLoc=sorted_saccharides[i].ringoxygen.altloc
+    if sorted_saccharides[i].ringoxygen.inscode == "?":
+        InsCode="n/a"
+    else:
+        InsCode=sorted_saccharides[i].ringoxygen.inscode
+    outstuff="""{glycanName:30s} {Name:5s} {Serial:6d} {ResName:7s} {Chain:5s} {ResNum:6d} {InsCode:7s} {AltLoc:6s}\n"""
+    outcontext={
+            "glycanName":glycanName,
+            "Name":sorted_saccharides[i].ringoxygen.name,
+            "Serial":sorted_saccharides[i].ringoxygen.serial,
+            "ResName":sorted_saccharides[i].ringoxygen.resname,
+            "Chain":Chain,
+            "ResNum":sorted_saccharides[i].ringoxygen.resnum,
+            "AltLoc":AltLoc,
+            "InsCode":InsCode
+            }
+    outf.write(outstuff.format(**outcontext))
+
+
+file_stuff="""
+===========================================
+4.  Error and warning messages
+===========================================
+
+"""
+outf.write(file_stuff)
+if len(generalerrors) == 0:
+    outf.write("No errors or warning messages were issued.")
+else :
+    for i in range(len(generalerrors)):
+        outstuff="""{index}. {error}\n"""
+        outcontext={
+                "index":i+1,
+                "error":generalerrors[i]
+                }
+        outf.write(outstuff.format(**outcontext))
+
+
