@@ -22,19 +22,19 @@ alternate_residues_map = temp.GetAlternateResidueMap()
 
 ###IF YOU WANT TO SEE THE RESULT IN THE TERMINAL USE THE FOLLOWING FOR LOOP OTHERWISE IGNORE AND COMMENT THE LOOP
 for x in alternate_residues_map:
-        alternate_residues_map[x].Print()
+	alternate_residues_map[x].Print()
 
 ###UPDATING ALTERNATE RESIDUES###
 ###GETTING THE OBJECT OF FIRST RESIDUE WITH ALTERNATE LOCATIONS (KEY OF THE alternate_residues_map IS THE COMBINATION OF "residuename_chainId_sequenceNumber_insertionCode")
-selected_alt_residue = alternate_residues_map['LEU_F_657_ '].GetSelectedAlternateLocation()
+selected_alt_residue = alternate_residues_map['LEU_F_657_?'].GetSelectedAlternateLocation()
 ###CHANGING THE ALTERNATE RESIDUE FROM A TO B
 selected_alt_residue[0] = 0
 selected_alt_residue[1] = 1
 ###APPLY THE CHANGES TO THE FIRST ALTERNATE RESIDUE OBJECT
-alternate_residues_map['LEU_F_657_ '].SetSelectedAlternateLocation(selected_alt_residue)
+alternate_residues_map['LEU_F_657_?'].SetSelectedAlternateLocation(selected_alt_residue)
 ###PRINT TO SEE THE CHANGES YOU HAVE MADE
 print "The updated alternate residue locations:"
-alternate_residues_map['LEU_F_657_ '].Print()
+alternate_residues_map['LEU_F_657_?'].Print()
 
 ###REMOVING THE UNSELECTED ALTERNATE RESIDUES FROM THE PDB OBJECT
 temp.RemoveUnselectedAlternateResidues(pdbfile, alternate_residues_map)

@@ -5,6 +5,7 @@
 
 import gmml
 import sys
+import time
 het = gmml.string_vector()
 amino_libs = gmml.string_vector()
 pdb_file = ''
@@ -53,8 +54,12 @@ if pdb_file != '':
 	het.push_back(pdb_file)
 	temp = gmml.Assembly(het, gmml.PDB)
 	empty = gmml.string_vector()
+	start = time.time()
 	temp.BuildStructure(gmml.DISTANCE, empty, empty)
+	#temp.Print()
+	end = time.time()
+	print end - start
 
-	temp.ExtractSugars(amino_libs)
+	#temp.ExtractSugars(amino_libs)
 
 
