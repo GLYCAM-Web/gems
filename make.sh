@@ -46,9 +46,8 @@ if [ -f $PYTHON_FILE ]; then
 else
 	echo "PYTHON_HOME variable has not been set"
 fi
-if [ -f "_gmml.so" ]; then
+if [ -f "gmml_wrap.o" ]; then
 	g++ -shared gmml/*.o gmml_wrap.o -o _gmml.so
 else
 	echo "gmml has not been compiled correctly"
 fi
-
