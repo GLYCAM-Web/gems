@@ -80,6 +80,19 @@
 #include "gmml/includes/FileSet/PdbFileSpace/pdbtitlecard.hpp"
 #include "gmml/includes/FileSet/PdbFileSpace/pdbresidue.hpp"
 
+#include "gmml/includes/FileSet/PdbqtFileSpace/pdbqtatom.hpp"
+#include "gmml/includes/FileSet/PdbqtFileSpace/pdbqtatomcard.hpp"
+#include "gmml/includes/FileSet/PdbqtFileSpace/pdbqtbranchcard.hpp"
+#include "gmml/includes/FileSet/PdbqtFileSpace/pdbqtcompoundcard.hpp"
+#include "gmml/includes/FileSet/PdbqtFileSpace/pdbqtfile.hpp"
+#include "gmml/includes/FileSet/PdbqtFileSpace/pdbqtfileprocessingexception.hpp"
+#include "gmml/includes/FileSet/PdbqtFileSpace/pdbqtmodel.hpp"
+#include "gmml/includes/FileSet/PdbqtFileSpace/pdbqtmodelcard.hpp"
+#include "gmml/includes/FileSet/PdbqtFileSpace/pdbqtmodelresidueset.hpp"
+#include "gmml/includes/FileSet/PdbqtFileSpace/pdbqtremarkcard.hpp"
+#include "gmml/includes/FileSet/PdbqtFileSpace/pdbqtrootcard.hpp"
+#include "gmml/includes/FileSet/PdbqtFileSpace/pdbqttorsionaldofcard.hpp"
+
 #include "gmml/includes/Resolver/PdbPreprocessor/pdbpreprocessor.hpp"
 #include "gmml/includes/Resolver/PdbPreprocessor/pdbpreprocessorchaintermination.hpp"
 #include "gmml/includes/Resolver/PdbPreprocessor/pdbpreprocessordisulfidebond.hpp"
@@ -116,6 +129,7 @@
 #include "gmml/includes/FileSet/TopologyFileSpace/topologyfile.hpp"
 #include "gmml/includes/FileSet/TopologyFileSpace/topologyresidue.hpp"
 #include "gmml/includes/FileSet/TopologyFileSpace/topologyfileprocessingexception.hpp"
+
 %}
 
 %inline %{
@@ -195,6 +209,19 @@ std::ostream & get_cout() { return std::cout; }
 %include "gmml/includes/FileSet/PdbFileSpace/pdbtitlecard.hpp"
 %include "gmml/includes/FileSet/PdbFileSpace/pdbresidue.hpp"
 
+%include "gmml/includes/FileSet/PdbqtFileSpace/pdbqtatom.hpp"
+%include "gmml/includes/FileSet/PdbqtFileSpace/pdbqtatomcard.hpp"
+%include "gmml/includes/FileSet/PdbqtFileSpace/pdbqtbranchcard.hpp"
+%include "gmml/includes/FileSet/PdbqtFileSpace/pdbqtcompoundcard.hpp"
+%include "gmml/includes/FileSet/PdbqtFileSpace/pdbqtfile.hpp"
+%include "gmml/includes/FileSet/PdbqtFileSpace/pdbqtfileprocessingexception.hpp"
+%include "gmml/includes/FileSet/PdbqtFileSpace/pdbqtmodel.hpp"
+%include "gmml/includes/FileSet/PdbqtFileSpace/pdbqtmodelcard.hpp"
+%include "gmml/includes/FileSet/PdbqtFileSpace/pdbqtmodelresidueset.hpp"
+%include "gmml/includes/FileSet/PdbqtFileSpace/pdbqtremarkcard.hpp"
+%include "gmml/includes/FileSet/PdbqtFileSpace/pdbqtrootcard.hpp"
+%include "gmml/includes/FileSet/PdbqtFileSpace/pdbqttorsionaldofcard.hpp"
+
 %include "gmml/includes/Resolver/PdbPreprocessor/pdbpreprocessor.hpp"
 %include "gmml/includes/Resolver/PdbPreprocessor/pdbpreprocessorchaintermination.hpp"
 %include "gmml/includes/Resolver/PdbPreprocessor/pdbpreprocessordisulfidebond.hpp"
@@ -231,7 +258,6 @@ std::ostream & get_cout() { return std::cout; }
 %include "gmml/includes/FileSet/TopologyFileSpace/topologyfile.hpp"
 %include "gmml/includes/FileSet/TopologyFileSpace/topologyresidue.hpp"
 %include "gmml/includes/FileSet/TopologyFileSpace/topologyfileprocessingexception.hpp"
-
 
 %template(string_vector) std::vector<std::string>;
 %template(int_vector) std::vector<int>;
@@ -471,3 +497,27 @@ std::ostream & get_cout() { return std::cout; }
 //typedef std::map<std::string, PdbAtomVector* > PdbResidueAtomsMap;
 %template() std::pair<std::string, PdbFileSpace::PdbFile::PdbAtomVector* >;
 %template(pdb_residue_atom_map) std::map<std::string, PdbFileSpace::PdbFile::PdbAtomVector* >;
+
+//typedef std::vector<PdbqtAtom*> PdbqtAtomVector;
+%template(pdbqt_atom_vector) std::vector<PdbqtFileSpace::PdbqtAtom*>;
+
+//typedef std::map<std::string, PdbqtAtomVector* > PdbqtResidueAtomsMap;
+%template() std::pair<std::string, PdbqtFileSpace::PdbqtFile::PdbqtAtomVector*>;
+%template(pdbqt_residue_atom_map) std::map<std::string, PdbqtFileSpace::PdbqtFile::PdbqtAtomVector*>;
+
+//typedef std::map<int, PdbqtModel*> PdbqtModelMap;
+%template() std::pair<int, PdbqtFileSpace::PdbqtModel*>;
+%template(pdbqt_model_map) std::map<int, PdbqtFileSpace::PdbqtModel*>;
+
+//typedef std::vector<PdbqtRemarkCard*> RemarkCardVector;
+%template(pdbqt_remark_card_vector) std::vector<PdbqtFileSpace::PdbqtRemarkCard*>;
+
+//typedef std::vector<PdbqtTorsionalDoFCard*> TorsionalDoFCardVector;
+%template(torsional_dof_card_vector) std::vector<PdbqtFileSpace::PdbqtTorsionalDoFCard*>;
+
+//typedef std::map<int, PdbqtAtom*> PdbqtAtomMap;
+%template() std::pair<int, PdbqtFileSpace::PdbqtAtom* >;
+%template(pdbqt_atom_map) std::map<int, PdbqtFileSpace::PdbqtAtom* >;
+
+//typedef std::vector<PdbqtBranchCard*> BranchCardVector;
+%template(pdbqt_branch_card_vector) std::vector<PdbqtFileSpace::PdbqtBranchCard*>;
