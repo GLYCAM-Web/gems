@@ -58,6 +58,7 @@ if pdb_file != '':
 	temp.BuildStructure(gmml.DISTANCE, empty, empty)
 	end = time.time()
 	print end - start
-#	temp.ExtractSugars(amino_libs)
+	temp.ExtractSugars(amino_libs)
+	temp.Print()
 
 
