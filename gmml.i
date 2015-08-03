@@ -465,12 +465,9 @@ std::ostream & get_cout() { return std::cout; }
 %template() std::pair<int, TopologyFileSpace::TopologyDihedralType*>;
 %template(dihedral_type_map_Topology_file) std::map<int, TopologyFileSpace::TopologyDihedralType*>;
 
+//typedef std::vector<PdbAtom*> PdbAtomVector;
+%template(pdb_atom_vector) std::vector<PdbFileSpace::PdbAtom*>;
 
-
-
-
-
-
-
-
-
+//typedef std::map<std::string, PdbAtomVector* > PdbResidueAtomsMap;
+%template() std::pair<std::string, PdbFileSpace::PdbFile::PdbAtomVector* >;
+%template(pdb_residue_atom_map) std::map<std::string, PdbFileSpace::PdbFile::PdbAtomVector* >;
