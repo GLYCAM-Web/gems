@@ -5,9 +5,9 @@
 
 ###IMPORTING THE GMML LIBRARY
 
-import gmml
 import sys
-
+sys.path.insert(0, '../')
+import gmml
 
 temp = gmml.PdbPreprocessor()
 amino_libs = gmml.string_vector()

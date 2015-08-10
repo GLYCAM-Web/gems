@@ -2,8 +2,9 @@
 # python alternateresidues.py gmml/example/pdb/1Z7E-Mod.pdb
 
 ###IMPORTING THE GMML LIBRARY
-import gmml
 import sys
+sys.path.insert(0, '../')
+import gmml
 
 ###BUILDING AN OBJECT OF THE PDB PREPROCESSOR AND STORING IT IN "temp" VARIABLE TO WORK WITH
 temp = gmml.PdbPreprocessor()
@@ -27,10 +28,11 @@ for x in alternate_residues_map:
 
 ###UPDATING ALTERNATE RESIDUES###
 ###GETTING THE OBJECT OF FIRST RESIDUE WITH ALTERNATE LOCATIONS (KEY OF THE alternate_residues_map IS THE COMBINATION OF "residuename_chainId_sequenceNumber_insertionCode")
-selected_alt_residue = alternate_residues_map['LEU_F_657_?_?'].GetSelectedAlternateLocation()
+selected_alt_residue = alternate_residues_map['LEU_F_657_?'].GetSelectedAlternateLocation()
 ###CHANGING THE ALTERNATE RESIDUE FROM A TO B
 selected_alt_residue[0] = 0
 selected_alt_residue[1] = 1
+
 ###APPLY THE CHANGES TO THE FIRST ALTERNATE RESIDUE OBJECT
 alternate_residues_map['LEU_F_657_?'].SetSelectedAlternateLocation(selected_alt_residue)
 ###PRINT TO SEE THE CHANGES YOU HAVE MADE

@@ -2,9 +2,9 @@
 #SAMPLE COMMAND :
 # python gapsinaminoacidchains.py -amino_libs "gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/amino12.lib","gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminont12.lib","gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminoct12.lib" -pdb "gmml/example/pdb/1Z7E.pdb"
 
-
-import gmml
 import sys
+sys.path.insert(0, '../')
+import gmml
 
 temp = gmml.PdbPreprocessor()
 amino_libs = gmml.string_vector()
