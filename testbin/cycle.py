@@ -3,8 +3,9 @@
 # python cycle.py -amino_libs "gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/amino12.lib" -pdb "../../Downloads/1.pdb" &> output_file_name
 
 
-import gmml
 import sys
+sys.path.insert(0, '../')
+import gmml
 import time
 het = gmml.string_vector()
 amino_libs = gmml.string_vector()

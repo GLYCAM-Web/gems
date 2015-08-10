@@ -4,8 +4,9 @@
 
 #If you need to add other libraries for glycam there is -glycam_libs option available for the command.
 
-import gmml
 import sys
+sys.path.insert(0, '../')
+import gmml
 
 temp = gmml.PdbPreprocessor()
 amino_libs = gmml.string_vector()

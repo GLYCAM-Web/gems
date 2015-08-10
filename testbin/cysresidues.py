@@ -1,5 +1,6 @@
 ###FOR FURTHER INSTRUCTIONS PLEASE REFER TO alternateresidues.py SAMPLE FILE
 
+sys.path.insert(0, '../')
 import gmml
 
 temp = gmml.PdbPreprocessor()
