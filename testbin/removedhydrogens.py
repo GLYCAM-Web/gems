@@ -1,11 +1,12 @@
 ###FOR FURTHER INSTRUCTIONS PLEASE REFER TO alternateresidues.py SAMPLE FILE
-###SAMPLE COMMAND :
-# python unknownheavyatoms.py -amino_libs "gmml/dat/lib/GLYCAM_amino_06h.lib","gmml/dat/lib/GLYCAM_aminoct_06h.lib","gmml/dat/lib/GLYCAM_aminont_06h.lib" -prep "gmml/dat/prep/Glycam_06.prep" -pdb "gmml/example/pdb/sucros.pdb"
+#SAMPLE COMMAND :
+# python removedhydrogens.py -amino_libs "gmml/dat/lib/GLYCAM_amino_06h.lib","gmml/dat/lib/GLYCAM_aminoct_06h.lib","gmml/dat/lib/GLYCAM_aminont_06h.lib" -prep "gmml/dat/prep/Glycam_06.prep" -pdb "gmml/example/pdb/1Z7E-Mod.pdb"
 
 #If you need to add other libraries for glycam and other residues there are -glycam_libs and -other_libs options available for the command.
 
-import gmml
 import sys
+sys.path.insert(0, '../')
+import gmml
 
 temp = gmml.PdbPreprocessor()
 amino_libs = gmml.string_vector()
@@ -81,22 +82,20 @@ else:
 
 pdbfile = gmml.PdbFile(pdb)
 
-temp.ExtractUnknownHeavyAtoms(pdbfile, amino_libs, glycam_libs, other_libs, prep)	
+temp.ExtractRemovedHydrogens(pdbfile, amino_libs, glycam_libs, other_libs, prep)	
 
 ###FOR GIVING THE FILES MANUALLY AND THROUGH THE COMMAND LINE USE THE FOLOWING SECTION
 #amino_libs.push_back("gmml/dat/lib/GLYCAM_amino_06h.lib")
 #amino_libs.push_back("gmml/dat/lib/GLYCAM_aminoct_06h.lib")
 #amino_libs.push_back("gmml/dat/lib/GLYCAM_aminont_06h.lib")
 #prep.push_back("gmml/dat/prep/Glycam_06.prep")
-#temp.ExtractUnknownHeavyAtoms("gmml/example/pdb/sucros.pdb", amino_libs, glycam_libs, other_libs, prep)
+#temp.ExtractRemovedHydrogens("gmml/example/pdb/1Z7E-Mod.pdb", amino_libs, glycam_libs, other_libs, prep)
 
-unrecognized_heavy_atoms = temp.GetUnrecognizedHeavyAtoms()
-for x in xrange(0, unrecognized_heavy_atoms.size()):
-        unrecognized_heavy_atoms[x].Print()
-
-
-temp.RemoveUnknownHeavyAtoms(pdbfile, unrecognized_heavy_atoms)
-
-pdbfile.Write('unknownheavyatoms-update.pdb')
+replaced_hydrogens = temp.GetReplacedHydrogens()
+for x in xrange(0, replaced_hydrogens.size()):
+        replaced_hydrogens[x].Print()
 
 
+temp.RemoveRemovedHydrogens(pdbfile, replaced_hydrogens)
+
+pdbfile.Write('removedhydrogens-update.pdb')

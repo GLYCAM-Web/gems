@@ -1,13 +1,12 @@
-###SAMPLE COMMAND 
-# python residueinfo.py -amino_libs "gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/amino12.lib","gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminont12.lib","gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminoct12.lib" -prep "gmml/dat/CurrentParams/leaprc_GLYCAM_06j-1_2014-03-14/GLYCAM_06j-1.prep" -pdb "gmml/example/pdb/1NXC.pdb"
+###FOR FURTHER INSTRUCTIONS PLEASE REFER TO alternateresidues.py SAMPLE FILE
+#SAMPLE COMMAND :
+# python unrecognizedresidues.py -amino_libs "gmml/dat/lib/GLYCAM_amino_06h.lib","gmml/dat/lib/GLYCAM_aminoct_06h.lib","gmml/dat/lib/GLYCAM_aminont_06h.lib" -prep "gmml/dat/prep/Glycam_06.prep" -pdb "gmml/example/pdb/1Z7E.pdb"
 
 #If you need to add other libraries for glycam and other residues there are -glycam_libs and -other_libs options available for the command.
 
-###IMPORTING THE GMML LIBRARY
-
-import gmml
 import sys
-
+sys.path.insert(0, '../')
+import gmml
 
 temp = gmml.PdbPreprocessor()
 amino_libs = gmml.string_vector()
@@ -82,22 +81,22 @@ else:
 			pdb = sys.argv[i+1]
 
 pdbfile = gmml.PdbFile(pdb)
-
-temp.ExtractResidueInfo(pdbfile, amino_libs, glycam_libs, other_libs, prep)
+temp.ExtractUnrecognizedResidues(pdbfile, amino_libs, glycam_libs, other_libs, prep)	
 
 
 ###FOR GIVING THE FILES MANUALLY AND THROUGH THE COMMAND LINE USE THE FOLOWIG SECTION
 #amino_libs.push_back("gmml/dat/lib/GLYCAM_amino_06h.lib")
 #amino_libs.push_back("gmml/dat/lib/GLYCAM_aminoct_06h.lib")
 #amino_libs.push_back("gmml/dat/lib/GLYCAM_aminont_06h.lib")
-#temp.ExtractRemovedHydrogens("gmml/example/pdb/1Z7E-Mod.pdb, amino_libs, glycam_libs, other_libs, prep)
+#prep.push_back("gmml/dat/prep/Glycam_06.prep")
+#temp.ExtractUnrecognizedResidues("gmml/example/pdb/1Z7E.pdb", amino_libs, glycam_libs, other_libs, prep)
 
 
-residue_info = temp.GetResidueInfoMap()
-for x in residue_info:
-	residue_info[x].Print()
+unrecognized_residues = temp.GetUnrecognizedResidues()
+for x in xrange(0, unrecognized_residues.size()):
+        unrecognized_residues[x].Print()
 
-print 'Model charge is: ' ,temp.CalculateModelCharge(pdbfile, amino_libs, glycam_libs, other_libs, prep)
 
-pdbfile.Write('residueinfo-update.pdb')
+temp.RemoveUnrecognizedResidues(pdbfile, unrecognized_residues)
+pdbfile.Write('unrecognizedresidue-update.pdb')
 

@@ -1,15 +1,17 @@
 ###FOR FURTHER INSTRUCTIONS PLEASE REFER TO alternateresidues.py SAMPLE FILE
-#SAMPLE COMMAND :
-# python aminoacidchains.py -amino_libs "gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/amino12.lib","gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminont12.lib","gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminoct12.lib" -prep "gmml/dat/CurrentParams/leaprc_GLYCAM_06j-1_2014-03-14/GLYCAM_06j-1.prep" -pdb "gmml/example/pdb/1Z7E.pdb"
+###SAMPLE COMMAND :
+# python unknownheavyatoms.py -amino_libs "gmml/dat/lib/GLYCAM_amino_06h.lib","gmml/dat/lib/GLYCAM_aminoct_06h.lib","gmml/dat/lib/GLYCAM_aminont_06h.lib" -prep "gmml/dat/prep/Glycam_06.prep" -pdb "gmml/example/pdb/sucros.pdb"
 
-#If you need to add other libraries for glycam there is -glycam_libs option available for the command.
+#If you need to add other libraries for glycam and other residues there are -glycam_libs and -other_libs options available for the command.
 
-import gmml
 import sys
+sys.path.insert(0, '../')
+import gmml
 
 temp = gmml.PdbPreprocessor()
 amino_libs = gmml.string_vector()
 glycam_libs = gmml.string_vector()
+other_libs = gmml.string_vector()
 prep = gmml.string_vector()
 
 if sys.argv[1] == '--help':  
@@ -80,21 +82,22 @@ else:
 
 pdbfile = gmml.PdbFile(pdb)
 
-temp.ExtractAminoAcidChains(pdbfile)
+temp.ExtractUnknownHeavyAtoms(pdbfile, amino_libs, glycam_libs, other_libs, prep)	
 
-chain_terminations = temp.GetChainTerminations()
+###FOR GIVING THE FILES MANUALLY AND THROUGH THE COMMAND LINE USE THE FOLOWING SECTION
+#amino_libs.push_back("gmml/dat/lib/GLYCAM_amino_06h.lib")
+#amino_libs.push_back("gmml/dat/lib/GLYCAM_aminoct_06h.lib")
+#amino_libs.push_back("gmml/dat/lib/GLYCAM_aminont_06h.lib")
+#prep.push_back("gmml/dat/prep/Glycam_06.prep")
+#temp.ExtractUnknownHeavyAtoms("gmml/example/pdb/sucros.pdb", amino_libs, glycam_libs, other_libs, prep)
 
-for x in xrange(0, chain_terminations.size()):
-        chain_terminations[x].Print()
+unrecognized_heavy_atoms = temp.GetUnrecognizedHeavyAtoms()
+for x in xrange(0, unrecognized_heavy_atoms.size()):
+        unrecognized_heavy_atoms[x].Print()
 
 
-###UPDATING AMINO ACID CHAINS###
-chain_terminations[0].SetSelectedNTermination(gmml.NH3)
-chain_terminations[0].SetSelectedCTermination(gmml.NHCH3)
-print "The Updated chain terminations:"
-for x in xrange(0, chain_terminations.size()):
-        chain_terminations[x].Print()
+temp.RemoveUnknownHeavyAtoms(pdbfile, unrecognized_heavy_atoms)
 
-temp.UpdateAminoAcidChains(pdbfile, amino_libs, glycam_libs, prep, chain_terminations)
+pdbfile.Write('unknownheavyatoms-update.pdb')
 
-pdbfile.Write('aminoacidchain-update.pdb')
+

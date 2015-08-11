@@ -1,11 +1,12 @@
 ###FOR FURTHER INSTRUCTIONS PLEASE REFER TO alternateresidues.py SAMPLE FILE
 
-import gmml
 import sys
+sys.path.insert(0, '../')
+import gmml
 
 temp = gmml.PdbPreprocessor()
-
-pdbfile = gmml.PdbFile("gmml/example/pdb/1RVZ_New.pdb")
+st = gmml.PdbFile()
+pdbfile = st.LoadPdbFile("gmml/example/pdb/1RVZ_New.pdb")
 #pdbfile = gmml.PdbFile(sys.argv[1])
 
 temp.ExtractHISResidues(pdbfile)

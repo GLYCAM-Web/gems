@@ -1,11 +1,12 @@
-###FOR FURTHER INSTRUCTIONS PLEASE REFER TO alternateresidues.py SAMPLE FILE
 #SAMPLE COMMAND :
-# python removedhydrogens.py -amino_libs "gmml/dat/lib/GLYCAM_amino_06h.lib","gmml/dat/lib/GLYCAM_aminoct_06h.lib","gmml/dat/lib/GLYCAM_aminont_06h.lib" -prep "gmml/dat/prep/Glycam_06.prep" -pdb "gmml/example/pdb/1Z7E-Mod.pdb"
+# python pdbpreprocessing.py -amino_libs "gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/amino12.lib","gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminont12.lib","gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminoct12.lib" -prep "gmml/dat/CurrentParams/leaprc_GLYCAM_06j-1_2014-03-14/GLYCAM_06j-1.prep" -pdb "gmml/example/pdb/1RVZ_New.pdb"
 
-#If you need to add other libraries for glycam and other residues there are -glycam_libs and -other_libs options available for the command.
+#If you need to add other libraries for glycam and other residues there are -glycam_libs and -other_libs options available for the command. 
 
-import gmml
 import sys
+sys.path.insert(0, '../')
+import gmml 
+
 
 temp = gmml.PdbPreprocessor()
 amino_libs = gmml.string_vector()
@@ -78,23 +79,30 @@ else:
 				prep.push_back(argument)
 		elif arg == '-pdb':
 			pdb = sys.argv[i+1]
-
+	
 pdbfile = gmml.PdbFile(pdb)
 
-temp.ExtractRemovedHydrogens(pdbfile, amino_libs, glycam_libs, other_libs, prep)	
+temp.Preprocess(pdbfile, amino_libs, glycam_libs, other_libs, prep)
 
-###FOR GIVING THE FILES MANUALLY AND THROUGH THE COMMAND LINE USE THE FOLOWING SECTION
-#amino_libs.push_back("gmml/dat/lib/GLYCAM_amino_06h.lib")
-#amino_libs.push_back("gmml/dat/lib/GLYCAM_aminoct_06h.lib")
-#amino_libs.push_back("gmml/dat/lib/GLYCAM_aminont_06h.lib")
-#prep.push_back("gmml/dat/prep/Glycam_06.prep")
-#temp.ExtractRemovedHydrogens("gmml/example/pdb/1Z7E-Mod.pdb", amino_libs, glycam_libs, other_libs, prep)
+###IN ORDER TO UPDATE EACH PARTS OF THE PDB FILE YOU CAN USE THE SAME CODE FROM ANY OF THE SAMPLE FILES, i.e. cysresidues.py
+###UPDATING CYS RESIDUES###
+#disulfide_bonds = temp.GetDisulfideBonds()
+#disulfide_bonds[0].SetIsBonded(False)
 
-replaced_hydrogens = temp.GetReplacedHydrogens()
-for x in xrange(0, replaced_hydrogens.size()):
-        replaced_hydrogens[x].Print()
+###FIRST OPTION:
+###THIS FUNCTIONS WILL APPLY ALL THE UPDATED INFORMATION ON THE SELECTED MODEL.
+###THE DEFAULT MODEL IS THE FIRST ONE, IN ORDER TO CHANGE IT GIVE ANOTHER MODEL NUMBER AS THE 5th ARGUMENT TO THE FOLLOWING FUNCTION i.e. temp.ApplyPreprocessingWithTheGivenModelNumber(pdbfile, amino_libs, 	glycam_libs, prep, 2)
+temp.ApplyPreprocessingWithTheGivenModelNumber(pdbfile, amino_libs, glycam_libs, prep)
+temp.Print()
+seq_map = pdbfile.GetSequenceNumberMapping()
+print seq_map.size()
+for x in seq_map:
+	print x, seq_map[x]
+###THE DEFAULT MODEL IS THE FIRST ONE, IN ORDER TO CHANGE IT GIVE ANOTHER MODEL NUMBER AS THE 2ND ARGUMENT TO THE FOLLOWING FUNCTION i.e. pdbfile.WriteWithTheGivenModelNumber('updated_pdb.txt', 2). THE 		GIVEN NUMBER SHOULD MATCH THE PREVIOUS MODEL NUMBER WHICH HAS BEEN GIVEN TO THE ApplyPreprocessingWithTheGivenModelNumber FUNCTION.
+pdbfile.WriteWithTheGivenModelNumber('updated_pdb.txt')
 
-
-temp.RemoveRemovedHydrogens(pdbfile, replaced_hydrogens)
-
-pdbfile.Write('removedhydrogens-update.pdb')
+###SECOND OPTION:
+###THIS FUNCTIONS WILL APPLY ALL THE UPDATED INFORMATION ON ALL THE MODELS.
+#temp.ApplyPreprocessing(pdbfile, amino_libs, glycam_libs, prep)
+#temp.Print()
+#pdbfile.Write('updated_pdb.txt')

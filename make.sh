@@ -1,13 +1,53 @@
+MOOD="$1"
+TARGET_MAKE_FILE="Makefile-main"
+echo $TARGET_MAKE_FILE
+echo $MOOD
 cd gmml
-make clean
-make distclean
-rm -rf gmml.pro*
-qmake -project -t lib
-qmake -o
-make 
+if [ -f $TARGET_MAKE_FILE ]; then
+	if [ "$MOOD" == "Qt" ]; then
+		echo "Compile compatible with Qt"
+		make distclean
+		rm -rf gmml.pro*
+		qmake -project -t lib
+		mv *.pro gmml.pro
+		qmake -o
+		make
+	else
+		echo "Qt independent compilation"
+		make -f $TARGET_MAKE_FILE distclean
+		rm -rf gmml.pro*
+		make -f $TARGET_MAKE_FILE
+	fi
+else
+	if [ "$MOOD" == "Qt" ]; then
+		make distclean
+		rm -rf gmml.pro*
+		qmake -project -t lib
+		mv *.pro gmml.pro
+		qmake -o
+		make
+	else
+		echo "Qt independent make file does not exist"
+	fi
+fi
 cd ..
-swig -c++ -python gmml.i
-g++ -O2 -fPIC -c gmml_wrap.cxx -I/usr/include/python2.7
-g++ -shared gmml/parameterfile.o gmml/parameterfileatom.o gmml/parameterfileangle.o gmml/parameterfilebond.o gmml/parameterfiledihedral.o gmml/parameterfiledihedralterm.o gmml/parameterfileprocessingexception.o gmml/coordinate.o gmml/libraryfile.o gmml/libraryfileatom.o gmml/libraryfileresidue.o gmml/libraryfileprocessingexception.o gmml/coordinatefile.o gmml/coordinatefileprocessingexception.o gmml/prepfile.o gmml/prepfileatom.o gmml/prepfileresidue.o gmml/prepfileprocessingexception.o gmml/pdbatom.o gmml/pdbatomcard.o gmml/pdbcompoundcard.o gmml/pdbcompoundspecification.o gmml/pdbconnectcard.o gmml/pdbcrystallographiccard.o gmml/pdbdisulfidebondcard.o gmml/pdbdisulfideresidue.o gmml/pdbdisulfideresiduebond.o gmml/pdbfile.o gmml/pdbfileprocessingexception.o gmml/pdbformula.o gmml/pdbformulacard.o gmml/pdbheadercard.o gmml/pdbhelix.o gmml/pdbhelixcard.o gmml/pdbhelixresidue.o gmml/pdbheterogen.o gmml/pdbheterogenatomcard.o gmml/pdbheterogencard.o gmml/pdbheterogenname.o gmml/pdbheterogennamecard.o gmml/pdbheterogensynonym.o gmml/pdbheterogensynonymcard.o gmml/pdblink.o gmml/pdblinkcard.o gmml/pdblinkresidue.o gmml/pdbmatrixn.o gmml/pdbmatrixncard.o gmml/pdbmodel.o gmml/pdbmodelcard.o gmml/pdbmodelresidueset.o gmml/pdbmodeltypecard.o gmml/pdbnummodelcard.o gmml/pdboriginxn.o gmml/pdboriginxncard.o gmml/pdbresiduemodification.o gmml/pdbresiduemodificationcard.o gmml/pdbresiduesequence.o gmml/pdbresiduesequencecard.o gmml/pdbscalen.o gmml/pdbscalencard.o gmml/pdbsheet.o gmml/pdbsheetcard.o gmml/pdbsheetstrand.o gmml/pdbsheetstrandresidue.o gmml/pdbsite.o gmml/pdbsitecard.o gmml/pdbsiteresidue.o gmml/pdbtitlecard.o gmml/pdbresidue.o gmml/pdbpreprocessor.o gmml/pdbpreprocessorchaintermination.o gmml/pdbpreprocessordisulfidebond.o gmml/pdbpreprocessorhistidinemapping.o gmml/pdbpreprocessormissingresidue.o gmml/pdbpreprocessorreplacedhydrogen.o gmml/pdbpreprocessorunrecognizedheavyatom.o gmml/pdbpreprocessorunrecognizedresidue.o gmml/pdbpreprocessoralternateresidue.o gmml/pdbpreprocessorresidueinfo.o gmml/topologyangle.o gmml/topologyangletype.o gmml/topologyassembly.o gmml/topologyatom.o gmml/topologyatompair.o gmml/topologybond.o gmml/topologybondtype.o gmml/topologydihedral.o gmml/topologydihedraltype.o gmml/topologyfile.o gmml/topologyresidue.o gmml/topologyfileprocessingexception.o gmml/angle.o gmml/dihedral.o gmml/distance.o gmml/assembly.o gmml/atom.o gmml/element.o gmml/dockingatom.o gmml/moleculardynamicatom.o gmml/quantommechanicatom.o gmml/residue.o gmml/atomnode.o gmml_wrap.o -o _gmml.so
-
-
+if [ -f "gmml.i" ]; then
+	swig -c++ -python gmml.i
+else
+	echo "Interface file for swig does not exist"
+fi
+PYTHON_FILE="$PYTHON_HOME/Python.h"
+if [ -f $PYTHON_FILE ]; then
+	if [ -f "gmml_wrap.cxx" ]; then
+		g++ -O3 -fPIC -c gmml_wrap.cxx -I"$PYTHON_HOME"
+	else
+		echo "gmml_wrap.cxx does not exist"
+	fi
+else
+	echo "PYTHON_HOME variable has not been set"
+fi
+if [ -f "gmml_wrap.o" ]; then
+	g++ -shared gmml/*.o gmml_wrap.o -o _gmml.so
+else
+	echo "gmml has not been compiled correctly"
+fi
