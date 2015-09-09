@@ -133,8 +133,8 @@
 #include "gmml/includes/FileSet/TopologyFileSpace/topologyresidue.hpp"
 #include "gmml/includes/FileSet/TopologyFileSpace/topologyfileprocessingexception.hpp"
 
-#include "gmml/includes/FileSet/CondensedSequenceSpace/condensedsequence.hpp"
-#include "gmml/includes/FileSet/CondensedSequenceSpace/condensedsequenceresidue.hpp"
+//#include "gmml/includes/FileSet/CondensedSequenceSpace/condensedsequence.hpp"
+//#include "gmml/includes/FileSet/CondensedSequenceSpace/condensedsequenceresidue.hpp"
 
 %}
 
@@ -268,8 +268,8 @@ std::ostream & get_cout() { return std::cout; }
 %include "gmml/includes/FileSet/TopologyFileSpace/topologyresidue.hpp"
 %include "gmml/includes/FileSet/TopologyFileSpace/topologyfileprocessingexception.hpp"
 
-%include "gmml/includes/FileSet/CondensedSequenceSpace/condensedsequence.hpp"
-%include "gmml/includes/FileSet/CondensedSequenceSpace/condensedsequenceresidue.hpp"
+//%include "gmml/includes/FileSet/CondensedSequenceSpace/condensedsequence.hpp"
+//%include "gmml/includes/FileSet/CondensedSequenceSpace/condensedsequenceresidue.hpp"
 
 %template(string_vector) std::vector<std::string>;
 %template(int_vector) std::vector<int>;
@@ -554,11 +554,11 @@ std::ostream & get_cout() { return std::cout; }
 
 ///Condensed Sequence///
 //typedef std::vector<CondensedSequenceResidue*> CondensedSequenceResidueVector;
-%template(condensedsequence_residue_vector) std::vector<CondensedSequenceSpace::CondensedSequenceResidue*>;
+//%template(condensedsequence_residue_vector) std::vector<CondensedSequenceSpace::CondensedSequenceResidue*>;
 
 //typedef std::vector<gmml::CondensedSequenceTokenType> CondensedSequenceTokenTypeVector;
-%template(condensedsequence_token_type_vector) std::vector<gmml::CondensedSequenceTokenType>;
+//%template(condensedsequence_token_type_vector) std::vector<gmml::CondensedSequenceTokenType>;
 
 //typedef std::map<int, std::string> DerivativeMap;
-%template() std::pair<int, std::string >;
-%template(condensedsequence_derivative_map) std::map<int, std::string >;
+//%template() std::pair<int, std::string >;
+//%template(condensedsequence_derivative_map) std::map<int, std::string >;
