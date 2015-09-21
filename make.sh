@@ -8,8 +8,7 @@ if [ -f $TARGET_MAKE_FILE ]; then
 		echo "Compile compatible with Qt"
 		make distclean
 		rm -rf gmml.pro*
-		qmake -project -t lib
-		mv *.pro gmml.pro
+		qmake -project -t lib -o gmml.pro "OBJECTS_DIR = build" "DESTDIR = bin"
 		qmake -o
 		make
 	else
@@ -22,8 +21,7 @@ else
 	if [ "$MOOD" == "Qt" ]; then
 		make distclean
 		rm -rf gmml.pro*
-		qmake -project -t lib
-		mv *.pro gmml.pro
+		qmake -project -t lib -o gmml.pro "OBJECTS_DIR = build" "DESTDIR = bin"
 		qmake -o
 		make
 	else
@@ -47,7 +45,7 @@ else
 	echo "PYTHON_HOME variable has not been set"
 fi
 if [ -f "gmml_wrap.o" ]; then
-	g++ -shared gmml/*.o gmml_wrap.o -o _gmml.so
+	g++ -shared gmml/build/*.o gmml_wrap.o -o _gmml.so
 else
 	echo "gmml has not been compiled correctly"
 fi
