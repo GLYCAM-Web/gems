@@ -7,6 +7,9 @@
 
 %{
 #define SWIG_FILE_WITH_INIT
+//#include "/usr/include/sql.h"
+//#include "/usr/include/sqlext.h"
+
 #include "gmml/includes/common.hpp"
 #include "gmml/includes/InputSet/CoordinateFileSpace/coordinatefile.hpp"
 #include "gmml/includes/InputSet/CoordinateFileSpace/coordinatefileprocessingexception.hpp"
@@ -142,6 +145,9 @@
 %inline %{
 std::ostream & get_cout() { return std::cout; }
 %}
+
+//%include "/usr/include/sql.h"
+//%include "/usr/include/sqlext.h"
 
 %include "gmml/includes/common.hpp"
 %include "gmml/includes/InputSet/CoordinateFileSpace/coordinatefile.hpp"
