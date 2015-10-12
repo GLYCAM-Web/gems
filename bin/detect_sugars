@@ -45,7 +45,6 @@ het = gmml.string_vector()
 het.push_back(sys.argv[1])
 temp = gmml.Assembly(het, gmml.PDB)
 empty = gmml.string_vector()
-temp.BuildStructure(gmml.DISTANCE, empty, empty)
+temp.BuildStructureByDistance(10)
 
-temp.ExtractSugars(aminolibs)
-
+temp.ExtractSugars(amino_libs)
