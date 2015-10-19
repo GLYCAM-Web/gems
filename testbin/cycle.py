@@ -60,7 +60,11 @@ if pdb_file != '':
 	temp.BuildStructureByDistance(10)
 	end = time.time()
 	print end - start
-	temp.ExtractSugars(amino_libs)
+	oligos = temp.ExtractSugars(amino_libs)
+	res_map = temp.ExtractResidueGlycamNamingMap(oligos)
+	temp.UpdateResidueName2GlycamName(res_map)
+	pdb = temp.BuildPdbFileStructureFromAssembly()
+	pdb.Write('glycam_pdb.pdb')
 	#temp.Print()
 
 
