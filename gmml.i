@@ -31,10 +31,11 @@
 #include "gmml/includes/ParameterSet/PrepFileSpace/prepfileresidue.hpp"
 #include "gmml/includes/ParameterSet/PrepFileSpace/prepfileprocessingexception.hpp"
 
-//#include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequence.hpp"
-//#include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceresidue.hpp"
-//#include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceamberprepresidue.hpp"
-//#include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceprocessingexception.hpp"
+#include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceprocessingexception.hpp"
+#include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceresidue.hpp"
+#include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceamberprepresidue.hpp"
+#include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequence.hpp"
+
 #include "gmml/includes/InputSet/PdbFileSpace/pdbatom.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbatomcard.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbcompoundcard.hpp"
@@ -170,10 +171,10 @@ std::ostream & get_cout() { return std::cout; }
 %include "gmml/includes/ParameterSet/PrepFileSpace/prepfileresidue.hpp"
 %include "gmml/includes/ParameterSet/PrepFileSpace/prepfileprocessingexception.hpp"
 
-//%include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequence.hpp"
-//%include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceresidue.hpp"
-//%include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceamberprepresidue.hpp"
-//%include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceprocessingexception.hpp"
+%include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceprocessingexception.hpp"
+%include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceresidue.hpp"
+%include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceamberprepresidue.hpp"
+%include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequence.hpp"
 
 %include "gmml/includes/InputSet/PdbFileSpace/pdbatom.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbatomcard.hpp"
@@ -568,13 +569,11 @@ std::ostream & get_cout() { return std::cout; }
 //typedef std::vector<gmml::CondensedSequenceTokenType> CondensedSequenceTokenTypeVector;
 //%template(condensedsequence_token_type_vector) std::vector<gmml::CondensedSequenceTokenType>;
 
-//typedef std::vector<std::pair<CondensedSequenceResidue*, int> > CondensedSequenceResidueTree;
-//%template() std::pair<gmml::CondensedSequenceResidue*, int >;
-//%template(condensed_sequence_residue_tree) std::vector<std::pair<gmml::CondensedSequenceResidue*, int > >;
+//typedef std::vector<CondensedSequenceResidue*> CondensedSequenceResidueTree;
+//%template(condensedsequence_residue_tree) std::vector<CondensedSequenceSpace::CondensedSequenceResidue*>;
 
-//typedef std::vector<std::pair<CondensedSequenceAmberPrepResidue*, int> > CondensedSequenceAmberPrepResidueTree;
-//%template() std::pair<gmml::CondensedSequenceAmberPrepResidue*, int>;
-//%template(condensed_sequence_amber_prep_residue_tree) std::vector<std::pair< gmml::CondensedSequenceAmberPrepResidue*, int> >;
+//typedef std::vector<CondensedSequenceAmberPrepResidue*> CondensedSequenceAmberPrepResidueTree;
+//%template(condensedsequence_amber_prep_residue_tree) std::vector<CondensedSequenceSpace::CondensedSequenceAmberPrepResidue*>;
 
 //typedef std::map<int, std::string> DerivativeMap;
 //%template() std::pair<int, std::string >;
