@@ -1,6 +1,6 @@
 ###FOR FURTHER INSTRUCTIONS PLEASE REFER TO alternateresidues.py SAMPLE FILE
 #SAMPLE COMMAND :
-# python cycle.py -amino_libs "gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/amino12.lib" -pdb "../../Downloads/1.pdb" &> output_file_name
+# python cycle.py -amino_libs "../gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/amino12.lib" -pdb "../../../Downloads/1.pdb" &> output_file_name
 
 
 import sys
@@ -56,10 +56,15 @@ if pdb_file != '':
 	temp = gmml.Assembly(het, gmml.PDB)
 	empty = gmml.string_vector()
 	start = time.time()
-	temp.BuildStructure(gmml.DISTANCE, empty, empty)
+	#temp.BuildStructure(gmml.DISTANCE, empty, empty)
+	temp.BuildStructureByDistance(10)
 	end = time.time()
 	print end - start
-	temp.ExtractSugars(amino_libs)
-	temp.Print()
+	oligos = temp.ExtractSugars(amino_libs)
+	res_map = temp.ExtractResidueGlycamNamingMap(oligos)
+	temp.UpdateResidueName2GlycamName(res_map)
+	pdb = temp.BuildPdbFileStructureFromAssembly()
+	pdb.Write('glycam_pdb.pdb')
+	#temp.Print()
 
 
