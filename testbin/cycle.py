@@ -27,7 +27,8 @@ elif sys.argv[1] == '-pdb':
 			arguments = sys.argv[4].split(',')
 			for argument in arguments:
 				amino_libs.push_back(argument)
-	
+else:
+	print 'Please import one pdb file using -pdb option and (optionally) amino library file(s) using -amino_libs option'		
 	
 
 #het.push_back("../../Downloads/DAldoHexaF/DGlcfb.pdb")

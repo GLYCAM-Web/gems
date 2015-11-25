@@ -493,6 +493,8 @@ std::ostream & get_cout() { return std::cout; }
 %template() std::pair<std::string, std::vector<MolecularModeling::Atom* > >;
 %template(cycle_map_assembly_file) std::map<std::string, std::vector<MolecularModeling::Atom* > >;
 
+//typedef std::vector<Glycan::Oligosaccharide*> OligosaccharideVector;
+%template(oligosaccharide_vector) std::vector<Glycan::Oligosaccharide* >;  
 
 ///Topology File///
 //typedef std::map<std::string, TopologyResidue*> TopologyResidueMap;
