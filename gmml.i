@@ -580,3 +580,8 @@ std::ostream & get_cout() { return std::cout; }
 //typedef std::map<int, std::string> DerivativeMap;
 //%template() std::pair<int, std::string >;
 //%template(condensedsequence_derivative_map) std::map<int, std::string >;
+
+///Common///
+//typedef std::map<std::string, std::string> ResidueNameMap;
+%template() std::pair<std::string, std::string>;
+%template(residue_name_map) std::map<std::string, std::string>;
