@@ -40,5 +40,9 @@ if pdb_file != '':
 	end = time.time()
 	print 'Time of building structure by distance:',end - start,'(sec)'
 	oligos = temp.ExtractSugars(amino_libs)
+	res_map = temp.ExtractResidueGlycamNamingMap(oligos)
+	temp.UpdateResidueName2GlycamName(res_map)
+	pdb = temp.BuildPdbFileStructureFromAssembly()
+	pdb.Write('glycam_pdb.pdb')
 
 
