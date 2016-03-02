@@ -1,0 +1,8 @@
+Testing the PDB function.  Output from the run follows.
+================================================================
+
+just loaded the pdb
+path is ../canonicals.txt
+cut-off is 10
+
+OUTPUT FILE:ring_conformations.txt
