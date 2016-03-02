@@ -1,0 +1,149 @@
+The program is also available for download here:
+
+http://glycam.org/docs/othertoolsservice/downloads/downloads-software/
+
+
+ASSOCIATED PUBLICATION
+This software is released in association with the journal article “BFMP : A method for discretizing and visualizing pyranose conformations”.  It is currently in review at the Journal of Chemical Information and Modeling.  Please see that publication for detailed information about the software and method.
+
+INSTALLATION
+
+1 Prerequisites.
+
+a) A Linux- or UNIX-based operating system.
+Alternately, a unix-like environment such as cygwin might work, but has not been tested.
+
+b) The gcc compiler.
+Many modern Linuxes do not include gcc in their standard distribution.  To see if you have gcc installed, issue the command below.  Your output might vary from what is shown below, but it should not declare “command not found”.  In the latter case, consult your distribution’s instructions to determine how to install gcc.
+
+$ gcc --version
+gcc (Ubuntu/Linaro 4.6.3-1ubuntu5) 4.6.3
+Copyright (C) 2011 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions. There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Other compilers might work, but we haven’t tested them.  If you want to try another compiler, just alter the makefile as needed.  The compiler might need to be GNU-compatible.
+
+c)The GLYLIB library.   
+Instructions for obtaining, installing and updating GLYLIB are provided here.  We recommend using the most recent GLYLIB available, but for those who desire historical accuracy, or in the unanticipated case that a future GLYLIB is incompatible, an archived version of GLYLIB is available.  Note that we will not fix bugs in the archived version.  To use it, unpack the tarball, change to the “GLYLIB_BFMP_Archive/lib” directory and type “make”.  Then follow the rest of these instructions.
+A plain-text editor such as vi, nano, gedit, emacs, etc.
+
+
+2  Unpack the program archive.  Alter the archive name shown below as needed.
+
+ 	tar -xzf BFMP.tar.gz
+
+3  This should create a directory called BFMP (or something similar) in your current working directory.  Change to that directory.
+
+	cd BFMP
+
+4  Using a plain text editor, edit the following line in the file makefile so that it gives the full path to your GLYLIB installation.
+
+	GLYHOME = /path/to/your/glylib
+
+5  Compile the program:
+
+	make
+
+It is safe to ignore any warnings about variables that are set but not used.  You should now have an executable called detect_shape in your directory.
+
+6   Optional:  Put the detect_shape executable in your $PATH.  You might also put the file “canonicals.txt” (see description below) in a convenient location.
+
+TESTING
+
+You can test the installation using data in the test_directory directory.  It contains a PDB file and an AMBER format topology and coordinate file. The coordinate file consists of 100 frames of the MD simulation of an iduronate monosaccharide
+
+To run the tests, remain in the BFMP top-level directory and enter the command:
+
+bash test_program.bash
+If the tests passed, normal output from the program is saved in files test_results_PDB and test_results_traj in test_directory.  If the tests did not pass, inspect these files and the files diffs_PDB and diffs_traj, also in test_directory, to determine the problem.
+
+RUNNING
+Usage:
+
+detect_shape  Data-File(s)  Configuration-File
+The requirements for “Data-File(s)” and “Configuration-File” are detailed below.
+
+If the detect_shape executable is not in your $PATH or in the current directory, you will need to specify its location, e.g.
+
+/path/to/detect_shape Data-File(s) Configuration-File
+
+Input and Output Files
+Data-File(s)
+The program accepts two types of data input files.  It detects the type of data based on the total number of input files listed on the command line.
+
+1 An AMBER style topology and restart/trajectory file
+./detect_shape input.top input.crd Configuration-File
+
+2 A PDB file obtained from RCSB or elsewhere
+./detect_shape input.pdb Configuration-File
+
+3 Configuration-File
+The program requires an additional text file as an input. This file contains information about the residue number, atom names and cut-off values the user can specify. Please look at the sample input file provided (input_PDB or input_traj) in the test directory. The required entries are explained below in detail. Please note that these entries need to be in the same order in which they appear below and in the sample input file.
+
+Atom
+A  list of ring atom names specified on subsequent lines, in order around the ring, starting from the “first” atom and proceeding clockwise if the ring is in a standard viewing orientation.  For example, a typical aldohexapyranose (6-carbon aldose in a six-atom ring configuration) would have:
+
+Atom
+C1
+C2
+C3
+C4
+C5
+O5
+
+Residue
+Residue number of the carbohydrate ring.
+
+Residue numbering in large or complex PDB files
+This program does not recognize insertion codes or chain identifiers.  It will find the first residue with your specified number and attempt to analyze it.
+The program also does a lot of back-and-forth checking of the PDB file.  So, very large files can take a longer time to run.  This can become significant if you are processing many files.
+The fix for both of these situations is to copy the relevant residue’s ATOM or HETATM cards into a separate, temporary file.  The program does not need any other information in the file.  In fact, it only needs the six specific atoms in the ring.  The smaller the file, the faster the program will run.
+
+An easy way to extract  the residue is to use grep.  Consider the PDB file from Tutorial 2 (PDB ID 1AXM) and assume that you want to extract residue SGN in chain F with residue number 505.  The grep command given below should work on most systems.  If you have an insertion code, just include it right after the residue number (where the space is after 505, below).  You might get a few extra cards, but you will get the proper ATOM/HETATM entries.
+
+grep "^.\{17\}SGN F 505 " 1AXM.pdb > temp.pdb
+If you have multiple models, be sure to include only one at a time in your temporary pdb file.
+
+Cut-Off
+This cut-off value is used to filter the best planes identified. The greater the cut-off value the more chances that an asymmetric shape is identified as an IUPAC conformation. The default cut-off value is 10Å.  The cut-off refers to the average dihedral calculated around the circumference of the 4-atom pseudo-square.  Please see the associated publication for details.
+
+Path
+This refers to the path of a text file which is required to run the program. The text file is called canonicals.txt and is provided in the BFMP directory. You can copy or move this text file to wherever you like but please make sure to add the path to the configuration file.  Note that the Path entry must be correct relative to the directory from which the program is called.  It can also be an absolute path.  For example, to run the tests by hand rather than by using the test_program.bash script, you would need to change to the test_directory or the path to “canonicals.txt” will be incorrect.
+
+Path
+/pathtoyourfile/canonicals.txt
+
+Output
+The program creates an output file called ring_conformations.txt. Please note that if you are running the program on multiple files in the same directory it will overwrite this file each time.
+
+The output file consists of three columns.
+
+Sample output:
+
+Timestep        Standard Nomenclature        Ring conformation
+
+1                       -                    5d2(1.543800)           t46(6.649975)
+
+49                      1C4                  1d4(1.315064)           5d2(8.650978)         3d6(9.472997)
+
+Column 1: Simulation frame (“Timestep”)
+
+Ring shapes of the residue number specified in the input file are calculated for each frame in a trajectory file.  This column identifies the frame by index beginning with one.  If the input file is a PDB file, the ring shape in the first model is determined.
+
+Column 2: Standard/Canonical Nomenclature
+
+Where appropriate, the standard IUPAC nomenclature is listed in this column (See paper for explanation).  If an IUPAC structure for a frame cannot be designated within the specified cut-off, this column will be blank for that frame.
+
+Column 3: BFMP Nomenclature
+
+The BFMP nomenclatures for all four-atom sets with dihedrals below the cut-off (see cut-off, above), along with their average dihedral angles, are listed in this column.
+
+Other Documentation
+Detailed tutorials on how to use the program and interpret the results are available.
+
+Tutorial 1 Determining the conformations of Iduronate during the course of a simulation. This is available here http://glycam.org/docs/help/2014/07/28/bfmp-tutorial-1-3/
+ 
+Tutorial 2 Determining the conformation of Iduronate from a PDB file. This is available here http://glycam.org/docs/help/2014/07/28/bfmp-tutorial-2/
+
+

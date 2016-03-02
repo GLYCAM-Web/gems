@@ -496,6 +496,7 @@ std::ostream & get_cout() { return std::cout; }
 //typedef std::vector<Glycan::Oligosaccharide*> OligosaccharideVector;
 %template(oligosaccharide_vector) std::vector<Glycan::Oligosaccharide* >;  
 
+
 ///Topology File///
 //typedef std::map<std::string, TopologyResidue*> TopologyResidueMap;
 %template() std::pair<std::string, TopologyFileSpace::TopologyResidue*>;
@@ -585,3 +586,8 @@ std::ostream & get_cout() { return std::cout; }
 //typedef std::map<std::string, std::string> ResidueNameMap;
 %template() std::pair<std::string, std::string>;
 %template(residue_name_map) std::map<std::string, std::string>;
+
+///Utils///
+//typedef std::map<int, std::vector<Glycan::SugarName> > SugarNameClosestMatchMap;
+//%template() std::pair<int, std::vector<Glycan::SugarName> >;
+//%template(sugar_name_closest_match_map) std::map<int, std::vector<Glycan::SugarName> >;

@@ -1,0 +1,16 @@
+Testing the traj function.  Output from the run follows.
+================================================================
+
+Unexpected blank line in read_amber_prmtop
+   at line number 238 in file IdoA.prmtop.  Ignoring.
+The section (29) FLAG is:  HBOND_ACOEF
+Unexpected blank line in read_amber_prmtop
+   at line number 241 in file IdoA.prmtop.  Ignoring.
+The section (30) FLAG is:  HBOND_BCOEF
+Unexpected blank line in read_amber_prmtop
+   at line number 244 in file IdoA.prmtop.  Ignoring.
+The section (31) FLAG is:  HBCUT
+path is ../canonicals.txt
+cut-off is 10
+
+OUTPUT FILE:ring_conformations.txt
