@@ -36,9 +36,9 @@
 #include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceamberprepresidue.hpp"
 #include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequence.hpp"
 
-#include "gmml/includes/InputSet/CifFileSpace/ciffileatom.hpp"
-#include "gmml/includes/InputSet/CifFileSpace/ciffile.hpp"
-#include "gmml/includes/InputSet/CifFileSpace/ciffileprocessingexception.hpp"
+//#include "gmml/includes/InputSet/CifFileSpace/ciffileatom.hpp"
+//#include "gmml/includes/InputSet/CifFileSpace/ciffile.hpp"
+//#include "gmml/includes/InputSet/CifFileSpace/ciffileprocessingexception.hpp"
 
 #include "gmml/includes/InputSet/PdbFileSpace/pdbatom.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbatomcard.hpp"
@@ -245,9 +245,9 @@ std::ostream & get_cout() { return std::cout; }
 %include "gmml/includes/InputSet/PdbqtFileSpace/pdbqtrootcard.hpp"
 %include "gmml/includes/InputSet/PdbqtFileSpace/pdbqttorsionaldofcard.hpp"
 
-%include "gmml/includes/InputSet/CifFileSpace/ciffileatom.hpp"
-%include "gmml/includes/InputSet/CifFileSpace/ciffile.hpp"
-%include "gmml/includes/InputSet/CifFileSpace/ciffileprocessingexception.hpp"
+//%include "gmml/includes/InputSet/CifFileSpace/ciffileatom.hpp"
+//%include "gmml/includes/InputSet/CifFileSpace/ciffile.hpp"
+//%include "gmml/includes/InputSet/CifFileSpace/ciffileprocessingexception.hpp"
 
 %include "gmml/includes/Resolver/PdbPreprocessor/pdbpreprocessor.hpp"
 %include "gmml/includes/Resolver/PdbPreprocessor/pdbpreprocessorchaintermination.hpp"
@@ -574,7 +574,7 @@ std::ostream & get_cout() { return std::cout; }
 
 ///Cif File///
 //typedef std::vector<CifFileAtom*> CifFileAtomVector;
-%template(cif_atom_vector) std::vector<CifFileSpace::CifFileAtom*>;
+//%template(cif_atom_vector) std::vector<CifFileSpace::CifFileAtom*>;
 
 ///Condensed Sequence///
 //typedef std::vector<CondensedSequenceResidue*> CondensedSequenceResidueVector;
