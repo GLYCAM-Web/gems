@@ -32,7 +32,7 @@ if [ -f $TARGET_MAKE_FILE ]; then
 			make distclean
 			rm -rf gmml.pro*
 			qmake -project -t lib -o gmml.pro "OBJECTS_DIR = build" "DESTDIR = bin"
-			qmake -o
+			qmake -o Makefile
 			make -j 4
 		elif [ "$CLEAN" == "-m" ]; then
 			make -j 4
@@ -53,7 +53,7 @@ else
 			make distclean
 			rm -rf gmml.pro*
 			qmake -project -t lib -o gmml.pro "OBJECTS_DIR = build" "DESTDIR = bin"
-			qmake -o
+			qmake -o Makefile
 			make -j 4
 		elif [ "$CLEAN" == "-m" ]; then
 			make -j 4
