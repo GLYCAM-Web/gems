@@ -5,7 +5,8 @@ import gmml
 temp = gmml.Assembly()
 
 
-temp.ExtractAtomCoordinatesForTorsionAnglesFromOntologySlow("DNeupNAca2-3DGalpb")
+#temp.ExtractAtomCoordinatesForTorsionAnglesFromOntologySlow("DNeupNAca2-3DGalpb")
+temp.ExtractAtomCoordinatesForTorsionAnglesFromOntologySlow("DNeupNAca2-6DGalpb")
 temp.ExtractTorsionAnglesFromSlowQueryResult()
 
 #temp.ExtractAtomCoordinatesForTorsionAnglesFromOntologyFast("DNeupNAca2-3DGalpb")
