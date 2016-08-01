@@ -18,7 +18,7 @@ for x in xrange(0, disulfide_bonds.size()):
 
 ###UPDATING CYS RESIDUES###
 disulfide_bonds[0].SetIsBonded(False)
-print "Updated disulfide bond(s):"
+print("Updated disulfide bond(s):")
 disulfide_bonds[0].Print()
 temp.UpdateCYSResidues(pdbfile, disulfide_bonds)
 

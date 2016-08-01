@@ -11,13 +11,13 @@ het = gmml.string_vector()
 amino_libs = gmml.string_vector()
 pdb_file = ''
 if len(sys.argv) < 2:
-	print 'Please import one pdb file using -pdb option and (optionally) amino library file(s) using -amino_libs option'
+	print('Please import one pdb file using -pdb option and (optionally) amino library file(s) using -amino_libs option')
 elif sys.argv[1] == '-amino_libs': 
 	arguments = sys.argv[2].split(',')
 	for argument in arguments:
 		amino_libs.push_back(argument)
 	if len(sys.argv) < 4:
-		print 'Please import one pdb file using -pdb option'
+		print('Please import one pdb file using -pdb option')
 	elif sys.argv[3] == '-pdb':
 		pdb_file = sys.argv[4]
 elif sys.argv[1] == '-pdb':
@@ -28,7 +28,7 @@ elif sys.argv[1] == '-pdb':
 			for argument in arguments:
 				amino_libs.push_back(argument)
 else:
-	print 'Please import one pdb file using -pdb option and (optionally) amino library file(s) using -amino_libs option'		
+	print('Please import one pdb file using -pdb option and (optionally) amino library file(s) using -amino_libs option')
 	
 
 if pdb_file != '':
@@ -38,7 +38,7 @@ if pdb_file != '':
 	start = time.time()
 	temp.BuildStructureByDistance(10)
 	end = time.time()
-	print 'Time of building structure by distance:',end - start,'(sec)'
+	print('Time of building structure by distance:',end - start,'(sec)')
 	oligos = temp.ExtractSugars(amino_libs)
 
 

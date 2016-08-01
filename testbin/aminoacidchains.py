@@ -14,22 +14,25 @@ glycam_libs = gmml.string_vector()
 prep = gmml.string_vector()
 
 if sys.argv[1] == '--help':  
-	print 'Available options:'
-	print '-amino_libs : amino acid library file(s) (e.g. gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/amino12.lib)'
-	print '-glycam_libs: glycam library file(s)'
-	print '-other_libs : other kinds of library files'
-	print '-prep       : prep file(s) (e.g. gmml/dat/CurrentParams/leaprc_GLYCAM_06j-1_2014-03-14/GLYCAM_06j-1.prep)'
-	print '-pdb        : pdb file (e.g. gmml/example/pdb/1RVZ_New.pdb)'
-	print '-cnf        : configuration file as an argument. sample file format:'
-	print 'amino_libs'
-	print 'gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/amino12.lib'
-	print 'gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminont12.lib'
-	print 'glycam_libs'
-	print 'other_libs'
-	print 'prep'
-	print 'gmml/dat/CurrentParams/leaprc_GLYCAM_06j-1_2014-03-14/GLYCAM_06j-1.prep'
-	print 'pdb'
-	print 'gmml/example/pdb/1RVZ_New.pdb'
+	print("""
+Available options:
+        -amino_libs : amino acid library file(s) (e.g. gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/amino12.lib)
+        -glycam_libs: glycam library file(s)
+        -other_libs : other kinds of library files
+        -prep       : prep file(s) (e.g. gmml/dat/CurrentParams/leaprc_GLYCAM_06j-1_2014-03-14/GLYCAM_06j-1.prep)
+        -pdb        : pdb file (e.g. gmml/example/pdb/1RVZ_New.pdb)
+        -cnf        : configuration file as an argument. 
+            Sample file format:
+                amino_libs 
+                gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/amino12.lib
+                gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminont12.lib
+                glycam_libs
+                other_libs
+                prep
+                gmml/dat/CurrentParams/leaprc_GLYCAM_06j-1_2014-03-14/GLYCAM_06j-1.prep
+                pdb
+                gmml/example/pdb/1RVZ_New.pdb
+""")
 	sys.exit()
 elif sys.argv[1] == '-cnf':      
 	with open(sys.argv[2], 'r') as my_file:
@@ -57,7 +60,7 @@ elif sys.argv[1] == '-cnf':
 		i = i+1
 		pdb = conf_file[i]
 	else:
-		print 'invalid configuration file format'
+		print('invalid configuration file format')
 else:
 	for i, arg in enumerate(sys.argv):
 		if arg == '-amino_libs':                    
@@ -92,7 +95,7 @@ for x in xrange(0, chain_terminations.size()):
 ###UPDATING AMINO ACID CHAINS###
 chain_terminations[0].SetSelectedNTermination(gmml.NH3)
 chain_terminations[0].SetSelectedCTermination(gmml.NHCH3)
-print "The Updated chain terminations:"
+print("The Updated chain terminations:")
 for x in xrange(0, chain_terminations.size()):
         chain_terminations[x].Print()
 
