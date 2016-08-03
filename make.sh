@@ -29,7 +29,7 @@ if [ -f $TARGET_MAKE_FILE ]; then
 	if [ "$MOOD" == "Qt" ]; then
 		echo "Compile compatible with Qt"
 		if [ "$CLEAN" == "-cm" ]; then
-			make distclean
+			make -f $TARGET_MAKE_FILE distclean
 			rm -rf gmml.pro*
 			qmake -project -t lib -o gmml.pro "OBJECTS_DIR = build" "DESTDIR = bin"
 			qmake -o Makefile
