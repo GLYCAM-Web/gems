@@ -14,24 +14,26 @@ elif len(sys.argv) < 8:
 	prep_residues = gmml.condensedsequence_amber_prep_residue_tree()
 	if assembly.CheckCondensedSequenceSanity(sys.argv[2], prep_residues):
 		print sys.argv[2],' is valid'
-		assembly.BuildAssemblyFromCondensedSequence(sys.argv[2], sys.argv[4], sys.argv[6], False)
+		assembly.BuildAssemblyFromCondensedSequence(sys.argv[2], sys.argv[4], sys.argv[6], True)
 		print 'Charge: ' + str(assembly.GetTotalCharge())
 		condensed_sequence = gmml.CondensedSequence(sys.argv[2])
-		rotomers_glycosidic_angles_info = condensed_sequence.GetCondensedSequenceRotomersAndGlycosidicAnglesInfo(condensed_sequence.GetCondensedSequenceResidueTree())
-		for rotomer_name, rotomers_info in rotomers_glycosidic_angles_info:
-			print rotomer_name
-			p_rotomers = ""
-			for pr in rotomers_info.possible_rotomers_:
-				p_rotomers += pr + ", "
-			d_rotomers = ""
-			for dr in rotomers_info.default_seleted_rotomers_:
-				d_rotomers += dr + ", "
+		rotamers_glycosidic_angles_info = condensed_sequence.GetCondensedSequenceRotamersAndGlycosidicAnglesInfo(condensed_sequence.GetCondensedSequenceResidueTree())
+		for rotomer_name, rotamers_info in rotamers_glycosidic_angles_info:
+			print '(' + str(rotamers_info.linkage_index_) + ') ' + rotomer_name
+			p_rotamers = ""
+			for pr in rotamers_info.possible_rotamers_:
+				p_rotamers += pr + ", "
+			d_rotamers = ""
+			for dr in rotamers_info.default_seleted_rotamers_:
+				d_rotamers += dr + ", "
 			e_angles = ""
-			for ga in rotomers_info.enabled_glycosidic_angles_:
+			for ga in rotamers_info.enabled_glycosidic_angles_:
 				e_angles += ga + ", "
-			print "possible rotomers: " + p_rotomers
-			print "default rotomers: " + d_rotomers
+			print "possible rotamers: " + p_rotamers
+			print "default rotamers: " + d_rotamers
 			print "enabled angles: " + e_angles
+		pdb_file = assembly.BuildPdbFileStructureFromAssembly()
+		pdb_file.Write('pdb_file.pdb')
 	else:
 		print sys.argv[2],' is not valid'
 else:

@@ -589,11 +589,11 @@ std::ostream & get_cout() { return std::cout; }
 //typedef std::vector<CondensedSequenceAmberPrepResidue*> CondensedSequenceAmberPrepResidueTree;
 %template(condensedsequence_amber_prep_residue_tree) std::vector<CondensedSequenceSpace::CondensedSequenceAmberPrepResidue*>;
 
-//typedef std::pair<std::string, RotomersAndGlycosidicAnglesInfo*> RotomerNameInfoPair;
-%template(rotomer_name_info_pair) std::pair<std::string, CondensedSequenceSpace::RotomersAndGlycosidicAnglesInfo*>;
+//typedef std::pair<std::string, RotamersAndGlycosidicAnglesInfo*> RotamerNameInfoPair;
+%template(rotamer_name_info_pair) std::pair<std::string, CondensedSequenceSpace::RotamersAndGlycosidicAnglesInfo*>;
 
-//typedef std::vector<RotomerNameInfoPair> CondensedSequenceRotomersAndGlycosidicAnglesInfo;
-%template(rotomer_angle_info_vector) std::vector<std::pair<std::string, CondensedSequenceSpace::RotomersAndGlycosidicAnglesInfo*> >;
+//typedef std::vector<RotamerNameInfoPair> CondensedSequenceRatomersAndGlycosidicAnglesInfo;
+%template(rotamer_angle_info_vector) std::vector<std::pair<std::string, CondensedSequenceSpace::RotamersAndGlycosidicAnglesInfo*> >;
 
 //typedef std::map<int, std::string> DerivativeMap;
 //%template() std::pair<int, std::string >;
