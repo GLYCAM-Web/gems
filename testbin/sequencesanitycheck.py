@@ -1,6 +1,8 @@
 ###FOR FURTHER INSTRUCTIONS PLEASE REFER TO alternateresidues.py SAMPLE FILE
 #SAMPLE COMMAND :
-# python sequencesanitycheck.py -seq "LManpa1-2[LGalpa1-3LGlcpa1-4]DGalpa1-4DGlcpa1-6DAllpa1-OH" -prep "../gmml/dat/CurrentParams/leaprc_GLYCAM_06j-1_2014-03-14/GLYCAM_06j-1.prep" -parm "../gmml/dat/CurrentParams/leaprc_GLYCAM_06j-1_2014-03-14/GLYCAM_06j.dat"
+# python sequencesanitycheck.py -seq "LManpa1-2[LGalpa1-3LGlcpa1-4]DGalpa1-4DGlcpa1-6DAllpa1-OH"
+# -prep "../gmml/dat/CurrentParams/leaprc_GLYCAM_06j-1_2014-03-14/GLYCAM_06j-1.prep" 
+#-parm "../gmml/dat/CurrentParams/leaprc_GLYCAM_06j-1_2014-03-14/GLYCAM_06j.dat"
 
 
 import sys
@@ -19,7 +21,7 @@ elif len(sys.argv) < 8:
 		condensed_sequence = gmml.CondensedSequence(sys.argv[2])
 		rotomers_glycosidic_angles_info = condensed_sequence.GetCondensedSequenceRotomersAndGlycosidicAnglesInfo(condensed_sequence.GetCondensedSequenceResidueTree())
 		for rotomer_name, rotomers_info in rotomers_glycosidic_angles_info:
-			print(rotamer_name)
+			print(rotomer_name)
 			p_rotomers = ""
 			for pr in rotomers_info.possible_rotomers_:
 				p_rotomers += pr + ", "
