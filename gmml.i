@@ -589,12 +589,26 @@ std::ostream & get_cout() { return std::cout; }
 //typedef std::vector<CondensedSequenceAmberPrepResidue*> CondensedSequenceAmberPrepResidueTree;
 %template(condensedsequence_amber_prep_residue_tree) std::vector<CondensedSequenceSpace::CondensedSequenceAmberPrepResidue*>;
 
-//typedef std::pair<std::string, RotomersAndGlycosidicAnglesInfo*> RotomerNameInfoPair;
-%template(rotomer_name_info_pair) std::pair<std::string, CondensedSequenceSpace::RotomersAndGlycosidicAnglesInfo*>;
+//typedef std::pair<std::string, RotamersAndGlycosidicAnglesInfo*> RotamerNameInfoPair;
+%template(rotamer_name_info_pair) std::pair<std::string, CondensedSequenceSpace::RotamersAndGlycosidicAnglesInfo*>;
 
-//typedef std::vector<RotomerNameInfoPair> CondensedSequenceRotomersAndGlycosidicAnglesInfo;
-%template(rotomer_angle_info_vector) std::vector<std::pair<std::string, CondensedSequenceSpace::RotomersAndGlycosidicAnglesInfo*> >;
+//typedef std::vector<RotamerNameInfoPair> CondensedSequenceRatomersAndGlycosidicAnglesInfo;
+%template(rotamer_angle_info_vector) std::vector<std::pair<std::string, CondensedSequenceSpace::RotamersAndGlycosidicAnglesInfo*> >;
 
+%template(glycosidic_angle_name_value_pair_vector) std::vector<std::pair<std::string, double> >;
+
+%template(string_double_pair) std::pair<std::string, double>;
+
+%template(rotamer_name_value_vector) std::vector<std::pair<std::string, std::vector<std::string> > >;
+
+%template(string_vector_string_pair) std::pair<std::string, std::vector<std::string> >;
+
+%template(vector_vector_int) std::vector<std::vector<int> >;
+
+%template(vector_vector_double) std::vector<std::vector<double> >;
+
+%template() std::pair<int, std::vector<std::vector<double> > >;
+%template(int_vector_vector_double_map) std::map<int, std::vector<std::vector<double> > >;
 //typedef std::map<int, std::string> DerivativeMap;
 //%template() std::pair<int, std::string >;
 //%template(condensedsequence_derivative_map) std::map<int, std::string >;
