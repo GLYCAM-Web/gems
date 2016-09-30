@@ -15,6 +15,8 @@ elif len(sys.argv) < 8:
 	if assembly.CheckCondensedSequenceSanity(sys.argv[2], prep_residues):
 		print sys.argv[2],' is valid'
 		assembly.BuildAssemblyFromCondensedSequence(sys.argv[2], sys.argv[4], sys.argv[6], True)
+		pdb_file = assembly.BuildPdbFileStructureFromAssembly()
+		pdb_file.Write('pdb_file.pdb')
 		print 'Charge: ' + str(assembly.GetTotalCharge())
 		condensed_sequence = gmml.CondensedSequence(sys.argv[2])
 		rotamers_glycosidic_angles_info = condensed_sequence.GetCondensedSequenceRotamersAndGlycosidicAnglesInfo(condensed_sequence.GetCondensedSequenceResidueTree())
@@ -41,7 +43,7 @@ elif len(sys.argv) < 8:
 		structures = assembly.BuildAllRotamersFromCondensedSequence(sys.argv[2], sys.argv[4], sys.argv[6], rotamers_glycosidic_angles_info)
 		i = 1
 		for structure in structures:
-			pdb_file = structure.BuildPdbFileStructureFromAssembly(-1, 0)			
+			pdb_file = structure.BuildPdbFileStructureFromAssembly()			
 			pdb_file.Write('pdb_file_' + str(i) + '.pdb')
 			i += 1
 		_map = condensed_sequence.CreateBaseMapAllPossibleSelectedRotamers(rotamers_glycosidic_angles_info)
