@@ -20,22 +20,15 @@ elif len(sys.argv) < 8:
 		print('Charge: ' + str(assembly.GetTotalCharge()))
 		condensed_sequence = gmml.CondensedSequence(sys.argv[2])
 		rotamers_glycosidic_angles_info = condensed_sequence.GetCondensedSequenceRotamersAndGlycosidicAnglesInfo(condensed_sequence.GetCondensedSequenceResidueTree())
-		print(rotamers_glycosidic_angles_info)
 		for rotamer_name, rotamers_info in rotamers_glycosidic_angles_info:
-			print('aaa'+rotamer_name)
+			print(rotamer_name)
 			p_rotamers = ""
 			for pr in rotamers_info.possible_rotamers_:
-				#print('aaa------------')
-				#print(pr[1])
-				p_rotamers += str(pr[1]) + ", "
+				p_rotamers += pr + ", "
 			d_rotamers = ""
-			print(rotamers_info.selected_rotamers_)
-			#print(rotamers_info.selected_rotamers_[0])
-			for dr in rotamers_info.selected_rotamers_:
-				d_rotamers += str(dr[1]) + ", "
-		rotamers_glycosidic_angles_info = 
-condensed_sequence.GetCondensedSequenceRotamersAndGlycosidicAnglesInfo
-(condensed_sequence.GetCondensedSequenceResidueTree())
+			for dr in rotamers_info.default_seleted_rotamers_:
+				d_rotamers += dr + ", "
+		rotamers_glycosidic_angles_info = condensed_sequence.GetCondensedSequenceRotamersAndGlycosidicAnglesInfo(condensed_sequence.GetCondensedSequenceResidueTree())
 		print("Total number of structures with selected rotamers: " + str(condensed_sequence.CountAllPossibleSelectedRotamers(rotamers_glycosidic_angles_info)))
 		for rotamer_name, rotamers_info in rotamers_glycosidic_angles_info:
 			print('(' + str(rotamers_info.linkage_index_) + ') ' + rotamer_name)
@@ -44,9 +37,7 @@ condensed_sequence.GetCondensedSequenceRotamersAndGlycosidicAnglesInfo
 				for val in pr_val:
 					p_rotamers += val + ", "
 			s_rotamers = ""
-			for sr_name, sr_val in rotamers_info.selected_rotamers_[3]:
-			#rotamers_info.selected_rotamers_[phi].append((name,val))
-			#
+			for sr_name, sr_val in rotamers_info.selected_rotamers_:
 				for val in sr_val:
 					s_rotamers += val + ", "
 			e_angles = ""
@@ -61,14 +52,9 @@ condensed_sequence.GetCondensedSequenceRotamersAndGlycosidicAnglesInfo
 		structures = assembly.BuildAllRotamersFromCondensedSequence(sys.argv[2], sys.argv[4], sys.argv[6], rotamers_glycosidic_angles_info)
 		i = 1
 		for structure in structures:
-			pdb_file = structure.BuildPdbFileStructureFromAssembly()#(-1,0)			
+			pdb_file = structure.BuildPdbFileStructureFromAssembly(-1, 0)			
 			pdb_file.Write('pdb_file_' + str(i) + '.pdb')
 			i += 1
-
-
-
-
-
 		_map = condensed_sequence.CreateBaseMapAllPossibleSelectedRotamers(rotamers_glycosidic_angles_info)
 		map_str = ""
 		for m in _map:
