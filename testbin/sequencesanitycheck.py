@@ -15,12 +15,83 @@ elif len(sys.argv) < 8:
 	if assembly.CheckCondensedSequenceSanity(sys.argv[2], prep_residues):
 		print(sys.argv[2],' is valid')
 		assembly.BuildAssemblyFromCondensedSequence(sys.argv[2], sys.argv[4], sys.argv[6], True)
+		Pdb_file = assembly.BuildPdbFileStructureFromAssembly()
+		pdb_file.Write('pdb_file.pdb')
 		print('Charge: ' + str(assembly.GetTotalCharge()))
 		condensed_sequence = gmml.CondensedSequence(sys.argv[2])
 		rotamers_glycosidic_angles_info = condensed_sequence.GetCondensedSequenceRotamersAndGlycosidicAnglesInfo(condensed_sequence.GetCondensedSequenceResidueTree())
+
+		# Remove tg rotamer of OMEGA angle for 'DGalpA1-6DGlcpA' linkage if exists in selected rotamers for the specific linkage
+		new_rotamers_glycosidic_angles_info = gmml.rotamer_angle_info_vector()
+		for rotamers_name, rotamers_info in rotamers_glycosidic_angles_info:
+			if rotamers_name == 'DGalpA1-6DGlcpA':
+				new_selected_rotamers = gmml.string_vector_string_pair_vector()
+				for sr_name, sr_val in rotamers_info.selected_rotamers_:
+					if sr_name == 'omega':
+						new_omega_selected_rotamers = gmml.string_vector()
+						for val in sr_val:
+							if val != 'tg':
+								new_omega_selected_rotamers.push_back(val)
+						new_selected_rotamers.push_back([sr_name, new_omega_selected_rotamers])
+					else:
+						new_selected_rotamers.push_back([sr_name, sr_val])				
+				rotamers_info.selected_rotamers_ = new_selected_rotamers
+			new_rotamers_glycosidic_angles_info.push_back([rotamers_name, rotamers_info])
+		rotamers_glycosidic_angles_info = new_rotamers_glycosidic_angles_info
+
+		# Add tg rotamer of OMEGA for 'DGalpA1-6DGlcpA' linkage if tg is one of the possible rotamers for the specifi linkage
+		new_rotamers_glycosidic_angles_info = gmml.rotamer_angle_info_vector()
+		for rotamers_name, rotamers_info in rotamers_glycosidic_angles_info:
+			if rotamers_name == 'DGalpA1-6DGlcpA':
+				is_possible = False
+				for pr_name,pr_val in rotamers_info.possible_rotamers_:
+					if pr_name == 'omega':
+						for val in pr_val:
+							if val == 'tg':
+								is_possible = True
+								break
+				if is_possible:
+					new_selected_rotamers = gmml.string_vector_string_pair_vector()
+					for sr_name, sr_val in rotamers_info.selected_rotamers_:
+						if sr_name == 'omega':
+							new_omega_selected_rotamers = gmml.string_vector()
+							for val in sr_val:
+								if val != 'tg':
+									new_omega_selected_rotamers.push_back(val)
+							new_omega_selected_rotamers.push_back('tg')
+							new_selected_rotamers.push_back([sr_name, new_omega_selected_rotamers])
+						else:
+							new_selected_rotamers.push_back([sr_name, sr_val])				
+					rotamers_info.selected_rotamers_ = new_selected_rotamers
+			new_rotamers_glycosidic_angles_info.push_back([rotamers_name, rotamers_info])
+		rotamers_glycosidic_angles_info = new_rotamers_glycosidic_angles_info
+
+		# Set OMEGA angle of 'DGalpA1-6DGlcpA' to a constant value = 160 if it is enabled
+		new_rotamers_glycosidic_angles_info = gmml.rotamer_angle_info_vector()
+		for rotamers_name, rotamers_info in rotamers_glycosidic_angles_info:
+			if rotamers_name == 'DGalpA1-6DGlcpA':
+				is_enabled = False
+				for ga_name, ga_val in rotamers_info.enabled_glycosidic_angles_:
+					if ga_name == 'omega':						
+						is_enabled = True
+						break
+				if is_enabled:
+					new_enabled_angles = gmml.glycosidic_angle_name_value_pair_vector()
+					for ga_name, ga_val in rotamers_info.enabled_glycosidic_angles_:
+						if ga_name == 'omega':
+							new_enabled_angles.push_back([ga_name, 160])
+						else:
+							new_enabled_angles.push_back([ga_name, ga_val])				
+					rotamers_info.enabled_glycosidic_angles_ = new_enabled_angles
+			new_rotamers_glycosidic_angles_info.push_back([rotamers_name, rotamers_info])
+		rotamers_glycosidic_angles_info = new_rotamers_glycosidic_angles_info
+		
+	
+
 		print("Total number of structures with selected rotamers: " + str(condensed_sequence.CountAllPossibleSelectedRotamers(rotamers_glycosidic_angles_info)))
-		for rotomer_name, rotamers_info in rotamers_glycosidic_angles_info:
-			print('(' + str(rotamers_info.linkage_index_) + ') ' + rotomer_name)
+
+		for rotamer_name, rotamers_info in rotamers_glycosidic_angles_info:
+			print('(' + str(rotamers_info.linkage_index_) + ') ' + rotamer_name)
 			p_rotamers = ""
 			for pr_name, pr_val in rotamers_info.possible_rotamers_:
 				for val in pr_val:
@@ -41,7 +112,7 @@ elif len(sys.argv) < 8:
 		structures = assembly.BuildAllRotamersFromCondensedSequence(sys.argv[2], sys.argv[4], sys.argv[6], rotamers_glycosidic_angles_info)
 		i = 1
 		for structure in structures:
-			pdb_file = structure.BuildPdbFileStructureFromAssembly(-1, 0)			
+			pdb_file = structure.BuildPdbFileStructureFromAssembly()			
 			pdb_file.Write('pdb_file_' + str(i) + '.pdb')
 			i += 1
 		_map = condensed_sequence.CreateBaseMapAllPossibleSelectedRotamers(rotamers_glycosidic_angles_info)
