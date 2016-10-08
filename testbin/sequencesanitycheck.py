@@ -21,7 +21,7 @@ elif len(sys.argv) < 8:
 		condensed_sequence = gmml.CondensedSequence(sys.argv[2])
 		rotamers_glycosidic_angles_info = condensed_sequence.GetCondensedSequenceRotamersAndGlycosidicAnglesInfo(condensed_sequence.GetCondensedSequenceResidueTree())
 
-		# Remove tg rotamer of OMEGA angle for 'DGalpA1-6DGlcpA' linkage if exists in selected rotamers for the specific linkage
+		"""# Remove tg rotamer of OMEGA angle for 'DGalpA1-6DGlcpA' linkage if exists in selected rotamers for the specific linkage
 		new_rotamers_glycosidic_angles_info = gmml.rotamer_angle_info_vector()
 		for rotamers_name, rotamers_info in rotamers_glycosidic_angles_info:
 			if rotamers_name == 'DGalpA1-6DGlcpA':
@@ -84,7 +84,7 @@ elif len(sys.argv) < 8:
 							new_enabled_angles.push_back([ga_name, ga_val])				
 					rotamers_info.enabled_glycosidic_angles_ = new_enabled_angles
 			new_rotamers_glycosidic_angles_info.push_back([rotamers_name, rotamers_info])
-		rotamers_glycosidic_angles_info = new_rotamers_glycosidic_angles_info
+		rotamers_glycosidic_angles_info = new_rotamers_glycosidic_angles_info"""
 		
 	
 
@@ -109,13 +109,8 @@ elif len(sys.argv) < 8:
 			print("possible rotamers: " + p_rotamers)
 			print("default rotamers: " + s_rotamers)
 			print("enabled angles: " + e_angles)
-		structures = assembly.BuildAllRotamersFromCondensedSequence(sys.argv[2], sys.argv[4], sys.argv[6], rotamers_glycosidic_angles_info)
-		i = 1
-		for structure in structures:
-			pdb_file = structure.BuildPdbFileStructureFromAssembly()			
-			pdb_file.Write('pdb_file_' + str(i) + '.pdb')
-			i += 1
-		_map = condensed_sequence.CreateBaseMapAllPossibleSelectedRotamers(rotamers_glycosidic_angles_info)
+		
+		"""_map = condensed_sequence.CreateBaseMapAllPossibleSelectedRotamers(rotamers_glycosidic_angles_info)
 		map_str = ""
 		for m in _map:
 			map_str += "<"
@@ -123,7 +118,14 @@ elif len(sys.argv) < 8:
 				map_str = map_str + str(val) + " "
 			map_str += ">"
 		print(map_str)
-		condensed_sequence.CreateIndexLinkageConfigurationMap(rotamers_glycosidic_angles_info)
+		condensed_sequence.CreateIndexLinkageConfigurationMap(rotamers_glycosidic_angles_info)"""
+							
+		structures = assembly.BuildAllRotamersFromCondensedSequence(sys.argv[2], sys.argv[4], sys.argv[6], rotamers_glycosidic_angles_info)
+		i = 1
+		for structure in structures:
+			pdb_file = structure.BuildPdbFileStructureFromAssembly()			
+			pdb_file.Write('pdb_file_' + str(i) + '.pdb')
+			i += 1
 	else:
 		print(sys.argv[2],' is not valid')
 else:
