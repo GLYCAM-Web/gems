@@ -88,7 +88,7 @@ elif len(sys.argv) < 8:
 		
 	
 
-		print "Total number of structures with selected rotamers: " + str(condensed_sequence.CountAllPossibleSelectedRotamers(rotamers_glycosidic_angles_info))
+		print "Total number of structures with selected rotamers: " + str(condensed_sequence.CountAllPossibleSelectedRotamers(rotamers_glycosidic_angles_info) * condensed_sequence.CountAllPossible28LinkagesRotamers(rotamers_glycosidic_angles_info))
 
 		for rotamer_name, rotamers_info in rotamers_glycosidic_angles_info:
 			print '(' + str(rotamers_info.linkage_index_) + ') ' + rotamer_name
