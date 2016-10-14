@@ -17,7 +17,7 @@ elif len(sys.argv) < 8:
 		assembly.BuildAssemblyFromCondensedSequence(sys.argv[2], sys.argv[4], sys.argv[6], True)
 		pdb_file = assembly.BuildPdbFileStructureFromAssembly()
 		pdb_file.Write('pdb_file.pdb')
-		print 'Charge: ' + str(assembly.GetTotalCharge())
+		print 'Charge: ' + str(round(assembly.GetTotalCharge(),4))
 		condensed_sequence = gmml.CondensedSequence(sys.argv[2])
 		rotamers_glycosidic_angles_info = condensed_sequence.GetCondensedSequenceRotamersAndGlycosidicAnglesInfo(condensed_sequence.GetCondensedSequenceResidueTree())
 
