@@ -1,4 +1,4 @@
-#!/usr/bin/python2.7
+#!/usr/bin/python3.4
 import sys
 import os
 import subprocess
@@ -109,8 +109,8 @@ else :
   
 p = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
 (output, err) = p.communicate()
-outsplit=output.splitlines()
-#print(outsplit)
+outsplit=output.decode().splitlines()
+print(outsplit)
 
 ## The output file
 outf=open(sys.argv[2],'w')
@@ -118,7 +118,7 @@ thecommand=""
 for i in range(len(sys.argv)):
     thecommand=thecommand+" "+sys.argv[i]
 
-md5_for_file=hashlib.md5(open(sys.argv[1]).read()).hexdigest()
+md5_for_file=hashlib.md5(open(sys.argv[1]).read().encode('utf-8')).hexdigest()
 thedate=(time.strftime("%Y-%m-%d %H:%M:%S"))
 file_stuff="""File written by GEMS/GMML PDB glycan detection package.
 
