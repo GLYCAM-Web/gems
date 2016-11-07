@@ -110,7 +110,7 @@ else :
 p = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
 (output, err) = p.communicate()
 outsplit=output.decode().splitlines()
-print(outsplit)
+#print(outsplit)
 
 ## The output file
 outf=open(sys.argv[2],'w')
