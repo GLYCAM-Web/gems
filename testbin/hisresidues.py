@@ -19,7 +19,7 @@ for x in xrange(0, histidine_mappings.size()):
 ###UPDATING HISTIDINE MAPPINGS###
 #MODIFYING selected_mapping ATTRIBUTE OF THE HISTIDINE MAPPINGS VECTOR (POSSIBLE OPTIONS: gmml.HIE, gmml.HIP, gmml.HID)
 histidine_mappings[0].SetSelectedMapping(gmml.HIP)
-print "The Updated part(s):"
+print("The Updated part(s):")
 histidine_mappings[0].Print()
 temp.UpdateHISMapping(pdbfile, histidine_mappings)
 

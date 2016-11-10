@@ -22,7 +22,7 @@ temp.ExtractAlternateResidue(pdbfile)
 alternate_residues_map = temp.GetAlternateResidueMap()
 
 ###IF YOU WANT TO SEE THE RESULT IN THE TERMINAL USE THE FOLLOWING FOR LOOP OTHERWISE IGNORE AND COMMENT THE LOOP
-print alternate_residues_map
+print(alternate_residues_map)
 for x in alternate_residues_map:
 	alternate_residues_map[x].Print()
 
@@ -36,7 +36,7 @@ selected_alt_residue[1] = 1
 ###APPLY THE CHANGES TO THE FIRST ALTERNATE RESIDUE OBJECT
 alternate_residues_map['LEU_F_657_?'].SetSelectedAlternateLocation(selected_alt_residue)
 ###PRINT TO SEE THE CHANGES YOU HAVE MADE
-print "The updated alternate residue locations:"
+print("The updated alternate residue locations:")
 alternate_residues_map['LEU_F_657_?'].Print()
 
 ###REMOVING THE UNSELECTED ALTERNATE RESIDUES FROM THE PDB OBJECT

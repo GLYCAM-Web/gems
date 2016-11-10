@@ -1,23 +1,23 @@
-#!/usr/bin/python2.7
+#!/usr/bin/python3.4
 import sys
 import os
 
 # check out the environment
 GemsPath = os.environ.get('GEMSHOME')
 if GemsPath == None:
-    print """
+    print("""
 
 Must set GEMSHOME environment variable
 
     BASH:  export GEMSHOME=/path/to/gems
     SH:    setenv GEMSHOME /path/to/gems
 
-"""
+""")
     sys.exit(1)
 
 # check out the command line
 if len(sys.argv)<2:
-    print """
+    print("""
 Usage:
 
     detect_sugars PDB_file.pdb
@@ -27,7 +27,7 @@ So, alternately:
 
     detect_sugars PDB_file.pdb > output_file_name
 
-"""
+""")
     sys.exit(1)
 
 # import gems/gmml stuff
@@ -37,8 +37,8 @@ import gmml
 aminolibs=gmml.string_vector()
 aminolibs.push_back(GemsPath+"/gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/amino12.lib")
 
-#print "aminolibs is >>>"+aminolibs+"<<<."
-#print aminolibs
+#print("aminolibs is >>>"+aminolibs+"<<<.")
+#print(aminolibs)
 #sys.exit(0)
 
 het = gmml.string_vector()

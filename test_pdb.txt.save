@@ -2340,4 +2340,10 @@ ATOM   2337 CD2  HIE A 299      14.110 -21.867 -27.508  1.00 26.42           C
 ATOM   2338 CE1  HIE A 299      15.749 -22.302 -28.900  1.00 28.50           C  
 ATOM   2339 NE2  HIE A 299      14.441 -22.382 -28.738  1.00 30.49           N  
 TER    2340      HIE A 299                                                      
+CONECT  318 2180                                                                
+CONECT  414  503                                                                
+CONECT  503  414                                                                
+CONECT  684 1051                                                                
+CONECT 1051  684                                                                
+CONECT 2180  318                                                                
 END                                                                             
