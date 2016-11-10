@@ -1,11 +1,11 @@
 #!/bin/bash
 
-if [ "$(which python2.7)" == "" ] ; then
+if [ "$(which python3)" == "" ] ; then
 	echo "
 
 TEST FAILURE:
 
-		You need python2.7 to use GEMS.
+	You need python3 to use this version of GEMS.
 
 "
 	exit
@@ -16,8 +16,8 @@ if [ ! -d "gmml" ] ; then
 
 TEST FAILURE:
 
-		You need gmml to use GEMS.  
-		It must be in a sub-directory of GEMS to run this test.
+	You need gmml to use GEMS.  
+	It must be in a sub-directory of GEMS to run this test.
 
 "
 	exit
@@ -30,7 +30,7 @@ for i in test_installation.py gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/am
 
 TEST FAILURE:
 	
-		Cannot find the file ${i}
+	Cannot find the file ${i}
 
 "
 		exit
@@ -50,7 +50,7 @@ This test will compare these files:
 Beginning test.
 "
 
-python2.7 test_installation.py -amino_libs "gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/amino12.lib","gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminont12.lib","gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminoct12.lib" -prep "gmml/dat/CurrentParams/leaprc_GLYCAM_06j-1_2014-03-14/GLYCAM_06j-1.prep" -pdb "gmml/example/pdb/Small_to_test.pdb" > testing.log 2> testing.error
+python3 test_installation.py -amino_libs "gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/amino12.lib","gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminont12.lib","gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminoct12.lib" -prep "gmml/dat/CurrentParams/leaprc_GLYCAM_06j-1_2014-03-14/GLYCAM_06j-1.prep" -pdb "gmml/example/pdb/Small_to_test.pdb" > testing.log 2> testing.error
 
 echo "
 

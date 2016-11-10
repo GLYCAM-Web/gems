@@ -12,29 +12,29 @@ amino_libs = gmml.string_vector()
 pdb_file = ''
 prep_file = ''
 if len(sys.argv) < 2:
-	print 'Please import one pdb file using -pdb option, one prep file using -prep option  and (optionally) amino library file(s) using -amino_libs option'
+	print('Please import one pdb file using -pdb option, one prep file using -prep option  and (optionally) amino library file(s) using -amino_libs option')
 elif sys.argv[1] == '-amino_libs': 
 	arguments = sys.argv[2].split(',')
 	for argument in arguments:
 		amino_libs.push_back(argument)
 	if len(sys.argv) < 4:
-		print 'Please import one pdb file using -pdb option and one prep file using -prep option'
+		print('Please import one pdb file using -pdb option and one prep file using -prep option')
 	elif sys.argv[3] == '-pdb':
 		pdb_file = sys.argv[4]
 		if(len(sys.argv) < 6):
-			print 'Please import one prep file using -prep option'
+			print('Please import one prep file using -prep option')
 		elif sys.argv[5] == '-prep':
 			prep_file = sys.argv[6]
 	elif sys.argv[3] == '-prep':
 		prep_file = sys.argv[4]
 		if(len(sys.argv) < 6):
-			print 'Please insert one pdb file using -pdb option'
+			print('Please insert one pdb file using -pdb option')
 		elif sys.argv[5] == 'pdb':
 			pdb_file = sys.argv[6]
 elif sys.argv[1] == '-pdb':
 	pdb_file = sys.argv[2]
 	if len(sys.argv) < 4:
-		print 'Please import one prep file using -prep option and (optionally) amino library file(s) using -amino_libs option'
+		print('Please import one prep file using -prep option and (optionally) amino library file(s) using -amino_libs option')
 	elif sys.argv[3] == '-prep':
 		prep_file = sys.argv[4]
 		if len(sys.argv) > 5:
@@ -47,13 +47,13 @@ elif sys.argv[1] == '-pdb':
 		for argument in arguments:
 			amino_libs.push_back(argument)
 		if len(sys.argv) < 6:
-			print 'Please import one prep file using -prep option'
+			print('Please import one prep file using -prep option')
 		elif sys.argv[5] == '-prep':
 			prep_file = sys.argv[6]
 elif sys.argv[1] == '-prep':
 	prep_file = sys.argv[2]
 	if len(sys.argv) < 4:
-		print 'Please import one pdb file using -pdb option and (optionally) amino library file(s) using -amino_libs option'
+		print('Please import one pdb file using -pdb option and (optionally) amino library file(s) using -amino_libs option')
 	elif sys.argv[3] == '-pdb':
 		pdb_file = sys.argv[4]
 		if len(sys.argv) > 5:
@@ -66,11 +66,11 @@ elif sys.argv[1] == '-prep':
 		for argument in arguments:
 			amino_libs.push_back(argument)
 		if len(sys.argv) < 6:
-			print 'Please import a pdb file using -pdb option'
+			print('Please import a pdb file using -pdb option')
 		elif sys.argv[5] == '-pdb':
 			pdb_file = sys.argv[6]
 else:
-	print 'Please import one pdb file using -pdb option and (optionally) amino library file(s) using -amino_libs option'		
+	print('Please import one pdb file using -pdb option and (optionally) amino library file(s) using -amino_libs option'		)
 	
 
 if pdb_file != '':
@@ -80,7 +80,7 @@ if pdb_file != '':
 	start = time.time()
 	temp.BuildStructureByDistance(10)
 	end = time.time()
-	print 'Time of building structure by distance:',end - start,'(sec)'
+	print('Time of building structure by distance:',end - start,'(sec)')
 	oligos = temp.ExtractSugars(amino_libs)
 	res_map = temp.ExtractResidueGlycamNamingMap(oligos)
 	temp.UpdateResidueName2GlycamName(res_map, prep_file)

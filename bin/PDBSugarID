@@ -1,4 +1,4 @@
-#!/usr/bin/python2.7
+#!/usr/bin/python3.4
 import sys
 import os
 import subprocess
@@ -47,12 +47,12 @@ Usage:
 
 # check out the command line
 if len(sys.argv)<3:
-    print """
+    print("""
 
 Error:  Insufficient number of arguments.
 
-"""
-    print USAGE
+""")
+    print(USAGE)
     sys.exit(1)
 
 ###  Make sure the gems/gmml environment is set
@@ -60,14 +60,14 @@ Error:  Insufficient number of arguments.
 # check out the environment
 GemsPath = os.environ.get('GEMSHOME')
 if GemsPath == None:
-    print """
+    print("""
 
 Must set GEMSHOME environment variable
 
     BASH:  export GEMSHOME=/path/to/gems
     SH:    setenv GEMSHOME /path/to/gems
 
-"""
+""")
     sys.exit(1)
 
 # import gems/gmml stuff
@@ -84,20 +84,20 @@ import gmml
 basecommand = GemsPath+"/bin/detect_sugars "
 if len(sys.argv)>=4 :
     if sys.argv[3] != "keep" :
-        print """
+        print("""
 
 Error:  The fourth argument must be 'keep' or it must be omitted.
 
-"""
-        print USAGE 
+""")
+        print(USAGE)
         sys.exit(1)
     if len(sys.argv)>5 :
-        print """
+        print("""
 
 Error:  Too many arguments on the command line.
 
-"""
-        print USAGE 
+""")
+        print(USAGE)
         sys.exit(1)
     if len(sys.argv)==5 :
         command=basecommand + sys.argv[1] + " | tee " + sys.argv[4] 
@@ -105,12 +105,12 @@ Error:  Too many arguments on the command line.
         command=basecommand + sys.argv[1] + " | tee " + sys.argv[2] + "_sugar-details"
 else :
     command=basecommand + sys.argv[1] 
-#print " the command is >>>" + command + "<<<"
+#print(" the command is >>>" + command + "<<<")
   
 p = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
 (output, err) = p.communicate()
-outsplit=output.splitlines()
-#print outsplit
+outsplit=output.decode().splitlines()
+#print(outsplit)
 
 ## The output file
 outf=open(sys.argv[2],'w')
@@ -118,7 +118,7 @@ thecommand=""
 for i in range(len(sys.argv)):
     thecommand=thecommand+" "+sys.argv[i]
 
-md5_for_file=hashlib.md5(open(sys.argv[1]).read()).hexdigest()
+md5_for_file=hashlib.md5(open(sys.argv[1]).read().encode('utf-8')).hexdigest()
 thedate=(time.strftime("%Y-%m-%d %H:%M:%S"))
 file_stuff="""File written by GEMS/GMML PDB glycan detection package.
 
@@ -144,7 +144,7 @@ file_stuff_context = {
         }
 outf.write(file_stuff.format(**file_stuff_context))
 
-#print outsplit
+#print(outsplit)
 
 ###############################################
 ##  Generate classes for holding information
@@ -209,7 +209,7 @@ class GlycosidicLinkage(object):
         self.nonreducingC=LinkAtomInfo.parselinkatomstring(self.nonreducingC,splitlinkstring[3])
         self.glycosidicO=LinkAtomInfo.parselinkatomstring(self.glycosidicO,splitlinkstring[7])
         #for li in range(len(splitlinkstring)):
-            #print "entry ",li," is >>>"+splitlinkstring[li]
+            #print("entry ",li," is >>>"+splitlinkstring[li])
         #exit(0)
         return self
 
@@ -249,7 +249,7 @@ generalerrors = []
 
 State="new"
 for i  in range(len(outsplit)):
-    #print "This split bit is: >>>"+outsplit[i]+"<<<"
+    #print("This split bit is: >>>"+outsplit[i]+"<<<")
     if outsplit[i] == "Detailed information of sorted cycles after discarding fused or oxygenless rings: ":
         State="residues"
         continue

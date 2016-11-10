@@ -11,8 +11,8 @@ if len(sys.argv) == 3:
 elif len(sys.argv) == 2:
 	temp.ExtractOntologyInfoByCustomQuery(sys.argv[1])
 else:
-	print 'A query file as an input argument is missing'
-	print 'Sample usage: python query11_ExtractOntologyInfoByCustomQuery.py [YOUR_QUERY_FILE]'
+	print('A query file as an input argument is missing')
+	print('Sample usage: python query11_ExtractOntologyInfoByCustomQuery.py [YOUR_QUERY_FILE]')
 
 
 
