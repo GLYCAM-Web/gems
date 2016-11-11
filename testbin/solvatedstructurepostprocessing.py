@@ -6,7 +6,7 @@ import time
 assembly = gmml.Assembly()
 assembly.BuildAssemblyFromPdbFile(sys.argv[1])
 assembly.BuildStructureByDistance(1)
-assembly.Solvation(8, 3, sys.argv[2])
+assembly.Solvation(10, 3, sys.argv[2])
 pdb_file = assembly.BuildPdbFileStructureFromAssembly()
 pdb_file.Write('solvated.pdb')
 solvent = gmml.Assembly()

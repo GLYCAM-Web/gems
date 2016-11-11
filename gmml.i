@@ -616,6 +616,10 @@ std::ostream & get_cout() { return std::cout; }
 %template() std::pair<int, std::vector<std::vector<double> > >;
 %template(int_vector_vector_double_map) std::map<int, std::vector<std::vector<double> > >;
 
+//typedef std::map<int, std::string> IndexNameMap;
+%template() std::pair<int, std::string>;
+%template(int_string_map) std::map<int, std::string>;
+
 //typedef std::map<int, std::string> DerivativeMap;
 //%template() std::pair<int, std::string >;
 //%template(condensedsequence_derivative_map) std::map<int, std::string >;
