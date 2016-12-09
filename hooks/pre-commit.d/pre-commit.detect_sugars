@@ -1,0 +1,28 @@
+#!/bin/bash
+
+#Probably the most likely bug to appear
+if [ GEMSHOME = "" ] ; then
+echo "
+	Error: You need to set GEMSHOME
+
+	You need to use the format 'export GEMSHOME=/path/to/directory'
+		to make this scipt work
+"
+exit 1
+fi
+
+#Went ahead and did it for you if you were too lazy
+export GEMSHOME=/home/hussain/gems/gems
+
+#Runs the script
+detect_sugars "/home/hussain/GEMS/Gems4/gems/gmml/example/pdb/1NXC.pdb"
+
+# check out the command line
+if [ "$#" < 2 ] ; then
+   echo "
+TEST FAILURE:
+Not enough arguments. Re-check your code.
+"
+exit 1
+fi
+

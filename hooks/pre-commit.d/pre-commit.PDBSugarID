@@ -1,0 +1,18 @@
+#!/bin/bash
+
+export GEMSHOME=/home/hussain/GEMS/Gems4/gems
+
+#runs the script with a functional argument
+PDBSugarID "/home/hussain/GEMS/Gems4/gems/gmml/example/pdb/1NXC.pdb" "test_output" "keep"
+#PDBSugarID /home/hussain/GEMS/Gems4/gems/gmml/example/pdb/1NXC.pdb test_output keep
+
+#The test statement
+if [ -f "test_output" ] ; then
+  rm "test_output"
+  rm "test_output_sugar-details"
+else
+        echo "$test_output not found."
+    exit 1
+fi
+
+

@@ -1,0 +1,57 @@
+==============
+Purpose
+==============
+
+These are simple hooks are used to see if you've forgotten something, to make sure tests
+run, and to examine whatever you need to inspect in the code.
+	-If it likes what it sees, it will proceed with the commit.
+	-Else it will indicate where and what error popped up when it ean the code.
+
+==============
+How it works
+==============
+
+	1. After a commit is made, the pre-commit file will access the pre-commit.d
+	   	directory and runs all scripts with the pre-fix "pre-commit."
+
+	2. It will then actually run each script in alphabetical order in your terminal 
+		(Note: it will only execute the scripts that do not take a long time to
+		run in order to not waste the user's time. For the long ones, it will 
+		just tell you of any bugs found)
+	
+	3. If it does not stumble onto any major bugs,  it will say "SUCCESSFUL" which 
+		indicates that this script will commit this script as long as all other
+		scripts that have a hook also are successful.
+
+	4. Once committed, cheer that your script is slightly more bug free.
+
+===============
+How to use it
+===============
+
+	1. Simply type "git commit" when your located inside your branch
+	
+	2. If its successful, you could then "git push" to send it to your scripts to the
+	remote repository
+
+
+
+
+  #The Cheering Code Pig
+  #The pig that likes when people's scripts work
+  #                           _
+  #  _._ _..._ .-',     _.._(`))
+  # '-. `     '  /-._.-'    ',/
+  #    )         \            '.
+  #   / _    _    |             \
+  #  |  a    a    /              |
+  #  \   .-.                     ;
+  #   '-('' ).-'       ,'       ;
+  #      '-;           |      .'
+  #         \           \    /
+  #         | 7  .__  _.-\   \
+  #         | |  |  ``/  /`  /
+  #        /,_|  |   /,_/   /
+  #           /,_/      '`-'
+  #
+

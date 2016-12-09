@@ -1,0 +1,18 @@
+#!/bin/bash
+
+#You may want to edit this to your directory if you changed the original code a lot.
+source  "/home/hussain/gems/gems/test_installation.bash"
+
+#The script's built-in test
+if [ "$OUTPUT" != "" ] ; then 
+        echo "
+
+TEST FAILURE:
+Your output did not match the expected output. Re-check your code.
+
+
+"
+#fail
+exit 1
+fi
+

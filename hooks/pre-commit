@@ -1,0 +1,21 @@
+#!/bin/bash
+#############################
+# This file is auto generated
+#############################
+BASEDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+for h_file in $BASEDIR/pre-rebase.d/pre-rebase.*
+do
+        if [ -f "$h_file" ]
+        then
+                source $h_file "$@"
+                h_file_return=$?
+                if [ $h_file_return == 0 ]
+                then
+                        echo "$h_file --- SUCCESSFUL"
+                else
+                        echo "$h_file --- FAILED"
+                        exit $h_file_return
+                fi
+        fi
+done
+

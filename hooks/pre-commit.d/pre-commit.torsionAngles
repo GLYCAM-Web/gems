@@ -1,0 +1,29 @@
+#!/bin/bash
+
+#The commit process seems to stop here for no reason...
+echo "
+
+Click on the screen once to continue the pre-commit process
+
+"
+#Runs the script
+source "/home/hussain/gems/gems/torsionAngles.py"
+
+#After committing, these random files seem to generate for no reason, so I removed them
+#for you
+if [ "$temp" != "gmml.Assembly()" ] ; then
+  rm "time"
+  rm "subprocess"
+  rm "re"
+  rm "os"
+  rm "hashlib"
+  rm "sys"
+
+else
+exit 1
+
+fi
+
+
+
+

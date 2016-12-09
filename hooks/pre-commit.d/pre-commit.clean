@@ -1,0 +1,20 @@
+#!/bin/bash
+
+#run the script to see if its funcational
+#source  "/home/hussain/gems/gems/clean"
+
+#Check to see if it removed the files it was suppose to remove
+if [[ -e "gmml.pro*" && -e "gmml_wrap.cxx" && -e "gmml_wrap.0" && -e "gmml.pyc" && -e "_gmml.so" ]]; then
+echo "
+	Error: The clean process did not delete all files properly
+"
+exit 1
+fi
+
+#Ensures that the file still exists
+if [[ ! -e "./gmml/Makefile-main" ]]; then
+echo "
+	Error: The clean process did not create necessary files
+"
+exit 1
+fi
