@@ -39,6 +39,6 @@ if pdb_file != '':
 	temp.BuildStructureByDistance(10)
 	end = time.time()
 	print('Time of building structure by distance:',end - start,'(sec)')
-	oligos = temp.ExtractSugars(amino_libs)
+	oligos = temp.ExtractSugars(amino_libs, False, True)
 
 
