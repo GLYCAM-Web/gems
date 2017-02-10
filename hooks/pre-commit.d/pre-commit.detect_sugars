@@ -17,7 +17,7 @@ fi
 export GEMSHOME=/home/hussain/Gems/gems
 
 #Runs the script
-detect_sugars "/home/hussain/Gems/gems/gmml/example/pdb/1NXC.pdb"
+detect_sugars "gmml/example/pdb/1NXC.pdb"
 
 # check out the command line
 if [ "$#" < 2 ] ; then

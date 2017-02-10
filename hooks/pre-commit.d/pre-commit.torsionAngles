@@ -7,7 +7,7 @@ echo "
 ///////////////////////////////////////////////////////////////////
 "
 #Runs the script
-source "/home/hussain/Gems/gems/torsionAngles.py"
+source "torsionAngles.py"
 
 #After committing, these random files seem to generate for no reason, so I removed them
 #for you
