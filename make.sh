@@ -82,3 +82,10 @@ if [ -f "gmml_wrap.o" ]; then
 else
 	echo "gmml has not been compiled correctly"
 fi
+if [ -d "$hooks" ]; then
+	mv hooks/pre-commit .git/hooks
+	mv hooks/pre.commit.d .git/hooks
+        chmod +x .git/hooks/pre.commit.d/*
+        chmod +x .git/hooks/pre-commit
+        chmod +x .git/hooks/pre-commit.d
+fi
