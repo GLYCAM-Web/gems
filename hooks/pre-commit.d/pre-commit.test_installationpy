@@ -1,0 +1,11 @@
+#!/bin/bash
+
+#run the script to see if it funcational
+python3.4 test_installation.py "--help"
+
+#First test
+OUTPUT="$(python3.4 test_installation.py "--help")"
+
+if [ "$OUTPUT" == "" ] ; then
+exit 1
+fi
