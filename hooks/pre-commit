@@ -1,21 +1,26 @@
 #!/bin/bash
-#############################
-# This file is auto generated
-#############################
-BASEDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-for h_file in $BASEDIR/pre-rebase.d/pre-rebase.*
-do
-        if [ -f "$h_file" ]
-        then
-                source $h_file "$@"
-                h_file_return=$?
-                if [ $h_file_return == 0 ]
-                then
-                        echo "$h_file --- SUCCESSFUL"
-                else
-                        echo "$h_file --- FAILED"
-                        exit $h_file_return
-                fi
-        fi
-done
 
+if [ `git rev-parse --abbrev-ref HEAD` == "master" ] || [ `git rev-parse --abbrev-ref HEAD` == "python2.7-legacy"] ; then
+	echo "
+             No hooks are used on this branch        
+	Do 'git checkout gems-dev' to switch branches
+"   
+
+else
+BASEDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+for h_file in $BASEDIR/pre-commit.d/pre-commit.*
+do
+	if [ -f "$h_file" ]
+	then
+		source $h_file "$@"
+		h_file_return=$?
+		if [ $h_file_return == 0 ]
+		then
+			echo "$h_file --- SUCCESSFUL"
+		else
+			echo "$h_file --- FAILED"
+			exit $h_file_return
+		fi
+	fi
+done
+fi

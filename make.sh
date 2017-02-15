@@ -82,3 +82,16 @@ if [ -f "gmml_wrap.o" ]; then
 else
 	echo "gmml has not been compiled correctly"
 fi
+if [ -d ".git/hooks/pre-commit.d" ]; then
+read -p "Pre-commit hooks are detected in your .git directory. Do you want your current ones replaced with the ones found in the gems/hooks directory [y/n]? " INPUT
+	if [ "$INPUT" = "y" ]; then
+		rm -r .git/hooks/pre-commit.d
+		rm .git/hooks/pre-commit
+	        cp -R hooks/. .git/hooks/
+		echo "They have been replaced."
+	else
+		echo "Your current pre-commit hooks will be kept."
+	fi
+else
+	cp -R hooks/. .git/hooks/
+fi

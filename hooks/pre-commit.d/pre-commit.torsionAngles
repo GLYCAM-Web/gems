@@ -2,12 +2,12 @@
 
 #The commit process seems to stop here for no reason...
 echo "
-
-Click on the screen once to continue the pre-commit process
-
+///////////////////////////////////////////////////////////////////
+//  Click on the screen once to continue the pre-commit process  //
+///////////////////////////////////////////////////////////////////
 "
 #Runs the script
-source "/home/hussain/gems/gems/torsionAngles.py"
+source "torsionAngles.py"
 
 #After committing, these random files seem to generate for no reason, so I removed them
 #for you
