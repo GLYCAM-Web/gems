@@ -1,9 +1,9 @@
 #!/bin/bash
 
-#run the script to see if it funcational
+#run the script to see if its funcational
 python3.4 test_installation.py "--help"
 
-#First test
+#Tests one of the commands that this script has
 OUTPUT="$(python3.4 test_installation.py "--help")"
 
 if [ "$OUTPUT" == "" ] ; then

@@ -9,8 +9,7 @@ echo "
 #Runs the script
 source "torsionAngles.py"
 
-#After committing, these random files seem to generate for no reason, so I removed them
-#for you
+#After committing, these random files seem to generate for no reason, so I removed them for you
 if [ "$temp" != "gmml.Assembly()" ] ; then
   rm "time"
   rm "subprocess"
