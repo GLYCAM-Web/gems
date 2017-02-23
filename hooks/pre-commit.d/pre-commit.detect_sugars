@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#Probably the most likely bug to appear
+#Check to make sure that GEMSHOME is set
 if [ GEMSHOME = "" ] ; then
 echo "
       ///////////////////////////////////////////////////////////////////
@@ -13,13 +13,10 @@ echo "
 exit 1
 fi
 
-#Went ahead and did it for you if you were too lazy
-export GEMSHOME=/home/hussain/Gems/gems
-
-#Runs the script
+#Runs the script that is being tested
 detect_sugars "gmml/example/pdb/1NXC.pdb"
 
-# check out the command line
+#checks out the command line
 if [ "$#" < 2 ] ; then
    echo "
 TEST FAILURE:

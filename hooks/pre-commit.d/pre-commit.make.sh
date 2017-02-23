@@ -1,8 +1,6 @@
 #!/bin/bash
-
-export PYTHON_HOME=/usr/include/python3.4  
-
-#Probably the most common error for this script
+ 
+#Checks to make sure that PYTHON_HOME is set
 if [ "$PYTHON_HOME" = "" ] ; then
 echo  "
       ///////////////////////////////////////////////////////////////////
@@ -18,5 +16,3 @@ echo  "
 
 exit 1
 fi
-
-#source "/home/hussain/gems/gems/make.sh"

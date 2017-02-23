@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#You may want to edit this to your directory if you changed the original code a lot.
+#Runs the script
 source  "test_installation.bash"
 
 #The script's built-in test

@@ -1,15 +1,13 @@
 #!/bin/bash
 
-#export GEMSHOME=/home/hussain/Gems/gems
-
 #runs the script with a functional argument
 PDBSugarID "gmml/example/pdb/1NXC.pdb" "test_output" "keep"
-#PDBSugarID /home/hussain/GEMS/Gems4/gems/gmml/example/pdb/1NXC.pdb test_output keep
 
-#The test statement
+#If the output file was created, success
 if [ -f "test_output" ] ; then
   rm "test_output"
   rm "test_output_sugar-details"
+#If the file was not found, fail
 else
         echo "$test_output not found."
     exit 1
