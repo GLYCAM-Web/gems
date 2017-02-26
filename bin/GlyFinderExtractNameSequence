@@ -34,9 +34,7 @@ Usage:
 	This program searches Glycan structures based on the given oligosaccharide sequence.
 	
 	Command:
-        python3 GlyFinderExtractNameSequence [output_type] oligoNameSequence
-        or
-        ./GlyFinderExtractNameSequence [output_type] oligoNameSequence
+        GlyFinderExtractNameSequence [output_type] oligoNameSequence
 
         where:
 
