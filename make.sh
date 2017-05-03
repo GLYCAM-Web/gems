@@ -86,6 +86,8 @@ cp -r $GEMSHOME/gmml/.hooks/* $GEMSHOME/gmml/.git/hooks/
 #I don't think this is ideal, and is perhaps silly. OG Apr 2017.
 #People can still clone, make edits, and push without compiling.
 
+cp -r $GEMSGOME/.hooks/. $GEMSHOME/.git/hooks/
+
 ################################################################
 #########                WRITE CONFIG.H                #########
 ################################################################
