@@ -1,0 +1,94 @@
+File written by GEMS/GMML PDB glycan detection package.
+
+Contents:
+    1.  Analysis parameters
+    2.  Saccharide molecules detected
+    3.  Saccharide residues detected
+    4.  Error and warning messages
+
+===========================================
+1.  Analysis parameters
+===========================================
+
+Analysis completed on: 2017-04-21 11:50:45
+The command line was:  /programs/local/bin/PDBSugarID /home/hussain/gems/gems/gmml/example/pdb/1NXC.pdb Outfile keep
+The md5sum for the analyzed file was: 33b5a595943e6fb22d252356405e6856
+
+
+===========================================
+2.  Saccharide molecules detected
+===========================================
+
+This section contains the list of saccharide molecules that were found.  They 
+are given in glycam condensed notation.  For each linkage in an oligosaccharide, 
+the identity of the inter-residue linking atom is also given.  For complete 
+details about the saccharide residues in the molecules, see section 3.
+
+Linking atoms, where relevant, are identified by:
+        Linkage Index
+        Chain ID
+        Residue Name
+        Residue Number
+        Atom Name
+
+18 saccharide molecule(s) were detected:
+    DManpx1-ASN
+    -------------------------------------------------------------------------------------------------------------------------------------------
+    NOTES/ISSUES:
+    Category: residue name
+    Type: error
+    Description: Residue name in input PDB file for DGlcpNAcb does not match to PDB code: BGC
+    Category: residue name
+    Type: error
+    Description: Residue name in input PDB file for DGlcpNAcb does not match to PDB code: BGC
+    Category: anomeric
+    Type: warning
+    Description: DManpx: Anomeric oxygen is missing
+    Category: anomeric
+    Type: warning
+    Description: DManpa: Anomeric oxygen is missing
+    -------------------------------------------------------------------------------------------------------------------------------------------
+    DManpa1-6DManpx
+        Linkage atom(s):
+        1    a     MAN      5  O6   
+    DManpa1-6DManpa1-6DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-ASN
+        Linkage atom(s):
+        4    a     MAN      4  O6   
+        3    a     BMA      3  O6   
+        2    a     NAG      2  O4   
+        1    a     NAG      1  O4   
+
+===========================================
+3.  Saccharide residues detected
+===========================================
+
+The following is a list of all saccharide residues found in the file.  Most of
+them will also be contained in the list of oligosaccharides above.
+
+The identity of the ring oxygen for each residue is also given.
+Ring oxygens are identified by:
+        Atom Name
+        Serial
+        Residue Name
+        Chain ID
+        Residue Serial
+        Alternate Location
+        Insertion Code
+
+8 saccharide residue(s) were detected:
+
+Residue Identity               Name  Serial ResName Chain ResSer InsCode AltLoc
+N-acetyl-b-D-glucopyranose     O5      3706 NAG     a          1 n/a     n/a   
+N-acetyl-b-D-glucopyranose     O5      3720 NAG     a          2 n/a     n/a   
+b-D-mannopyranose              O5      3732 BMA     a          3 n/a     n/a   
+a-D-mannopyranose              O5      3743 MAN     a          4 n/a     n/a   
+a-D-mannopyranose              O5      3754 MAN     a          6 n/a     n/a   
+x-D-mannopyranose              O5      3765 MAN     a          7 n/a     n/a   
+x-D-mannopyranose              O5      3776 MAN     a          5 n/a     n/a   
+a-D-mannopyranose              O5      3787 MAN     a          8 n/a     n/a   
+
+===========================================
+4.  Error and warning messages
+===========================================
+
+No errors or warning messages were issued.
