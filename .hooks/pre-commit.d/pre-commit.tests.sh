@@ -30,7 +30,7 @@ check_gemshome $gemshome
 
 if [ -f $GEMSHOME/tests/All_Tests_Passed ] ; then
     echo  "All tests have passed. Commits are allowed."
-    rm All_Tests_Passed
+    rm $GEMSHOME/tests/All_Tests_Passed
     exit 0
 else
     echo "
