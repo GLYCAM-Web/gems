@@ -68,6 +68,6 @@ fi
 
 
 ############# Allow git commits ###################
-if [[ $tests_passed -eq $number_of_tests ]]; then
+if [[ $tests_passed == $number_of_tests ]]; then
    > All_Tests_Passed 
 fi
