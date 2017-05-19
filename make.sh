@@ -86,8 +86,6 @@ cp -r $GEMSHOME/gmml/.hooks/* $GEMSHOME/gmml/.git/hooks/
 #I don't think this is ideal, and is perhaps silly. OG Apr 2017.
 #People can still clone, make edits, and push without compiling.
 
-cp -r $GEMSGOME/.hooks/. $GEMSHOME/.git/hooks/
-
 ################################################################
 #########                WRITE CONFIG.H                #########
 ################################################################
@@ -119,22 +117,24 @@ cp -r $GEMSGOME/.hooks/. $GEMSHOME/.git/hooks/
 TARGET_MAKE_FILE="Makefile-main"
 IDE="None"
 CLEAN="No"
-WRAP_GMMML="Wrap"
+WRAP_GMML="Wrap"
 
 ################################################################
 #########               COMMAND LINE INPUTS            #########
 ################################################################
 
-if [[ $# -eq 2 ]]; then 
+if [[ $# -eq 1 ]]; then 
     CLEAN="$1"
+elif [[ $# -eq 2 ]]; then
+    CLEAN="$1"
+    WRAP_GMML="$2"
 elif [[ $# -eq 3 ]]; then
     CLEAN="$1"
-    WRAP_GMMML="$2"
-elif [[ $# -eq 4 ]]; then
-    CLEAN="$1"
-    WRAP_GMMML="$2"
+    WRAP_GMML="$2"
     IDE="$3"
 fi
+
+echo "TARGET_MAKE_FILE=$TARGET_MAKE_FILE, IDE=$IDE, CLEAN=$CLEAN, WRAP_GMML=$WRAP_GMML"
 
 if [[ "$1" == "-help" ]] || [[ "$1" == "-h" ]]; then
     printf "\nUsage: $0 clean_gmml? wrap_gmml? ide?\n"
@@ -169,31 +169,6 @@ if [ -f $TARGET_MAKE_FILE ]; then
     echo "Compiling gmml"
     make -j 4 -f $TARGET_MAKE_FILE
 fi
-<<<<<<< HEAD
-PYTHON_FILE="$PYTHON_HOME/Python.h"
-if [ -f $PYTHON_FILE ]; then
-	if [ -f "gmml_wrap.cxx" ]; then
-		echo "Compiling wrapped gmml library in python ..."
-		g++ -O3 -fPIC -c gmml_wrap.cxx -I"$PYTHON_HOME"
-	else
-		echo "gmml_wrap.cxx does not exist"
-	fi
-else
-	echo "PYTHON_HOME variable has not been set"
-fi
-if [ -f "gmml_wrap.o" ]; then
-	echo "Building python interface ..."
-	g++ -shared gmml/build/*.o gmml_wrap.o -o _gmml.so
-else
-	echo "gmml has not been compiled correctly"
-fi
-if [ -d ".git/hooks/pre-commit.d" ]; then
-	rm -r .git/hooks/pre-commit.d
-	rm .git/hooks/pre-commit
-	cp -R hooks/. .git/hooks/
-else
-	cp -R hooks/. .git/hooks/
-=======
 cd ../
 
 ################################################################
@@ -228,5 +203,4 @@ if [[ "$WRAP_GMML" != "no_wrap" ]]; then
         echo "gmml has not been compiled correctly"
     fi
 
->>>>>>> master
 fi
