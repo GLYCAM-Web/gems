@@ -94,6 +94,8 @@ rm test6_output
 
 ############# Allow git Pushes ###################
 if [[ $tests_passed == $number_of_tests ]]; then
-    > All_Tests_Passed 
+    exit 0
     echo "All tests passed"
+else
+    exit 1
 fi

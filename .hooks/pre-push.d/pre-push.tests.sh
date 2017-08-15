@@ -35,9 +35,9 @@ cd - >> /dev/null 2>&1
 echo "Running mandatory tests..."
 cd $GEMSHOME/tests/
  bash run_tests.bash
+ result=$? # record the exit status from compile_run_tests.bash
 cd - >> /dev/null 2>&1
-
-if [ -f $GEMSHOME/tests/All_Tests_Passed ] ; then
+if [ $result -eq 0 ] ; then
     echo  "All tests have passed. Pushing is allowed."
     exit 0
 else
