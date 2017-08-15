@@ -1,20 +1,3 @@
-File written by GEMS/GMML PDB glycan detection package.
-
-Contents:
-    1.  Analysis parameters
-    2.  Saccharide molecules detected
-    3.  Saccharide residues detected
-    4.  Error and warning messages
-
-===========================================
-1.  Analysis parameters
-===========================================
-
-Analysis completed on: 2017-04-21 11:50:45
-The command line was:  /programs/local/bin/PDBSugarID /home/hussain/gems/gems/gmml/example/pdb/1NXC.pdb Outfile keep
-The md5sum for the analyzed file was: 33b5a595943e6fb22d252356405e6856
-
-
 ===========================================
 2.  Saccharide molecules detected
 ===========================================
@@ -31,16 +14,10 @@ Linking atoms, where relevant, are identified by:
         Residue Number
         Atom Name
 
-18 saccharide molecule(s) were detected:
+12 saccharide molecule(s) were detected:
     DManpx1-ASN
     -------------------------------------------------------------------------------------------------------------------------------------------
     NOTES/ISSUES:
-    Category: residue name
-    Type: error
-    Description: Residue name in input PDB file for DGlcpNAcb does not match to PDB code: BGC
-    Category: residue name
-    Type: error
-    Description: Residue name in input PDB file for DGlcpNAcb does not match to PDB code: BGC
     Category: anomeric
     Type: warning
     Description: DManpx: Anomeric oxygen is missing

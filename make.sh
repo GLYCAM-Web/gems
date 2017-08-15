@@ -82,9 +82,8 @@ check_gmmldir $GEMSHOME/gmml
 #Solution: The folder gmml/.hooks is tracked by git.
 # Copy gmml/.hooks to gmml/.git/hooks during installation
 cp -r $GEMSHOME/gmml/.hooks/* $GEMSHOME/gmml/.git/hooks/
-
+cp -r $GEMSHOME/.hooks/* $GEMSHOME/.git/hooks/
 #I don't think this is ideal, and is perhaps silly. OG Apr 2017.
-#People can still clone, make edits, and push without compiling.
 
 ################################################################
 #########                WRITE CONFIG.H                #########

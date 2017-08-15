@@ -33,15 +33,16 @@ Side group atoms:
 [5] -> C6_3700_NAG_a_1_?_?_1
 Anomeric carbon: C1_3695_NAG_a_1_?_?_1
 
-Stereo chemistry chemical code:
+Ring Stereo chemistry chemical code:
       3    a +1 
         P      
     2 4         
 
 Creating PDB file
 PDB file created
-Unable to open ring_conformations.txt file from detect shape program
-Carbon at position 2 is attached to xC-N-C=OCH3
+BFMP ring conformation: 4C1
+
+Carbon at Ring Position 2 is attached to xC-N-C=OCH3
 
 Stereochemistry name: b-D-glucopyranose
 Stereochemistry short name: DGlcpb
@@ -57,15 +58,16 @@ Side group atoms:
 [5] -> C6_3714_NAG_a_2_?_?_1
 Anomeric carbon: C1_3709_NAG_a_2_?_?_1
 
-Stereo chemistry chemical code:
+Ring Stereo chemistry chemical code:
       3    a +1 
         P      
     2 4         
 
 Creating PDB file
 PDB file created
-Unable to open ring_conformations.txt file from detect shape program
-Carbon at position 2 is attached to xC-N-C=OCH3
+BFMP ring conformation: 4C1
+
+Carbon at Ring Position 2 is attached to xC-N-C=OCH3
 
 Stereochemistry name: b-D-glucopyranose
 Stereochemistry short name: DGlcpb
@@ -81,14 +83,15 @@ Side group atoms:
 [5] -> C6_3728_BMA_a_3_?_?_1
 Anomeric carbon: C1_3723_BMA_a_3_?_?_1
 
-Stereo chemistry chemical code:
+Ring Stereo chemistry chemical code:
     2 3    a +1 
         P      
       4         
 
 Creating PDB file
 PDB file created
-Unable to open ring_conformations.txt file from detect shape program
+BFMP ring conformation: 4C1
+
 
 Stereochemistry name: b-D-mannopyranose
 Stereochemistry short name: DManpb
@@ -104,14 +107,15 @@ Side group atoms:
 [5] -> C6_3739_MAN_a_4_?_?_1
 Anomeric carbon: C1_3734_MAN_a_4_?_?_1
 
-Stereo chemistry chemical code:
+Ring Stereo chemistry chemical code:
     2 3      +1 
         P      
       4       a 
 
 Creating PDB file
 PDB file created
-Unable to open ring_conformations.txt file from detect shape program
+BFMP ring conformation: 4C1
+
 
 Stereochemistry name: a-D-mannopyranose
 Stereochemistry short name: DManpa
@@ -127,14 +131,15 @@ Side group atoms:
 [5] -> C6_3750_MAN_a_6_?_?_1
 Anomeric carbon: C1_3745_MAN_a_6_?_?_1
 
-Stereo chemistry chemical code:
+Ring Stereo chemistry chemical code:
     2 3      +1 
         P      
       4       a 
 
 Creating PDB file
 PDB file created
-Unable to open ring_conformations.txt file from detect shape program
+BFMP ring conformation: 4C1
+
 
 Stereochemistry name: a-D-mannopyranose
 Stereochemistry short name: DManpa
@@ -149,14 +154,15 @@ Side group atoms:
 [5] -> C6_3761_MAN_a_7_?_?_1
 Anomeric carbon: C1_3756_MAN_a_7_?_?_1
 
-Stereo chemistry chemical code:
+Ring Stereo chemistry chemical code:
     2 3      +1 
         P      
       4         
 
 Creating PDB file
 PDB file created
-Unable to open ring_conformations.txt file from detect shape program
+BFMP ring conformation: 4C1
+
 
 Stereochemistry name: x-D-mannopyranose
 Stereochemistry short name: DManpx
@@ -171,14 +177,15 @@ Side group atoms:
 [5] -> C6_3772_MAN_a_5_?_?_1
 Anomeric carbon probably is: C1_3767_MAN_a_5_?_?_1
 
-Stereo chemistry chemical code:
+Ring Stereo chemistry chemical code:
     2 3      +1 
         P      
       4         
 
 Creating PDB file
 PDB file created
-Unable to open ring_conformations.txt file from detect shape program
+BFMP ring conformation: 4C1
+
 
 Stereochemistry name: x-D-mannopyranose
 Stereochemistry short name: DManpx
@@ -194,14 +201,15 @@ Side group atoms:
 [5] -> C6_3783_MAN_a_8_?_?_1
 Anomeric carbon probably is: C1_3778_MAN_a_8_?_?_1
 
-Stereo chemistry chemical code:
+Ring Stereo chemistry chemical code:
     2 3      +1 
         P      
       4       a 
 
 Creating PDB file
 PDB file created
-Unable to open ring_conformations.txt file from detect shape program
+BFMP ring conformation: 4C1
+
 
 Stereochemistry name: a-D-mannopyranose
 Stereochemistry short name: DManpa
@@ -224,14 +232,6 @@ DManpa1-6DManpx
 -------------------------------------------------------------------------------------------------------------------------------------------
 
 NOTES/ISSUES:
-
-Category: residue name
-Type: error
-Description: Residue name in input PDB file for DGlcpNAcb does not match to PDB code: BGC
-
-Category: residue name
-Type: error
-Description: Residue name in input PDB file for DGlcpNAcb does not match to PDB code: BGC
 
 Category: anomeric
 Type: warning
