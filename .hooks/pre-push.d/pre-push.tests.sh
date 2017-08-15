@@ -34,7 +34,7 @@ cd - >> /dev/null 2>&1
 
 echo "Running mandatory tests..."
 cd $GEMSHOME/tests/
- bash run_tests.bash
+ bash run_tests.sh
  result=$? # record the exit status from compile_run_tests.bash
 cd - >> /dev/null 2>&1
 if [ $result -eq 0 ] ; then
