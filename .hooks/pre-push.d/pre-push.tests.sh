@@ -27,9 +27,9 @@ gemshome=`pwd`
 check_gemshome $gemshome 
 
 #Compile gmml if not compiled:
-echo "Compiling gmml if necessary with ./make.sh NoClean no-wrap"
+echo "Compiling gmml if necessary with ./make.sh NoClean nwrap"
 cd $GEMSHOME/
- ./make.sh no_clean no_wrap
+ ./make.sh no_clean wrap
 cd - >> /dev/null 2>&1
 
 echo "Running mandatory tests..."
