@@ -33,9 +33,7 @@ Usage:
 	This program searches Glycan structures based on the given pattern.
 	
 	Command:
-	   python3 GlyFinderExtractNameSequenceByRegex [output_type] oligoNameSequencePattern
-	   or
-           ./GlyFinderExtractNameSequenceByRegex [output_type] oligoNameSequence
+           GlyFinderExtractNameSequenceByRegex [output_type] oligoNameSequence
 
         where:
             oligoNameSequencePattern is Pattern for which

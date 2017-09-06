@@ -82,9 +82,8 @@ check_gmmldir $GEMSHOME/gmml
 #Solution: The folder gmml/.hooks is tracked by git.
 # Copy gmml/.hooks to gmml/.git/hooks during installation
 cp -r $GEMSHOME/gmml/.hooks/* $GEMSHOME/gmml/.git/hooks/
-
+cp -r $GEMSHOME/.hooks/* $GEMSHOME/.git/hooks/
 #I don't think this is ideal, and is perhaps silly. OG Apr 2017.
-#People can still clone, make edits, and push without compiling.
 
 ################################################################
 #########                WRITE CONFIG.H                #########
@@ -117,22 +116,24 @@ cp -r $GEMSHOME/gmml/.hooks/* $GEMSHOME/gmml/.git/hooks/
 TARGET_MAKE_FILE="Makefile-main"
 IDE="None"
 CLEAN="No"
-WRAP_GMMML="Wrap"
+WRAP_GMML="Wrap"
 
 ################################################################
 #########               COMMAND LINE INPUTS            #########
 ################################################################
 
-if [[ $# -eq 2 ]]; then 
+if [[ $# -eq 1 ]]; then 
     CLEAN="$1"
+elif [[ $# -eq 2 ]]; then
+    CLEAN="$1"
+    WRAP_GMML="$2"
 elif [[ $# -eq 3 ]]; then
     CLEAN="$1"
-    WRAP_GMMML="$2"
-elif [[ $# -eq 4 ]]; then
-    CLEAN="$1"
-    WRAP_GMMML="$2"
+    WRAP_GMML="$2"
     IDE="$3"
 fi
+
+echo "TARGET_MAKE_FILE=$TARGET_MAKE_FILE, IDE=$IDE, CLEAN=$CLEAN, WRAP_GMML=$WRAP_GMML"
 
 if [[ "$1" == "-help" ]] || [[ "$1" == "-h" ]]; then
     printf "\nUsage: $0 clean_gmml? wrap_gmml? ide?\n"

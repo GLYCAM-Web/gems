@@ -1,0 +1,20 @@
+GENERATED QUERY:
+PREFIX : <http://gmmo.uga.edu/#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT ?oligo_sequence ?residue_links ?glycosidic_linkage WHERE {
+:4A2G    :hasOligo   ?oligo.
+?oligo    :oligoName 	?oligo_sequence.
+OPTIONAL { ?oligo	:oligoResidueLinks	?residue_links.
+?linkage 	:hasParent 	?oligo.
+?linkage	:glycosidicLinkage    ?glycosidic_linkage.}
+}
+
+
+RESULTS: 
+"oligo_sequence","residue_links","glycosidic_linkage"
+"DGlcpNAcb1-4DGlcpNAcb1-ASN","NAG(1521_A)-NAG(1520_A)","NAG(1520_A)O4"
+"DGlcpNAcb1-4DGlcpNAcb1-ASN","NAG(1523_A)-NAG(1522_A)","NAG(1522_A)O4"
+
