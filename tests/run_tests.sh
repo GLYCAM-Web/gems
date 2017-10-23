@@ -14,7 +14,7 @@ ${THISPYTHON} ./bin/detect_sugars $GEMSHOME/tests/inputs/1NXC.pdb > $GEMSHOME/te
 cd - >> /dev/null 2>&1 #return now to reduce chance of forgetting later
 DIFF=$(diff test1_output correct_outputs/test1_output) 
 if [ "$DIFF" != "" ]; then
-    echo "Test failed"
+    echo "Test FAILED!"
 else
     echo "Test passed."
     ((tests_passed++))
@@ -31,7 +31,7 @@ cd - >> /dev/null 2>&1
 tail -n +18 test2_output >> tmp2
 DIFF=$(diff tmp2 correct_outputs/test2_output)
 if [ "$DIFF" != "" ]; then
-    echo "Test failed"
+    echo "Test FAILED!"
 else
     echo "Test passed."
     ((tests_passed++))
@@ -48,7 +48,7 @@ cd $GEMSHOME
 cd - >> /dev/null 2>&1
 DIFF=$(diff test3_output correct_outputs/test3_output)
 if [ "$DIFF" != "" ]; then
-    echo "Test failed"
+    echo "Test FAILED!"
 else
     echo "Test passed."
     ((tests_passed++))
@@ -61,7 +61,7 @@ echo "Testing test_installation.py..."
 ${THISPYTHON} ../test_installation.py "--help" > test4_output
 DIFF=$(diff test4_output correct_outputs/test4_output)
 if [ "$DIFF" != "" ]; then
-    echo "Test failed"
+    echo "Test FAILED!"
 else
     echo "Test passed."
     ((tests_passed++))
@@ -74,7 +74,7 @@ rm test4_output
 #python3 ../testbin/query1_ExtractOntologyInfoByNameOfGlycan.py > test5_output
 #DIFF=$(diff test5_output correct_outputs/test5_output)
 #if [ "$DIFF" != "" ]; then
-#    echo "Test failed"
+#    echo "Test FAILED!"
 #else
 #    echo "Test passed."
 #    ((tests_passed++))
@@ -87,7 +87,7 @@ rm test4_output
 #python3 ../testbin/query3_ExtractOntologyInfoByPDBID.py > test6_output
 #DIFF=$(diff test6_output correct_outputs/test6_output)
 #if [ "$DIFF" != "" ]; then
-#    echo "Test failed"
+#    echo "Test FAILED!"
 #else
 #    echo "Test passed."
 #    ((tests_passed++))

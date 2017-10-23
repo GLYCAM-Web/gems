@@ -175,7 +175,7 @@ Side group atoms:
 [3] -> O3_3774_MAN_A_5_?_?_1
 [4] -> O4_3775_MAN_A_5_?_?_1
 [5] -> C6_3772_MAN_A_5_?_?_1
-Anomeric carbon assigned based on its atom name index (1) as found in the input file (/home/chatali/gems/tests/inputs/1NXC.pdb), Anomeric Carbon is: C1_3767_MAN_A_5_?_?_1
+Anomeric carbon assigned based on its atom name index (1), Anomeric Carbon is: C1_3767_MAN_A_5_?_?_1
 
 Ring Stereo chemistry chemical code:
     2 3      +1 
@@ -199,7 +199,7 @@ Side group atoms:
 [3] -> O3_3785_MAN_A_8_?_?_1
 [4] -> O4_3786_MAN_A_8_?_?_1
 [5] -> C6_3783_MAN_A_8_?_?_1
-Anomeric carbon assigned based on its atom name index (1) as found in the input file (/home/chatali/gems/tests/inputs/1NXC.pdb), Anomeric Carbon is: C1_3778_MAN_A_8_?_?_1
+Anomeric carbon assigned based on its atom name index (1), Anomeric Carbon is: C1_3778_MAN_A_8_?_?_1
 
 Ring Stereo chemistry chemical code:
     2 3      +1 
