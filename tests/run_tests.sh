@@ -9,7 +9,7 @@ tests_passed=0
 ##################### Test 1 ########################
 echo "Testing detect_sugar..."
 #Runs the script that is being tested
-cd $GEMSHOME #detect sugars has hardcoded path to apps/BFMP/detect_shape in GMML::Assembly.ExtractSugars. I don't understand how it works for Gly-spec. #OCG 2017-08-10 
+cd $GEMSHOME #detect sugars has hardcoded path to apps/BFMP/detect_shape in GMML::Assembly.ExtractSugars.
 ${THISPYTHON} ./bin/detect_sugars $GEMSHOME/tests/inputs/1NXC.pdb > $GEMSHOME/tests/test1_output
 cd - >> /dev/null 2>&1 #return now to reduce chance of forgetting later
 DIFF=$(diff test1_output correct_outputs/test1_output) 
