@@ -172,6 +172,7 @@ cd gmml/
 
  if [ "$CLEAN" == "clean" ]; then
      make -f $TARGET_MAKE_FILE distclean
+     qmake -o $TARGET_MAKE_FILE
  fi       
  
  echo "Compiling gmml"
