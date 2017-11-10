@@ -109,14 +109,33 @@ cp -r $GEMSHOME/.hooks/* $GEMSHOME/.git/hooks/
 #printf "\n###############################################################################\n\n" >> config.h
 
 ################################################################
+##########               Print help message         ############
+################################################################
+
+if [[ "$1" == "-help" ]] || [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]]; then
+    printf "*************************************************************\n"
+    printf "Usage: $0 clean_gmml? wrap_gmml? qmake_gmml?\n"
+    printf "Example: $0 clean no_wrap qmake\n"
+    printf "Default: $0 no_clean wrap no_qmake\n"
+    printf "*************************************************************\n"
+    printf "If selected the options do this:\n"
+    printf "     1. Cleans gmml before making\n"
+    printf "     2. Wrap up via swig (wrapping required only for Gems)\n"
+    printf "     3. Regenerate gmml.pro and Makefile using qmake\n"
+    printf "*************************************************************\n"    
+    echo "Exiting."
+    exit 1
+fi
+
+################################################################
 #########                SET UP DEFAULTS               #########
 ################################################################
 
 #Changing the following options are for developers.
-TARGET_MAKE_FILE="Makefile-main"
-IDE="None"
-CLEAN="No"
-WRAP_GMML="Wrap"
+TARGET_MAKE_FILE="Makefile"
+CLEAN="no"
+WRAP_GMML="wrap"
+QMAKE="no"
 
 ################################################################
 #########               COMMAND LINE INPUTS            #########
@@ -130,21 +149,10 @@ elif [[ $# -eq 2 ]]; then
 elif [[ $# -eq 3 ]]; then
     CLEAN="$1"
     WRAP_GMML="$2"
-    IDE="$3"
+    QMAKE="$3"
 fi
 
-echo "TARGET_MAKE_FILE=$TARGET_MAKE_FILE, IDE=$IDE, CLEAN=$CLEAN, WRAP_GMML=$WRAP_GMML"
-
-if [[ "$1" == "-help" ]] || [[ "$1" == "-h" ]]; then
-    printf "\nUsage: $0 clean_gmml? wrap_gmml? ide?\n"
-    printf "Example $0 clean no_wrap Qt\n" 
-    printf "This 1. Cleans gmml before making\n" 
-    printf "     2. Does not wrap up via swig (required only for Gems)\n"
-    printf "     3. Prepares a .pro file for Qt to read\n"
-    echo "Exiting."
-    exit 1
-fi
-
+printf "\nTARGET_MAKE_FILE: $TARGET_MAKE_FILE, CLEAN: $CLEAN, WRAP_GMML: $WRAP_GMML, qmake_gmml: $QMAKE\n"
 
 ################################################################
 #########                  COMPILE GMML                #########
@@ -155,19 +163,20 @@ if [[ "$WRAP_GMML" != "no_wrap" ]]; then
     check_pythonhome
 fi
 
-cd gmml
-if [ -f $TARGET_MAKE_FILE ]; then
-    if [ "$CLEAN" == "clean" ]; then
-        make -f $TARGET_MAKE_FILE distclean
-        rm -rf gmml.pro*
-    fi
-    if [ "$IDE" == "Qt" ]; then
-        qmake -project -t lib -o gmml.pro "OBJECTS_DIR = build" "DESTDIR = bin"
-        qmake -o Makefile 
-    fi
-    echo "Compiling gmml"
-    make -j 4 -f $TARGET_MAKE_FILE
-fi
+cd gmml/
+
+ if [ "$QMAKE" == "qmake" ] || [ ! -f $TARGET_MAKE_FILE ] || [ ! -f gmml.pro ]; then # If user requests or if Makefile or gmml.pro does not exit, create them.
+     qmake -project -t lib -o gmml.pro "OBJECTS_DIR = build" "DESTDIR = bin" -r src/ includes/ -nopwd
+     qmake -o $TARGET_MAKE_FILE
+ fi
+
+ if [ "$CLEAN" == "clean" ]; then
+     make -f $TARGET_MAKE_FILE distclean
+ fi       
+ 
+ echo "Compiling gmml"
+ make -j 4 -f $TARGET_MAKE_FILE
+
 cd ../
 
 ################################################################
