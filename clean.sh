@@ -1,4 +1,4 @@
-TARGET_MAKE_FILE="Makefile-main"
+TARGET_MAKE_FILE="Makefile"
 echo $TARGET_MAKE_FILE
 cd gmml
 if [ -f $TARGET_MAKE_FILE ]; then
