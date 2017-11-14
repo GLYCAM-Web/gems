@@ -1,3 +1,20 @@
+File written by GEMS/GMML PDB glycan detection package.
+
+Contents:
+    1.  Analysis parameters
+    2.  Saccharide molecules detected
+    3.  Saccharide residues detected
+    4.  Error and warning messages
+
+===========================================
+1.  Analysis parameters
+===========================================
+
+Analysis completed on: 2017-11-14 17:26:06
+The command line was:  ./bin/PDBSugarID /home/oliver/Programs/gems/tests/inputs/1NXC.pdb /home/oliver/Programs/gems/tests/test2_output keep
+The md5sum for the analyzed file was: 33b5a595943e6fb22d252356405e6856
+
+
 ===========================================
 2.  Saccharide molecules detected
 ===========================================
@@ -14,14 +31,10 @@ Linking atoms, where relevant, are identified by:
         Residue Number
         Atom Name
 
-18 saccharide molecule(s) were detected:
+12 saccharide molecule(s) were detected:
     DManpa1-6DManpa1-6DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-ASN
-    oligo_res_link: MAN(6_A_4C1)-MAN(4_A_4C1)-BMA(3_A_4C1)-NAG(2_A_4C1)-NAG(1_A_4C1)-ASN(515_A_)
     DManpx1-ASN
-    oligo_link: 
-    oligo_res_link: MAN(7_A_4C1)
     DManpa1-6DManpx
-    oligo_res_link: MAN(8_A_4C1)-MAN(5_A_4C1)
     -------------------------------------------------------------------------------------------------------------------------------------------
     NOTES/ISSUES:
     Category: anomeric
@@ -31,15 +44,6 @@ Linking atoms, where relevant, are identified by:
     Type: warning
     Description: DManpa: Could not find glycosidic oxygen or nitrogen within 1.65 Angstroms of a ring carbon bonded to the ring oxygen(O5).
     -------------------------------------------------------------------------------------------------------------------------------------------
-    oligo_link: 
-        Linkage atom(s):
-        1    A     MAN      5  O6   
-    oligo_link: 
-        Linkage atom(s):
-        4    A     MAN      4  O6   
-        3    A     BMA      3  O6   
-        2    A     NAG      2  O4   
-        1    A     NAG      1  O4   
 
 ===========================================
 3.  Saccharide residues detected

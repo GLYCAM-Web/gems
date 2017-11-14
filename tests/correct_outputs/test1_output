@@ -219,22 +219,8 @@ Short name: DManpa
 
 Oligosaccharides:
 DManpa1-6DManpa1-6DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-ASN
-oligo_link: 
-{4}MAN(6_A_4C1)C1-MAN(4_A_4C1)C6, Glycosidic linkage: MAN(4_A)O6
-{3}MAN(4_A_4C1)C1-BMA(3_A_4C1)C6, Glycosidic linkage: BMA(3_A)O6
-{2}BMA(3_A_4C1)C1-NAG(2_A_4C1)C4, Glycosidic linkage: NAG(2_A)O4
-{1}NAG(2_A_4C1)C1-NAG(1_A_4C1)C4, Glycosidic linkage: NAG(1_A)O4
-oligo_res_link: MAN(6_A_4C1)-MAN(4_A_4C1)-BMA(3_A_4C1)-NAG(2_A_4C1)-NAG(1_A_4C1)-ASN(515_A_)
-
 DManpx1-ASN
-oligo_link: 
-oligo_res_link: MAN(7_A_4C1)
-
 DManpa1-6DManpx
-oligo_link: 
-{1}MAN(8_A_4C1)C1-MAN(5_A_4C1)C6, Glycosidic linkage: MAN(5_A)O6
-oligo_res_link: MAN(8_A_4C1)-MAN(5_A_4C1)
-
 -------------------------------------------------------------------------------------------------------------------------------------------
 
 NOTES/ISSUES:

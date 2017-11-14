@@ -3,7 +3,7 @@
 THISPYTHON='python3'
 
 #Manually change this number as you add tests:
-number_of_tests=4
+number_of_tests=3
 tests_passed=0
 
 ##################### Test 1 ########################
@@ -18,8 +18,8 @@ if [ "$DIFF" != "" ]; then
 else
     echo "Test passed."
     ((tests_passed++))
+    rm test1_output
 fi
-rm test1_output
 
 
 ##################### Test 2 ########################
@@ -35,10 +35,10 @@ if [ "$DIFF" != "" ]; then
 else
     echo "Test passed."
     ((tests_passed++))
+    rm test2_output
+    rm test2_output_sugar-details
 fi
 rm tmp2
-rm test2_output
-rm test2_output_sugar-details
 
 
 ##################### Test 3 ########################
@@ -52,8 +52,8 @@ if [ "$DIFF" != "" ]; then
 else
     echo "Test passed."
     ((tests_passed++))
+    rm test3_output
 fi
-rm test3_output
 
 ##################### Test 4 ########################
 echo "Testing test_installation.py..."
@@ -65,8 +65,8 @@ if [ "$DIFF" != "" ]; then
 else
     echo "Test passed."
     ((tests_passed++))
+    rm test4_output
 fi
-rm test4_output
  
 ##################### Test 5 ########################
 #echo "Testing GMMO query 1..."
