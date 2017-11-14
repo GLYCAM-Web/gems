@@ -1,21 +1,3 @@
-File written by GEMS/GMML PDB glycan detection package.
-
-Contents:
-    1.  Analysis parameters
-    2.  Saccharide molecules detected
-    3.  Saccharide residues detected
-    4.  Error and warning messages
-
-===========================================
-1.  Analysis parameters
-===========================================
-
-Analysis completed on: 2017-11-14 17:26:06
-The command line was:  ./bin/PDBSugarID /home/oliver/Programs/gems/tests/inputs/1NXC.pdb /home/oliver/Programs/gems/tests/test2_output keep
-The md5sum for the analyzed file was: 33b5a595943e6fb22d252356405e6856
-
-
-===========================================
 2.  Saccharide molecules detected
 ===========================================
 

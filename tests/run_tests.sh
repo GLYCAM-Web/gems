@@ -28,7 +28,7 @@ echo "Testing PDBSugarID..."
 cd $GEMSHOME
 ${THISPYTHON} ./bin/PDBSugarID $GEMSHOME/tests/inputs/1NXC.pdb $GEMSHOME/tests/test2_output keep
 cd - >> /dev/null 2>&1
-tail -n +18 test2_output >> tmp2
+tail -n +18 test2_output > tmp2
 DIFF=$(diff tmp2 correct_outputs/test2_output)
 if [ "$DIFF" != "" ]; then
     echo "Test FAILED!"
@@ -41,7 +41,7 @@ fi
 rm tmp2
 
 
-##################### Test 3 ########################
+	##################### Test 3 ########################
 echo "Testing test_installation.bash..."
 cd $GEMSHOME
 ./test_installation.bash > $GEMSHOME/tests/test3_output

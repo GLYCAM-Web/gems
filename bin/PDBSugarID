@@ -417,7 +417,7 @@ file_stuff="""
 """
 outf.write(file_stuff)
 if len(generalerrors) == 0:
-    outf.write("No errors or warning messages were issued.")
+    outf.write("No errors or warning messages were issued.\n")
 else :
     for i in range(len(generalerrors)):
         outstuff="""{index}. {error}\n"""
