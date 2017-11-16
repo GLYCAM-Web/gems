@@ -166,7 +166,8 @@ fi
 cd gmml/
 
  if [ "$QMAKE" == "qmake" ] || [ ! -f $TARGET_MAKE_FILE ] || [ ! -f gmml.pro ]; then # If user requests or if Makefile or gmml.pro does not exit, create them.
-     qmake -project -t lib -o gmml.pro "OBJECTS_DIR = build" "DESTDIR = bin" -r src/ includes/ -nopwd
+    ## This is going to be broken up to variables instead of being this long command. Just wanted to get a working version pushed up.
+    qmake -project -t lib -o gmml.pro "QMAKE_CXXFLAGS += -Wall -W" "QMAKE_CFLAGS += -Wall -W" "DEFINES += _REENTRANT" "CONFIG = no_lflag_merge" "unix:LIBS = -L/usr/lib/x86_64-linux-gnu -lpthread" "OBJECTS_DIR = build" "DESTDIR = bin" -r src/ includes/ -nopwd
      qmake -o $TARGET_MAKE_FILE
  fi
 
