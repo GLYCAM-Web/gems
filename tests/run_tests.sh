@@ -3,7 +3,7 @@
 THISPYTHON='python3'
 
 #Manually change this number as you add tests:
-number_of_tests=3
+number_of_tests=4
 tests_passed=0
 
 ##################### Test 1 ########################
