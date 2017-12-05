@@ -33,7 +33,7 @@
 
 #include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceprocessingexception.hpp"
 #include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceresidue.hpp"
-#include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceamberprepresidue.hpp"
+#include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceglycam06residue.hpp"
 #include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequence.hpp"
 
 //#include "gmml/includes/InputSet/CifFileSpace/ciffileatom.hpp"
@@ -177,7 +177,7 @@ std::ostream & get_cout() { return std::cout; }
 
 %include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceprocessingexception.hpp"
 %include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceresidue.hpp"
-%include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceamberprepresidue.hpp"
+%include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceglycam06residue.hpp"
 %include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequence.hpp"
 
 %include "gmml/includes/InputSet/PdbFileSpace/pdbatom.hpp"
@@ -587,7 +587,7 @@ std::ostream & get_cout() { return std::cout; }
 %template(condensedsequence_residue_tree) std::vector<CondensedSequenceSpace::CondensedSequenceResidue*>;
 
 //typedef std::vector<CondensedSequenceAmberPrepResidue*> CondensedSequenceAmberPrepResidueTree;
-%template(condensedsequence_amber_prep_residue_tree) std::vector<CondensedSequenceSpace::CondensedSequenceAmberPrepResidue*>;
+%template(condensedsequence_glycam06_residue_tree) std::vector<CondensedSequenceSpace::CondensedSequenceAmberPrepResidue*>;
 
 //typedef std::pair<std::string, RotamersAndGlycosidicAnglesInfo*> RotamerNameInfoPair;
 %template(rotamer_name_info_pair) std::pair<std::string, CondensedSequenceSpace::RotamersAndGlycosidicAnglesInfo*>;
