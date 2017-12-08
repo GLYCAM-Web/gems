@@ -586,8 +586,8 @@ std::ostream & get_cout() { return std::cout; }
 //typedef std::vector<CondensedSequenceResidue*> CondensedSequenceResidueTree;
 %template(condensedsequence_residue_tree) std::vector<CondensedSequenceSpace::CondensedSequenceResidue*>;
 
-//typedef std::vector<CondensedSequenceAmberPrepResidue*> CondensedSequenceAmberPrepResidueTree;
-%template(condensedsequence_glycam06_residue_tree) std::vector<CondensedSequenceSpace::CondensedSequenceAmberPrepResidue*>;
+//typedef std::vector<CondensedSequenceGlycam06Residue*> CondensedSequenceGlycam06ResidueTree;
+%template(condensedsequence_glycam06_residue_tree) std::vector<CondensedSequenceSpace::CondensedSequenceGlycam06Residue*>;
 
 //typedef std::pair<std::string, RotamersAndGlycosidicAnglesInfo*> RotamerNameInfoPair;
 %template(rotamer_name_info_pair) std::pair<std::string, CondensedSequenceSpace::RotamersAndGlycosidicAnglesInfo*>;
