@@ -4,7 +4,8 @@
 
 
 import sys
-sys.path.insert(0, '../')
+import os
+sys.path.insert(0, os.environ['GEMSHOME'] + '/')
 import gmml
 import time
 het = gmml.string_vector()
@@ -12,7 +13,7 @@ amino_libs = gmml.string_vector()
 pdb_file = ''
 if len(sys.argv) < 2:
 	print('Please import one pdb file using -pdb option and (optionally) amino library file(s) using -amino_libs option')
-elif sys.argv[1] == '-amino_libs': 
+elif sys.argv[1] == '-amino_libs':
 	arguments = sys.argv[2].split(',')
 	for argument in arguments:
 		amino_libs.push_back(argument)
@@ -29,7 +30,7 @@ elif sys.argv[1] == '-pdb':
 				amino_libs.push_back(argument)
 else:
 	print('Please import one pdb file using -pdb option and (optionally) amino library file(s) using -amino_libs option')
-	
+
 
 if pdb_file != '':
 	het.push_back(pdb_file)
@@ -40,5 +41,3 @@ if pdb_file != '':
 	end = time.time()
 	print('Time of building structure by distance:',end - start,'(sec)')
 	oligos = temp.ExtractSugars(amino_libs, False, True)
-
-
