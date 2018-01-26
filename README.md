@@ -60,7 +60,7 @@ pwd
 /gems
 ```
 
-Set your **`PYTHON_HOME`** environment variable to the location of the `Python.h` file for your Python version. For Ubuntu, use one of the following: 
+Set your **`PYTHON_HOME`** environment variable to the location of the `Python.h` file for your Python version. For Ubuntu, use something like one of the following: 
 
 `export PYTHON_HOME=/usr/include/python3.4`   
 or   
@@ -69,6 +69,14 @@ or
 Make sure to use the correct path to your Python version, and the correct version of Python. 
 
 For other Linux distros, please follow the instructions to set environment variables specific to your system. 
+
+To control the number of processors used during the *`make`* process, set the GEMSMAKEPROCS environment variable.  
+The default value of 4 will be used if you do not set this variable. For exmaple, a command like one of the 
+will set the number of processors to be used during *`make`* to 8:
+
+`export GEMSMAKEPROCS=8`   
+or   
+`setenv GEMSMAKEPROCS 8`  
 
 After setting the `PYTHON_HOME`, run the makefile in order to compile `gmml` and create the `gems` interface. 
 

@@ -33,6 +33,20 @@ check_pythonhome() {
     fi
 }
 
+get_numprocs() {
+   if [ -z "$GEMSMAKEPROCS" ]; then
+	   NMP=4
+   elif ! [[ $GEMSMAKEPROCS =~ ^[0-9]+$ ]] ; then
+	   echo "GEMSMAKEPROCS is not a valid integer; setting to 4"
+	   NMP=4
+   elif [ "$GEMSMAKEPROCS" -eq "0" ] ; then
+	   echo "GEMSMAKEPROCS cannot be zero; setting to 4"
+	   NMP=4
+   else
+	   NMP=$GEMSMAKEPROCS
+   fi
+}
+
 check_gemshome() {
    if [ -z "$GEMSHOME" ]; then
       echo ""
@@ -72,6 +86,7 @@ check_gmmldir() {
 gemshome=`pwd`
 check_gemshome $gemshome
 check_gmmldir $GEMSHOME/gmml
+get_numprocs
 
 ################################################################
 #########              CREATE CLIENT HOOKS             #########
@@ -177,7 +192,7 @@ cd gmml/
  fi       
  
  echo "Compiling gmml"
- make -j 4 -f $TARGET_MAKE_FILE
+ make -j ${NMP} -f $TARGET_MAKE_FILE
 
 cd ../
 
