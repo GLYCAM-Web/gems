@@ -150,7 +150,6 @@ fi
 TARGET_MAKE_FILE="Makefile"
 CLEAN="no"
 WRAP_GMML="wrap"
-QMAKE="no"
 
 ################################################################
 #########               COMMAND LINE INPUTS            #########
@@ -161,13 +160,9 @@ if [[ $# -eq 1 ]]; then
 elif [[ $# -eq 2 ]]; then
     CLEAN="$1"
     WRAP_GMML="$2"
-elif [[ $# -eq 3 ]]; then
-    CLEAN="$1"
-    WRAP_GMML="$2"
-    QMAKE="$3"
 fi
 
-printf "\nTARGET_MAKE_FILE: $TARGET_MAKE_FILE, CLEAN: $CLEAN, WRAP_GMML: $WRAP_GMML, qmake_gmml: $QMAKE\n"
+printf "\nTARGET_MAKE_FILE: $TARGET_MAKE_FILE, CLEAN: $CLEAN, WRAP_GMML: $WRAP_GMML\n"
 
 ################################################################
 #########                  COMPILE GMML                #########
@@ -179,12 +174,10 @@ if [[ "$WRAP_GMML" != "no_wrap" ]]; then
 fi
 
 cd gmml/
-
- if [ "$QMAKE" == "qmake" ] || [ ! -f $TARGET_MAKE_FILE ] || [ ! -f gmml.pro ]; then # If user requests or if Makefile or gmml.pro does not exit, create them.
-    ## This is going to be broken up to variables instead of being this long command. Just wanted to get a working version pushed up.
-    qmake -project -t lib -o gmml.pro "QMAKE_CXXFLAGS += -Wall -W -std=c++98" "QMAKE_CFLAGS += -Wall -W" "DEFINES += _REENTRANT" "CONFIG = no_lflag_merge" "unix:LIBS = -L/usr/lib/x86_64-linux-gnu -lpthread" "OBJECTS_DIR = build" "DESTDIR = bin" -r src/ includes/ -nopwd
-     qmake -o $TARGET_MAKE_FILE
- fi
+ # Always create a new gmml.pro and makefile
+ ## This is going to be broken up to variables instead of being this long command. Just wanted to get a working version pushed up.
+ qmake -project -t lib -o gmml.pro "QMAKE_CXXFLAGS += -Wall -W -std=c++98" "QMAKE_CFLAGS += -Wall -W" "DEFINES += _REENTRANT" "CONFIG = no_lflag_merge" "unix:LIBS = -L/usr/lib/x86_64-linux-gnu -lpthread" "OBJECTS_DIR = build" "DESTDIR = bin" -r src/ includes/ -nopwd
+ qmake -o $TARGET_MAKE_FILE
 
  if [ "$CLEAN" == "clean" ]; then
      make -f $TARGET_MAKE_FILE distclean
