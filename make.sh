@@ -129,14 +129,13 @@ cp -r $GEMSHOME/.hooks/* $GEMSHOME/.git/hooks/
 
 if [[ "$1" == "-help" ]] || [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]]; then
     printf "*************************************************************\n"
-    printf "Usage: $0 clean_gmml? wrap_gmml? qmake_gmml?\n"
-    printf "Example: $0 clean no_wrap qmake\n"
-    printf "Default: $0 no_clean wrap no_qmake\n"
+    printf "Usage: $0 clean_gmml? wrap_gmml?\n"
+    printf "Example: $0 clean no_wrap\n"
+    printf "Default: $0 no_clean wrap\n"
     printf "*************************************************************\n"
     printf "If selected the options do this:\n"
     printf "     1. Cleans gmml before making\n"
     printf "     2. Wrap up via swig (wrapping required only for Gems)\n"
-    printf "     3. Regenerate gmml.pro and Makefile using qmake\n"
     printf "*************************************************************\n"    
     echo "Exiting."
     exit 1
