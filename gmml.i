@@ -40,57 +40,58 @@
 //#include "gmml/includes/InputSet/CifFileSpace/ciffile.hpp"
 //#include "gmml/includes/InputSet/CifFileSpace/ciffileprocessingexception.hpp"
 
-#include "gmml/includes/InputSet/PdbFileSpace/pdbatom.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbatomsection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbatomcard.hpp"
-#include "gmml/includes/InputSet/PdbFileSpace/pdbcompoundcard.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbcompoundsection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbcompoundspecification.hpp"
-#include "gmml/includes/InputSet/PdbFileSpace/pdbconnectcard.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbconnectsection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbcrystallographiccard.hpp"
-#include "gmml/includes/InputSet/PdbFileSpace/pdbdisulfidebondcard.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbdisulfidebondsection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbdisulfideresidue.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbdisulfideresiduebond.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbfile.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbfileprocessingexception.hpp"
-#include "gmml/includes/InputSet/PdbFileSpace/pdbformula.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbformulasection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbformulacard.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbheadercard.hpp"
-#include "gmml/includes/InputSet/PdbFileSpace/pdbhelix.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbhelixsection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbhelixcard.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbhelixresidue.hpp"
-#include "gmml/includes/InputSet/PdbFileSpace/pdbheterogen.hpp"
-#include "gmml/includes/InputSet/PdbFileSpace/pdbheterogenatomcard.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbheterogencard.hpp"
-#include "gmml/includes/InputSet/PdbFileSpace/pdbheterogenname.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbheterogenatomsection.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbheterogensection.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbheterogennamesection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbheterogennamecard.hpp"
-#include "gmml/includes/InputSet/PdbFileSpace/pdbheterogensynonym.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbheterogensynonymsection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbheterogensynonymcard.hpp"
-#include "gmml/includes/InputSet/PdbFileSpace/pdblink.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdblinksection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdblinkcard.hpp"
-#include "gmml/includes/InputSet/PdbFileSpace/pdblinkresidue.hpp"
-#include "gmml/includes/InputSet/PdbFileSpace/pdbmatrixn.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdblinkcardresidue.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbmatrixnsection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbmatrixncard.hpp"
-#include "gmml/includes/InputSet/PdbFileSpace/pdbmodel.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbmodelsection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbmodelcard.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbmodelresidueset.hpp"
-#include "gmml/includes/InputSet/PdbFileSpace/pdbmodeltypecard.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbmodeltypesection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbnummodelcard.hpp"
-#include "gmml/includes/InputSet/PdbFileSpace/pdboriginxn.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdboriginxnsection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdboriginxncard.hpp"
-#include "gmml/includes/InputSet/PdbFileSpace/pdbresiduemodification.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbremarksection.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbresidue.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbresiduemodificationsection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbresiduemodificationcard.hpp"
-#include "gmml/includes/InputSet/PdbFileSpace/pdbresiduesequence.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbresiduesequencesection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbresiduesequencecard.hpp"
-#include "gmml/includes/InputSet/PdbFileSpace/pdbscalen.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbscalensection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbscalencard.hpp"
-#include "gmml/includes/InputSet/PdbFileSpace/pdbsheet.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbsheetsection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbsheetcard.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbsheetstrand.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbsheetstrandresidue.hpp"
-#include "gmml/includes/InputSet/PdbFileSpace/pdbsite.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbsitesection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbsitecard.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbsiteresidue.hpp"
-#include "gmml/includes/InputSet/PdbFileSpace/pdbtitlecard.hpp"
-#include "gmml/includes/InputSet/PdbFileSpace/pdbresidue.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbtitlesection.hpp"
 
 #include "gmml/includes/InputSet/PdbqtFileSpace/pdbqtatom.hpp"
 #include "gmml/includes/InputSet/PdbqtFileSpace/pdbqtatomcard.hpp"
@@ -180,56 +181,57 @@ std::ostream & get_cout() { return std::cout; }
 %include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceglycam06residue.hpp"
 %include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequence.hpp"
 
-%include "gmml/includes/InputSet/PdbFileSpace/pdbatom.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbatomsection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbatomcard.hpp"
-%include "gmml/includes/InputSet/PdbFileSpace/pdbcompoundcard.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbcompoundsection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbcompoundspecification.hpp"
-%include "gmml/includes/InputSet/PdbFileSpace/pdbconnectcard.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbconnectsection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbcrystallographiccard.hpp"
-%include "gmml/includes/InputSet/PdbFileSpace/pdbdisulfidebondcard.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbdisulfidebondsection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbdisulfideresidue.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbdisulfideresiduebond.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbfile.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbfileprocessingexception.hpp"
-%include "gmml/includes/InputSet/PdbFileSpace/pdbformula.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbformulasection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbformulacard.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbheadercard.hpp"
-%include "gmml/includes/InputSet/PdbFileSpace/pdbhelix.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbhelixsection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbhelixcard.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbhelixresidue.hpp"
-%include "gmml/includes/InputSet/PdbFileSpace/pdbheterogen.hpp"
-%include "gmml/includes/InputSet/PdbFileSpace/pdbheterogenatomcard.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbheterogensection.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbheterogenatomsection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbheterogencard.hpp"
-%include "gmml/includes/InputSet/PdbFileSpace/pdbheterogenname.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbheterogennamesection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbheterogennamecard.hpp"
-%include "gmml/includes/InputSet/PdbFileSpace/pdbheterogensynonym.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbheterogensynonymsection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbheterogensynonymcard.hpp"
-%include "gmml/includes/InputSet/PdbFileSpace/pdblink.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdblinksection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdblinkcard.hpp"
-%include "gmml/includes/InputSet/PdbFileSpace/pdblinkresidue.hpp"
-%include "gmml/includes/InputSet/PdbFileSpace/pdbmatrixn.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdblinkcardresidue.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbmatrixnsection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbmatrixncard.hpp"
-%include "gmml/includes/InputSet/PdbFileSpace/pdbmodel.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbmodelsection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbmodelcard.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbmodelresidueset.hpp"
-%include "gmml/includes/InputSet/PdbFileSpace/pdbmodeltypecard.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbmodeltypesection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbnummodelcard.hpp"
-%include "gmml/includes/InputSet/PdbFileSpace/pdboriginxn.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdboriginxnsection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdboriginxncard.hpp"
-%include "gmml/includes/InputSet/PdbFileSpace/pdbresiduemodification.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbremarksection.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbresiduemodificationsection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbresiduemodificationcard.hpp"
-%include "gmml/includes/InputSet/PdbFileSpace/pdbresiduesequence.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbresiduesequencesection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbresiduesequencecard.hpp"
-%include "gmml/includes/InputSet/PdbFileSpace/pdbscalen.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbscalensection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbscalencard.hpp"
-%include "gmml/includes/InputSet/PdbFileSpace/pdbsheet.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbsheetsection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbsheetcard.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbsheetstrand.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbsheetstrandresidue.hpp"
-%include "gmml/includes/InputSet/PdbFileSpace/pdbsite.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbsitesection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbsitecard.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbsiteresidue.hpp"
-%include "gmml/includes/InputSet/PdbFileSpace/pdbtitlecard.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbtitlesection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbresidue.hpp"
 
 %include "gmml/includes/InputSet/PdbqtFileSpace/pdbqtatom.hpp"
@@ -347,9 +349,9 @@ std::ostream & get_cout() { return std::cout; }
 
 
 ///PDB file///
-//typedef std::map<int, PdbAtom*> PdbAtomMap;
-%template() std::pair<int, PdbFileSpace::PdbAtom*>;
-%template(atom_map_pdb_file) std::map<int, PdbFileSpace::PdbAtom*>;
+//typedef std::map<int, PdbAtomCard*> PdbAtomCardMap;
+%template() std::pair<int, PdbFileSpace::PdbAtomCard*>;
+%template(atom_map_pdb_file) std::map<int, PdbFileSpace::PdbAtomCard*>;
 
 //typedef std::map<std::string, PdbCompoundSpecification*> PdbCompoundSpecificationMap;
 %template() std::pair<std::string, PdbFileSpace::PdbCompoundSpecification*>;
@@ -366,78 +368,78 @@ std::ostream & get_cout() { return std::cout; }
 //typedef std::vector<PdbDisulfideResidue*> DisulfideResidueVector;
 %template(pdbdisulfideresidue_vector) std::vector<PdbFileSpace::PdbDisulfideResidue*>;
 
-//typedef std::map<std::string, PdbFormula*> FormulaMap;
-%template() std::pair<std::string, PdbFileSpace::PdbFormula*>;
-%template(formula_map_pdb_file) std::map<std::string, PdbFileSpace::PdbFormula*>;
+//typedef std::map<std::string, PdbFormulaCard*> FormulaCardMap;
+%template() std::pair<std::string, PdbFileSpace::PdbFormulaCard*>;
+%template(formula_map_pdb_file) std::map<std::string, PdbFileSpace::PdbFormulaCard*>;
 
 //typedef std::vector<PdbHelixResidue*> HelixResidueVector;
 %template(pdbhelixresidue_vector) std::vector<PdbFileSpace::PdbHelixResidue*>;
 
-//typedef std::map<std::string, PdbHelix*> HelixMap;
-%template() std::pair<std::string, PdbFileSpace::PdbHelix*>;
-%template(helix_map_pdb_file) std::map<std::string, PdbFileSpace::PdbHelix*>;
+//typedef std::map<std::string, PdbHelixCard*> HelixCardMap;
+%template() std::pair<std::string, PdbFileSpace::PdbHelixCard*>;
+%template(helix_map_pdb_file) std::map<std::string, PdbFileSpace::PdbHelixCard*>;
 
-//typedef PdbAtom PdbHeterogenAtom;
+//typedef PdbAtomCard PdbHeterogenAtomSection;
 ///???
-      
-//typedef std::map<int, PdbHeterogenAtom*> PdbHeterogenAtomMap;
-//%template() std::pair<int, PdbFileSpace::PdbHeterogenAtomCard::PdbHeterogenAtom*>;
-//%template(heterogen_atom_map_pdb_file) std::map<int, PdbFileSpace::PdbHeterogenAtomCard::PdbHeterogenAtom*>;
 
-//typedef std::map<std::string, PdbHeterogen*> HeterogenMap;
-%template() std::pair<std::string, PdbFileSpace::PdbHeterogen*>;
-%template(heterogen_pdb_map_file) std::map<std::string, PdbFileSpace::PdbHeterogen*>;
+//typedef std::map<int, PdbHeterogenAtom*> PdbHeterogenAtomCardMap;
+//%template() std::pair<int, PdbFileSpace::PdbHeterogenAtomSection::PdbHeterogenAtom*>;
+//%template(heterogen_atom_map_pdb_file) std::map<int, PdbFileSpace::PdbHeterogenAtomSection::PdbHeterogenAtom*>;
 
-//typedef std::map<std::string, PdbHeterogenName*> HeterogenNameMap;
-%template() std::pair<std::string, PdbFileSpace::PdbHeterogenName*>;
-%template(heterogen_name_map_pdb_file) std::map<std::string, PdbFileSpace::PdbHeterogenName*>;
+//typedef std::map<std::string, PdbHeterogenCard*> HeterogenCardMap;
+%template() std::pair<std::string, PdbFileSpace::PdbHeterogenCard*>;
+%template(heterogen_pdb_map_file) std::map<std::string, PdbFileSpace::PdbHeterogenCard*>;
 
-//typedef std::map<std::string, PdbHeterogenSynonym*> HeterogenSynonymMap;
-%template() std::pair<std::string, PdbFileSpace::PdbHeterogenSynonym*>;
-%template(heterogen_synonym_map_pdb_file) std::map<std::string, PdbFileSpace::PdbHeterogenSynonym*>;
+//typedef std::map<std::string, PdbHeterogenNameCard*> HeterogenNameCardMap;
+%template() std::pair<std::string, PdbFileSpace::PdbHeterogenNameCard*>;
+%template(heterogen_name_map_pdb_file) std::map<std::string, PdbFileSpace::PdbHeterogenNameCard*>;
 
-//typedef std::vector< PdbLinkResidue* > LinkResidueVector;
-%template(pdblinkresidue_vector) std::vector<PdbFileSpace::PdbLinkResidue*>;
+//typedef std::map<std::string, PdbHeterogenSynonymCard*> HeterogenSynonymCardMap;
+%template() std::pair<std::string, PdbFileSpace::PdbHeterogenSynonymCard*>;
+%template(heterogen_synonym_map_pdb_file) std::map<std::string, PdbFileSpace::PdbHeterogenSynonymCard*>;
 
-//typedef std::vector< PdbLink* > LinkVector;
-%template(pdblink_vector) std::vector<PdbFileSpace::PdbLink*>;
+//typedef std::vector< PdbLinkCardResidue* > LinkResidueVector;
+%template(pdblinkcardresidue_vector) std::vector<PdbFileSpace::PdbLinkCardResidue*>;
 
-//typedef std::vector<PdbMatrixN*> MatrixNVector;
-%template(pdbmatrixn_vector) std::vector<PdbFileSpace::PdbMatrixN*>;
+//typedef std::vector< PdbLinkCard* > LinkCardVector;
+%template(pdblink_vector) std::vector<PdbFileSpace::PdbLinkCard*>;
+
+//typedef std::vector<PdbMatrixNCard*> MatrixNVector;
+%template(pdbmatrixn_vector) std::vector<PdbFileSpace::PdbMatrixNCard*>;
 
 //typedef std::vector<MatrixNVector> MatrixNVectorVector;
-%template(pdbmatrixn_vector_vector) std::vector<PdbFileSpace::PdbMatrixNCard::MatrixNVector>;
+%template(pdbmatrixn_vector_vector) std::vector<PdbFileSpace::PdbMatrixNSection::MatrixNVector>;
 
-//typedef std::map<int, PdbModel*> PdbModelMap;
-%template() std::pair<int, PdbFileSpace::PdbModel*>;
-%template(model_map_pdb_file) std::map<int, PdbFileSpace::PdbModel*>;
+//typedef std::map<int, PdbModelCard*> PdbModelCardMap;
+%template() std::pair<int, PdbFileSpace::PdbModelCard*>;
+%template(model_map_pdb_file) std::map<int, PdbFileSpace::PdbModelCard*>;
 
-//typedef std::vector<PdbAtomCard*> AtomCardVector;
-%template(pdbatomcard_vector) std::vector<PdbFileSpace::PdbAtomCard*>;
+//typedef std::vector<PdbAtomSection*> AtomSectionVector;
+%template(pdbatomsection_vector) std::vector<PdbFileSpace::PdbAtomSection*>;
 
-//typedef std::vector<PdbHeterogenAtomCard*> HeterogenAtomCardVector;
-%template(pdbheterogenatomcard_vector) std::vector<PdbFileSpace::PdbHeterogenAtomCard*>;
+//typedef std::vector<PdbHeterogenAtomSection*> HeterogenAtomCardVector;
+%template(pdbheterogenatomcard_vector) std::vector<PdbFileSpace::PdbHeterogenAtomSection*>;
 
-//typedef std::vector< PdbOriginXn* > OriginXnVector;
-%template(pdboriginxn_vector) std::vector<PdbFileSpace::PdbOriginXn*>;
+//typedef std::vector< PdbOriginXnCard* > OriginXnVector;
+%template(pdboriginxn_vector) std::vector<PdbFileSpace::PdbOriginXnCard*>;
 
-//typedef std::map<std::string, PdbResidueModification*> ResidueModificationMap;
-%template() std::pair<std::string, PdbFileSpace::PdbResidueModification*>;
-%template(residue_modification_map_pdb_file) std::map<std::string, PdbFileSpace::PdbResidueModification*>;
+//typedef std::map<std::string, PdbResidueModificationCard*> ResidueModificationMap;
+%template() std::pair<std::string, PdbFileSpace::PdbResidueModificationCard*>;
+%template(residue_modification_map_pdb_file) std::map<std::string, PdbFileSpace::PdbResidueModificationCard*>;
 
-//typedef std::map<char, PdbResidueSequence*> ResidueSequenceMap;
-%template() std::pair<char, PdbFileSpace::PdbResidueSequence*>;
-%template(residue_sequence_map_pdb_file) std::map<char, PdbFileSpace::PdbResidueSequence*>;
+//typedef std::map<char, PdbResidueSequenceCard*> ResidueSequenceMap;
+%template() std::pair<char, PdbFileSpace::PdbResidueSequenceCard*>;
+%template(residue_sequence_map_pdb_file) std::map<char, PdbFileSpace::PdbResidueSequenceCard*>;
 
-//typedef std::vector< PdbScaleN* > ScaleNVector;
-%template(pdbscalenvector_vector) std::vector<PdbFileSpace::PdbScaleN*>;
+//typedef std::vector< PdbScaleNCard* > ScaleNVector;
+%template(pdbscalenvector_vector) std::vector<PdbFileSpace::PdbScaleNCard*>;
 
 //typedef std::vector<PdbSheetStrand*> SheetStrandVector;
 %template(pdbsheetstrand_vector) std::vector<PdbFileSpace::PdbSheetStrand*>;
 
-//typedef std::map<std::string, PdbSheet*> SheetMap;
-%template() std::pair<std::string, PdbFileSpace::PdbSheet*>;
-%template(sheet_pdb_map_file) std::map<std::string, PdbFileSpace::PdbSheet*>;
+//typedef std::map<std::string, PdbSheetCard*> SheetMap;
+%template() std::pair<std::string, PdbFileSpace::PdbSheetCard*>;
+%template(sheet_pdb_map_file) std::map<std::string, PdbFileSpace::PdbSheetCard*>;
 
 //typedef std::vector<PdbSheetStrandResidue*> SheetStrandResidueVector;
 %template(pdbsheetstrandresidue_vector) std::vector<PdbFileSpace::PdbSheetStrandResidue*>;
@@ -445,12 +447,12 @@ std::ostream & get_cout() { return std::cout; }
 //typedef std::vector< PdbSiteResidue* > SiteResidueVector;
 %template(pdbsiteresidue_vector) std::vector<PdbFileSpace::PdbSiteResidue*>;
 
-//typedef std::map<std::string, PdbSite*> PdbSiteMap;
-%template() std::pair<std::string, PdbFileSpace::PdbSite*>;
-%template(site_map_pdb_file) std::map<std::string, PdbFileSpace::PdbSite*>;
+//typedef std::map<std::string, PdbSiteCard*> PdbSiteCardMap;
+%template() std::pair<std::string, PdbFileSpace::PdbSiteCard*>;
+%template(site_map_pdb_file) std::map<std::string, PdbFileSpace::PdbSiteCard*>;
 
-//typedef std::vector<PdbAtom*> PdbAtomVector;
-%template(pdb_atom_vector) std::vector<PdbFileSpace::PdbAtom*>;
+//typedef std::vector<PdbAtomCard*> PdbAtomCardVector;
+%template(pdb_atom_vector) std::vector<PdbFileSpace::PdbAtomCard*>;
 
 
 ///PDB Preprocessor///
@@ -489,10 +491,10 @@ std::ostream & get_cout() { return std::cout; }
 %template(assembly_vector) std::vector<MolecularModeling::Assembly* >;
 
 //typedef std::vector<Residue*> ResidueVector;
-%template(residue_vector) std::vector<MolecularModeling::Residue* >;  
+%template(residue_vector) std::vector<MolecularModeling::Residue* >;
 
 //typedef std::vector<Atom*> AtomVector;
-%template(atom_vector) std::vector<MolecularModeling::Atom* >;  
+%template(atom_vector) std::vector<MolecularModeling::Atom* >;
 
 //typedef std::vector<AtomVector > AtomVectorVector;
 //%template(atom_vector_vector) std::vector<std::vector<MolecularModeling::Atom* > >;
@@ -502,7 +504,7 @@ std::ostream & get_cout() { return std::cout; }
 %template(cycle_map_assembly_file) std::map<std::string, std::vector<MolecularModeling::Atom* > >;
 
 //typedef std::vector<Glycan::Oligosaccharide*> OligosaccharideVector;
-%template(oligosaccharide_vector) std::vector<Glycan::Oligosaccharide* >;  
+%template(oligosaccharide_vector) std::vector<Glycan::Oligosaccharide* >;
 
 
 ///Topology File///
@@ -544,9 +546,9 @@ std::ostream & get_cout() { return std::cout; }
 
 
 ///PDBQT file///
-//typedef std::map<std::string, PdbAtomVector* > PdbResidueAtomsMap;
-%template() std::pair<std::string, PdbFileSpace::PdbFile::PdbAtomVector* >;
-%template(pdb_residue_atom_map) std::map<std::string, PdbFileSpace::PdbFile::PdbAtomVector* >;
+//typedef std::map<std::string, PdbAtomCardVector* > PdbResidueAtomsMap;
+%template() std::pair<std::string, PdbFileSpace::PdbFile::PdbAtomCardVector* >;
+%template(pdb_residue_atom_map) std::map<std::string, PdbFileSpace::PdbFile::PdbAtomCardVector* >;
 
 //typedef std::vector<PdbqtAtom*> PdbqtAtomVector;
 %template(pdbqt_atom_vector) std::vector<PdbqtFileSpace::PdbqtAtom*>;
