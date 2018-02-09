@@ -42,6 +42,7 @@
 
 #include "gmml/includes/InputSet/PdbFileSpace/pdbatomsection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbatomcard.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbcaveatsection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbcompoundsection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbcompoundspecification.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbconnectsection.hpp"
@@ -93,6 +94,9 @@
 #include "gmml/includes/InputSet/PdbFileSpace/pdbsitesection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbsitecard.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbsiteresidue.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbsourcecard.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbsourcesection.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbsplitsection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbtitlesection.hpp"
 
 #include "gmml/includes/InputSet/PdbqtFileSpace/pdbqtatom.hpp"
@@ -185,6 +189,7 @@ std::ostream & get_cout() { return std::cout; }
 
 %include "gmml/includes/InputSet/PdbFileSpace/pdbatomsection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbatomcard.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbcaveatsection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbcompoundsection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbcompoundspecification.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbconnectsection.hpp"
@@ -235,6 +240,9 @@ std::ostream & get_cout() { return std::cout; }
 %include "gmml/includes/InputSet/PdbFileSpace/pdbsitesection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbsitecard.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbsiteresidue.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbsourcecard.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbsourcesection.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbsplitsection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbtitlesection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbresidue.hpp"
 
@@ -457,6 +465,9 @@ std::ostream & get_cout() { return std::cout; }
 //typedef std::map<std::string, PdbSiteCard*> PdbSiteCardMap;
 %template() std::pair<std::string, PdbFileSpace::PdbSiteCard*>;
 %template(site_map_pdb_file) std::map<std::string, PdbFileSpace::PdbSiteCard*>;
+
+//typedef std::vector<PdbSourceCard*> SourceCardVector;
+%template(pdb_source_vector) std::vector<PdbFileSpace::PdbSourceCard*>;
 
 //typedef std::vector<PdbAtomCard*> PdbAtomCardVector;
 %template(pdb_atom_vector) std::vector<PdbFileSpace::PdbAtomCard*>;
