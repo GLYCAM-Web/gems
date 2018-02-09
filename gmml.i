@@ -74,6 +74,8 @@
 #include "gmml/includes/InputSet/PdbFileSpace/pdbmodelresidueset.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbmodeltypesection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbnummodelcard.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbobsoletesection.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbobsoletecard.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdboriginxnsection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdboriginxncard.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbremarksection.hpp"
@@ -215,6 +217,8 @@ std::ostream & get_cout() { return std::cout; }
 %include "gmml/includes/InputSet/PdbFileSpace/pdbmodelresidueset.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbmodeltypesection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbnummodelcard.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbobsoletesection.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbobsoletecard.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdboriginxnsection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdboriginxncard.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbremarksection.hpp"
@@ -349,7 +353,7 @@ std::ostream & get_cout() { return std::cout; }
 
 
 ///PDB file///
-//typedef std::map<int, PdbAtomCard*> PdbAtomCardMap;
+//typedef std::map<int, PdbAtomCard*> PdbAtomMap;
 %template() std::pair<int, PdbFileSpace::PdbAtomCard*>;
 %template(atom_map_pdb_file) std::map<int, PdbFileSpace::PdbAtomCard*>;
 
@@ -374,6 +378,9 @@ std::ostream & get_cout() { return std::cout; }
 
 //typedef std::vector<PdbHelixResidue*> HelixResidueVector;
 %template(pdbhelixresidue_vector) std::vector<PdbFileSpace::PdbHelixResidue*>;
+
+//typedef std::vector<PdbObsoleteCard*> ObsoleteCardVector;
+%template(pdbobsolete_card_vector) std::vector<PdbFileSpace::PdbObsoleteCard*>;
 
 //typedef std::map<std::string, PdbHelixCard*> HelixCardMap;
 %template() std::pair<std::string, PdbFileSpace::PdbHelixCard*>;
