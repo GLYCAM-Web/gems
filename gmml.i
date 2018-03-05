@@ -42,14 +42,20 @@
 
 #include "gmml/includes/InputSet/PdbFileSpace/pdbatomsection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbatomcard.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbauthorsection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbcaveatsection.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbcispeptidesection.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbcispeptidecard.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbcompoundsection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbcompoundspecification.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbconnectsection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbcrystallographiccard.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbdatabasereferencesection.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbdatabasereference.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbdisulfidebondsection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbdisulfideresidue.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbdisulfideresiduebond.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbexperimentaldatasection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbfile.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbfileprocessingexception.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbformulasection.hpp"
@@ -65,10 +71,12 @@
 #include "gmml/includes/InputSet/PdbFileSpace/pdbheterogennamecard.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbheterogensynonymsection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbheterogensynonymcard.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbjournalsection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdblinksection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbkeywordssection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdblinkcard.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdblinkcardresidue.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbmastercard.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbmatrixnsection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbmatrixncard.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbmodelsection.hpp"
@@ -86,8 +94,12 @@
 #include "gmml/includes/InputSet/PdbFileSpace/pdbresiduemodificationcard.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbresiduesequencesection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbresiduesequencecard.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbrevisiondatasection.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbrevisiondatacard.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbscalensection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbscalencard.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbsequenceadvancedsection.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbsequenceadvancedcard.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbsheetsection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbsheetcard.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbsheetstrand.hpp"
@@ -98,6 +110,8 @@
 #include "gmml/includes/InputSet/PdbFileSpace/pdbsourcecard.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbsourcesection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbsplitsection.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbsupersededentriescard.hpp"
+#include "gmml/includes/InputSet/PdbFileSpace/pdbsupersededentriessection.hpp"
 #include "gmml/includes/InputSet/PdbFileSpace/pdbtitlesection.hpp"
 
 #include "gmml/includes/InputSet/PdbqtFileSpace/pdbqtatom.hpp"
@@ -190,14 +204,20 @@ std::ostream & get_cout() { return std::cout; }
 
 %include "gmml/includes/InputSet/PdbFileSpace/pdbatomsection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbatomcard.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbauthorsection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbcaveatsection.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbcispeptidesection.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbcispeptidecard.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbcompoundsection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbcompoundspecification.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbconnectsection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbcrystallographiccard.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbdatabasereferencesection.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbdatabasereference.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbdisulfidebondsection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbdisulfideresidue.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbdisulfideresiduebond.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbexperimentaldatasection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbfile.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbfileprocessingexception.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbformulasection.hpp"
@@ -213,10 +233,12 @@ std::ostream & get_cout() { return std::cout; }
 %include "gmml/includes/InputSet/PdbFileSpace/pdbheterogennamecard.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbheterogensynonymsection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbheterogensynonymcard.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbjournalsection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbkeywordssection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdblinksection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdblinkcard.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdblinkcardresidue.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbmastercard.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbmatrixnsection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbmatrixncard.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbmodelsection.hpp"
@@ -233,8 +255,12 @@ std::ostream & get_cout() { return std::cout; }
 %include "gmml/includes/InputSet/PdbFileSpace/pdbresiduemodificationcard.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbresiduesequencesection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbresiduesequencecard.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbrevisiondatasection.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbrevisiondatacard.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbscalensection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbscalencard.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbsequenceadvancedsection.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbsequenceadvancedcard.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbsheetsection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbsheetcard.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbsheetstrand.hpp"
@@ -245,6 +271,8 @@ std::ostream & get_cout() { return std::cout; }
 %include "gmml/includes/InputSet/PdbFileSpace/pdbsourcecard.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbsourcesection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbsplitsection.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbsupersededentriescard.hpp"
+%include "gmml/includes/InputSet/PdbFileSpace/pdbsupersededentriessection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbtitlesection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbresidue.hpp"
 
@@ -471,8 +499,20 @@ std::ostream & get_cout() { return std::cout; }
 //typedef std::vector<PdbSourceCard*> SourceCardVector;
 %template(pdb_source_vector) std::vector<PdbFileSpace::PdbSourceCard*>;
 
+//typedef std::vector<PdbRevisionDataCard*> RevisionDataCardVector;
+%template(pdb_revision_vector) std::vector<PdbFileSpace::PdbRevisionDataCard*>;
+
+//typedef std::vector<PdbSupersededEntriesCard*> SupersededEntriesCardVector;
+%template(pdb_superseded_vector) std::vector<PdbFileSpace::PdbSupersededEntriesCard*>;
+
 //typedef std::vector<PdbAtomCard*> PdbAtomCardVector;
 %template(pdb_atom_vector) std::vector<PdbFileSpace::PdbAtomCard*>;
+
+//typedef std::vector<PdbSequenceAdvancedCard*> SequenceAdvancedCardVector;
+%template(pdb_seq_adv_vector) std::vector<PdbFileSpace::PdbSequenceAdvancedCard*>;
+
+//typedef std::vector<PdbCISPeptideCard*> CISPeptideCardVector;
+%template(pdb_cis_peptide_vector) std::vector<PdbFileSpace::PdbCISPeptideCard*>;
 
 
 ///PDB Preprocessor///
