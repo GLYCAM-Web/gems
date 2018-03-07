@@ -5,3 +5,4 @@ gmml.pyc
 gmml_wrap.cxx
 gmml_wrap.o
 __pycache__
+log.log
