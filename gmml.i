@@ -345,12 +345,12 @@ std::ostream & get_cout() { return std::cout; }
 //std::vector<GeometryTopology::Coordinate*> coordinates_;
 %template(coordinate_vector) std::vector<GeometryTopology::Coordinate*>;
 
-//typedef std::vector<Cell*> CellVector;
+//typedef std::vector<GeometryTopology::Cell*> CellVector;
 %template(cell_vector) std::vector<GeometryTopology::Cell*>;
 
 
 ///Prep File///
-//std::vector<PrepFileAtom*> atoms_;
+//std::vector<PrepFileSpace::PrepFileAtom*> atoms_;
 %template(prepfileatom_vector) std::vector<PrepFileSpace::PrepFileAtom*>;
 
 
@@ -364,18 +364,18 @@ std::ostream & get_cout() { return std::cout; }
 %template() std::pair<std::vector<std::string>, ParameterFileSpace::ParameterFileAngle*>;
 %template(angles_map_parameter_file) std::map<std::vector<std::string>, ParameterFileSpace::ParameterFileAngle*>;
 
-//std::vector<ParameterFileDihedralTerm> terms_;
+//std::vector<ParameterFileSpace::ParameterFileDihedralTerm> terms_;
 %template(dihedral_terms_vector_parameter_file) std::vector<ParameterFileSpace::ParameterFileDihedralTerm>;
 %template() std::pair<std::vector<std::string>, ParameterFileSpace::ParameterFileDihedral*>;
 %template(dihedrals_map_parameter_file) std::map<std::vector<std::string>, ParameterFileSpace::ParameterFileDihedral*>;
 
 
 ///Library File///
-//typedef std::map<std::string, LibraryFileResidue*> ResidueMap;
+//typedef std::map<std::string, LibraryFileSpace::LibraryFileResidue*> ResidueMap;
 %template() std::pair<std::string, LibraryFileSpace::LibraryFileResidue*>;
 %template(residue_map_library_file) std::map<std::string, LibraryFileSpace::LibraryFileResidue*>;
 
-//typedef std::map<int, LibraryFileAtom*> AtomMap;
+//typedef std::map<int, LibraryFileSpace::LibraryFileAtom*> AtomMap;
 %template() std::pair<int, LibraryFileSpace::LibraryFileAtom*>;
 %template(atom_map_library_file) std::map<int, LibraryFileSpace::LibraryFileAtom*>;
 
@@ -385,17 +385,17 @@ std::ostream & get_cout() { return std::cout; }
 %template() std::pair<int,int>;
 %template(loop_map_prep_file) std::map<int, int>;
 
-//typedef std::map< std::string, PrepFileResidue* > ResidueMap;
+//typedef std::map< std::string, PrepFileSpace::PrepFileResidue* > ResidueMap;
 %template() std::pair<std::string, PrepFileSpace::PrepFileResidue*>;
 %template(residue_map_prep_file) std::map<std::string, PrepFileSpace::PrepFileResidue*>;
 
 
 ///PDB file///
-//typedef std::map<int, PdbAtomCard*> PdbAtomMap;
+//typedef std::map<int, PrepFileSpace::PdbAtomCard*> PdbAtomMap;
 %template() std::pair<int, PdbFileSpace::PdbAtomCard*>;
 %template(atom_map_pdb_file) std::map<int, PdbFileSpace::PdbAtomCard*>;
 
-//typedef std::map<std::string, PdbCompoundSpecification*> PdbCompoundSpecificationMap;
+//typedef std::map<std::string, PdbFileSpace::PdbCompoundSpecification*> PdbCompoundSpecificationMap;
 %template() std::pair<std::string, PdbFileSpace::PdbCompoundSpecification*>;
 %template(compound_specification_map_pdb_file) std::map<std::string, PdbFileSpace::PdbCompoundSpecification*>;
 
@@ -403,63 +403,63 @@ std::ostream & get_cout() { return std::cout; }
 %template() std::pair<int, std::vector<int> >;
 %template(bonded_atoms_serial_numbers_map_pdb_file) std::map<int, std::vector<int> >;
 
-//typedef std::map<int, PdbDisulfideResidueBond*> DisulfideResidueBondMap;
+//typedef std::map<int, PdbFileSpace::PdbDisulfideResidueBond*> DisulfideResidueBondMap;
 %template() std::pair<int, PdbFileSpace::PdbDisulfideResidueBond*>;
 %template(disulfide_residue_bond_map_pdb_file) std::map<int, PdbFileSpace::PdbDisulfideResidueBond*>;
 
-//typedef std::vector<PdbDisulfideResidue*> DisulfideResidueVector;
+//typedef std::vector<PdbFileSpace::PdbDisulfideResidue*> DisulfideResidueVector;
 %template(pdbdisulfideresidue_vector) std::vector<PdbFileSpace::PdbDisulfideResidue*>;
 
-//typedef std::map<std::string, PdbFormulaCard*> FormulaCardMap;
+//typedef std::map<std::string, PdbFileSpace::PdbFormulaCard*> FormulaCardMap;
 %template() std::pair<std::string, PdbFileSpace::PdbFormulaCard*>;
 %template(formula_map_pdb_file) std::map<std::string, PdbFileSpace::PdbFormulaCard*>;
 
-//typedef std::vector<PdbHelixResidue*> HelixResidueVector;
+//typedef std::vector<PdbFileSpace::PdbHelixResidue*> HelixResidueVector;
 %template(pdbhelixresidue_vector) std::vector<PdbFileSpace::PdbHelixResidue*>;
 
-//typedef std::vector<PdbObsoleteCard*> ObsoleteCardVector;
+//typedef std::vector<PdbFileSpace::PdbObsoleteCard*> ObsoleteCardVector;
 %template(pdbobsolete_card_vector) std::vector<PdbFileSpace::PdbObsoleteCard*>;
 
-//typedef std::map<std::string, PdbHelixCard*> HelixCardMap;
+//typedef std::map<std::string, PdbFileSpace::PdbHelixCard*> HelixCardMap;
 %template() std::pair<std::string, PdbFileSpace::PdbHelixCard*>;
 %template(helix_map_pdb_file) std::map<std::string, PdbFileSpace::PdbHelixCard*>;
 
-//typedef PdbAtomCard PdbHeterogenAtomSection;
+//typedef PdbFileSpace::PdbAtomCard PdbFileSpace::PdbHeterogenAtomSection;
 ///???
 
-//typedef std::map<int, PdbHeterogenAtom*> PdbHeterogenAtomCardMap;
+//typedef std::map<int, PdbFileSpace::PdbHeterogenAtom*> PdbHeterogenAtomCardMap;
 //%template() std::pair<int, PdbFileSpace::PdbHeterogenAtomSection::PdbHeterogenAtom*>;
 //%template(heterogen_atom_map_pdb_file) std::map<int, PdbFileSpace::PdbHeterogenAtomSection::PdbHeterogenAtom*>;
 
-//typedef std::map<std::string, PdbHeterogenCard*> HeterogenCardMap;
+//typedef std::map<std::string, PdbFileSpace::PdbHeterogenCard*> HeterogenCardMap;
 %template() std::pair<std::string, PdbFileSpace::PdbHeterogenCard*>;
 %template(heterogen_pdb_map_file) std::map<std::string, PdbFileSpace::PdbHeterogenCard*>;
 
-//typedef std::map<std::string, PdbHeterogenNameCard*> HeterogenNameCardMap;
+//typedef std::map<std::string, PdbFileSpace::PdbHeterogenNameCard*> HeterogenNameCardMap;
 %template() std::pair<std::string, PdbFileSpace::PdbHeterogenNameCard*>;
 %template(heterogen_name_map_pdb_file) std::map<std::string, PdbFileSpace::PdbHeterogenNameCard*>;
 
-//typedef std::map<std::string, PdbHeterogenSynonymCard*> HeterogenSynonymCardMap;
+//typedef std::map<std::string, PdbFileSpace::PdbHeterogenSynonymCard*> HeterogenSynonymCardMap;
 %template() std::pair<std::string, PdbFileSpace::PdbHeterogenSynonymCard*>;
 %template(heterogen_synonym_map_pdb_file) std::map<std::string, PdbFileSpace::PdbHeterogenSynonymCard*>;
 
 //typedef std::vector< PdbLinkCardResidue* > LinkResidueVector;
 %template(pdblinkcardresidue_vector) std::vector<PdbFileSpace::PdbLinkCardResidue*>;
 
-//typedef std::vector< PdbLinkCard* > LinkCardVector;
+//typedef std::vector< PdbFileSpace::PdbLinkCard* > LinkCardVector;
 %template(pdblink_vector) std::vector<PdbFileSpace::PdbLinkCard*>;
 
-//typedef std::vector<PdbMatrixNCard*> MatrixNVector;
+//typedef std::vector<PdbFileSpace::PdbMatrixNCard*> MatrixNVector;
 %template(pdbmatrixn_vector) std::vector<PdbFileSpace::PdbMatrixNCard*>;
 
 //typedef std::vector<MatrixNVector> MatrixNVectorVector;
 %template(pdbmatrixn_vector_vector) std::vector<PdbFileSpace::PdbMatrixNSection::MatrixNVector>;
 
-//typedef std::map<int, PdbModelCard*> PdbModelCardMap;
+//typedef std::map<int, PdbFileSpace::PdbModelCard*> PdbModelCardMap;
 %template() std::pair<int, PdbFileSpace::PdbModelCard*>;
 %template(model_map_pdb_file) std::map<int, PdbFileSpace::PdbModelCard*>;
 
-//typedef std::vector<PdbAtomSection*> AtomSectionVector;
+//typedef std::vector<PdbFileSpace::PdbAtomSection*> AtomSectionVector;
 %template(pdbatomsection_vector) std::vector<PdbFileSpace::PdbAtomSection*>;
 
 //typedef std::vector<PdbHeterogenAtomSection*> HeterogenAtomCardVector;
@@ -472,88 +472,88 @@ std::ostream & get_cout() { return std::cout; }
 %template() std::pair<std::string, PdbFileSpace::PdbResidueModificationCard*>;
 %template(residue_modification_map_pdb_file) std::map<std::string, PdbFileSpace::PdbResidueModificationCard*>;
 
-//typedef std::map<char, PdbResidueSequenceCard*> ResidueSequenceMap;
+//typedef std::map<char, PdbFileSpace::PdbResidueSequenceCard*> ResidueSequenceMap;
 %template() std::pair<char, PdbFileSpace::PdbResidueSequenceCard*>;
 %template(residue_sequence_map_pdb_file) std::map<char, PdbFileSpace::PdbResidueSequenceCard*>;
 
-//typedef std::vector< PdbScaleNCard* > ScaleNVector;
+//typedef std::vector< PdbFileSpace::PdbScaleNCard* > ScaleNVector;
 %template(pdbscalenvector_vector) std::vector<PdbFileSpace::PdbScaleNCard*>;
 
-//typedef std::vector<PdbSheetStrand*> SheetStrandVector;
+//typedef std::vector<PdbFileSpace::PdbSheetStrand*> SheetStrandVector;
 %template(pdbsheetstrand_vector) std::vector<PdbFileSpace::PdbSheetStrand*>;
 
-//typedef std::map<std::string, PdbSheetCard*> SheetMap;
+//typedef std::map<std::string, PdbFileSpace::PdbSheetCard*> SheetMap;
 %template() std::pair<std::string, PdbFileSpace::PdbSheetCard*>;
 %template(sheet_pdb_map_file) std::map<std::string, PdbFileSpace::PdbSheetCard*>;
 
-//typedef std::vector<PdbSheetStrandResidue*> SheetStrandResidueVector;
+//typedef std::vector<PdbFileSpace::PdbSheetStrandResidue*> SheetStrandResidueVector;
 %template(pdbsheetstrandresidue_vector) std::vector<PdbFileSpace::PdbSheetStrandResidue*>;
 
-//typedef std::vector< PdbSiteResidue* > SiteResidueVector;
+//typedef std::vector< PdbFileSpace::PdbSiteResidue* > SiteResidueVector;
 %template(pdbsiteresidue_vector) std::vector<PdbFileSpace::PdbSiteResidue*>;
 
-//typedef std::map<std::string, PdbSiteCard*> PdbSiteCardMap;
+//typedef std::map<std::string, PdbFileSpace::PdbSiteCard*> PdbSiteCardMap;
 %template() std::pair<std::string, PdbFileSpace::PdbSiteCard*>;
 %template(site_map_pdb_file) std::map<std::string, PdbFileSpace::PdbSiteCard*>;
 
 //typedef std::vector<PdbSourceCard*> SourceCardVector;
 %template(pdb_source_vector) std::vector<PdbFileSpace::PdbSourceCard*>;
 
-//typedef std::vector<PdbRevisionDataCard*> RevisionDataCardVector;
+//typedef std::vector<PdbFileSpace::PdbRevisionDataCard*> RevisionDataCardVector;
 %template(pdb_revision_vector) std::vector<PdbFileSpace::PdbRevisionDataCard*>;
 
-//typedef std::vector<PdbSupersededEntriesCard*> SupersededEntriesCardVector;
+//typedef std::vector<PdbFileSpace::PdbSupersededEntriesCard*> SupersededEntriesCardVector;
 %template(pdb_superseded_vector) std::vector<PdbFileSpace::PdbSupersededEntriesCard*>;
 
-//typedef std::vector<PdbAtomCard*> PdbAtomCardVector;
+//typedef std::vector<PdbFileSpace::PdbAtomCard*> PdbAtomCardVector;
 %template(pdb_atom_vector) std::vector<PdbFileSpace::PdbAtomCard*>;
 
-//typedef std::vector<PdbSequenceAdvancedCard*> SequenceAdvancedCardVector;
+//typedef std::vector<PdbFileSpace::PdbSequenceAdvancedCard*> SequenceAdvancedCardVector;
 %template(pdb_seq_adv_vector) std::vector<PdbFileSpace::PdbSequenceAdvancedCard*>;
 
-//typedef std::vector<PdbCISPeptideCard*> CISPeptideCardVector;
+//typedef std::vector<PdbFileSpace::PdbCISPeptideCard*> CISPeptideCardVector;
 %template(pdb_cis_peptide_vector) std::vector<PdbFileSpace::PdbCISPeptideCard*>;
 
 
 ///PDB Preprocessor///
-//typedef std::vector<PdbPreprocessorDisulfideBond*> PdbPreprocessorDisulfideBondVector;
+//typedef std::vector<PdbPreprocessorSpace::PdbPreprocessorDisulfideBond*> PdbPreprocessorDisulfideBondVector;
 %template(pdbpreprocessordisulfidebond_vector) std::vector<PdbPreprocessorSpace::PdbPreprocessorDisulfideBond*>;
 
-//typedef std::vector<PdbPreprocessorChainTermination*> PdbPreprocessorChainTerminationVector;
+//typedef std::vector<PdbPreprocessorSpace::PdbPreprocessorChainTermination*> PdbPreprocessorChainTerminationVector;
 %template(pdbpreprocessorchaintermination_vector) std::vector<PdbPreprocessorSpace::PdbPreprocessorChainTermination*>;
 
-//typedef std::vector<PdbPreprocessorHistidineMapping*> PdbPreprocessorHistidineMappingVector;
+//typedef std::vector<PdbPreprocessorSpace::PdbPreprocessorHistidineMapping*> PdbPreprocessorHistidineMappingVector;
 %template(pdbpreprocessorhistidinemapping_vector) std::vector<PdbPreprocessorSpace::PdbPreprocessorHistidineMapping*>;
 
-//typedef std::vector<PdbPreprocessorMissingResidue*> PdbPreprocessorMissingResidueVector;
+//typedef std::vector<PdbPreprocessorSpace::PdbPreprocessorMissingResidue*> PdbPreprocessorMissingResidueVector;
 %template(pdbpreprocessormissingresidue_vector) std::vector<PdbPreprocessorSpace::PdbPreprocessorMissingResidue*>;
 
-//typedef std::vector<PdbPreprocessorUnrecognizedResidue*> PdbPreprocessorUnrecognizedResidueVector;
+//typedef std::vector<PdbPreprocessorSpace::PdbPreprocessorUnrecognizedResidue*> PdbPreprocessorUnrecognizedResidueVector;
 %template(pdbpreprocessorunrecognizedresidue_vector) std::vector<PdbPreprocessorSpace::PdbPreprocessorUnrecognizedResidue*>;
 
-//typedef std::vector<PdbPreprocessorUnrecognizedHeavyAtom*> PdbPreprocessorUnrecognizedHeavyAtomVector;
+//typedef std::vector<PdbPreprocessorSpace::PdbPreprocessorUnrecognizedHeavyAtom*> PdbPreprocessorUnrecognizedHeavyAtomVector;
 %template(pdbpreprocessorunrecognizedheavyatom_vector) std::vector<PdbPreprocessorSpace::PdbPreprocessorUnrecognizedHeavyAtom*>;
 
-//typedef std::vector<PdbPreprocessorReplacedHydrogen*> PdbPreprocessorReplacedHydrogenVector;
+//typedef std::vector<PdbPreprocessorSpace::PdbPreprocessorReplacedHydrogen*> PdbPreprocessorReplacedHydrogenVector;
 %template(pdbpreprocessorreplacedhydrogen_vector) std::vector<PdbPreprocessorSpace::PdbPreprocessorReplacedHydrogen*>;
 
-//typedef std::map<std::string, PdbPreprocessorAlternateResidue*> PdbPreprocessorAlternateResidueMap;
+//typedef std::map<std::string, PdbPreprocessorSpace::PdbPreprocessorAlternateResidue*> PdbPreprocessorAlternateResidueMap;
 %template() std::pair<std::string, PdbPreprocessorSpace::PdbPreprocessorAlternateResidue*>;
 %template(alternate_residue_map_pdbpreprocessor_file) std::map<std::string, PdbPreprocessorSpace::PdbPreprocessorAlternateResidue*>;
 
-//typedef std::map<std::string, PdbPreprocessorResidueInfo*> PdbPreprocessorResidueInfoMap;
+//typedef std::map<std::string, PdbPreprocessorSpace::PdbPreprocessorResidueInfo*> PdbPreprocessorResidueInfoMap;
 %template() std::pair<std::string, PdbPreprocessorSpace::PdbPreprocessorResidueInfo*>;
 %template(residue_info_map_pdbpreprocessor_file) std::map<std::string, PdbPreprocessorSpace::PdbPreprocessorResidueInfo*>;
 
 
 ///MolecularModeling///
-//typedef std::vector<Assembly*> AssemblyVector;
+//typedef std::vector<MolecularModeling::Assembly*> AssemblyVector;
 %template(assembly_vector) std::vector<MolecularModeling::Assembly* >;
 
-//typedef std::vector<Residue*> ResidueVector;
+//typedef std::vector<MolecularModeling::Residue*> ResidueVector;
 %template(residue_vector) std::vector<MolecularModeling::Residue* >;
 
-//typedef std::vector<Atom*> AtomVector;
+//typedef std::vector<MolecularModeling::Atom*> AtomVector;
 %template(atom_vector) std::vector<MolecularModeling::Atom* >;
 
 //typedef std::vector<AtomVector > AtomVectorVector;
@@ -568,19 +568,19 @@ std::ostream & get_cout() { return std::cout; }
 
 
 ///Topology File///
-//typedef std::map<std::string, TopologyResidue*> TopologyResidueMap;
+//typedef std::map<std::string, TopologyFileSpace::TopologyResidue*> TopologyResidueMap;
 %template() std::pair<std::string, TopologyFileSpace::TopologyResidue*>;
 %template(residue_map_Topology_file) std::map<std::string, TopologyFileSpace::TopologyResidue*>;
 
-//typedef std::map<std::vector<std::string>, TopologyBond*> TopologyBondMap;
+//typedef std::map<std::vector<std::string>, TopologyFileSpace::TopologyBond*> TopologyBondMap;
 %template() std::pair<std::string, TopologyFileSpace::TopologyBond*>;
 %template(bond_map_Topology_file) std::map<std::string, TopologyFileSpace::TopologyBond*>;
 
-//typedef std::map<std::vector<std::string>, TopologyAngle*> TopologyAngleMap;
+//typedef std::map<std::vector<std::string>, TopologyFileSpace::TopologyAngle*> TopologyAngleMap;
 %template() std::pair<std::string, TopologyFileSpace::TopologyAngle*>;
 %template(angle_map_Topology_file) std::map<std::string, TopologyFileSpace::TopologyAngle*>;
 
-//typedef std::map<std::vector<std::string>, TopologyDihedral*> TopologyDihedralMap;
+//typedef std::map<std::vector<std::string>, TopologyFileSpace::TopologyDihedral*> TopologyDihedralMap;
 %template() std::pair<std::string, TopologyFileSpace::TopologyDihedral*>;
 %template(dihedral_map_Topology_file) std::map<std::string, TopologyFileSpace::TopologyDihedral*>;
 
@@ -588,70 +588,70 @@ std::ostream & get_cout() { return std::cout; }
 %template() std::pair<int, double>;
 %template(coefficient_map_Topology_file) std::map<int, double>;
 
-//typedef std::map<int, TopologyAtomType*> TopologyAtomPairMap;
+//typedef std::map<int, TopologyFileSpace::TopologyAtomType*> TopologyAtomPairMap;
 %template() std::pair<std::string, TopologyFileSpace::TopologyAtomPair*>;
 %template(atom_pair_map_Topology_file) std::map<std::string, TopologyFileSpace::TopologyAtomPair*>;
 
-//typedef std::map<int, TopologyBondType*> TopologyBondTypeMap;
+//typedef std::map<int, TopologyFileSpace::TopologyBondType*> TopologyBondTypeMap;
 %template() std::pair<int, TopologyFileSpace::TopologyBondType*>;
 %template(bond_type_map_Topology_file) std::map<int, TopologyFileSpace::TopologyBondType*>;
 
-//typedef std::map<int, TopologyAngleType*> TopologyAngleTypeMap;
+//typedef std::map<int, TopologyFileSpace::TopologyAngleType*> TopologyAngleTypeMap;
 %template() std::pair<int, TopologyFileSpace::TopologyAngleType*>;
 %template(angle_type_map_Topology_file) std::map<int, TopologyFileSpace::TopologyAngleType*>;
 
-//typedef std::map<int, TopologyDihedralType*> TopologyDihedralTypeMap;
+//typedef std::map<int, TopologyFileSpace::TopologyDihedralType*> TopologyDihedralTypeMap;
 %template() std::pair<int, TopologyFileSpace::TopologyDihedralType*>;
 %template(dihedral_type_map_Topology_file) std::map<int, TopologyFileSpace::TopologyDihedralType*>;
 
 
 ///PDBQT file///
-//typedef std::map<std::string, PdbAtomCardVector* > PdbResidueAtomsMap;
+//typedef std::map<std::string, PdbFileSpace::PdbFile::PdbAtomCardVector* > PdbResidueAtomsMap;
 %template() std::pair<std::string, PdbFileSpace::PdbFile::PdbAtomCardVector* >;
 %template(pdb_residue_atom_map) std::map<std::string, PdbFileSpace::PdbFile::PdbAtomCardVector* >;
 
-//typedef std::vector<PdbqtAtom*> PdbqtAtomVector;
+//typedef std::vector<PdbqtFileSpace::PdbqtAtom*> PdbqtAtomVector;
 %template(pdbqt_atom_vector) std::vector<PdbqtFileSpace::PdbqtAtom*>;
 
-//typedef std::map<std::string, PdbqtAtomVector* > PdbqtResidueAtomsMap;
+//typedef std::map<std::string, PdbqtFileSpace::PdbqtFile::PdbqtAtomVector* > PdbqtResidueAtomsMap;
 %template() std::pair<std::string, PdbqtFileSpace::PdbqtFile::PdbqtAtomVector*>;
 %template(pdbqt_residue_atom_map) std::map<std::string, PdbqtFileSpace::PdbqtFile::PdbqtAtomVector*>;
 
-//typedef std::map<int, PdbqtModel*> PdbqtModelMap;
+//typedef std::map<int, PdbqtFileSpace::PdbqtModel*> PdbqtModelMap;
 %template() std::pair<int, PdbqtFileSpace::PdbqtModel*>;
 %template(pdbqt_model_map) std::map<int, PdbqtFileSpace::PdbqtModel*>;
 
-//typedef std::vector<PdbqtRemarkCard*> RemarkCardVector;
+//typedef std::vector<PdbqtFileSpace::PdbqtRemarkCard*> RemarkCardVector;
 %template(pdbqt_remark_card_vector) std::vector<PdbqtFileSpace::PdbqtRemarkCard*>;
 
-//typedef std::vector<PdbqtTorsionalDoFCard*> TorsionalDoFCardVector;
+//typedef std::vector<PdbqtFileSpace::PdbqtTorsionalDoFCard*> TorsionalDoFCardVector;
 %template(torsional_dof_card_vector) std::vector<PdbqtFileSpace::PdbqtTorsionalDoFCard*>;
 
-//typedef std::map<int, PdbqtAtom*> PdbqtAtomMap;
+//typedef std::map<int, PdbqtFileSpace::PdbqtAtom*> PdbqtAtomMap;
 %template() std::pair<int, PdbqtFileSpace::PdbqtAtom* >;
 %template(pdbqt_atom_map) std::map<int, PdbqtFileSpace::PdbqtAtom* >;
 
-//typedef std::vector<PdbqtBranchCard*> BranchCardVector;
+//typedef std::vector<PdbqtFileSpace::PdbqtBranchCard*> BranchCardVector;
 %template(pdbqt_branch_card_vector) std::vector<PdbqtFileSpace::PdbqtBranchCard*>;
 
 ///Cif File///
-//typedef std::vector<CifFileAtom*> CifFileAtomVector;
+//typedef std::vector<CifFileSpace::CifFileAtom*> CifFileAtomVector;
 //%template(cif_atom_vector) std::vector<CifFileSpace::CifFileAtom*>;
 
 ///Condensed Sequence///
-//typedef std::vector<CondensedSequenceResidue*> CondensedSequenceResidueVector;
+//typedef std::vector<CondensedSequenceSpace::CondensedSequenceResidue*> CondensedSequenceResidueVector;
 //%template(condensedsequence_residue_vector) std::vector<CondensedSequenceSpace::CondensedSequenceResidue*>;
 
 //typedef std::vector<gmml::CondensedSequenceTokenType> CondensedSequenceTokenTypeVector;
 //%template(condensedsequence_token_type_vector) std::vector<gmml::CondensedSequenceTokenType>;
 
-//typedef std::vector<CondensedSequenceResidue*> CondensedSequenceResidueTree;
+//typedef std::vector<CondensedSequenceSpace::CondensedSequenceResidue*> CondensedSequenceResidueTree;
 %template(condensedsequence_residue_tree) std::vector<CondensedSequenceSpace::CondensedSequenceResidue*>;
 
-//typedef std::vector<CondensedSequenceGlycam06Residue*> CondensedSequenceGlycam06ResidueTree;
+//typedef std::vector<CondensedSequenceSpace::CondensedSequenceGlycam06Residue*> CondensedSequenceGlycam06ResidueTree;
 %template(condensedsequence_glycam06_residue_tree) std::vector<CondensedSequenceSpace::CondensedSequenceGlycam06Residue*>;
 
-//typedef std::pair<std::string, RotamersAndGlycosidicAnglesInfo*> RotamerNameInfoPair;
+//typedef std::pair<std::string, CondensedSequenceSpace::RotamersAndGlycosidicAnglesInfo*> RotamerNameInfoPair;
 %template(rotamer_name_info_pair) std::pair<std::string, CondensedSequenceSpace::RotamersAndGlycosidicAnglesInfo*>;
 
 //typedef std::vector<RotamerNameInfoPair> CondensedSequenceRatomersAndGlycosidicAnglesInfo;
