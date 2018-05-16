@@ -175,7 +175,7 @@ fi
 cd gmml/
  # Always create a new gmml.pro and makefile
  ## This is going to be broken up to variables instead of being this long command. Just wanted to get a working version pushed up.
- qmake -project -t lib -o gmml.pro "QMAKE_CXXFLAGS += -Wall -W -std=c++98" "QMAKE_CFLAGS += -Wall -W" "DEFINES += _REENTRANT" "CONFIG = no_lflag_merge" "unix:LIBS = -L/usr/lib/x86_64-linux-gnu -lpthread" "OBJECTS_DIR = build" "DESTDIR = bin" -r src/ includes/ -nopwd
+ qmake -project -t lib -o gmml.pro "QMAKE_CXXFLAGS += -Wall -W -std=c++11" "QMAKE_CFLAGS += -Wall -W" "DEFINES += _REENTRANT" "CONFIG = no_lflag_merge" "unix:LIBS = -L/usr/lib/x86_64-linux-gnu -lpthread" "OBJECTS_DIR = build" "DESTDIR = bin" -r src/ includes/ -nopwd
  qmake -o $TARGET_MAKE_FILE
 
  if [ "$CLEAN" == "clean" ]; then
@@ -205,7 +205,7 @@ if [[ "$WRAP_GMML" != "no_wrap" ]]; then
     if [ -f $PYTHON_FILE ]; then
         if [ -f "gmml_wrap.cxx" ]; then
             echo "Compiling wrapped gmml library in python ..."
-            g++ -O3 -fPIC -c gmml_wrap.cxx -I"$PYTHON_HOME"
+            g++ -std=c++11 -O3 -fPIC -c gmml_wrap.cxx -I"$PYTHON_HOME"
         else
             echo "gmml_wrap.cxx does not exist"
         fi
@@ -215,7 +215,7 @@ if [[ "$WRAP_GMML" != "no_wrap" ]]; then
 
     if [[ -f "gmml_wrap.o" ]]; then
         echo "Building python interface ..."
-        g++ -shared gmml/build/*.o gmml_wrap.o -o _gmml.so
+        g++ -std=c++11 -shared gmml/build/*.o gmml_wrap.o -o _gmml.so
     elif [[ -z "gmml_wrap.o" ]]; then
         echo "gmml has not been compiled correctly"
     fi
