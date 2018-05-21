@@ -150,6 +150,7 @@
 #include "gmml/includes/MolecularModeling/residue.hpp"
 #include "gmml/includes/MolecularModeling/atomnode.hpp"
 #include "gmml/includes/MolecularModeling/assembly.hpp"
+#include "gmml/includes/MolecularModeling/molecule.hpp"
 
 #include "gmml/includes/GeometryTopology/grid.hpp"
 #include "gmml/includes/GeometryTopology/cell.hpp"
@@ -316,6 +317,7 @@ std::ostream & get_cout() { return std::cout; }
 %include "gmml/includes/MolecularModeling/residue.hpp"
 %include "gmml/includes/MolecularModeling/atomnode.hpp"
 %include "gmml/includes/MolecularModeling/assembly.hpp"
+%include "gmml/includes/MolecularModeling/molecule.hpp"
 
 %include "gmml/includes/GeometryTopology/grid.hpp"
 %include "gmml/includes/GeometryTopology/cell.hpp"
