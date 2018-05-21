@@ -35,7 +35,8 @@ configs = gmml.GraphVizDotConfig()
 
 # If you want to change any of the default values
 # for the configs struct now would be the time to
-# do it.
+# do it. Of course, this script can also be changed
+# to accept more command line arguments too. ;)
 # Example:
 # configs.dpi = 360
 
