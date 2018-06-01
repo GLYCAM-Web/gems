@@ -3,7 +3,7 @@
 THISPYTHON='python3'
 
 #Manually change this number as you add tests:
-number_of_tests=4
+number_of_tests=5
 tests_passed=0
 
 ##################### Test 1 ########################
@@ -12,7 +12,7 @@ echo "Testing detect_sugar..."
 cd $GEMSHOME #detect sugars has hardcoded path to apps/BFMP/detect_shape in GMML::Assembly.ExtractSugars.
 ${THISPYTHON} ./bin/detect_sugars $GEMSHOME/tests/inputs/1NXC.pdb > $GEMSHOME/tests/test1_output
 cd - >> /dev/null 2>&1 #return now to reduce chance of forgetting later
-DIFF=$(diff test1_output correct_outputs/test1_output) 
+DIFF=$(diff test1_output correct_outputs/test1_output)
 if [ "$DIFF" != "" ]; then
     echo "Test FAILED!"
 else
@@ -67,7 +67,7 @@ else
     ((tests_passed++))
     rm test4_output
 fi
- 
+
 ##################### Test 5 ########################
 #echo "Testing GMMO query 1..."
 ##Tests one of the commands that this script has
@@ -94,6 +94,18 @@ fi
 #fi
 ##rm test6_output
 
+##################### Test 7 ########################
+echo "Testing DrawGlycan.py..."
+#Runs the script that is being tested.
+${THISPYTHON} $GEMSHOME/bin/DrawGlycan.py LFucp[2S]b1-6[DGlcpNAc[3A]a1-2]DManp[3A]a1-3[DGalpNAc[6Me]a1-4]DGalpNAc[6S]b1-OME
+DIFF=$(diff drawglycan.dot correct_outputs/test7_output)
+if [ "$D0IFF" != "" ]; then
+    echo "Test FAILED!"
+else
+    echo "Test passed."
+    ((tests_passed++))
+    rm drawglycan.dot
+fi
 
 ############# Allow git Pushes ###################
 if [[ $tests_passed == $number_of_tests ]]; then
@@ -102,4 +114,3 @@ if [[ $tests_passed == $number_of_tests ]]; then
 else
     exit 1
 fi
-
