@@ -33,6 +33,20 @@ check_pythonhome() {
     fi
 }
 
+get_numprocs() {
+   if [ -z "$GEMSMAKEPROCS" ]; then
+	   NMP=4
+   elif ! [[ $GEMSMAKEPROCS =~ ^[0-9]+$ ]] ; then
+	   echo "GEMSMAKEPROCS is not a valid integer; setting to 4"
+	   NMP=4
+   elif [ "$GEMSMAKEPROCS" -eq "0" ] ; then
+	   echo "GEMSMAKEPROCS cannot be zero; setting to 4"
+	   NMP=4
+   else
+	   NMP=$GEMSMAKEPROCS
+   fi
+}
+
 check_gemshome() {
    if [ -z "$GEMSHOME" ]; then
       echo ""
@@ -72,6 +86,7 @@ check_gmmldir() {
 gemshome=`pwd`
 check_gemshome $gemshome
 check_gmmldir $GEMSHOME/gmml
+get_numprocs
 
 ################################################################
 #########              CREATE CLIENT HOOKS             #########
@@ -109,14 +124,31 @@ cp -r $GEMSHOME/.hooks/* $GEMSHOME/.git/hooks/
 #printf "\n###############################################################################\n\n" >> config.h
 
 ################################################################
+##########               Print help message         ############
+################################################################
+
+if [[ "$1" == "-help" ]] || [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]]; then
+    printf "*************************************************************\n"
+    printf "Usage: $0 clean_gmml? wrap_gmml?\n"
+    printf "Example: $0 clean no_wrap\n"
+    printf "Default: $0 no_clean wrap\n"
+    printf "*************************************************************\n"
+    printf "If selected the options do this:\n"
+    printf "     1. Cleans gmml before making\n"
+    printf "     2. Wrap up via swig (wrapping required only for Gems)\n"
+    printf "*************************************************************\n"    
+    echo "Exiting."
+    exit 1
+fi
+
+################################################################
 #########                SET UP DEFAULTS               #########
 ################################################################
 
 #Changing the following options are for developers.
-TARGET_MAKE_FILE="Makefile-main"
-IDE="None"
-CLEAN="No"
-WRAP_GMML="Wrap"
+TARGET_MAKE_FILE="Makefile"
+CLEAN="no"
+WRAP_GMML="wrap"
 
 ################################################################
 #########               COMMAND LINE INPUTS            #########
@@ -127,24 +159,9 @@ if [[ $# -eq 1 ]]; then
 elif [[ $# -eq 2 ]]; then
     CLEAN="$1"
     WRAP_GMML="$2"
-elif [[ $# -eq 3 ]]; then
-    CLEAN="$1"
-    WRAP_GMML="$2"
-    IDE="$3"
 fi
 
-echo "TARGET_MAKE_FILE=$TARGET_MAKE_FILE, IDE=$IDE, CLEAN=$CLEAN, WRAP_GMML=$WRAP_GMML"
-
-if [[ "$1" == "-help" ]] || [[ "$1" == "-h" ]]; then
-    printf "\nUsage: $0 clean_gmml? wrap_gmml? ide?\n"
-    printf "Example $0 clean no_wrap Qt\n" 
-    printf "This 1. Cleans gmml before making\n" 
-    printf "     2. Does not wrap up via swig (required only for Gems)\n"
-    printf "     3. Prepares a .pro file for Qt to read\n"
-    echo "Exiting."
-    exit 1
-fi
-
+printf "\nTARGET_MAKE_FILE: $TARGET_MAKE_FILE, CLEAN: $CLEAN, WRAP_GMML: $WRAP_GMML\n"
 
 ################################################################
 #########                  COMPILE GMML                #########
@@ -155,19 +172,20 @@ if [[ "$WRAP_GMML" != "no_wrap" ]]; then
     check_pythonhome
 fi
 
-cd gmml
-if [ -f $TARGET_MAKE_FILE ]; then
-    if [ "$CLEAN" == "clean" ]; then
-        make -f $TARGET_MAKE_FILE distclean
-        rm -rf gmml.pro*
-    fi
-    if [ "$IDE" == "Qt" ]; then
-        qmake -project -t lib -o gmml.pro "OBJECTS_DIR = build" "DESTDIR = bin"
-        qmake -o Makefile 
-    fi
-    echo "Compiling gmml"
-    make -j 4 -f $TARGET_MAKE_FILE
-fi
+cd gmml/
+ # Always create a new gmml.pro and makefile
+ ## This is going to be broken up to variables instead of being this long command. Just wanted to get a working version pushed up.
+ qmake -project -t lib -o gmml.pro "QMAKE_CXXFLAGS += -Wall -W -std=c++11" "QMAKE_CFLAGS += -Wall -W" "DEFINES += _REENTRANT" "CONFIG = no_lflag_merge" "unix:LIBS = -L/usr/lib/x86_64-linux-gnu -lpthread" "OBJECTS_DIR = build" "DESTDIR = bin" -r src/ includes/ -nopwd
+ qmake -o $TARGET_MAKE_FILE
+
+ if [ "$CLEAN" == "clean" ]; then
+     make -f $TARGET_MAKE_FILE distclean
+     qmake -o $TARGET_MAKE_FILE
+ fi       
+ 
+ echo "Compiling gmml"
+ make -j ${NMP} -f $TARGET_MAKE_FILE
+
 cd ../
 
 ################################################################
@@ -187,7 +205,7 @@ if [[ "$WRAP_GMML" != "no_wrap" ]]; then
     if [ -f $PYTHON_FILE ]; then
         if [ -f "gmml_wrap.cxx" ]; then
             echo "Compiling wrapped gmml library in python ..."
-            g++ -O3 -fPIC -c gmml_wrap.cxx -I"$PYTHON_HOME"
+            g++ -std=c++11 -O3 -fPIC -c gmml_wrap.cxx -I"$PYTHON_HOME"
         else
             echo "gmml_wrap.cxx does not exist"
         fi
@@ -197,7 +215,7 @@ if [[ "$WRAP_GMML" != "no_wrap" ]]; then
 
     if [[ -f "gmml_wrap.o" ]]; then
         echo "Building python interface ..."
-        g++ -shared gmml/build/*.o gmml_wrap.o -o _gmml.so
+        g++ -std=c++11 -shared gmml/build/*.o gmml_wrap.o -o _gmml.so
     elif [[ -z "gmml_wrap.o" ]]; then
         echo "gmml has not been compiled correctly"
     fi

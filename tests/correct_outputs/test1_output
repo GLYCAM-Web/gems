@@ -4,34 +4,34 @@ End of file
 Building structure by distance ...
 
 All detected cycles
-C1_3723_BMA_a_3_?_?_1-C2_3724_BMA_a_3_?_?_1-C3_3725_BMA_a_3_?_?_1-C4_3726_BMA_a_3_?_?_1-C5_3727_BMA_a_3_?_?_1-O5_3732_BMA_a_3_?_?_1
-C1_3734_MAN_a_4_?_?_1-C2_3735_MAN_a_4_?_?_1-C3_3736_MAN_a_4_?_?_1-C4_3737_MAN_a_4_?_?_1-C5_3738_MAN_a_4_?_?_1-O5_3743_MAN_a_4_?_?_1
-C1_3745_MAN_a_6_?_?_1-O5_3754_MAN_a_6_?_?_1-C5_3749_MAN_a_6_?_?_1-C4_3748_MAN_a_6_?_?_1-C3_3747_MAN_a_6_?_?_1-C2_3746_MAN_a_6_?_?_1
-C1_3778_MAN_a_8_?_?_1-O5_3787_MAN_a_8_?_?_1-C5_3782_MAN_a_8_?_?_1-C4_3781_MAN_a_8_?_?_1-C3_3780_MAN_a_8_?_?_1-C2_3779_MAN_a_8_?_?_1
-C4_3698_NAG_a_1_?_?_1-C3_3697_NAG_a_1_?_?_1-C2_3696_NAG_a_1_?_?_1-C1_3695_NAG_a_1_?_?_1-O5_3706_NAG_a_1_?_?_1-C5_3699_NAG_a_1_?_?_1
-C4_3712_NAG_a_2_?_?_1-C3_3711_NAG_a_2_?_?_1-C2_3710_NAG_a_2_?_?_1-C1_3709_NAG_a_2_?_?_1-O5_3720_NAG_a_2_?_?_1-C5_3713_NAG_a_2_?_?_1
-C5_3771_MAN_a_5_?_?_1-O5_3776_MAN_a_5_?_?_1-C1_3767_MAN_a_5_?_?_1-C2_3768_MAN_a_5_?_?_1-C3_3769_MAN_a_5_?_?_1-C4_3770_MAN_a_5_?_?_1
-O5_3765_MAN_a_7_?_?_1-C5_3760_MAN_a_7_?_?_1-C4_3759_MAN_a_7_?_?_1-C3_3758_MAN_a_7_?_?_1-C2_3757_MAN_a_7_?_?_1-C1_3756_MAN_a_7_?_?_1
+C1_3723_BMA_A_3_?_?_1-C2_3724_BMA_A_3_?_?_1-C3_3725_BMA_A_3_?_?_1-C4_3726_BMA_A_3_?_?_1-C5_3727_BMA_A_3_?_?_1-O5_3732_BMA_A_3_?_?_1
+C1_3734_MAN_A_4_?_?_1-C2_3735_MAN_A_4_?_?_1-C3_3736_MAN_A_4_?_?_1-C4_3737_MAN_A_4_?_?_1-C5_3738_MAN_A_4_?_?_1-O5_3743_MAN_A_4_?_?_1
+C1_3745_MAN_A_6_?_?_1-O5_3754_MAN_A_6_?_?_1-C5_3749_MAN_A_6_?_?_1-C4_3748_MAN_A_6_?_?_1-C3_3747_MAN_A_6_?_?_1-C2_3746_MAN_A_6_?_?_1
+C1_3778_MAN_A_8_?_?_1-O5_3787_MAN_A_8_?_?_1-C5_3782_MAN_A_8_?_?_1-C4_3781_MAN_A_8_?_?_1-C3_3780_MAN_A_8_?_?_1-C2_3779_MAN_A_8_?_?_1
+C4_3698_NAG_A_1_?_?_1-C3_3697_NAG_A_1_?_?_1-C2_3696_NAG_A_1_?_?_1-C1_3695_NAG_A_1_?_?_1-O5_3706_NAG_A_1_?_?_1-C5_3699_NAG_A_1_?_?_1
+C4_3712_NAG_A_2_?_?_1-C3_3711_NAG_A_2_?_?_1-C2_3710_NAG_A_2_?_?_1-C1_3709_NAG_A_2_?_?_1-O5_3720_NAG_A_2_?_?_1-C5_3713_NAG_A_2_?_?_1
+C5_3771_MAN_A_5_?_?_1-O5_3776_MAN_A_5_?_?_1-C1_3767_MAN_A_5_?_?_1-C2_3768_MAN_A_5_?_?_1-C3_3769_MAN_A_5_?_?_1-C4_3770_MAN_A_5_?_?_1
+O5_3765_MAN_A_7_?_?_1-C5_3760_MAN_A_7_?_?_1-C4_3759_MAN_A_7_?_?_1-C3_3758_MAN_A_7_?_?_1-C2_3757_MAN_A_7_?_?_1-C1_3756_MAN_A_7_?_?_1
 
 Cycles after discarding rings that are all-carbon
-C1_3723_BMA_a_3_?_?_1-C2_3724_BMA_a_3_?_?_1-C3_3725_BMA_a_3_?_?_1-C4_3726_BMA_a_3_?_?_1-C5_3727_BMA_a_3_?_?_1-O5_3732_BMA_a_3_?_?_1
-C1_3734_MAN_a_4_?_?_1-C2_3735_MAN_a_4_?_?_1-C3_3736_MAN_a_4_?_?_1-C4_3737_MAN_a_4_?_?_1-C5_3738_MAN_a_4_?_?_1-O5_3743_MAN_a_4_?_?_1
-C1_3745_MAN_a_6_?_?_1-O5_3754_MAN_a_6_?_?_1-C5_3749_MAN_a_6_?_?_1-C4_3748_MAN_a_6_?_?_1-C3_3747_MAN_a_6_?_?_1-C2_3746_MAN_a_6_?_?_1
-C1_3778_MAN_a_8_?_?_1-O5_3787_MAN_a_8_?_?_1-C5_3782_MAN_a_8_?_?_1-C4_3781_MAN_a_8_?_?_1-C3_3780_MAN_a_8_?_?_1-C2_3779_MAN_a_8_?_?_1
-C4_3698_NAG_a_1_?_?_1-C3_3697_NAG_a_1_?_?_1-C2_3696_NAG_a_1_?_?_1-C1_3695_NAG_a_1_?_?_1-O5_3706_NAG_a_1_?_?_1-C5_3699_NAG_a_1_?_?_1
-C4_3712_NAG_a_2_?_?_1-C3_3711_NAG_a_2_?_?_1-C2_3710_NAG_a_2_?_?_1-C1_3709_NAG_a_2_?_?_1-O5_3720_NAG_a_2_?_?_1-C5_3713_NAG_a_2_?_?_1
-C5_3771_MAN_a_5_?_?_1-O5_3776_MAN_a_5_?_?_1-C1_3767_MAN_a_5_?_?_1-C2_3768_MAN_a_5_?_?_1-C3_3769_MAN_a_5_?_?_1-C4_3770_MAN_a_5_?_?_1
-O5_3765_MAN_a_7_?_?_1-C5_3760_MAN_a_7_?_?_1-C4_3759_MAN_a_7_?_?_1-C3_3758_MAN_a_7_?_?_1-C2_3757_MAN_a_7_?_?_1-C1_3756_MAN_a_7_?_?_1
+C1_3723_BMA_A_3_?_?_1-C2_3724_BMA_A_3_?_?_1-C3_3725_BMA_A_3_?_?_1-C4_3726_BMA_A_3_?_?_1-C5_3727_BMA_A_3_?_?_1-O5_3732_BMA_A_3_?_?_1
+C1_3734_MAN_A_4_?_?_1-C2_3735_MAN_A_4_?_?_1-C3_3736_MAN_A_4_?_?_1-C4_3737_MAN_A_4_?_?_1-C5_3738_MAN_A_4_?_?_1-O5_3743_MAN_A_4_?_?_1
+C1_3745_MAN_A_6_?_?_1-O5_3754_MAN_A_6_?_?_1-C5_3749_MAN_A_6_?_?_1-C4_3748_MAN_A_6_?_?_1-C3_3747_MAN_A_6_?_?_1-C2_3746_MAN_A_6_?_?_1
+C1_3778_MAN_A_8_?_?_1-O5_3787_MAN_A_8_?_?_1-C5_3782_MAN_A_8_?_?_1-C4_3781_MAN_A_8_?_?_1-C3_3780_MAN_A_8_?_?_1-C2_3779_MAN_A_8_?_?_1
+C4_3698_NAG_A_1_?_?_1-C3_3697_NAG_A_1_?_?_1-C2_3696_NAG_A_1_?_?_1-C1_3695_NAG_A_1_?_?_1-O5_3706_NAG_A_1_?_?_1-C5_3699_NAG_A_1_?_?_1
+C4_3712_NAG_A_2_?_?_1-C3_3711_NAG_A_2_?_?_1-C2_3710_NAG_A_2_?_?_1-C1_3709_NAG_A_2_?_?_1-O5_3720_NAG_A_2_?_?_1-C5_3713_NAG_A_2_?_?_1
+C5_3771_MAN_A_5_?_?_1-O5_3776_MAN_A_5_?_?_1-C1_3767_MAN_A_5_?_?_1-C2_3768_MAN_A_5_?_?_1-C3_3769_MAN_A_5_?_?_1-C4_3770_MAN_A_5_?_?_1
+O5_3765_MAN_A_7_?_?_1-C5_3760_MAN_A_7_?_?_1-C4_3759_MAN_A_7_?_?_1-C3_3758_MAN_A_7_?_?_1-C2_3757_MAN_A_7_?_?_1-C1_3756_MAN_A_7_?_?_1
 
 Detailed information of sorted cycles after discarding fused or oxygenless rings: 
-Ring atoms: C1_3695_NAG_a_1_?_?_1-C2_3696_NAG_a_1_?_?_1-C3_3697_NAG_a_1_?_?_1-C4_3698_NAG_a_1_?_?_1-C5_3699_NAG_a_1_?_?_1-O5_3706_NAG_a_1_?_?_1
+Ring atoms: C1_3695_NAG_A_1_?_?_1-C2_3696_NAG_A_1_?_?_1-C3_3697_NAG_A_1_?_?_1-C4_3698_NAG_A_1_?_?_1-C5_3699_NAG_A_1_?_?_1-O5_3706_NAG_A_1_?_?_1
 Side group atoms: 
 [1] -> ND2_2612_ASN_A_515_?_?_1
-[2] -> N2_3703_NAG_a_1_?_?_1
-[3] -> O3_3704_NAG_a_1_?_?_1
-[4] -> O4_3705_NAG_a_1_?_?_1
-[5] -> C6_3700_NAG_a_1_?_?_1
-Anomeric carbon: C1_3695_NAG_a_1_?_?_1
+[2] -> N2_3703_NAG_A_1_?_?_1
+[3] -> O3_3704_NAG_A_1_?_?_1
+[4] -> O4_3705_NAG_A_1_?_?_1
+[5] -> C6_3700_NAG_A_1_?_?_1
+Anomeric carbon: C1_3695_NAG_A_1_?_?_1
 
 Ring Stereo chemistry chemical code:
       3    a +1 
@@ -49,14 +49,14 @@ Stereochemistry short name: DGlcpb
 Complete name: N-acetyl-b-D-glucopyranose
 Short name: DGlcpNAcb
 -------------------------------------------------------------------------------------------------------------------------------------------
-Ring atoms: C1_3709_NAG_a_2_?_?_1-C2_3710_NAG_a_2_?_?_1-C3_3711_NAG_a_2_?_?_1-C4_3712_NAG_a_2_?_?_1-C5_3713_NAG_a_2_?_?_1-O5_3720_NAG_a_2_?_?_1
+Ring atoms: C1_3709_NAG_A_2_?_?_1-C2_3710_NAG_A_2_?_?_1-C3_3711_NAG_A_2_?_?_1-C4_3712_NAG_A_2_?_?_1-C5_3713_NAG_A_2_?_?_1-O5_3720_NAG_A_2_?_?_1
 Side group atoms: 
-[1] -> O4_3705_NAG_a_1_?_?_1
-[2] -> N2_3717_NAG_a_2_?_?_1
-[3] -> O3_3718_NAG_a_2_?_?_1
-[4] -> O4_3719_NAG_a_2_?_?_1
-[5] -> C6_3714_NAG_a_2_?_?_1
-Anomeric carbon: C1_3709_NAG_a_2_?_?_1
+[1] -> O4_3705_NAG_A_1_?_?_1
+[2] -> N2_3717_NAG_A_2_?_?_1
+[3] -> O3_3718_NAG_A_2_?_?_1
+[4] -> O4_3719_NAG_A_2_?_?_1
+[5] -> C6_3714_NAG_A_2_?_?_1
+Anomeric carbon: C1_3709_NAG_A_2_?_?_1
 
 Ring Stereo chemistry chemical code:
       3    a +1 
@@ -74,14 +74,14 @@ Stereochemistry short name: DGlcpb
 Complete name: N-acetyl-b-D-glucopyranose
 Short name: DGlcpNAcb
 -------------------------------------------------------------------------------------------------------------------------------------------
-Ring atoms: C1_3723_BMA_a_3_?_?_1-C2_3724_BMA_a_3_?_?_1-C3_3725_BMA_a_3_?_?_1-C4_3726_BMA_a_3_?_?_1-C5_3727_BMA_a_3_?_?_1-O5_3732_BMA_a_3_?_?_1-
+Ring atoms: C1_3723_BMA_A_3_?_?_1-C2_3724_BMA_A_3_?_?_1-C3_3725_BMA_A_3_?_?_1-C4_3726_BMA_A_3_?_?_1-C5_3727_BMA_A_3_?_?_1-O5_3732_BMA_A_3_?_?_1-
 Side group atoms: 
-[1] -> O4_3719_NAG_a_2_?_?_1
-[2] -> O2_3729_BMA_a_3_?_?_1
-[3] -> O3_3730_BMA_a_3_?_?_1
-[4] -> O4_3731_BMA_a_3_?_?_1
-[5] -> C6_3728_BMA_a_3_?_?_1
-Anomeric carbon: C1_3723_BMA_a_3_?_?_1
+[1] -> O4_3719_NAG_A_2_?_?_1
+[2] -> O2_3729_BMA_A_3_?_?_1
+[3] -> O3_3730_BMA_A_3_?_?_1
+[4] -> O4_3731_BMA_A_3_?_?_1
+[5] -> C6_3728_BMA_A_3_?_?_1
+Anomeric carbon: C1_3723_BMA_A_3_?_?_1
 
 Ring Stereo chemistry chemical code:
     2 3    a +1 
@@ -98,14 +98,14 @@ Stereochemistry short name: DManpb
 Complete name: b-D-mannopyranose
 Short name: DManpb
 -------------------------------------------------------------------------------------------------------------------------------------------
-Ring atoms: C1_3734_MAN_a_4_?_?_1-C2_3735_MAN_a_4_?_?_1-C3_3736_MAN_a_4_?_?_1-C4_3737_MAN_a_4_?_?_1-C5_3738_MAN_a_4_?_?_1-O5_3743_MAN_a_4_?_?_1-
+Ring atoms: C1_3734_MAN_A_4_?_?_1-C2_3735_MAN_A_4_?_?_1-C3_3736_MAN_A_4_?_?_1-C4_3737_MAN_A_4_?_?_1-C5_3738_MAN_A_4_?_?_1-O5_3743_MAN_A_4_?_?_1-
 Side group atoms: 
-[1] -> O6_3733_BMA_a_3_?_?_1
-[2] -> O2_3740_MAN_a_4_?_?_1
-[3] -> O3_3741_MAN_a_4_?_?_1
-[4] -> O4_3742_MAN_a_4_?_?_1
-[5] -> C6_3739_MAN_a_4_?_?_1
-Anomeric carbon: C1_3734_MAN_a_4_?_?_1
+[1] -> O6_3733_BMA_A_3_?_?_1
+[2] -> O2_3740_MAN_A_4_?_?_1
+[3] -> O3_3741_MAN_A_4_?_?_1
+[4] -> O4_3742_MAN_A_4_?_?_1
+[5] -> C6_3739_MAN_A_4_?_?_1
+Anomeric carbon: C1_3734_MAN_A_4_?_?_1
 
 Ring Stereo chemistry chemical code:
     2 3      +1 
@@ -122,14 +122,14 @@ Stereochemistry short name: DManpa
 Complete name: a-D-mannopyranose
 Short name: DManpa
 -------------------------------------------------------------------------------------------------------------------------------------------
-Ring atoms: C1_3745_MAN_a_6_?_?_1-C2_3746_MAN_a_6_?_?_1-C3_3747_MAN_a_6_?_?_1-C4_3748_MAN_a_6_?_?_1-C5_3749_MAN_a_6_?_?_1-O5_3754_MAN_a_6_?_?_1
+Ring atoms: C1_3745_MAN_A_6_?_?_1-C2_3746_MAN_A_6_?_?_1-C3_3747_MAN_A_6_?_?_1-C4_3748_MAN_A_6_?_?_1-C5_3749_MAN_A_6_?_?_1-O5_3754_MAN_A_6_?_?_1
 Side group atoms: 
-[1] -> O6_3744_MAN_a_4_?_?_1
-[2] -> O2_3751_MAN_a_6_?_?_1
-[3] -> O3_3752_MAN_a_6_?_?_1
-[4] -> O4_3753_MAN_a_6_?_?_1
-[5] -> C6_3750_MAN_a_6_?_?_1
-Anomeric carbon: C1_3745_MAN_a_6_?_?_1
+[1] -> O6_3744_MAN_A_4_?_?_1
+[2] -> O2_3751_MAN_A_6_?_?_1
+[3] -> O3_3752_MAN_A_6_?_?_1
+[4] -> O4_3753_MAN_A_6_?_?_1
+[5] -> C6_3750_MAN_A_6_?_?_1
+Anomeric carbon: C1_3745_MAN_A_6_?_?_1
 
 Ring Stereo chemistry chemical code:
     2 3      +1 
@@ -146,13 +146,13 @@ Stereochemistry short name: DManpa
 Complete name: a-D-mannopyranose
 Short name: DManpa
 -------------------------------------------------------------------------------------------------------------------------------------------
-Ring atoms: C1_3756_MAN_a_7_?_?_1-C2_3757_MAN_a_7_?_?_1-C3_3758_MAN_a_7_?_?_1-C4_3759_MAN_a_7_?_?_1-C5_3760_MAN_a_7_?_?_1-O5_3765_MAN_a_7_?_?_1
+Ring atoms: C1_3756_MAN_A_7_?_?_1-C2_3757_MAN_A_7_?_?_1-C3_3758_MAN_A_7_?_?_1-C4_3759_MAN_A_7_?_?_1-C5_3760_MAN_A_7_?_?_1-O5_3765_MAN_A_7_?_?_1
 Side group atoms: 
-[2] -> O2_3762_MAN_a_7_?_?_1
-[3] -> O3_3763_MAN_a_7_?_?_1
-[4] -> O4_3764_MAN_a_7_?_?_1
-[5] -> C6_3761_MAN_a_7_?_?_1
-Anomeric carbon: C1_3756_MAN_a_7_?_?_1
+[2] -> O2_3762_MAN_A_7_?_?_1
+[3] -> O3_3763_MAN_A_7_?_?_1
+[4] -> O4_3764_MAN_A_7_?_?_1
+[5] -> C6_3761_MAN_A_7_?_?_1
+Anomeric carbon: C1_3756_MAN_A_7_?_?_1
 
 Ring Stereo chemistry chemical code:
     2 3      +1 
@@ -169,13 +169,13 @@ Stereochemistry short name: DManpx
 Complete name: x-D-mannopyranose
 Short name: DManpx
 -------------------------------------------------------------------------------------------------------------------------------------------
-Ring atoms: C1_3767_MAN_a_5_?_?_1-C2_3768_MAN_a_5_?_?_1-C3_3769_MAN_a_5_?_?_1-C4_3770_MAN_a_5_?_?_1-C5_3771_MAN_a_5_?_?_1-O5_3776_MAN_a_5_?_?_1
+Ring atoms: C1_3767_MAN_A_5_?_?_1-C2_3768_MAN_A_5_?_?_1-C3_3769_MAN_A_5_?_?_1-C4_3770_MAN_A_5_?_?_1-C5_3771_MAN_A_5_?_?_1-O5_3776_MAN_A_5_?_?_1
 Side group atoms: 
-[2] -> O2_3773_MAN_a_5_?_?_1
-[3] -> O3_3774_MAN_a_5_?_?_1
-[4] -> O4_3775_MAN_a_5_?_?_1
-[5] -> C6_3772_MAN_a_5_?_?_1
-Anomeric carbon probably is: C1_3767_MAN_a_5_?_?_1
+[2] -> O2_3773_MAN_A_5_?_?_1
+[3] -> O3_3774_MAN_A_5_?_?_1
+[4] -> O4_3775_MAN_A_5_?_?_1
+[5] -> C6_3772_MAN_A_5_?_?_1
+Anomeric carbon assigned based on its atom name index (1), Anomeric Carbon is: C1_3767_MAN_A_5_?_?_1
 
 Ring Stereo chemistry chemical code:
     2 3      +1 
@@ -192,14 +192,14 @@ Stereochemistry short name: DManpx
 Complete name: x-D-mannopyranose
 Short name: DManpx
 -------------------------------------------------------------------------------------------------------------------------------------------
-Ring atoms: C1_3778_MAN_a_8_?_?_1-C2_3779_MAN_a_8_?_?_1-C3_3780_MAN_a_8_?_?_1-C4_3781_MAN_a_8_?_?_1-C5_3782_MAN_a_8_?_?_1-O5_3787_MAN_a_8_?_?_1
+Ring atoms: C1_3778_MAN_A_8_?_?_1-C2_3779_MAN_A_8_?_?_1-C3_3780_MAN_A_8_?_?_1-C4_3781_MAN_A_8_?_?_1-C5_3782_MAN_A_8_?_?_1-O5_3787_MAN_A_8_?_?_1
 Side group atoms: 
-[1] -> O6_3777_MAN_a_5_?_?_1
-[2] -> O2_3784_MAN_a_8_?_?_1
-[3] -> O3_3785_MAN_a_8_?_?_1
-[4] -> O4_3786_MAN_a_8_?_?_1
-[5] -> C6_3783_MAN_a_8_?_?_1
-Anomeric carbon probably is: C1_3778_MAN_a_8_?_?_1
+[1] -> O6_3777_MAN_A_5_?_?_1
+[2] -> O2_3784_MAN_A_8_?_?_1
+[3] -> O3_3785_MAN_A_8_?_?_1
+[4] -> O4_3786_MAN_A_8_?_?_1
+[5] -> C6_3783_MAN_A_8_?_?_1
+Anomeric carbon assigned based on its atom name index (1), Anomeric Carbon is: C1_3778_MAN_A_8_?_?_1
 
 Ring Stereo chemistry chemical code:
     2 3      +1 
@@ -219,25 +219,17 @@ Short name: DManpa
 
 Oligosaccharides:
 DManpa1-6DManpa1-6DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-ASN
-{4}MAN(6_a)C1-MAN(4_a)C6, Glycosidic linkage: MAN(4_a)O6
-{3}MAN(4_a)C1-BMA(3_a)C6, Glycosidic linkage: BMA(3_a)O6
-{2}BMA(3_a)C1-NAG(2_a)C4, Glycosidic linkage: NAG(2_a)O4
-{1}NAG(2_a)C1-NAG(1_a)C4, Glycosidic linkage: NAG(1_a)O4
-
 DManpx1-ASN
-
 DManpa1-6DManpx
-{1}MAN(8_a)C1-MAN(5_a)C6, Glycosidic linkage: MAN(5_a)O6
-
 -------------------------------------------------------------------------------------------------------------------------------------------
 
 NOTES/ISSUES:
 
 Category: anomeric
 Type: warning
-Description: DManpx: Anomeric oxygen is missing
+Description: DManpx: Could not find glycosidic oxygen or nitrogen within 1.65 Angstroms of a ring carbon bonded to the ring oxygen(O5).
 
 Category: anomeric
 Type: warning
-Description: DManpa: Anomeric oxygen is missing
+Description: DManpa: Could not find glycosidic oxygen or nitrogen within 1.65 Angstroms of a ring carbon bonded to the ring oxygen(O5).
 -------------------------------------------------------------------------------------------------------------------------------------------

@@ -1,5 +1,6 @@
 HEADER    Test file for the pdb preprocessor                                    
 TITLE     Was originally: 1934 H1 HEMAGGLUTININ IN COMPLEX WITH LSTC            
+REMARK     Was 1RVZ, but much was deleted to make a small test case.            
 ATOM      1 N    ASP A   5      17.925 -16.975  36.734  1.00 83.79           N  
 ATOM      2 CA   ASP A   5      18.534 -16.355  35.523  1.00 83.69           C  
 ATOM      3 C    ASP A   5      19.052 -17.415  34.562  1.00 83.43           C  

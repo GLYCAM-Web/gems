@@ -13,7 +13,7 @@ if len(sys.argv) < 2:
 	print('Please enter a sequence using -seq option')
 elif len(sys.argv) < 8: 
 	assembly = gmml.Assembly()
-	prep_residues = gmml.condensedsequence_amber_prep_residue_tree()
+	prep_residues = gmml.condensedsequence_glycam06_residue_tree()
 	if assembly.CheckCondensedSequenceSanity(sys.argv[2], prep_residues):
 		print(sys.argv[2],' is valid')
 		assembly.BuildAssemblyFromCondensedSequence(sys.argv[2], sys.argv[4], sys.argv[6], True)

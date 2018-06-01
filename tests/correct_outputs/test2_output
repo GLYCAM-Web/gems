@@ -15,25 +15,18 @@ Linking atoms, where relevant, are identified by:
         Atom Name
 
 12 saccharide molecule(s) were detected:
+    DManpa1-6DManpa1-6DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-ASN
     DManpx1-ASN
+    DManpa1-6DManpx
     -------------------------------------------------------------------------------------------------------------------------------------------
     NOTES/ISSUES:
     Category: anomeric
     Type: warning
-    Description: DManpx: Anomeric oxygen is missing
+    Description: DManpx: Could not find glycosidic oxygen or nitrogen within 1.65 Angstroms of a ring carbon bonded to the ring oxygen(O5).
     Category: anomeric
     Type: warning
-    Description: DManpa: Anomeric oxygen is missing
+    Description: DManpa: Could not find glycosidic oxygen or nitrogen within 1.65 Angstroms of a ring carbon bonded to the ring oxygen(O5).
     -------------------------------------------------------------------------------------------------------------------------------------------
-    DManpa1-6DManpx
-        Linkage atom(s):
-        1    a     MAN      5  O6   
-    DManpa1-6DManpa1-6DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-ASN
-        Linkage atom(s):
-        4    a     MAN      4  O6   
-        3    a     BMA      3  O6   
-        2    a     NAG      2  O4   
-        1    a     NAG      1  O4   
 
 ===========================================
 3.  Saccharide residues detected
@@ -55,14 +48,14 @@ Ring oxygens are identified by:
 8 saccharide residue(s) were detected:
 
 Residue Identity               Name  Serial ResName Chain ResSer InsCode AltLoc
-N-acetyl-b-D-glucopyranose     O5      3706 NAG     a          1 n/a     n/a   
-N-acetyl-b-D-glucopyranose     O5      3720 NAG     a          2 n/a     n/a   
-b-D-mannopyranose              O5      3732 BMA     a          3 n/a     n/a   
-a-D-mannopyranose              O5      3743 MAN     a          4 n/a     n/a   
-a-D-mannopyranose              O5      3754 MAN     a          6 n/a     n/a   
-x-D-mannopyranose              O5      3765 MAN     a          7 n/a     n/a   
-x-D-mannopyranose              O5      3776 MAN     a          5 n/a     n/a   
-a-D-mannopyranose              O5      3787 MAN     a          8 n/a     n/a   
+N-acetyl-b-D-glucopyranose     O5      3706 NAG     A          1 n/a     n/a   
+N-acetyl-b-D-glucopyranose     O5      3720 NAG     A          2 n/a     n/a   
+b-D-mannopyranose              O5      3732 BMA     A          3 n/a     n/a   
+a-D-mannopyranose              O5      3743 MAN     A          4 n/a     n/a   
+a-D-mannopyranose              O5      3754 MAN     A          6 n/a     n/a   
+x-D-mannopyranose              O5      3765 MAN     A          7 n/a     n/a   
+x-D-mannopyranose              O5      3776 MAN     A          5 n/a     n/a   
+a-D-mannopyranose              O5      3787 MAN     A          8 n/a     n/a   
 
 ===========================================
 4.  Error and warning messages
