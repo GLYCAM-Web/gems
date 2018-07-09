@@ -11,21 +11,21 @@ check_pythonhome() {
         if locate_test="$(type -p "locate")" || [ -z "locate" ]; then
             num_Pythons=`locate -ce Python.h`
             if [[ $num_Pythons -gt 0 ]]; then
-            { 
+            {
                 printf "Here are the current locations of Python.h on your machine:\n\n"
                 locate -e Python.h
                 printf "\n"
             }
             else
                 printf "locate could not find any instances of Python.h\n"
-                
+
             fi
         fi
         echo "Exiting."
         exit 1
     elif [ ! -d $PYTHON_HOME ]; then
         guess=`dirname $PYTHON_HOME`
-        printf "PYTHON_HOME is not set to a directory.\n" 
+        printf "PYTHON_HOME is not set to a directory.\n"
         printf "It is currently %s\n" $PYTHON_HOME
         printf "Perhaps try     %s\n" $guess
         echo "Exiting."
@@ -93,7 +93,7 @@ get_numprocs
 ################################################################
 
 #Cannot use server side hooks when hosting on git-hub.
-#Stuff in .git/hooks is ignored by git 
+#Stuff in .git/hooks is ignored by git
 #Solution: The folder gmml/.hooks is tracked by git.
 # Copy gmml/.hooks to gmml/.git/hooks during installation
 cp -r $GEMSHOME/gmml/.hooks/* $GEMSHOME/gmml/.git/hooks/
@@ -136,7 +136,7 @@ if [[ "$1" == "-help" ]] || [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]]; then
     printf "If selected the options do this:\n"
     printf "     1. Cleans gmml before making\n"
     printf "     2. Wrap up via swig (wrapping required only for Gems)\n"
-    printf "*************************************************************\n"    
+    printf "*************************************************************\n"
     echo "Exiting."
     exit 1
 fi
@@ -154,7 +154,7 @@ WRAP_GMML="wrap"
 #########               COMMAND LINE INPUTS            #########
 ################################################################
 
-if [[ $# -eq 1 ]]; then 
+if [[ $# -eq 1 ]]; then
     CLEAN="$1"
 elif [[ $# -eq 2 ]]; then
     CLEAN="$1"
@@ -175,15 +175,15 @@ fi
 cd gmml/
  # Always create a new gmml.pro and makefile
  ## This is going to be broken up to variables instead of being this long command. Just wanted to get a working version pushed up.
- qmake -project -t lib -o gmml.pro "QMAKE_CXXFLAGS += -Wall -W -std=c++11" "QMAKE_CFLAGS += -Wall -W" "DEFINES += _REENTRANT" "CONFIG = no_lflag_merge" "unix:LIBS = -L/usr/lib/x86_64-linux-gnu -lpthread" "OBJECTS_DIR = build" "DESTDIR = bin" -r src/ includes/ -nopwd
+ qmake -project -t lib -o gmml.pro "QMAKE_CXXFLAGS += -Wall -W -std=c++11" "QMAKE_CFLAGS += -Wall -W" "DEFINES += _REENTRANT" "CONFIG = no_lflag_merge" "unix:LIBS = -L/usr/lib/x86_64-linux-gnu -lpthread" "OBJECTS_DIR = build" "DESTDIR = lib" -r src/ includes/ -nopwd
  qmake -o $TARGET_MAKE_FILE
 
  if [ "$CLEAN" == "clean" ]; then
      make -f $TARGET_MAKE_FILE distclean
      make clean
      qmake -o $TARGET_MAKE_FILE
- fi       
- 
+ fi
+
  echo "Compiling gmml"
  make -j ${NMP} -f $TARGET_MAKE_FILE
 

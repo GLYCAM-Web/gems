@@ -26,7 +26,7 @@ fi
 echo "Testing PDBSugarID..."
 #runs the script with a functional argument
 cd $GEMSHOME
-${THISPYTHON} ./bin/PDBSugarID $GEMSHOME/tests/inputs/1NXC.pdb $GEMSHOME/tests/test2_output keep
+${THISPYTHON} ./bin/PDBSugarID $GEMSHOME/tests/inputs/1NXC.pdb $GEMSHOME/tests/test2_output # keep
 cd - >> /dev/null 2>&1
 tail -n +18 test2_output > tmp2
 DIFF=$(diff tmp2 correct_outputs/test2_output)
@@ -36,10 +36,9 @@ else
     echo "Test passed."
     ((tests_passed++))
     rm test2_output
-    rm test2_output_sugar-details
+    rm tmp2
+    # rm test2_output_sugar-details
 fi
-rm tmp2
-
 
 	##################### Test 3 ########################
 echo "Testing test_installation.bash..."
