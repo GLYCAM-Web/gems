@@ -27,8 +27,11 @@ gemshome=`pwd`
 check_gemshome $gemshome 
 
 #Compile gmml if not compiled:
-echo "Compiling gmml if necessary with ./make.sh no_clean wrap"
-cd $GEMSHOME/
+echo "Pulling gems AND gmml, and then compiling gmml if necessary with ./make.sh no_clean wrap"
+cd $GEMSHOME/gmml/
+  git pull
+cd $GEMSHOME
+  git pull
  ./make.sh no_clean wrap
 cd - >> /dev/null 2>&1
 
