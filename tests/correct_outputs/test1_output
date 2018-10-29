@@ -38,9 +38,9 @@ Ring Stereo chemistry chemical code:
         P      
     2 4         
 
-Creating PDB file
-PDB file created
-BFMP ring conformation: 4C1
+Ok
+BFMP ring conformation: 	4C1		6d3(3.33869)		2d5(3.49903)		4d1(6.64317)	
+
 
 Carbon at Ring Position 2 is attached to xC-N-C=OCH3
 
@@ -63,9 +63,9 @@ Ring Stereo chemistry chemical code:
         P      
     2 4         
 
-Creating PDB file
-PDB file created
-BFMP ring conformation: 4C1
+Ok
+BFMP ring conformation: 	4C1		6d3(0.923873)		2d5(6.19768)		4d1(7.25127)	
+
 
 Carbon at Ring Position 2 is attached to xC-N-C=OCH3
 
@@ -88,9 +88,9 @@ Ring Stereo chemistry chemical code:
         P      
       4         
 
-Creating PDB file
-PDB file created
-BFMP ring conformation: 4C1
+Ok
+BFMP ring conformation: 	4C1		6d3(2.14717)		4d1(2.48299)		2d5(4.72614)	
+
 
 
 Stereochemistry name: b-D-mannopyranose
@@ -112,9 +112,9 @@ Ring Stereo chemistry chemical code:
         P      
       4       a 
 
-Creating PDB file
-PDB file created
-BFMP ring conformation: 4C1
+Ok
+BFMP ring conformation: 	4C1		2d5(0.959165)		6d3(2.5311)		4d1(3.6575)	
+
 
 
 Stereochemistry name: a-D-mannopyranose
@@ -136,9 +136,9 @@ Ring Stereo chemistry chemical code:
         P      
       4       a 
 
-Creating PDB file
-PDB file created
-BFMP ring conformation: 4C1
+Ok
+BFMP ring conformation: 	4C1		4d1(0.397628)		2d5(1.91258)		6d3(2.18911)	
+
 
 
 Stereochemistry name: a-D-mannopyranose
@@ -159,9 +159,9 @@ Ring Stereo chemistry chemical code:
         P      
       4         
 
-Creating PDB file
-PDB file created
-BFMP ring conformation: 4C1
+Ok
+BFMP ring conformation: 	4C1		4d1(1.84586)		2d5(1.85285)		6d3(3.52446)	
+
 
 
 Stereochemistry name: x-D-mannopyranose
@@ -182,9 +182,9 @@ Ring Stereo chemistry chemical code:
         P      
       4         
 
-Creating PDB file
-PDB file created
-BFMP ring conformation: 4C1
+Ok
+BFMP ring conformation: 	4C1		4d1(1.80593)		6d3(6.65133)		2d5(8.58487)	
+
 
 
 Stereochemistry name: x-D-mannopyranose
@@ -206,9 +206,9 @@ Ring Stereo chemistry chemical code:
         P      
       4       a 
 
-Creating PDB file
-PDB file created
-BFMP ring conformation: 4C1
+Ok
+BFMP ring conformation: 	4C1		4d1(1.48318)		6d3(1.76285)		2d5(3.38955)	
+
 
 
 Stereochemistry name: a-D-mannopyranose
@@ -220,7 +220,7 @@ Short name: DManpa
 Oligosaccharides:
 DManpa1-6DManpa1-6DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-ASN
 DManpx1-ASN
-DManpa1-6DManpx
+DManpa1-6DManpx1-UNK
 -------------------------------------------------------------------------------------------------------------------------------------------
 
 NOTES/ISSUES:
