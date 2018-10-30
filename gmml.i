@@ -142,11 +142,13 @@
 #include "gmml/includes/GeometryTopology/InternalCoordinate/dihedral.hpp"
 #include "gmml/includes/GeometryTopology/InternalCoordinate/distance.hpp"
 
+#include "gmml/includes/MolecularMetadata/GLYCAM/amberatomtypeinfo.hpp"
+#include "gmml/includes/MolecularMetadata/GLYCAM/bondlengthbytypepair.hpp"
+#include "gmml/includes/MolecularMetadata/GLYCAM/dihedralangledata.hpp"
+#include "gmml/includes/MolecularMetadata/GLYCAM/glycam06residueinfo.hpp"
+#include "gmml/includes/MolecularMetadata/AMBER/amberelements.hpp"
 #include "gmml/includes/MolecularMetadata/element.hpp"
 #include "gmml/includes/MolecularMetadata/molecularmetadata.hpp"
-#include "gmml/includes/MolecularMetadata/AMBER/amberelements.hpp"
-#include "gmml/includes/MolecularMetadata/GLYCAM/glycam06.hpp"
-#include "gmml/includes/MolecularMetadata/GLYCAM/glycam06residueinfo.hpp"
 
 #include "gmml/includes/MolecularModeling/dockingatom.hpp"
 #include "gmml/includes/MolecularModeling/moleculardynamicatom.hpp"
@@ -314,11 +316,13 @@ std::ostream & get_cout() { return std::cout; }
 %include "gmml/includes/GeometryTopology/InternalCoordinate/dihedral.hpp"
 %include "gmml/includes/GeometryTopology/InternalCoordinate/distance.hpp"
 
+%include "gmml/includes/MolecularMetadata/GLYCAM/amberatomtypeinfo.hpp"
+%include "gmml/includes/MolecularMetadata/GLYCAM/bondlengthbytypepair.hpp"
+%include "gmml/includes/MolecularMetadata/GLYCAM/dihedralangledata.hpp"
+%include "gmml/includes/MolecularMetadata/GLYCAM/glycam06residueinfo.hpp"
+%include "gmml/includes/MolecularMetadata/AMBER/amberelements.hpp"
 %include "gmml/includes/MolecularMetadata/element.hpp"
 %include "gmml/includes/MolecularMetadata/molecularmetadata.hpp"
-%include "gmml/includes/MolecularMetadata/AMBER/amberelements.hpp"
-%include "gmml/includes/MolecularMetadata/GLYCAM/glycam06.hpp"
-%include "gmml/includes/MolecularMetadata/GLYCAM/glycam06residueinfo.hpp"
 
 %include "gmml/includes/MolecularModeling/dockingatom.hpp"
 %include "gmml/includes/MolecularModeling/moleculardynamicatom.hpp"
