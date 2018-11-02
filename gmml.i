@@ -35,6 +35,7 @@
 #include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceresidue.hpp"
 #include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceglycam06residue.hpp"
 #include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequence.hpp"
+#include "gmml/includes/InputSet/CondensedSequenceSpace/sequencestring.hpp"
 
 //#include "gmml/includes/InputSet/CifFileSpace/ciffileatom.hpp"
 //#include "gmml/includes/InputSet/CifFileSpace/ciffile.hpp"
@@ -209,6 +210,7 @@ std::ostream & get_cout() { return std::cout; }
 %include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceresidue.hpp"
 %include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceglycam06residue.hpp"
 %include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequence.hpp"
+%include "gmml/includes/InputSet/CondensedSequenceSpace/sequencestring.hpp"
 
 %include "gmml/includes/InputSet/PdbFileSpace/pdbatomsection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbatomcard.hpp"
