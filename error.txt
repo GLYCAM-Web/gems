@@ -1,0 +1,36 @@
+std::pair<
+	std::_Rb_tree_const_iterator<
+		std::pair<
+			const std::__cxx11::basic_string<
+				char>, 
+			std::__cxx11::basic_string<
+				char> 
+			> >, 
+	std::_Rb_tree_const_iterator<
+		std::pair<
+			const std::__cxx11::basic_string<
+				char>, 
+			std::__cxx11::basic_string<
+				char> 
+			> 
+	> 
+>’ to non-scalar type ‘
+
+std::pair<
+	std::_Rb_tree_iterator<
+		std::pair<
+			const std::__cxx11::basic_string<
+				char>, 
+			std::__cxx11::basic_string<
+				char> 
+			> 
+		>, 
+	std::_Rb_tree_iterator<
+		std::pair<
+			const std::__cxx11::basic_string<
+				char>, 
+			std::__cxx11::basic_string<
+				char> 
+			> 
+		>
+	>

@@ -1,4 +1,4 @@
-GLYHOME = /home/delaram/Projects/gems/apps/GLYLIB
+GLYHOME = /home/spandana/GLYLIB
 FLAGS = -L$(GLYHOME)/lib -I$(GLYHOME)/inc -lglylib -Wall -lm
 SOURCE = ring_puckering_final.c
 OUTEXE = detect_shape
