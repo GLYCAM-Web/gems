@@ -19,8 +19,9 @@ else
     echo "Test passed."
     ((tests_passed++))
     rm test1_output
+    rm ../ring_conformations.txt
 fi
-
+# rm ring_conformations.txt
 
 ##################### Test 2 ########################
 echo "Testing PDBSugarID..."
@@ -37,9 +38,10 @@ else
     ((tests_passed++))
     rm test2_output
     rm tmp2
+    rm ../ring_conformations.txt
 fi
 
-	##################### Test 3 ########################
+##################### Test 3 ########################
 echo "Testing test_installation.bash..."
 cd $GEMSHOME
 ./test_installation.bash > $GEMSHOME/tests/test3_output
