@@ -12,7 +12,7 @@ echo "Testing detect_sugar..."
 cd $GEMSHOME #detect sugars has hardcoded path to apps/BFMP/detect_shape in GMML::Assembly.ExtractSugars.
 ${THISPYTHON} ./bin/detect_sugars $GEMSHOME/tests/inputs/1NXC.pdb > $GEMSHOME/tests/test1_output
 cd - >> /dev/null 2>&1 #return now to reduce chance of forgetting later
-DIFF=$(diff test1_output correct_outputs/test1_output)
+DIFF=$(diff test1_output correct_outputs/test1_output 2>&1)
 if [ "$DIFF" != "" ]; then
     echo "Test FAILED!"
 else
@@ -30,7 +30,7 @@ cd $GEMSHOME
 ${THISPYTHON} ./bin/PDBSugarID $GEMSHOME/tests/inputs/1NXC.pdb $GEMSHOME/tests/test2_output
 cd - >> /dev/null 2>&1
 tail -n +18 test2_output > tmp2
-DIFF=$(diff tmp2 correct_outputs/test2_output)
+DIFF=$(diff tmp2 correct_outputs/test2_output 2>&1)
 if [ "$DIFF" != "" ]; then
     echo "Test FAILED!"
 else
@@ -46,7 +46,7 @@ echo "Testing test_installation.bash..."
 cd $GEMSHOME
 ./test_installation.bash > $GEMSHOME/tests/test3_output
 cd - >> /dev/null 2>&1
-DIFF=$(diff test3_output correct_outputs/test3_output)
+DIFF=$(diff test3_output correct_outputs/test3_output 2>&1)
 if [ "$DIFF" != "" ]; then
     echo "Test FAILED!"
 else
@@ -59,7 +59,7 @@ fi
 echo "Testing test_installation.py..."
 #Tests one of the commands that this script has
 ${THISPYTHON} ../test_installation.py "--help" > test4_output
-DIFF=$(diff test4_output correct_outputs/test4_output)
+DIFF=$(diff test4_output correct_outputs/test4_output 2>&1)
 if [ "$DIFF" != "" ]; then
     echo "Test FAILED!"
 else
@@ -98,7 +98,7 @@ fi
 echo "Testing DrawGlycan.py..."
 #Runs the script that is being tested.
 ${THISPYTHON} $GEMSHOME/bin/DrawGlycan.py LFucp[2S]b1-6[DGlcpNAc[3A]a1-2]DManp[3A]a1-3[DGalpNAc[6Me]a1-4]DGalpNAc[6S]b1-OME
-DIFF=$(diff drawglycan.dot correct_outputs/test7_output)
+DIFF=$(diff drawglycan.dot correct_outputs/test7_output 2>&1)
 if [ "$D0IFF" != "" ]; then
     echo "Test FAILED!"
 else
