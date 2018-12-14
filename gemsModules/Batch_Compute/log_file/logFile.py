@@ -15,36 +15,19 @@ def AppendLogFile(file_path, line_content):
 if (__name__ == '__main__'):
   filename="log.dum"
   filepath=Path(filename)
-  print("""
-Creating a file called >>>""" + filename + "<<< in the current directory.")
+  print("Creating a file and checking that it exists.")
   CreateLogFile(filename)
-  print("  Checking to see if that file exists.")
-  if filepath.is_file() :
-    print("    File exists")
-  else:
-    print("    File does not exist.  Exiting now because nothing else to do")
-    sys.exit()
- 
+  assert filepath.is_file(), "File should exist, but appears not to."
+
+  print("Appending a line to the file and checking file contents.")
   appendstring="Hello, world!  I'm a log file!"
-  print("""
-Appending this line:  
-  >>>""" + appendstring + """<<<
-  to the file.""")
   AppendLogFile(filename,appendstring)
-  print("""
-Here is the content of that file.
-++++++++++++++++++++++++++++++++++++++++++""")
   with open(filename, 'r') as f:
-    print(f.read())
-  print("""++++++++++++++++++++++++++++++++++++++++++
-If the contents aren't as expected, then something is wrong.""")
+    contents=(f.read())
+    assert contents == appendstring , "File content is not correct."
  
-  print("""
-Deleting the file called >>>""" + filename + "<<< in the current directory.")
+  print("Deleting the file and checking that it is gone.")
   RemoveLogFile(filename)
   print("  Checking to see if that file exists.")
-  if filepath.is_file() :
-    print("    File exists!  There is a problem!  Please fix it, and remove the file.")
-  else:
-    print("    File no longer exists.  All is well!")
+  assert filepath.is_file() == False , "File should not be present, but is."
  
