@@ -71,7 +71,7 @@ class Slurm_Job:
 def process_individual_SMAT_entry(SMAT_ENTRY, SMAT_index, web_id):
     RUN_PREF = conf.File_Naming.prefSTRUCTURE
     new_slurm_job = Slurm_Job (SMAT_ENTRY ,web_id)
-    subdir_path = os.path.abspath(os.path.curdir) + '/' + SMAT_ENTRY[SMAT.key_and_values.LABEL_KEY]
+    subdir_path = os.path.abspath(os.path.curdir) + '/' + SMAT_ENTRY[SMAT.key_and_values.LABEL_KEY] ## FIXME
     #For testing, temporary change to "STATUS_COMPLETE". Should be "STATUS_READY"
     if SMAT_ENTRY[SMAT.key_and_values.STATUS_KEY] != SMAT.key_and_values.STATUS_READY: #If status is not "Ready", the job has been submitted before.Will not attempt re-submission.
         if SMAT_ENTRY[SMAT.key_and_values.STATUS_KEY].find(SMAT.key_and_values.STATUS_JOBID_PREFIX) != -1: #If current job has job id, it has been submitted before. Can't decide its status at this point, could be PD,R,C etc.
@@ -108,7 +108,7 @@ def process_individual_SMAT_entry(SMAT_ENTRY, SMAT_index, web_id):
 def process_SMAT_entries(SMAT_array, job_id):
     SMAT_index = -1
     job_objects_list = []
-    Main_dir = os.path.abspath(os.path.curdir)
+    Main_dir = os.path.abspath(os.path.curdir) ## FIXME
     for entry in SMAT_array:
         SMAT_index += 1
         new_slurm_job_object = process_individual_SMAT_entry(entry, SMAT_index, job_id)
