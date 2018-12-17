@@ -1,0 +1,11 @@
+Protein:
+1eer_eop_Asn.pdb
+
+Glycans:
+glycans/
+
+Protein Residue, Glycan Name:
+A_24,Man9-
+A_38,Man5-
+A_83,Complex-
+END
