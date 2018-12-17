@@ -23,6 +23,16 @@ C4_3712_NAG_A_2_?_?_1-C3_3711_NAG_A_2_?_?_1-C2_3710_NAG_A_2_?_?_1-C1_3709_NAG_A_
 C5_3771_MAN_A_5_?_?_1-O5_3776_MAN_A_5_?_?_1-C1_3767_MAN_A_5_?_?_1-C2_3768_MAN_A_5_?_?_1-C3_3769_MAN_A_5_?_?_1-C4_3770_MAN_A_5_?_?_1
 O5_3765_MAN_A_7_?_?_1-C5_3760_MAN_A_7_?_?_1-C4_3759_MAN_A_7_?_?_1-C3_3758_MAN_A_7_?_?_1-C2_3757_MAN_A_7_?_?_1-C1_3756_MAN_A_7_?_?_1
 
+Cycles after discarding rings containing C-C double bonds
+C1_3695_NAG_A_1_?_?_1-C2_3696_NAG_A_1_?_?_1-C3_3697_NAG_A_1_?_?_1-C4_3698_NAG_A_1_?_?_1-C5_3699_NAG_A_1_?_?_1-O5_3706_NAG_A_1_?_?_1
+C1_3709_NAG_A_2_?_?_1-C2_3710_NAG_A_2_?_?_1-C3_3711_NAG_A_2_?_?_1-C4_3712_NAG_A_2_?_?_1-C5_3713_NAG_A_2_?_?_1-O5_3720_NAG_A_2_?_?_1
+C1_3723_BMA_A_3_?_?_1-C2_3724_BMA_A_3_?_?_1-C3_3725_BMA_A_3_?_?_1-C4_3726_BMA_A_3_?_?_1-C5_3727_BMA_A_3_?_?_1-O5_3732_BMA_A_3_?_?_1-
+C1_3734_MAN_A_4_?_?_1-C2_3735_MAN_A_4_?_?_1-C3_3736_MAN_A_4_?_?_1-C4_3737_MAN_A_4_?_?_1-C5_3738_MAN_A_4_?_?_1-O5_3743_MAN_A_4_?_?_1-
+C1_3745_MAN_A_6_?_?_1-C2_3746_MAN_A_6_?_?_1-C3_3747_MAN_A_6_?_?_1-C4_3748_MAN_A_6_?_?_1-C5_3749_MAN_A_6_?_?_1-O5_3754_MAN_A_6_?_?_1
+C1_3756_MAN_A_7_?_?_1-C2_3757_MAN_A_7_?_?_1-C3_3758_MAN_A_7_?_?_1-C4_3759_MAN_A_7_?_?_1-C5_3760_MAN_A_7_?_?_1-O5_3765_MAN_A_7_?_?_1
+C1_3767_MAN_A_5_?_?_1-C2_3768_MAN_A_5_?_?_1-C3_3769_MAN_A_5_?_?_1-C4_3770_MAN_A_5_?_?_1-C5_3771_MAN_A_5_?_?_1-O5_3776_MAN_A_5_?_?_1
+C1_3778_MAN_A_8_?_?_1-C2_3779_MAN_A_8_?_?_1-C3_3780_MAN_A_8_?_?_1-C4_3781_MAN_A_8_?_?_1-C5_3782_MAN_A_8_?_?_1-O5_3787_MAN_A_8_?_?_1
+
 Detailed information of sorted cycles after discarding fused or oxygenless rings: 
 Ring atoms: C1_3695_NAG_A_1_?_?_1-C2_3696_NAG_A_1_?_?_1-C3_3697_NAG_A_1_?_?_1-C4_3698_NAG_A_1_?_?_1-C5_3699_NAG_A_1_?_?_1-O5_3706_NAG_A_1_?_?_1
 Side group atoms: 
@@ -34,6 +44,7 @@ Side group atoms:
 Anomeric carbon: C1_3695_NAG_A_1_?_?_1
 
 Ring Stereo chemistry chemical code:
+_2_4^3P^a^+1
       3    a +1 
         P      
     2 4         
@@ -48,6 +59,7 @@ Stereochemistry name: b-D-glucopyranose
 Stereochemistry short name: DGlcpb
 Complete name: N-acetyl-b-D-glucopyranose
 Short name: DGlcpNAcb
+SNFG Name: GlcNAc
 -------------------------------------------------------------------------------------------------------------------------------------------
 Ring atoms: C1_3709_NAG_A_2_?_?_1-C2_3710_NAG_A_2_?_?_1-C3_3711_NAG_A_2_?_?_1-C4_3712_NAG_A_2_?_?_1-C5_3713_NAG_A_2_?_?_1-O5_3720_NAG_A_2_?_?_1
 Side group atoms: 
@@ -59,6 +71,7 @@ Side group atoms:
 Anomeric carbon: C1_3709_NAG_A_2_?_?_1
 
 Ring Stereo chemistry chemical code:
+_2_4^3P^a^+1
       3    a +1 
         P      
     2 4         
@@ -73,6 +86,7 @@ Stereochemistry name: b-D-glucopyranose
 Stereochemistry short name: DGlcpb
 Complete name: N-acetyl-b-D-glucopyranose
 Short name: DGlcpNAcb
+SNFG Name: GlcNAc
 -------------------------------------------------------------------------------------------------------------------------------------------
 Ring atoms: C1_3723_BMA_A_3_?_?_1-C2_3724_BMA_A_3_?_?_1-C3_3725_BMA_A_3_?_?_1-C4_3726_BMA_A_3_?_?_1-C5_3727_BMA_A_3_?_?_1-O5_3732_BMA_A_3_?_?_1-
 Side group atoms: 
@@ -84,6 +98,7 @@ Side group atoms:
 Anomeric carbon: C1_3723_BMA_A_3_?_?_1
 
 Ring Stereo chemistry chemical code:
+_4^2^3P^a^+1
     2 3    a +1 
         P      
       4         
@@ -97,6 +112,7 @@ Stereochemistry name: b-D-mannopyranose
 Stereochemistry short name: DManpb
 Complete name: b-D-mannopyranose
 Short name: DManpb
+SNFG Name: Man
 -------------------------------------------------------------------------------------------------------------------------------------------
 Ring atoms: C1_3734_MAN_A_4_?_?_1-C2_3735_MAN_A_4_?_?_1-C3_3736_MAN_A_4_?_?_1-C4_3737_MAN_A_4_?_?_1-C5_3738_MAN_A_4_?_?_1-O5_3743_MAN_A_4_?_?_1-
 Side group atoms: 
@@ -108,6 +124,7 @@ Side group atoms:
 Anomeric carbon: C1_3734_MAN_A_4_?_?_1
 
 Ring Stereo chemistry chemical code:
+_4^2^3P_a^+1
     2 3      +1 
         P      
       4       a 
@@ -121,6 +138,7 @@ Stereochemistry name: a-D-mannopyranose
 Stereochemistry short name: DManpa
 Complete name: a-D-mannopyranose
 Short name: DManpa
+SNFG Name: Man
 -------------------------------------------------------------------------------------------------------------------------------------------
 Ring atoms: C1_3745_MAN_A_6_?_?_1-C2_3746_MAN_A_6_?_?_1-C3_3747_MAN_A_6_?_?_1-C4_3748_MAN_A_6_?_?_1-C5_3749_MAN_A_6_?_?_1-O5_3754_MAN_A_6_?_?_1
 Side group atoms: 
@@ -132,6 +150,7 @@ Side group atoms:
 Anomeric carbon: C1_3745_MAN_A_6_?_?_1
 
 Ring Stereo chemistry chemical code:
+_4^2^3P_a^+1
     2 3      +1 
         P      
       4       a 
@@ -145,6 +164,7 @@ Stereochemistry name: a-D-mannopyranose
 Stereochemistry short name: DManpa
 Complete name: a-D-mannopyranose
 Short name: DManpa
+SNFG Name: Man
 -------------------------------------------------------------------------------------------------------------------------------------------
 Ring atoms: C1_3756_MAN_A_7_?_?_1-C2_3757_MAN_A_7_?_?_1-C3_3758_MAN_A_7_?_?_1-C4_3759_MAN_A_7_?_?_1-C5_3760_MAN_A_7_?_?_1-O5_3765_MAN_A_7_?_?_1
 Side group atoms: 
@@ -155,6 +175,7 @@ Side group atoms:
 Anomeric carbon: C1_3756_MAN_A_7_?_?_1
 
 Ring Stereo chemistry chemical code:
+_4^2^3P^+1
     2 3      +1 
         P      
       4         
@@ -168,6 +189,7 @@ Stereochemistry name: x-D-mannopyranose
 Stereochemistry short name: DManpx
 Complete name: x-D-mannopyranose
 Short name: DManpx
+SNFG Name: Man
 -------------------------------------------------------------------------------------------------------------------------------------------
 Ring atoms: C1_3767_MAN_A_5_?_?_1-C2_3768_MAN_A_5_?_?_1-C3_3769_MAN_A_5_?_?_1-C4_3770_MAN_A_5_?_?_1-C5_3771_MAN_A_5_?_?_1-O5_3776_MAN_A_5_?_?_1
 Side group atoms: 
@@ -178,6 +200,7 @@ Side group atoms:
 Anomeric carbon assigned based on its atom name index (1), Anomeric Carbon is: C1_3767_MAN_A_5_?_?_1
 
 Ring Stereo chemistry chemical code:
+_4^2^3P^+1
     2 3      +1 
         P      
       4         
@@ -191,6 +214,7 @@ Stereochemistry name: x-D-mannopyranose
 Stereochemistry short name: DManpx
 Complete name: x-D-mannopyranose
 Short name: DManpx
+SNFG Name: Man
 -------------------------------------------------------------------------------------------------------------------------------------------
 Ring atoms: C1_3778_MAN_A_8_?_?_1-C2_3779_MAN_A_8_?_?_1-C3_3780_MAN_A_8_?_?_1-C4_3781_MAN_A_8_?_?_1-C5_3782_MAN_A_8_?_?_1-O5_3787_MAN_A_8_?_?_1
 Side group atoms: 
@@ -202,6 +226,7 @@ Side group atoms:
 Anomeric carbon assigned based on its atom name index (1), Anomeric Carbon is: C1_3778_MAN_A_8_?_?_1
 
 Ring Stereo chemistry chemical code:
+_4^2^3P_a^+1
     2 3      +1 
         P      
       4       a 
@@ -215,6 +240,7 @@ Stereochemistry name: a-D-mannopyranose
 Stereochemistry short name: DManpa
 Complete name: a-D-mannopyranose
 Short name: DManpa
+SNFG Name: Man
 -------------------------------------------------------------------------------------------------------------------------------------------
 
 Oligosaccharides:
