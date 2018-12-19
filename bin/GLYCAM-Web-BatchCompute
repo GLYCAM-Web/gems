@@ -25,8 +25,12 @@ Usage:
 
      GLYCAM-Web-BatchCompute web-id work_dir
 
-     web-id:    Unless you are a website, 'web-id' can be anything.  
-                It's just a name.
+     web-id:    Unless you are calling this from a website or some other 
+                form of automation, 'web-id' can be anything.  It's just 
+                a name.  If this is being called from some sort of 
+                automation, it can still be anything, but you might want
+                to make it meaningful.  A session ID or similar is a 
+                good choice.  
      work-dir:  Needs to be an existing directory containing the files
                 needed for running the simulation.  See the docs in 
                 $GEMSHOME/gemsModules/Batch_Compute for more.   Note
