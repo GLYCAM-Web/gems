@@ -13,6 +13,7 @@ cd $GEMSHOME #detect sugars has hardcoded path to apps/BFMP/detect_shape in GMML
 ${THISPYTHON} ./bin/detect_sugars $GEMSHOME/tests/inputs/1NXC.pdb > $GEMSHOME/tests/test1_output
 cd - >> /dev/null 2>&1 #return now to reduce chance of forgetting later
 DIFF=$(diff test1_output correct_outputs/test1_output 2>&1)
+echo "DIFF:  >>>$DIFF<<<"
 if [ "$DIFF" != "" ]; then
     echo "Test FAILED!"
 else
@@ -31,6 +32,7 @@ ${THISPYTHON} ./bin/PDBSugarID $GEMSHOME/tests/inputs/1NXC.pdb $GEMSHOME/tests/t
 cd - >> /dev/null 2>&1
 tail -n +18 test2_output > tmp2
 DIFF=$(diff tmp2 correct_outputs/test2_output 2>&1)
+echo "DIFF:  >>>$DIFF<<<"
 if [ "$DIFF" != "" ]; then
     echo "Test FAILED!"
 else
