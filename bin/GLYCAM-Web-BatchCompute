@@ -1,0 +1,60 @@
+#!/usr/bin/python3.4
+
+import sys
+import os
+import subprocess
+
+###  Make sure the gems/gmml environment is set
+GemsPath = os.environ.get('GEMSHOME')
+if GemsPath == None:
+    print("""
+
+Must set GEMSHOME environment variable
+
+    BASH:  export GEMSHOME=/path/to/gems
+    SH:    setenv GEMSHOME /path/to/gems
+
+""")
+    sys.exit(1)
+sys.path.append(GemsPath)
+from gemsModules import Batch_Compute
+
+## Set the USAGE statement
+USAGE = """
+Usage:
+
+     GLYCAM-Web-BatchCompute web-id work_dir
+
+     web-id:    Unless you are calling this from a website or some other 
+                form of automation, 'web-id' can be anything.  It's just 
+                a name.  If this is being called from some sort of 
+                automation, it can still be anything, but you might want
+                to make it meaningful.  A session ID or similar is a 
+                good choice.  
+     work-dir:  Needs to be an existing directory containing the files
+                needed for running the simulation.  See the docs in 
+                $GEMSHOME/gemsModules/Batch_Compute for more.   Note
+                that the 'docs' might be usage statements like this one.
+
+     Note:  The output from this script is a JSON object directed to 
+            standard output.  If you want that object written to a file,
+            try something like:
+
+            GLYCAM-Web-BatchCompute web-id work_dir > output_file.json
+
+"""
+if len(sys.argv) != 3:
+    print('Must supply exactly 2 arguments: batch_compute.py web_id work_dir')
+    print('%d arguments are supplied'%(len(sys.argv)-1) )
+    print(USAGE)
+    sys.exit()
+
+elif os.path.isdir(sys.argv[2]) == False:
+    print('Argument 2: "' + sys.argv[2] + '" is not a directory')
+    print(USAGE)
+    sys.exit()
+
+web_id = sys.argv[1]
+workdir = sys.argv[2]
+
+

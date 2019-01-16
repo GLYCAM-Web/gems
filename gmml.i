@@ -139,9 +139,12 @@
 #include "gmml/includes/Resolver/PdbPreprocessor/pdbpreprocessoralternateresidue.hpp"
 #include "gmml/includes/Resolver/PdbPreprocessor/pdbpreprocessorresidueinfo.hpp"
 
-#include "gmml/includes/GeometryTopology/InternalCoordinate/angle.hpp"
-#include "gmml/includes/GeometryTopology/InternalCoordinate/dihedral.hpp"
-#include "gmml/includes/GeometryTopology/InternalCoordinate/distance.hpp"
+#include "gmml/includes/GeometryTopology/angle.hpp"
+#include "gmml/includes/GeometryTopology/dihedral.hpp"
+#include "gmml/includes/GeometryTopology/distance.hpp"
+#include "gmml/includes/GeometryTopology/rotation.hpp"
+#include "gmml/includes/GeometryTopology/grid.hpp"
+#include "gmml/includes/GeometryTopology/cell.hpp"
 
 #include "gmml/includes/MolecularMetadata/GLYCAM/amberatomtypeinfo.hpp"
 #include "gmml/includes/MolecularMetadata/GLYCAM/bondlengthbytypepair.hpp"
@@ -159,9 +162,6 @@
 #include "gmml/includes/MolecularModeling/atomnode.hpp"
 #include "gmml/includes/MolecularModeling/assembly.hpp"
 #include "gmml/includes/MolecularModeling/molecule.hpp"
-
-#include "gmml/includes/GeometryTopology/grid.hpp"
-#include "gmml/includes/GeometryTopology/cell.hpp"
 
 #include "gmml/includes/InputSet/TopologyFileSpace/topologyangle.hpp"
 #include "gmml/includes/InputSet/TopologyFileSpace/topologyangletype.hpp"
@@ -314,9 +314,9 @@ std::ostream & get_cout() { return std::cout; }
 %include "gmml/includes/Resolver/PdbPreprocessor/pdbpreprocessoralternateresidue.hpp"
 %include "gmml/includes/Resolver/PdbPreprocessor/pdbpreprocessorresidueinfo.hpp"
 
-%include "gmml/includes/GeometryTopology/InternalCoordinate/angle.hpp"
-%include "gmml/includes/GeometryTopology/InternalCoordinate/dihedral.hpp"
-%include "gmml/includes/GeometryTopology/InternalCoordinate/distance.hpp"
+%include "gmml/includes/GeometryTopology/angle.hpp"
+%include "gmml/includes/GeometryTopology/dihedral.hpp"
+%include "gmml/includes/GeometryTopology/distance.hpp"
 
 %include "gmml/includes/MolecularMetadata/GLYCAM/amberatomtypeinfo.hpp"
 %include "gmml/includes/MolecularMetadata/GLYCAM/bondlengthbytypepair.hpp"
