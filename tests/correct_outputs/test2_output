@@ -14,19 +14,17 @@ Linking atoms, where relevant, are identified by:
         Residue Number
         Atom Name
 
-12 saccharide molecule(s) were detected:
-    DManpx6-1DManpa1-UNK
+10 saccharide molecule(s) were detected:
+    3
+    Oligo IUPAC Name:       DManpa1-6DManpa1-6DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-ASN
+    Oligo author IUPAC Name:1-61-61-41-41-ASN
     DManpa1-6DManpa1-6DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-ASN
-    DManpx1-ASN
-    -------------------------------------------------------------------------------------------------------------------------------------------
-    NOTES/ISSUES:
-    Category: anomeric
-    Type: warning
-    Description: DManpx: Could not find glycosidic oxygen or nitrogen within 1.65 Angstroms of a ring carbon bonded to the ring oxygen(O5).
-    Category: anomeric
-    Type: warning
-    Description: DManpa: Could not find glycosidic oxygen or nitrogen within 1.65 Angstroms of a ring carbon bonded to the ring oxygen(O5).
-    -------------------------------------------------------------------------------------------------------------------------------------------
+    Oligo IUPAC Name:       DManpa1-6DManpx1-
+    Oligo author IUPAC Name:1-61-
+    DManpa1-6DManpx1-Unknown
+    Oligo IUPAC Name:       DManpx1-
+    Oligo author IUPAC Name:1-
+    DManpx1-Unknown
 
 ===========================================
 3.  Saccharide residues detected
