@@ -2,7 +2,12 @@ import subprocess
 import re
 import datetime
 import slurm
+from shutil import which
+
 def QueryJobStatus(job_obj_list):
+
+    which(command) is not None  ## FIXME
+
     #Do a squeue -l command, but instead of using -l, explicitly specify format. 
     query = subprocess.Popen(["squeue", "-o %.18i %.9P %.8j %.8u %.8T %.10M %.9l %.6D %R"],stdout = subprocess.PIPE, stderr = subprocess.PIPE)
     std_out, std_err = query.communicate()

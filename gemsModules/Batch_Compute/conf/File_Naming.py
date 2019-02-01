@@ -1,3 +1,7 @@
+##
+## This file contains defaults for file naming
+##
+
 prefSTRUCTURE='struct'  # default prefix for a structure file
 
 ##
@@ -42,5 +46,11 @@ GVIZ='Graphviz_SNFG_script.dot' # file used to make the SNFG image
 RMAP='Residue_Mapping_Table.txt' # Maps input PDB residues to output residues
 SNFG_SVG='SNFG.svg' # SVG file of the SNFG image
 SNFG_PNG='SNFG.png' # PNG file of the SNFG image
-SUB_OSM_PREF='Run' # Submission script prefix, OS-modeling
+SUB_OS_PREF='Run' # Submission script prefix, oligosaccharides
 
+if (__name__ == '__main__'):
+  print ("""
+
+This submodule merely defines variables and does nothing else.
+
+""")
