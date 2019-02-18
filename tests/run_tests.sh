@@ -3,9 +3,7 @@
 THISPYTHON='python3'
 
 #Manually change this number as you add tests:
-number_of_tests=3
-## The real number - set down for now so can push (BLF 2019-01-08)
-## number_of_tests=5
+number_of_tests=5
 tests_passed=0
 
 ##################### Test 1 ########################
