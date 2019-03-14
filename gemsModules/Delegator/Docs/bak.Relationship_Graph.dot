@@ -1,0 +1,124 @@
+digraph json_relationships {
+  compound = true;
+  rankdir = LR; 
+
+/*  Node Definitions  */
+//  node [ label="Owns",  penwidth=4, color="blue"  ] ;
+//  node [ label="Does",  penwidth=4, color="green" ] ;
+//  node [ label="Needs", penwidth=4, color="black" ] ;
+//  node [ label="Uses",  penwidth=4, color="gray"  ] ;
+  
+  /* ******************************************
+     JSON Built-In
+     ****************************************** */
+  Date;
+  Time;
+  EmailAddress;
+  IPAddress;
+  node [ label="Owns", penwidth=4, color="blue" ] ;
+  node [ label="Does", penwidth=4, color="green" ] ;
+  node [ label="Needs", penwidth=4, color="black" ] ;
+  node [ label="Uses", penwidth=4, color="gray" ] ;
+  
+  /* ******************************************
+     Utilities & Users
+     ****************************************** */
+  User;
+  UserName;
+  Name;
+  Type;
+  Label;
+  Tags;
+  Status;
+  ID;
+  MD5Sum; 
+  UUID;
+  SessionID;
+  Path;
+  Directory;
+  File;
+  Format;
+  Unit;
+  /* Maybe make things like this into clusters.... */
+  node [ label="Owns", penwidth=4, color="blue" ] ;
+  node [ label="Does", penwidth=4, color="green" ] ;
+  node [ label="Needs", penwidth=4, color="black" ] ;
+  File->Name;
+  File->Path;
+  File->Type;
+  File->Format;
+  node [ label="Uses", penwidth=4, color="gray" ] ;
+  
+  /* ******************************************
+     Global Actions
+     ****************************************** */
+  GlobalActions;
+  Evaluate;
+  ReturnSchema;
+  ReturnHelp;
+  ReturnActionsList;
+  ReturnResponsesList;
+  ReturnOptionsList;
+  ReturnDryRunList;
+  
+  /* ******************************************
+     Jobs 
+     ****************************************** */
+  JobsList; 
+  Job;
+  TimeLeft;
+  AheadWaiting;
+  AheadRunning;
+  node [ label="Owns", penwidth=4, color="blue" ] ;
+  node [ label="Does", penwidth=4, color="green" ] ;
+  node [ label="Needs", penwidth=4, color="black" ] ;
+  node [ label="Uses", penwidth=4, color="gray" ] ;
+
+  /* ******************************************
+     Molecular Data
+     ****************************************** */
+  Atom;
+  Residue;
+  Molecule;
+  
+  
+  /* ******************************************
+     Sequences
+     ****************************************** */
+  SequenceList;
+  Sequence;
+  SequenceList->Sequence;
+  Sequence->Type;
+  Sequence->MD5Sum;
+  Sequence->Linkage;
+  node [ label="Owns", penwidth=4, color="blue" ] ;
+  node [ label="Does", penwidth=4, color="green" ] ;
+  node [ label="Needs", penwidth=4, color="black" ] ;
+  node [ label="Uses", penwidth=4, color="gray" ] ;
+
+  /* ******************************************
+     Geometries
+     ****************************************** */
+  GeometryList;
+  Geometry;
+  Dihedral;
+  Rotamer;
+  
+  Linkage;
+  LinkageName;
+  LinkageLabel;
+
+  
+  /* ******************************************
+     Oligosaccharide Modeling
+     ****************************************** */
+
+  
+  
+IONS_KEY = 'Ions'
+IONS_YES = 'Yes'
+IONS_NO = 'No'
+ENERGY_KEY = 'Energy'
+ROTAMER_LIST_KEY = 'RotamerList'
+
+}
