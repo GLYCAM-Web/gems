@@ -41,11 +41,11 @@ declare -A NodesByType=(
 [JSONInternalNodes]="IPAddress Time TimeLeft URI"
 [DataNodes]="AheadRunning AheadWaiting Date Directory 
   EmailAddress File Format ID Label MD5Sum Name
-  Path ResourceLocation SessionID Status Tags TextBlock
+  Path ResourcePayload SessionID Status Tags TextBlock
   Type Unit UserName UUID Value"
-[StubNodes]="AND Angle Attachment Conformation Dihedral
-  Directory Distance File NOT OR Path RingPucker Rotamer
-  SecondaryStructure TextBlock URI XOR"
+[StubNodes]="AllOf AnyOf Angle Attachment Conformation Dihedral
+  Directory Distance File NoneOf OneOf Path RingPucker Rotamer
+  SecondaryStructure TextBlock URI "
 ## Non-object nodes that refer to other nodes
 [DefinitionNodes]="Resource"
 [GlobalDefinitionNodes]="GlobalDefines GlobalActions GlobalMetadata"
@@ -55,7 +55,7 @@ declare -A NodesByType=(
   Molecule Represent Residue Selection Simulate User"
 [IOAndGlobalObjectNodes]="AntibodyDocking Build GlycoComplex
   GlycoConjugate Image Job Sequence Text"
-[InputOutputObjectNodes]="InputSpec OutputSpec"
+[InputOutputObjectNodes]="Resource"
 [NoGlobalsObjectNodes]="Evaluate Options ReturnActions ReturnDryRun
   ReturnHelp ReturnOptions ReturnResponses ReturnSchema WebMetadata"
 [UnassignedObjectNodes]="Project System"
@@ -70,7 +70,7 @@ declare -A NodeStylesByType=(
 [EnumNodes]='shape=diamond'
 [DefinitionNodes]='shape=rect'
 [GlobalDefinitionNodes]='shape=rect style=filled fillcolor="cadetblue2"'
-[InputOutputObjectNodes]='shape=octagon style=filled fillcolor="orchid1"'
+[InputOutputObjectNodes]='shape=rect style=filled fillcolor="orchid1"'
 [IOAndGlobalObjectNodes]='shape=octagon style=filled fillcolor="cadetblue2:orchid1"'
 )
 
@@ -91,13 +91,11 @@ declare -A SingleEntityRelations=(
   [GeometricProperty]="Angle Conformation Dihedral Distance Rotamer RingPucker SecondaryStructure"
   [GlobalDefines]="GlobalActions GlobalMetadata"
   [GlobalActions]="Evaluate Options ReturnActions ReturnDryRun ReturnHelp ReturnOptions ReturnResponses ReturnSchema "
-  [GlobalMetadata]="Format ID Label Name Tags Type"
-  [InputSpec]="Resource"
-  [LogicGate]="AND OR XOR NOT"
+  [GlobalMetadata]="Format ID Label Name Type"
+  [LogicGate]="AllOf OneOf AnyOf NoneOf"
   [Molecule]="Atom Residue "
-  [OutputSpec]="Resource"
   [Residue]="Atom "
-  [Resource]="ResourceLocation ResourceType"
+  [Resource]="ResourcePayload ResourceType GlobalMetadata"
   [ResourceType]="Attachment Directory File Path TextBlock URI"
   [Selection]="LogicGate"
   [WebMetadata]="EmailAddress Date IPAddress SessionID Time User UserName UUID"
@@ -118,6 +116,7 @@ declare -A MultipleEntityRelations=(
   [Residue]="Atom "
   [Selection]="Atom Bond Fragment Linkage Molecule Residue Selection"
   [AntibodyDocking]="Represent Sequence "
+  [GlobalMetadata]="Tags"
   [GlycoConjugate]="Represent Sequence Simulate"
   [GlycoComplex]="Represent Sequence Simulate"
   [Represent]="Image Text"

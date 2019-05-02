@@ -51,9 +51,6 @@ done
 
 echo '
 
-  Label->InputSpec [ style=invis ];
-  Label->OutputSpec [ style=invis ];
-
   subgraph cluster_0 {
     label="Nodes Legend"; ' >> ${OUTFILE}
 for NodeType in ${NodeTypeAppearanceOrder[@]} ; do

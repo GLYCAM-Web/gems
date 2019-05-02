@@ -47,7 +47,7 @@ digraph bigpicture {
   MD5Sum [ shape=parallelogram ];
   Name [ shape=parallelogram ];
   Path [ shape=parallelogram ];
-  ResourceLocation [ shape=parallelogram ];
+  ResourcePayload [ shape=parallelogram ];
   SessionID [ shape=parallelogram ];
   Status [ shape=parallelogram ];
   Tags [ shape=parallelogram ];
@@ -58,7 +58,8 @@ digraph bigpicture {
   UUID [ shape=parallelogram ];
   Value [ shape=parallelogram ];
   // Enum choices or similar 
-  AND [ shape=rect style="rounded" ];
+  AllOf [ shape=rect style="rounded" ];
+  AnyOf [ shape=rect style="rounded" ];
   Angle [ shape=rect style="rounded" ];
   Attachment [ shape=rect style="rounded" ];
   Conformation [ shape=rect style="rounded" ];
@@ -66,15 +67,14 @@ digraph bigpicture {
   Directory [ shape=rect style="rounded" ];
   Distance [ shape=rect style="rounded" ];
   File [ shape=rect style="rounded" ];
-  NOT [ shape=rect style="rounded" ];
-  OR [ shape=rect style="rounded" ];
+  NoneOf [ shape=rect style="rounded" ];
+  OneOf [ shape=rect style="rounded" ];
   Path [ shape=rect style="rounded" ];
   RingPucker [ shape=rect style="rounded" ];
   Rotamer [ shape=rect style="rounded" ];
   SecondaryStructure [ shape=rect style="rounded" ];
   TextBlock [ shape=rect style="rounded" ];
   URI [ shape=rect style="rounded" ];
-  XOR [ shape=rect style="rounded" ];
   // Enum Nodes 
   LogicGate [ shape=diamond ];
   GeometricProperty [ shape=diamond ];
@@ -86,8 +86,7 @@ digraph bigpicture {
   GlobalActions [ shape=rect style=filled fillcolor="cadetblue2" ];
   GlobalMetadata [ shape=rect style=filled fillcolor="cadetblue2" ];
   // Objects that need I/O info 
-  InputSpec [ shape=octagon style=filled fillcolor="orchid1" ];
-  OutputSpec [ shape=octagon style=filled fillcolor="orchid1" ];
+  Resource [ shape=rect style=filled fillcolor="orchid1" ];
   // Objects that need Global Defines and I/O info 
   AntibodyDocking [ shape=octagon style=filled fillcolor="cadetblue2:orchid1" ];
   Build [ shape=octagon style=filled fillcolor="cadetblue2:orchid1" ];
@@ -114,8 +113,6 @@ digraph bigpicture {
   Job->Time [ penwidth=1 ];
   Job->TimeLeft [ penwidth=1 ];
   Job->WebMetadata [ penwidth=1 ];
-  OutputSpec->Resource [ penwidth=1 ];
-  InputSpec->Resource [ penwidth=1 ];
   Residue->Atom [ penwidth=1 ];
   GeometricProperty->Angle [ penwidth=1 ];
   GeometricProperty->Conformation [ penwidth=1 ];
@@ -134,10 +131,10 @@ digraph bigpicture {
   WebMetadata->UserName [ penwidth=1 ];
   WebMetadata->UUID [ penwidth=1 ];
   Sequence->MD5Sum [ penwidth=1 ];
-  LogicGate->AND [ penwidth=1 ];
-  LogicGate->OR [ penwidth=1 ];
-  LogicGate->XOR [ penwidth=1 ];
-  LogicGate->NOT [ penwidth=1 ];
+  LogicGate->AllOf [ penwidth=1 ];
+  LogicGate->OneOf [ penwidth=1 ];
+  LogicGate->AnyOf [ penwidth=1 ];
+  LogicGate->NoneOf [ penwidth=1 ];
   GlycoComplex->AntibodyDocking [ penwidth=1 ];
   GlycoComplex->Build [ penwidth=1 ];
   Build->WebMetadata [ penwidth=1 ];
@@ -156,14 +153,14 @@ digraph bigpicture {
   Geometry->Unit [ penwidth=1 ];
   Geometry->Value [ penwidth=1 ];
   Selection->LogicGate [ penwidth=1 ];
-  Resource->ResourceLocation [ penwidth=1 ];
+  Resource->ResourcePayload [ penwidth=1 ];
   Resource->ResourceType [ penwidth=1 ];
+  Resource->GlobalMetadata [ penwidth=1 ];
   GlycoConjugate->Build [ penwidth=1 ];
   GlobalMetadata->Format [ penwidth=1 ];
   GlobalMetadata->ID [ penwidth=1 ];
   GlobalMetadata->Label [ penwidth=1 ];
   GlobalMetadata->Name [ penwidth=1 ];
-  GlobalMetadata->Tags [ penwidth=1 ];
   GlobalMetadata->Type [ penwidth=1 ];
   Linkage->Molecule [ penwidth=4 color="gray" style="dashed" ];
   Linkage->Residue [ penwidth=4 color="gray" style="dashed" ];
@@ -195,10 +192,8 @@ digraph bigpicture {
   GlycoConjugate->Represent [ penwidth=4 style="dotted" ];
   GlycoConjugate->Sequence [ penwidth=4 style="dotted" ];
   GlycoConjugate->Simulate [ penwidth=4 style="dotted" ];
+  GlobalMetadata->Tags [ penwidth=4 style="dotted" ];
 
-
-  Label->InputSpec [ style=invis ];
-  Label->OutputSpec [ style=invis ];
 
   subgraph cluster_0 {
     label="Nodes Legend"; 
@@ -211,7 +206,7 @@ digraph bigpicture {
   EnumNodes [ shape=diamond label="Enum Nodes" ];
   DefinitionNodes [ shape=rect label="Nodes that are definitions" ];
   GlobalDefinitionNodes [ shape=rect style=filled fillcolor="cadetblue2" label="Nodes that contain defs used by most Objects" ];
-  InputOutputObjectNodes [ shape=octagon style=filled fillcolor="orchid1" label="Objects that need I/O info" ];
+  InputOutputObjectNodes [ shape=rect style=filled fillcolor="orchid1" label="Objects that need I/O info" ];
   IOAndGlobalObjectNodes [ shape=octagon style=filled fillcolor="cadetblue2:orchid1" label="Objects that need Global Defines and I/O info" ];
   } 
 

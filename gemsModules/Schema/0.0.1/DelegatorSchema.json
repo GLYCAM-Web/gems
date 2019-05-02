@@ -2,7 +2,7 @@
  "$schema": "http://json-schema.org/draft-07/schema#",
 
  "definitions" : {
-    "Entity": {
+    "entity": {
       "type": "object",
       "description": "An Entity to be sent to the gemsModules Delegator",
       "properties":  {
@@ -30,7 +30,7 @@
       },
       "required": ["type"]
     },
-    "Service": {
+    "service": {
       "type": "object",
       "description": "An Service to be performed in association with an Entity",
       "properties":  {
@@ -46,7 +46,7 @@
       },
       "required": ["name"]
     },
-    "Option": {
+    "option": {
       "type": "object",
       "description": "A list of options.  Allowed values will vary by Entity, Service, etc.",
       "properties":  {
@@ -63,9 +63,9 @@
   "description": "A payload sent to the gemsModules Delegator",
   "type": "object",
   "properties": {
-    "Entity":  { "$ref": "#/definitions/Entity" }
+    "entity":  { "$ref": "#/definitions/entity" }
   },
-  "required": [ "Entity" ]
+  "required": [ "entity" ]
  
 }
 
