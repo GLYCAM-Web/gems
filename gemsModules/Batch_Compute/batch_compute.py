@@ -44,7 +44,7 @@ def batch_compute (web_id, workdir):
   print("past write")   ## FIXME
 
 
-if if (__name__ == '__main__'):
+if (__name__ == '__main__'):
   import sys
   if len(sys.argv) != 3:
       print('Must supply exactly 2 arguments: batch_compute.py web_id work_dir')
