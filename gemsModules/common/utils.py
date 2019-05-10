@@ -11,12 +11,26 @@ def investigate_gems_setup(command_line):
   PythonPathHasNoGemsModules=102
   IncorrectNumberArgs=201
   BadArguments=202
+  NotAFile=203
+  NotAJSONFile=204
 
   # check the command line
   if len(command_line) != 2:
     print('Must supply exactly 1 argument.')
     print('%d arguments are supplied'%(len(command_line)-1) )
     sys.exit(IncorrectNumberArgs)
+
+  # check that the argument is a file
+  if not os.path.isfile(sys.argv[1]):
+    print("The given argument is not a file.  Exiting.")
+    sys.exit(NotAFile)
+
+  # check that it contains a json object (see below for schema check)
+  try:
+    json_object = json.load(open(sys.argv[1],'r'))
+  except ValueError:
+    print("The given file appears not to be in JSON format.  Exiting.")
+    sys.exit(NotAJSONFile)
 
   # check the paths and modules
   if importlib.util.find_spec("gemsModules") is None:
@@ -66,6 +80,10 @@ Bt the way, if your PYTHONPATH contains GEMSHOME, you might not
 need GEMSHOME to also be set.
 
 """)
+
+  # TODO:  check that the file in argv[1] conforms to our schema
+
+
 
 def main():
   import sys,os

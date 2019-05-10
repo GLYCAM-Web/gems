@@ -1,3 +1,16 @@
+#!/usr/bin/env python3
+
+def delegate():
+
+  import json
+  from io import StringIO
+
+
+def listEntities():
+  from delegator import entities
+  entities.entityFunction.keys() 
+
+
 
 def main():
   import importlib, os, sys
@@ -13,11 +26,7 @@ def main():
     from gemsModules.common import utils
   utils.investigate_gems_setup(sys.argv)
 
-###
-## Add your code to the main() def starting here.
-## Mind the indents...
-###
-
+  
 
 
 if __name__ == "__main__":

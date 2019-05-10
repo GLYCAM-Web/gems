@@ -29,6 +29,9 @@ def main():
 
   if sys.argv[1] == 'Marco':
     print(commonServices.marco)
+  elif sys.argv[1] == 'ListEntities':
+    from gemsModules.common import entities
+    print(entities.listEntities())
   else:
     print("Unrecognized request to commonServices")
  
