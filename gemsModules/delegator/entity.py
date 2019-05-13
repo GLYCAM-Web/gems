@@ -1,24 +1,27 @@
 #!/usr/bin/env python3
 
 def delegate(jsonObject):
-    import json
-    from io import StringIO
-    io=StringIO()
-    json.loads(jsonObject)
-    theObject = json.loads(jsonObject)
-    if theObject['entity'] is None:
-        print("This JSON object is not usable by the Delegator.")
-        sys.exit(1)
     import gemsModules
-    from gemsModules.common import entities
-    if not theObject['entity']['type'] in entities.entityFunction:
-        print("The entity in this JSON object is not known to the Delegator!")
-    if theObject['entity']['type'] == 'Delegator' :
-        from gemsModules.common import services
-        services.commonServicer(jsonObject)
-    else:
-        entities.entityFunctions[theObject['entity']['type']](jsonObject)
+    from gemsModules.common import services
+    responseObject = services.commonServicer(jsonObject)
+    import json
+    #print(json.dumps(responseObject))
+    return json.dumps(responseObject)
 
+
+def defaultService(theObject):
+    ## TODO give me something to do...
+    import json
+    responseObject={
+            "entity" : "Delegator",
+            "responses" : [
+                {
+                    'payload' : 'there is no default yet'
+                    }
+                ]
+            }
+    #print(json.dumps(responseObject))
+    return json.dumps(responseObject)
 
 def main():
   import importlib.util, os, sys
