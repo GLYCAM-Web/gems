@@ -1,9 +1,9 @@
 {
  "entity" : {
-    "type": "delegator"
+    "type": "Delegator"
   },
  "services" : [
-    { "type" : "marco" },
-    { "type" : "listEntities" }
+    { "type" : "Marco" },
+    { "type" : "ListEntities" }
   ]
 }
