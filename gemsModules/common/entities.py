@@ -16,10 +16,10 @@ entityFunction = {
   'Glycoprotein'      : 'glycoprotein'
 }
 helpDict = {
-  'Usage'     : 'usageText',
-  'Help'      : 'basicHelpText',
-  'More Help' : 'moreHelpText',
-  'Schema'    : 'schemaLocation'
+  'ReturnUsage'       : 'usageText',
+  'ReturnHelp'        : 'basicHelpText',
+  'ReturnVerboseHelp' : 'moreHelpText',
+  'ReturnSchema'      : 'schemaLocation'
 }
 
 def main():
