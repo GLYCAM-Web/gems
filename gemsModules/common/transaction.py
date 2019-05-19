@@ -12,9 +12,35 @@ from pydantic.schema import schema
 # ##
 # ## Enums for Entity-specific Services
 # ##
-class DelegatorServices(str,Enum):
-    delegate = 'Delegate'
+class DelegatorServicesEnum(str,Enum):
+    delegate = 'Delegate' 
 
+class DelegatorServices(BaseModel):
+    delegatorServices : DelegatorServicesEnum = Schema(
+            'Delegate',
+            title = 'Delegator  Services',
+            description = 'Services available to the Delegator Entity'
+            )
+
+class SequenceServicesEnum(str,Enum):
+    build3DStructure = 'Build3DStructure'
+
+class SequenceServices(BaseModel):
+    sequenceServices : SequenceServicesEnum = Schema(
+            'Build3DStructure',
+            title = 'Sequence  Services',
+            description = 'Services available to the Sequence Entity'
+            )
+
+class GlycoProteinServicesEnum(str,Enum):
+    build3DStructure = 'Build3DStructure'
+
+class GlycoProteinServices(BaseModel):
+    glycoProteinServices : GlycoProteinServicesEnum = Schema(
+            'Build3DStructure',
+            title = 'GlycoProtein  Services',
+            description = 'Services available to the GlycoProtein Entity'
+            )
 
 # ##
 # ## Enums relevant to all Entities & Services
@@ -26,7 +52,7 @@ class EntityTypeEnum(str, Enum):
     glycoprotein = 'Glycoprotein'
     structureFile = 'StructureFile'
 
-class CommonServices(str,Enum):
+class CommonServicesEnum(str,Enum):
     """
     Services used by all Entities.
 
@@ -34,6 +60,9 @@ class CommonServices(str,Enum):
     For example, 'ListServices' or 'DefaultService' will certainly differ.  
     Even something like 'Marco', which will look the same on the surface, 
     will return 'Polo' for the relevant Entity.
+
+    On that note, there is a 'CommonServices' Entity.  If the incoming JSON
+    object is sufficiently malformed, this is the Entity that responds.
 
     See the Enums for each specific service, above.
     """
@@ -44,6 +73,13 @@ class CommonServices(str,Enum):
     returnHelp = 'ReturnHelp'
     returnSchema = 'ReturnSchema'
     defaultService = 'DefaultService'
+
+class CommonServices(BaseModel):
+    commonServices : CommonServicesEnum = Schema(
+            'DefaultService',
+            title = 'Common Services',
+            description = 'Services available to all Entities'
+            )
 
 # ##
 # ## Other general Enums
@@ -143,22 +179,17 @@ class Option(BaseModel):
         self.key = key
         self.value = value
 
-
 class Service(BaseModel):
-    """
-    Storage for information relevant to performing a particular service.
-
-    The Service is type-named based on the information in the request.  That
-    name is then mapped to a submodule that performs the service.  Any 
-    options or resources needed are also tracked.
-    """
-    typename : str = Schema(
+    """Holds information about a requested Service."""
+    typename : Union[CommonServices, DelegatorServices, SequenceServices, GlycoProteinServices] = Schema(
             None,
             title='Type of Service.',
             description='The services available will vary by Entity.'
             )
     options : List[Option] = Schema(
             None,
+            title = 'Options for this service',
+            description = 'Options might be specific to the Entity and/or Service.  See docs.'
             )
     inputs : List[Resource] = None
     requestID : str = Schema(
@@ -204,12 +235,13 @@ class Entity(BaseModel):
             )
     services : List[Service] = None
     responses : List[Response] = None
+    ## TODO: figure out how to include a list of Entities in the Entity itself.
 #    entities : List['Entity'] = None
 
 #Entity.update_forward_refs()
 
 class Project(BaseModel):
-    pass 
+    resources : List[Resource] = None
 
 # ####
 # ####  Container for use in the modules
@@ -241,11 +273,12 @@ class Transaction:
             self.outgoing_string=json.dumps(response_dict)
 
 
-print(Entity.schema_json(indent=2))
-#top_level_schema = schema([Entity, Project], title='A GemsModules Transaction')
-#def generateGemsModulesSchema():
-    #print(json.dumps(top_level_schema, indent=2))
+#print(Entity.schema_json(indent=2))
+top_level_schema = schema([Entity, Project], title='A GemsModules Transaction')
+def generateGemsModulesSchema():
+    import json
+    print(json.dumps(top_level_schema, indent=2))
 
-#if __name__ == "__main__":
-#  main() 
+if __name__ == "__main__":
+  generateGemsModulesSchema() 
 #print(Resource.schema_json(indent=2))
