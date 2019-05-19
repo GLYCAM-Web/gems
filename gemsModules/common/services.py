@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-#import os
-#import json
-#from io import StringIO
-
 import sys,importlib.util
 import gemsModules
 from gemsModules.common import entities
@@ -14,61 +10,56 @@ commonServicesExitCodes = {
         'RequestedEntityNotFindable':'310'
         }
 
+## Other entities will need this, too.
 def importEntity(requestedEntity):
   import gemsModules
   requestedModule="."+entities.entityFunction[requestedEntity]
   module_spec = importlib.util.find_spec(requestedModule,package="gemsModules")
   if module_spec is None: 
     print("The module spec returned None for rquestedEntity: " + requestedEntity)
-    sys.exit(commonServicesExitCodes['RequestedEntityNotFindable'])
+    return None
   return importlib.import_module(requestedModule,package="gemsModules")
 
-def commonServicer(jsonObject):
+## Make this create/return the json dict and a response dict.
+## Change name to JSON parser or something more appropriate
+def parseinput(Transaction thisTransaction):
     import json
     from io import StringIO
     io=StringIO()
-    json.loads(jsonObject)
-    theObject = json.loads(jsonObject)
-    responseObject = { }
-    ## TODO  Dry out the next several lines - make json builder or such
-    if not 'entity' in theObject:
-        payload="The JSON object does not contain an Entity."
-        responseObject['entity']='commonServicer'
-        responseObject['payload'] = payload
-        responseObject['exitError']= 'NoEntityDefined'
-        responseObject['exitCode'] = commonServicesExitCodes['NoEntityDefined']
-        #print(json.dumps(responseObject))
-        return responseObject
-    if not 'type' in theObject['entity']:
+    # Load the JSON string into the incoming dictionary
+    thisTransaction.request_dict = json.loads(thisTransaction.incoming_string)
+    # Set a flag that there are no errors
+    isError = False
+    # Check to see if there are errors
+    if not 'entity' in jsonDict:
+        payload= "The JSON object does not contain an Entity."
+        exitError = 'NoEntityDefined'
+        isError = True
+    if not 'type' in jsonDict['entity']:
         payload="The Entity does not contain a type."
-        responseObject['entity']='commonServicer'
-        responseObject['payload'] = payload
-        responseObject['exitError']= 'NoTypeForEntity'
-        responseObject['exitCode'] = commonServicesExitCodes['NoTypeForEntity']
-        #print(json.dumps(responseObject))
-        return responseObject
-    if not theObject['entity']['type'] in entities.entityFunction:
+        exitError= 'NoTypeForEntity'
+        isError = True
+    if not jsonDict['entity']['type'] in entities.entityFunction:
         payload="The entity in this JSON Onject is not known to the commonServicer."
-        responseObject['entity']='commonServicer'
-        responseObject['payload'] = payload
-        responseObject['exitError']= 'EntityNotKnown'
-        responseObject['exitCode'] = commonServicesExitCodes['EntityNotKnown']
-        #print(json.dumps(responseObject))
-        return responseObject
+        exitError = 'EntityNotKnown'
+        isError = True
+    if isError :
+        responseObject['entity']['type']='commonServicer'
+        return exitCode
+    return 0
+
+
+def doServices():
     ## TODO figure out how to impose options on things....
-    if not 'services' in theObject:
-        theEntity = importEntity(theObject['entity']['type'])
-        responseObject = theEntity.entity.defaultService(theObject)
-        return responseObject
-    responseObject['entity']=theObject['entity']
+    responseObject['entity']=jsonDict['entity']
     responseObject['responses']=[]
-    for i in theObject['services']:
+    for i in jsonDict['services']:
         #print("The service is:  " + i['type'])
         ## TODO make the reply object build work better
         if i['type'] in entities.helpDict:
-            payload=commonServices[i['type']]((theObject['entity']['type']),i['type'])
+            payload=commonServices[i['type']]((jsonDict['entity']['type']),i['type'])
         else:
-            payload=commonServices[i['type']](theObject['entity']['type'])
+            payload=commonServices[i['type']](jsonDict['entity']['type'])
         #print("payload is :  ")
         #print(payload)
         responseObject['responses'].append({
