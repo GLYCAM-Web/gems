@@ -8,6 +8,17 @@ from pydantic.schema import schema
 # ####
 # ####  Enums
 # ####
+
+# ##
+# ## Enums for Entity-specific Services
+# ##
+class DelegatorServices(str,Enum):
+    delegate = 'Delegate'
+
+
+# ##
+# ## Enums relevant to all Entities & Services
+# ##
 class EntityTypeEnum(str, Enum):
     delegator = 'Delegator'
     sequence = 'Sequence'
@@ -16,12 +27,27 @@ class EntityTypeEnum(str, Enum):
     structureFile = 'StructureFile'
 
 class CommonServices(str,Enum):
+    """
+    Services used by all Entities.
+
+    The behaviors of these services might differ from one Entity to another.  
+    For example, 'ListServices' or 'DefaultService' will certainly differ.  
+    Even something like 'Marco', which will look the same on the surface, 
+    will return 'Polo' for the relevant Entity.
+
+    See the Enums for each specific service, above.
+    """
     marco = 'Marco'
     evaluate = 'Evaluate'
     listEntities = 'ListEntities'
+    listServices = 'ListEntities' 
     returnHelp = 'ReturnHelp'
     returnSchema = 'ReturnSchema'
+    defaultService = 'DefaultService'
 
+# ##
+# ## Other general Enums
+# ##
 class ExternalLocationTypeEnum(str, Enum):
     filepath = 'file-path'
     httpheader = 'http-header'
