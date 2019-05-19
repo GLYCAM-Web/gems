@@ -2,11 +2,9 @@ TARGET_MAKE_FILE="Makefile"
 echo $TARGET_MAKE_FILE
 cd gmml
 if [ -f $TARGET_MAKE_FILE ]; then
-	make -f $TARGET_MAKE_FILE clean
 	make -f $TARGET_MAKE_FILE distclean
 	rm -rf gmml.pro*
 else
-	make clean
 	make distclean
 	rm -rf gmml.pro*
 fi

@@ -35,6 +35,7 @@
 #include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceresidue.hpp"
 #include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceglycam06residue.hpp"
 #include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequence.hpp"
+#include "gmml/includes/InputSet/CondensedSequenceSpace/sequencestring.hpp"
 
 //#include "gmml/includes/InputSet/CifFileSpace/ciffileatom.hpp"
 //#include "gmml/includes/InputSet/CifFileSpace/ciffile.hpp"
@@ -138,15 +139,20 @@
 #include "gmml/includes/Resolver/PdbPreprocessor/pdbpreprocessoralternateresidue.hpp"
 #include "gmml/includes/Resolver/PdbPreprocessor/pdbpreprocessorresidueinfo.hpp"
 
-#include "gmml/includes/GeometryTopology/InternalCoordinate/angle.hpp"
-#include "gmml/includes/GeometryTopology/InternalCoordinate/dihedral.hpp"
-#include "gmml/includes/GeometryTopology/InternalCoordinate/distance.hpp"
+#include "gmml/includes/GeometryTopology/angle.hpp"
+#include "gmml/includes/GeometryTopology/dihedral.hpp"
+#include "gmml/includes/GeometryTopology/distance.hpp"
+#include "gmml/includes/GeometryTopology/rotation.hpp"
+#include "gmml/includes/GeometryTopology/grid.hpp"
+#include "gmml/includes/GeometryTopology/cell.hpp"
 
+#include "gmml/includes/MolecularMetadata/GLYCAM/amberatomtypeinfo.hpp"
+#include "gmml/includes/MolecularMetadata/GLYCAM/bondlengthbytypepair.hpp"
+#include "gmml/includes/MolecularMetadata/GLYCAM/dihedralangledata.hpp"
+#include "gmml/includes/MolecularMetadata/GLYCAM/glycam06residueinfo.hpp"
+#include "gmml/includes/MolecularMetadata/AMBER/amberelements.hpp"
 #include "gmml/includes/MolecularMetadata/element.hpp"
 #include "gmml/includes/MolecularMetadata/molecularmetadata.hpp"
-#include "gmml/includes/MolecularMetadata/AMBER/amberelements.hpp"
-#include "gmml/includes/MolecularMetadata/GLYCAM/glycam06.hpp"
-#include "gmml/includes/MolecularMetadata/GLYCAM/glycam06residueinfo.hpp"
 
 #include "gmml/includes/MolecularModeling/dockingatom.hpp"
 #include "gmml/includes/MolecularModeling/moleculardynamicatom.hpp"
@@ -156,9 +162,6 @@
 #include "gmml/includes/MolecularModeling/atomnode.hpp"
 #include "gmml/includes/MolecularModeling/assembly.hpp"
 #include "gmml/includes/MolecularModeling/molecule.hpp"
-
-#include "gmml/includes/GeometryTopology/grid.hpp"
-#include "gmml/includes/GeometryTopology/cell.hpp"
 
 #include "gmml/includes/InputSet/TopologyFileSpace/topologyangle.hpp"
 #include "gmml/includes/InputSet/TopologyFileSpace/topologyangletype.hpp"
@@ -207,6 +210,7 @@ std::ostream & get_cout() { return std::cout; }
 %include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceresidue.hpp"
 %include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceglycam06residue.hpp"
 %include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequence.hpp"
+%include "gmml/includes/InputSet/CondensedSequenceSpace/sequencestring.hpp"
 
 %include "gmml/includes/InputSet/PdbFileSpace/pdbatomsection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbatomcard.hpp"
@@ -310,15 +314,17 @@ std::ostream & get_cout() { return std::cout; }
 %include "gmml/includes/Resolver/PdbPreprocessor/pdbpreprocessoralternateresidue.hpp"
 %include "gmml/includes/Resolver/PdbPreprocessor/pdbpreprocessorresidueinfo.hpp"
 
-%include "gmml/includes/GeometryTopology/InternalCoordinate/angle.hpp"
-%include "gmml/includes/GeometryTopology/InternalCoordinate/dihedral.hpp"
-%include "gmml/includes/GeometryTopology/InternalCoordinate/distance.hpp"
+%include "gmml/includes/GeometryTopology/angle.hpp"
+%include "gmml/includes/GeometryTopology/dihedral.hpp"
+%include "gmml/includes/GeometryTopology/distance.hpp"
 
+%include "gmml/includes/MolecularMetadata/GLYCAM/amberatomtypeinfo.hpp"
+%include "gmml/includes/MolecularMetadata/GLYCAM/bondlengthbytypepair.hpp"
+%include "gmml/includes/MolecularMetadata/GLYCAM/dihedralangledata.hpp"
+%include "gmml/includes/MolecularMetadata/GLYCAM/glycam06residueinfo.hpp"
+%include "gmml/includes/MolecularMetadata/AMBER/amberelements.hpp"
 %include "gmml/includes/MolecularMetadata/element.hpp"
 %include "gmml/includes/MolecularMetadata/molecularmetadata.hpp"
-%include "gmml/includes/MolecularMetadata/AMBER/amberelements.hpp"
-%include "gmml/includes/MolecularMetadata/GLYCAM/glycam06.hpp"
-%include "gmml/includes/MolecularMetadata/GLYCAM/glycam06residueinfo.hpp"
 
 %include "gmml/includes/MolecularModeling/dockingatom.hpp"
 %include "gmml/includes/MolecularModeling/moleculardynamicatom.hpp"
