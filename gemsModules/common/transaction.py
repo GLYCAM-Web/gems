@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-from collections import defaultdict
 from enum import Enum, auto
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
+from typing import ForwardRef
 from pydantic import BaseModel, Schema
 from pydantic.schema import schema
 
@@ -15,32 +15,11 @@ from pydantic.schema import schema
 class DelegatorServicesEnum(str,Enum):
     delegate = 'Delegate' 
 
-class DelegatorServices(BaseModel):
-    delegatorServices : DelegatorServicesEnum = Schema(
-            'Delegate',
-            title = 'Delegator  Services',
-            description = 'Services available to the Delegator Entity'
-            )
-
 class SequenceServicesEnum(str,Enum):
     build3DStructure = 'Build3DStructure'
 
-class SequenceServices(BaseModel):
-    sequenceServices : SequenceServicesEnum = Schema(
-            'Build3DStructure',
-            title = 'Sequence  Services',
-            description = 'Services available to the Sequence Entity'
-            )
-
 class GlycoProteinServicesEnum(str,Enum):
     build3DStructure = 'Build3DStructure'
-
-class GlycoProteinServices(BaseModel):
-    glycoProteinServices : GlycoProteinServicesEnum = Schema(
-            'Build3DStructure',
-            title = 'GlycoProtein  Services',
-            description = 'Services available to the GlycoProtein Entity'
-            )
 
 # ##
 # ## Enums relevant to all Entities & Services
@@ -69,7 +48,7 @@ class CommonServicesEnum(str,Enum):
     marco = 'Marco'
     evaluate = 'Evaluate'
     listEntities = 'ListEntities'
-    listServices = 'ListEntities' 
+    listServices = 'ListServices' 
     returnHelp = 'ReturnHelp'
     returnSchema = 'ReturnSchema'
     defaultService = 'DefaultService'
@@ -113,6 +92,27 @@ class NoticeTypeEnum(str, Enum):
 # ####
 # ####  Definition Objects
 # ####
+class DelegatorServices(BaseModel):
+    delegatorServices : DelegatorServicesEnum = Schema(
+            'Delegate',
+            title = 'Delegator  Services',
+            description = 'Services available to the Delegator Entity'
+            )
+
+class SequenceServices(BaseModel):
+    sequenceServices : SequenceServicesEnum = Schema(
+            'Build3DStructure',
+            title = 'Sequence  Services',
+            description = 'Services available to the Sequence Entity'
+            )
+
+class GlycoProteinServices(BaseModel):
+    glycoProteinServices : GlycoProteinServicesEnum = Schema(
+            'Build3DStructure',
+            title = 'GlycoProtein  Services',
+            description = 'Services available to the GlycoProtein Entity'
+            )
+
 class ExternalResource(BaseModel):
     locationType: ExternalLocationTypeEnum = Schema(
             None,
@@ -155,38 +155,36 @@ class Notice(BaseModel):
     noticeType: NoticeTypeEnum = Schema(
             None,
             title='Type',
+            alias='type'
             )
     noticeCode: str = Schema(
             None,
             title='Code',
+            alias='code',
             description='Code associated with this notice.'
             )
     noticeBrief: str = Schema(
             None,
             title='Brief',
+            alias='brief',
             description='Brief title, status or name for this notice or notice type.'
             )
     noticeMessage : str = Schema(
             None,
             title='Message',
+            alias='message',
             description='A more detailed message for this notice.'
             )
-
-class Option(BaseModel):
-    """A key-value pair used to hold information about an option."""
-    def __init__(self, key, value):
-        """This might not need to be a whole class."""
-        self.key = key
-        self.value = value
 
 class Service(BaseModel):
     """Holds information about a requested Service."""
     typename : Union[CommonServices, DelegatorServices, SequenceServices, GlycoProteinServices] = Schema(
             None,
             title='Type of Service.',
+            alias='type',
             description='The services available will vary by Entity.'
             )
-    options : List[Option] = Schema(
+    options : List[str] = Schema(
             None,
             title = 'Options for this service',
             description = 'Options might be specific to the Entity and/or Service.  See docs.'
@@ -203,12 +201,13 @@ class Response(BaseModel):
     typename : str = Schema(
             None,
             title='Type of Service.',
+            alias='type',
             description='The type service that this is in response to.'
             )
-    notices : List[Notice] = Schema(
+    notice : Notice = Schema(
             None
             )
-    outputs : List[Resource] = None
+    output : Resource = None
     requestID : str = Schema(
             None,
             title = 'Request ID',
@@ -221,10 +220,11 @@ class Response(BaseModel):
 class Entity(BaseModel):
     """Holds information about the main object responsible for a service."""
     entityType: EntityTypeEnum = Schema(
-            None,
+            ...,
             title='Type',
+            alias='type'
             )
-    options : List[Option] = Schema(
+    options : List[str] = Schema(
             None,
             )
     inputs : List[Resource] = None
@@ -243,12 +243,16 @@ class Entity(BaseModel):
 class Project(BaseModel):
     resources : List[Resource] = None
 
+class TransactionSchema(BaseModel):
+    entity : Entity
+    project : Project = None
+    options : List[str] = None
+
 # ####
 # ####  Container for use in the modules
 # ####
 class Transaction:
     """Holds information relevant to a delegated transaction"""
-    from . import Entity, Option, Project
     def __init__(self, incoming_string):
         """
         Storage for the input and output relevant to the transaction.
@@ -259,26 +263,28 @@ class Transaction:
         is generated.
         """
         self.incoming_string = incoming_string
-        self.request_dict = {}
-        self.entity = Entity
-        self.options = Options
-        self.project = Project
-        self.response_dict = {}
-        self.outgoing_string = ""
-    def build_outgoing_string():
+        self.request_dict : {} = None
+        self.entity : Entity = None
+        self.options : [] = None
+        self.project : Project = None
+        self.response_dict : {} = None
+        self.outgoing_string : str = None
+    def build_outgoing_string(self):
         import json
-        if ('jsonObjectOutputFormat','Pretty') in self.options.items():
-            self.outgoing_string=json.dumps(response_dict, indent=4)
+        isPretty=False
+        if self.options is not None:
+            print(self.options)
+            if ('jsonObjectOutputFormat','Pretty') in self.options.items():
+                isPretty=True
+        if isPretty:
+            self.outgoing_string=json.dumps(self.response_dict, indent=4)
         else:
-            self.outgoing_string=json.dumps(response_dict)
+            self.outgoing_string=json.dumps(self.response_dict)
 
-
-#print(Entity.schema_json(indent=2))
-top_level_schema = schema([Entity, Project], title='A GemsModules Transaction')
+#top_level_schema = schema([Entity, Project], title='A GemsModules Transaction')
 def generateGemsModulesSchema():
     import json
-    print(json.dumps(top_level_schema, indent=2))
+    print(TransactionSchema.schema_json(indent=2))
 
 if __name__ == "__main__":
   generateGemsModulesSchema() 
-#print(Resource.schema_json(indent=2))

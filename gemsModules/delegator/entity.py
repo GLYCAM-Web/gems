@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-import gemsModules.common as gMC
-from gMC.services import parseInput, doServices
-from gMC.transactions import Transaction # might need whole file...
+import gemsModules
+from gemsModules import common 
+from gemsModules.common.services import importEntity, parseInput, doServices, marco
+from gemsModules.common.transaction import * # might need whole file...
 
 def delegate(jsonObjectString):
     """
@@ -22,12 +23,15 @@ def delegate(jsonObjectString):
 
     # If the incoming string was improperly formed, bail, but give a reason.
     if parseInput(thisTransaction) != 0:
+        #print(""" There was an error!  """)
+        #exit(1)
         thisTransaction.build_outgoing_string()
         return thisTransaction.outgoing_string
 
     ###
     ###  TODO:  This is going to need recursion down to the 
     ###  lowest-level Entities at the top level.  Not doing that yet.
+    ###  And, not that the models in transaction.py can handle it either.
     ###
     ###  Entities referenced within Services will need this, too, so
     ###  this should probably be a module in common.services.
@@ -39,41 +43,32 @@ def delegate(jsonObjectString):
     elif not 'services' in thisTransaction.request_dict['entity']:
         theEntity.entity.doDefaultService(thisTransaction)
     else:
-        theEntity.entity.receiving(thisTransaction)
+        theEntity.entity.receive(thisTransaction)
 
     # Check to see if an outgoing string got built.  If not, try to
     # build one.  If that still doesn't work, make the string be a
     # generic error output JSON object. 
-    if thisTransaction.outgoing_string = None:
+    if thisTransaction.outgoing_string is None:
         thisTransaction.build_outgoing_string()
-    if thisTransaction.outgoing_string = None:
-        thisTransaction.build-general-error-output()
+    if thisTransaction.outgoing_string is None:
+        ## TODO:  write this function....
+        thisTransaction.build_general_error_output()
 
     # Return whatever outgoing string got made
     return thisTransaction.outgoing_string
 
-def doDefaultService(Transaction thisTransaction):
+def doDefaultService(thisTransaction):
     """This might not be necessary... """
-    from services import marco
+    if thisTransaction.response_dict is None:
+        thisTransaction.response_dict={}
     thisTransaction.response_dict['entity']={}
     thisTransaction.response_dict['entity']['type']='Delegator'
     thisTransaction.response_dict['responses']=[]
     thisTransaction.response_dict['responses'].append({'payload':marco('Delegator')})
     thisTransaction.build_outgoing_string()
 
-def defaultService(theObject):
-    ## TODO give me something to do...
-    import json
-    responseObject={
-            "entity" : "Delegator",
-            "responses" : [
-                {
-                    'payload' : 'there is no default yet'
-                    }
-                ]
-            }
-    #print(json.dumps(responseObject))
-    return json.dumps(responseObject)
+def receive(thisTransaction):
+    pass
 
 def main():
   import importlib.util, os, sys
@@ -91,9 +86,9 @@ def main():
   utils.investigate_gems_setup(sys.argv)
  
   with open(sys.argv[1], 'r') as file:
-    jsonObject = file.read().replace('\n', '')
-  responseObject=delegate(jsonObject)
-  print(responseObject)
+    jsonObjectString = file.read().replace('\n', '')
+  responseObjectString=delegate(jsonObjectString)
+  print(responseObjectString)
 
 
 if __name__ == "__main__":

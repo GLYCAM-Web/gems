@@ -1,4 +1,6 @@
 {
+ "entity" : {
+ },
  "services" : [
     { "type" : "Marco" },
     { "type" : "ListEntities" },

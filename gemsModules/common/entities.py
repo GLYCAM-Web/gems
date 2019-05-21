@@ -1,20 +1,12 @@
 #!/usr/bin/env python3
 
-## Let python know that these things exist.
-## They will be redefined elsewhere.
-#def delegator():
-  #pass
-#def sequence():
-  #pass
-#def glycoprotein():
-  #pass
-
-
-entityFunction = {
+## The module to load for each Entity type
+entityModule = {
   'Delegator'         : 'delegator' ,
   'Sequence'          : 'sequence' ,
   'Glycoprotein'      : 'glycoprotein'
 }
+## The name of the text to return for various types of help
 helpDict = {
   'ReturnUsage'       : 'usageText',
   'ReturnHelp'        : 'basicHelpText',

@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
 import sys,importlib.util
 import gemsModules
-from gemsModules.common import entities
-
-commonServicesExitCodes = {
-        'NoEntityDefined':'301',
-        'EntityNotKnown':'302',
-        'NoTypeForEntity':'303',
-        'RequestedEntityNotFindable':'310'
-        }
+from gemsModules import common 
+from gemsModules.common.entities import *
+from gemsModules.common.transaction import *
+from gemsModules.common.errors import *
+from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
+from pydantic import BaseModel, Schema
+from pydantic.schema import schema
 
 ## Other entities will need this, too.
 def importEntity(requestedEntity):
   import gemsModules
-  requestedModule="."+entities.entityFunction[requestedEntity]
+  requestedModule='.'+entityModule[requestedEntity]
   module_spec = importlib.util.find_spec(requestedModule,package="gemsModules")
   if module_spec is None: 
     print("The module spec returned None for rquestedEntity: " + requestedEntity)
@@ -22,30 +21,32 @@ def importEntity(requestedEntity):
 
 ## Make this create/return the json dict and a response dict.
 ## Change name to JSON parser or something more appropriate
-def parseinput(Transaction thisTransaction):
+def parseInput(thisTransaction):
     import json
     from io import StringIO
+    from pydantic import BaseModel, ValidationError
     io=StringIO()
     # Load the JSON string into the incoming dictionary
     thisTransaction.request_dict = json.loads(thisTransaction.incoming_string)
-    # Set a flag that there are no errors
-    isError = False
     # Check to see if there are errors
-    if not 'entity' in jsonDict:
-        payload= "The JSON object does not contain an Entity."
-        exitError = 'NoEntityDefined'
-        isError = True
-    if not 'type' in jsonDict['entity']:
-        payload="The Entity does not contain a type."
-        exitError= 'NoTypeForEntity'
-        isError = True
-    if not jsonDict['entity']['type'] in entities.entityFunction:
-        payload="The entity in this JSON Onject is not known to the commonServicer."
-        exitError = 'EntityNotKnown'
-        isError = True
-    if isError :
-        responseObject['entity']['type']='commonServicer'
-        return exitCode
+    ## TODO:  This will break really easily.  The 'response' part needs to refer to the
+    ## response from this activity rather than the zeroth response.
+    ## That said, at this point, the response will usually be the zeroth one.
+    ## A construction maybe like:  if ('X','Y') in this.big.object.items():
+    if thisTransaction.request_dict is None:
+        appendCommonParserNotice(thisTransaction,'JsonParseEror')
+        return thisTransaction.response_dict['entity']['responses'][0]['notices']['code']
+    try:
+        TransactionSchema(**thisTransaction.request_dict)
+    except ValidationError as e:
+#        print(e.json())
+#        print(e.errors())
+        if 'entity' in e.errors()[0]['loc']:
+            if 'type' in e.errors()[0]['loc']:
+                appendCommonParserNotice(thisTransaction,'NoTypeForEntity')
+            else:
+                appendCommonParserNotice(thisTransaction,'NoEntityDefined')
+        return thisTransaction.response_dict['entity']['responses'][0]['notice']['code']
     return 0
 
 
