@@ -11,9 +11,9 @@ WhoIAm='CommonServicer'
 
 ## Module names for entities that this entity/module knows.
 EntityModules = {
-        'Delegator' = 'delegator'
-        'Sequence' = 'sequence'
-        'Glycoprotein' = 'glycoprotein'
+        'Delegator' : 'delegator',
+        'Sequence' : 'sequence',
+        'Glycoprotein' : 'glycoprotein'
         }
 ## Module names for services that this entity/module can perform.
 ServiceModules = {
@@ -55,7 +55,7 @@ ExitMessages = {
         'RequestedEntityNotFindable':'The requested Entity is known, but does not respond.'
         }
 
-## TODO Make this sort of thing ultimately part of the Notice class.
+## TODO Make this sort of thing ultimately part of transaction.py (eg Notice class).
 def appendCommonParserNotice(thisTransaction: Transaction,  noticeBrief: str):
     # Build the notice
     if thisTransaction.response_dict is None:
@@ -68,10 +68,10 @@ def appendCommonParserNotice(thisTransaction: Transaction,  noticeBrief: str):
     thisTransaction.response_dict['entity']['responses'].append({
             'type':'errorNotice',
             'notice' : {
-                'type' : commonServicesExitTypes[noticeBrief],
-                'code' : commonServicesExitCodes[noticeBrief],
+                'type' : ExitTypes[noticeBrief],
+                'code' : ExitCodes[noticeBrief],
                 'brief' : noticeBrief,
-                'message' : commonServicesExitMessages[noticeBrief],
+                'message' : ExitMessages[noticeBrief],
                 }
             })
 
