@@ -92,6 +92,12 @@ class NoticeTypeEnum(str, Enum):
 # ####
 # ####  Definition Objects
 # ####
+class Options(BaseModel):
+    options : Dict[str,str] = Schema(
+            None,
+            description='Key-value pairs that are specific to each entity or service'
+            )
+
 class DelegatorServices(BaseModel):
     delegatorServices : DelegatorServicesEnum = Schema(
             'Delegate',
@@ -235,7 +241,7 @@ class Entity(BaseModel):
             )
     services : List[Service] = None
     responses : List[Response] = None
-    ## TODO: figure out how to include a list of Entities in the Entity itself.
+    ## TODO: include a list of Entities once the recursion-schema bug is fixed.
 #    entities : List['Entity'] = None
 
 #Entity.update_forward_refs()
@@ -246,7 +252,7 @@ class Project(BaseModel):
 class TransactionSchema(BaseModel):
     entity : Entity
     project : Project = None
-    options : List[str] = None
+    options : Options = None
 
 # ####
 # ####  Container for use in the modules
@@ -264,18 +270,18 @@ class Transaction:
         """
         self.incoming_string = incoming_string
         self.request_dict : {} = None
-        self.entity : Entity = None
-        self.options : [] = None
-        self.project : Project = None
+        self.transaction_in : TransactionSchema = None
+        self.transaction_out : TransactionSchema = None
         self.response_dict : {} = None
         self.outgoing_string : str = None
     def build_outgoing_string(self):
         import json
         isPretty=False
-        if self.options is not None:
-            print(self.options)
-            if ('jsonObjectOutputFormat','Pretty') in self.options.items():
-                isPretty=True
+#        ## TODO: read in whether the output should be pretty
+#        # this might work:
+#        if self.transaction_in.options is not None:
+#            if ('jsonObjectOutputFormat', 'Pretty') in self.transaction_in.options:
+#                isPretty = True
         if isPretty:
             self.outgoing_string=json.dumps(self.response_dict, indent=4)
         else:

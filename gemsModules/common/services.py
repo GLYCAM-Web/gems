@@ -4,12 +4,11 @@ import gemsModules
 from gemsModules import common 
 from gemsModules.common.entities import *
 from gemsModules.common.transaction import *
-from gemsModules.common.errors import *
+from gemsModules.common.settings import *
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 from pydantic import BaseModel, Schema
 from pydantic.schema import schema
 
-## Other entities will need this, too.
 def importEntity(requestedEntity):
   import gemsModules
   requestedModule='.'+entityModule[requestedEntity]
@@ -19,19 +18,22 @@ def importEntity(requestedEntity):
     return None
   return importlib.import_module(requestedModule,package="gemsModules")
 
-## Make this create/return the json dict and a response dict.
-## Change name to JSON parser or something more appropriate
 def parseInput(thisTransaction):
     import json
     from io import StringIO
     from pydantic import BaseModel, ValidationError
+    import jsonpickle
     io=StringIO()
+
     # Load the JSON string into the incoming dictionary
+    #
     thisTransaction.request_dict = json.loads(thisTransaction.incoming_string)
-    # Check to see if there are errors
+
+    # Check to see if there are errors.  If there are, bail, but give a reason
+    #
     ## TODO:  This will break really easily.  The 'response' part needs to refer to the
-    ## response from this activity rather than the zeroth response.
-    ## That said, at this point, the response will usually be the zeroth one.
+    ## response from this activity rather than the zeroth response.  That said, at this 
+    ## point, the response will usually be the zeroth one.
     ## A construction maybe like:  if ('X','Y') in this.big.object.items():
     if thisTransaction.request_dict is None:
         appendCommonParserNotice(thisTransaction,'JsonParseEror')
@@ -47,28 +49,13 @@ def parseInput(thisTransaction):
             else:
                 appendCommonParserNotice(thisTransaction,'NoEntityDefined')
         return thisTransaction.response_dict['entity']['responses'][0]['notice']['code']
+
+    # If still here, load the data into a Transaction object and return success
+    #
+    thisTransaction.transaction_in = jsonpickle.decode(thisTransaction.incoming_string)
+#    dummystring=jsonpickle.encode(thisTransaction.transaction_in)
+#    print(dummystring)
     return 0
-
-
-def doServices():
-    ## TODO figure out how to impose options on things....
-    responseObject['entity']=jsonDict['entity']
-    responseObject['responses']=[]
-    for i in jsonDict['services']:
-        #print("The service is:  " + i['type'])
-        ## TODO make the reply object build work better
-        if i['type'] in entities.helpDict:
-            payload=commonServices[i['type']]((jsonDict['entity']['type']),i['type'])
-        else:
-            payload=commonServices[i['type']](jsonDict['entity']['type'])
-        #print("payload is :  ")
-        #print(payload)
-        responseObject['responses'].append({
-            'type':i['type'],
-            'payload':payload
-            })
-    #print(json.dumps(responseObject))
-    return responseObject
 
 def marco(requestedEntity):
   theEntity = importEntity(requestedEntity)
@@ -77,12 +64,12 @@ def marco(requestedEntity):
   else:
     return "The entity you seek is not responding properly."
 
+## TODO make this more generic
 def listEntities(requestedEntity='Delegator'):
   return list(entities.entityFunction.keys())
 
+
 def returnHelp(requestedEntity,requestedHelp):
-  ## have something figure out the help that's wanted...
-  ## print("The requestedHelp is >>>" +requestedHelp + "<<< and the entity is >>>" + requestedEntity + "<<<")
   theEntity = importEntity(requestedEntity)
   theHelp = entities.helpDict[requestedHelp]
   if theHelp == 'schemaLocation':
@@ -97,14 +84,6 @@ def returnHelp(requestedEntity,requestedHelp):
     return "Something went wrong getting the requestedHelp from " + requestedEntity
   return thisHelp
 
-commonServices = {
-        'Marco' : marco,
-        'ListEntities' : listEntities,
-        'ReturnHelp' : returnHelp,
-        'ReturnUsage' : returnHelp,
-        'ReturnVerboseHelp' : returnHelp,
-        'ReturnSchema' : returnHelp
-        }
 
 def main():
   import importlib, os, sys

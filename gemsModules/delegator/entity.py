@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import gemsModules
 from gemsModules import common 
-from gemsModules.common.services import importEntity, parseInput, doServices, marco
+from gemsModules.common.services import importEntity, parseInput, marco
 from gemsModules.common.transaction import * # might need whole file...
 
 def delegate(jsonObjectString):
