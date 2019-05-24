@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
 
 ## Who I am
-WhoIAm='Delegator'
+WhoIAm='Conjugate'
 
 ## Module names for services that this entity/module can perform.
 ## These should not include the Common Services.
-ServiceModule = {
-        'delegate' : 'delegate'
-        }
 
 def main():
     print("Ths script only contains dictionary-type information.")

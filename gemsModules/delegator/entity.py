@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import gemsModules
 from gemsModules import common 
-from gemsModules.common.services import importEntity, parseInput, marco
+from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
 
 def delegate(jsonObjectString):
@@ -38,11 +38,18 @@ def delegate(jsonObjectString):
     ###
     # See if it is possible to load a module for the requested Entity
     theEntity = importEntity(thisTransaction.request_dict['entity']['type'])
+    #print(thisTransaction.request_dict['entity']['type'])
+    #print(theEntity)
     if theEntity is None:
-        thisTransaction.build-general-error-output()
+        #thisTransaction.build-general-error-output()
+        print("there was no entity to call.  bailing")
+        sys.exit(1)
     elif not 'services' in thisTransaction.request_dict['entity']:
+        #print("calling default")
         theEntity.entity.doDefaultService(thisTransaction)
     else:
+        #print("calling receive")
+        #print(theEntity.entity.receive)
         theEntity.entity.receive(thisTransaction)
 
     # Check to see if an outgoing string got built.  If not, try to
@@ -68,7 +75,8 @@ def doDefaultService(thisTransaction):
     thisTransaction.build_outgoing_string()
 
 def receive(thisTransaction):
-    pass
+    print("Delegator received it")
+    doDefaultService(thisTransaction)
 
 def main():
   import importlib.util, os, sys

@@ -29,6 +29,7 @@ You can find the JSON Schema in the $GEMSHOME/gemsModules/Schema directory.
 ## Prerequisites
 
 * GEMS - https://github.com/GLYCAM-Web/gems 
+* GMML - https://github.com/GLYCAM-Web/gmml
 * Python 3.7 
 * Pydantic - https://pydantic-docs.helpmanual.io/
 * jsonpickle - https://jsonpickle.github.io/
@@ -39,7 +40,6 @@ You can find the JSON Schema in the $GEMSHOME/gemsModules/Schema directory.
 
 Depending on what you want to do, these other packages might be required:
 
-* GMML - https://github.com/GLYCAM-Web/gmml
 * AMBER and/or AmberTools - http://ambermd.org/
 * Slurm - https://slurm.schedmd.com/documentation.html
 * GRPC - https://grpc.io/

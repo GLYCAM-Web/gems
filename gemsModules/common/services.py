@@ -2,7 +2,6 @@
 import sys,importlib.util
 import gemsModules
 from gemsModules import common 
-from gemsModules.common.entities import *
 from gemsModules.common.transaction import *
 from gemsModules.common.settings import *
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
@@ -11,7 +10,7 @@ from pydantic.schema import schema
 
 def importEntity(requestedEntity):
   import gemsModules
-  requestedModule='.'+entityModule[requestedEntity]
+  requestedModule='.'+entityModules[requestedEntity]
   module_spec = importlib.util.find_spec(requestedModule,package="gemsModules")
   if module_spec is None: 
     print("The module spec returned None for rquestedEntity: " + requestedEntity)
@@ -41,7 +40,7 @@ def parseInput(thisTransaction):
     try:
         TransactionSchema(**thisTransaction.request_dict)
     except ValidationError as e:
-#        print(e.json())
+        print(e.json())
 #        print(e.errors())
         if 'entity' in e.errors()[0]['loc']:
             if 'type' in e.errors()[0]['loc']:
@@ -87,6 +86,9 @@ def returnHelp(requestedEntity,requestedHelp):
 
 def main():
   import importlib, os, sys
+  from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
+  from pydantic import BaseModel, Schema
+  from pydantic.schema import schema
   if importlib.util.find_spec("gemsModules") is None:
     this_dir, this_filename = os.path.split(__file__)
     sys.path.append(this_dir + "/../")
@@ -101,23 +103,10 @@ def main():
 
   with open(sys.argv[1], 'r') as file:
     data = file.read().replace('\n', '')
-  commonServicer(data)
- 
+    # Make a new Transaction object for holding I/O information.
+    thisTransaction=Transaction(data)
+    parseInput(thisTransaction)
 
-  print("""
-The Entities are:
-  """)
-  print(listEntities())
-  print("")
-
-  if len(sys.argv) == 2:
-    print("The available help options for  >>>" + sys.argv[1] + "<<<  are:")
-    for i in entities.helpDict.keys():
-      print("======================== " + i + " =====================================")
-      print(returnHelp(sys.argv[1],i))
-      print("=============================================================")
-    print("Here is the result of Marco:")
-    print(marco(sys.argv[1]))
 
 if __name__ == "__main__":
   main() 

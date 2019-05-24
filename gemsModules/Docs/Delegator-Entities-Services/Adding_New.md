@@ -11,6 +11,8 @@ You will need to:
     * Are you collecting info from databases?  Maybe call it a _Query_.
   * If the name for your Entity already exists, consider adding your
     code to that Entity as a new Service.
+* Make a directory of the same name, initial letter lowercase, inside 
+  the gemsModules directory.
 * If your code is not written in python, then wrap it in python.
 * Find some way to encode your code's input in JSON. 
   * The simplest way will be to use the _tags_ in the Delegator schema.
@@ -40,7 +42,13 @@ existing directories for format and content information.
     directly cause the execution of any code.  So, we make sure that the code
     on the back-end always performs actions _on behalf of_ a request rather 
     than performing commands in the request.
-* schema.json - a symbolic link to the schema appropriate to the Entity.
+  * At the very least, add a "WhoIAm" line to this file.
+* \_\_init\_\_.py - make sure this imports everything you need in order for your
+    service to run.  At the very least, have it import entity, helpme and settings.
+  To ensure that the proper versions of the files are loaded, be sure to include
+  a 'from .', like this:
+
+  from . import entity, helme, settings, _yourotherstuff_
 
 Of course, your Entity's directory can contain other files as needed for the
 Entity to perform its services.
@@ -55,12 +63,39 @@ containing and executing any Services that all Entites should perform.
   * Add the entity to EntityTypeEnum.
   * Add any non-common Services for your entity to a new Enum (see existing
     Enum's for examples - they should be right at the top).
-  * Make a new EntityServices(BaseModel) class for your Entity's Services Enum 
+  * If the entity has any non-common services, make a new 
+    EntityServices(BaseModel) class for your Entity's Services Enum 
     (again see existing classes as examples).
   * Add that new BaseModel to the Union at the top of the Service class.
 
-# At this point, it should just work.
+## Additions to the gemsModules
 
-If not, please let us know by opening an issue:
+In \_\_init\_\_.py in the gemsModules directory, add an import statement 
+for your entity.  It should look like the others, something like:
+
+from . import _entity_
+
+At this point, it should just work.
+
+
+### To test
+
+Copy a file from gemsModules/delegator/test\_in to somewhere else.  Change
+the entity to your entity's name.  If necessary, rename or delete references 
+to services, etc., that your Entity doesn't provide.
+
+You might want to start with _default.json_ then move to something with 
+more complexity, like:  _sequence-options.json_  Don't forget to edit the
+file for services, options, etc., that your entity provides.
+
+Then:
+* Ensure that PYTHONPATH points to your GEMSHOME.
+* Enter this command:
+  
+$GEMSHOME/gemsModules/delegator/entity.py /path/to/your/test/input.json
+
+## If it doesn't work...
+
+Please let us know by opening an issue:
 https://github.com/GLYCAM-Web/gems/issues
 

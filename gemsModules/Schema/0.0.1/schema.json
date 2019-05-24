@@ -1,11 +1,34 @@
 {
-  "title": "A GemsModules Transaction",
+  "title": "TransactionSchema",
+  "type": "object",
+  "properties": {
+    "entity": {
+      "$ref": "#/definitions/Entity"
+    },
+    "project": {
+      "$ref": "#/definitions/Project"
+    },
+    "options": {
+      "$ref": "#/definitions/Options"
+    }
+  },
+  "required": [
+    "entity"
+  ],
   "definitions": {
-    "Option": {
-      "title": "Option",
-      "description": "A key-value pair used to hold information about an option.",
+    "Options": {
+      "title": "Options",
       "type": "object",
-      "properties": {}
+      "properties": {
+        "options": {
+          "title": "Options",
+          "description": "Key-value pairs that are specific to each entity, service, etc",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
     },
     "EmbeddedResource": {
       "title": "EmbeddedResource",
@@ -25,6 +48,9 @@
             "GlycamNickName"
           ],
           "type": "string"
+        },
+        "options": {
+          "$ref": "#/definitions/Options"
         }
       }
     },
@@ -52,6 +78,9 @@
             "AMBEROFF"
           ],
           "type": "string"
+        },
+        "options": {
+          "$ref": "#/definitions/Options"
         }
       }
     },
@@ -99,6 +128,9 @@
               "type": "string"
             }
           }
+        },
+        "options": {
+          "$ref": "#/definitions/Options"
         }
       }
     },
@@ -107,7 +139,7 @@
       "description": "Holds information about a requested Service.",
       "type": "object",
       "properties": {
-        "typename": {
+        "type": {
           "title": "Type of Service.",
           "description": "The services available will vary by Entity.",
           "anyOf": [
@@ -123,6 +155,7 @@
                     "Marco",
                     "Evaluate",
                     "ListEntities",
+                    "ListServices",
                     "ReturnHelp",
                     "ReturnSchema",
                     "DefaultService"
@@ -178,14 +211,6 @@
             }
           ]
         },
-        "options": {
-          "title": "Options for this service",
-          "description": "Options might be specific to the Entity and/or Service.  See docs.",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Option"
-          }
-        },
         "inputs": {
           "title": "Inputs",
           "type": "array",
@@ -197,6 +222,9 @@
           "title": "Request ID",
           "description": "User-specified ID that will be echoed in responses.",
           "type": "string"
+        },
+        "options": {
+          "$ref": "#/definitions/Options"
         }
       }
     },
@@ -205,7 +233,7 @@
       "description": "Description of a Notice.",
       "type": "object",
       "properties": {
-        "noticeType": {
+        "type": {
           "title": "Type",
           "enum": [
             "Note",
@@ -215,20 +243,23 @@
           ],
           "type": "string"
         },
-        "noticeCode": {
+        "code": {
           "title": "Code",
           "description": "Code associated with this notice.",
           "type": "string"
         },
-        "noticeBrief": {
+        "brief": {
           "title": "Brief",
           "description": "Brief title, status or name for this notice or notice type.",
           "type": "string"
         },
-        "noticeMessage": {
+        "message": {
           "title": "Message",
           "description": "A more detailed message for this notice.",
           "type": "string"
+        },
+        "options": {
+          "$ref": "#/definitions/Options"
         }
       }
     },
@@ -237,29 +268,24 @@
       "description": "Holds information about a response to a service request.",
       "type": "object",
       "properties": {
-        "typename": {
+        "type": {
           "title": "Type of Service.",
           "description": "The type service that this is in response to.",
           "type": "string"
         },
-        "notices": {
-          "title": "Notices",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Notice"
-          }
+        "notice": {
+          "$ref": "#/definitions/Notice"
         },
-        "outputs": {
-          "title": "Outputs",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Resource"
-          }
+        "output": {
+          "$ref": "#/definitions/Resource"
         },
         "requestID": {
           "title": "Request ID",
           "description": "User-specified ID from the service request.",
           "type": "string"
+        },
+        "options": {
+          "$ref": "#/definitions/Options"
         }
       }
     },
@@ -268,23 +294,17 @@
       "description": "Holds information about the main object responsible for a service.",
       "type": "object",
       "properties": {
-        "entityType": {
+        "type": {
           "title": "Type",
           "enum": [
             "Delegator",
             "Sequence",
             "CommonServices",
             "Glycoprotein",
-            "StructureFile"
+            "StructureFile",
+            "Conjugate"
           ],
           "type": "string"
-        },
-        "options": {
-          "title": "Options",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Option"
-          }
         },
         "inputs": {
           "title": "Inputs",
@@ -311,8 +331,14 @@
           "items": {
             "$ref": "#/definitions/Response"
           }
+        },
+        "options": {
+          "$ref": "#/definitions/Options"
         }
-      }
+      },
+      "required": [
+        "type"
+      ]
     },
     "Project": {
       "title": "Project",
@@ -324,6 +350,9 @@
           "items": {
             "$ref": "#/definitions/Resource"
           }
+        },
+        "options": {
+          "$ref": "#/definitions/Options"
         }
       }
     }

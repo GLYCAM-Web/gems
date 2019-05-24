@@ -22,6 +22,15 @@ class GlycoProteinServicesEnum(str,Enum):
     build3DStructure = 'Build3DStructure'
 
 # ##
+# ## Enums for environment variables
+# ##
+class SequenceServicesPathEnum(str,Enum):
+    sequenceentity   = 'GEMS_MODULES_SEQUENCE_PATH'
+    build3DStructure = 'GEMS_MODULES_SEQUENCE_STRUCTURE_PATH'
+    evaluate         = 'GEMS_MODULES_SEQUENCE_STRUCTURE_PATH'
+    drawGlycan       = 'GEMS_MODULES_SEQUENCE_DRAWGLYCAN_PATH'
+
+# ##
 # ## Enums relevant to all Entities & Services
 # ##
 class EntityTypeEnum(str, Enum):
@@ -30,6 +39,7 @@ class EntityTypeEnum(str, Enum):
     commonServices = 'CommonServices'
     glycoprotein = 'Glycoprotein'
     structureFile = 'StructureFile'
+    conjugate = 'Conjugate'
 
 class CommonServicesEnum(str,Enum):
     """
@@ -52,13 +62,6 @@ class CommonServicesEnum(str,Enum):
     returnHelp = 'ReturnHelp'
     returnSchema = 'ReturnSchema'
     defaultService = 'DefaultService'
-
-class CommonServices(BaseModel):
-    commonServices : CommonServicesEnum = Schema(
-            'DefaultService',
-            title = 'Common Services',
-            description = 'Services available to all Entities'
-            )
 
 # ##
 # ## Other general Enums
@@ -95,7 +98,7 @@ class NoticeTypeEnum(str, Enum):
 class Options(BaseModel):
     options : Dict[str,str] = Schema(
             None,
-            description='Key-value pairs that are specific to each entity or service'
+            description='Key-value pairs that are specific to each entity, service, etc'
             )
 
 class DelegatorServices(BaseModel):
@@ -110,6 +113,13 @@ class SequenceServices(BaseModel):
             'Build3DStructure',
             title = 'Sequence  Services',
             description = 'Services available to the Sequence Entity'
+            )
+
+class CommonServices(BaseModel):
+    commonServices : CommonServicesEnum = Schema(
+            'DefaultService',
+            title = 'Common Services',
+            description = 'Services available to all Entities'
             )
 
 class GlycoProteinServices(BaseModel):
@@ -130,6 +140,7 @@ class ExternalResource(BaseModel):
             title='Resource Format',
             description='The format of the external data.',
             )
+    options : Options = None
 
 class EmbeddedResource(BaseModel):
     resourceFormat: ResourceStringFormatEnum = Schema(
@@ -137,6 +148,7 @@ class EmbeddedResource(BaseModel):
             title='Resource Format',
             description='The format of the data embedded in the Payload.'
             )
+    options : Options = None
     
 class ResourceDescriptor(BaseModel):
     """Metadata about the resource (where, what, etc.)."""
@@ -155,6 +167,7 @@ class Resource(BaseModel):
         None,
         description='List of arbitrary Key:Value pairs initially interpreted as string literals.'
         )
+    options : Options = None
 
 class Notice(BaseModel):
     """Description of a Notice."""
@@ -181,6 +194,7 @@ class Notice(BaseModel):
             alias='message',
             description='A more detailed message for this notice.'
             )
+    options : Options = None
 
 class Service(BaseModel):
     """Holds information about a requested Service."""
@@ -190,17 +204,13 @@ class Service(BaseModel):
             alias='type',
             description='The services available will vary by Entity.'
             )
-    options : List[str] = Schema(
-            None,
-            title = 'Options for this service',
-            description = 'Options might be specific to the Entity and/or Service.  See docs.'
-            )
     inputs : List[Resource] = None
     requestID : str = Schema(
             None,
             title = 'Request ID',
             description = 'User-specified ID that will be echoed in responses.'
             )
+    options : Options = None
 
 class Response(BaseModel):
     """Holds information about a response to a service request."""
@@ -219,6 +229,7 @@ class Response(BaseModel):
             title = 'Request ID',
             description = 'User-specified ID from the service request.'
             )
+    options : Options = None
 
 # ####
 # ####  Top-Level Objects
@@ -230,24 +241,24 @@ class Entity(BaseModel):
             title='Type',
             alias='type'
             )
-    options : List[str] = Schema(
-            None,
-            )
     inputs : List[Resource] = None
     requestID : str = Schema(
             None,
             title = 'Request ID',
             description = 'User-specified ID that will be echoed in responses.'
             )
+    ## TODO: Figure out the syntax so that it isn't necessaary to say 'services : ' before each.
     services : List[Service] = None
     responses : List[Response] = None
-    ## TODO: include a list of Entities once the recursion-schema bug is fixed.
+    options : Options = None
+     ## TODO: include a list of Entities once the recursion-schema bug is fixed.
 #    entities : List['Entity'] = None
 
 #Entity.update_forward_refs()
 
 class Project(BaseModel):
     resources : List[Resource] = None
+    options : Options = None
 
 class TransactionSchema(BaseModel):
     entity : Entity

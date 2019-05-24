@@ -10,13 +10,13 @@ from pydantic import BaseModel, Schema
 WhoIAm='CommonServicer'
 
 ## Module names for entities that this entity/module knows.
-EntityModules = {
+entityModules = {
         'Delegator' : 'delegator',
         'Sequence' : 'sequence',
-        'Glycoprotein' : 'glycoprotein'
+        'Conjugate' : 'conjugate',
         }
 ## Module names for services that this entity/module can perform.
-ServiceModules = {
+serviceModules = {
         'Marco' : 'marco',
         'ListEntities' : 'listEntities',
         'ReturnHelp' : 'returnHelp',
