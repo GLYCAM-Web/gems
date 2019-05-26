@@ -1,25 +1,25 @@
-#include "../../gmml/includes/gmml.hpp"
-#include "../../gmml/includes/MolecularModeling/assembly.hpp"
-#include "../../gmml/includes/ParameterSet/PrepFileSpace/prepfile.hpp"
-#include "../../gmml/includes/ParameterSet/PrepFileSpace/prepfileresidue.hpp"
-#include "../../gmml/includes/ParameterSet/PrepFileSpace/prepfileprocessingexception.hpp"
-#include "../../gmml/includes/ParameterSet/OffFileSpace/offfile.hpp"
-#include "../../gmml/includes/ParameterSet/OffFileSpace/offfileresidue.hpp"
-#include "../../gmml/includes/ParameterSet/OffFileSpace/offfileprocessingexception.hpp"
-#include <iostream>
-#include <string>
 
-int main()
-{
-    std::string prep = "../dat/prep/GLYCAM_06j-1.prep";
-    PrepFileSpace::PrepFile* prepA = new PrepFileSpace::PrepFile(prep);
-    std::string condensed_sequence = "DManp[2S,3Me]a1-6DManpa1-6[DGlcpNAcb1-4][DNeu5Aca2-6DGalpb1-4DGlcpNAc[3S]b1-2DManpa1-3]DManpb1-4DGlcpNAc[6Me]b1-4DGlcpNAcb1-OH";
-    MolecularModeling::Assembly assemblyA = MolecularModeling::Assembly();
-    assemblyA.SetName("CONDENSEDSEQUENCE");
-    assemblyA.BuildAssemblyFromCondensedSequence (condensed_sequence, prepA);
-    PdbFileSpace::PdbFile *outputPdbFile = assemblyA.BuildPdbFileStructureFromAssembly();
-    outputPdbFile->Write("buildBySequence.pdb");
-    std::cout << "Done writing pdb." << std::endl;
-}
-//prep file
 
+## TODO Make this not be a call to a compiled binary
+def build3DStructure(thisTransaction : Transaction):
+    # Check for environment variables that tell where things go
+    # check out the environment
+    OutputPath = os.environ.get('GEMS_MODULES_SEQUENCE_STRUCTURE_PATH')
+    if OutputPath == None:
+        OutputPath = os.environ.get('GEMS_MODULES_SEQUENCE_PATH')
+    if OutputPath == None:
+        OutputPath = os.environ.get('GEMS_MODULES_PATH')
+    if OutputPath == None:
+        OutputPath = '.' 
+    # Set up the location where output files will be stored
+    # This next function should check for directory name prefix or
+    # if the complete spec is known or if a UUID should be generated
+    #    OutputDirectorySpecification = getOutputDirectorySpecification(thisTransaction: Transaction)
+    # Set up the location of the MD5Sum directory
+    # Set up the location of the prep file to be used
+    # Generate directories as needed
+    # Save output files to the directories as needed
+    # Run the program to generate the files
+    # Return the name of the directory where the files reside
+    pass
+    
