@@ -1,0 +1,27 @@
+{ 
+	"entity" : 
+	{ 
+		"type": "Sequence", 
+		"services" : 
+		[ 
+			{ "service" :  
+				{ 
+					"type" : "evaluate" 
+				} 
+			} 
+		], 
+		"inputs" : 
+		[ 
+			{ "resource" : 
+				{ 
+					"payload" : "DManpa1-OH" 
+				} 
+			} 
+		] 
+	}, 
+	"options" : 
+	{ 
+		"onError" : "abort", 
+		"jsonObjectOutputFormat": "Pretty" 
+	} 
+} 

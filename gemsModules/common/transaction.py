@@ -8,6 +8,9 @@ from pydantic.schema import schema
 # ####
 # ####  Enums
 # ####
+# ####  Keep values in some sort of logical order, please
+# ####  Alphabetical is good if there is no other obvious order.
+# ####
 
 # ##
 # ## Enums for Entity-specific Services
@@ -15,31 +18,33 @@ from pydantic.schema import schema
 class DelegatorServicesEnum(str,Enum):
     delegate = 'Delegate' 
 
-class SequenceServicesEnum(str,Enum):
+class GlycoProteinServicesEnum(str,Enum):
     build3DStructure = 'Build3DStructure'
 
-class GlycoProteinServicesEnum(str,Enum):
+class SequenceServicesEnum(str,Enum):
     build3DStructure = 'Build3DStructure'
 
 # ##
 # ## Enums for environment variables
 # ##
 class SequenceServicesPathEnum(str,Enum):
+    ## The entity itself
     sequenceentity   = 'GEMS_MODULES_SEQUENCE_PATH'
+    ## Services for this entity, in alphabetical order
     build3DStructure = 'GEMS_MODULES_SEQUENCE_STRUCTURE_PATH'
-    evaluate         = 'GEMS_MODULES_SEQUENCE_STRUCTURE_PATH'
     drawGlycan       = 'GEMS_MODULES_SEQUENCE_DRAWGLYCAN_PATH'
+    evaluate         = 'GEMS_MODULES_SEQUENCE_STRUCTURE_PATH'
 
 # ##
 # ## Enums relevant to all Entities & Services
 # ##
 class EntityTypeEnum(str, Enum):
-    delegator = 'Delegator'
-    sequence = 'Sequence'
     commonServices = 'CommonServices'
-    glycoprotein = 'Glycoprotein'
-    structureFile = 'StructureFile'
     conjugate = 'Conjugate'
+    delegator = 'Delegator'
+    glycoprotein = 'Glycoprotein'
+    sequence = 'Sequence'
+    structureFile = 'StructureFile'
 
 class CommonServicesEnum(str,Enum):
     """
@@ -55,27 +60,33 @@ class CommonServicesEnum(str,Enum):
 
     See the Enums for each specific service, above.
     """
-    marco = 'Marco'
     evaluate = 'Evaluate'
+    defaultService = 'DefaultService'
+    marco = 'Marco'
     listEntities = 'ListEntities'
     listServices = 'ListServices' 
     returnHelp = 'ReturnHelp'
     returnSchema = 'ReturnSchema'
-    defaultService = 'DefaultService'
 
 # ##
 # ## Other general Enums
 # ##
-class ExternalLocationTypeEnum(str, Enum):
-    filepath = 'file-path'
-    httpheader = 'http-header'
-    uri = 'uri'
-
 class ExternalFormatEnum(str, Enum):
     pdb = 'PDB'
     mmcif = 'MMCIF'
     text = 'TEXT'
     amberoff = 'AMBEROFF' 
+
+class ExternalLocationTypeEnum(str, Enum):
+    filepath = 'file-path'
+    httpheader = 'http-header'
+    uri = 'uri'
+
+class NoticeTypeEnum(str, Enum):
+    note = 'Note'
+    warning = 'Warning'
+    error = 'Error'
+    exit = 'Exit'
 
 class ResourceStringFormatEnum(str, Enum):
     json = 'JSON'
@@ -86,16 +97,12 @@ class ResourceStringFormatEnum(str, Enum):
     glycamSequenceID = 'GlycamSequenceID'
     glycamNickName = 'GlycamNickName'
 
-class NoticeTypeEnum(str, Enum):
-    note = 'Note'
-    warning = 'Warning'
-    error = 'Error'
-    exit = 'Exit'
-
 # ####
 # ####  Definition Objects
 # ####
-class Options(BaseModel):
+# ####  The order will be guided mostly by dependency
+# ####
+class Tags(BaseModel):
     options : Dict[str,str] = Schema(
             None,
             description='Key-value pairs that are specific to each entity, service, etc'
@@ -140,7 +147,7 @@ class ExternalResource(BaseModel):
             title='Resource Format',
             description='The format of the external data.',
             )
-    options : Options = None
+    options : Tags = None
 
 class EmbeddedResource(BaseModel):
     resourceFormat: ResourceStringFormatEnum = Schema(
@@ -148,7 +155,7 @@ class EmbeddedResource(BaseModel):
             title='Resource Format',
             description='The format of the data embedded in the Payload.'
             )
-    options : Options = None
+    options : Tags = None
     
 class ResourceDescriptor(BaseModel):
     """Metadata about the resource (where, what, etc.)."""
@@ -167,7 +174,7 @@ class Resource(BaseModel):
         None,
         description='List of arbitrary Key:Value pairs initially interpreted as string literals.'
         )
-    options : Options = None
+    options : Tags = None
 
 class Notice(BaseModel):
     """Description of a Notice."""
@@ -194,7 +201,7 @@ class Notice(BaseModel):
             alias='message',
             description='A more detailed message for this notice.'
             )
-    options : Options = None
+    options : Tags = None
 
 class Service(BaseModel):
     """Holds information about a requested Service."""
@@ -210,7 +217,7 @@ class Service(BaseModel):
             title = 'Request ID',
             description = 'User-specified ID that will be echoed in responses.'
             )
-    options : Options = None
+    options : Tags = None
 
 class Response(BaseModel):
     """Holds information about a response to a service request."""
@@ -223,13 +230,13 @@ class Response(BaseModel):
     notice : Notice = Schema(
             None
             )
-    output : Resource = None
+    outputs : List[Resource] = None
     requestID : str = Schema(
             None,
             title = 'Request ID',
             description = 'User-specified ID from the service request.'
             )
-    options : Options = None
+    options : Tags = None
 
 # ####
 # ####  Top-Level Objects
@@ -247,10 +254,11 @@ class Entity(BaseModel):
             title = 'Request ID',
             description = 'User-specified ID that will be echoed in responses.'
             )
-    ## TODO: Figure out the syntax so that it isn't necessaary to say 'services : ' before each.
+    ## TODO: Figure out the syntax so that it isn't necessaary 
+    ## to say 'service : ' or 'response: ' before each.
     services : List[Service] = None
     responses : List[Response] = None
-    options : Options = None
+    options : Tags = None
      ## TODO: include a list of Entities once the recursion-schema bug is fixed.
 #    entities : List['Entity'] = None
 
@@ -258,12 +266,12 @@ class Entity(BaseModel):
 
 class Project(BaseModel):
     resources : List[Resource] = None
-    options : Options = None
+    options : Tags = None
 
 class TransactionSchema(BaseModel):
     entity : Entity
     project : Project = None
-    options : Options = None
+    options : Tags = None
 
 # ####
 # ####  Container for use in the modules
