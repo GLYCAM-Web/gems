@@ -1,0 +1,40 @@
+{
+ "entity" :
+ {
+     "type": "Query",
+     "services" :
+     [
+         { "service" :
+             {
+                 "type" : "evaluate" ,
+                 "options" :
+                 {
+                         "searchType" : "Ontology",
+                         "searchTerm" : ".*Man.*",
+                         "resolution_min" : -1,
+                         "resolution_max" : -1,
+                         "b_factor_min" : -1,
+                         "b_factor_max" : -1,
+                         "oligo_b_factor_min" : -1,
+                         "oligo_b_factor_max" : -1,
+                         "isError" : -1,
+                         "isWarning" : -1,
+                         "isComment" : -1,
+                         "isLigand" : -1,
+                         "isGlycomimetic" : -1,
+                         "isNucleotide" : -1,
+                         "aglycon" : -1,
+                         "page" : -1,
+                         "resultsPerPage" : -1,
+                         "sortBy" : -1,
+                         "output_file_typ" : -1
+                 }
+             }
+         }
+      ],
+ "options" :
+ {
+         "jsonObjectOutputFormat" : "Pretty"
+ }
+}
+}
