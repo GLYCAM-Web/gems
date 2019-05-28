@@ -16,7 +16,7 @@ from pydantic.schema import schema
 # ## Enums for Entity-specific Services
 # ##
 class DelegatorServicesEnum(str,Enum):
-    delegate = 'Delegate' 
+    delegate = 'Delegate'
 
 class GlycoProteinServicesEnum(str,Enum):
     build3DStructure = 'Build3DStructure'
@@ -45,14 +45,15 @@ class EntityTypeEnum(str, Enum):
     glycoprotein = 'Glycoprotein'
     sequence = 'Sequence'
     structureFile = 'StructureFile'
+    query = 'Query'
 
 class CommonServicesEnum(str,Enum):
     """
     Services used by all Entities.
 
-    The behaviors of these services might differ from one Entity to another.  
-    For example, 'ListServices' or 'DefaultService' will certainly differ.  
-    Even something like 'Marco', which will look the same on the surface, 
+    The behaviors of these services might differ from one Entity to another.
+    For example, 'ListServices' or 'DefaultService' will certainly differ.
+    Even something like 'Marco', which will look the same on the surface,
     will return 'Polo' for the relevant Entity.
 
     On that note, there is a 'CommonServices' Entity.  If the incoming JSON
@@ -64,7 +65,7 @@ class CommonServicesEnum(str,Enum):
     defaultService = 'DefaultService'
     marco = 'Marco'
     listEntities = 'ListEntities'
-    listServices = 'ListServices' 
+    listServices = 'ListServices'
     returnHelp = 'ReturnHelp'
     returnSchema = 'ReturnSchema'
 
@@ -75,7 +76,7 @@ class ExternalFormatEnum(str, Enum):
     pdb = 'PDB'
     mmcif = 'MMCIF'
     text = 'TEXT'
-    amberoff = 'AMBEROFF' 
+    amberoff = 'AMBEROFF'
 
 class ExternalLocationTypeEnum(str, Enum):
     filepath = 'file-path'
@@ -91,8 +92,8 @@ class NoticeTypeEnum(str, Enum):
 class ResourceStringFormatEnum(str, Enum):
     json = 'JSON'
     pdbid = 'PDBID'
-    uri = 'URI' 
-    glycamCondensed = 'GlycamCondensed' 
+    uri = 'URI'
+    glycamCondensed = 'GlycamCondensed'
     glytoucanAccessionID = 'GlyTouCanID'
     glycamSequenceID = 'GlycamSequenceID'
     glycamNickName = 'GlycamNickName'
@@ -159,7 +160,7 @@ class EmbeddedResource(BaseModel):
     
 class ResourceDescriptor(BaseModel):
     """Metadata about the resource (where, what, etc.)."""
-    descriptor: Union[EmbeddedResource,ExternalResource] 
+    descriptor: Union[EmbeddedResource,ExternalResource]
 
 class Resource(BaseModel):
     """Information describing a resource containing data."""
@@ -312,4 +313,4 @@ def generateGemsModulesSchema():
     print(TransactionSchema.schema_json(indent=2))
 
 if __name__ == "__main__":
-  generateGemsModulesSchema() 
+  generateGemsModulesSchema()
