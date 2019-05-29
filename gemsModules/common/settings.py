@@ -11,10 +11,10 @@ WhoIAm='CommonServicer'
 
 ## Module names for entities that this entity/module knows.
 entityModules = {
-        'Delegator' : 'delegator',
-        'Sequence' : 'sequence',
         'Conjugate' : 'conjugate',
+        'Delegator' : 'delegator',
         'Query' : 'query',
+        'Sequence' : 'sequence',
         }
 ## Module names for services that this entity/module can perform.
 serviceModules = {
@@ -39,13 +39,23 @@ ExitTypes = {
         'EntityNotKnown':'error',
         'NoTypeForEntity':'error',
         'JsonParseEror':'error',
+        'ServiceNotKnownToEntity':'error',
         'RequestedEntityNotFindable':'error'
+        }
+ExitBlockIDs = {
+        'NoEntityDefined':'Transaction',
+        'EntityNotKnown':'Entity',
+        'NoTypeForEntity':'Entity',
+        'JsonParseEror':'Transaction',
+        'ServiceNotKnownToEntity':'Service',
+        'RequestedEntityNotFindable':'SystemError'
         }
 ExitCodes = {
         'NoEntityDefined':'301',
         'EntityNotKnown':'302',
         'NoTypeForEntity':'303',
         'JsonParseEror':'304',
+        'ServiceNotKnownToEntity':'305',
         'RequestedEntityNotFindable':'310'
         }
 ExitMessages = {
@@ -53,11 +63,12 @@ ExitMessages = {
         'EntityNotKnown':'The entity in this JSON Onject is not known to the commonServicer.',
         'NoTypeForEntity':'The Entity does not contain a type.',
         'JsonParseEror':'There was an unknown error parsing the JSON Object.',
+        'ServiceNotKnownToEntity':'The requested Entity does not offer this Service.',
         'RequestedEntityNotFindable':'The requested Entity is known, but does not respond.'
         }
 
 ## TODO Make this sort of thing ultimately part of transaction.py (eg Notice class).
-def appendCommonParserNotice(thisTransaction: Transaction,  noticeBrief: str):
+def appendCommonParserNotice(thisTransaction: Transaction,  noticeBrief: str, blockID: str = None):
     # Build the notice
     if thisTransaction.response_dict is None:
         thisTransaction.response_dict={}
@@ -66,12 +77,19 @@ def appendCommonParserNotice(thisTransaction: Transaction,  noticeBrief: str):
         thisTransaction.response_dict['entity']={}
     if not 'responses' in thisTransaction.response_dict['entity']:
         thisTransaction.response_dict['entity']['responses']=[]
+    if blockID is None:
+        if noticeBrief in ExitBlockIDs:
+            blockID = ExitBlockIDs[noticeBrief]
+        else:
+            blockID = 'unknown'
     thisTransaction.response_dict['entity']['responses'].append({
-            'type':'errorNotice',
+            'CommonServicerNotice' : {
+            'type' : ExitTypes[noticeBrief],
             'notice' : {
-                'type' : ExitTypes[noticeBrief],
                 'code' : ExitCodes[noticeBrief],
                 'brief' : noticeBrief,
+                'blockID' : blockID,
                 'message' : ExitMessages[noticeBrief],
                 }
-            })
+            }})
+

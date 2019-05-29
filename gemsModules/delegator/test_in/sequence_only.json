@@ -4,15 +4,12 @@
 		"type": "Sequence", 
 		"services" : 
 		[ 
-			{ "service" :  
-				{ 
-					"type" : "evaluate" 
-				} 
-			} 
+			{ "Evaluate" :  { "type" : "Evaluate" } } ,
+			{ "Build" :  { "type" : "Build3DStructure" } } 
 		], 
 		"inputs" : 
 		[ 
-			{ "resource" : 
+			{ "SimpleSequence" : 
 				{ 
 					"payload" : "DManpa1-OH" 
 				} 

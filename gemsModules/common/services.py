@@ -40,20 +40,20 @@ def parseInput(thisTransaction):
     try:
         TransactionSchema(**thisTransaction.request_dict)
     except ValidationError as e:
-        print(e.json())
+#        print(e.json())
 #        print(e.errors())
         if 'entity' in e.errors()[0]['loc']:
             if 'type' in e.errors()[0]['loc']:
                 appendCommonParserNotice(thisTransaction,'NoTypeForEntity')
             else:
                 appendCommonParserNotice(thisTransaction,'NoEntityDefined')
-        return thisTransaction.response_dict['entity']['responses'][0]['notice']['code']
+        theResponseTypes = getTypesFromList(thisTransaction.response_dict['entity']['responses'])
+#        print(theResponseTypes)
+        return theResponseTypes.count('error')
 
     # If still here, load the data into a Transaction object and return success
     #
     thisTransaction.transaction_in = jsonpickle.decode(thisTransaction.incoming_string)
-#    dummystring=jsonpickle.encode(thisTransaction.transaction_in)
-#    print(dummystring)
     return 0
 
 def marco(requestedEntity):
@@ -62,6 +62,26 @@ def marco(requestedEntity):
     return "Polo"
   else:
     return "The entity you seek is not responding properly."
+
+def getTypesFromList(theList):
+    typesInList=[]
+    for i in range(len(theList)):
+        thekeys=list(theList[i].keys())
+        thevalues=list(theList[i].values())
+        for j in range(len(thevalues)):
+            #print("Checking if there is a type")
+            if not 'type' in thevalues[j].keys():
+                #print("there is no type.  If there is a type, it might be")
+                #print(thekeys[j])
+                typesInList.append(thekeys[j])
+            else:
+                #print("there is a type and it is:")
+                #print(thevalues[j]['type'])
+                typesInList.append(thevalues[j]['type'])
+    #print("printing the typesInList:")
+    #print(typesInList)
+    return typesInList
+
 
 ## TODO make this more generic
 def listEntities(requestedEntity='Delegator'):
