@@ -1,0 +1,30 @@
+{ 
+	"entity" : 
+	{ 
+		"type": "Sequence", 
+		"services" : 
+		[ 
+			{ "Evalpuate" :  
+				{ 
+					"type" : "Evalpuate" ,
+					"time" : "now" 
+				} 
+			} ,
+			{ "Build" :  { "type" : "Build3DStructure" } } ,
+			{ "Evaluate" :  {  } } 
+		], 
+		"inputs" : 
+		[ 
+			{ "Sequence" : 
+				{ 
+					"payload" : "DManpa1-OH" 
+				} 
+			} 
+		] 
+	}, 
+	"options" : 
+	{ 
+		"onError" : "abort", 
+		"jsonObjectOutputFormat": "Pretty" 
+	} 
+} 
