@@ -9,7 +9,7 @@ import csv
 import ast
 from gemsModules import common
 from gemsModules.common.services import *
-from gemsModules.common.transaction import * 
+from gemsModules.common.transaction import *
 
 exitMessages = {
         'GmmlNotFound':'Cannot load the GMML module',
@@ -19,17 +19,17 @@ exitCodes = {
         }
 
 # import gems/gmml stuff
-import gmml 
+import gmml
 if gmml is None:
     print(exitMessages["GmmlNotFound"])
     sys.exit(exitCodes["GmmlNotFound"])
 
 def buildQueryString(thisTransaction : Transaction):
-    """Build a Query String""" 
+    """Build a Query String"""
     #
-    # THIS IS A KLUGE!   See the [0]?  That's ugly...  and bad.  
+    # THIS IS A KLUGE!   See the [0]?  That's ugly...  and bad.
     # And, if I knew Python better....
-    # 
+    #
     try:
         virtLocation = os.getenv('VIRTUOSO_DB') + ":" + str(8890) + "/sparql"
     except:
@@ -42,25 +42,26 @@ def buildQueryString(thisTransaction : Transaction):
         print(theseOptions['aglycon'])
         temp = gmml.Assembly()
         theQueryString = temp.QueryOntology(
-                str(theseOptions['searchType']), 
-                str(theseOptions['searchTerm']), 
-                float(theseOptions['resolution_min']), 
-                float(theseOptions['resolution_max']), 
-                float(theseOptions['b_factor_min']), 
-                float(theseOptions['b_factor_max']), 
-                float(theseOptions['oligo_b_factor_min']), 
-                float(theseOptions['oligo_b_factor_max']), 
-                int(theseOptions['isError']), 
-                int(theseOptions['isWarning']), 
-                int(theseOptions['isComment']), 
-                int(theseOptions['isLigand']), 
-                int(theseOptions['isGlycomimetic']), 
-                int(theseOptions['isNucleotide']), 
-                str(theseOptions['aglycon']), 
-                int(theseOptions['page']), 
-                int(theseOptions['resultsPerPage']), 
-                str(theseOptions['sortBy']), 
-                str(virtLocation), 
+                str(theseOptions['searchType']),
+                str(theseOptions['searchTerm']),
+                float(theseOptions['resolution_min']),
+                float(theseOptions['resolution_max']),
+                float(theseOptions['b_factor_min']),
+                float(theseOptions['b_factor_max']),
+                float(theseOptions['oligo_b_factor_min']),
+                float(theseOptions['oligo_b_factor_max']),
+                int(theseOptions['isError']),
+                int(theseOptions['isWarning']),
+                int(theseOptions['isComment']),
+                int(theseOptions['isLigand']),
+                int(theseOptions['isGlycomimetic']),
+                int(theseOptions['isNucleotide']),
+                str(theseOptions['aglycon']),
+                str(theseOptions['count']),
+                int(theseOptions['page']),
+                int(theseOptions['resultsPerPage']),
+                str(theseOptions['sortBy']),
+                str(virtLocation),
                 str(theseOptions['output_file_type'])
                 )
     elif theseOptions['queryType'] == "More":
@@ -83,4 +84,3 @@ def buildQueryString(thisTransaction : Transaction):
     print(out)
     jsonObj = json.loads(out)
     thisTransaction.response_dict= jsonObj
-    
