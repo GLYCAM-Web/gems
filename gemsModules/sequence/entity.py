@@ -25,7 +25,7 @@ def doDefaultService(thisTransaction : Transaction):
 
 def receive(thisTransaction : Transaction):
     ## First figure out the names of each of the requested services
-    if thisTransaction.request_dict['entity']['services'] is None:
+    if not 'services' in thisTransaction.request_dict['entity'].keys():
         doDefaultService(thisTransaction)
         return
     input_services = thisTransaction.request_dict['entity']['services']

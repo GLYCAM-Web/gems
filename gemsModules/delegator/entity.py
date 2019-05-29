@@ -44,7 +44,7 @@ def delegate(jsonObjectString):
         #thisTransaction.build-general-error-output()
         print("there was no entity to call.  bailing")
         sys.exit(1)
-    elif thisTransaction.request_dict['entity']['services'] is None:
+    elif not 'services' in thisTransaction.request_dict['entity'].keys():
         #print("calling default")
         theEntity.entity.doDefaultService(thisTransaction)
     else:
