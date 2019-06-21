@@ -1,8 +1,16 @@
+## GEMS-specfic things to ignore
 gmml
 _gmml.so
 gmml.py
-gmml.pyc
 gmml_wrap.cxx
 gmml_wrap.o
-__pycache__
 log.log
+
+## general things to ignore
+*__pycache__
+*.pyc
+*.pyo
+*.swp
+*~
+*git-ignore-me*
+
