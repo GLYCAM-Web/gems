@@ -1,0 +1,360 @@
+{
+  "title": "TransactionSchema",
+  "type": "object",
+  "properties": {
+    "entity": {
+      "$ref": "#/definitions/Entity"
+    },
+    "project": {
+      "$ref": "#/definitions/Project"
+    },
+    "options": {
+      "$ref": "#/definitions/Options"
+    }
+  },
+  "required": [
+    "entity"
+  ],
+  "definitions": {
+    "Options": {
+      "title": "Options",
+      "type": "object",
+      "properties": {
+        "options": {
+          "title": "Options",
+          "description": "Key-value pairs that are specific to each entity, service, etc",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "EmbeddedResource": {
+      "title": "EmbeddedResource",
+      "type": "object",
+      "properties": {
+        "resourceFormat": {
+          "title": "Resource Format",
+          "description": "The format of the data embedded in the Payload.",
+          "default": "GlycamCondensed",
+          "enum": [
+            "JSON",
+            "PDBID",
+            "URI",
+            "GlycamCondensed",
+            "GlyTouCanID",
+            "GlycamSequenceID",
+            "GlycamNickName"
+          ],
+          "type": "string"
+        },
+        "options": {
+          "$ref": "#/definitions/Options"
+        }
+      }
+    },
+    "ExternalResource": {
+      "title": "ExternalResource",
+      "type": "object",
+      "properties": {
+        "locationType": {
+          "title": "External Location Type",
+          "description": "The kind of location that is specified in the Payload.",
+          "enum": [
+            "file-path",
+            "http-header",
+            "uri"
+          ],
+          "type": "string"
+        },
+        "resourceFormat": {
+          "title": "Resource Format",
+          "description": "The format of the external data.",
+          "enum": [
+            "PDB",
+            "MMCIF",
+            "TEXT",
+            "AMBEROFF"
+          ],
+          "type": "string"
+        },
+        "options": {
+          "$ref": "#/definitions/Options"
+        }
+      }
+    },
+    "ResourceDescriptor": {
+      "title": "ResourceDescriptor",
+      "description": "Metadata about the resource (where, what, etc.).",
+      "type": "object",
+      "properties": {
+        "descriptor": {
+          "title": "Descriptor",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/EmbeddedResource"
+            },
+            {
+              "$ref": "#/definitions/ExternalResource"
+            }
+          ]
+        }
+      },
+      "required": [
+        "descriptor"
+      ]
+    },
+    "Resource": {
+      "title": "Resource",
+      "description": "Information describing a resource containing data.",
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/ResourceDescriptor"
+        },
+        "payload": {
+          "title": "Payload",
+          "description": "The thing that is described in the Descriptor",
+          "type": "string"
+        },
+        "tags": {
+          "title": "Tags",
+          "description": "List of arbitrary Key:Value pairs initially interpreted as string literals.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        },
+        "options": {
+          "$ref": "#/definitions/Options"
+        }
+      }
+    },
+    "Service": {
+      "title": "Service",
+      "description": "Holds information about a requested Service.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "title": "Type of Service.",
+          "description": "The services available will vary by Entity.",
+          "anyOf": [
+            {
+              "title": "CommonServices",
+              "type": "object",
+              "properties": {
+                "commonServices": {
+                  "title": "Common Services",
+                  "description": "Services available to all Entities",
+                  "default": "DefaultService",
+                  "enum": [
+                    "Marco",
+                    "Evaluate",
+                    "ListEntities",
+                    "ListServices",
+                    "ReturnHelp",
+                    "ReturnSchema",
+                    "DefaultService"
+                  ],
+                  "type": "string"
+                }
+              }
+            },
+            {
+              "title": "DelegatorServices",
+              "type": "object",
+              "properties": {
+                "delegatorServices": {
+                  "title": "Delegator  Services",
+                  "description": "Services available to the Delegator Entity",
+                  "default": "Delegate",
+                  "enum": [
+                    "Delegate"
+                  ],
+                  "type": "string"
+                }
+              }
+            },
+            {
+              "title": "SequenceServices",
+              "type": "object",
+              "properties": {
+                "sequenceServices": {
+                  "title": "Sequence  Services",
+                  "description": "Services available to the Sequence Entity",
+                  "default": "Build3DStructure",
+                  "enum": [
+                    "Build3DStructure"
+                  ],
+                  "type": "string"
+                }
+              }
+            },
+            {
+              "title": "GlycoProteinServices",
+              "type": "object",
+              "properties": {
+                "glycoProteinServices": {
+                  "title": "GlycoProtein  Services",
+                  "description": "Services available to the GlycoProtein Entity",
+                  "default": "Build3DStructure",
+                  "enum": [
+                    "Build3DStructure"
+                  ],
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "inputs": {
+          "title": "Inputs",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Resource"
+          }
+        },
+        "requestID": {
+          "title": "Request ID",
+          "description": "User-specified ID that will be echoed in responses.",
+          "type": "string"
+        },
+        "options": {
+          "$ref": "#/definitions/Options"
+        }
+      }
+    },
+    "Notice": {
+      "title": "Notice",
+      "description": "Description of a Notice.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "title": "Type",
+          "enum": [
+            "Note",
+            "Warning",
+            "Error",
+            "Exit"
+          ],
+          "type": "string"
+        },
+        "code": {
+          "title": "Code",
+          "description": "Code associated with this notice.",
+          "type": "string"
+        },
+        "brief": {
+          "title": "Brief",
+          "description": "Brief title, status or name for this notice or notice type.",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "description": "A more detailed message for this notice.",
+          "type": "string"
+        },
+        "options": {
+          "$ref": "#/definitions/Options"
+        }
+      }
+    },
+    "Response": {
+      "title": "Response",
+      "description": "Holds information about a response to a service request.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "title": "Type of Service.",
+          "description": "The type service that this is in response to.",
+          "type": "string"
+        },
+        "notice": {
+          "$ref": "#/definitions/Notice"
+        },
+        "output": {
+          "$ref": "#/definitions/Resource"
+        },
+        "requestID": {
+          "title": "Request ID",
+          "description": "User-specified ID from the service request.",
+          "type": "string"
+        },
+        "options": {
+          "$ref": "#/definitions/Options"
+        }
+      }
+    },
+    "Entity": {
+      "title": "Entity",
+      "description": "Holds information about the main object responsible for a service.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "title": "Type",
+          "enum": [
+            "Delegator",
+            "Sequence",
+            "CommonServices",
+            "Glycoprotein",
+            "StructureFile",
+            "Conjugate"
+          ],
+          "type": "string"
+        },
+        "inputs": {
+          "title": "Inputs",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Resource"
+          }
+        },
+        "requestID": {
+          "title": "Request ID",
+          "description": "User-specified ID that will be echoed in responses.",
+          "type": "string"
+        },
+        "services": {
+          "title": "Services",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Service"
+          }
+        },
+        "responses": {
+          "title": "Responses",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Response"
+          }
+        },
+        "options": {
+          "$ref": "#/definitions/Options"
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "Project": {
+      "title": "Project",
+      "type": "object",
+      "properties": {
+        "resources": {
+          "title": "Resources",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Resource"
+          }
+        },
+        "options": {
+          "$ref": "#/definitions/Options"
+        }
+      }
+    }
+  }
+}

@@ -1,82 +1,60 @@
 #!/usr/bin/env python3
-#import os
-#import json
-#from io import StringIO
-
 import sys,importlib.util
 import gemsModules
-from gemsModules.common import entities
-
-commonServicesExitCodes = {
-        'NoEntityDefined':'301',
-        'EntityNotKnown':'302',
-        'NoTypeForEntity':'303',
-        'RequestedEntityNotFindable':'310'
-        }
+from gemsModules import common 
+from gemsModules.common.transaction import *
+from gemsModules.common.settings import *
+from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
+from pydantic import BaseModel, Schema
+from pydantic.schema import schema
 
 def importEntity(requestedEntity):
   import gemsModules
-  requestedModule="."+entities.entityFunction[requestedEntity]
+  requestedModule='.'+entityModules[requestedEntity]
   module_spec = importlib.util.find_spec(requestedModule,package="gemsModules")
   if module_spec is None: 
     print("The module spec returned None for rquestedEntity: " + requestedEntity)
-    sys.exit(commonServicesExitCodes['RequestedEntityNotFindable'])
+    return None
   return importlib.import_module(requestedModule,package="gemsModules")
 
-def commonServicer(jsonObject):
+def parseInput(thisTransaction):
     import json
     from io import StringIO
+    from pydantic import BaseModel, ValidationError
+    import jsonpickle
     io=StringIO()
-    json.loads(jsonObject)
-    theObject = json.loads(jsonObject)
-    responseObject = { }
-    ## TODO  Dry out the next several lines - make json builder or such
-    if not 'entity' in theObject:
-        payload="The JSON object does not contain an Entity."
-        responseObject['entity']='commonServicer'
-        responseObject['payload'] = payload
-        responseObject['exitError']= 'NoEntityDefined'
-        responseObject['exitCode'] = commonServicesExitCodes['NoEntityDefined']
-        #print(json.dumps(responseObject))
-        return responseObject
-    if not 'type' in theObject['entity']:
-        payload="The Entity does not contain a type."
-        responseObject['entity']='commonServicer'
-        responseObject['payload'] = payload
-        responseObject['exitError']= 'NoTypeForEntity'
-        responseObject['exitCode'] = commonServicesExitCodes['NoTypeForEntity']
-        #print(json.dumps(responseObject))
-        return responseObject
-    if not theObject['entity']['type'] in entities.entityFunction:
-        payload="The entity in this JSON Onject is not known to the commonServicer."
-        responseObject['entity']='commonServicer'
-        responseObject['payload'] = payload
-        responseObject['exitError']= 'EntityNotKnown'
-        responseObject['exitCode'] = commonServicesExitCodes['EntityNotKnown']
-        #print(json.dumps(responseObject))
-        return responseObject
-    ## TODO figure out how to impose options on things....
-    if not 'services' in theObject:
-        theEntity = importEntity(theObject['entity']['type'])
-        responseObject = theEntity.entity.defaultService(theObject)
-        return responseObject
-    responseObject['entity']=theObject['entity']
-    responseObject['responses']=[]
-    for i in theObject['services']:
-        #print("The service is:  " + i['type'])
-        ## TODO make the reply object build work better
-        if i['type'] in entities.helpDict:
-            payload=commonServices[i['type']]((theObject['entity']['type']),i['type'])
-        else:
-            payload=commonServices[i['type']](theObject['entity']['type'])
-        #print("payload is :  ")
-        #print(payload)
-        responseObject['responses'].append({
-            'type':i['type'],
-            'payload':payload
-            })
-    #print(json.dumps(responseObject))
-    return responseObject
+
+    # Load the JSON string into the incoming dictionary
+    #
+    thisTransaction.request_dict = json.loads(thisTransaction.incoming_string)
+
+    # Check to see if there are errors.  If there are, bail, but give a reason
+    #
+    ## TODO:  This will break really easily.  The 'response' part needs to refer to the
+    ## response from this activity rather than the zeroth response.  That said, at this 
+    ## point, the response will usually be the zeroth one.
+    ## A construction maybe like:  if ('X','Y') in this.big.object.items():
+    if thisTransaction.request_dict is None:
+        appendCommonParserNotice(thisTransaction,'JsonParseEror')
+        return thisTransaction.response_dict['entity']['responses'][0]['notices']['code']
+    try:
+        TransactionSchema(**thisTransaction.request_dict)
+    except ValidationError as e:
+#        print(e.json())
+#        print(e.errors())
+        if 'entity' in e.errors()[0]['loc']:
+            if 'type' in e.errors()[0]['loc']:
+                appendCommonParserNotice(thisTransaction,'NoTypeForEntity')
+            else:
+                appendCommonParserNotice(thisTransaction,'NoEntityDefined')
+        theResponseTypes = getTypesFromList(thisTransaction.response_dict['entity']['responses'])
+#        print(theResponseTypes)
+        return theResponseTypes.count('error')
+
+    # If still here, load the data into a Transaction object and return success
+    #
+    thisTransaction.transaction_in = jsonpickle.decode(thisTransaction.incoming_string)
+    return 0
 
 def marco(requestedEntity):
   theEntity = importEntity(requestedEntity)
@@ -85,12 +63,32 @@ def marco(requestedEntity):
   else:
     return "The entity you seek is not responding properly."
 
+def getTypesFromList(theList):
+    typesInList=[]
+    for i in range(len(theList)):
+        thekeys=list(theList[i].keys())
+        thevalues=list(theList[i].values())
+        for j in range(len(thevalues)):
+            #print("Checking if there is a type")
+            if not 'type' in thevalues[j].keys():
+                #print("there is no type.  If there is a type, it might be")
+                #print(thekeys[j])
+                typesInList.append(thekeys[j])
+            else:
+                #print("there is a type and it is:")
+                #print(thevalues[j]['type'])
+                typesInList.append(thevalues[j]['type'])
+    #print("printing the typesInList:")
+    #print(typesInList)
+    return typesInList
+
+
+## TODO make this more generic
 def listEntities(requestedEntity='Delegator'):
   return list(entities.entityFunction.keys())
 
+
 def returnHelp(requestedEntity,requestedHelp):
-  ## have something figure out the help that's wanted...
-  ## print("The requestedHelp is >>>" +requestedHelp + "<<< and the entity is >>>" + requestedEntity + "<<<")
   theEntity = importEntity(requestedEntity)
   theHelp = entities.helpDict[requestedHelp]
   if theHelp == 'schemaLocation':
@@ -105,17 +103,12 @@ def returnHelp(requestedEntity,requestedHelp):
     return "Something went wrong getting the requestedHelp from " + requestedEntity
   return thisHelp
 
-commonServices = {
-        'Marco' : marco,
-        'ListEntities' : listEntities,
-        'ReturnHelp' : returnHelp,
-        'ReturnUsage' : returnHelp,
-        'ReturnVerboseHelp' : returnHelp,
-        'ReturnSchema' : returnHelp
-        }
 
 def main():
   import importlib, os, sys
+  from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
+  from pydantic import BaseModel, Schema
+  from pydantic.schema import schema
   if importlib.util.find_spec("gemsModules") is None:
     this_dir, this_filename = os.path.split(__file__)
     sys.path.append(this_dir + "/../")
@@ -130,23 +123,10 @@ def main():
 
   with open(sys.argv[1], 'r') as file:
     data = file.read().replace('\n', '')
-  commonServicer(data)
- 
+    # Make a new Transaction object for holding I/O information.
+    thisTransaction=Transaction(data)
+    parseInput(thisTransaction)
 
-  print("""
-The Entities are:
-  """)
-  print(listEntities())
-  print("")
-
-  if len(sys.argv) == 2:
-    print("The available help options for  >>>" + sys.argv[1] + "<<<  are:")
-    for i in entities.helpDict.keys():
-      print("======================== " + i + " =====================================")
-      print(returnHelp(sys.argv[1],i))
-      print("=============================================================")
-    print("Here is the result of Marco:")
-    print(marco(sys.argv[1]))
 
 if __name__ == "__main__":
   main() 
