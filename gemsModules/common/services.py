@@ -24,9 +24,13 @@ def parseInput(thisTransaction):
     import jsonpickle
     io=StringIO()
 
+    print("~~~\nparseInput() was called.")
+    print("thisTransaction.incoming_string: " + thisTransaction.incoming_string)
+
     # Load the JSON string into the incoming dictionary
     #
     thisTransaction.request_dict = json.loads(thisTransaction.incoming_string)
+    print("thisTransaction.request_dict: " + str(thisTransaction.request_dict))
 
     # Check to see if there are errors.  If there are, bail, but give a reason
     #
@@ -54,6 +58,7 @@ def parseInput(thisTransaction):
     # If still here, load the data into a Transaction object and return success
     #
     thisTransaction.transaction_in = jsonpickle.decode(thisTransaction.incoming_string)
+    print("thisTransaction.transaction_in: " + str(thisTransaction.transaction_in))
     return 0
 
 def marco(requestedEntity):
@@ -85,7 +90,9 @@ def getTypesFromList(theList):
 
 ## TODO make this more generic
 def listEntities(requestedEntity='Delegator'):
-  return list(entities.entityFunction.keys())
+  print("~~~\nlistEntities() was called.")
+  print("entityModules: " + str(entityModules))
+  return list(entityModules.keys())
 
 
 def returnHelp(requestedEntity,requestedHelp):

@@ -9,6 +9,7 @@ ServiceModule = {
         'delegate' : 'delegate'
         }
 
+
 def main():
     print("Ths script only contains dictionary-type information.")
 

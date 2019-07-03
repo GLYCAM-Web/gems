@@ -5,6 +5,8 @@ from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
 
 def delegate(jsonObjectString):
+    print("~~~\ndelegate was called.")
+    #print("jsonObjectString: \n" + jsonObjectString)
     """
     Call other modules based on the contents of jsonObjectString.
 
@@ -45,10 +47,13 @@ def delegate(jsonObjectString):
         print("there was no entity to call.  bailing")
         sys.exit(1)
     elif not 'services' in thisTransaction.request_dict['entity'].keys():
+        print("could not find services in thisTransaction.request_dict['entity'].keys()")
+        print("keys: " + str(thisTransaction.request_dict['entity'].keys))
+        print("There were no services listed for the intity, doing the default.")
         #print("calling default")
         theEntity.entity.doDefaultService(thisTransaction)
     else:
-        #print("calling receive")
+        print("Calling receive for this entity: " + str(theEntity.entity))
         #print(theEntity.entity.receive)
         theEntity.entity.receive(thisTransaction)
 
@@ -77,7 +82,28 @@ def doDefaultService(thisTransaction):
 
 def receive(thisTransaction):
     print("Delegator received it")
-    doDefaultService(thisTransaction)
+    print("request_dict: " + str(thisTransaction.request_dict))
+    
+    if 'services' not in thisTransaction.request_dict['entity'].keys():
+        doDefaultService(thisTransaction)
+    else:
+        requestedServices = thisTransaction.request_dict['entity']['services']
+        print("len(requestedServices): " + str(len(requestedServices)))
+        for element in requestedServices:
+            print("element.keys(): " + str(element.keys()))
+            if 'listEntities' in element.keys():
+                entities = listEntities("Delegator")
+                print("entities: " + str(entities))
+                if thisTransaction.response_dict is None:
+                    thisTransaction.response_dict={}
+                thisTransaction.response_dict['entity']={}
+                thisTransaction.response_dict['entity']['type']='Delegator'
+                thisTransaction.response_dict['responses'] = []
+                thisTransaction.response_dict['responses'].append({'entities' : entities})
+                thisTransaction.build_outgoing_string()
+               
+
+    
 
 def main():
   import importlib.util, os, sys
