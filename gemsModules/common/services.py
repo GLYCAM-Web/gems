@@ -8,6 +8,11 @@ from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 from pydantic import BaseModel, Schema
 from pydantic.schema import schema
 
+
+"""
+TODO: Update this method to receive actual module name, not its key.
+Also update methods that call common/services.py importEntity() to reflect this change.
+"""
 def importEntity(requestedEntity):
   import gemsModules
   requestedModule='.'+entityModules[requestedEntity]
