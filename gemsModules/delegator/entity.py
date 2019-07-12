@@ -7,6 +7,7 @@ from gemsModules.common.transaction import * # might need whole file...
 def delegate(jsonObjectString):
     print("~~~\ndelegate was called.")
     #print("jsonObjectString: \n" + jsonObjectString)
+
     """
     Call other modules based on the contents of jsonObjectString.
 
@@ -30,36 +31,41 @@ def delegate(jsonObjectString):
         thisTransaction.build_outgoing_string()
         return thisTransaction.outgoing_string
 
-    ###
-    ###  TODO:  This is going to need recursion down to the 
-    ###  lowest-level Entities at the top level.  Not doing that yet.
-    ###  And, not that the models in transaction.py can handle it either.
-    ###
-    ###  Entities referenced within Services will need this, too, so
-    ###  this should probably be a module in common.services.
-    ###
+    """
+      TODO:  This is going to need recursion down to the 
+      lowest-level Entities at the top level.  Not doing that yet.
+      And, not that the models in transaction.py can handle it either.
+    
+      Entities referenced within Services will need this, too, so
+      this should probably be a module in common.services.
+    """
     # See if it is possible to load a module for the requested Entity
     theEntity = importEntity(thisTransaction.request_dict['entity']['type'])
     #print(thisTransaction.request_dict['entity']['type'])
     #print(theEntity)
+
     if theEntity is None:
         #thisTransaction.build-general-error-output()
         print("there was no entity to call.  bailing")
         sys.exit(1)
     elif not 'services' in thisTransaction.request_dict['entity'].keys():
+        """If no service is requested in the json object, do the default service."""
         print("could not find services in thisTransaction.request_dict['entity'].keys()")
         print("keys: " + str(thisTransaction.request_dict['entity'].keys))
         print("There were no services listed for the intity, doing the default.")
         #print("calling default")
         theEntity.entity.doDefaultService(thisTransaction)
     else:
+        """This is where specific requested services are called."""
         print("Calling receive for this entity: " + str(theEntity.entity))
         #print(theEntity.entity.receive)
         theEntity.entity.receive(thisTransaction)
 
-    # Check to see if an outgoing string got built.  If not, try to
-    # build one.  If that still doesn't work, make the string be a
-    # generic error output JSON object. 
+    """
+    Check to see if an outgoing string got built.  If not, try to
+    build one.  If that still doesn't work, make the string be a
+    generic error output JSON object. 
+    """
     if thisTransaction.outgoing_string is None:
         thisTransaction.build_outgoing_string()
     if thisTransaction.outgoing_string is None:
