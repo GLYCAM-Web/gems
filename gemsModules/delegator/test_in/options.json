@@ -1,0 +1,9 @@
+{
+ "entity" : {
+    "type": "Delegator"
+  },
+  "options" : { 
+	  "onError" : "abort",
+	  "jsonObjectOutputFormat": "Pretty"
+  }
+}

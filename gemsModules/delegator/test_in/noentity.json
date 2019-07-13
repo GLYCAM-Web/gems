@@ -1,0 +1,9 @@
+{
+ "services" : [
+    { "type" : "Marco" },
+    { "type" : "ListEntities" },
+    { "type" : "ReturnUsage" }
+  ],
+  "options" : [ "onError : abort" ]
+  
+}

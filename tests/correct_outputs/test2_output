@@ -14,17 +14,14 @@ Linking atoms, where relevant, are identified by:
         Residue Number
         Atom Name
 
-10 saccharide molecule(s) were detected:
+7 saccharide molecule(s) were detected:
     3
     Oligo IUPAC Name:       DManpa1-6DManpa1-6DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-ASN
-    Oligo author IUPAC Name:1-61-61-41-41-ASN
-    DManpa1-6DManpa1-6DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-ASN
+    Oligo Name:             DManpa1-6DManpa1-6DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-ASN
     Oligo IUPAC Name:       DManpa1-6DManpx1-
-    Oligo author IUPAC Name:1-61-
-    DManpa1-6DManpx1-Unknown
+    Oligo Name:             DManpa1-6DManpx1-Unknown
     Oligo IUPAC Name:       DManpx1-
-    Oligo author IUPAC Name:1-
-    DManpx1-Unknown
+    Oligo Name:             DManpx1-Unknown
 
 ===========================================
 3.  Saccharide residues detected

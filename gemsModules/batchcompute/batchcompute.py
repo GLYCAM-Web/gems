@@ -1,22 +1,10 @@
-#!/usr/bin/python3
+#!/usr/bin/python3.4
 
 import sys
 import os
 import subprocess
 
-class GemsTask(object):
-
-  def __init__(self, jsonObject):
-    self.__dict__ = json.loads(jsonObject)
-
-  def assign
-
-def delegate_task(jsonObject):
-  
-  file=sys.stdout 
-
-def delegate_task(jsonObject,logPath=sys.stdout):
-
+def batch_compute (web_id, workdir):
 
   #Create global log file
   log_file_name = '/global.log'   ## FIXME
@@ -56,7 +44,7 @@ def delegate_task(jsonObject,logPath=sys.stdout):
   print("past write")   ## FIXME
 
 
-if if (__name__ == '__main__'):
+if (__name__ == '__main__'):
   import sys
   if len(sys.argv) != 3:
       print('Must supply exactly 2 arguments: batch_compute.py web_id work_dir')
