@@ -10,6 +10,7 @@ These should not include the Common Services.
 
 ServiceModule = {
         'delegate' : 'delegate'
+        'ListEntities' : 'listEntities',
         }
 
 """
