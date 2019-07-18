@@ -11,7 +11,10 @@ WhoIAm='CommonServicer'
 
 ## Module names for entities that this entity/module knows.
 entityModules = {
+        'Conjugate' : 'conjugate',
         'Delegator' : 'delegator',
+        'Query' : 'query',
+        'Sequence' : 'sequence',
         }
 ## Module names for services that this entity/module can perform.
 serviceModules = {

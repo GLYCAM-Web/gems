@@ -40,14 +40,16 @@ def delegate(jsonObjectString):
       this should probably be a module in common.services.
     """
     # See if it is possible to load a module for the requested Entity
-    theEntity = importEntity(thisTransaction.request_dict['entity']['type'])
+    entityType = thisTransaction.request_dict['entity']['type']
+    print("entityType: " + entityType)
+    theEntity = importEntity(entityType)
     #print(thisTransaction.request_dict['entity']['type'])
     #print(theEntity)
 
     if theEntity is None:
         #thisTransaction.build-general-error-output()
         print("there was no entity to call.  bailing")
-        sys.exit(1)
+        appendCommonParserNotice(thisTransaction,'NoEntityDefined')
     elif not 'services' in thisTransaction.request_dict['entity'].keys():
         """If no service is requested in the json object, do the default service."""
         print("could not find services in thisTransaction.request_dict['entity'].keys()")
