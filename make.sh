@@ -182,11 +182,6 @@ printf "\nTARGET_MAKE_FILE: $TARGET_MAKE_FILE, CLEAN: $CLEAN, WRAP_GMML: $WRAP_G
 #########                  COMPILE GMML                #########
 ################################################################
 
-#If wrapping later, check if PYTHON_HOME is set before compiling GMML
-if [[ "$WRAP_GMML" != "no_wrap" ]]; then
-    check_pythonhome
-fi
-
 cd gmml/
  # Always create a new gmml.pro and makefile
  ## This is going to be broken up to variables instead of being this long command. Just wanted to get a working version pushed up.
@@ -208,6 +203,8 @@ cd ../
 ################################################################
 
 if [[ "$WRAP_GMML" != "no_wrap" ]]; then
+
+    check_pythonhome
 
     if [[ -f "gmml.i" ]]; then
         echo "Wrapping gmml library in python ..."
