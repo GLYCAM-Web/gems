@@ -210,7 +210,7 @@ if [[ "$WRAP_GMML" != "no_wrap" ]]; then
         echo "Wrapping gmml library in python ..."
         swig -c++ -python gmml.i
     elif [[ -z "gmml.i" ]]; then
-        echo "Interface file for swig does not exist"
+        echo "Warning:  Interface file for swig does not exist."
     fi
 
     PYTHON_FILE="$PYTHON_HOME/Python.h"
@@ -219,17 +219,16 @@ if [[ "$WRAP_GMML" != "no_wrap" ]]; then
             echo "Compiling wrapped gmml library in python ..."
             g++ -std=c++11 -O3 -fPIC -c gmml_wrap.cxx -I"$PYTHON_HOME"
         else
-            echo "gmml_wrap.cxx does not exist"
+            echo "Warning:  gmml_wrap.cxx does not exist."
         fi
     else
-        echo "$PYTHON_FILE not found !"
+        echo "Warning:  $PYTHON_FILE not found !"
     fi
 
     if [[ -f "gmml_wrap.o" ]]; then
         echo "Building python interface ..."
         g++ -std=c++11 -shared gmml/build/*.o gmml_wrap.o -o _gmml.so
     elif [[ -z "gmml_wrap.o" ]]; then
-        echo "gmml has not been compiled correctly"
+        echo "Warning:  gmml python interface has not been compiled correctly."
     fi
-
 fi
