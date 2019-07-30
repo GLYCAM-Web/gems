@@ -158,15 +158,15 @@ DEBUG=""
 ################################################################
 i=1
 while [ ${i} -le $# ]; do
-  argument="${!i}"
-  if [ "$argument" = "clean" ]||[ "$argument" = "no_clean" ];then
-    CLEAN="${!i}"
-  elif [ "$argument" = "wrap" ]||[ "$argument" = "no_wrap" ];then
-    WRAP_GMML="${!i}"
-  elif [ "$argument" = "debug" ];then
-    DEBUG="-g"
-  fi
-  i=$[$i+1]
+    argument="${!i}"
+    if [ "$argument" = "clean" ]||[ "$argument" = "no_clean" ];then
+        CLEAN="${!i}"
+    elif [ "$argument" = "wrap" ]||[ "$argument" = "no_wrap" ];then
+        WRAP_GMML="${!i}"
+    elif [ "$argument" = "debug" ];then
+        DEBUG="-g"
+    fi
+    i=$[$i+1]
 done
 
 # if [[ $# -eq 1 ]]; then
