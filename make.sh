@@ -6,8 +6,9 @@
 
 check_pythonhome() {
     if [ -z "$PYTHON_HOME" ]; then
-        printf "PYTHON_HOME is not set.\n"
-        printf "Set PYTHON_HOME to the location of Python.h for a python 3 installation,\n"
+        printf "\nError:  PYTHON_HOME is not set.\n"
+        printf "Set PYTHON_HOME to the location of Python.h for a python 3 installation.\n"
+        printf "Searching for locations of Python.h:\n"
         if locate_test="$(type -p "locate")" || [ -z "locate" ]; then
             num_Pythons=`locate -ce Python.h`
             if [[ $num_Pythons -gt 0 ]]; then
@@ -25,7 +26,7 @@ check_pythonhome() {
         exit 1
     elif [ ! -d $PYTHON_HOME ]; then
         guess=`dirname $PYTHON_HOME`
-        printf "PYTHON_HOME is not set to a directory.\n"
+        printf "\nError:  PYTHON_HOME is not set to a directory.\n"
         printf "It is currently %s\n" $PYTHON_HOME
         printf "Perhaps try     %s\n" $guess
         echo "Exiting."
@@ -37,10 +38,10 @@ get_numprocs() {
    if [ -z "$GEMSMAKEPROCS" ]; then
 	   NMP=4
    elif ! [[ $GEMSMAKEPROCS =~ ^[0-9]+$ ]] ; then
-	   echo "GEMSMAKEPROCS is not a valid integer; setting to 4"
+	   echo "Warning:  GEMSMAKEPROCS is not a valid integer; setting to 4"
 	   NMP=4
    elif [ "$GEMSMAKEPROCS" -eq "0" ] ; then
-	   echo "GEMSMAKEPROCS cannot be zero; setting to 4"
+	   echo "Warning:  GEMSMAKEPROCS cannot be zero; setting to 4"
 	   NMP=4
    else
 	   NMP=$GEMSMAKEPROCS
@@ -50,12 +51,12 @@ get_numprocs() {
 check_gemshome() {
    if [ -z "$GEMSHOME" ]; then
       echo ""
-      echo "Your GEMSHOME environment variable is not set! It should be set to"
+      echo "Error:  GEMSHOME environment variable is not set! It should be set to"
       echo "$1"
       exit 1
    elif [ ! -d $GEMSHOME ]; then
       echo ""
-      echo "Your GEMSHOME environment variable is set to $GEMSHOME -- this does"
+      echo "Error:  GEMSHOME environment variable is set to $GEMSHOME -- this does"
       echo "not appear to be a directory. It should be set to"
       echo "$1"
       exit 1
@@ -63,8 +64,9 @@ check_gemshome() {
       #try checking the inode incase there is a problem with symlinks
        if [ `stat -c "%i" $GEMSHOME` != `stat -c "%i" ${1}` ]; then
            echo ""
-           echo "ERROR: GEMSHOME is expected to be $1 but it is currently"
-           echo "$GEMSHOME    This will cause problems!"
+           echo "Error:  GEMSHOME is expected to be $1 but it is currently"
+           echo "$GEMSHOME"
+           echo "        This will cause problems!"
            exit 1
        fi
    fi
@@ -73,7 +75,7 @@ check_gemshome() {
 check_gmmldir() {
     if [ ! -d "$1" ]; then
         echo ""
-        echo "Your gmml directory does not exist. If your GEMSHOME is set correctly,"
+        echo "Error:  gmml directory does not exist. If your GEMSHOME is set correctly,"
         echo "it should be here: $GEMSHOME/gmml"
         exit 1
     fi
