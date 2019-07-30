@@ -223,7 +223,7 @@ if [[ "$WRAP_GMML" != "no_wrap" ]]; then
             echo "gmml_wrap.cxx does not exist"
         fi
     else
-        echo "PYTHON_HOME variable has not been set"
+        echo "$PYTHON_FILE not found !"
     fi
 
     if [[ -f "gmml_wrap.o" ]]; then
