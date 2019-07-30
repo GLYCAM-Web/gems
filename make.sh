@@ -148,10 +148,10 @@ fi
 ################################################################
 
 #Changing the following options are for developers.
-TARGET_MAKE_FILE="Makefile"
 CLEAN="no_clean"
+DEBUG="no_debug"
+TARGET_MAKE_FILE="Makefile"
 WRAP_GMML="wrap"
-DEBUG=""
 
 ################################################################
 #########               COMMAND LINE INPUTS            #########
@@ -163,8 +163,8 @@ while [ ${i} -le $# ]; do
         CLEAN="${!i}"
     elif [ "$argument" = "wrap" ]||[ "$argument" = "no_wrap" ];then
         WRAP_GMML="${!i}"
-    elif [ "$argument" = "debug" ];then
-        DEBUG="-g"
+    elif [ "$argument" = "debug" ]||[ "$argument" = "no_debug" ];then
+        DEBUG="${!i}"
     fi
     i=$[$i+1]
 done
@@ -177,13 +177,14 @@ done
 # fi
 
 printf "\nTARGET_MAKE_FILE: $TARGET_MAKE_FILE, CLEAN: $CLEAN, WRAP_GMML: $WRAP_GMML\n"
+printf "DEBUG: $DEBUG\n"
 
 ################################################################
 #########                  COMPILE GMML                #########
 ################################################################
 
 cd gmml/
-./make.sh $CLEAN
+./make.sh $CLEAN $DEBUG
 cd ../
 
 ################################################################
