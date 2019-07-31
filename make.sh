@@ -85,6 +85,8 @@ check_gmmldir() {
 #########                CHECK SETTINGS                #########
 ################################################################
 
+echo "Starting installation of GEMS at `date`".
+
 gemshome=`pwd`
 check_gemshome $gemshome
 check_gmmldir $GEMSHOME/gmml
@@ -221,3 +223,8 @@ if [[ "$WRAP_GMML" != "no_wrap" ]]; then
         echo "Warning:  gmml python interface has not been compiled correctly."
     fi
 fi
+
+echo ""
+echo "GEMS compilation is finished at `date`".
+exit
+
