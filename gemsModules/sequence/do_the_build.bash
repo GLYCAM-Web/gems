@@ -1,22 +1,35 @@
 #!/bin/bash
 export LD_LIBRARY_PATH=$GEMSHOME/gmml/lib
-SeqPath="$GEMSHOME/gemsModules/sequence"
+
+echo "GEMSHOME: $GEMSHOME" 
+
+SeqPath="/website/userdata/tools/cb"
+#SeqPath="$GEMSHOME/gemsModules/sequence"
+SeqModulePath="${GEMSHOME}/gemsModules/sequence"
+echo "SeqModulePath: $SeqModulePath" 
+
 OutPath="${SeqPath}/git-ignore-me_userdata"
 #uuid=$(uuidgen)
 #uuid=${uuid,,}
 #OutDir="${OutPath}/${uuid}"
 OutDir="${OutPath}/${2}"
-#echo "outdir is >>>${OutDir}<<<"
+echo "OutDIR is >>>${OutDir}<<<"
 #exit
 if [ ! -e ${OutPath} ] ; then
-	mkdir ${OutPath}
+	mkdir - p ${OutPath}
 fi
 if [ ! -e ${OutDir} ] ; then
-	mkdir ${OutDir}
+	mkdir  -p ${OutDir}
 fi
-BuildMe="${SeqPath}/buildFromSeq_Temp.exe"
-PrepFile="${SeqPath}/GLYCAM_06j-1.prep"
+
+BuildMe="${SeqModulePath}/buildFromSeq_Temp.exe"
+echo "BuildMe: ${BuildMe}"
+PrepFile="${SeqModulePath}/GLYCAM_06j-1.prep"
+echo "PrepFile: ${PrepFile}"
 OutOFF="${OutDir}/structure.off"
+echo "OutOFF: ${OutOFF}"
 OutPDB="${OutDir}/structure.pdb"
+echo "OutPDB: ${OutPDB}"
+
 
 ${BuildMe} ${PrepFile} $1 ${OutOFF} ${OutPDB}
