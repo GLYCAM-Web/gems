@@ -1,6 +1,14 @@
 #!/bin/bash
+echo "~~~Doing the build."
+
 export LD_LIBRARY_PATH=$GEMSHOME/gmml/lib
-SeqPath="$GEMSHOME/gemsModules/sequence"
+
+#Path used in development. Not in line with Django expectations.
+SequenceModulePath="$GEMSHOME/gemsModules/sequence"
+
+#This is the preferred output destination for sequence builds as expected by Django.
+SeqPath="/website/userdata/tools/cb"
+
 OutPath="${SeqPath}/git-ignore-me_userdata"
 #uuid=$(uuidgen)
 #uuid=${uuid,,}
@@ -14,9 +22,19 @@ fi
 if [ ! -e ${OutDir} ] ; then
 	mkdir ${OutDir}
 fi
-BuildMe="${SeqPath}/buildFromSeq_Temp.exe"
-PrepFile="${SeqPath}/GLYCAM_06j-1.prep"
+
+BuildMe="${SequenceModulePath}/buildFromSeq_Temp.exe"
+PrepFile="${SequenceModulePath}/GLYCAM_06j-1.prep"
 OutOFF="${OutDir}/structure.off"
 OutPDB="${OutDir}/structure.pdb"
 
+echo "SequenceModulePath: ${SequenceModulePath}"
+echo "BuildMe: ${BuildMe}"
+echo "PrepFile: ${PrepFile}"
+echo "OutOFF: ${OutOFF}"
+echo "OutPDB: ${OutPDB}"
+echo "The command: ${BuildMe} ${PrepFile} $1 ${OutOFF} ${OutPDB}"
+
 ${BuildMe} ${PrepFile} $1 ${OutOFF} ${OutPDB}
+
+echo "~~~Finished doing the build."
