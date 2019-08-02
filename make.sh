@@ -226,7 +226,7 @@ if [[ "$WRAP_GMML" != "no_wrap" ]]; then
     if [[ -f "gmml_wrap.o" ]]; then
         echo "Building python interface ..."
         g++ -std=c++11 -shared gmml/build/*.o gmml_wrap.o -o _gmml.so
-    elif [[ -z "gmml_wrap.o" ]]; then
+    else
         echo "Warning:  gmml python interface has not been compiled correctly."
     fi
 fi
