@@ -206,18 +206,20 @@ if [[ "$WRAP_GMML" != "no_wrap" ]]; then
     fi
 
     echo ""
-    if [ -z "$PYTHON_HEADER" ]; then
-        PYTHON_HEADER="$PYTHON_HOME/Python.h"
+    # In some cases Python.h does not live in PYTHON_HOME; allow user control.
+    if [ -z "$PYTHON_HEADER_HOME" ]; then
+        PYTHON_HEADER_HOME="$PYTHON_HOME"
     fi
-    if [ -f $PYTHON_HEADER ]; then
+    PYTHON_FILE="$PYTHON_HEADER_HOME/Python.h"
+    if [ -f $PYTHON_FILE ]; then
         if [ -f "gmml_wrap.cxx" ]; then
             echo "Compiling wrapped gmml library in python ..."
-            g++ -std=c++11 -O3 -fPIC -c gmml_wrap.cxx -I"$PYTHON_HOME"
+            g++ -std=c++11 -O3 -fPIC -c gmml_wrap.cxx -I"$PYTHON_HEADER_HOME"
         else
             echo "Warning:  gmml_wrap.cxx does not exist."
         fi
     else
-        echo "Warning:  $PYTHON_HEADER not found !"
+        echo "Warning:  $PYTHON_FILE not found !"
     fi
 
     echo ""
