@@ -178,8 +178,12 @@ done
 #     WRAP_GMML="$2"
 # fi
 
-printf "\nTARGET_MAKE_FILE: $TARGET_MAKE_FILE, CLEAN: $CLEAN, WRAP_GMML: $WRAP_GMML\n"
+printf "\nBuilding with these settings:\n"
+printf "GEMSHOME: $GEMSHOME\n"
+printf "TARGET_MAKE_FILE: $TARGET_MAKE_FILE\n"
+printf "CLEAN: $CLEAN\n"
 printf "DEBUG: $DEBUG\n"
+printf "WRAP_GMML: $WRAP_GMML\n\n"
 
 ################################################################
 #########                  COMPILE GMML                #########
