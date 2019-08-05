@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+"""
+Use this file to test running the delegator from a python script.
+"""
+
 import importlib.util, os, sys
 if importlib.util.find_spec("gemsModules") is None:
   this_dir, this_filename = os.path.split(__file__)
