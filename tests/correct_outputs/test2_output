@@ -1,3 +1,20 @@
+File written by GEMS/GMML PDB glycan detection package.
+
+Contents:
+    1.  Analysis parameters
+    2.  Saccharide molecules detected
+    3.  Saccharide residues detected
+    4.  Error and warning messages
+
+===========================================
+1.  Analysis parameters
+===========================================
+
+Analysis completed on: 2019-08-05 16:53:51
+The command line was:  ./bin/PDBSugarID /home/dwm19550/GLYCAM_Dev_Env/V_2/Web_Programs/gems/tests/inputs/1NXC.pdb /home/dwm19550/GLYCAM_Dev_Env/V_2/Web_Programs/gems/tests/test2_output
+The md5sum for the analyzed file was: 33b5a595943e6fb22d252356405e6856
+
+
 ===========================================
 2.  Saccharide molecules detected
 ===========================================
@@ -43,8 +60,8 @@ Ring oxygens are identified by:
 8 saccharide residue(s) were detected:
 
 Residue Identity               Name  Serial ResName Chain ResSer InsCode AltLoc
-N-acetyl-b-D-glucopyranose     O5      3706 NAG     A          1 n/a     n/a   
-N-acetyl-b-D-glucopyranose     O5      3720 NAG     A          2 n/a     n/a   
+N-acetyl-b-D-glucosamine       O5      3706 NAG     A          1 n/a     n/a   
+N-acetyl-b-D-glucosamine       O5      3720 NAG     A          2 n/a     n/a   
 b-D-mannopyranose              O5      3732 BMA     A          3 n/a     n/a   
 a-D-mannopyranose              O5      3743 MAN     A          4 n/a     n/a   
 a-D-mannopyranose              O5      3754 MAN     A          6 n/a     n/a   
