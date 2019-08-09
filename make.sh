@@ -61,7 +61,7 @@ check_gemshome() {
         echo "$1"
         exit 1
     elif [ ! "$GEMSHOME" = "$1" -a ! "$GEMSHOME" = "${1}/" ]; then
-        #try checking the inode incase there is a problem with symlinks
+        #try checking the inode in case there is a problem with symlinks
         if [ `stat -c "%i" $GEMSHOME` != `stat -c "%i" ${1}` ]; then
             echo ""
             echo "Error:  GEMSHOME is expected to be $1 but it is currently"
@@ -116,7 +116,7 @@ cp -r $GEMSHOME/.hooks/* $GEMSHOME/.git/hooks/
 # Write directories into config.h
 #printf "# Gems configuration file, created with: %s\n\n" $command > config.h
 #printf "###############################################################################\n\n" >> config.h
-#printf "# (1) Location of the installtion\n\n" >> config.h
+#printf "# (1) Location of the installation\n\n" >> config.h
 
 #printf "BASEDIR=%s\n" $GEMSHOME >> config.h
 #printf "BINDIR=%s/bin\n" $GEMSHOME >> config.h
@@ -133,13 +133,20 @@ cp -r $GEMSHOME/.hooks/* $GEMSHOME/.git/hooks/
 
 if [[ "$1" == "-help" ]] || [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]]; then
     printf "*************************************************************\n"
-    printf "Usage: $0 clean_gmml? wrap_gmml?\n"
+    printf "Usage: $0 clean_gmml? debug_gmml wrap_gmml?\n"
     printf "Example: $0 clean no_wrap\n"
     printf "Default: $0 no_clean wrap\n"
     printf "*************************************************************\n"
     printf "If selected the options do this:\n"
-    printf "     1. Cleans gmml before making\n"
-    printf "     2. Wrap up via swig (wrapping required only for Gems)\n"
+    printf "     1. Cleans gmml before making.\n"
+    printf "     2. Build gmml with debugging options.\n"
+    printf "     3. Wrap up via swig (wrapping required only for GEMS).\n"
+    printf "*************************************************************\n"
+    printf "These environment variables are also used:\n"
+    printf "GEMSHOME: The path of the top level directory of GEMS.\n"
+    printf "GEMSMAKEPROCS: The parallelism of make; optional, default is 4.\n"
+    printf "PYTHON_HOME: The path of the top level directory of Python 3.\n"
+    printf "PYTHON_HEADER_HOME: The path of Python.h; optional, default is PYTHON_HOME.\n"
     printf "*************************************************************\n"
     echo "Exiting."
     exit 1
@@ -204,8 +211,9 @@ if [[ "$WRAP_GMML" != "no_wrap" ]]; then
     echo ""
     if [[ -f "gmml.i" ]]; then
         echo "Wrapping gmml library in python ..."
+        swig -version
         swig -c++ -python gmml.i
-    elif [[ -z "gmml.i" ]]; then
+    else
         echo "Warning:  Interface file for swig does not exist."
     fi
 
@@ -216,6 +224,7 @@ if [[ "$WRAP_GMML" != "no_wrap" ]]; then
     fi
     PYTHON_FILE="$PYTHON_HEADER_HOME/Python.h"
     if [ -f $PYTHON_FILE ]; then
+        echo "Using $PYTHON_FILE header file."
         if [ -f "gmml_wrap.cxx" ]; then
             echo "Compiling wrapped gmml library in python ..."
             g++ -std=c++11 -O3 -fPIC -c gmml_wrap.cxx -I"$PYTHON_HEADER_HOME"
