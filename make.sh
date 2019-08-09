@@ -1,5 +1,29 @@
 #!/bin/bash
 
+: << '=cut'
+COMMENT - Requirements and Known Issues.
+
+# Python 3 is required.
+# These are known to work: 3.6.6 :: Anaconda custom and 3.7.3.
+
+# Python.h is required.
+# In some cases Python.h does not live in PYTHON_HOME.
+# Users can run this command to find it and set PYTHON_HEADER_HOME accordingly:
+## python3-config --cflags
+
+# Based on practice SWIG version 3 or later is recommended.
+# These are known to work: 3.0.10 and 3.0.12.
+# These are known to fail: 2.0.10.
+# SWIG Version 2.0.10 fails due to this issue:
+# https://sourceforge.net/p/swig/bugs/1331/
+# Here's part of a typical failure:
+##gmml_wrap.cxx: In function 'PyObject* _wrap_pdbmatrixn_vector_vector_erase__SWIG_0(PyObject*, PyObject*)':
+##gmml_wrap.cxx:202628:30: error: no matching function for call to 'std::vector<std::vector<PdbFileSpace::PdbMatrixNCard*>
+##>::erase(SwigValueWrapper<__gnu_cxx::__normal_iterator<std::vector<PdbFileSpace::PdbMatrixNCard*>*, std::vector<std::vector<PdbFileSpace::PdbMatrixNCard*> > > >>&)'
+##   result = (arg1)->erase(arg2);
+
+=cut
+
 ################################################################
 #########                 FUNCTIONS                    #########
 ################################################################
