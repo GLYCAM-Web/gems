@@ -54,10 +54,10 @@ _2NAc_4^3P^a^+1
 BFMP ring conformation: 	4C1		6d3(3.33869)		2d5(3.49903)		4d1(6.64317)	
 
 
-Carbon at Ring Position 2 is attached to xC-N-C=OCH3
-Stereochemistry name: b-D-glucopyranose
+Carbon at Ring Position 2 is attached to -N-C=OCH3
+Stereochemistry name: N-acetyl-b-D-glucopyranose
 Stereochemistry short name: DGlcpb
-Complete name: N-acetyl-b-D-glucopyranose
+Complete name: N-acetyl-b-D-glucosamine
 Short name: DGlcpNAcb
 SNFG Name: GlcNAc
 -------------------------------------------------------------------------------------------------------------------------------------------
@@ -79,10 +79,10 @@ _2NAc_4^3P^a^+1
 BFMP ring conformation: 	4C1		6d3(0.923873)		2d5(6.19768)		4d1(7.25127)	
 
 
-Carbon at Ring Position 2 is attached to xC-N-C=OCH3
-Stereochemistry name: b-D-glucopyranose
+Carbon at Ring Position 2 is attached to -N-C=OCH3
+Stereochemistry name: N-acetyl-b-D-glucopyranose
 Stereochemistry short name: DGlcpb
-Complete name: N-acetyl-b-D-glucopyranose
+Complete name: N-acetyl-b-D-glucosamine
 Short name: DGlcpNAcb
 SNFG Name: GlcNAc
 -------------------------------------------------------------------------------------------------------------------------------------------

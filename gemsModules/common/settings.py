@@ -19,7 +19,6 @@ entityModules = {
 ## Module names for services that this entity/module can perform.
 serviceModules = {
         'Marco' : 'marco',
-        'ListEntities' : 'listEntities',
         'ReturnHelp' : 'returnHelp',
         'ReturnUsage' : 'returnHelp',
         'ReturnVerboseHelp' : 'returnHelp',

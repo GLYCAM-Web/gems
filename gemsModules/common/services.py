@@ -8,13 +8,29 @@ from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 from pydantic import BaseModel, Schema
 from pydantic.schema import schema
 
+
+"""
+TODO: Update this method to receive actual module name, not its key.
+Also update methods that call common/services.py importEntity() to reflect this change.
+"""
 def importEntity(requestedEntity):
+  print("~~~ importEntity was called.")
   import gemsModules
-  requestedModule='.'+entityModules[requestedEntity]
+
+  print("requestedEntity: " + requestedEntity)
+  print("common entityModules: " + str(entityModules))
+
+  requestedModule = '.' + entityModules[requestedEntity]
+
+  print("requestedModule: " + requestedModule)
+  
   module_spec = importlib.util.find_spec(requestedModule,package="gemsModules")
+
   if module_spec is None: 
     print("The module spec returned None for rquestedEntity: " + requestedEntity)
     return None
+
+  print("module_spec: " + str(module_spec))
   return importlib.import_module(requestedModule,package="gemsModules")
 
 def parseInput(thisTransaction):
@@ -24,9 +40,13 @@ def parseInput(thisTransaction):
     import jsonpickle
     io=StringIO()
 
+    print("~~~\nparseInput() was called.")
+    print("thisTransaction.incoming_string: " + thisTransaction.incoming_string)
+
     # Load the JSON string into the incoming dictionary
     #
     thisTransaction.request_dict = json.loads(thisTransaction.incoming_string)
+    print("thisTransaction.request_dict: " + str(thisTransaction.request_dict))
 
     # Check to see if there are errors.  If there are, bail, but give a reason
     #
@@ -35,7 +55,7 @@ def parseInput(thisTransaction):
     ## point, the response will usually be the zeroth one.
     ## A construction maybe like:  if ('X','Y') in this.big.object.items():
     if thisTransaction.request_dict is None:
-        appendCommonParserNotice(thisTransaction,'JsonParseEror')
+        appendCommonParserNotice(thisTransaction,'JsonParseError')
         return thisTransaction.response_dict['entity']['responses'][0]['notices']['code']
     try:
         TransactionSchema(**thisTransaction.request_dict)
@@ -54,6 +74,7 @@ def parseInput(thisTransaction):
     # If still here, load the data into a Transaction object and return success
     #
     thisTransaction.transaction_in = jsonpickle.decode(thisTransaction.incoming_string)
+    print("thisTransaction.transaction_in: " + str(thisTransaction.transaction_in))
     return 0
 
 def marco(requestedEntity):
@@ -85,7 +106,9 @@ def getTypesFromList(theList):
 
 ## TODO make this more generic
 def listEntities(requestedEntity='Delegator'):
-  return list(entities.entityFunction.keys())
+  print("~~~\nlistEntities() was called.")
+  print("entityModules: " + str(entityModules))
+  return list(entityModules.keys())
 
 
 def returnHelp(requestedEntity,requestedHelp):

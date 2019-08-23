@@ -294,6 +294,7 @@ class Transaction:
         self.transaction_out : TransactionSchema = None
         self.response_dict : {} = None
         self.outgoing_string : str = None
+
     def build_outgoing_string(self):
         import json
         isPretty=False
@@ -306,6 +307,9 @@ class Transaction:
             self.outgoing_string=json.dumps(self.response_dict, indent=4)
         else:
             self.outgoing_string=json.dumps(self.response_dict)
+
+    def build_general_error_output(self):
+        print("build_general_error_output was called. Still in development.")
 
 #top_level_schema = schema([Entity, Project], title='A GemsModules Transaction')
 def generateGemsModulesSchema():
