@@ -1,6 +1,4 @@
 #!/bin/bash
-echo "~~~Doing the build."
-
 export LD_LIBRARY_PATH=$GEMSHOME/gmml/lib
 
 
@@ -24,7 +22,7 @@ if [ ! -e ${OutDir} ] ; then
 	mkdir  -p ${OutDir}
 fi
 
-BuildMe="${SequenceModulePath}/buildFromSeq_Temp.exe"
+BuildMe="${SequenceModulePath}/buildFromSequence.py"
 PrepFile="${SequenceModulePath}/GLYCAM_06j-1.prep"
 
 OutOFF="${OutDir}/structure.off"
@@ -36,6 +34,7 @@ echo "PrepFile: ${PrepFile}"
 echo "OutOFF: ${OutOFF}"
 echo "OutPDB: ${OutPDB}"
 echo "The command: ${BuildMe} ${PrepFile} $1 ${OutOFF} ${OutPDB}"
+echo "~~~Doing the build."
 
 ${BuildMe} ${PrepFile} $1 ${OutOFF} ${OutPDB}
 
