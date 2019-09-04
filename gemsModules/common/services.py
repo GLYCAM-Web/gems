@@ -18,11 +18,11 @@ def importEntity(requestedEntity):
   import gemsModules
 
   print("requestedEntity: " + requestedEntity)
-  print("common entityModules: " + str(entityModules))
+  #print("common entityModules: " + str(entityModules))
 
   requestedModule = '.' + entityModules[requestedEntity]
 
-  print("requestedModule: " + requestedModule)
+  #print("requestedModule: " + requestedModule)
   
   module_spec = importlib.util.find_spec(requestedModule,package="gemsModules")
 
@@ -46,7 +46,7 @@ def parseInput(thisTransaction):
     # Load the JSON string into the incoming dictionary
     #
     thisTransaction.request_dict = json.loads(thisTransaction.incoming_string)
-    print("thisTransaction.request_dict: " + str(thisTransaction.request_dict))
+    #print("thisTransaction.request_dict: " + str(thisTransaction.request_dict))
 
     # Check to see if there are errors.  If there are, bail, but give a reason
     #
@@ -73,8 +73,9 @@ def parseInput(thisTransaction):
 
     # If still here, load the data into a Transaction object and return success
     #
-    thisTransaction.transaction_in = jsonpickle.decode(thisTransaction.incoming_string)
+    #thisTransaction.transaction_in = jsonpickle.decode(thisTransaction.incoming_string)
     print("thisTransaction.transaction_in: " + str(thisTransaction.transaction_in))
+    print("~~~Finished parseInput()")
     return 0
 
 def marco(requestedEntity):

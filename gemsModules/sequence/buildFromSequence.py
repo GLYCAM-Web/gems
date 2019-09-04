@@ -13,35 +13,53 @@ Must set GEMSHOME environment variable
     SH:    setenv GEMSHOME /path/to/gems
 
 """)
-    sys.exit(1)
+   
 
-# check out the command line
-if len(sys.argv)<2:
-    print("""
-Usage:
 
-    detect_sugars PDB_file.pdb
-
-The output goes to standard out (your terminal window, usually).
-So, alternately:
-
-    detect_sugars PDB_file.pdb > output_file_name
-
-""")
-    sys.exit(1)
 
 # import gems/gmml stuff
 sys.path.append(GemsPath)
 import gmml
 
+def getPrepFileName():
+	print("Getting prepfile name.")
+	try:
+		prepFileName = sys.argv[5]
+		return prepFileName
+	except Exception as error:
+		print("There was a problem getting the prepfile.")
+		print("Error type: " + str(type(error)))
+		print("Error details: " + str(error))
+		return error
+
+def doTheBuild(sequence, id):
+	print("~~~ buildFromSequence.py's doTheBuild() was called.")
+	print("sequence: " + sequence)
+	print("id: " + id)
+
+
+
 def main():
+	print("~~~ buildFromSequence.py was called.")
 	thisFileName = sys.argv[0]
+
+	testVar = getPrepFileName()
+	print("testVar type: " + str(type(testVar)))
+	if(str(type(testVar)) != "str"):
+		print("There was an issue getting the prepFile.")
+		print("error: " + str(testVar))
+	else:
+		print("testVar: " + testVar)
+
 	prepFileName = sys.argv[1]
+	
 	sequence = sys.argv[2]
+	
 	outOffFileName = sys.argv[3]
+	
 	outPdbFileName = sys.argv[4]
 
-	print("thisFile: " + thisFileName)
+	#print("thisFile: " + thisFileName)
 	print("prepFile: " + prepFileName)
 	print("sequence: " + sequence)
 	print("outOff: " + outOffFileName)
