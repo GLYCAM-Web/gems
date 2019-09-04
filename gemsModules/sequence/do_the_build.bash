@@ -13,7 +13,7 @@ OutPath="${SeqPath}/git-ignore-me_userdata"
 #uuid=${uuid,,}
 #OutDir="${OutPath}/${uuid}"
 OutDir="${OutPath}/${2}"
-echo "OutDIR is >>>${OutDir}<<<"
+#echo "OutDIR is >>>${OutDir}<<<"
 #exit
 if [ ! -e ${OutPath} ] ; then
 	mkdir - p ${OutPath}
@@ -28,12 +28,12 @@ PrepFile="${SequenceModulePath}/GLYCAM_06j-1.prep"
 OutOFF="${OutDir}/structure.off"
 OutPDB="${OutDir}/structure.pdb"
 
-echo "SequenceModulePath: ${SequenceModulePath}"
-echo "BuildMe: ${BuildMe}"
-echo "PrepFile: ${PrepFile}"
-echo "OutOFF: ${OutOFF}"
-echo "OutPDB: ${OutPDB}"
-echo "The command: ${BuildMe} ${PrepFile} $1 ${OutOFF} ${OutPDB}"
+#echo "SequenceModulePath: ${SequenceModulePath}"
+#echo "BuildMe: ${BuildMe}"
+#echo "PrepFile: ${PrepFile}"
+#echo "OutOFF: ${OutOFF}"
+#echo "OutPDB: ${OutPDB}"
+#echo "The command: ${BuildMe} ${PrepFile} $1 ${OutOFF} ${OutPDB}"
 echo "~~~Doing the build."
 
 ${BuildMe} ${PrepFile} $1 ${OutOFF} ${OutPDB}

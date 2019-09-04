@@ -114,7 +114,6 @@ def receive(thisTransaction):
     
 
 def main():
-  print("hi.")
   import importlib.util, os, sys
   #from importlib import util
   if importlib.util.find_spec("gemsModules") is None:

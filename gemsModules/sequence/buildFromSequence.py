@@ -1,25 +1,8 @@
 #!/usr/bin/env python3
 import sys
 import os
-
-# check out the environment
-GemsPath = os.environ.get('GEMSHOME')
-if GemsPath == None:
-    print("""
-
-Must set GEMSHOME environment variable
-
-    BASH:  export GEMSHOME=/path/to/gems
-    SH:    setenv GEMSHOME /path/to/gems
-
-""")
-   
-
-
-
-# import gems/gmml stuff
-sys.path.append(GemsPath)
 import gmml
+
 
 def getPrepFileName():
 	print("Getting prepfile name.")

@@ -36,6 +36,7 @@ def build3DStructure(thisTransaction : Transaction, thisService : Service = None
     ## The original way. TODO: delete the subprocess call to the bash file.
     import subprocess
     subprocess.run("$GEMSHOME/gemsModules/sequence/do_the_build.bash '" + theSequence +"' " + theUUID, shell=True)
+    print("Attempting to do the build.")
     
     # try:
     #     print("Attempting to doTheBuild()")
