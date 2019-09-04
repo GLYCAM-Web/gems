@@ -6,7 +6,7 @@ import gemsModules
 #from gemsModules.sequence.entity import *
 from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
-from . import settings, buildFromSequence
+from . import settings
 
 ## TODO Write this function
 def evaluate(thisTransaction : Transaction, thisService : Service = None):
@@ -34,16 +34,16 @@ def build3DStructure(thisTransaction : Transaction, thisService : Service = None
     #print(theSequence)
 
     ## The original way. TODO: delete the subprocess call to the bash file.
-    #import subprocess
-    #subprocess.run("$GEMSHOME/gemsModules/sequence/do_the_build.bash '" + theSequence +"' " + theUUID, shell=True)
+    import subprocess
+    subprocess.run("$GEMSHOME/gemsModules/sequence/do_the_build.bash '" + theSequence +"' " + theUUID, shell=True)
     
-    try:
-        print("Attempting to doTheBuild()")
-        doTheBuild(theSequence, theUUID)
-    except Exception as error:
-        print("There was an error while attempting to doTheBuild.")
-        print("Error type: " + str(type(error)))
-        print("Error details: " + str(error))
+    # try:
+    #     print("Attempting to doTheBuild()")
+    #     doTheBuild(theSequence, theUUID)
+    # except Exception as error:
+    #     print("There was an error while attempting to doTheBuild.")
+    #     print("Error type: " + str(type(error)))
+    #     print("Error details: " + str(error))
         
 
     if thisTransaction.response_dict is None:
