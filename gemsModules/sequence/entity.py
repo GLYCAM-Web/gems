@@ -8,6 +8,7 @@ from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
 from . import settings
 
+
 ## TODO Write this function
 def evaluate(thisTransaction : Transaction, thisService : Service = None):
     # from .evaluate import *
@@ -37,14 +38,14 @@ def build3DStructure(thisTransaction : Transaction, thisService : Service = None
     import subprocess
     subprocess.run("$GEMSHOME/gemsModules/sequence/do_the_build.bash '" + theSequence +"' " + theUUID, shell=True)
     print("Attempting to do the build.")
+
+    # projectDir = "/website/userdata/tools/cb/git-ignore-me_userdata/" + str(theUUID) + "/"
+    # prepFile = "GLYCAM_06j-1.prep"
+    # offFile =  projectDir + "structure.off-test"
+    # pdbFile = projectDir + "structure.pdb=test"
+    # from . import buildFromSequence
+    # buildFromSequence.buildThis(theSequence,  prepFile, offFile, pdbFile)
     
-    # try:
-    #     print("Attempting to doTheBuild()")
-    #     doTheBuild(theSequence, theUUID)
-    # except Exception as error:
-    #     print("There was an error while attempting to doTheBuild.")
-    #     print("Error type: " + str(type(error)))
-    #     print("Error details: " + str(error))
         
 
     if thisTransaction.response_dict is None:

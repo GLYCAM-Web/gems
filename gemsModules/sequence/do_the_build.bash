@@ -2,7 +2,7 @@
 export LD_LIBRARY_PATH=$GEMSHOME/gmml/lib
 
 
-#Path used in development. Not in line with Django expectations.
+#Path to the module
 SequenceModulePath="$GEMSHOME/gemsModules/sequence"
 
 #This is the preferred output destination for sequence builds as expected by Django.
@@ -30,7 +30,7 @@ OutPDB="${OutDir}/structure.pdb"
 
 #echo "SequenceModulePath: ${SequenceModulePath}"
 #echo "BuildMe: ${BuildMe}"
-#echo "PrepFile: ${PrepFile}"
+echo "PrepFile: ${PrepFile}"
 #echo "OutOFF: ${OutOFF}"
 #echo "OutPDB: ${OutPDB}"
 #echo "The command: ${BuildMe} ${PrepFile} $1 ${OutOFF} ${OutPDB}"
