@@ -73,7 +73,7 @@ def parseInput(thisTransaction):
 
     # If still here, load the data into a Transaction object and return success
     #
-    #thisTransaction.transaction_in = jsonpickle.decode(thisTransaction.incoming_string)
+    thisTransaction.transaction_in = jsonpickle.decode(thisTransaction.incoming_string)
     print("thisTransaction.transaction_in: " + str(thisTransaction.transaction_in))
     print("~~~Finished parseInput()")
     return 0
