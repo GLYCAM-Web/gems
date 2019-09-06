@@ -40,6 +40,8 @@ def buildQueryString(thisTransaction : Transaction):
         print(theseOptions)
         print("Printing the aglycon part:")
         print(theseOptions['aglycon'])
+        if theseOptions['aglycon'] == 'None':
+            theseOptions['aglycon'] = ""
         temp = gmml.Assembly()
         theQueryString = temp.QueryOntology(
                 str(theseOptions['searchType']),
@@ -74,6 +76,7 @@ def buildQueryString(thisTransaction : Transaction):
                 str(theseOptions['output_file_type'])
                 )
     proc = subprocess.Popen(theQueryString, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    print(theQueryString)
     (out, err) = proc.communicate()
     out = str(out.decode('utf-8'))
     #variable out contains results of curl command that returns some unnecessary information about curl version at the begginging
