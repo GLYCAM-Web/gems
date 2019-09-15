@@ -5,7 +5,7 @@ from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
 
 def delegate(jsonObjectString):
-    print("~~~\ndelegate was called.")
+    print("~~~\nDelegator entity's delegate() was called.\n~~~")
     #print("jsonObjectString: \n" + jsonObjectString)
 
     """
@@ -130,7 +130,9 @@ def main():
  
   with open(sys.argv[1], 'r') as file:
     jsonObjectString = file.read().replace('\n', '')
+
   responseObjectString=delegate(jsonObjectString)
+
   print(responseObjectString)
 
 

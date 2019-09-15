@@ -6,6 +6,8 @@ THISPYTHON='python3'
 number_of_tests=5
 tests_passed=0
 
+printf "$number_of_tests tests will be run.\n"
+
 ##################### Test 1 ########################
 echo "Testing detect_sugar..."
 #Runs the script that is being tested
