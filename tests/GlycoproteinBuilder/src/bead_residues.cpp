@@ -167,7 +167,7 @@ void beads::Remove_Beads(MolecularModeling::Assembly &glycoprotein)
             Atom *atom = *it2;
             if (atom->GetName().find("fat")==1)
             {
-                residue->RemoveAtom(atom, true);
+                residue->RemoveAtom(atom);
             }
         }
     }
