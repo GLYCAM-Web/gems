@@ -579,6 +579,8 @@ std::ostream & get_cout() { return std::cout; }
 //typedef std::vector<Glycan::Oligosaccharide*> OligosaccharideVector;
 %template(oligosaccharide_vector) std::vector<Glycan::Oligosaccharide* >;
 
+//typedef std::vector<MolecularModeling::ResidueNode*> ResidueNodeVector;
+%template(residue_node_vector) std::vector<MolecularModeling::ResidueNode* >;
 
 ///Topology File///
 //typedef std::map<std::string, TopologyFileSpace::TopologyResidue*> TopologyResidueMap;
