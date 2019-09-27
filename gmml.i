@@ -142,8 +142,8 @@
 #include "gmml/includes/GeometryTopology/rotation.hpp"
 #include "gmml/includes/GeometryTopology/grid.hpp"
 #include "gmml/includes/GeometryTopology/cell.hpp"
-#include "GeometryTopology/ResidueLinkages/residue_linkage.h"
-#include "GeometryTopology/ResidueLinkages/rotatable_dihedral.h"
+#include "gmml/includes/GeometryTopology/ResidueLinkages/residue_linkage.h"
+#include "gmml/includes/GeometryTopology/ResidueLinkages/rotatable_dihedral.h"
 
 #include "gmml/includes/MolecularMetadata/GLYCAM/amberatomtypeinfo.hpp"
 #include "gmml/includes/MolecularMetadata/GLYCAM/bondlengthbytypepair.hpp"
