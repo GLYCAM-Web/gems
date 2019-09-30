@@ -39,7 +39,9 @@ ExitTypes = {
         'NoTypeForEntity':'error',
         'JsonParseEror':'error',
         'ServiceNotKnownToEntity':'error',
-        'RequestedEntityNotFindable':'error'
+        'RequestedEntityNotFindable':'error',
+        'EmptyPayload':'error',
+        'InvalidInput':'error'
         }
 ExitBlockIDs = {
         'NoEntityDefined':'Transaction',
@@ -47,7 +49,9 @@ ExitBlockIDs = {
         'NoTypeForEntity':'Entity',
         'JsonParseEror':'Transaction',
         'ServiceNotKnownToEntity':'Service',
-        'RequestedEntityNotFindable':'SystemError'
+        'RequestedEntityNotFindable':'SystemError',
+        'InvalidInputPayload':'Transaction',
+        'NoInputPayloadDefined':'Transaction'
         }
 ExitCodes = {
         'NoEntityDefined':'301',
@@ -55,7 +59,9 @@ ExitCodes = {
         'NoTypeForEntity':'303',
         'JsonParseEror':'304',
         'ServiceNotKnownToEntity':'305',
-        'RequestedEntityNotFindable':'310'
+        'RequestedEntityNotFindable':'310',
+        'EmptyPayload':'400',
+        'InvalidInput':'400'
         }
 ExitMessages = {
         'NoEntityDefined':'The JSON object does not contain an Entity.',
@@ -63,7 +69,9 @@ ExitMessages = {
         'NoTypeForEntity':'The Entity does not contain a type.',
         'JsonParseEror':'There was an unknown error parsing the JSON Object.',
         'ServiceNotKnownToEntity':'The requested Entity does not offer this Service.',
-        'RequestedEntityNotFindable':'The requested Entity is known, but does not respond.'
+        'RequestedEntityNotFindable':'The requested Entity is known, but does not respond.',
+        'EmptyPayload':'Missing or empty input payload.',
+        'InvalidInput':'error'
         }
 
 ## TODO Make this sort of thing ultimately part of transaction.py (eg Notice class).

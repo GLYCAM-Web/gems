@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import sys, os, re, importlib.util
 import gemsModules
+import gmml
+
 #from gemsModules import common
 #from gemsModules import sequence
 #from gemsModules.sequence.entity import *
@@ -8,6 +10,94 @@ from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
 from . import settings
 
+
+##Validate can potentially handle multiple sequences. Top level iterates and 
+##  updates transaction.
+def validateCondensedSequence(thisTransaction : Transaction, thisService : Service = None):
+    print("~~~ validateCondensedSequence was called.")
+    #Look in transaction for sequence
+    inputs = thisTransaction.request_dict['entity']['inputs']
+    print("Number of inputs: " + str(len(inputs)))
+    print("inputs: " + str(inputs))
+    inputCount = 1
+    
+    sequences = []
+    for input in inputs:
+        print("~~~ input# " + str(inputCount))
+        payload = input['Sequence']['payload']
+        print("payload: " + payload)
+        if payload == None:
+            print("Could not find Sequence in inputs.")
+            ##transaction, noticeBrief, blockId
+            common.settings.appendCommonParserNotice( thisTransaction, 'EmptyPayload', 'InvalidInputPayload')
+            
+        elif payload == "":
+            print("Sequence payload is an empty string. Invalid sequence.")
+            common.settings.appendCommonParserNotice( thisTransaction, 'EmptyPayload', 'InvalidInputPayload')
+
+        elif "'" in payload:
+            print("Sequence contains a single quote. Invalid sequence.")
+            common.settings.appendCommonParserNotice( thisTransaction, 'Invalidinput', 'InvalidInputPayload')
+        elif "(" in payload:
+            print("Sequence contains a parenthesis. Invalid sequence.")
+            common.settings.appendCommonParserNotice( thisTransaction,  'InvalidInput', 'InvalidInputPayload')
+        elif ")" in payload:
+            print("Sequence contains a parenthesis. Invalid sequence.")
+            common.settings.appendCommonParserNotice( thisTransaction,  'InvalidInput', 'InvalidInputPayload')
+        else:
+            print("input: " + str(input))
+            sequence = payload
+            print("sequence: " + sequence)
+            sequences.append(sequence)
+
+            #Get prep residues
+            prepResidues = gmml.condensedsequence_glycam06_residue_tree()
+            print("prepResidues: \n" + str(prepResidues))
+
+            #Create an assembly
+            assembly = gmml.Assembly()
+            print("assembly: " + str(assembly))
+
+            #Call assembly.CheckCondensed sequence sanity.
+            valid = assembly.CheckCondensedSequenceSanity(sequence, prepResidues)
+            print("validation result: " + str(valid))
+
+            ## Add valid to the transaction responses.
+            if valid:
+                if thisTransaction.response_dict is None:
+                    thisTransaction.response_dict={}
+                    thisTransaction.response_dict['entity']={}
+                if thisTransaction.response_dict['entity'] is None:
+                    thisTransaction.response_dict['entity']={}
+                if not 'responses' in thisTransaction.response_dict['entity']:
+                    thisTransaction.response_dict['entity']['responses']=[]
+
+                print("Creating a response for this sequence.")
+                thisTransaction.response_dict['entity']['responses'].append({ 
+                    "condensedSequenceValidation" : {
+                        'sequence': sequence,
+                        'valid' : valid,
+                    }
+                })
+            else:
+                thisTransaction.response_dict['responses'].append({ 
+                    common.settings.appendCommonParserNotice( thisTransaction,  'Invalidinput', 'InvalidInputPayload')
+                })
+
+        inputCount += 1
+
+    print("sequences: " + str(sequences))
+
+
+
+
+    
+
+    
+
+    
+
+    #Update transaction with results so a response string may be built.
 
 ## TODO Write this function
 def evaluate(thisTransaction : Transaction, thisService : Service = None):
@@ -97,8 +187,10 @@ def receive(thisTransaction : Transaction):
                 common.settings.appendCommonParserNotice( thisTransaction,'ServiceNotKnownToEntity',i)
             else:
                 pass
-
         ## if it is known, try to do it
+        elif i == "Validate":
+            print("Validate service requested from sequence entity.")
+            validateCondensedSequence(thisTransaction, None)
         elif i == "Evaluate":
             evaluate(thisTransaction,  None)
         elif i == 'Build3DStructure':

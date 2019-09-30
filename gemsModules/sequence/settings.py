@@ -9,6 +9,7 @@ WhoIAm='Sequence'
 
 ## Module names for services that this entity/module can perform.
 serviceModules = {
+		'Validate' : 'validate',
         'Evaluate' : 'evaluate',
         'Build3DStructure' : 'build3Dstructure'
         }
