@@ -298,6 +298,7 @@ class Transaction:
     def build_outgoing_string(self):
         import json
         isPretty=False
+
 #        ## TODO: read in whether the output should be pretty
 #        # this might work:
 #        if self.transaction_in.options is not None:

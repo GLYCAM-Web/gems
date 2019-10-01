@@ -30,20 +30,6 @@ def validateCondensedSequence(thisTransaction : Transaction, thisService : Servi
             print("Could not find Sequence in inputs.")
             ##transaction, noticeBrief, blockId
             common.settings.appendCommonParserNotice( thisTransaction, 'EmptyPayload', 'InvalidInputPayload')
-            
-        elif payload == "":
-            print("Sequence payload is an empty string. Invalid sequence.")
-            common.settings.appendCommonParserNotice( thisTransaction, 'EmptyPayload', 'InvalidInputPayload')
-
-        elif "'" in payload:
-            print("Sequence contains a single quote. Invalid sequence.")
-            common.settings.appendCommonParserNotice( thisTransaction, 'Invalidinput', 'InvalidInputPayload')
-        elif "(" in payload:
-            print("Sequence contains a parenthesis. Invalid sequence.")
-            common.settings.appendCommonParserNotice( thisTransaction,  'InvalidInput', 'InvalidInputPayload')
-        elif ")" in payload:
-            print("Sequence contains a parenthesis. Invalid sequence.")
-            common.settings.appendCommonParserNotice( thisTransaction,  'InvalidInput', 'InvalidInputPayload')
         else:
             print("input: " + str(input))
             sequence = payload
@@ -52,11 +38,9 @@ def validateCondensedSequence(thisTransaction : Transaction, thisService : Servi
 
             #Get prep residues
             prepResidues = gmml.condensedsequence_glycam06_residue_tree()
-            print("prepResidues: \n" + str(prepResidues))
 
             #Create an assembly
             assembly = gmml.Assembly()
-            print("assembly: " + str(assembly))
 
             #Call assembly.CheckCondensed sequence sanity.
             valid = assembly.CheckCondensedSequenceSanity(sequence, prepResidues)
@@ -80,13 +64,11 @@ def validateCondensedSequence(thisTransaction : Transaction, thisService : Servi
                     }
                 })
             else:
-                thisTransaction.response_dict['responses'].append({ 
-                    common.settings.appendCommonParserNotice( thisTransaction,  'Invalidinput', 'InvalidInputPayload')
-                })
+                print("~~~\nCheckCondensedSequenceSanity returned false. Creating an error response.")
+                #print("thisTransaction: "  + str(thisTransaction))
+                common.settings.appendCommonParserNotice( thisTransaction,  'InvalidInput', 'InvalidInputPayload')
 
         inputCount += 1
-
-    print("sequences: " + str(sequences))
 
 
 
