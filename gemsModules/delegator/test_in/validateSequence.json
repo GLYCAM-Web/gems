@@ -1,0 +1,33 @@
+{ 
+	"entity" : 
+	{ 
+		"type": "Sequence", 
+		"services" : 
+		[ 
+			{ "Validate" :  
+				{ "type" : "Validate" } 
+			} 
+		], 
+		"inputs" : 
+		[ 
+			{ "Sequence" : 
+				{ "payload" : "DManpa1-OH" } 
+			} ,
+			{ "Sequence" : 
+				{ "payload" : "DGalpa1-OH" } 
+			} ,
+			{ "Sequence" : 
+				{ "payload" : "DManp'a1-OH" } 
+			} ,
+			{ "Sequence" : 
+				{ "payload" : "DManp(a1-OH" } 
+			} ,
+			{ "Sequence" : 
+				{ "payload" : "DManp)a1-OH" } 
+			} ,
+			{ "Sequence" :
+				{ "payload" : "" }
+			}
+		] 
+	}
+} 

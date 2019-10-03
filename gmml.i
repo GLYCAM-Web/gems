@@ -139,12 +139,11 @@
 #include "gmml/includes/Resolver/PdbPreprocessor/pdbpreprocessoralternateresidue.hpp"
 #include "gmml/includes/Resolver/PdbPreprocessor/pdbpreprocessorresidueinfo.hpp"
 
-#include "gmml/includes/GeometryTopology/angle.hpp"
-#include "gmml/includes/GeometryTopology/dihedral.hpp"
-#include "gmml/includes/GeometryTopology/distance.hpp"
 #include "gmml/includes/GeometryTopology/rotation.hpp"
 #include "gmml/includes/GeometryTopology/grid.hpp"
 #include "gmml/includes/GeometryTopology/cell.hpp"
+#include "gmml/includes/GeometryTopology/ResidueLinkages/residue_linkage.h"
+#include "gmml/includes/GeometryTopology/ResidueLinkages/rotatable_dihedral.h"
 
 #include "gmml/includes/MolecularMetadata/GLYCAM/amberatomtypeinfo.hpp"
 #include "gmml/includes/MolecularMetadata/GLYCAM/bondlengthbytypepair.hpp"
@@ -313,10 +312,6 @@ std::ostream & get_cout() { return std::cout; }
 %include "gmml/includes/Resolver/PdbPreprocessor/pdbpreprocessorunrecognizedresidue.hpp"
 %include "gmml/includes/Resolver/PdbPreprocessor/pdbpreprocessoralternateresidue.hpp"
 %include "gmml/includes/Resolver/PdbPreprocessor/pdbpreprocessorresidueinfo.hpp"
-
-%include "gmml/includes/GeometryTopology/angle.hpp"
-%include "gmml/includes/GeometryTopology/dihedral.hpp"
-%include "gmml/includes/GeometryTopology/distance.hpp"
 
 %include "gmml/includes/MolecularMetadata/GLYCAM/amberatomtypeinfo.hpp"
 %include "gmml/includes/MolecularMetadata/GLYCAM/bondlengthbytypepair.hpp"
@@ -584,6 +579,8 @@ std::ostream & get_cout() { return std::cout; }
 //typedef std::vector<Glycan::Oligosaccharide*> OligosaccharideVector;
 %template(oligosaccharide_vector) std::vector<Glycan::Oligosaccharide* >;
 
+//typedef std::vector<MolecularModeling::ResidueNode*> ResidueNodeVector;
+%template(residue_node_vector) std::vector<MolecularModeling::ResidueNode* >;
 
 ///Topology File///
 //typedef std::map<std::string, TopologyFileSpace::TopologyResidue*> TopologyResidueMap;
