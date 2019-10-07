@@ -3,24 +3,24 @@
 ## Who I am
 WhoIAm='Delegator'
 
-""" 
+"""
 Module names for services that this entity/module can perform.
 These should not include the Common Services.
 """
 
 ServiceModule = {
-        'delegate' : 'delegate',
-        'ListEntities' : 'listEntities',
-        }
+    'delegate' : 'delegate',
+    'ListEntities' : 'listEntities',
+}
 
 """
 Module names for entities that the Delegator knows about
 """
 entityModules = {
-	'Conjugate' : 'conjugate',
-	'Common' : 'common',
-	'Query' : 'query',
-	'Sequence' : 'sequence',
+    'Conjugate' : 'conjugate',
+    'Common' : 'common',
+    'Query' : 'query',
+    'Sequence' : 'sequence',
 }
 
 
