@@ -47,4 +47,4 @@ temp = gmml.Assembly(het, gmml.PDB)
 empty = gmml.string_vector()
 temp.BuildStructureByDistance(10)
 
-temp.ExtractSugars(aminolibs)
+temp.ExtractSugars(aminolibs, False, True)
