@@ -958,7 +958,7 @@ gmmo:1nxc_oligo1_link_2 gmmo:hasChildMono """DManpb""".
 gmmo:1nxc_oligo1_link_2 gmmo:linkageIndeces """1-4""".
 gmmo:1nxc_oligo1_link_2 gmmo:hasGlycosidicPhiAngle "-85.2487"^^xsd:decimal.
 gmmo:1nxc_oligo1_link_2 gmmo:hasGlycosidicPsiAngle "102.81"^^xsd:decimal.
-gmmo:1nxc_oligo1_link_2 gmmo:hasGlycosidicOmegaAngle "-0.449311"^^xsd:decimal.
+gmmo:1nxc_oligo1_link_2 gmmo:hasGlycosidicOmegaAngle "0"^^xsd:decimal.
 gmmo:1nxc_oligo1 gmmo:hasGlycosidicLinkage gmmo:1nxc_oligo1_link_3.
 gmmo:1nxc_oligo1_link_3 rdf:type gmmo:Linkage.
 gmmo:1nxc_oligo1_link_3 gmmo:hasParent gmmo:1nxc_oligo1_res0.
