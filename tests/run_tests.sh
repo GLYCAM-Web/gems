@@ -3,7 +3,7 @@
 THISPYTHON='python3'
 
 #Manually change this number as you add tests:
-number_of_tests=5
+number_of_tests=4
 tests_passed=0
 
 printf "$number_of_tests tests will be run.\n"
@@ -12,38 +12,45 @@ printf "$number_of_tests tests will be run.\n"
 echo "Testing detect_sugar..."
 #Runs the script that is being tested
 cd $GEMSHOME #detect sugars has hardcoded path to apps/BFMP/detect_shape in GMML::Assembly.ExtractSugars.
-${THISPYTHON} ./bin/detect_sugars $GEMSHOME/tests/inputs/1NXC.pdb > $GEMSHOME/tests/test1_output
+if [ -f gmmo.ttl ]; then
+   mv gmmo.ttl gmmoBeforeTests.ttl > /dev/null 2>&1
+fi
+${THISPYTHON} ./bin/detect_sugars $GEMSHOME/tests/inputs/1NXC.pdb > /dev/null 2>&1
 cd - >> /dev/null 2>&1 #return now to reduce chance of forgetting later
-DIFF=$(diff test1_output correct_outputs/test1_output 2>&1)
+DIFF=$(diff ../gmmo.ttl correct_outputs/test1_output 2>&1)
 echo "DIFF:  >>>$DIFF<<<"
 if [ "$DIFF" != "" ]; then
-    echo "Test FAILED!"
+    echo "Test FAILED!  Please see test1gmmo.ttl in the tests directory to see what went wrong."
+    mv ../gmmo.ttl test1gmmo.ttl > /dev/null 2>&1
 else
     echo "Test passed."
     ((tests_passed++))
-    rm test1_output
     rm ../ring_conformations.txt
+    rm ../gmmo.ttl
+    if [ -f ../gmmoBeforeTests.ttl ]; then
+       mv ../gmmoBeforeTests.ttl ../gmmo.ttl > /dev/null 2>&1
+    fi
 fi
 # rm ring_conformations.txt
 
 ##################### Test 2 ########################
-echo "Testing PDBSugarID..."
-#runs the script with a functional argument
-cd $GEMSHOME
-${THISPYTHON} ./bin/PDBSugarID $GEMSHOME/tests/inputs/1NXC.pdb $GEMSHOME/tests/test2_output
-cd - >> /dev/null 2>&1
-tail -n +18 test2_output > tmp2
-DIFF=$(diff tmp2 correct_outputs/test2_output 2>&1)
-echo "DIFF:  >>>$DIFF<<<"
-if [ "$DIFF" != "" ]; then
-    echo "Test FAILED!"
-else
-    echo "Test passed."
-    ((tests_passed++))
-    rm test2_output
-    rm tmp2
-    rm ../ring_conformations.txt
-fi
+#echo "Testing PDBSugarID..."
+##runs the script with a functional argument
+#cd $GEMSHOME
+#${THISPYTHON} ./bin/PDBSugarID $GEMSHOME/tests/inputs/1NXC.pdb $GEMSHOME/tests/test2_output
+#cd - >> /dev/null 2>&1
+#tail -n +18 test2_output > tmp2
+#DIFF=$(diff tmp2 correct_outputs/test2_output 2>&1)
+#echo "DIFF:  >>>$DIFF<<<"
+#if [ "$DIFF" != "" ]; then
+#    echo "Test FAILED!"
+#else
+#    echo "Test passed."
+#    ((tests_passed++))
+#    rm test2_output
+#    rm tmp2
+#    rm ../ring_conformations.txt
+#fi
 
 ##################### Test 3 ########################
 echo "Testing test_installation.bash..."

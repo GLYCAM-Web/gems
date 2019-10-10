@@ -16,10 +16,10 @@ OutDir="${OutPath}/${2}"
 #echo "OutDIR is >>>${OutDir}<<<"
 #exit
 if [ ! -e ${OutPath} ] ; then
-	mkdir - p ${OutPath}
+    mkdir - p ${OutPath}
 fi
 if [ ! -e ${OutDir} ] ; then
-	mkdir  -p ${OutDir}
+    mkdir  -p ${OutDir}
 fi
 
 BuildMe="${SequenceModulePath}/buildFromSequence.py"
