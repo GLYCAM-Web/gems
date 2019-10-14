@@ -15,6 +15,7 @@ entityModules = {
     'Delegator' : 'delegator',
     'Query' : 'query',
     'Sequence' : 'sequence',
+    'DrawGlycan' : 'drawglycan',
 }
 
 ## Module names for services that this entity/module can perform.

@@ -21,6 +21,7 @@ entityModules = {
     'Common' : 'common',
     'Query' : 'query',
     'Sequence' : 'sequence',
+    'DrawGlycan' : 'drawglycan',
 }
 
 

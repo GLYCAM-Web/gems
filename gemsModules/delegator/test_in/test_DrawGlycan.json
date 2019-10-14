@@ -1,0 +1,18 @@
+{
+	"entity" :
+		{
+			"type": "DrawGlycan",
+			"services" :
+			[
+				{ "Draw" :
+					{ "type" : "2dSnfg" }
+				}
+			],
+			"inputs" :
+			[
+				{ "Sequence" :
+					{ "payload" : "DManpa1-OH" }
+				}
+			]
+		}
+	}
