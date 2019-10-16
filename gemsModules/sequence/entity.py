@@ -11,7 +11,7 @@ from gemsModules.common.transaction import * # might need whole file...
 from . import settings
 
 
-##Validate can potentially handle multiple sequences. Top level iterates and 
+##Validate can potentially handle multiple sequences. Top level iterates and
 ##  updates transaction.
 def validateCondensedSequence(thisTransaction : Transaction, thisService : Service = None):
     print("~~~ validateCondensedSequence was called.")
@@ -20,7 +20,7 @@ def validateCondensedSequence(thisTransaction : Transaction, thisService : Servi
     print("Number of inputs: " + str(len(inputs)))
     print("inputs: " + str(inputs))
     inputCount = 1
-    
+
     sequences = []
     for input in inputs:
         print("~~~ input# " + str(inputCount))
@@ -57,7 +57,7 @@ def validateCondensedSequence(thisTransaction : Transaction, thisService : Servi
                     thisTransaction.response_dict['entity']['responses']=[]
 
                 print("Creating a response for this sequence.")
-                thisTransaction.response_dict['entity']['responses'].append({ 
+                thisTransaction.response_dict['entity']['responses'].append({
                     "condensedSequenceValidation" : {
                         'sequence': sequence,
                         'valid' : valid,
@@ -69,17 +69,6 @@ def validateCondensedSequence(thisTransaction : Transaction, thisService : Servi
                 common.settings.appendCommonParserNotice( thisTransaction,  'InvalidInput', 'InvalidInputPayload')
 
         inputCount += 1
-
-
-
-
-    
-
-    
-
-    
-
-    #Update transaction with results so a response string may be built.
 
 ## TODO Write this function
 def evaluate(thisTransaction : Transaction, thisService : Service = None):
@@ -95,7 +84,7 @@ def build3DStructure(thisTransaction : Transaction, thisService : Service = None
 
     inputs = thisTransaction.request_dict['entity']['inputs']
     theInputs=getTypesFromList(inputs)
-    if 'Sequence' in theInputs: 
+    if 'Sequence' in theInputs:
         print("found Sequence in theInputs")
     else:
         #sequence is required. Attach an error response and return.
@@ -117,8 +106,8 @@ def build3DStructure(thisTransaction : Transaction, thisService : Service = None
     # pdbFile = projectDir + "structure.pdb=test"
     # from . import buildFromSequence
     # buildFromSequence.buildThis(theSequence,  prepFile, offFile, pdbFile)
-    
-        
+
+
 
     if thisTransaction.response_dict is None:
         thisTransaction.response_dict={}
@@ -165,7 +154,7 @@ def receive(thisTransaction : Transaction):
         #####  so, writing something ugly for now
         if i not in settings.serviceModules.keys():
             if i not in common.settings.serviceModules.keys():
-                print("The provided service is not recognized. Building and returning an error response.")
+                print("The provided service is not recognized.")
                 common.settings.appendCommonParserNotice( thisTransaction,'ServiceNotKnownToEntity',i)
             else:
                 pass
@@ -181,7 +170,7 @@ def receive(thisTransaction : Transaction):
             print("got to the else, so something is wrong")
             common.settings.appendCommonParserNotice( thisTransaction,'ServiceNotKnownToEntity',i)
     thisTransaction.build_outgoing_string()
-            
+
 
 
 # Some alternate ways to interrogate lists:
@@ -197,4 +186,4 @@ def main():
 
 if __name__ == "__main__":
   main()
- 
+
