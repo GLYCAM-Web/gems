@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys,importlib.util
 import gemsModules
-from gemsModules import common 
+from gemsModules import common
 from gemsModules.common.transaction import *
 from gemsModules.common.settings import *
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
@@ -18,15 +18,15 @@ def importEntity(requestedEntity):
   import gemsModules
 
   print("requestedEntity: " + requestedEntity)
-  #print("common entityModules: " + str(entityModules))
+  print("common entityModules: " + str(entityModules))
 
   requestedModule = '.' + entityModules[requestedEntity]
 
   #print("requestedModule: " + requestedModule)
-  
+
   module_spec = importlib.util.find_spec(requestedModule,package="gemsModules")
 
-  if module_spec is None: 
+  if module_spec is None:
     print("The module spec returned None for rquestedEntity: " + requestedEntity)
     return None
 
@@ -51,7 +51,7 @@ def parseInput(thisTransaction):
     # Check to see if there are errors.  If there are, bail, but give a reason
     #
     ## TODO:  This will break really easily.  The 'response' part needs to refer to the
-    ## response from this activity rather than the zeroth response.  That said, at this 
+    ## response from this activity rather than the zeroth response.  That said, at this
     ## point, the response will usually be the zeroth one.
     ## A construction maybe like:  if ('X','Y') in this.big.object.items():
     if thisTransaction.request_dict is None:
@@ -60,11 +60,12 @@ def parseInput(thisTransaction):
     try:
         TransactionSchema(**thisTransaction.request_dict)
     except ValidationError as e:
+        print("Validation Error occured.")
 #        print(e.json())
 #        print(e.errors())
         if 'entity' in e.errors()[0]['loc']:
             if 'type' in e.errors()[0]['loc']:
-                appendCommonParserNotice(thisTransaction,'NoTypeForEntity')
+                appendCommonParserNotice(thisTransaction,'EntityNotKnown')
             else:
                 appendCommonParserNotice(thisTransaction,'NoEntityDefined')
         theResponseTypes = getTypesFromList(thisTransaction.response_dict['entity']['responses'])
@@ -118,7 +119,7 @@ def returnHelp(requestedEntity,requestedHelp):
   if theHelp == 'schemaLocation':
     return "Here there should be a location for the schema"  ## TODO:  make this do something real
   if not hasattr(theEntity, 'helpme'):
-    return "No help available for " + requestedEntity 
+    return "No help available for " + requestedEntity
   helpLocation = getattr(theEntity, 'helpme')
   if not hasattr(helpLocation,theHelp):
     return "The requestedHelp is not available for " + requestedEntity
@@ -138,7 +139,7 @@ def main():
     sys.path.append(this_dir + "/../")
     if importlib.util.find_spec("common") is None:
       print("Something went horribly wrong.  No clue what to do.")
-      sys.exit(1)
+      return
     else:
       from common import utils
   else:
@@ -153,4 +154,4 @@ def main():
 
 
 if __name__ == "__main__":
-  main() 
+  main()

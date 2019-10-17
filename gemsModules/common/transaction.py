@@ -46,6 +46,7 @@ class EntityTypeEnum(str, Enum):
     sequence = 'Sequence'
     structureFile = 'StructureFile'
     query = 'Query'
+    drawglycan = 'DrawGlycan'
 
 class CommonServicesEnum(str,Enum):
     """
@@ -157,7 +158,7 @@ class EmbeddedResource(BaseModel):
             description='The format of the data embedded in the Payload.'
             )
     options : Tags = None
-    
+
 class ResourceDescriptor(BaseModel):
     """Metadata about the resource (where, what, etc.)."""
     descriptor: Union[EmbeddedResource,ExternalResource]
@@ -255,7 +256,7 @@ class Entity(BaseModel):
             title = 'Request ID',
             description = 'User-specified ID that will be echoed in responses.'
             )
-    ## TODO: Figure out the syntax so that it isn't necessaary 
+    ## TODO: Figure out the syntax so that it isn't necessaary
     ## to say 'service : ' or 'response: ' before each.
     services : List[Service] = None
     responses : List[Response] = None

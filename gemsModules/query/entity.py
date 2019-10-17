@@ -29,7 +29,7 @@ def main():
     sys.path.append(this_dir + "/../")
     if importlib.util.find_spec("common") is None:
       print("Something went horribly wrong.  No clue what to do.")
-      sys.exit(1)
+      return
     else:
       from common import utils
   else:
