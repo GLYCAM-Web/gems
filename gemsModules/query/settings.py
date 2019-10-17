@@ -14,7 +14,7 @@ def main():
         sys.path.append(this_dir + "/../")
         if importlib.util.find_spec("common") is None:
             print("Something went horribly wrong.  No clue what to do.")
-            sys.exit(1)
+            return
         else:
             from common import utils
     else:
@@ -25,7 +25,7 @@ def main():
 
     # If I can get the code below to work it should be a breeze to make the other queries.
 
-    
+
     # Code from gems level detect sugar test
     # import gems/gmml stuff
     sys.path.append(GemsPath)

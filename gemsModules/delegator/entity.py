@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import gemsModules
-from gemsModules import common 
+from gemsModules import common
 from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
 
@@ -15,8 +15,8 @@ def delegate(jsonObjectString):
 
     First, a new Transaction obect is made.  This object holds all the
     information about the delegated work.  To initialize it, we give it
-    the incoming JSON object, which is then interrogated by parseInput 
-    in the common.services module.  If that goes well, this function 
+    the incoming JSON object, which is then interrogated by parseInput
+    in the common.services module.  If that goes well, this function
     reads the identity of the top-level Entity and, if it can load a
     module for that entity, it passes the Transaction object over.
     """
@@ -32,10 +32,10 @@ def delegate(jsonObjectString):
         return thisTransaction.outgoing_string
 
     """
-      TODO:  This is going to need recursion down to the 
+      TODO:  This is going to need recursion down to the
       lowest-level Entities at the top level.  Not doing that yet.
       And, not that the models in transaction.py can handle it either.
-    
+
       Entities referenced within Services will need this, too, so
       this should probably be a module in common.services.
     """
@@ -66,7 +66,7 @@ def delegate(jsonObjectString):
     """
     Check to see if an outgoing string got built.  If not, try to
     build one.  If that still doesn't work, make the string be a
-    generic error output JSON object. 
+    generic error output JSON object.
     """
     if thisTransaction.outgoing_string is None:
         thisTransaction.build_outgoing_string()
@@ -91,7 +91,7 @@ def doDefaultService(thisTransaction):
 def receive(thisTransaction):
     print("Delegator received it")
     print("request_dict: " + str(thisTransaction.request_dict))
-    
+
     if 'services' not in thisTransaction.request_dict['entity'].keys():
         doDefaultService(thisTransaction)
     else:
@@ -109,9 +109,9 @@ def receive(thisTransaction):
                 thisTransaction.response_dict['responses'] = []
                 thisTransaction.response_dict['responses'].append({'entities' : entities})
                 thisTransaction.build_outgoing_string()
-               
 
-    
+
+
 
 def main():
   import importlib.util, os, sys
@@ -121,13 +121,13 @@ def main():
     sys.path.append(this_dir + "/../")
     if importlib.util.find_spec("common") is None:
       print("Something went horribly wrong.  No clue what to do.")
-      sys.exit(1)
+      return
     else:
       from common import utils
   else:
     from gemsModules.common import utils
   utils.investigate_gems_setup(sys.argv)
- 
+
   with open(sys.argv[1], 'r') as file:
     jsonObjectString = file.read().replace('\n', '')
 
@@ -138,4 +138,4 @@ def main():
 
 if __name__ == "__main__":
   main()
- 
+

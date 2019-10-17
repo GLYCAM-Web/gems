@@ -85,15 +85,19 @@ def appendCommonParserNotice(thisTransaction: Transaction,  noticeBrief: str, bl
     if thisTransaction.response_dict is None:
         thisTransaction.response_dict={}
         thisTransaction.response_dict['entity']={}
+
     if thisTransaction.response_dict['entity'] is None:
         thisTransaction.response_dict['entity']={}
+
     if not 'responses' in thisTransaction.response_dict['entity']:
         thisTransaction.response_dict['entity']['responses']=[]
+
     if blockID is None:
         if noticeBrief in ExitBlockIDs:
             blockID = ExitBlockIDs[noticeBrief]
         else:
             blockID = 'unknown'
+
     thisTransaction.response_dict['entity']['responses'].append({
             'CommonServicerNotice' : {
             'type' : ExitTypes[noticeBrief],

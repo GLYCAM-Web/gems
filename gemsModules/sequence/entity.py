@@ -66,6 +66,7 @@ def validateCondensedSequence(thisTransaction : Transaction, thisService : Servi
             else:
                 print("~~~\nCheckCondensedSequenceSanity returned false. Creating an error response.")
                 #print("thisTransaction: "  + str(thisTransaction))
+                ##appendCommonParserNotice(thisTransaction: Transaction,  noticeBrief: str, blockID: str = None)
                 common.settings.appendCommonParserNotice( thisTransaction,  'InvalidInput', 'InvalidInputPayload')
 
         inputCount += 1
