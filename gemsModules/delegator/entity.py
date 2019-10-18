@@ -131,7 +131,25 @@ def main():
   with open(sys.argv[1], 'r') as file:
     jsonObjectString = file.read().replace('\n', '')
 
-  responseObjectString=delegate(jsonObjectString)
+  try:
+    responseObjectString=delegate(jsonObjectString)
+  except Exception as error:
+    print("The delegator module captured an error.")
+    print(str(error))
+    ##TODO: see about exploring this error and returning more info. Temp solution for now.
+    responseObject = {
+        'DelegatorNotice' : {
+            'type' : 'UnknownError',
+            'notice' : {
+                'code' : '500',
+                'brief' : 'unknownError',
+                'blockID' : 'unknown',
+                'message' : 'Not sure what went wrong. Error captured by the Delegator gemsModule.'
+            }
+        }
+    }
+    responseObjectString = str(responseObject)
+
 
   print(responseObjectString)
 
