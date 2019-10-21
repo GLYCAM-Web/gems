@@ -5,7 +5,7 @@ import gmml
 
 #from gemsModules import common
 #from gemsModules import sequence
-#from gemsModules.sequence.entity import *
+#from gemsModules.sequence.receive import *
 from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
 from . import settings
@@ -79,7 +79,7 @@ def evaluate(thisTransaction : Transaction, thisService : Service = None):
     print("evaluate was called! ...But it has not been written for this module yet.")
 
 def build3DStructure(thisTransaction : Transaction, thisService : Service = None):
-    print("~~~ Sequence entity's build3Dstructure was called!")
+    print("~~~ Sequence receive.py build3Dstructure() was called!")
     import uuid
     theUUID=str(uuid.uuid4())
 

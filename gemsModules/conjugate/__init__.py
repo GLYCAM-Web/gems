@@ -1,1 +1,1 @@
-from . import entity, helpme, settings
+from . import receive, helpme, settings

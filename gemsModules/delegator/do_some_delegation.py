@@ -20,7 +20,7 @@ utils.investigate_gems_setup(sys.argv)
 with open(sys.argv[1], 'r') as file:
   jsonObjectString = file.read().replace('\n', '')
 
-from gemsModules.delegator.entity import delegate
+from gemsModules.delegator.receive import delegate
 responseObjectString=delegate(jsonObjectString)
 print(responseObjectString)
 

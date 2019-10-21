@@ -22,7 +22,7 @@ def importEntity(requestedEntity):
 
   requestedModule = '.' + entityModules[requestedEntity]
 
-  #print("requestedModule: " + requestedModule)
+  print("requestedModule: " + requestedModule)
 
   module_spec = importlib.util.find_spec(requestedModule,package="gemsModules")
 

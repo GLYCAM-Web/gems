@@ -5,7 +5,7 @@ from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
 
 def delegate(jsonObjectString):
-    print("~~~\nDelegator entity's delegate() was called.\n~~~")
+    print("~~~\nDelegator receive.py delegate() was called.\n~~~")
     #print("jsonObjectString: \n" + jsonObjectString)
 
     """
@@ -44,7 +44,7 @@ def delegate(jsonObjectString):
     print("entityType: " + entityType)
     theEntity = importEntity(entityType)
     #print(thisTransaction.request_dict['entity']['type'])
-    #print(theEntity)
+    print(theEntity)
 
     if theEntity is None:
         #thisTransaction.build-general-error-output()
@@ -56,12 +56,12 @@ def delegate(jsonObjectString):
         print("keys: " + str(thisTransaction.request_dict['entity'].keys))
         print("There were no services listed for the intity, doing the default.")
         #print("calling default")
-        theEntity.entity.doDefaultService(thisTransaction)
+        theEntity.receive.doDefaultService(thisTransaction)
     else:
         """This is where specific requested services are called."""
-        print("Calling receive for this entity: " + str(theEntity.entity))
+        #print("Calling receive for this entity: " + str(receive.entity))
         #print(theEntity.entity.receive)
-        theEntity.entity.receive(thisTransaction)
+        theEntity.receive.receive(thisTransaction)
 
     """
     Check to see if an outgoing string got built.  If not, try to
