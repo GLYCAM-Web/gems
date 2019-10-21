@@ -17,59 +17,64 @@ def validateCondensedSequence(thisTransaction : Transaction, thisService : Servi
     print("~~~ validateCondensedSequence was called.")
     #Look in transaction for sequence
     inputs = thisTransaction.request_dict['entity']['inputs']
-    print("Number of inputs: " + str(len(inputs)))
     print("inputs: " + str(inputs))
-    inputCount = 1
 
-    sequences = []
     for input in inputs:
-        print("~~~ input# " + str(inputCount))
-        payload = input['Sequence']['payload']
-        print("payload: " + payload)
-        if payload == None:
-            print("Could not find Sequence in inputs.")
-            ##transaction, noticeBrief, blockId
-            common.settings.appendCommonParserNotice( thisTransaction, 'EmptyPayload', 'InvalidInputPayload')
-        else:
-            print("input: " + str(input))
-            sequence = payload
-            print("sequence: " + sequence)
-            sequences.append(sequence)
+        print("input.keys(): " + str(input.keys()))
 
-            #Get prep residues
-            prepResidues = gmml.condensedsequence_glycam06_residue_tree()
+        keys = input.keys()
 
-            #Create an assembly
-            assembly = gmml.Assembly()
-
-            #Call assembly.CheckCondensed sequence sanity.
-            valid = assembly.CheckCondensedSequenceSanity(sequence, prepResidues)
-            print("validation result: " + str(valid))
-
-            ## Add valid to the transaction responses.
-            if valid:
-                if thisTransaction.response_dict is None:
-                    thisTransaction.response_dict={}
-                    thisTransaction.response_dict['entity']={}
-                if thisTransaction.response_dict['entity'] is None:
-                    thisTransaction.response_dict['entity']={}
-                if not 'responses' in thisTransaction.response_dict['entity']:
-                    thisTransaction.response_dict['entity']['responses']=[]
-
-                print("Creating a response for this sequence.")
-                thisTransaction.response_dict['entity']['responses'].append({
-                    "condensedSequenceValidation" : {
-                        'sequence': sequence,
-                        'valid' : valid,
-                    }
-                })
+        if 'Sequence' in keys:
+            payload = input['Sequence']['payload']
+            print("payload: " + payload)
+            if payload == None:
+                print("Could not find Sequence in inputs.")
+                ##transaction, noticeBrief, blockId
+                common.settings.appendCommonParserNotice( thisTransaction, 'EmptyPayload', 'InvalidInputPayload')
             else:
-                print("~~~\nCheckCondensedSequenceSanity returned false. Creating an error response.")
-                #print("thisTransaction: "  + str(thisTransaction))
-                ##appendCommonParserNotice(thisTransaction: Transaction,  noticeBrief: str, blockID: str = None)
-                common.settings.appendCommonParserNotice( thisTransaction,  'InvalidInput', 'InvalidInputPayload')
+                print("validating input: " + str(input))
+                sequence = payload
+                print("getting prepResidues.")
+                #Get prep residues
+                prepResidues = gmml.condensedsequence_glycam06_residue_tree()
+                print("Instantiating an assembly.")
+                #Create an assembly
+                assembly = gmml.Assembly()
 
-        inputCount += 1
+                try:
+                    print("Checking sequence sanity.")
+                    #Call assembly.CheckCondensed sequence sanity.
+                    valid = assembly.CheckCondensedSequenceSanity(sequence, prepResidues)
+                    print("validation result: " + str(valid))
+
+                    ## Add valid to the transaction responses.
+                    if valid:
+                        if thisTransaction.response_dict is None:
+                            thisTransaction.response_dict={}
+                            thisTransaction.response_dict['entity']={}
+                        if thisTransaction.response_dict['entity'] is None:
+                            thisTransaction.response_dict['entity']={}
+                        if not 'responses' in thisTransaction.response_dict['entity']:
+                            thisTransaction.response_dict['entity']['responses']=[]
+
+                        print("Creating a response for this sequence.")
+                        thisTransaction.response_dict['entity']['responses'].append({
+                            "condensedSequenceValidation" : {
+                                'sequence': sequence,
+                                'valid' : valid,
+                            }
+                        })
+                    else:
+                        print("~~~\nCheckCondensedSequenceSanity returned false. Creating an error response.")
+                        #print("thisTransaction: "  + str(thisTransaction))
+                        ##appendCommonParserNotice(thisTransaction: Transaction,  noticeBrief: str, blockID: str = None)
+                        common.settings.appendCommonParserNotice( thisTransaction,  'InvalidInput', 'InvalidInputPayload')
+                except:
+                    print("Something went wrong while validating this sequence.")
+                    print("sequence: " + sequence)
+                    common.settings.appendCommonParserNotice( thisTransaction, 'InvalidInput', 'InvalidInputPayload')
+        else:
+            print("no sequence found in this input, skipping.")
 
 ## TODO Write this function
 def evaluate(thisTransaction : Transaction, thisService : Service = None):
