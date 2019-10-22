@@ -160,7 +160,7 @@ def receive(thisTransaction : Transaction):
         #####  so, writing something ugly for now
         if i not in settings.serviceModules.keys():
             if i not in common.settings.serviceModules.keys():
-                print("The provided service is not recognized.")
+                print("The requested service is not recognized.")
                 common.settings.appendCommonParserNotice( thisTransaction,'ServiceNotKnownToEntity',i)
             else:
                 pass

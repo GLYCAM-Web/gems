@@ -16,6 +16,7 @@ entityModules = {
     'Query' : 'query',
     'Sequence' : 'sequence',
     'DrawGlycan' : 'drawglycan',
+    'StatusReport' : 'status'
 }
 
 ## Module names for services that this entity/module can perform.

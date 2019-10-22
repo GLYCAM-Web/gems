@@ -5,8 +5,15 @@
 		"services" :
 		[
 			{ "GenerateReport" :
-				{ "type" : "All" }
+				{ "type" : "GenerateReport" }
 			}
-		]
+		],
+		"options" :
+		{
+			"targets" :
+			[
+				{"type" : "All"}
+			]
+		}
 	}
 }

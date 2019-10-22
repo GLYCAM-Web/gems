@@ -8,6 +8,5 @@ from pydantic import BaseModel, Schema
 WhoIAm='Sequence'
 
 serviceModules = {
-    "All" : "all",
-    "EntityReport" : "entityReport"
+    "GenerateReport" :"generateReport"
 }

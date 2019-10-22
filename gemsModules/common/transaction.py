@@ -24,6 +24,9 @@ class GlycoProteinServicesEnum(str,Enum):
 class SequenceServicesEnum(str,Enum):
     build3DStructure = 'Build3DStructure'
 
+class StatusServicesEnum(str,Enum):
+    generateReport = 'GenerateReport'
+
 # ##
 # ## Enums for environment variables
 # ##
