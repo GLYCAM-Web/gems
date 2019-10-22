@@ -47,6 +47,7 @@ class EntityTypeEnum(str, Enum):
     structureFile = 'StructureFile'
     query = 'Query'
     drawglycan = 'DrawGlycan'
+    statusReport = "StatusReport"
 
 class CommonServicesEnum(str,Enum):
     """

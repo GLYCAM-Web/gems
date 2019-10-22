@@ -1,0 +1,12 @@
+{
+	"entity" :
+	{
+		"type": "StatusReport",
+		"services" :
+		[
+			{ "GenerateReport" :
+				{ "type" : "All" }
+			}
+		]
+	}
+}
