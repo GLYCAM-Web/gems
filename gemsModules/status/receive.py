@@ -62,34 +62,75 @@ def generateReport(thisTransaction : Transaction, thisService : Service = None):
 ## The default here is to just report on every gemsModule and their corresponding services.
 def doDefaultService(thisTransaction : Transaction):
     print("doDefaultService() was called. Generating a status report for all entities and services.")
+    print("thisTransaction: " + str(thisTransaction))
+
+    if thisTransaction.response_dict is None:
+        thisTransaction.response_dict = {}
+
+    thisTransaction.response_dict['entity'] = {}
+    thisTransaction.response_dict['entity']['type']="StatusReport"
+    if 'responses' not in thisTransaction.response_dict:
+        thisTransaction.response_dict['responses'] = []
+
 
     for availableEntity in listEntities():
         print("Generating a report for entity: " + availableEntity)
+        response = {}
         thisEntity = importEntity(availableEntity)
+        response.update({
+            'entity' : availableEntity
+        })
         #print("thisEntity.__dict__.keys(): " + str(thisEntity.__dict__.keys()))
         if thisEntity.settings is not None:
             settings = thisEntity.settings
             settingsAttributes = settings.__dict__.keys()
+
             if 'status' in settingsAttributes:
-                print("     settings.status: " + settings.status)
+                status = settings.status
+                print("     settings.status: " + status)
+                response.update({
+                    'status' : status
+                })
 
             if 'moduleStatusDetail' in settingsAttributes:
-                print("     settings.moduleStatusDetail: " + settings.moduleStatusDetail)
+                moduleStatusDetail = settings.moduleStatusDetail
+                print("     settings.moduleStatusDetail: " + moduleStatusDetail)
+                response.update({
+                    'moduleStatusDetail' : moduleStatusDetail
+                })
 
+            serviceStatuses= []
             if 'servicesStatus' in settingsAttributes:
-                for serviceStatus in settings.servicesStatus:
-                    print("serviceStatus: " + str(serviceStatus))
-                    print("serviceStatus.keys(): " + str(serviceStatus.keys()))
 
-                    print("service: " + serviceStatus['service'])
-                    print("status: " + serviceStatus['status'])
-                    print("statusDetail: " + serviceStatus['statusDetail'])
-            #print("thisEntity's settings: " + str(settings))
-            #TODO: Look in settings for a status
-            #TODO: Decide what to report if no status is present.
-            #TODO: Decide what to show for each entity & each service it offers.
+                for element in settings.servicesStatus:
+                    #print("serviceStatus: " + str(serviceStatus))
+                    #print("serviceStatus.keys(): " + str(serviceStatus.keys()))
+                    service = element['service']
+                    print("service: " + service)
+                    serviceStatus = element['status']
+                    print("serviceStatus: " + serviceStatus)
+                    serviceStatusDetail = element['statusDetail']
+                    print("statusDetail: " + serviceStatusDetail)
+
+                    serviceStatuses.append(element)
+
+            response.update({
+                'services' : serviceStatuses
+            })
+
+            thisTransaction.response_dict['responses'].append(response)
+
         else:
             print("Could not find settings for this entity.")
+
+
+
+    thisTransaction.build_outgoing_string()
+
+
+
+
+
 
 
 
