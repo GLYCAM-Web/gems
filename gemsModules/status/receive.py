@@ -4,6 +4,8 @@ import gmml
 from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
 from . import settings
+from datetime import datetime
+
 
 def receive(thisTransaction : Transaction):
     print("status gemsModule receive.py receive() was called.")
@@ -69,6 +71,9 @@ def doDefaultService(thisTransaction : Transaction):
 
     thisTransaction.response_dict['entity'] = {}
     thisTransaction.response_dict['entity']['type']="StatusReport"
+    timestamp = str(datetime.now())
+
+    thisTransaction.response_dict['entity']['timestamp'] = timestamp
     if 'responses' not in thisTransaction.response_dict:
         thisTransaction.response_dict['responses'] = []
 
