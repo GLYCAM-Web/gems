@@ -81,9 +81,9 @@ def doDefaultService(thisTransaction : Transaction):
                     print("serviceStatus: " + str(serviceStatus))
                     print("serviceStatus.keys(): " + str(serviceStatus.keys()))
 
-                    print("service: " + serviceStatus.service)
-                    print("status: " + serviceStatus.status)
-                    print("statusDetail: " + serviceStatusDetail)
+                    print("service: " + serviceStatus['service'])
+                    print("status: " + serviceStatus['status'])
+                    print("statusDetail: " + serviceStatus['statusDetail'])
             #print("thisEntity's settings: " + str(settings))
             #TODO: Look in settings for a status
             #TODO: Decide what to report if no status is present.
