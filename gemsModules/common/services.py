@@ -14,15 +14,15 @@ TODO: Update this method to receive actual module name, not its key.
 Also update methods that call common/services.py importEntity() to reflect this change.
 """
 def importEntity(requestedEntity):
-  print("~~~ importEntity was called.")
+  #print("~~~ importEntity was called.")
   import gemsModules
 
-  print("requestedEntity: " + requestedEntity)
-  print("common entityModules: " + str(entityModules))
+  #print("requestedEntity: " + requestedEntity)
+  #print("common entityModules: " + str(entityModules))
 
   requestedModule = '.' + entityModules[requestedEntity]
 
-  print("requestedModule: " + requestedModule)
+  #print("requestedModule: " + requestedModule)
 
   module_spec = importlib.util.find_spec(requestedModule,package="gemsModules")
 
@@ -30,7 +30,7 @@ def importEntity(requestedEntity):
     print("The module spec returned None for rquestedEntity: " + requestedEntity)
     return None
 
-  print("module_spec: " + str(module_spec))
+  #print("module_spec: " + str(module_spec))
   return importlib.import_module(requestedModule,package="gemsModules")
 
 def parseInput(thisTransaction):
@@ -108,8 +108,8 @@ def getTypesFromList(theList):
 
 ## TODO make this more generic
 def listEntities(requestedEntity='Delegator'):
-  print("~~~\nlistEntities() was called.")
-  print("entityModules: " + str(entityModules))
+  #print("~~~\nlistEntities() was called.")
+  #print("entityModules: " + str(entityModules))
   return list(entityModules.keys())
 
 

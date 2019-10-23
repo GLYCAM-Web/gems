@@ -26,7 +26,7 @@ def delegate(jsonObjectString):
 
     # If the incoming string was improperly formed, bail, but give a reason.
     if parseInput(thisTransaction) != 0:
-        #print(""" There was an error!  """)
+        print(" There was an error! ")
         #exit(1)
         thisTransaction.build_outgoing_string()
         return thisTransaction.outgoing_string

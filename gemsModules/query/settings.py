@@ -1,6 +1,18 @@
 ## Who I am
 WhoIAm='Query'
 
+status = "In development."
+moduleStatusDetail = "Can make queries via GlyFinder serviceModule."
+
+servicesStatus = [
+    {
+        "service" : "GlyFinder",
+        "status" : "In development.",
+        "statusDetail" : "The glyfinder service is maturing. Can make queries. Adding finishing touches."
+    }
+]
+
+
 ## Module names for services that this entity/module can perform.
 ## These should not include the Common Services.
 ServiceModule = {

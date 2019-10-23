@@ -1,7 +1,7 @@
 {
 	"entity" :
 	{
-		"type": "StatusReport",
+		"type": "Status",
 		"services" :
 		[
 			{ "GenerateReport" :

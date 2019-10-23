@@ -17,9 +17,13 @@ from pydantic.schema import schema
 # ##
 class DelegatorServicesEnum(str,Enum):
     delegate = 'Delegate'
+    listEntities = 'ListEntities'
 
 class GlycoProteinServicesEnum(str,Enum):
     build3DStructure = 'Build3DStructure'
+
+class GraphServicesEnum(str,Enum):
+    drawGlycan = 'DrawGlycan'
 
 class SequenceServicesEnum(str,Enum):
     build3DStructure = 'Build3DStructure'
@@ -35,7 +39,7 @@ class SequenceServicesPathEnum(str,Enum):
     sequenceentity   = 'GEMS_MODULES_SEQUENCE_PATH'
     ## Services for this entity, in alphabetical order
     build3DStructure = 'GEMS_MODULES_SEQUENCE_STRUCTURE_PATH'
-    drawGlycan       = 'GEMS_MODULES_SEQUENCE_DRAWGLYCAN_PATH'
+    graph = 'GEMS_MODULES_SEQUENCE_GRAPH_PATH'
     evaluate         = 'GEMS_MODULES_SEQUENCE_STRUCTURE_PATH'
 
 # ##
@@ -49,8 +53,8 @@ class EntityTypeEnum(str, Enum):
     sequence = 'Sequence'
     structureFile = 'StructureFile'
     query = 'Query'
-    drawglycan = 'DrawGlycan'
-    statusReport = "StatusReport"
+    graph = 'Graph'
+    status = "Status"
 
 class CommonServicesEnum(str,Enum):
     """
@@ -117,14 +121,21 @@ class Tags(BaseModel):
 class DelegatorServices(BaseModel):
     delegatorServices : DelegatorServicesEnum = Schema(
             'Delegate',
-            title = 'Delegator  Services',
+            title = 'Delegator Services',
             description = 'Services available to the Delegator Entity'
             )
+
+class GraphServices(BaseModel):
+    graphServices : GraphServicesEnum = Schema(
+        'DrawGlycan',
+        title = "Graph Services",
+        description = 'Services related to drawing graphs.'
+        )
 
 class SequenceServices(BaseModel):
     sequenceServices : SequenceServicesEnum = Schema(
             'Build3DStructure',
-            title = 'Sequence  Services',
+            title = 'Sequence Services',
             description = 'Services available to the Sequence Entity'
             )
 
@@ -138,9 +149,16 @@ class CommonServices(BaseModel):
 class GlycoProteinServices(BaseModel):
     glycoProteinServices : GlycoProteinServicesEnum = Schema(
             'Build3DStructure',
-            title = 'GlycoProtein  Services',
+            title = 'GlycoProtein Services',
             description = 'Services available to the GlycoProtein Entity'
             )
+
+class StatusServices(BaseModel):
+    statusServices : StatusServicesEnum = Schema(
+        'GenerateReport',
+        title = 'Status Reporting Services',
+        description = 'Reporting services for gemsModules.'
+        )
 
 class ExternalResource(BaseModel):
     locationType: ExternalLocationTypeEnum = Schema(
@@ -211,7 +229,7 @@ class Notice(BaseModel):
 
 class Service(BaseModel):
     """Holds information about a requested Service."""
-    typename : Union[CommonServices, DelegatorServices, SequenceServices, GlycoProteinServices] = Schema(
+    typename : Union[CommonServices, DelegatorServices, GraphServices, SequenceServices, GlycoProteinServices, StatusServices ] = Schema(
             None,
             title='Type of Service.',
             alias='type',

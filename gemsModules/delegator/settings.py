@@ -3,6 +3,22 @@
 ## Who I am
 WhoIAm='Delegator'
 
+status = "Stable."
+moduleStatusDetail = "Can Delegate and ListEntities."
+
+servicesStatus = [
+    {
+        "service" : "delegate",
+        "status" : "Stable.",
+        "statusDetail" : "Can receive a request for an entity and service, validate the request, and forward the request to the appropriate entity."
+    },
+    {
+        "service" : "ListEntities",
+        "status" : "Stable.",
+        "statusDetail" : "Simply lists the entities that have been developed."
+    }
+]
+
 """
 Module names for services that this entity/module can perform.
 These should not include the Common Services.
@@ -22,6 +38,7 @@ entityModules = {
     'Query' : 'query',
     'Sequence' : 'sequence',
     'DrawGlycan' : 'drawglycan',
+    'Status' : 'status'
 }
 
 

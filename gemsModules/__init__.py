@@ -4,5 +4,5 @@ from . import delegator
 #from . import project
 from . import query
 from . import sequence
-from . import drawglycan
+from . import graph
 from . import status

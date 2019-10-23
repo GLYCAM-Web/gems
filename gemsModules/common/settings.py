@@ -9,14 +9,48 @@ from pydantic import BaseModel, Schema
 ## Who I am
 WhoIAm='CommonServicer'
 
+status = "Stable."
+moduleStatusDetail = "Can provide Marco, ReturnHelp, ReturnUsage, ReturnVerboseHelp, and ReturnSchema services."
+
+servicesStatus = [
+    {
+        "service" : "Marco",
+        "status" : "Stable.",
+        "statusDetail" : "Returns Polo if all is well."
+    },
+    {
+        "service" : "ReturnHelp",
+        "status" : "Stable.",
+        "statusDetail" : "Returns brief help message if provided in gemsModule."
+    },
+    {
+        "service" : "ReturnUsage",
+        "status" : "Stable.",
+        "statusDetail" : "Returns usage help message if provided in gemsModule."
+    },
+    {
+        "service" : "ReturnVerboseHelp",
+        "status" : "Stable",
+        "statusDetail" : "Returns more detailed help message if provided in gemsModule."
+    },
+    {
+        "service" : "ReturnSchema",
+        "status" : "Stable",
+        "statusDetail" : "Returns a schema upon request."
+    }
+]
+
+
+
 ## Module names for entities that this entity/module knows.
 entityModules = {
     'Conjugate' : 'conjugate',
     'Delegator' : 'delegator',
+    'Graph' : 'graph',
     'Query' : 'query',
     'Sequence' : 'sequence',
-    'DrawGlycan' : 'drawglycan',
-    'StatusReport' : 'status'
+    'Status' : 'status'
+
 }
 
 ## Module names for services that this entity/module can perform.
