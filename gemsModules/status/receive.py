@@ -28,6 +28,7 @@ def receive(thisTransaction : Transaction):
                     common.settings.appendCommonParserNotice( thisTransaction, 'ServiceNotKnownToEntity', requestedService)
             elif requestedService == "GenerateReport":
                 generateReport(thisTransaction, None)
+                print("finished generating the report. Building outgoing string.")
                 thisTransaction.build_outgoing_string()
             else:
                 print("Perhaps a service was added to settings.py, but not defined in receive.py? Likely this service is still in development.")
@@ -72,8 +73,10 @@ def doDefaultService(thisTransaction : Transaction):
     thisTransaction.response_dict['entity'] = {}
     thisTransaction.response_dict['entity']['type']="StatusReport"
     timestamp = str(datetime.now())
+    print("timestamp: " + str(timestamp))
 
     thisTransaction.response_dict['entity']['timestamp'] = timestamp
+
     if 'responses' not in thisTransaction.response_dict:
         thisTransaction.response_dict['responses'] = []
 
@@ -127,10 +130,10 @@ def doDefaultService(thisTransaction : Transaction):
 
         else:
             print("Could not find settings for this entity.")
+    print("finished updating the transaction.")
 
+    print("timestamp: " + str(timestamp))
 
-
-    thisTransaction.build_outgoing_string()
 
 
 

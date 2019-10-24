@@ -75,7 +75,7 @@ def delegate(jsonObjectString):
         thisTransaction.build_general_error_output()
 
     # Return whatever outgoing string got made
-    #print("about to return")
+    print("about to return")
     return thisTransaction.outgoing_string
 
 def doDefaultService(thisTransaction):
