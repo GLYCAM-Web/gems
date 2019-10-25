@@ -107,9 +107,9 @@ def doDefaultService(thisTransaction : Transaction):
                     'moduleStatusDetail' : moduleStatusDetail
                 })
 
-            serviceStatuses= []
-            if 'servicesStatus' in settingsAttributes:
 
+            if 'servicesStatus' in settingsAttributes:
+                serviceStatuses= []
                 for element in settings.servicesStatus:
                     #print("serviceStatus: " + str(serviceStatus))
                     #print("serviceStatus.keys(): " + str(serviceStatus.keys()))
@@ -122,9 +122,19 @@ def doDefaultService(thisTransaction : Transaction):
 
                     serviceStatuses.append(element)
 
-            response.update({
-                'services' : serviceStatuses
-            })
+                response.update({
+                    'services' : serviceStatuses
+                })
+
+            if 'subEntities' in settingsAttributes:
+                subEntities = []
+                for element in subEntities:
+                    subEntity = element['subEntity']
+                    subEntities.append(element)
+
+                response.update({
+                    'subEntities' : subEntities
+                })
 
             thisTransaction.response_dict['responses'].append(response)
 

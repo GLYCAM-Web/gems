@@ -12,6 +12,12 @@ servicesStatus = [
     }
 ]
 
+subEntities = [
+    {
+        "subEntity" : "Graph"
+    }
+]
+
 
 ## Module names for services that this entity/module can perform.
 ## These should not include the Common Services.

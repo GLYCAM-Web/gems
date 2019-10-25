@@ -29,6 +29,12 @@ servicesStatus = [
     }
 ]
 
+subEntities = [
+    {
+        "subEntity" : "Graph"
+    }
+]
+
 
 #Validate service in focus.
 #Evaluate service still needs to be developed.
