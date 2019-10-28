@@ -80,11 +80,12 @@ def parseInput(thisTransaction):
     return 0
 
 def marco(requestedEntity):
-  theEntity = importEntity(requestedEntity)
-  if hasattr(theEntity, 'entity'):
-    return "Polo"
-  else:
-    return "The entity you seek is not responding properly."
+    print("The delegator's marco method was called.")
+    theEntity = importEntity(requestedEntity)
+    if hasattr(theEntity, 'receive'):
+        return "Polo"
+    else:
+        return "The entity you seek is not responding properly."
 
 def getTypesFromList(theList):
     typesInList=[]
