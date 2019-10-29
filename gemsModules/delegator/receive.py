@@ -44,7 +44,7 @@ def delegate(jsonObjectString):
     print("entityType: " + entityType)
     theEntity = importEntity(entityType)
     #print(thisTransaction.request_dict['entity']['type'])
-    print(theEntity)
+    print("theEntity: " + str(theEntity))
 
     if theEntity is None:
         #thisTransaction.build-general-error-output()
@@ -54,13 +54,12 @@ def delegate(jsonObjectString):
         """If no service is requested in the json object, do the default service."""
         print("could not find services in thisTransaction.request_dict['entity'].keys()")
         print("keys: " + str(thisTransaction.request_dict['entity'].keys))
-        print("There were no services listed for the intity, doing the default.")
+        print("There were no services in the request, doing the default.")
         #print("calling default")
         theEntity.receive.doDefaultService(thisTransaction)
     else:
         """This is where specific requested services are called."""
-        #print("Calling receive for this entity: " + str(receive.entity))
-        #print(theEntity.entity.receive)
+
         theEntity.receive.receive(thisTransaction)
 
     """
@@ -79,6 +78,7 @@ def delegate(jsonObjectString):
     return thisTransaction.outgoing_string
 
 def doDefaultService(thisTransaction):
+    print("doing the default service for the Delegator.")
     """This might not be necessary... """
     if thisTransaction.response_dict is None:
         thisTransaction.response_dict={}
