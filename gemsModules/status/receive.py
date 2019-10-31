@@ -122,9 +122,9 @@ def doDefaultService(thisTransaction : Transaction):
 
                     serviceStatuses.append(element)
 
-            response.update({
-                'services' : serviceStatuses
-            })
+                response.update({
+                    'services' : serviceStatuses
+                })
 
             thisTransaction.response_dict['responses'].append(response)
 

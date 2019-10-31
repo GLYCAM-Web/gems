@@ -8,8 +8,8 @@ from pydantic import BaseModel, Schema
 WhoIAm='Graph'
 
 ##Status Report
-status = "In development."
-moduleStatusDetail = "Module framework in place. Currently working to install required dependencies and develop services."
+status = "Down"
+moduleStatusDetail = "In queue for development. Gems/JSON interface needed."
 
 servicesStatus = [
     {

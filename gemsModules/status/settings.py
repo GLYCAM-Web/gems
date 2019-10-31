@@ -8,7 +8,7 @@ from pydantic import BaseModel, Schema
 WhoIAm='Status'
 
 ## Status Report
-status = "In development."
+status = "In development"
 moduleStatusDetail = "Can receive requests. Currently working on report generation."
 
 servicesStatus = [

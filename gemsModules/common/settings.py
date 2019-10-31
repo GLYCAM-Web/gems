@@ -9,7 +9,7 @@ from pydantic import BaseModel, Schema
 ## Who I am
 WhoIAm='CommonServicer'
 
-status = "Stable."
+status = "Stable"
 moduleStatusDetail = "Can provide Marco, ReturnHelp, ReturnUsage, ReturnVerboseHelp, and ReturnSchema services."
 
 servicesStatus = [
