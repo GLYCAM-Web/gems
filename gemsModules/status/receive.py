@@ -136,6 +136,7 @@ def doDefaultService(thisTransaction : Transaction):
                     'subEntities' : subEntities
                 })
 
+
             thisTransaction.response_dict['responses'].append(response)
 
         else:

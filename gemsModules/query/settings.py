@@ -1,7 +1,7 @@
 ## Who I am
 WhoIAm='Query'
 
-status = "In development."
+status = "In development"
 moduleStatusDetail = "Can make queries via GlyFinder serviceModule."
 
 servicesStatus = [

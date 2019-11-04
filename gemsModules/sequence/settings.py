@@ -8,8 +8,8 @@ from pydantic import BaseModel, Schema
 WhoIAm='Sequence'
 
 ##Status Report
-status = "In development."
-moduleStatusDetail = "Module framework in place."
+status = "In development"
+moduleStatusDetail = "Module framework in place. Can build default structures that are not minimized. Currently working on condensed sequence validation."
 
 servicesStatus = [
     {

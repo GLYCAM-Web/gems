@@ -3,7 +3,7 @@
 ## Who I am
 WhoIAm='Delegator'
 
-status = "Stable."
+status = "Stable"
 moduleStatusDetail = "Can Delegate and ListEntities."
 
 servicesStatus = [

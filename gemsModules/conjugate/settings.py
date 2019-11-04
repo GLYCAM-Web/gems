@@ -7,8 +7,8 @@ WhoIAm='Conjugate'
 ## These should not include the Common Services.
 
 ##Status Report
-status = "In development."
-moduleStatusDetail = "Module framework in place. No services defined in serviceModules."
+status = "Down"
+moduleStatusDetail = "In queue for development. Gems/JSON interface needed."
 
 def main():
     print("Ths script only contains dictionary-type information.")
