@@ -64,7 +64,7 @@ def generateReport(thisTransaction : Transaction, thisService : Service = None):
 
 ## The default here is to just report on every gemsModule and their corresponding services.
 def doDefaultService(thisTransaction : Transaction):
-    print("doDefaultService() was called. Generating a status report for all entities and services.")
+    print("~~~doDefaultService() was called. Generating a status report for all entities and services.")
     print("thisTransaction: " + str(thisTransaction))
 
     if thisTransaction.response_dict is None:
@@ -72,8 +72,8 @@ def doDefaultService(thisTransaction : Transaction):
 
     thisTransaction.response_dict['entity'] = {}
     thisTransaction.response_dict['entity']['type']="StatusReport"
-    timestamp = str(datetime.now())
-    print("timestamp: " + str(timestamp))
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+    print("~timestamp: " + str(timestamp))
 
     thisTransaction.response_dict['entity']['timestamp'] = timestamp
 
