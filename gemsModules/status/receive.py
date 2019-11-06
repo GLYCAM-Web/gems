@@ -67,6 +67,7 @@ def doDefaultService(thisTransaction : Transaction):
     print("~~~doDefaultService() was called. Generating a status report for all entities and services.")
     print("thisTransaction: " + str(thisTransaction))
 
+    ##Header section
     if thisTransaction.response_dict is None:
         thisTransaction.response_dict = {}
 
@@ -80,7 +81,9 @@ def doDefaultService(thisTransaction : Transaction):
     if 'responses' not in thisTransaction.response_dict:
         thisTransaction.response_dict['responses'] = []
 
+    responses = []
 
+    ##Entity Reporting
     for availableEntity in listEntities():
         print("Generating a report for entity: " + availableEntity)
         response = {}
@@ -137,21 +140,16 @@ def doDefaultService(thisTransaction : Transaction):
                 })
 
 
-            thisTransaction.response_dict['responses'].append(response)
+            responses.append(response)
 
         else:
             print("Could not find settings for this entity.")
+
+
+    thisTransaction.response_dict['responses'].append(responses)
     print("finished updating the transaction.")
 
     print("timestamp: " + str(timestamp))
-
-
-
-
-
-
-
-
 
 def main():
     pass
