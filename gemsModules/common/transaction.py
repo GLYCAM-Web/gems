@@ -332,6 +332,7 @@ class Transaction:
         else:
             self.outgoing_string=json.dumps(self.response_dict)
 
+
     def build_general_error_output(self):
         print("build_general_error_output was called. Still in development.")
 

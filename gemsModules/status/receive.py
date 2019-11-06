@@ -28,7 +28,7 @@ def receive(thisTransaction : Transaction):
                     common.settings.appendCommonParserNotice( thisTransaction, 'ServiceNotKnownToEntity', requestedService)
             elif requestedService == "GenerateReport":
                 generateReport(thisTransaction, None)
-                print("finished generating the report. Building outgoing string.")
+                #print("finished generating the report. Building outgoing string.")
                 thisTransaction.build_outgoing_string()
             else:
                 print("Perhaps a service was added to settings.py, but not defined in receive.py? Likely this service is still in development.")
@@ -91,10 +91,10 @@ def doDefaultService(thisTransaction : Transaction):
             settings = thisEntity.settings
             settingsAttributes = settings.__dict__.keys()
 
-            response = getModuleStatus(response, settingsAttributes)
-            response = getModuleStatusDetail(response, settingsAttributes)
-            response = getServiceStatuses(response, settingsAttributes)
-            response = getSubEntities(response, settingsAttributes)
+            response = getModuleStatus(response, settings, settingsAttributes)
+            response = getModuleStatusDetail(response, settings, settingsAttributes)
+            response = getServiceStatuses(response, settings, settingsAttributes)
+            response = getSubEntities(response, settings, settingsAttributes)
 
             print("type of response: " + str(type(response)))
             responses.append(response)
@@ -103,33 +103,35 @@ def doDefaultService(thisTransaction : Transaction):
             print("Could not find settings for this entity.")
 
 
-    thisTransaction.response_dict['responses'] = responses
-    print("finished updating the transaction.")
-    print("thisTransaction.response_dict: " + str(thisTransaction.response_dict))
-    print("timestamp: " + str(timestamp))
+    thisTransaction.response_dict.update({
+        "responses": responses
+    })
+    #print("\nfinished updating the transaction.")
+    #print("thisTransaction.response_dict: " + str(thisTransaction.response_dict))
+    #print("timestamp: " + str(timestamp))
 
 ##Append a status from a module's settings file to a json response object
-def getModuleStatus(response, settingsAttributes):
+def getModuleStatus(response, settings, settingsAttributes):
     if 'status' in settingsAttributes:
         status = settings.status
         print("     settings.status: " + status)
         response.update({
             'status' : status
-    })
+        })
     return response
 
 ##Append a module status detail from a module's settings file to a json response object
-def getModuleStatusDetail(response, settingsAttributes):
+def getModuleStatusDetail(response, settings, settingsAttributes):
     if 'moduleStatusDetail' in settingsAttributes:
         moduleStatusDetail = settings.moduleStatusDetail
         print("     settings.moduleStatusDetail: " + moduleStatusDetail)
         response.update({
             'moduleStatusDetail' : moduleStatusDetail
-    })
+        })
     return response
 
 ##Append a list of module services and their statuses to a json response object
-def getServiceStatuses(response, settingsAttributes):
+def getServiceStatuses(response, settings, settingsAttributes):
     if 'servicesStatus' in settingsAttributes:
         serviceStatuses= []
         for element in settings.servicesStatus:
@@ -146,16 +148,18 @@ def getServiceStatuses(response, settingsAttributes):
 
         response.update({
             'services' : serviceStatuses
-    })
+        })
     return response
 
 ##Update a response with the entities an entity uses.
-def getSubEntities(response, settingsAttributes):
+def getSubEntities(response, settings, settingsAttributes):
     if 'subEntities' in settingsAttributes:
+        print("~~~adding subentities.")
         subEntities = []
-        for element in subEntities:
-            subEntity = element['subEntity']
-            subEntities.append(element)
+        for subEntity in settings.subEntities:
+            print("   element: " + str(subEntity))
+            subEntities.append(subEntity)
+
 
         response.update({
             'subEntities' : subEntities

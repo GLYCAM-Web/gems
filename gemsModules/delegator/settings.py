@@ -41,6 +41,8 @@ entityModules = {
     'Status' : 'status'
 }
 
+subEntities = entityModules
+
 
 def main():
     print("Ths script only contains dictionary-type information.")

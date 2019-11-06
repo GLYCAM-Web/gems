@@ -10,7 +10,7 @@ if importlib.util.find_spec("gemsModules") is None:
   sys.path.append(this_dir + "/../")
   if importlib.util.find_spec("common") is None:
     print("Something went horribly wrong.  No clue what to do.")
-    return
+    system.exit(0)
   else:
     from common import utils
 else:

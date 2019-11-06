@@ -40,8 +40,8 @@ def parseInput(thisTransaction):
     import jsonpickle
     io=StringIO()
 
-    print("~~~\nparseInput() was called.")
-    print("thisTransaction.incoming_string: " + thisTransaction.incoming_string)
+    #print("~~~parseInput() was called.")
+    #print("thisTransaction.incoming_string: " + thisTransaction.incoming_string)
 
     # Load the JSON string into the incoming dictionary
     #
@@ -75,8 +75,8 @@ def parseInput(thisTransaction):
     # If still here, load the data into a Transaction object and return success
     #
     thisTransaction.transaction_in = jsonpickle.decode(thisTransaction.incoming_string)
-    print("thisTransaction.transaction_in: " + str(thisTransaction.transaction_in))
-    print("~~~Finished parseInput()")
+    #print("thisTransaction.transaction_in: " + str(thisTransaction.transaction_in))
+    #print("~~~Finished parseInput()")
     return 0
 
 def marco(requestedEntity):

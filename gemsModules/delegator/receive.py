@@ -41,10 +41,10 @@ def delegate(jsonObjectString):
     """
     # See if it is possible to load a module for the requested Entity
     entityType = thisTransaction.request_dict['entity']['type']
-    print("entityType: " + entityType)
+    print("Requested entityType: " + entityType)
     theEntity = importEntity(entityType)
     #print(thisTransaction.request_dict['entity']['type'])
-    print("theEntity: " + str(theEntity))
+    #print("theEntity: " + str(theEntity))
 
     if theEntity is None:
         #thisTransaction.build-general-error-output()
@@ -59,7 +59,6 @@ def delegate(jsonObjectString):
         theEntity.receive.doDefaultService(thisTransaction)
     else:
         """This is where specific requested services are called."""
-
         theEntity.receive.receive(thisTransaction)
 
     """
@@ -74,7 +73,7 @@ def delegate(jsonObjectString):
         thisTransaction.build_general_error_output()
 
     # Return whatever outgoing string got made
-    print("about to return")
+    #print("about to return")
     return thisTransaction.outgoing_string
 
 def doDefaultService(thisTransaction):
@@ -151,7 +150,7 @@ def main():
     responseObjectString = str(responseObject)
 
 
-  print(responseObjectString)
+  print("\ndelegator is returning this: \n" +  responseObjectString)
 
 
 if __name__ == "__main__":
