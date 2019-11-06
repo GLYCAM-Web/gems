@@ -65,7 +65,7 @@ def generateReport(thisTransaction : Transaction, thisService : Service = None):
 ## The default here is to just report on every gemsModule and their corresponding services.
 def doDefaultService(thisTransaction : Transaction):
     print("~~~doDefaultService() was called. Generating a status report for all entities and services.")
-    print("thisTransaction: " + str(thisTransaction))
+    #print("thisTransaction: " + str(thisTransaction))
 
     ##Header section
     if thisTransaction.response_dict is None:
@@ -77,12 +77,7 @@ def doDefaultService(thisTransaction : Transaction):
     print("~timestamp: " + str(timestamp))
 
     thisTransaction.response_dict['entity']['timestamp'] = timestamp
-
-    if 'responses' not in thisTransaction.response_dict:
-        thisTransaction.response_dict['responses'] = []
-
     responses = []
-
     ##Entity Reporting
     for availableEntity in listEntities():
         print("Generating a report for entity: " + availableEntity)
@@ -96,60 +91,76 @@ def doDefaultService(thisTransaction : Transaction):
             settings = thisEntity.settings
             settingsAttributes = settings.__dict__.keys()
 
-            if 'status' in settingsAttributes:
-                status = settings.status
-                print("     settings.status: " + status)
-                response.update({
-                    'status' : status
-                })
+            response = getModuleStatus(response, settingsAttributes)
+            response = getModuleStatusDetail(response, settingsAttributes)
+            response = getServiceStatuses(response, settingsAttributes)
+            response = getSubEntities(response, settingsAttributes)
 
-            if 'moduleStatusDetail' in settingsAttributes:
-                moduleStatusDetail = settings.moduleStatusDetail
-                print("     settings.moduleStatusDetail: " + moduleStatusDetail)
-                response.update({
-                    'moduleStatusDetail' : moduleStatusDetail
-                })
-
-
-            if 'servicesStatus' in settingsAttributes:
-                serviceStatuses= []
-                for element in settings.servicesStatus:
-                    #print("serviceStatus: " + str(serviceStatus))
-                    #print("serviceStatus.keys(): " + str(serviceStatus.keys()))
-                    service = element['service']
-                    print("service: " + service)
-                    serviceStatus = element['status']
-                    print("serviceStatus: " + serviceStatus)
-                    serviceStatusDetail = element['statusDetail']
-                    print("statusDetail: " + serviceStatusDetail)
-
-                    serviceStatuses.append(element)
-
-                response.update({
-                    'services' : serviceStatuses
-                })
-
-            if 'subEntities' in settingsAttributes:
-                subEntities = []
-                for element in subEntities:
-                    subEntity = element['subEntity']
-                    subEntities.append(element)
-
-                response.update({
-                    'subEntities' : subEntities
-                })
-
-
+            print("type of response: " + str(type(response)))
             responses.append(response)
 
         else:
             print("Could not find settings for this entity.")
 
 
-    thisTransaction.response_dict['responses'].append(responses)
+    thisTransaction.response_dict['responses'] = responses
     print("finished updating the transaction.")
-
+    print("thisTransaction.response_dict: " + str(thisTransaction.response_dict))
     print("timestamp: " + str(timestamp))
+
+##Append a status from a module's settings file to a json response object
+def getModuleStatus(response, settingsAttributes):
+    if 'status' in settingsAttributes:
+        status = settings.status
+        print("     settings.status: " + status)
+        response.update({
+            'status' : status
+    })
+    return response
+
+##Append a module status detail from a module's settings file to a json response object
+def getModuleStatusDetail(response, settingsAttributes):
+    if 'moduleStatusDetail' in settingsAttributes:
+        moduleStatusDetail = settings.moduleStatusDetail
+        print("     settings.moduleStatusDetail: " + moduleStatusDetail)
+        response.update({
+            'moduleStatusDetail' : moduleStatusDetail
+    })
+    return response
+
+##Append a list of module services and their statuses to a json response object
+def getServiceStatuses(response, settingsAttributes):
+    if 'servicesStatus' in settingsAttributes:
+        serviceStatuses= []
+        for element in settings.servicesStatus:
+            #print("serviceStatus: " + str(serviceStatus))
+            #print("serviceStatus.keys(): " + str(serviceStatus.keys()))
+            service = element['service']
+            print("service: " + service)
+            serviceStatus = element['status']
+            print("serviceStatus: " + serviceStatus)
+            serviceStatusDetail = element['statusDetail']
+            print("statusDetail: " + serviceStatusDetail)
+
+            serviceStatuses.append(element)
+
+        response.update({
+            'services' : serviceStatuses
+    })
+    return response
+
+##Update a response with the entities an entity uses.
+def getSubEntities(response, settingsAttributes):
+    if 'subEntities' in settingsAttributes:
+        subEntities = []
+        for element in subEntities:
+            subEntity = element['subEntity']
+            subEntities.append(element)
+
+        response.update({
+            'subEntities' : subEntities
+        })
+    return response
 
 def main():
     pass
