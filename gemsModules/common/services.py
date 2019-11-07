@@ -8,7 +8,6 @@ from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 from pydantic import BaseModel, Schema
 from pydantic.schema import schema
 
-
 """
 TODO: Update this method to receive actual module name, not its key.
 Also update methods that call common/services.py importEntity() to reflect this change.
@@ -20,7 +19,7 @@ def importEntity(requestedEntity):
   #print("requestedEntity: " + requestedEntity)
   #print("common entityModules: " + str(entityModules))
 
-  requestedModule = '.' + entityModules[requestedEntity]
+  requestedModule = '.' + subEntities[requestedEntity]
 
   #print("requestedModule: " + requestedModule)
 
@@ -109,9 +108,7 @@ def getTypesFromList(theList):
 
 ## TODO make this more generic
 def listEntities(requestedEntity='Delegator'):
-  #print("~~~\nlistEntities() was called.")
-  #print("entityModules: " + str(entityModules))
-  return list(entityModules.keys())
+  return list(subEntities.keys())
 
 
 def returnHelp(requestedEntity,requestedHelp):

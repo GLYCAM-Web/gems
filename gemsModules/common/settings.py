@@ -43,7 +43,7 @@ servicesStatus = [
 
 
 ## Module names for entities that this entity/module knows.
-entityModules = {
+subEntities = {
     'Conjugate' : 'conjugate',
     'Delegator' : 'delegator',
     'Graph' : 'graph',

@@ -3,6 +3,7 @@ import gemsModules
 from gemsModules import common
 from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
+import traceback
 
 def delegate(jsonObjectString):
     print("~~~\nDelegator receive.py delegate() was called.\n~~~")
@@ -133,8 +134,9 @@ def main():
   try:
     responseObjectString=delegate(jsonObjectString)
   except Exception as error:
-    print("The delegator module captured an error.")
-    print(str(error))
+    print("\nThe delegator module captured an error.")
+    print("Error type: " + str(type(error)))
+    print(traceback.format_exc())
     ##TODO: see about exploring this error and returning more info. Temp solution for now.
     responseObject = {
         'DelegatorNotice' : {

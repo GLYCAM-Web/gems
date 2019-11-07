@@ -32,7 +32,7 @@ ServiceModule = {
 """
 Module names for entities that the Delegator knows about
 """
-entityModules = {
+subEntities = {
     'Conjugate' : 'conjugate',
     'Common' : 'common',
     'Query' : 'query',
@@ -41,7 +41,7 @@ entityModules = {
     'Status' : 'status'
 }
 
-subEntities = entityModules
+
 
 
 def main():
