@@ -65,7 +65,7 @@ def generateReport(thisTransaction : Transaction, thisService : Service = None):
 ## The default here is to just report on every gemsModule and their corresponding services.
 def doDefaultService(thisTransaction : Transaction):
     print("~~~doDefaultService() was called. Generating a status report for all entities and services.")
-    #print("thisTransaction: " + str(thisTransaction))
+    print("thisTransaction: \n" + repr(thisTransaction))
 
     ##Header section
     if thisTransaction.response_dict is None:
