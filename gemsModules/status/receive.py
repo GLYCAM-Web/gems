@@ -4,6 +4,7 @@ import gmml
 from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
 from . import settings
+from . import statusResponse
 from datetime import datetime
 import traceback
 
@@ -99,7 +100,8 @@ def doDefaultService(thisTransaction : Transaction):
             response = getServiceStatuses(response, settings, settingsAttributes)
             response = getSubEntities(response, settings, settingsAttributes)
 
-            #print("type of response: " + str(type(response)))
+            #print("\nType of response: " + str(type(response)))
+            #print("response: \n" + str(response))
             responses.append(response)
 
         else:
