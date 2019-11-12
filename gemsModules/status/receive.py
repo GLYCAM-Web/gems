@@ -69,6 +69,7 @@ def doDefaultService(thisTransaction : Transaction):
     #print("~~~doDefaultService() was called. Generating a status report for all entities and services.")
     #print("thisTransaction: " + str(thisTransaction))
 
+
     ##Header section
     if thisTransaction.response_dict is None:
         thisTransaction.response_dict = {}
