@@ -5,13 +5,14 @@ from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
 from . import settings
 from datetime import datetime
+import traceback
 
 
 def receive(thisTransaction : Transaction):
-    print("status gemsModule receive.py receive() was called.")
+    #print("status gemsModule receive.py receive() was called.")
 
     if not 'services' in thisTransaction.request_dict['entity'].keys():
-        print("'services' was not present in the request. Do the default.")
+        #print("'services' was not present in the request. Do the default.")
 
         doDefaultService(thisTransaction)
 
@@ -20,23 +21,24 @@ def receive(thisTransaction : Transaction):
         services = getTypesFromList(thisTransaction.request_dict['entity']['services'])
 
         for requestedService in services:
-            print("requestedService: " + str(requestedService))
+            #print("requestedService: " + str(requestedService))
 
             if requestedService not in settings.serviceModules.keys():
                 if requestedService not in common.settings.serviceModules.keys():
-                    print("The requested service is not recognized.")
+                    #print("The requested service is not recognized.")
                     common.settings.appendCommonParserNotice( thisTransaction, 'ServiceNotKnownToEntity', requestedService)
             elif requestedService == "GenerateReport":
                 generateReport(thisTransaction, None)
                 #print("finished generating the report. Building outgoing string.")
                 thisTransaction.build_outgoing_string()
+                #print("thisTransaction.outgoing_string: " + thisTransaction.outgoing_string)
             else:
-                print("Perhaps a service was added to settings.py, but not defined in receive.py? Likely this service is still in development.")
+                print("Perhaps a service was added to status/settings.py, but not defined in receive.py? Likely this service is still in development.")
 
 ##This method needs to check for options. If options are not present, do the default service.
 ##    If the options are present, and specify a list of entities to report on, only report on those.
 def generateReport(thisTransaction : Transaction, thisService : Service = None):
-    print("generateReport was called.")
+    #print("generateReport was called.")
 
     entityKeys = thisTransaction.request_dict['entity'].keys()
     #print("entityKeys : " + str(entityKeys))
@@ -49,12 +51,12 @@ def generateReport(thisTransaction : Transaction, thisService : Service = None):
         if "targets" in optionsKeys:
             for target in options['targets']:
                 #print("Report requested for target: " + str(target))
-                print("target type: " + str(target['type']))
+                #print("target type: " + str(target['type']))
 
                 if target['type'] == 'All':
                     doDefaultService(thisTransaction)
                 else:
-                    print("Report requested for a specific target.")
+                    print("Report requested for a specific target. Still being developed.")
 
         else:
             doDefaultService(thisTransaction)
@@ -64,7 +66,7 @@ def generateReport(thisTransaction : Transaction, thisService : Service = None):
 
 ## The default here is to just report on every gemsModule and their corresponding services.
 def doDefaultService(thisTransaction : Transaction):
-    print("~~~doDefaultService() was called. Generating a status report for all entities and services.")
+    #print("~~~doDefaultService() was called. Generating a status report for all entities and services.")
     #print("thisTransaction: " + str(thisTransaction))
 
     ##Header section
@@ -74,13 +76,13 @@ def doDefaultService(thisTransaction : Transaction):
     thisTransaction.response_dict['entity'] = {}
     thisTransaction.response_dict['entity']['type']="StatusReport"
     timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-    print("~timestamp: " + str(timestamp))
+    #print("~timestamp: " + str(timestamp))
 
     thisTransaction.response_dict['entity']['timestamp'] = timestamp
     responses = []
     ##Entity Reporting
     for availableEntity in listEntities():
-        print("Generating a report for entity: " + availableEntity)
+        #print("Generating a report for entity: " + availableEntity)
         response = {}
         thisEntity = importEntity(availableEntity)
         response.update({
@@ -96,7 +98,7 @@ def doDefaultService(thisTransaction : Transaction):
             response = getServiceStatuses(response, settings, settingsAttributes)
             response = getSubEntities(response, settings, settingsAttributes)
 
-            print("type of response: " + str(type(response)))
+            #print("type of response: " + str(type(response)))
             responses.append(response)
 
         else:
@@ -114,7 +116,7 @@ def doDefaultService(thisTransaction : Transaction):
 def getModuleStatus(response, settings, settingsAttributes):
     if 'status' in settingsAttributes:
         status = settings.status
-        print("     settings.status: " + status)
+        #print("     settings.status: " + status)
         response.update({
             'status' : status
         })
@@ -124,7 +126,7 @@ def getModuleStatus(response, settings, settingsAttributes):
 def getModuleStatusDetail(response, settings, settingsAttributes):
     if 'moduleStatusDetail' in settingsAttributes:
         moduleStatusDetail = settings.moduleStatusDetail
-        print("     settings.moduleStatusDetail: " + moduleStatusDetail)
+        #print("     settings.moduleStatusDetail: " + moduleStatusDetail)
         response.update({
             'moduleStatusDetail' : moduleStatusDetail
         })
@@ -138,11 +140,11 @@ def getServiceStatuses(response, settings, settingsAttributes):
             #print("serviceStatus: " + str(serviceStatus))
             #print("serviceStatus.keys(): " + str(serviceStatus.keys()))
             service = element['service']
-            print("service: " + service)
+            #print("service: " + service)
             serviceStatus = element['status']
-            print("serviceStatus: " + serviceStatus)
+            #print("serviceStatus: " + serviceStatus)
             serviceStatusDetail = element['statusDetail']
-            print("statusDetail: " + serviceStatusDetail)
+            #print("statusDetail: " + serviceStatusDetail)
 
             serviceStatuses.append(element)
 
@@ -154,10 +156,10 @@ def getServiceStatuses(response, settings, settingsAttributes):
 ##Update a response with the entities an entity uses.
 def getSubEntities(response, settings, settingsAttributes):
     if 'subEntities' in settingsAttributes:
-        print("~~~adding subentities.")
+        #print("~~~adding subentities.")
         subEntities = []
         for subEntity in settings.subEntities:
-            print("   element: " + str(subEntity))
+            #print("   element: " + str(subEntity))
             subEntities.append(subEntity)
 
 
@@ -167,7 +169,36 @@ def getSubEntities(response, settings, settingsAttributes):
     return response
 
 def main():
-    pass
+    #print("length of argv: " + str(len(sys.argv)))
+    if len(sys.argv) > 1:
+        #print("looking for the input filename.")
+        inputFile = sys.argv[1]
+    else:
+        #print("no argv was offered.")
+        inputFile = "../../delegator/test_in/statusReport_All.json"
+
+    #print("using the default inputFile: " + inputFile)
+    #print(os.listdir("../../delegator/test_in/"))
+
+    with open(inputFile, 'r') as file:
+        jsonObjectString = file.read().replace('\n', '')
+        #print("jsonObjectString: " + str(jsonObjectString))
+
+    #Create transaction, then pass that to receive
+    thisTransaction = Transaction(jsonObjectString)
+
+    try:
+        parseInput(thisTransaction)
+    except Exception as error:
+        print("Error parsing input.")
+        print("Error type: " + str(type(error)))
+        print(traceback.format_exc())
+
+    receive(thisTransaction)
+
+    responseObjectString = thisTransaction.outgoing_string
+    return responseObjectString
 
 if __name__ == "__main__":
+
   main()
