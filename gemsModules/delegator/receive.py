@@ -3,6 +3,8 @@ import gemsModules
 from gemsModules import common
 from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
+import faulthandler
+faulthandler.enable()
 
 def delegate(jsonObjectString):
     print("~~~\nDelegator receive.py delegate() was called.\n~~~")
