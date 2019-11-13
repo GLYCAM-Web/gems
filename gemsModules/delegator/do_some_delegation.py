@@ -3,14 +3,16 @@
 """
 Use this file to test running the delegator from a python script.
 """
+import importlib.util, os, sys, faulthandler
+faulthandler.enable()
 
-import importlib.util, os, sys
 if importlib.util.find_spec("gemsModules") is None:
   this_dir, this_filename = os.path.split(__file__)
   sys.path.append(this_dir + "/../")
   if importlib.util.find_spec("common") is None:
     print("Something went horribly wrong.  No clue what to do.")
-    system.exit(0)
+    #return
+    sys.exit(1)
   else:
     from common import utils
 else:
