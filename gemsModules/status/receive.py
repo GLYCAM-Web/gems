@@ -172,13 +172,30 @@ def getSubEntities(response, settings, settingsAttributes):
     return response
 
 def main():
+    GemsPath = os.environ.get('GEMSHOME')
+    if GemsPath == None:
+        this_dir, this_filename = os.path.split(__file__)
+        print("""
+
+        GEMSHOME environment variable is not set.
+
+        Set it using somthing like:
+
+          BASH:  export GEMSHOME=/path/to/gems
+          SH:    setenv GEMSHOME /path/to/gems
+        """)
+
     #print("length of argv: " + str(len(sys.argv)))
     if len(sys.argv) > 1:
         #print("looking for the input filename.")
-        inputFile = sys.argv[1]
+        if os.path.isfile(sys.argv[1]):
+            inputFile = sys.argv[1]
+        else:
+            #print("got an arg that is not a filename: " + sys.argv[1])
+            inputFile = GemsPath + "/gemsModules/delegator/test_in/statusReport_All.json"
     else:
         #print("no argv was offered.")
-        inputFile = "../../delegator/test_in/statusReport_All.json"
+        inputFile = GemsPath + "/gemsModules/delegator/test_in/statusReport_All.json"
 
     #print("using the default inputFile: " + inputFile)
     #print(os.listdir("../../delegator/test_in/"))

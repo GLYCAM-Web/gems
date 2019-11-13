@@ -1,7 +1,5 @@
 import os
 import unittest
-import gemsModules
-from gemsModules import status
 
 GemsPath = os.environ.get('GEMSHOME')
 if GemsPath == None:
@@ -17,35 +15,30 @@ if GemsPath == None:
 """)
 
 """
-Testing for the integrity of the status module in general.
+Testing for the integrity of the query module in general
 """
 class TestModule(unittest.TestCase):
 
     def test_help_file_exists(self):
-        print("GemsPath: " + GemsPath)
-        targetFile = GemsPath + "/gemsModules/status/helpme.py"
+        targetFile = GemsPath + "/gemsModules/query/helpme.py"
         exists = os.path.isfile(targetFile)
         self.assertTrue(exists)
 
     def test_receive_file_exists(self):
-        targetFile = GemsPath + "/gemsModules/status/receive.py"
+        targetFile = GemsPath + "/gemsModules/query/receive.py"
+        exists = os.path.isfile(targetFile)
+        self.assertTrue(exists)
+
+    def test_run_query_file_exists(self):
+        targetFile = GemsPath + "/gemsModules/query/run_query.py"
         exists = os.path.isfile(targetFile)
         self.assertTrue(exists)
 
     def test_settings_file_exists(self):
-        targetFile = GemsPath + "/gemsModules/status/settings.py"
+        targetFile = GemsPath + "/gemsModules/query/settings.py"
         exists = os.path.isfile(targetFile)
         self.assertTrue(exists)
 
-"""
-Testing for all methods involved in report generation.
-"""
-class TestReportGeneration(unittest.TestCase):
-
-    """main() must always return a string"""
-    def test_main_returns_string(self):
-        response = status.receive.main()
-        self.assertIsInstance(response, str)
 
 if __name__ == '__main__':
     unittest.main()
