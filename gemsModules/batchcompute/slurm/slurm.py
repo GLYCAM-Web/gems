@@ -4,13 +4,13 @@ import json
 import os
 import sys
 #Import custom packages
-import conf
-import SMAT
-import log_file
-import job_status_json
+from batchcompute import conf
+from batchcompute import SMAT
+from batchcompute import log_file
+from batchcompute import job_status_json
 import query
-import job_status_key_values
-import simulation
+from batchcompute import SMAT
+from batchcompute import simulation
 
 class Slurm_Job:
     def __init__(self, SMAT_ENTRY, WEB_ID, SIMULATION_OBJ = None):
@@ -60,7 +60,7 @@ class Slurm_Job:
             self.job_status_json_obj = json.dumps(self.status, sort_keys = True, indent = 4, separators = (',', ':'))
         else:
             print("Job status json object already exist. Has been dumped previously.")
-        
+
     def GetJobStatusJsonObj(self):
         if self.job_status_json_obj != None:
             return self.job_status_json_obj
@@ -76,13 +76,13 @@ def process_individual_SMAT_entry(SMAT_ENTRY, SMAT_index, web_id):
     if SMAT_ENTRY[SMAT.key_and_values.STATUS_KEY] != SMAT.key_and_values.STATUS_READY: #If status is not "Ready", the job has been submitted before.Will not attempt re-submission.
         if SMAT_ENTRY[SMAT.key_and_values.STATUS_KEY].find(SMAT.key_and_values.STATUS_JOBID_PREFIX) != -1: #If current job has job id, it has been submitted before. Can't decide its status at this point, could be PD,R,C etc.
             new_slurm_job.status[job_status_key_values.JOB_ID_KEY] = SMAT_ENTRY[SMAT.key_and_values.STATUS_KEY].replace(SMAT.key_and_values.STATUS_JOBID_PREFIX,'')
-        else: #If job does not have job id, it hasn't been successfully submitted before. In this case, copy the status in structure mapping table(Failed,Error etc) 
+        else: #If job does not have job id, it hasn't been successfully submitted before. In this case, copy the status in structure mapping table(Failed,Error etc)
             new_slurm_job.status[job_status_key_values.STATUS_KEY] = SMAT_ENTRY[SMAT.key_and_values.STATUS_KEY]
         new_simulation_job = simulation.Simulation(SMAT_ENTRY, web_id, new_slurm_job)
         new_slurm_job.SetSimulationJob (new_simulation_job)
         return new_slurm_job
-    
-    else: #If status is Ready, job needs first-time submission or resubmission.So code will attempt submission.         
+
+    else: #If status is Ready, job needs first-time submission or resubmission.So code will attempt submission.
         if os.path.isdir(subdir_path) == False:
             print('Error: subdirectory ' + SMAT_ENTRY[SMAT.key_and_values.LABEL_KEY] + 'does not exist.')
             new_slurm_job.status[job_status_key_values.MESSAGE_KEY] = new_slurm_job.status[job_status_key_values.MESSAGE_KEY] + ' Job submission failed for ' + SMAT_ENTRY[SMAT.key_and_values.LABEL_KEY] + '. See errors'
@@ -97,7 +97,7 @@ def process_individual_SMAT_entry(SMAT_ENTRY, SMAT_index, web_id):
             if simulation.check_if_dir_content_good(new_simulation_job, SMAT_ENTRY) == True:
                 #Submit job
                 submit_check_if_success(new_slurm_job, SMAT_ENTRY)
-            
+
             else:
                 print('Directory content bad. Input files are absent or output files are present.Unable to submit job.Skip this subdirectory')
 
@@ -115,7 +115,7 @@ def process_SMAT_entries(SMAT_array, job_id):
         job_objects_list.append(new_slurm_job_object)
 
     return job_objects_list
-            
+
 def submit_check_if_success(job_obj, SMAT_ENTRY):
     print("Now submitting using script: " + job_obj.Run_Script_Name)
     slurm_submit = subprocess.Popen(['sbatch', '--output=slurm-\%j.out', '--error=slurm-\%j.err', './' + job_obj.Run_Script_Name], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
@@ -136,7 +136,7 @@ def submit_check_if_success(job_obj, SMAT_ENTRY):
         #Trim "Submitted batch job 123\n" into "123". Remove "Submitted batch job" and "\n" and any whitespaces
         trimmed_std_out_str1 = std_out_str.replace('Submitted batch job ', '')
         trimmed_std_out_str2 = trimmed_std_out_str1.strip(' \n')
-        SMAT_ENTRY[SMAT.key_and_values.STATUS_KEY] = SMAT.key_and_values.STATUS_JOBID_PREFIX + trimmed_std_out_str2 
+        SMAT_ENTRY[SMAT.key_and_values.STATUS_KEY] = SMAT.key_and_values.STATUS_JOBID_PREFIX + trimmed_std_out_str2
         job_obj.status[job_status_key_values.JOB_ID_KEY] = trimmed_std_out_str2
         return True
 
