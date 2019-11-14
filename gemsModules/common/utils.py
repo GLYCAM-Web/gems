@@ -26,18 +26,18 @@ def JSON_Error_Response(errorcode):
     thereturn = "{\n\
 	\"entity\" :\n\
 	{\n\
-		\"type\": \"CommonServicer\",\n\
+		\"type\": \"CommonServices\",\n\
 		\"responses\" :\n\
 		[\n\
 			{ \"fatalError\" :\n\
 				{ \n\
-                                    \"type\" : \"Unknown\",\n\
+                                    \"respondingService\" : \"Utilities\",\n\
                                     \"notice\" : \n\
                                     {\n\
                                         \"type\" : \"Exit\",\n\
                                         \"code\" : \"" + str(errorcode) + "\",\n\
                                         \"brief\" : \"" + theBrief + "\",\n\
-                                        \"message\" : \"" + str(code_to_message[errorcode]) + "\",\n\
+                                        \"message\" : \"" + str(code_to_message[errorcode]) + "\"\n\
                                     }\n\
                                 }\n\
 			}\n\
@@ -130,9 +130,10 @@ def JSON_from_stdin(command_line):
     verbosity=gems_environment_verbosity()
     # check if there is standard input 
     if select.select([sys.stdin,],[],[],0.0)[0]:
+        jsonObjectString = sys.stdin.read().replace('\n', '')
         # check that it contains a json object 
         try:
-            jsonObjectString = json.loads(sys.stdin.read().replace('\n', ''))
+            testString = json.loads(jsonObjectString)
         except ValueError:
             if verbosity >= 0:
                 print("The content of stdin appears not to be in JSON format.  Exiting.")
@@ -164,9 +165,12 @@ def JSON_from_filename_on_command_line(command_line):
         else:
             return brief_to_code['NotAFile']
     else:
+        #jsonObjectString = open(sys.argv[1],'r')
+        with open(sys.argv[1], 'r') as content_file:
+            jsonObjectString = content_file.read()
         # check that it contains a json object 
         try:
-            jsonObjectString = json.load(open(sys.argv[1],'r'))
+            testString = json.loads(jsonObjectString)
         except ValueError:
             if verbosity >= 0:
                 print("The given file appears not to be in JSON format.  Exiting.")

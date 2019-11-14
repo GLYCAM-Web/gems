@@ -59,7 +59,8 @@ def parseInput(thisTransaction):
     try:
         TransactionSchema(**thisTransaction.request_dict)
     except ValidationError as e:
-        print("Validation Error.")
+        # TODO : Add these to the error/verbosity thing
+#        print("Validation Error.")
 #        print(e.json())
 #        print(e.errors())
         if 'entity' in e.errors()[0]['loc']:
@@ -128,27 +129,32 @@ def returnHelp(requestedEntity,requestedHelp):
 
 
 def main():
-  import importlib, os, sys
-  from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
-  from pydantic import BaseModel, Schema
-  from pydantic.schema import schema
-  if importlib.util.find_spec("gemsModules") is None:
-    this_dir, this_filename = os.path.split(__file__)
-    sys.path.append(this_dir + "/../")
-    if importlib.util.find_spec("common") is None:
-      print("Something went horribly wrong.  No clue what to do.")
-      return
+    import importlib, os, sys
+    from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
+    from pydantic import BaseModel, Schema
+    from pydantic.schema import schema
+    if importlib.util.find_spec("gemsModules") is None:
+      this_dir, this_filename = os.path.split(__file__)
+      sys.path.append(this_dir + "/../")
+      if importlib.util.find_spec("common") is None:
+        print("Something went horribly wrong.  No clue what to do.")
+        return
+      else:
+        from common import utils
     else:
-      from common import utils
-  else:
-    from gemsModules.common import utils
-  utils.investigate_gems_setup(sys.argv)
-
-  with open(sys.argv[1], 'r') as file:
-    data = file.read().replace('\n', '')
+      from gemsModules.common import utils
+#  utils.investigate_gems_setup(sys.argv)
+#
+#  with open(sys.argv[1], 'r') as file:
+#    data = file.read().replace('\n', '')
     # Make a new Transaction object for holding I/O information.
+    data=utils.JSON_From_Command_Line(sys.argv)
+    print("The object is:")
+    print(data)
     thisTransaction=Transaction(data)
     parseInput(thisTransaction)
+    print("finished parsing")
+
 
 
 if __name__ == "__main__":

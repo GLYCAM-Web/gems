@@ -17,7 +17,7 @@ if importlib.util.find_spec("gemsModules") is None:
     from common import utils
 else:
   from gemsModules.common import utils
-utils.investigate_gems_setup(sys.argv)
+data=utils.JSON_From_Command_Line(sys.argv)
 
 with open(sys.argv[1], 'r') as file:
   jsonObjectString = file.read().replace('\n', '')

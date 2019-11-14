@@ -30,10 +30,8 @@ def main():
       from common import utils
   else:
     from gemsModules.common import utils
-  utils.investigate_gems_setup(sys.argv)
 
-  with open(sys.argv[1], 'r') as file:
-    jsonObjectString = file.read().replace('\n', '')
+  jsonObjectString=utils.JSON_From_Command_Line(sys.argv)
   responseObjectString=delegate(jsonObjectString)
   print(responseObjectString)
 
