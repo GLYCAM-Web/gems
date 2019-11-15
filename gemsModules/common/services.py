@@ -2,35 +2,40 @@
 import sys,importlib.util
 import gemsModules
 from gemsModules import common
-from gemsModules.common.transaction import *
 from gemsModules.common.settings import *
+from gemsModules.common.transaction import *
+from gemsModules.common.utils import *
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 from pydantic import BaseModel, Schema
 from pydantic.schema import schema
 
-"""
-TODO: Update this method to receive actual module name, not its key.
-Also update methods that call common/services.py importEntity() to reflect this change.
-"""
+## TODO: Update this method to receive actual module name, not its key.
+## Also update methods that call common/services.py importEntity() to reflect this change.
+
+verbosity=common.utils.gems_environment_verbosity()
+
 def importEntity(requestedEntity):
-  #print("~~~ importEntity was called.")
-  import gemsModules
+    if verbosity > 0 :
+        print("~~~ importEntity was called.")
+    if verbosity > 1 :
+        print("requestedEntity: " + requestedEntity)
+        print("Entities known to Common Services: " + str(subEntities))
 
-  #print("requestedEntity: " + requestedEntity)
-  #print("common entityModules: " + str(entityModules))
+    requestedModule = '.' + subEntities[requestedEntity]
 
-  requestedModule = '.' + subEntities[requestedEntity]
+    if verbosity > 1 :
+        print("requestedModule: " + requestedModule)
 
-  #print("requestedModule: " + requestedModule)
+    module_spec = importlib.util.find_spec(requestedModule,package="gemsModules")
 
-  module_spec = importlib.util.find_spec(requestedModule,package="gemsModules")
+    if module_spec is None:
+        if verbosity > 0 :
+            print("The module spec returned None for rquestedEntity: " + requestedEntity)
+        return None
 
-  if module_spec is None:
-    print("The module spec returned None for rquestedEntity: " + requestedEntity)
-    return None
-
-  #print("module_spec: " + str(module_spec))
-  return importlib.import_module(requestedModule,package="gemsModules")
+    if verbosity > 1 :
+        print("module_spec: " + str(module_spec))
+    return importlib.import_module(requestedModule,package="gemsModules")
 
 def parseInput(thisTransaction):
     import json
@@ -80,7 +85,8 @@ def parseInput(thisTransaction):
     return 0
 
 def marco(requestedEntity):
-    print("The delegator's marco method was called.")
+    if verbosity > 1 :
+        print("The Marco method was called and is being fulfilled by CommonServices.")
     theEntity = importEntity(requestedEntity)
     if hasattr(theEntity, 'receive'):
         return "Polo"
