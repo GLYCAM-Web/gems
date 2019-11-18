@@ -34,7 +34,7 @@ def main():
       from common import utils
   else:
     from gemsModules.common import utils
-  data=utils.JSON_From_Command_Line(sys.argv)
+  jsonObjectString=utils.JSON_From_Command_Line(sys.argv)
 
   # with open(sys.argv[1], 'r') as file:
   #   jsonObjectString = file.read().replace('\n', '')

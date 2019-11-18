@@ -172,6 +172,7 @@ def getSubEntities(response, settings, settingsAttributes):
     return response
 
 def main():
+    ## TODO:  Make this look more like the main in delegator's receive.py
     GemsPath = os.environ.get('GEMSHOME')
     if GemsPath == None:
         this_dir, this_filename = os.path.split(__file__)
