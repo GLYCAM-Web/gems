@@ -20,6 +20,7 @@ jsonObjectString=utils.JSON_From_Command_Line(sys.argv)
 
 from gemsModules.delegator.receive import delegate
 responseObjectString=delegate(jsonObjectString)
+#print("This is the response: ")
 print(responseObjectString)
 
 

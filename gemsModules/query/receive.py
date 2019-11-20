@@ -16,7 +16,7 @@ def doDefaultService(thisTransaction):
     run_query.buildQueryString(thisTransaction)
 
 def receive(thisTransaction):
-    print("Query received it")
+#    print("Query received it")
     # doDefaultService(thisTransaction)
     from . import run_query
     run_query.buildQueryString(thisTransaction)

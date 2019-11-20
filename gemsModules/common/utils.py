@@ -60,7 +60,7 @@ def gems_environment_verbosity():
     if GemsDebugVerbosity != None:
         return int(GemsDebugVerbosity)
     else:
-        return 0
+        return '-1'
 
 def check_gems_home():
     import sys, os
