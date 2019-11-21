@@ -4,9 +4,6 @@ from gemsModules import common
 from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
 import traceback
-# These can capture segfaults, but can interfere with stderr somewhat
-import faulthandler
-faulthandler.enable()
 
 def delegate(jsonObjectString):
     """
@@ -95,6 +92,7 @@ def doDefaultService(thisTransaction):
     thisTransaction.response_dict['responses'].append({'payload':marco('Delegator')})
     thisTransaction.build_outgoing_string()
 
+## TODO:  this reception code does not conform to the current JSON schema (is close...).
 def receive(thisTransaction):
     if verbosity > 0 :
         print("Delegator received a transaction.")
@@ -121,6 +119,10 @@ def receive(thisTransaction):
                 thisTransaction.response_dict['responses'] = []
                 thisTransaction.response_dict['responses'].append({'entities' : entities})
                 thisTransaction.build_outgoing_string()
+            if 'testSegfault' in element.keys():
+#                print("About to segfault, I hope.")
+                from . import isegfault
+                return
 
 def main():
   import importlib.util, os, sys

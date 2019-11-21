@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 ##  Use this file to:
 ##    * Run the GEMS Delegator as a standalone script.
-import importlib.util, os, sys, getopt, faulthandler
-faulthandler.enable()
+import importlib.util, os, sys, getopt
+#import faulthandler
+#faulthandler.enable()
 
 USAGE="""
 USAGE:
