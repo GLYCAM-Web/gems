@@ -19,22 +19,18 @@ servicesStatus = [
     }
 ]
 
-"""
-Module names for services that this entity/module can perform.
-These should not include the Common Services.
-"""
 
+## Module names for services that this entity/module can perform.
+## These should not include the Common Services.
 ServiceModule = {
     'delegate' : 'delegate',
     'ListEntities' : 'listEntities',
 }
 
-"""
-Module names for entities that the Delegator knows about
-"""
+## Module names for entities that the Delegator knows about
 subEntities = {
     'Conjugate' : 'conjugate',
-    'Common' : 'common',
+    'CommonServices' : 'common',
     'Query' : 'query',
     'Sequence' : 'sequence',
     'DrawGlycan' : 'drawglycan',

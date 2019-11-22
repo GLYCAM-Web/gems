@@ -1,0 +1,17 @@
+{ 
+    "entity" : 
+    { 
+        "type": "Sequence", 
+        "services" : 
+        [ 
+            { "Build" :  
+                { "type" : "Build3DStructure" } 
+            } 
+        ], 
+        "inputs" : 
+        [ 
+            { "Sequence" : 
+                { "payload" : "DGalpa1-OH" } 
+            } 
+        ] 
+    }

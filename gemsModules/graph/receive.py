@@ -8,7 +8,7 @@ from gemsModules.common.transaction import *
 
 
 def receive(thisTransaction : Transaction):
-    print("~~~graph module's receive.py has received a transation.")
+#    print("~~~graph module's receive.py has received a transation.")
     import gemsModules.graph
 
     if 'services' not in thisTransaction.request_dict['entity'].keys():
@@ -18,18 +18,18 @@ def receive(thisTransaction : Transaction):
     input_services = thisTransaction.request_dict['entity']['services']
     requestedServices = getTypesFromList(input_services)
 
-    print("requestedServices: " + str(requestedServices))
+#    print("requestedServices: " + str(requestedServices))
 
-    print("graph.settings.serviceModules.keys(): " + str(settings.serviceModules.keys()))
+#    print("graph.settings.serviceModules.keys(): " + str(settings.serviceModules.keys()))
 
     requestedServices = getTypesFromList(input_services)
-    print("requestedServices: " + str(requestedServices))
+#    print("requestedServices: " + str(requestedServices))
     for requestedService in requestedServices:
         if requestedService not in common.settings.serviceModules.keys() and requestedService not in settings.serviceModules.keys():
-            print("requestedService was not recognized: " + requestedService)
+#            print("requestedService was not recognized: " + requestedService)
             common.settings.appendCommonParserNotice( thisTransaction,'ServiceNotKnownToEntity',i)
         else:
-            print("requested service was recognized.")
+#            print("requested service was recognized.")
 
             if thisTransaction.response_dict is None:
                 thisTransaction.response_dict={}
@@ -44,4 +44,5 @@ def receive(thisTransaction : Transaction):
 
 
     thisTransaction.build_outgoing_string()
-    print("thisTransaction.outgoing_string: " + thisTransaction.outgoing_string)
+    # TODO:  ensure that this print isn't being relied upon by anything important
+#    print("thisTransaction.outgoing_string: " + thisTransaction.outgoing_string)

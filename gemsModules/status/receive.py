@@ -34,7 +34,8 @@ def receive(thisTransaction : Transaction):
                 thisTransaction.build_outgoing_string()
                 #print("thisTransaction.outgoing_string: " + thisTransaction.outgoing_string)
             else:
-                print("Perhaps a service was added to status/settings.py, but not defined in receive.py? Likely this service is still in development.")
+                pass
+#                print("Perhaps a service was added to status/settings.py, but not defined in receive.py? Likely this service is still in development.")
 
 ##This method needs to check for options. If options are not present, do the default service.
 ##    If the options are present, and specify a list of entities to report on, only report on those.
@@ -57,7 +58,8 @@ def generateReport(thisTransaction : Transaction, thisService : Service = None):
                 if target['type'] == 'All':
                     doDefaultService(thisTransaction)
                 else:
-                    print("Report requested for a specific target. Still being developed.")
+                    pass
+#                    print("Report requested for a specific target. Still being developed.")
 
         else:
             doDefaultService(thisTransaction)
@@ -105,7 +107,8 @@ def doDefaultService(thisTransaction : Transaction):
             responses.append(response)
 
         else:
-            print("Could not find settings for this entity.")
+            pass
+#            print("Could not find settings for this entity.")
 
 
     thisTransaction.response_dict.update({
@@ -172,6 +175,7 @@ def getSubEntities(response, settings, settingsAttributes):
     return response
 
 def main():
+    ## TODO:  Make this look more like the main in delegator's receive.py
     GemsPath = os.environ.get('GEMSHOME')
     if GemsPath == None:
         this_dir, this_filename = os.path.split(__file__)

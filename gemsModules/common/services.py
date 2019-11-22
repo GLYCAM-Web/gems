@@ -2,35 +2,40 @@
 import sys,importlib.util
 import gemsModules
 from gemsModules import common
-from gemsModules.common.transaction import *
 from gemsModules.common.settings import *
+from gemsModules.common.transaction import *
+from gemsModules.common.utils import *
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 from pydantic import BaseModel, Schema
 from pydantic.schema import schema
 
-"""
-TODO: Update this method to receive actual module name, not its key.
-Also update methods that call common/services.py importEntity() to reflect this change.
-"""
+## TODO: Update this method to receive actual module name, not its key.
+## Also update methods that call common/services.py importEntity() to reflect this change.
+
+verbosity=common.utils.gems_environment_verbosity()
+
 def importEntity(requestedEntity):
-  #print("~~~ importEntity was called.")
-  import gemsModules
+    if verbosity > 0 :
+        print("~~~ importEntity was called.")
+    if verbosity > 1 :
+        print("requestedEntity: " + requestedEntity)
+        print("Entities known to Common Services: " + str(subEntities))
 
-  #print("requestedEntity: " + requestedEntity)
-  #print("common entityModules: " + str(entityModules))
+    requestedModule = '.' + subEntities[requestedEntity]
 
-  requestedModule = '.' + subEntities[requestedEntity]
+    if verbosity > 1 :
+        print("requestedModule: " + requestedModule)
 
-  #print("requestedModule: " + requestedModule)
+    module_spec = importlib.util.find_spec(requestedModule,package="gemsModules")
 
-  module_spec = importlib.util.find_spec(requestedModule,package="gemsModules")
+    if module_spec is None:
+        if verbosity > 0 :
+            print("The module spec returned None for rquestedEntity: " + requestedEntity)
+        return None
 
-  if module_spec is None:
-    print("The module spec returned None for rquestedEntity: " + requestedEntity)
-    return None
-
-  #print("module_spec: " + str(module_spec))
-  return importlib.import_module(requestedModule,package="gemsModules")
+    if verbosity > 1 :
+        print("module_spec: " + str(module_spec))
+    return importlib.import_module(requestedModule,package="gemsModules")
 
 def parseInput(thisTransaction):
     import json
@@ -59,7 +64,8 @@ def parseInput(thisTransaction):
     try:
         TransactionSchema(**thisTransaction.request_dict)
     except ValidationError as e:
-        print("Validation Error.")
+        # TODO : Add these to the error/verbosity thing
+#        print("Validation Error.")
 #        print(e.json())
 #        print(e.errors())
         if 'entity' in e.errors()[0]['loc']:
@@ -79,7 +85,8 @@ def parseInput(thisTransaction):
     return 0
 
 def marco(requestedEntity):
-    print("The delegator's marco method was called.")
+    if verbosity > 1 :
+        print("The Marco method was called and is being fulfilled by CommonServices.")
     theEntity = importEntity(requestedEntity)
     if hasattr(theEntity, 'receive'):
         return "Polo"
@@ -128,27 +135,32 @@ def returnHelp(requestedEntity,requestedHelp):
 
 
 def main():
-  import importlib, os, sys
-  from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
-  from pydantic import BaseModel, Schema
-  from pydantic.schema import schema
-  if importlib.util.find_spec("gemsModules") is None:
-    this_dir, this_filename = os.path.split(__file__)
-    sys.path.append(this_dir + "/../")
-    if importlib.util.find_spec("common") is None:
-      print("Something went horribly wrong.  No clue what to do.")
-      return
+    import importlib, os, sys
+    from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
+    from pydantic import BaseModel, Schema
+    from pydantic.schema import schema
+    if importlib.util.find_spec("gemsModules") is None:
+      this_dir, this_filename = os.path.split(__file__)
+      sys.path.append(this_dir + "/../")
+      if importlib.util.find_spec("common") is None:
+        print("Something went horribly wrong.  No clue what to do.")
+        return
+      else:
+        from common import utils
     else:
-      from common import utils
-  else:
-    from gemsModules.common import utils
-  utils.investigate_gems_setup(sys.argv)
-
-  with open(sys.argv[1], 'r') as file:
-    data = file.read().replace('\n', '')
+      from gemsModules.common import utils
+#  utils.investigate_gems_setup(sys.argv)
+#
+#  with open(sys.argv[1], 'r') as file:
+#    data = file.read().replace('\n', '')
     # Make a new Transaction object for holding I/O information.
+    data=utils.JSON_From_Command_Line(sys.argv)
+    print("The object is:")
+    print(data)
     thisTransaction=Transaction(data)
     parseInput(thisTransaction)
+    print("finished parsing")
+
 
 
 if __name__ == "__main__":
