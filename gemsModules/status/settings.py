@@ -7,10 +7,11 @@ from pydantic import BaseModel, Schema
 ## Who I am
 WhoIAm='Status'
 
-## Status Report
+## Module Status Report
 status = "In development"
 moduleStatusDetail = "Can receive requests. Currently working on report generation."
 
+## Status Reports For Module Services
 servicesStatus = [
     {
         "service" : "GenerateReport",
@@ -19,6 +20,8 @@ servicesStatus = [
     }
 ]
 
+## Service Modules. Keys are called by users. Values are used by code,
+##  so we never execute user commands.
 serviceModules = {
     "GenerateReport" :"generateReport"
 }
