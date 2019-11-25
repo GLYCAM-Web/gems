@@ -1,11 +1,21 @@
 """
 Testing schema inheritance with pydantic:
+
+First, the inherited model structure should be simple, for demo sake.
 House is generic. All houses have:
     windowCount: int
     floorCount:  int
 
 Apartment is a specific type of house:
     aptNumber: int
+
+Done.
+
+TODO next, Add Pydantic to this so that the schema inheritance can be
+demonstrated in-file.
+
+TODO last, separate the apartment subclass to its own file, and show
+how to use inheritance in python with pydantic.
 """
 
 
