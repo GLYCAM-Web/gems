@@ -2,11 +2,10 @@
 from enum import Enum, auto
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 from typing import ForwardRef
-from pydantic import BaseModel, Schema
+from pydantic import BaseModel,  Field
 from pydantic.schema import schema
 
-#from gemsModules.common import transaction
-from gemsModules.common.transaction import Tags
+from gemsModules.common import transaction
 
 # ##
 # ## Enums 
@@ -30,43 +29,53 @@ class SubmissionStatusEnum(str, Enum):
     complete='Complete'  # the job has run and is no longer being monitored by the scheduler
 
 class JobSubmissionInfo(BaseModel):
-    schedulerType: SchedulerTypeEnum = Schema(
+    schedulerType: SchedulerTypeEnum = Field(
             'Slurm',
             title='Scheduler Type',
             description='The type of scheduling software used in the compute cluster.'
             )
-    queuePartition: QueuePartitionEnum = Schema(
+    queuePartition: QueuePartitionEnum = Field(
             None,
             title='Queue / Partition',
             description='The queue/partition (term depends on software) to use..'
             )
-    submissionStatus: SubmissionStatusEnum = Schema(
+    submissionStatus: SubmissionStatusEnum = Field(
             None,
             alias='status',
             title='Queue / Partition',
             description='The queue/partition (term depends on software) to use..'
             )
-    name: str = Schema(
+    name: str = Field(
             None,
             title='Job name',
             description='Ensure that name format conforms to scheduler requirements.'
             )
-    workingDirectory: str = Schema(
+    jobID: str = Field(
+            None,
+            title='Job ID',
+            description='The job identifier, if any, returned by the scheduler.'
+            )
+    schedulerResponse: str = Field(
+            None,
+            title='Scheduler response',
+            description='The entire text returned by the scheduler upon the (attempted or successful) submission.'
+            )
+    workingDirectory: str = Field(
             None,
             title='Working Directory',
             description='Path must be appropriate to the scheduler file system.'
             )
-    schedulerGrpcHost: str = Schema(
+    schedulerGrpcHost: str = Field(
             None,
             title='Scheduler gRPC server',
             description='The server to contact via gRPC for submitting the job.  Normally not required.'
             )
-    schedulerGrpcPort: int = Schema(
+    schedulerGrpcPort: int = Field(
             None,
             title='Scheduler gRPC port',
             description='The port to contact via gRPC for submitting the job.  Normally not required.'
             )
-    options : Tags = None
+    options : transaction.Tags = None
 ##
 ##  Others to add one day:
 ##      time limit
