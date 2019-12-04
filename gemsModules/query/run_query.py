@@ -21,7 +21,7 @@ exitCodes = {
 # import gems/gmml stuff
 import gmml
 if gmml is None:
-    print(exitMessages["GmmlNotFound"])
+#    print(exitMessages["GmmlNotFound"])
     sys.exit(exitCodes["GmmlNotFound"])
 
 def buildQueryString(thisTransaction : Transaction):
@@ -33,13 +33,13 @@ def buildQueryString(thisTransaction : Transaction):
     try:
         virtLocation = os.getenv('VIRTUOSO_DB') + ":" + str(8890) + "/sparql"
     except:
-        print("Unable to find the Virtuoso Database.  Quitting.")
+#        print("Unable to find the Virtuoso Database.  Quitting.")
         sys.exit(1)
     theseOptions = thisTransaction.transaction_in['services'][0]['formQueryString']['options']
     if theseOptions['queryType'] == "Initial":
-        print(theseOptions)
-        print("Printing the aglycon part:")
-        print(theseOptions['aglycon'])
+#        print(theseOptions)
+#        print("Printing the aglycon part:")
+#        print(theseOptions['aglycon'])
         if theseOptions['aglycon'] == 'None':
             theseOptions['aglycon'] = ""
         temp = gmml.Assembly()
@@ -76,7 +76,7 @@ def buildQueryString(thisTransaction : Transaction):
                 str(theseOptions['output_file_type'])
                 )
     proc = subprocess.Popen(theQueryString, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    print(theQueryString)
+#    print(theQueryString)
     (out, err) = proc.communicate()
     out = str(out.decode('utf-8'))
     #variable out contains results of curl command that returns some unnecessary information about curl version at the begginging

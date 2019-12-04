@@ -1,6 +1,24 @@
 ## Who I am
 WhoIAm='Query'
 
+status = "In development"
+moduleStatusDetail = "Can make queries via GlyFinder serviceModule."
+
+servicesStatus = [
+    {
+        "service" : "GlyFinder",
+        "status" : "In development.",
+        "statusDetail" : "The glyfinder service is maturing. Can make queries. Adding finishing touches."
+    }
+]
+
+subEntities = [
+    {
+        "subEntity" : "Graph"
+    }
+]
+
+
 ## Module names for services that this entity/module can perform.
 ## These should not include the Common Services.
 ServiceModule = {
@@ -14,18 +32,18 @@ def main():
         sys.path.append(this_dir + "/../")
         if importlib.util.find_spec("common") is None:
             print("Something went horribly wrong.  No clue what to do.")
-            sys.exit(1)
+            return
         else:
             from common import utils
     else:
         from gemsModules.common import utils
-    utils.investigate_gems_setup(sys.argv)
+    data=utils.JSON_From_Command_Line(sys.argv)
 
 
 
     # If I can get the code below to work it should be a breeze to make the other queries.
 
-    
+
     # Code from gems level detect sugar test
     # import gems/gmml stuff
     sys.path.append(GemsPath)

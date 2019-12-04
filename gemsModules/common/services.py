@@ -1,37 +1,41 @@
 #!/usr/bin/env python3
 import sys,importlib.util
 import gemsModules
-from gemsModules import common 
-from gemsModules.common.transaction import *
+from gemsModules import common
 from gemsModules.common.settings import *
+from gemsModules.common.transaction import *
+from gemsModules.common.utils import *
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 from pydantic import BaseModel, Schema
 from pydantic.schema import schema
 
+## TODO: Update this method to receive actual module name, not its key.
+## Also update methods that call common/services.py importEntity() to reflect this change.
 
-"""
-TODO: Update this method to receive actual module name, not its key.
-Also update methods that call common/services.py importEntity() to reflect this change.
-"""
+verbosity=common.utils.gems_environment_verbosity()
+
 def importEntity(requestedEntity):
-  print("~~~ importEntity was called.")
-  import gemsModules
+    if verbosity > 0 :
+        print("~~~ importEntity was called.")
+    if verbosity > 1 :
+        print("requestedEntity: " + requestedEntity)
+        print("Entities known to Common Services: " + str(subEntities))
 
-  print("requestedEntity: " + requestedEntity)
-  #print("common entityModules: " + str(entityModules))
+    requestedModule = '.' + subEntities[requestedEntity]
 
-  requestedModule = '.' + entityModules[requestedEntity]
+    if verbosity > 1 :
+        print("requestedModule: " + requestedModule)
 
-  #print("requestedModule: " + requestedModule)
-  
-  module_spec = importlib.util.find_spec(requestedModule,package="gemsModules")
+    module_spec = importlib.util.find_spec(requestedModule,package="gemsModules")
 
-  if module_spec is None: 
-    print("The module spec returned None for rquestedEntity: " + requestedEntity)
-    return None
+    if module_spec is None:
+        if verbosity > 0 :
+            print("The module spec returned None for rquestedEntity: " + requestedEntity)
+        return None
 
-  print("module_spec: " + str(module_spec))
-  return importlib.import_module(requestedModule,package="gemsModules")
+    if verbosity > 1 :
+        print("module_spec: " + str(module_spec))
+    return importlib.import_module(requestedModule,package="gemsModules")
 
 def parseInput(thisTransaction):
     import json
@@ -40,8 +44,8 @@ def parseInput(thisTransaction):
     import jsonpickle
     io=StringIO()
 
-    print("~~~\nparseInput() was called.")
-    print("thisTransaction.incoming_string: " + thisTransaction.incoming_string)
+    #print("~~~parseInput() was called.")
+    #print("thisTransaction.incoming_string: " + thisTransaction.incoming_string)
 
     # Load the JSON string into the incoming dictionary
     #
@@ -51,7 +55,7 @@ def parseInput(thisTransaction):
     # Check to see if there are errors.  If there are, bail, but give a reason
     #
     ## TODO:  This will break really easily.  The 'response' part needs to refer to the
-    ## response from this activity rather than the zeroth response.  That said, at this 
+    ## response from this activity rather than the zeroth response.  That said, at this
     ## point, the response will usually be the zeroth one.
     ## A construction maybe like:  if ('X','Y') in this.big.object.items():
     if thisTransaction.request_dict is None:
@@ -60,11 +64,13 @@ def parseInput(thisTransaction):
     try:
         TransactionSchema(**thisTransaction.request_dict)
     except ValidationError as e:
+        # TODO : Add these to the error/verbosity thing
+#        print("Validation Error.")
 #        print(e.json())
 #        print(e.errors())
         if 'entity' in e.errors()[0]['loc']:
             if 'type' in e.errors()[0]['loc']:
-                appendCommonParserNotice(thisTransaction,'NoTypeForEntity')
+                appendCommonParserNotice(thisTransaction,'EntityNotKnown')
             else:
                 appendCommonParserNotice(thisTransaction,'NoEntityDefined')
         theResponseTypes = getTypesFromList(thisTransaction.response_dict['entity']['responses'])
@@ -74,16 +80,18 @@ def parseInput(thisTransaction):
     # If still here, load the data into a Transaction object and return success
     #
     thisTransaction.transaction_in = jsonpickle.decode(thisTransaction.incoming_string)
-    print("thisTransaction.transaction_in: " + str(thisTransaction.transaction_in))
-    print("~~~Finished parseInput()")
+    #print("thisTransaction.transaction_in: " + str(thisTransaction.transaction_in))
+    #print("~~~Finished parseInput()")
     return 0
 
 def marco(requestedEntity):
-  theEntity = importEntity(requestedEntity)
-  if hasattr(theEntity, 'entity'):
-    return "Polo"
-  else:
-    return "The entity you seek is not responding properly."
+    if verbosity > 1 :
+        print("The Marco method was called and is being fulfilled by CommonServices.")
+    theEntity = importEntity(requestedEntity)
+    if hasattr(theEntity, 'receive'):
+        return "Polo"
+    else:
+        return "The entity you seek is not responding properly."
 
 def getTypesFromList(theList):
     typesInList=[]
@@ -107,9 +115,7 @@ def getTypesFromList(theList):
 
 ## TODO make this more generic
 def listEntities(requestedEntity='Delegator'):
-  print("~~~\nlistEntities() was called.")
-  print("entityModules: " + str(entityModules))
-  return list(entityModules.keys())
+  return list(subEntities.keys())
 
 
 def returnHelp(requestedEntity,requestedHelp):
@@ -118,7 +124,7 @@ def returnHelp(requestedEntity,requestedHelp):
   if theHelp == 'schemaLocation':
     return "Here there should be a location for the schema"  ## TODO:  make this do something real
   if not hasattr(theEntity, 'helpme'):
-    return "No help available for " + requestedEntity 
+    return "No help available for " + requestedEntity
   helpLocation = getattr(theEntity, 'helpme')
   if not hasattr(helpLocation,theHelp):
     return "The requestedHelp is not available for " + requestedEntity
@@ -129,28 +135,33 @@ def returnHelp(requestedEntity,requestedHelp):
 
 
 def main():
-  import importlib, os, sys
-  from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
-  from pydantic import BaseModel, Schema
-  from pydantic.schema import schema
-  if importlib.util.find_spec("gemsModules") is None:
-    this_dir, this_filename = os.path.split(__file__)
-    sys.path.append(this_dir + "/../")
-    if importlib.util.find_spec("common") is None:
-      print("Something went horribly wrong.  No clue what to do.")
-      sys.exit(1)
+    import importlib, os, sys
+    from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
+    from pydantic import BaseModel, Schema
+    from pydantic.schema import schema
+    if importlib.util.find_spec("gemsModules") is None:
+      this_dir, this_filename = os.path.split(__file__)
+      sys.path.append(this_dir + "/../")
+      if importlib.util.find_spec("common") is None:
+        print("Something went horribly wrong.  No clue what to do.")
+        return
+      else:
+        from common import utils
     else:
-      from common import utils
-  else:
-    from gemsModules.common import utils
-  utils.investigate_gems_setup(sys.argv)
-
-  with open(sys.argv[1], 'r') as file:
-    data = file.read().replace('\n', '')
+      from gemsModules.common import utils
+#  utils.investigate_gems_setup(sys.argv)
+#
+#  with open(sys.argv[1], 'r') as file:
+#    data = file.read().replace('\n', '')
     # Make a new Transaction object for holding I/O information.
+    data=utils.JSON_From_Command_Line(sys.argv)
+    print("The object is:")
+    print(data)
     thisTransaction=Transaction(data)
     parseInput(thisTransaction)
+    print("finished parsing")
+
 
 
 if __name__ == "__main__":
-  main() 
+  main()

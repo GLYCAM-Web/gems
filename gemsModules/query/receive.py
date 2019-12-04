@@ -16,7 +16,7 @@ def doDefaultService(thisTransaction):
     run_query.buildQueryString(thisTransaction)
 
 def receive(thisTransaction):
-    print("Query received it")
+#    print("Query received it")
     # doDefaultService(thisTransaction)
     from . import run_query
     run_query.buildQueryString(thisTransaction)
@@ -29,12 +29,12 @@ def main():
     sys.path.append(this_dir + "/../")
     if importlib.util.find_spec("common") is None:
       print("Something went horribly wrong.  No clue what to do.")
-      sys.exit(1)
+      return
     else:
       from common import utils
   else:
     from gemsModules.common import utils
-  utils.investigate_gems_setup(sys.argv)
+  jsonObjectString=utils.JSON_From_Command_Line(sys.argv)
 
   # with open(sys.argv[1], 'r') as file:
   #   jsonObjectString = file.read().replace('\n', '')

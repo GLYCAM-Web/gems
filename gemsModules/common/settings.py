@@ -9,12 +9,49 @@ from pydantic import BaseModel, Schema
 ## Who I am
 WhoIAm='CommonServicer'
 
+status = "Stable"
+moduleStatusDetail = "Can provide Marco, ReturnHelp, ReturnUsage, ReturnVerboseHelp, and ReturnSchema services."
+
+servicesStatus = [
+    {
+        "service" : "Marco",
+        "status" : "Stable.",
+        "statusDetail" : "Returns Polo if all is well."
+    },
+    {
+        "service" : "ReturnHelp",
+        "status" : "Stable.",
+        "statusDetail" : "Returns brief help message if provided in gemsModule."
+    },
+    {
+        "service" : "ReturnUsage",
+        "status" : "Stable.",
+        "statusDetail" : "Returns usage help message if provided in gemsModule."
+    },
+    {
+        "service" : "ReturnVerboseHelp",
+        "status" : "Stable",
+        "statusDetail" : "Returns more detailed help message if provided in gemsModule."
+    },
+    {
+        "service" : "ReturnSchema",
+        "status" : "Stable",
+        "statusDetail" : "Returns a schema upon request."
+    }
+]
+
+
+
 ## Module names for entities that this entity/module knows.
-entityModules = {
+subEntities = {
+    'CommonServices' : 'common',
     'Conjugate' : 'conjugate',
     'Delegator' : 'delegator',
+    'Graph' : 'graph',
     'Query' : 'query',
     'Sequence' : 'sequence',
+    'Status' : 'status'
+
 }
 
 ## Module names for services that this entity/module can perform.
@@ -84,15 +121,19 @@ def appendCommonParserNotice(thisTransaction: Transaction,  noticeBrief: str, bl
     if thisTransaction.response_dict is None:
         thisTransaction.response_dict={}
         thisTransaction.response_dict['entity']={}
+
     if thisTransaction.response_dict['entity'] is None:
         thisTransaction.response_dict['entity']={}
+
     if not 'responses' in thisTransaction.response_dict['entity']:
         thisTransaction.response_dict['entity']['responses']=[]
+
     if blockID is None:
         if noticeBrief in ExitBlockIDs:
             blockID = ExitBlockIDs[noticeBrief]
         else:
             blockID = 'unknown'
+
     thisTransaction.response_dict['entity']['responses'].append({
             'CommonServicerNotice' : {
             'type' : ExitTypes[noticeBrief],

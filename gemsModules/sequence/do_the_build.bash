@@ -30,12 +30,12 @@ OutPDB="${OutDir}/structure.pdb"
 
 #echo "SequenceModulePath: ${SequenceModulePath}"
 #echo "BuildMe: ${BuildMe}"
-echo "PrepFile: ${PrepFile}"
+#echo "PrepFile: ${PrepFile}"
 #echo "OutOFF: ${OutOFF}"
 #echo "OutPDB: ${OutPDB}"
 #echo "The command: ${BuildMe} ${PrepFile} $1 ${OutOFF} ${OutPDB}"
-echo "~~~Doing the build."
+#echo "~~~Doing the build."
 
 ${BuildMe} ${PrepFile} $1 ${OutOFF} ${OutPDB}
 
-echo "~~~Finished doing the build."
+#echo "~~~Finished doing the build."

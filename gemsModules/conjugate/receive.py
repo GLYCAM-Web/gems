@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import gemsModules
-from gemsModules import common 
+from gemsModules import common
 from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
 
@@ -25,19 +25,17 @@ def main():
     sys.path.append(this_dir + "/../")
     if importlib.util.find_spec("common") is None:
       print("Something went horribly wrong.  No clue what to do.")
-      sys.exit(1)
+      return
     else:
       from common import utils
   else:
     from gemsModules.common import utils
-  utils.investigate_gems_setup(sys.argv)
- 
-  with open(sys.argv[1], 'r') as file:
-    jsonObjectString = file.read().replace('\n', '')
+
+  jsonObjectString=utils.JSON_From_Command_Line(sys.argv)
   responseObjectString=delegate(jsonObjectString)
   print(responseObjectString)
 
 
 if __name__ == "__main__":
   main()
- 
+
