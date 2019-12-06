@@ -49,6 +49,7 @@ subEntities = {
     'Delegator' : 'delegator',
     'Graph' : 'graph',
     'Query' : 'query',
+    'Project' : 'project',
     'Sequence' : 'sequence',
     'Status' : 'status'
 
