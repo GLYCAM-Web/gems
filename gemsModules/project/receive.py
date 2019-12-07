@@ -6,32 +6,47 @@ from project import *
 import settings
 import  os, logging, sys, uuid
 
+##TO set logging verbosity, edit this var to one of the following:
+##  logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
 debugLevel=logging.DEBUG
-logging.basicConfig(level=debugLevel, format='%(asctime)s %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+
+loggers = {}
 
 
-def startProject(thisTransaction : Transaction):
-    logging.info("\nstartProject() was called.")
+
+def receive(thisTransaction : Transaction):
+    log.info("receive() was called.")
     input_dir = "path/from/frontend"
     output_dir = settings.output_data_root + "tools/" + str(uuid.uuid4())
     requesting_agent = "Command line"
     myProject = Project(input_dir=input_dir, output_dir=output_dir, requesting_agent=requesting_agent)
-    logging.debug("myProject: " + str(myProject))
+    log.debug("myProject: " + str(myProject))
     # project.input_dir =
     # project.output_dir = settings.output_data_root + "tools/" + str(uuid.uuid4())
     # project.requesting_agent = "Command line"
-    # logging.debug("project: " + str(project))
+    # log.debug("project: " + str(project))
 
 def main():
-    logging.info("project/receive.py main() was called.")
-    logging.debug("number of args: " + str(len(sys.argv)))
+    log.info("main() was called.")
+    log.debug("number of args: " + str(len(sys.argv)))
     if len(sys.argv) == 2:
         jsonObjectString = utils.JSON_From_Command_Line(sys.argv)
-        logging.debug("jsonObjectString: " + jsonObjectString)
+        log.debug("jsonObjectString: " + jsonObjectString)
         thisTransaction=Transaction(jsonObjectString)
-        startProject(thisTransaction)
+        receive(thisTransaction)
     else:
-        logging.error("You must provide a path to a json request file.")
+        log.error("You must provide a path to a json request file.")
 
 if __name__ == "__main__":
+    if loggers.get(__name__):
+        pass
+    else:
+        log = logging.getLogger(__name__)
+        log.setLevel(debugLevel)
+        streamHandler = logging.StreamHandler()
+        streamHandler.setLevel(debugLevel)
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s',  datefmt='%m/%d/%Y %I:%M:%S %p')
+        streamHandler.setFormatter(formatter)
+        log.addHandler(streamHandler)
+        loggers[__name__] = log
     main()
