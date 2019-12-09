@@ -1,9 +1,10 @@
 import gemsModules
+from gemsModules.project.settings import *
 from gemsModules.common.transaction import *
 from gemsModules.common import utils
 from datetime import datetime
-from project import *
-import settings
+from .project import *
+
 import  os, logging, sys, uuid
 
 ##TO set logging verbosity, edit this var to one of the following:
