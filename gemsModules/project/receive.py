@@ -3,7 +3,6 @@ from gemsModules.project.settings import *
 from gemsModules.common.transaction import *
 from gemsModules.common import utils
 from datetime import datetime
-from .project import *
 
 import  os, logging, sys, uuid
 
@@ -13,14 +12,10 @@ debugLevel=logging.DEBUG
 
 loggers = {}
 
-
-
 def receive(thisTransaction : Transaction):
     log.info("receive() was called.")
-    input_dir = "path/from/frontend"
-    output_dir = settings.output_data_root + "tools/" + str(uuid.uuid4())
-    requesting_agent = "Command line"
-    myProject = Project(input_dir=input_dir, output_dir=output_dir, requesting_agent=requesting_agent)
+    myProject = Project()
+    myProject.buildProject(thisTransaction)
     log.debug("myProject: " + str(myProject))
     # project.input_dir =
     # project.output_dir = settings.output_data_root + "tools/" + str(uuid.uuid4())
