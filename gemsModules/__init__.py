@@ -19,6 +19,7 @@ services to the others.
 See also our JSON schema documentation in the Schema 
 subdirectory.
 """
+from . import batchcompute
 from . import common
 from . import conjugate
 from . import delegator
