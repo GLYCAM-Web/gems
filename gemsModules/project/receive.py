@@ -1,48 +1,53 @@
 import gemsModules
-from gemsModules.project.settings import *
+from gemsModules.project import settings as projectSettings
+from gemsModules.project.dataio import *
 from gemsModules.common.transaction import *
+from gemsModules.common.services import *
 from gemsModules.common import utils
 from datetime import datetime
 
-import  os, logging, sys, uuid
+import  os, sys, uuid
 
-##TO set logging verbosity, edit this var to one of the following:
-##  logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-debugLevel=logging.DEBUG
 
-loggers = {}
+def receive(thisTransaction: Transaction):
+    print("receive() was called.")
+    request = thisTransaction.request_dict
+    print("type of requestObject: " + str(type(request)))
+    if request['project']:
+        print("found a project in the request")
+        project = request['project']
+        if project['_django_version']:
+            ##The project was requested via web interface
+            startProject(thisTransaction, "website")
+        else:
+            ##The project was requested via json_api
+            print("Project was requested via json_api")
 
-def receive(thisTransaction : Transaction):
-    log.info("receive() was called.")
-    myProject = Project()
-    myProject.buildProject(thisTransaction)
-    log.debug("myProject: " + str(myProject))
+    else:
+        ##The request did not come through the frontend, or something went wrong.
+        print("No project present in the request.")
+
+    print("Transaction: " + str(thisTransaction.__dict__))
+
+def startProject(thisTransaction : Transaction, requestingAgent : str):
+    print("receive() was called.")
+    gemsProject = GemsProject()
+    gemsProject.buildProject(thisTransaction, requestingAgent)
+    print("gemsProject: " + str(gemsProject))
     # project.input_dir =
     # project.output_dir = settings.output_data_root + "tools/" + str(uuid.uuid4())
     # project.requesting_agent = "Command line"
     # log.debug("project: " + str(project))
 
 def main():
-    log.info("main() was called.")
-    log.debug("number of args: " + str(len(sys.argv)))
     if len(sys.argv) == 2:
         jsonObjectString = utils.JSON_From_Command_Line(sys.argv)
-        log.debug("jsonObjectString: " + jsonObjectString)
+        print("jsonObjectString: " + jsonObjectString)
         thisTransaction=Transaction(jsonObjectString)
+        parseInput(thisTransaction)
         receive(thisTransaction)
     else:
-        log.error("You must provide a path to a json request file.")
+        print("You must provide a path to a json request file.")
 
 if __name__ == "__main__":
-    if loggers.get(__name__):
-        pass
-    else:
-        log = logging.getLogger(__name__)
-        log.setLevel(debugLevel)
-        streamHandler = logging.StreamHandler()
-        streamHandler.setLevel(debugLevel)
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s',  datefmt='%m/%d/%Y %I:%M:%S %p')
-        streamHandler.setFormatter(formatter)
-        log.addHandler(streamHandler)
-        loggers[__name__] = log
     main()
