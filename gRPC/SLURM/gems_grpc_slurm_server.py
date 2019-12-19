@@ -85,9 +85,9 @@ class GemsGrpcSlurmReceiver(gems_grpc_slurm_pb2_grpc.GemsGrpcSlurmServicer):
             return gems_grpc_slurm_pb2.GemsGrpcSlurmResponse(output=theResponse)
 
         os.environ['GEMS_DEBUG_VERBOSITY']='-1'
-        jobsubmissioncommand = GemsPath+"/bin/gRPC/SLURM/slurmreceive"
+        jobsubmissioncommand = GemsPath+"/bin/slurmreceive"
         try:
-            p = subprocess.Popen(jobsubmissioncommand, stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=True) 
+            p = subprocess.Popen(jobsubmissioncommand, stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=False) 
             theStdin=request.input.encode('utf-8')
             (outputhere,errorshere) = p.communicate(input=theStdin)
             # Check to see if there were any errors, either by exit code or existence of stderr
@@ -118,10 +118,14 @@ def serve():
     print("Starting to serve Slurm via GRPC.")
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     gems_grpc_slurm_pb2_grpc.add_GemsGrpcSlurmServicer_to_server(GemsGrpcSlurmReceiver(), server)
-    # server.add_insecure_port(os.getenv('GEMS_GRPC_SLURM_HOST') + ':' + os.getenv('GEMS_GRPC_SLURM_PORT'))
+    # server.add_insecure_port(os.environ.get('GEMS_GRPC_SLURM_HOST') + ':' + os.environ.get('GEMS_GRPC_SLURM_PORT'))
     # server.add_insecure_port('[::]:50505')
     # TODO  Add capability for a secure port
-    server.add_insecure_port('[::]:' + os.getenv('GEMS_GRPC_SLURM_PORT'))
+    thePort=os.environ.get('GEMS_GRPC_SLURM_PORT')
+    if thePort is None:
+        print("The GEMS_GRPC_SLURM_PORT is not set.  Exiting.")
+        sys.exit(1)
+    server.add_insecure_port('[::]:' + thePort)
     server.start()
     try:
         while True:
