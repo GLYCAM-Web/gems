@@ -19,16 +19,16 @@ class GemsProject(BaseModel):
     requesting_agent : str = None
 
     def buildProject(self, thisTransaction : Transaction, requestingAgent : str):
-        print("buildProject was called.")
-        print("requestingAgent: " + requestingAgent)
+        #print("buildProject was called.")
+        #print("requestingAgent: " + requestingAgent)
 
         self.requestingAgent = requestingAgent
         request = thisTransaction.request_dict
-        print(str(request))
+        #print(str(request))
         if request['project']['timestamp']:
             self.timestamp = request['project']['timestamp']
         else:
-            print("No timestamp present in project, go ahead and make one.")
+            #print("No timestamp present in project, go ahead and make one.")
             self.timestamp = datetime.now()
 
         if request['project']['md5sum']:
@@ -37,11 +37,11 @@ class GemsProject(BaseModel):
             self.project_type = request['project']['type']
 
         self.gems_project_id = str(uuid.uuid4())
-        print("gems_project_id: " + str(self.gems_project_id))
+        #print("gems_project_id: " + str(self.gems_project_id))
         self.project_root =  str(uuid.uuid4())
-        print("project_root: " + self.project_root)
+        #print("project_root: " + self.project_root)
         self.output_dir = projectSettings.output_data_dir + self.project_root
-        print("output_dir: " + self.output_dir)
+        #print("output_dir: " + self.output_dir)
         self.updateTransaction(thisTransaction)
 
     def updateTransaction(self, thisTransaction: Transaction):
