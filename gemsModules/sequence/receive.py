@@ -49,15 +49,12 @@ def validateCondensedSequence(thisTransaction : Transaction, thisService : Servi
 
                     ## Add valid to the transaction responses.
                     if valid:
-                        if thisTransaction.response_dict is None:
-                            thisTransaction.response_dict={}
-                            thisTransaction.response_dict['entity']={}
-                        if thisTransaction.response_dict['entity'] is None:
-                            thisTransaction.response_dict['entity']={}
-                        if not 'responses' in thisTransaction.response_dict['entity']:
-                            thisTransaction.response_dict['entity']['responses']=[]
-
-#                        print("Creating a response for this sequence.")
+                        thisTransaction.response_dict={}
+                        thisTransaction.response_dict['entity']={
+                                'type' : "sequence",
+                        }
+                        thisTransaction.response_dict['entity']['responses']=[]
+#                       print("Creating a response for this sequence.")
                         thisTransaction.response_dict['entity']['responses'].append({
                             "condensedSequenceValidation" : {
                                 'sequence': sequence,
