@@ -118,6 +118,7 @@ ExitMessages = {
 
 ## TODO Make this sort of thing ultimately part of transaction.py (eg Notice class).
 def appendCommonParserNotice(thisTransaction: Transaction,  noticeBrief: str, blockID: str = None):
+#    print("appending common parser notice.")
     # Build the notice
     if thisTransaction.response_dict is None:
         thisTransaction.response_dict={}
@@ -125,6 +126,10 @@ def appendCommonParserNotice(thisTransaction: Transaction,  noticeBrief: str, bl
 
     if thisTransaction.response_dict['entity'] is None:
         thisTransaction.response_dict['entity']={}
+
+    if not 'type' in thisTransaction.response_dict['entity']:
+        thisTransaction.response_dict['entity']['type'] = 'CommonServicer'
+
 
     if not 'responses' in thisTransaction.response_dict['entity']:
         thisTransaction.response_dict['entity']['responses']=[]

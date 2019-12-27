@@ -1,7 +1,7 @@
 {
 	"entity" :
 	{
-		"type": "Sequence",
+		"type": "Unknown Entity",
 		"services" :
 		[
 			{ "Build" :

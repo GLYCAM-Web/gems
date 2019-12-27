@@ -44,7 +44,6 @@ def parseInput(thisTransaction):
     import jsonpickle
     io=StringIO()
 
-    #print("~~~parseInput() was called.")
     #print("thisTransaction.incoming_string: " + thisTransaction.incoming_string)
 
     # Load the JSON string into the incoming dictionary
@@ -70,9 +69,12 @@ def parseInput(thisTransaction):
 #        print(e.errors())
         if 'entity' in e.errors()[0]['loc']:
             if 'type' in e.errors()[0]['loc']:
+#                print("Type present, but unrecognized.")
                 appendCommonParserNotice(thisTransaction,'EntityNotKnown')
             else:
+#                print("No 'type' present. Appending common parser notice.")
                 appendCommonParserNotice(thisTransaction,'NoEntityDefined')
+
         theResponseTypes = getTypesFromList(thisTransaction.response_dict['entity']['responses'])
 #        print(theResponseTypes)
         return theResponseTypes.count('error')

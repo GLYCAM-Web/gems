@@ -18,7 +18,7 @@ def delegate(jsonObjectString):
     reads the identity of the top-level Entity and, if it can load a
     module for that entity, it passes the Transaction object over.
     """
-    
+
     if verbosity > 0 :
         print("~~~\nDelegator receive.py delegate() was called.\n~~~")
     if verbosity > 1 :
@@ -33,7 +33,7 @@ def delegate(jsonObjectString):
             print(" There was an error parsing the input!")
         thisTransaction.build_outgoing_string()
         return thisTransaction.outgoing_string
-    
+
     # Grab the entity type
     entityType = thisTransaction.request_dict['entity']['type']
     if verbosity > 0 :
