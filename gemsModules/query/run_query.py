@@ -84,6 +84,6 @@ def buildQueryString(thisTransaction : Transaction):
     startIndex = out.index('{')
     out = out[startIndex:]
     # out = "\"" + out + "\""
-    print(out)
+    # print(out)
     jsonObj = json.loads(out)
     thisTransaction.response_dict= jsonObj
