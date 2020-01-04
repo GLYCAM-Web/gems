@@ -92,10 +92,20 @@ def build3DStructure(thisTransaction : Transaction, thisService : Service = None
     inputs = thisTransaction.request_dict['entity']['inputs']
 
     for thisInput in inputs:
-        print("thisInput: " + str(thisInput))
+#        print("thisInput: " + str(thisInput))
         inputKeys = thisInput.keys()
         if "Sequence" in inputKeys:
             theSequence = thisInput['Sequence']['payload']
+            if thisTransaction.response_dict is None:
+                thisTransaction.response_dict={}
+            if not 'entity' in thisTransaction.response_dict:
+                thisTransaction.response_dict['entity']={}
+            if not 'type' in thisTransaction.response_dict['entity']:
+                thisTransaction.response_dict['entity']['type']='Sequence'
+            if not 'responses' in thisTransaction.response_dict:
+                thisTransaction.response_dict['responses']=[]
+
+            thisTransaction.response_dict['responses'].append({'Build3DStructure': {'payload': pUUID }})
 
         if theSequence is None:
             #sequence is required. Attach an error response and return.
@@ -107,16 +117,6 @@ def build3DStructure(thisTransaction : Transaction, thisService : Service = None
         subprocess.run("$GEMSHOME/gemsModules/sequence/do_the_build.bash '" + theSequence +"' " + pUUID, shell=True)
 
 
-        if thisTransaction.response_dict is None:
-            thisTransaction.response_dict={}
-        if not 'entity' in thisTransaction.response_dict:
-            thisTransaction.response_dict['entity']={}
-        if not 'type' in thisTransaction.response_dict['entity']:
-            thisTransaction.response_dict['entity']['type']='Sequence'
-        if not 'responses' in thisTransaction.response_dict:
-            thisTransaction.response_dict['responses']=[]
-
-        thisTransaction.response_dict['responses'].append({'Build3DStructure': {'payload': pUUID }})
 
 
 def doDefaultService(thisTransaction : Transaction):
