@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import  os, sys
 import json
 import uuid
 from datetime import datetime
@@ -12,7 +13,9 @@ The backend project is not the same as the project model in the frontend.
 """
 class GemsProject(BaseModel):
     timestamp : datetime = None
-    gems_project_id : str = None
+    ## The name of the output dir is the pUUID
+    pUUID : str = None
+    ## The output path
     output_dir : str = None
     md5sum : str = None
     project_type : str = None
@@ -20,28 +23,38 @@ class GemsProject(BaseModel):
 
     def buildProject(self, thisTransaction : Transaction, requestingAgent : str):
         #print("buildProject was called.")
-        #print("requestingAgent: " + requestingAgent)
-
-        self.requestingAgent = requestingAgent
+       #print("requestingAgent: " + requestingAgent)
+        self.requesting_agent = requestingAgent
+        self.timestamp = datetime.now()
         request = thisTransaction.request_dict
-        #print(str(request))
-        if request['project']['timestamp']:
-            self.timestamp = request['project']['timestamp']
+        #print("request: " + str(request))
+        keys = request.keys()
+        #print("keys: " + str(keys))
+        if self.requesting_agent == 'command_line':
+            ##There will be no frontend project here.
+            if request['entity']['type'] == 'Sequence':
+                self.project_type = "cb"
+            pass
+
         else:
-            #print("No timestamp present in project, go ahead and make one.")
-            self.timestamp = datetime.now()
+            projectKeys = request['project'].keys()
+            ##This is meant to be different from the frontend project timestamp.
+            if 'md5sum' in projectKeys:
+                self.md5sum = request['project']['md5sum']
+            if 'type' in projectKeys:
+                self.project_type = request['project']['type']
 
-        if request['project']['md5sum']:
-            self.md5sum = request['project']['md5sum']
-        if request['project']['type']:
-            self.project_type = request['project']['type']
+        self.pUUID = str(uuid.uuid4())
+        #print("pUUID: " + str(self.pUUID))
 
-        self.gems_project_id = str(uuid.uuid4())
-        #print("gems_project_id: " + str(self.gems_project_id))
-        self.project_root =  str(uuid.uuid4())
-        #print("project_root: " + self.project_root)
-        self.output_dir = projectSettings.output_data_dir + self.project_root
+        self.output_dir = projectSettings.output_data_dir + "tools/" + self.project_type + "/git-ignore-me_userdata/" + self.pUUID
         #print("output_dir: " + self.output_dir)
+
+        ##Check that the outpur_dir exists. Create it if not.
+        if not os.path.exists (self.output_dir):
+            #print("Creating a output_dir at: " + self.output_dir)
+            os.makedirs(self.output_dir)
+
         self.updateTransaction(thisTransaction)
 
     def updateTransaction(self, thisTransaction: Transaction):
@@ -52,7 +65,7 @@ class GemsProject(BaseModel):
 
         thisTransaction.response_dict['gemsProject']['requestingAgent'] = self.requesting_agent
         thisTransaction.response_dict['gemsProject']['timestamp'] = str(self.timestamp)
-        thisTransaction.response_dict['gemsProject']['gems_project_id'] = self.gems_project_id
+        thisTransaction.response_dict['gemsProject']['pUUID'] = self.pUUID
         thisTransaction.response_dict['gemsProject']['output_dir'] = self.output_dir
         if self.md5sum is not None:
             thisTransaction.response_dict['gemsProject']['md5sum'] = self.md5sum
@@ -61,14 +74,14 @@ class GemsProject(BaseModel):
 
     def __str__(self):
         result = "GemsProject  - requestingAgent: "
-        result = result + self.requestingAgent
+        result = result + self.requesting_agent
         if self.project_type is not None:
             result = result + ", type: "
             result = result + self.project_type
         result = result + ", timestamp: "
         result = result + str(self.timestamp)
-        result = result + ", gems_project_id: "
-        result = result + self.gems_project_id
+        result = result + ", pUUID: "
+        result = result + self.pUUID
         result = result + ", output_dir: "
         result = result + self.output_dir
         if self.md5sum is not None:

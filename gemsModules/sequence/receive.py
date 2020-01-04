@@ -7,6 +7,7 @@ import gmml
 #from gemsModules import sequence
 #from gemsModules.sequence.receive import *
 import gemsModules.common.utils
+from gemsModules.project.projectUtil import *
 from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
 from . import settings
@@ -85,47 +86,37 @@ def evaluate(thisTransaction : Transaction, thisService : Service = None):
 
 def build3DStructure(thisTransaction : Transaction, thisService : Service = None):
 #    print("~~~ Sequence receive.py build3Dstructure() was called!")
-    import uuid
-    theUUID=str(uuid.uuid4())
+    startProject(thisTransaction)
+    pUUID=thisTransaction.response_dict['gemsProject']['pUUID']
 
     inputs = thisTransaction.request_dict['entity']['inputs']
-    theInputs=getTypesFromList(inputs)
-    if 'Sequence' in theInputs:
-        pass
-#        print("found Sequence in theInputs")
-    else:
-        #sequence is required. Attach an error response and return.
-        common.settings.appendCommonParserNotice(thisTransaction,'ServiceNotKnownToEntity','Expected Sequence')
-        return
 
-    ### This is REALLY REALLY UGLY  PLEASE FIX THIS
-    theSequence=list(list(inputs[0].values())[0].values())[0]
-    #print(theSequence)
+    for thisInput in inputs:
+        print("thisInput: " + str(thisInput))
+        inputKeys = thisInput.keys()
+        if "Sequence" in inputKeys:
+            theSequence = thisInput['Sequence']['payload']
 
-    ## The original way. TODO: delete the subprocess call to the bash file.
-    import subprocess
-    subprocess.run("$GEMSHOME/gemsModules/sequence/do_the_build.bash '" + theSequence +"' " + theUUID, shell=True)
-#    print("Attempting to do the build.")
+        if theSequence is None:
+            #sequence is required. Attach an error response and return.
+            common.settings.appendCommonParserNotice(thisTransaction,'ServiceNotKnownToEntity','Expected Sequence')
+            return
 
-    # projectDir = "/website/userdata/tools/cb/git-ignore-me_userdata/" + str(theUUID) + "/"
-    # prepFile = "GLYCAM_06j-1.prep"
-    # offFile =  projectDir + "structure.off-test"
-    # pdbFile = projectDir + "structure.pdb=test"
-    # from . import buildFromSequence
-    # buildFromSequence.buildThis(theSequence,  prepFile, offFile, pdbFile)
+        ## The original way. TODO: delete the subprocess call to the bash file.
+        import subprocess
+        subprocess.run("$GEMSHOME/gemsModules/sequence/do_the_build.bash '" + theSequence +"' " + pUUID, shell=True)
 
 
+        if thisTransaction.response_dict is None:
+            thisTransaction.response_dict={}
+        if not 'entity' in thisTransaction.response_dict:
+            thisTransaction.response_dict['entity']={}
+        if not 'type' in thisTransaction.response_dict['entity']:
+            thisTransaction.response_dict['entity']['type']='Sequence'
+        if not 'responses' in thisTransaction.response_dict:
+            thisTransaction.response_dict['responses']=[]
 
-    if thisTransaction.response_dict is None:
-        thisTransaction.response_dict={}
-    if not 'entity' in thisTransaction.response_dict:
-        thisTransaction.response_dict['entity']={}
-    if not 'type' in thisTransaction.response_dict['entity']:
-        thisTransaction.response_dict['entity']['type']='Sequence'
-    if not 'responses' in thisTransaction.response_dict:
-        thisTransaction.response_dict['responses']=[]
-
-    thisTransaction.response_dict['responses'].append({'Build3DStructure': {'payload': theUUID }})
+        thisTransaction.response_dict['responses'].append({'Build3DStructure': {'payload': pUUID }})
 
 
 def doDefaultService(thisTransaction : Transaction):
