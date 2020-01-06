@@ -34,6 +34,8 @@ class GemsProject(BaseModel):
             ##There will be no frontend project here.
             if request['entity']['type'] == 'Sequence':
                 self.project_type = "cb"
+            if request['entity']['type'] == 'MmService':
+                self.project_type = "md"
             pass
 
         else:
