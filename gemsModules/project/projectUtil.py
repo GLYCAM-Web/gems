@@ -16,26 +16,25 @@ If no frontend project is present, the GemsProject is the only
 project.
 """
 def startProject(thisTransaction: Transaction):
-    #print("startProject() was called.")
+    print("startProject() was called.")
     request = thisTransaction.request_dict
-#    print("type of requestObject: " + str(type(request)))
     keys = request.keys()
     if 'project' in keys:
-        #print("found a project in the request")
+        print("found a project in the request")
         project = request['project']
-        if project['_django_version']:
-            #print("website project present.")
+        if '_django_version' in project.keys():
+            print("website project present.")
             ##The project was requested via web interface
             buildGemsProject(thisTransaction, "website")
         else:
             ##The project was requested via json_api
-            #print("Project was requested via json_api")
+            print("Project was requested via json_api")
             buildGemsProject(thisTransaction, "json_api")
     else:
-        #print("Project needs to be created without the frontend.")
+        print("Project needs to be created without the frontend.")
         buildGemsProject(thisTransaction, "command_line")
 
-    #print("Transaction: " + str(thisTransaction.__dict__))
+    print("Transaction: " + str(thisTransaction.__dict__))
 
 """
 Pass in a transaction and a string indicating what is requesting this project.

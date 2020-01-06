@@ -64,15 +64,17 @@ def parseInput(thisTransaction):
         TransactionSchema(**thisTransaction.request_dict)
     except ValidationError as e:
         # TODO : Add these to the error/verbosity thing
-#        print("Validation Error.")
+        print("Validation Error.")
 #        print(e.json())
 #        print(e.errors())
         if 'entity' in e.errors()[0]['loc']:
             if 'type' in e.errors()[0]['loc']:
-#                print("Type present, but unrecognized.")
+                #print("Type present, but unrecognized.")
+                #print(thisTransaction.request_dict['entity']['type'])
+                #print(str(listEntities()))
                 appendCommonParserNotice(thisTransaction,'EntityNotKnown')
             else:
-#                print("No 'type' present. Appending common parser notice.")
+                print("No 'type' present. Appending common parser notice.")
                 appendCommonParserNotice(thisTransaction,'NoEntityDefined')
 
         theResponseTypes = getTypesFromList(thisTransaction.response_dict['entity']['responses'])

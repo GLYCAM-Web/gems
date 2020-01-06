@@ -1,0 +1,46 @@
+{
+	"entity": {
+		"type": "MmService",
+		"services": [{
+			"Amber": {
+				"type": "Amber"
+			}
+		}],
+		"inputs": [{
+			"prmtop_file_name": "m.parm7"
+		}, {
+			"inpcrd_file_name": "min.rst7"
+		}]
+	},
+	"project": {
+		"_state": "<django.db.models.base.ModelState object at 0x7fac22c296d0>",
+		"user_id": "1",
+		"title": "test",
+		"timestamp": "2020-01-06 20:35:06.966806+00:00",
+		"id": "0919fbcb-1518-4553-a28a-c601021880ac",
+		"comment": "asfghasfh",
+		"type": "md",
+		"email": "test@gmail.com",
+		"gems_version": "2016xxx",
+		"gmml_version": "2016yyy-2",
+		"ff_version": "2012xxx",
+		"parameter_version": "2014",
+		"amber_version": "2014xxx",
+		"root": " ",
+		"project_ptr_id": "0919fbcb-1518-4553-a28a-c601021880ac",
+		"system_phase": "in solvent",
+		"input_type": "Amber-prmtop & inpcrd",
+		"prmtop_file_name": "m.parm7",
+		"inpcrd_file_name": "min.rst7",
+		"pdb_file_name": " ",
+		"mmcif_file_name": " ",
+		"off_file_name": " ",
+		"u_uuid": "18c923fc-819f-4122-a8b2-0d06c6925ee3",
+		"water_model": "tip-3p",
+		"sim_length": "on",
+		"notify": "True",
+		"upload_path": "/website/uploads/tools/md/git-ignore-me_userdata/0919fbcb-1518-4553-a28a-c601021880ac/",
+		"toolDir": "/website/userdata/tools/md",
+		"path": "/md/media"
+	}
+}
