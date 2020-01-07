@@ -23,10 +23,12 @@ def submit(thisSlurmJobInfo):
             return "Was unable to change to the working directory."
 #    print("The current directory is:  " + os.getcwd() )
     try:
+        print ("In func submit(), incoming dict sbatchArg is: " + thisSlurmJobInfo.incoming_dict['sbatchArgument'] + "\n")
         p = subprocess.Popen( [ 'sbatch', thisSlurmJobInfo.incoming_dict['sbatchArgument'] ] ,
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (outputhere,errorshere) = p.communicate()
         if p.returncode != 0 :
+            print ("Sbatch stdout is: " + str(outputhere) + "\n") #Yao's printing statement
             return "SLURM submit got non-zero exit upon attempt to submit."
         else:
             return str(outputhere)
