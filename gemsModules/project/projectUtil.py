@@ -17,6 +17,7 @@ project.
 """
 def startProject(thisTransaction: Transaction):
     print("startProject() was called.")
+    ##TODO: Add logic to return errors if things go wrong.
     request = thisTransaction.request_dict
     keys = request.keys()
     if 'project' in keys:
@@ -33,6 +34,36 @@ def startProject(thisTransaction: Transaction):
     else:
         print("Project needs to be created without the frontend.")
         buildGemsProject(thisTransaction, "command_line")
+
+    #Start a log file for the project and put it in uUUID dir
+    output_dir = thisTransaction.response_dict['gems_project']['output_dir']
+    print("output_dir: " + output_dir)
+
+    if not os.path.exists(output_dir):
+        print("creating the output_dir")
+        os.makdirs(output_dir)
+
+    if 'u_uuid' in project.keys():
+        uUUID = project['u_uuid']
+        uploads_copy_dir = output_dir + "Uploads/" + uUUID + "/"
+        print("uploads_copy_dir: " + uploads_copy_dir)
+        if not os.path.exists(uploads_copy_dir):
+            print("creating the uploads_copy_dir")
+            os.makedirs(uploads_copy_dir)
+        upload_dir = project['upload_path']
+        if not os.path.exists(upload_dir):
+            print("Returning an error. Upload_path indicated, but not present.")
+        else:
+            print("Copying upload files to the backend.")
+            ##TODO: copy em ova.
+
+    else:
+        print("no uUUID found. May be ok, if there are no uploads needed.")
+
+
+
+
+    #Save all upload files and logs into the pUUID dir
 
     print("Transaction: " + str(thisTransaction.__dict__))
 

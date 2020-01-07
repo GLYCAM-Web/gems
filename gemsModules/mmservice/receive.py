@@ -16,9 +16,12 @@ import traceback
 ##  (unless you write modules for using tleap to build, etc.....)
 ##
 
+"""
+The receive() method receives a transaction, and checks for the requested service.
+"""
 def receive(thisTransaction):
     print("mmservice receive() was called.")
-
+    request = thisTransaction.request_dict
 
     if 'services' not in thisTransaction.request_dict['entity'].keys():
         doDefaultService(thisTransaction)
@@ -27,12 +30,16 @@ def receive(thisTransaction):
 
         for requestedService in services:
             print("requestedService: " + str(requestedService))
+            ##Can we detect if this project has already been started?
+            ##  If so, check the status of a job that exists, and start jobs that don't.
+
             if requestedService not in mmSettings.serviceModules.keys():
                 print("The requested service is not recognized.")
                 print("services: " + str(mmSettings.serviceModules.keys()))
                 common.settings.appendCommonParserNotice(thisTransaction,'ServiceNotKnownToEntity', requestedService)
             elif requestedService == "Amber":
                 print("Amber service requested.")
+
                 startProject(thisTransaction)
             else:
                 print("The requested service is still in development.")

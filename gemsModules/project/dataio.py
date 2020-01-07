@@ -49,7 +49,7 @@ class GemsProject(BaseModel):
         self.pUUID = str(uuid.uuid4())
         #print("pUUID: " + str(self.pUUID))
 
-        self.output_dir = projectSettings.output_data_dir + "tools/" + self.project_type + "/git-ignore-me_userdata/" + self.pUUID
+        self.output_dir = projectSettings.output_data_dir + "tools/" + self.project_type + "/git-ignore-me_userdata/" + self.pUUID + "/"
         #print("output_dir: " + self.output_dir)
 
         ##Check that the outpur_dir exists. Create it if not.
@@ -62,17 +62,17 @@ class GemsProject(BaseModel):
     def updateTransaction(self, thisTransaction: Transaction):
         if thisTransaction.response_dict is None:
             thisTransaction.response_dict = {}
-        if not 'gemsProject' in thisTransaction.response_dict:
-            thisTransaction.response_dict['gemsProject'] = {}
+        if not 'gems_project' in thisTransaction.response_dict:
+            thisTransaction.response_dict['gems_project'] = {}
 
-        thisTransaction.response_dict['gemsProject']['requestingAgent'] = self.requesting_agent
-        thisTransaction.response_dict['gemsProject']['timestamp'] = str(self.timestamp)
-        thisTransaction.response_dict['gemsProject']['pUUID'] = self.pUUID
-        thisTransaction.response_dict['gemsProject']['output_dir'] = self.output_dir
+        thisTransaction.response_dict['gems_project']['requesting_agent'] = self.requesting_agent
+        thisTransaction.response_dict['gems_project']['timestamp'] = str(self.timestamp)
+        thisTransaction.response_dict['gems_project']['pUUID'] = self.pUUID
+        thisTransaction.response_dict['gems_project']['output_dir'] = self.output_dir
         if self.md5sum is not None:
-            thisTransaction.response_dict['gemsProject']['md5sum'] = self.md5sum
+            thisTransaction.response_dict['gems_project']['md5sum'] = self.md5sum
         if self.project_type is not None:
-            thisTransaction.response_dict['gemsProject']['project_type'] = self.project_type
+            thisTransaction.response_dict['gems_project']['project_type'] = self.project_type
 
     def __str__(self):
         result = "GemsProject  - requestingAgent: "
