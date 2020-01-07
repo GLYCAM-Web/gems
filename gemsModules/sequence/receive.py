@@ -87,7 +87,7 @@ def evaluate(thisTransaction : Transaction, thisService : Service = None):
 def build3DStructure(thisTransaction : Transaction, thisService : Service = None):
 #    print("~~~ Sequence receive.py build3Dstructure() was called!")
     startProject(thisTransaction)
-    pUUID=thisTransaction.response_dict['gemsProject']['pUUID']
+    pUUID=thisTransaction.response_dict['gems_project']['pUUID']
 
     inputs = thisTransaction.request_dict['entity']['inputs']
 
