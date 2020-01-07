@@ -120,9 +120,9 @@ class Amber_Job:
         self.MD_COMMAND='${AMBERHOME}/bin/sander'
         self.AMBERHOME = '/programs/amber16/'
 
-        self.Run_Script_Name = '/' + self.RUN_PREF + '.sh'
-        json_dict["sbatchArgument"] = "bash " + self.Run_Script_Name
-        run_script = open(os.path.abspath(os.path.curdir) + self.Run_Script_Name, 'w')
+        self.Run_Script_Name = self.RUN_PREF + '.sh'
+        json_dict["sbatchArgument"] = self.Run_Script_Name
+        run_script = open(os.path.abspath(json_dict["workingDirectory"]) + "/" + self.Run_Script_Name, 'w')
 
         run_script.write("cd " + os.path.abspath(os.path.curdir) + "\n")
         run_script.write("export RUN_ID=\'" + self.JobId + "\'\n")
@@ -203,13 +203,13 @@ class Amber_Job:
         out_files_exist = False
         if os.path.isfile(self.WorkDir + "/" + self.PARMTOP) == False:
             input_files_missing = True
-            print('Parmtop file missing in sub directory %s'%(os.path.abspath(os.path.curdir)))
+            print('Parmtop file missing in sub directory %s'%(os.path.abspath(self.WorkDir)))
         if os.path.isfile(self.WorkDir + "/" + self.INPCRD) == False:
             input_file_missing = True
-            print('Inpcrd file missing in sub directory %s'%(os.path.abspath(os.path.curdir)))
+            print('Inpcrd file missing in sub directory %s'%(os.path.abspath(self.WorkDir)))
         if os.path.isfile(self.WorkDir + "/" + self.MININ) == False:
             input_file_missing = True
-            print('MININ file missing in sub directory %s'%(os.path.abspath(os.path.curdir)))
+            print('MININ file missing in sub directory %s'%(os.path.abspath(self.WorkDir)))
 
         if self.minimization_only != "Yes":
             if os.path.isfile(self.WorkDir + "/" + self.HEATIN) == False:
@@ -267,11 +267,12 @@ if __name__ == "__main__":
         amber_job.CreateProductionInputFile()
         amber_job.CreateSubmissionScript(input_json_dict)
 
-    if amber_job.check_if_dir_content_good(logFile) == False:
+    if amber_job.check_if_dir_content_good(logFile) == True:
         slurm_module_path = '../../batchcompute' 
         sys.path.append(os.path.abspath(slurm_module_path))
         print("Importing path: " + os.path.abspath(slurm_module_path))
-        import slurm.receive.main as slurm_receive
+        #import slurm.receive.main as slurm_receive
+        import slurm.receive as slurm_receive
         outgoing_json_dict = {}
         #"partition"        : "amber",
         #"user"             : "webdev",
@@ -282,8 +283,8 @@ if __name__ == "__main__":
         outgoing_json_dict["user"] = input_json_dict["user"]
         outgoing_json_dict["name"] = input_json_dict["name"]
         outgoing_json_dict["workingDirectory"] = input_json_dict["workingDirectory"]
-        outgoing_json_dict["sbatchArgument"] = "bash " + amber_job.Run_Script_Name 
-        
-        slurm_receive(outgoing_json_dict)
+        outgoing_json_dict["sbatchArgument"] = amber_job.Run_Script_Name 
 
-    logFile.close()
+        outgoing_str = json.dumps(outgoing_json_dict);
+        
+        slurm_receive.manageIncomingString(outgoing_str);
