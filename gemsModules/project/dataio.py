@@ -23,7 +23,7 @@ class GemsProject(BaseModel):
 
     def buildProject(self, thisTransaction : Transaction, requestingAgent : str):
         #print("buildProject was called.")
-       #print("requestingAgent: " + requestingAgent)
+        #print("requestingAgent: " + requestingAgent)
         self.requesting_agent = requestingAgent
         self.timestamp = datetime.now()
         request = thisTransaction.request_dict

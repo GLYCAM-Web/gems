@@ -20,8 +20,14 @@ import traceback
 The receive() method receives a transaction, and checks for the requested service.
 """
 def receive(thisTransaction):
-    print("mmservice receive() was called.")
+    #print("mmservice receive() was called.")
     request = thisTransaction.request_dict
+
+    if thisTransaction.response_dict is None:
+        thisTransaction.response_dict = {}
+    thisTransaction.response_dict['entity'] = {}
+    thisTransaction.response_dict['entity']['type'] = "MmService"
+    thisTransaction.response_dict['responses'] = []
 
     if 'services' not in thisTransaction.request_dict['entity'].keys():
         doDefaultService(thisTransaction)
@@ -29,26 +35,28 @@ def receive(thisTransaction):
         services = getTypesFromList(thisTransaction.request_dict['entity']['services'])
 
         for requestedService in services:
-            print("requestedService: " + str(requestedService))
+            #print("requestedService: " + str(requestedService))
             ##Can we detect if this project has already been started?
             ##  If so, check the status of a job that exists, and start jobs that don't.
 
             if requestedService not in mmSettings.serviceModules.keys():
-                print("The requested service is not recognized.")
-                print("services: " + str(mmSettings.serviceModules.keys()))
+                #print("The requested service is not recognized.")
+                #print("services: " + str(mmSettings.serviceModules.keys()))
                 common.settings.appendCommonParserNotice(thisTransaction,'ServiceNotKnownToEntity', requestedService)
             elif requestedService == "Amber":
-                print("Amber service requested.")
+                #print("Amber service requested.")
 
                 startProject(thisTransaction)
             else:
-                print("The requested service is still in development.")
-                print("serviceModules.keys(): " + str(mmSettings.serviceModules.keys()))
+                #print("The requested service is still in development.")
+                #print("serviceModules.keys(): " + str(mmSettings.serviceModules.keys()))
                 pass
+    thisTransaction.build_outgoing_string()
 
 
 def doDefaultService(thisTransaction):
-    print("doDefaultService() was called.")
+    #print("doDefaultService() was called.")
+    pass
     # .setup.check(thisTransaction)
     # .amber.md.generate.plainMD(thisTransaction)
     # batchcompute.check(thisTransaction)
