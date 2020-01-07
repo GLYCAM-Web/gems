@@ -19,6 +19,9 @@ class DelegatorServicesEnum(str,Enum):
     delegate = 'Delegate'
     listEntities = 'ListEntities'
 
+class MmServiceServicesEnum(str,Enum):
+    amber = 'Amber'
+
 class GlycoProteinServicesEnum(str,Enum):
     build3DStructure = 'Build3DStructure'
 
@@ -50,6 +53,7 @@ class EntityTypeEnum(str, Enum):
     conjugate = 'Conjugate'
     delegator = 'Delegator'
     glycoprotein = 'Glycoprotein'
+    mmservice = 'MmService'
     sequence = 'Sequence'
     structureFile = 'StructureFile'
     query = 'Query'
@@ -138,6 +142,13 @@ class SequenceServices(BaseModel):
             title = 'Sequence Services',
             description = 'Services available to the Sequence Entity'
             )
+
+class MmServiceServices(BaseModel):
+    mmserviceServices : MmServiceServicesEnum = Schema(
+        'Amber',
+        title = 'Amber MmService Services',
+        description = 'Molecular Modeling services that use Amber.'
+    )
 
 class CommonServices(BaseModel):
     commonServices : CommonServicesEnum = Schema(
@@ -229,7 +240,7 @@ class Notice(BaseModel):
 
 class Service(BaseModel):
     """Holds information about a requested Service."""
-    typename : Union[CommonServices, DelegatorServices, GraphServices, SequenceServices, GlycoProteinServices, StatusServices ] = Schema(
+    typename : Union[CommonServices, DelegatorServices, GraphServices, MmServiceServices, SequenceServices, GlycoProteinServices, StatusServices ] = Schema(
             None,
             title='Type of Service.',
             alias='type',

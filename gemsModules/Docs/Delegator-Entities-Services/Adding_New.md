@@ -58,7 +58,7 @@ Entity to perform its services.
 The Common Servicer (in the _common_ subdirectory) is responsible for
 containing and executing any Services that all Entites should perform.
 
-* Add your entity to the EntityModules object in settings.py.
+* Add your entity to the subEntities object in settings.py.
 * In transaction.py:
 	* Add the entity to EntityTypeEnum.
 	* Add any non-common Services for your entity to a new Enum (see existing
