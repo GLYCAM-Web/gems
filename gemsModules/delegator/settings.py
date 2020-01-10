@@ -31,6 +31,7 @@ ServiceModule = {
 subEntities = {
     'Conjugate' : 'conjugate',
     'CommonServices' : 'common',
+    'MmService' : 'mmservice',
     'Query' : 'query',
     'Sequence' : 'sequence',
     'DrawGlycan' : 'drawglycan',

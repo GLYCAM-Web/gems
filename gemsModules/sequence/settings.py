@@ -14,8 +14,8 @@ moduleStatusDetail = "Module framework in place. Can build default structures th
 servicesStatus = [
     {
         "service" : "Validate",
-        "status" : "In development.",
-        "statusDetail" : "Currently in focus. Can identify most valid sequences. Improving stability."
+        "status" : "Stable.",
+        "statusDetail" : "Ready for testing."
     },
     {
         "service" : "Evaluate",
