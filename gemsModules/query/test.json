@@ -1,18 +1,23 @@
 {
  "entity" :
  {
-     "type": "Query",
-     "services" :
+   "options" :
+   {
+     "onError" : "abort",
+     "jsonObjectOutputFormat": "Pretty"
+   }, 
+   "type": "Query"},
+   "services" :
      [
-         { "service" :
+         { "formQueryString" :
              {
-                 "type" : "GlyFinder" ,
-                 "options" : [
-                 { "searchType" : "Ontology",
+                 "options" : 
+                 { "searchType" : "Oligo_REGEX",
                    "searchTerm" : ".*Man.*",
                    "resolution_min" : -1,
                    "resolution_max" : -1,
                    "b_factor_min" : -1,
+                   "count" : "FALSE",
                    "b_factor_max" : -1,
                    "oligo_b_factor_min" : -1,
                    "oligo_b_factor_max" : -1,
@@ -22,27 +27,15 @@
                    "isLigand" : -1,
                    "isGlycomimetic" : -1,
                    "isNucleotide" : -1,
-                   "aglycon" : -1,
-                   "page" : -1,
-                   "resultsPerPage" : -1,
-                   "sortBy" : -1,
-                   "output_file_typ" : -1
-                 }
-               ],
-                 "inputs" : [
-                     { "resource" :
-                         {
-                             "payload" : "Hello,world"
-                         }
-                     }
-                 ]
+                   "aglycon" : "",
+                   "page" : 1,
+                   "resultsPerPage" : 25,
+                   "sortBy" : "pdb",
+                   "output_file_type" : "json",
+                   "queryType" : "Initial"
+                 },
+                 "type" : "evaluate"
              }
          }
      ]
- },
- "options" :
- {
-     "onError" : "abort",
-     "jsonObjectOutputFormat": "Pretty"
- }
 }

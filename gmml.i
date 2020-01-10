@@ -11,6 +11,7 @@
 //#include "/usr/include/sqlext.h"
 
 #include "gmml/includes/common.hpp"
+#include "gmml/includes/utils.hpp"
 #include "gmml/includes/CodeUtils/codetests.hpp"
 #include "gmml/includes/InputSet/CoordinateFileSpace/coordinatefile.hpp"
 #include "gmml/includes/InputSet/CoordinateFileSpace/coordinatefileprocessingexception.hpp"
@@ -186,6 +187,7 @@ std::ostream & get_cout() { return std::cout; }
 //%include "/usr/include/sqlext.h"
 
 %include "gmml/includes/common.hpp"
+%include "gmml/includes/utils.hpp"
 %include "gmml/includes/CodeUtils/codetests.hpp"
 %include "gmml/includes/InputSet/CoordinateFileSpace/coordinatefile.hpp"
 %include "gmml/includes/InputSet/CoordinateFileSpace/coordinatefileprocessingexception.hpp"

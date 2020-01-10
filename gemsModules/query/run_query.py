@@ -10,6 +10,7 @@ import ast
 from gemsModules import common
 from gemsModules.common.services import *
 from gemsModules.common.transaction import *
+from inspect import currentframe, getframeinfo
 
 exitMessages = {
         'GmmlNotFound':'Cannot load the GMML module',
@@ -35,6 +36,11 @@ def buildQueryString(thisTransaction : Transaction):
     except:
 #        print("Unable to find the Virtuoso Database.  Quitting.")
         sys.exit(1)
+    try:
+        GemsPath = os.environ.get('GEMSHOME')
+    except:
+        sys.exit(1)
+    debugFileLocation = GemsPath + "/DebugOutput.txt"
     theseOptions = thisTransaction.transaction_in['services'][0]['formQueryString']['options']
     if theseOptions['queryType'] == "Initial":
 #        print(theseOptions)
@@ -76,13 +82,20 @@ def buildQueryString(thisTransaction : Transaction):
                 str(theseOptions['output_file_type'])
                 )
     proc = subprocess.Popen(theQueryString, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-#    print(theQueryString)
+    # print("HEY LOOK AT ME")
+    # print(theQueryString)
     (out, err) = proc.communicate()
     out = str(out.decode('utf-8'))
+    # print(out)
+    gmml.log(getframeinfo(currentframe()).lineno, getframeinfo(currentframe()).filename, gmml.INF, str(out), GemsPath + "/queryLog.txt")
+    # text_file = open(debugFileLocation, "a+")
+    # text_file.write(str(out))
+    # text_file.write(str(theQueryString))
+    # text_file.close()
     #variable out contains results of curl command that returns some unnecessary information about curl version at the begginging
     #to avoid that we consider result string starting from '{'
-    startIndex = out.index('{')
-    out = out[startIndex:]
+    # startIndex = out.index('{')
+    # out = out[startIndex:]
     # out = "\"" + out + "\""
     # print(out)
     jsonObj = json.loads(out)
