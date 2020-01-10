@@ -3,13 +3,16 @@ import conf
 class Amber_Job:
     def __init__(self, json_dict):
 	#Job id
-        self.JobId = json_dict['job_id']
-        self.WorkDir = json_dict['workingDirectory']
+        self.JobId = str (json_dict["project"]["id"])
+        self.WorkDir = str (json_dict["project"]["workingDirectory"])
         
         #File names
         self.RUN_PREF = conf.File_Naming.prefSTRUCTURE + conf.File_Naming.modION + conf.File_Naming.modSOLV
-        self.PARMTOP = self.RUN_PREF + '.' + conf.File_Naming.extPARM
-        self.INPCRD = self.RUN_PREF + '.' + conf.File_Naming.extINPCRD
+        #Expect the 1st member of that list to be prmtop name, the 2nd to be teh inpcrd name
+        self.PARMTOP = str (json_dict["project"]["prmtop_file_name"]) 
+        self.INPCRD = str (json_dict["project"]["inpcrd_file_name"])
+        print ("self PARMTOP is " + self.PARMTOP )
+        print ("self INPCRD is " + self.INPCRD )
         #input file names
         self.MININ = self.RUN_PREF + '.' + conf.File_Naming.extMININ
         self.HEATIN = self.RUN_PREF + '.' + conf.File_Naming.extHEATIN
@@ -43,7 +46,20 @@ class Amber_Job:
         #MD done text
         self.MD_DONE_TEXT = conf.MD_Defines.MD_GP_DONE_TEXT #Depending on solvation, this should change.Return later.
         #other parameters
-        self.minimization_only = json_dict["minimization_only"]
+        if json_dict["project"]["type"] == "minimization":
+            self.minimization_only = True;
+            self.CreateMinimizationInputFile()
+            self.CreateSubmissionScript(json_dict)
+        else:
+            self.minimization_only = False;
+            self.CreateMinimizationInputFile()
+            self.CreateHeatingInputFile()
+            self.CreateEquilibrationInputFile()
+            self.CreateProductionInputFile()
+            self.CreateSubmissionScript(input_json_dict)
+
+        self.phase = json_dict["project"]["system_phase"] #gas or solvent
+        self.water_model = json_dict["project"]["water_model"] #tip 3p/4p/5p or none (gas phase)
         
     def CreateTLeapInputFile(self): #Creates a tLeap input file that creates minimization PARMTOP and RST7 files.
         pass
@@ -122,9 +138,8 @@ class Amber_Job:
 
         self.Run_Script_Name = self.RUN_PREF + '.sh'
         json_dict["sbatchArgument"] = self.Run_Script_Name
-        run_script = open(os.path.abspath(json_dict["workingDirectory"]) + "/" + self.Run_Script_Name, 'w')
-
-        run_script.write("cd " + os.path.abspath(os.path.curdir) + "\n")
+        run_script = open(os.path.abspath(self.WorkDir + "/" + self.Run_Script_Name), 'w')
+        run_script.write("cd " + self.WorkDir + "\n")
         run_script.write("export RUN_ID=\'" + self.JobId + "\'\n")
         run_script.write("export AMBERHOME=\'" + self.AMBERHOME + "\'\n")
         run_script.write("export MD_COMMAND=\'" + self.MD_COMMAND + "\'\n\n")
@@ -150,9 +165,10 @@ class Amber_Job:
         run_script.write("    echo \"Minimization of webid ${RUN_ID} appears to be complete on $(date).\" >> ${LOGFILE}\n")
         run_script.write("else\n")
         run_script.write("    echo \"Minimization of webid ${RUN_ID} appears to have failed on $(date).Check " + self.MDOUT + "\" >> ${LOGFILE}\n")
+        run_script.write("    exit(1)")
         run_script.write("fi\n")
 
-        if self.minimization_only != "Yes":
+        if self.minimization_only != True:
             run_script.write("${MD_COMMAND} \\\n")
             run_script.write("  -p    " + self.PARMTOP + " \\\n")
             run_script.write("  -c    " + self.MINRST + " \\\n")
@@ -165,6 +181,7 @@ class Amber_Job:
             run_script.write("    echo \"Heating of webid ${RUN_ID} appears to be complete on $(date).\" >> ${LOGFILE}\n")
             run_script.write("else\n")
             run_script.write("    echo \"Heating of webid ${RUN_ID} appears to have failed on $(date).Check " + self.MDOUT + "\" >> ${LOGFILE}\n")
+            run_script.write("    exit(1)")
             run_script.write("fi\n")
 
             run_script.write("${MD_COMMAND} \\\n")
@@ -179,6 +196,7 @@ class Amber_Job:
             run_script.write("    echo \"Equilibration of webid ${RUN_ID} appears to be complete on $(date).\" >> ${LOGFILE}\n")
             run_script.write("else\n")
             run_script.write("    echo \"Equilibration of webid ${RUN_ID} appears to have failed on $(date).Check " + self.MDOUT + "\" >> ${LOGFILE}\n")
+            run_script.write("    exit(1)")
             run_script.write("fi\n")
 
             run_script.write("${MD_COMMAND} \\\n")
@@ -193,11 +211,12 @@ class Amber_Job:
             run_script.write("    echo \"MD simulation of webid ${RUN_ID} appears to be complete on $(date).\" >> ${LOGFILE}\n")
             run_script.write("else\n")
             run_script.write("    echo \"MD simulation of webid ${RUN_ID} appears to have failed on $(date).Check " + self.MDOUT + "\" >> ${LOGFILE}\n")
+            run_script.write("    exit(1)")
             run_script.write("fi\n")
 
         run_script.close()
 
-    def check_if_dir_content_good(self, logFile):
+    def check_if_dir_content_good(self):
         #Previous function should cd into working directory.So file path is omitted in this function. 
         input_files_missing = False
         out_files_exist = False
@@ -205,13 +224,14 @@ class Amber_Job:
             input_files_missing = True
             print('Parmtop file missing in sub directory %s'%(os.path.abspath(self.WorkDir)))
         if os.path.isfile(self.WorkDir + "/" + self.INPCRD) == False:
+            print ("Test:" + self.WorkDir + "/" + self.INPCRD)
             input_file_missing = True
             print('Inpcrd file missing in sub directory %s'%(os.path.abspath(self.WorkDir)))
         if os.path.isfile(self.WorkDir + "/" + self.MININ) == False:
             input_file_missing = True
             print('MININ file missing in sub directory %s'%(os.path.abspath(self.WorkDir)))
 
-        if self.minimization_only != "Yes":
+        if self.minimization_only != True:
             if os.path.isfile(self.WorkDir + "/" + self.HEATIN) == False:
                 input_file_missing = True
                 print('HEATIN file missing')
@@ -223,7 +243,6 @@ class Amber_Job:
                 print('MDIN file missing')
 
         if input_files_missing == True:
-            logFile.write('Error, one or more input files are missing in working directory: %s\n'%(os.path.abspath(os.path.curdir)) )
             return False
 
         if os.path.isfile(self.WorkDir + "/" + self.MINOUT) == True:
@@ -244,7 +263,6 @@ class Amber_Job:
 
 
         if out_files_exist == True:
-            logFile.write('Error, one or more output files already exist in working directory: %s\n'%(os.path.abspath(os.path.curdir)))
             return False
 
         elif input_files_missing == False and out_files_exist == False:
@@ -253,38 +271,20 @@ class Amber_Job:
 if __name__ == "__main__":
     import os,sys,json
     input_json_dict = {}
-    with open('input.json') as input_json:
+    with open('amberMdRequest.json') as input_json:
         input_json_dict = json.load(input_json)
-    logFile = open('amber.log', 'w')
-    amber_job = Amber_Job(input_json_dict)
-    if input_json_dict['minimization_only'] == 'Yes':
-        amber_job.CreateMinimizationInputFile()
-        amber_job.CreateSubmissionScript(json_dict)
-    else:
-        amber_job.CreateMinimizationInputFile()
-        amber_job.CreateHeatingInputFile()
-        amber_job.CreateEquilibrationInputFile()
-        amber_job.CreateProductionInputFile()
-        amber_job.CreateSubmissionScript(input_json_dict)
 
-    if amber_job.check_if_dir_content_good(logFile) == True:
+    amber_job = Amber_Job(input_json_dict)
+
+    if amber_job.check_if_dir_content_good() == True:
         slurm_module_path = '../../batchcompute' 
         sys.path.append(os.path.abspath(slurm_module_path))
-        print("Importing path: " + os.path.abspath(slurm_module_path))
-        #import slurm.receive.main as slurm_receive
-        import slurm.receive as slurm_receive
+        import batchcompute
         outgoing_json_dict = {}
-        #"partition"        : "amber",
-        #"user"             : "webdev",
-        #"name"             : "testMin",
-        #"workingDirectory" : "/website/TESTS/build-minimize",
-        #"sbatchArgument"   : "run.bash"
-        outgoing_json_dict["partition"] = input_json_dict["queue_partition"]
-        outgoing_json_dict["user"] = input_json_dict["user"]
-        outgoing_json_dict["name"] = input_json_dict["name"]
-        outgoing_json_dict["workingDirectory"] = input_json_dict["workingDirectory"]
+        outgoing_json_dict["partition"] = "amber"
+        outgoing_json_dict["user"] = "webdev"
+        outgoing_json_dict["name"] = "testmin"
+        outgoing_json_dict["workingDirectory"] = str(input_json_dict["project"]["workingDirectory"])
         outgoing_json_dict["sbatchArgument"] = amber_job.Run_Script_Name 
 
-        outgoing_str = json.dumps(outgoing_json_dict);
-        
-        slurm_receive.manageIncomingString(outgoing_str);
+        batchcompute.batch_compute_delegation(outgoing_json_dict)

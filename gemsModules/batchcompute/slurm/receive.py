@@ -38,6 +38,26 @@ def submit(thisSlurmJobInfo):
         print(traceback.format_exc())
         return "Was unable to submit the job."
 
+def writeSlurmSubmissionScript(path, jsonObjectString):
+    import sys
+    try:
+        script = open(path, "w")
+    except Exception as error:
+        print("Cannnot write slurm run script. Aborting")
+        sys.exit(1)
+
+    script.write("#!/bin/bash" + "\n")
+    script.write("#SBATCH --chdir=" + jsonObjectString["workingDirectory"] + "\n")
+    script.write("#SBATCH --error=slurm_%x-%A.err" + "\n")
+    script.write("#SBATCH --get-user-env" + "\n")
+    script.write("#SBATCH --job-name=" + jsonObjectString["name"] + "\n")
+    script.write("#SBATCH --nodes=1" + "\n")
+    script.write("#SBATCH --output=slurm_%x-%A.out" + "\n")
+    script.write("#SBATCH --partition=" + jsonObjectString["partition"] + "\n")
+    script.write("#SBATCH --tasks-per-node=1" + "\n")
+    script.write("#SBATCH --uid=" + jsonObjectString["user"] + "\n")
+    script.write("\n")
+    script.write("bash " + jsonObjectString["sbatchArgument"] + "\n")
 
 def manageIncomingString(jsonObjectString):
     """
@@ -71,6 +91,9 @@ def manageIncomingString(jsonObjectString):
         print("the local host is: " + localHost)
         if theHost == localHost:
             useGRPC=False
+
+    slurm_runscript_path = jsonObjectString["workingDirectory"] + "/slurm_submit.sh" 
+    writeSlurmSubmissionScript(slurm_runscript_path, jsonObjectString)
 
     if useGRPC:
         gemsPath = os.environ.get('GEMSHOME')
