@@ -2,12 +2,16 @@
 import conf
 class Amber_Job:
     def __init__(self, json_dict):
+        #Environment settings
+        #Later determine MD command by another argument that reflect what settings are needed.
+        self.AMBERHOME = '/programs/amber'
+        self.MD_COMMAND = 'sander' #Later determine this based on input json file. For now, just sander 
+        self.RUN_LOG = 'run.log'
+        self.RUN_PREF = conf.File_Naming.prefSTRUCTURE + conf.File_Naming.modION + conf.File_Naming.modSOLV
+        self.Run_Script_Name = self.RUN_PREF + '.sh'
 	#Job id
         self.JobId = str (json_dict["project"]["id"])
         self.WorkDir = str (json_dict["project"]["workingDirectory"])
-        
-        #File names
-        self.RUN_PREF = conf.File_Naming.prefSTRUCTURE + conf.File_Naming.modION + conf.File_Naming.modSOLV
         #Expect the 1st member of that list to be prmtop name, the 2nd to be teh inpcrd name
         self.PARMTOP = str (json_dict["project"]["prmtop_file_name"]) 
         self.INPCRD = str (json_dict["project"]["inpcrd_file_name"])
@@ -132,19 +136,23 @@ class Amber_Job:
         equi_in.write(' /\n')
 
     def CreateSubmissionScript(self,json_dict):
-        #Later determine MD command by another argument that reflect what settings are needed.
-        self.MD_COMMAND='${AMBERHOME}/bin/sander'
-        self.AMBERHOME = '/programs/amber16/'
-
-        self.Run_Script_Name = self.RUN_PREF + '.sh'
-        json_dict["sbatchArgument"] = self.Run_Script_Name
         run_script = open(os.path.abspath(self.WorkDir + "/" + self.Run_Script_Name), 'w')
+        run_script.write("#!/bin/bash\n")
+        run_script.write("export LOGFILE=\'" + self.RUN_LOG + "\'\n\n")
+        run_script.write("echo \"Run log begin on $(date) \" > ${LOGFILE}"  + "\n")
+        run_script.write("export AMBERHOME=" + self.AMBERHOME + "\n")
+        run_script.write("echo \"Sourcing amber.sh \" > ${LOGFILE}" + "\n")
+        run_script.write("source ${AMBERHOME}/amber.sh\n")
+        #For now don't call tleap to make Prmtop and rst7, they are provided by the user. The create tleap input file function is currently empty
+        #run_script.write("echo \"Running tleap...\" >> ${LOGFILE}" + "\n")
+        #run_script.write("tleap -f tleap.in\n")
+        run_script.write("echo \"Running sander...\" >> ${LOGFILE}" + "\n")
+        run_script.write("\n")
         run_script.write("cd " + self.WorkDir + "\n")
         run_script.write("export RUN_ID=\'" + self.JobId + "\'\n")
         run_script.write("export AMBERHOME=\'" + self.AMBERHOME + "\'\n")
         run_script.write("export MD_COMMAND=\'" + self.MD_COMMAND + "\'\n\n")
-        run_script.write("# Initialize logging for this simulation\n")
-        run_script.write("echo \"Beginning simulation run for webid ${RUN_ID} on $(date)\" >> ${LOGFILE}\n")
+        run_script.write("echo \"Beginning simulation run for webid ${RUN_ID} on $(date)\" > ${LOGFILE}\n")
         run_script.write("# Record the nodes that will do the calculation\n")
         run_script.write("echo \"The minimization for webid ${RUN_ID} will run on these hosts:\" >> ${LOGFILE}\n")
         run_script.write("srun hostname -s | sort -u >slurm.hosts\n")
@@ -164,8 +172,8 @@ class Amber_Job:
         run_script.write("if grep -q \'" + self.MD_DONE_TEXT + "\' " + self.MINOUT + " ; then\n")
         run_script.write("    echo \"Minimization of webid ${RUN_ID} appears to be complete on $(date).\" >> ${LOGFILE}\n")
         run_script.write("else\n")
-        run_script.write("    echo \"Minimization of webid ${RUN_ID} appears to have failed on $(date).Check " + self.MDOUT + "\" >> ${LOGFILE}\n")
-        run_script.write("    exit(1)")
+        run_script.write("    echo \"Minimization of webid ${RUN_ID} appears to have failed on $(date).Check " + self.MINOUT + "\" >> ${LOGFILE}\n")
+        run_script.write("    exit 1\n")
         run_script.write("fi\n")
 
         if self.minimization_only != True:
@@ -180,8 +188,8 @@ class Amber_Job:
             run_script.write("if grep -q \'" + self.MD_DONE_TEXT + "\' " + self.HEATOUT + " ; then\n")
             run_script.write("    echo \"Heating of webid ${RUN_ID} appears to be complete on $(date).\" >> ${LOGFILE}\n")
             run_script.write("else\n")
-            run_script.write("    echo \"Heating of webid ${RUN_ID} appears to have failed on $(date).Check " + self.MDOUT + "\" >> ${LOGFILE}\n")
-            run_script.write("    exit(1)")
+            run_script.write("    echo \"Heating of webid ${RUN_ID} appears to have failed on $(date).Check " + self.HEATOUT + "\" >> ${LOGFILE}\n")
+            run_script.write("    exit 1\n")
             run_script.write("fi\n")
 
             run_script.write("${MD_COMMAND} \\\n")
@@ -195,8 +203,8 @@ class Amber_Job:
             run_script.write("if grep -q \'" + self.MD_DONE_TEXT + "\' " + self.EQUIOUT + " ; then\n")
             run_script.write("    echo \"Equilibration of webid ${RUN_ID} appears to be complete on $(date).\" >> ${LOGFILE}\n")
             run_script.write("else\n")
-            run_script.write("    echo \"Equilibration of webid ${RUN_ID} appears to have failed on $(date).Check " + self.MDOUT + "\" >> ${LOGFILE}\n")
-            run_script.write("    exit(1)")
+            run_script.write("    echo \"Equilibration of webid ${RUN_ID} appears to have failed on $(date).Check " + self.EQUIOUT + "\" >> ${LOGFILE}\n")
+            run_script.write("    exit 1\n")
             run_script.write("fi\n")
 
             run_script.write("${MD_COMMAND} \\\n")
@@ -207,11 +215,11 @@ class Amber_Job:
             run_script.write("  -r    " + self.MDRST + " \\\n")
             run_script.write("  -x    " + self.MDCRD + " \\\n")
             run_script.write("  -inf  " + self.MDINFO + " \\\n\n")
-            run_script.write("if grep -q \'" + self.MD_DONE_TEXT + "\' " + self.EQUIOUT + " ; then\n")
+            run_script.write("if grep -q \'" + self.MD_DONE_TEXT + "\' " + self.MDOUT + " ; then\n")
             run_script.write("    echo \"MD simulation of webid ${RUN_ID} appears to be complete on $(date).\" >> ${LOGFILE}\n")
             run_script.write("else\n")
             run_script.write("    echo \"MD simulation of webid ${RUN_ID} appears to have failed on $(date).Check " + self.MDOUT + "\" >> ${LOGFILE}\n")
-            run_script.write("    exit(1)")
+            run_script.write("    exit 1\n")
             run_script.write("fi\n")
 
         run_script.close()
