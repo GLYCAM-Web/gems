@@ -24,11 +24,10 @@ def submit(thisSlurmJobInfo):
 #    print("The current directory is:  " + os.getcwd() )
     try:
         print ("In func submit(), incoming dict sbatchArg is: " + thisSlurmJobInfo.incoming_dict['sbatchArgument'] + "\n")
-        p = subprocess.Popen( [ 'sbatch', thisSlurmJobInfo.incoming_dict['sbatchArgument'] ] ,
+        p = subprocess.Popen( [ 'sbatch', thisSlurmJobInfo.incoming_dict["slurm_runscript_name"] ] ,
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (outputhere,errorshere) = p.communicate()
         if p.returncode != 0 :
-            print ("Sbatch stdout is: " + str(outputhere) + "\n") #Yao's printing statement
             return "SLURM submit got non-zero exit upon attempt to submit."
         else:
             return str(outputhere)
@@ -38,7 +37,7 @@ def submit(thisSlurmJobInfo):
         print(traceback.format_exc())
         return "Was unable to submit the job."
 
-def writeSlurmSubmissionScript(path, jsonObjectString):
+def writeSlurmSubmissionScript(path, thisSlurmJobInfo):
     import sys
     try:
         script = open(path, "w")
@@ -46,18 +45,20 @@ def writeSlurmSubmissionScript(path, jsonObjectString):
         print("Cannnot write slurm run script. Aborting")
         sys.exit(1)
 
+    incoming_dict = thisSlurmJobInfo.incoming_dict
+
     script.write("#!/bin/bash" + "\n")
-    script.write("#SBATCH --chdir=" + jsonObjectString["workingDirectory"] + "\n")
+    script.write("#SBATCH --chdir=" + incoming_dict["workingDirectory"] + "\n")
     script.write("#SBATCH --error=slurm_%x-%A.err" + "\n")
     script.write("#SBATCH --get-user-env" + "\n")
-    script.write("#SBATCH --job-name=" + jsonObjectString["name"] + "\n")
+    script.write("#SBATCH --job-name=" + incoming_dict["name"] + "\n")
     script.write("#SBATCH --nodes=1" + "\n")
     script.write("#SBATCH --output=slurm_%x-%A.out" + "\n")
-    script.write("#SBATCH --partition=" + jsonObjectString["partition"] + "\n")
+    script.write("#SBATCH --partition=" + incoming_dict["partition"] + "\n")
     script.write("#SBATCH --tasks-per-node=1" + "\n")
-    script.write("#SBATCH --uid=" + jsonObjectString["user"] + "\n")
+    script.write("#SBATCH --uid=" + incoming_dict["user"] + "\n")
     script.write("\n")
-    script.write("bash " + jsonObjectString["sbatchArgument"] + "\n")
+    script.write("bash " + incoming_dict["sbatchArgument"] + "\n")
 
 def manageIncomingString(jsonObjectString):
     """
@@ -91,9 +92,10 @@ def manageIncomingString(jsonObjectString):
         print("the local host is: " + localHost)
         if theHost == localHost:
             useGRPC=False
-
-    slurm_runscript_path = jsonObjectString["workingDirectory"] + "/slurm_submit.sh" 
-    writeSlurmSubmissionScript(slurm_runscript_path, jsonObjectString)
+    thisSlurmJobInfo.incoming_dict["slurm_runscript_name"] = "slurm_submit.sh"
+    slurm_runscript_path = thisSlurmJobInfo.incoming_dict["workingDirectory"] + "/" + thisSlurmJobInfo.incoming_dict["slurm_runscript_name"] 
+    print ("Slurm runscript path: " + slurm_runscript_path + "\n")
+    writeSlurmSubmissionScript(slurm_runscript_path, thisSlurmJobInfo)
 
     if useGRPC:
         gemsPath = os.environ.get('GEMSHOME')
