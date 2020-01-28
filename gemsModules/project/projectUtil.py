@@ -38,18 +38,29 @@ def startProject(thisTransaction: Transaction):
         if '_django_version' in project.keys():
             log.debug("website project present.")
             ##The project was requested via web interface
-            buildGemsProject(thisTransaction, "website")
+            gemsProject = buildGemsProject(thisTransaction, "website")
         else:
             ##The project was requested via json_api
             log.debug("Project was requested via json_api")
-            buildGemsProject(thisTransaction, "json_api")
+            gemsProject = buildGemsProject(thisTransaction, "json_api")
+
+        log.debug("project type: " + gemsProject.project_type)
 
     else:
         log.debug("Project needs to be created without the frontend.")
-        buildGemsProject(thisTransaction, "command_line")
+        gemsProject = buildGemsProject(thisTransaction, "command_line")
 
-    log.debug("project type: " + project.project_type)
-    output_dir = copyUploadFiles(thisTransaction)
+    output_dir = thisTransaction.response_dict['gems_project']['output_dir']
+
+    if gemsProject.project_type == "cb":
+        log.debug("cb projects need no input files. skipping.")
+    else:
+        output_dir = copyUploadFiles(thisTransaction)
+
+    if not os.path.exists(output_dir):
+        log.debug("creating the output_dir")
+        os.makedirs(output_dir)
+
     #Start a log file for the project and put it in uUUID dir
     logs_dir = output_dir + "logs/"
     if not os.path.exists(logs_dir):
@@ -124,6 +135,7 @@ def buildGemsProject(thisTransaction : Transaction, requestingAgent : str):
     gemsProject = GemsProject()
     gemsProject.buildProject(thisTransaction, requestingAgent)
     log.debug("gemsProject: " + str(gemsProject))
+    return gemsProject
 
 
 def main():
