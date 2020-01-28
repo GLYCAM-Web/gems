@@ -7,6 +7,17 @@ from gemsModules.common.transaction import *
 from gemsModules.project import settings as projectSettings
 from pydantic import BaseModel, Field
 from pydantic.schema import schema
+from gemsModules.common.loggingConfig import *
+import traceback
+
+##TO set logging verbosity for just this file, edit this var to one of the following:
+## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
+logLevel = logging.DEBUG
+
+if loggers.get(__name__):
+    pass
+else:
+    log = createLogger(__name__, logLevel)
 
 """
 The backend project is not the same as the project model in the frontend.
@@ -22,14 +33,14 @@ class GemsProject(BaseModel):
     requesting_agent : str = None
 
     def buildProject(self, thisTransaction : Transaction, requestingAgent : str):
-        #print("buildProject was called.")
-        #print("requestingAgent: " + requestingAgent)
+        log.info("buildProject was called.")
+        log.debug("requestingAgent: " + requestingAgent)
         self.requesting_agent = requestingAgent
         self.timestamp = datetime.now()
         request = thisTransaction.request_dict
-        #print("request: " + str(request))
+        log.debug("request: " + str(request))
         keys = request.keys()
-        #print("keys: " + str(keys))
+        log.debug("keys: " + str(keys))
         if self.requesting_agent == 'command_line':
             ##There will be no frontend project here.
             if request['entity']['type'] == 'Sequence':
@@ -47,14 +58,14 @@ class GemsProject(BaseModel):
                 self.project_type = request['project']['type']
 
         self.pUUID = str(uuid.uuid4())
-        #print("pUUID: " + str(self.pUUID))
+        log.debug("pUUID: " + str(self.pUUID))
 
         self.output_dir = projectSettings.output_data_dir + "tools/" + self.project_type + "/git-ignore-me_userdata/" + self.pUUID + "/"
-        #print("output_dir: " + self.output_dir)
+        log.debug("output_dir: " + self.output_dir)
 
         ##Check that the outpur_dir exists. Create it if not.
         if not os.path.exists (self.output_dir):
-            #print("Creating a output_dir at: " + self.output_dir)
+            log.debug("Creating a output_dir at: " + self.output_dir)
             os.makedirs(self.output_dir)
 
         self.updateTransaction(thisTransaction)

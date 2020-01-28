@@ -10,43 +10,53 @@ import gemsModules.common.utils
 from gemsModules.project.projectUtil import *
 from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
+from gemsModules.common.loggingConfig import *
 from . import settings
+
+##TO set logging verbosity for just this file, edit this var to one of the following:
+## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
+logLevel = logging.DEBUG
+
+if loggers.get(__name__):
+    pass
+else:
+    log = createLogger(__name__, logLevel)
 
 ##Validate can potentially handle multiple sequences. Top level iterates and
 ##  updates transaction.
 def validateCondensedSequence(thisTransaction : Transaction, thisService : Service = None):
-#    print("~~~ validateCondensedSequence was called.")
+    log.info("~~~ validateCondensedSequence was called.")
     #Look in transaction for sequence
     inputs = thisTransaction.request_dict['entity']['inputs']
-#    print("inputs: " + str(inputs))
+    log.debug("inputs: " + str(inputs))
 
     for input in inputs:
-#        print("input.keys(): " + str(input.keys()))
+        log.debug("input.keys(): " + str(input.keys()))
 
         keys = input.keys()
 
         if 'Sequence' in keys:
             payload = input['Sequence']['payload']
-#            print("payload: " + payload)
+            log.debug("payload: " + payload)
             if payload == None:
-#                print("Could not find Sequence in inputs.")
+                log.error("Could not find Sequence in inputs.")
                 ##transaction, noticeBrief, blockId
                 common.settings.appendCommonParserNotice( thisTransaction, 'EmptyPayload', 'InvalidInputPayload')
             else:
-#                print("validating input: " + str(input))
+                log.debug("validating input: " + str(input))
                 sequence = payload
-#                print("getting prepResidues.")
+                log.debug("getting prepResidues.")
                 #Get prep residues
                 prepResidues = gmml.condensedsequence_glycam06_residue_tree()
-#                print("Instantiating an assembly.")
+                log.debug("Instantiating an assembly.")
                 #Create an assembly
                 assembly = gmml.Assembly()
 
                 try:
-#                    print("Checking sequence sanity.")
+                    log.debug("Checking sequence sanity.")
                     #Call assembly.CheckCondensed sequence sanity.
                     valid = assembly.CheckCondensedSequenceSanity(sequence, prepResidues)
-#                    print("validation result: " + str(valid))
+                    log.debug("validation result: " + str(valid))
 
                     ## Add valid to the transaction responses.
                     if valid:
@@ -55,7 +65,7 @@ def validateCondensedSequence(thisTransaction : Transaction, thisService : Servi
                                 'type' : "sequence",
                         }
                         thisTransaction.response_dict['entity']['responses']=[]
-#                       print("Creating a response for this sequence.")
+                        log.debug("Creating a response for this sequence.")
                         thisTransaction.response_dict['entity']['responses'].append({
                             "condensedSequenceValidation" : {
                                 'sequence': sequence,
@@ -63,36 +73,35 @@ def validateCondensedSequence(thisTransaction : Transaction, thisService : Servi
                             }
                         })
                     else:
-#                        print("~~~\nCheckCondensedSequenceSanity returned false. Creating an error response.")
-                        #print("thisTransaction: "  + str(thisTransaction))
+                        log.error("~~~\nCheckCondensedSequenceSanity returned false. Creating an error response.")
+                        log.error("thisTransaction: "  + str(thisTransaction))
                         ##appendCommonParserNotice(thisTransaction: Transaction,  noticeBrief: str, blockID: str = None)
                         common.settings.appendCommonParserNotice( thisTransaction,  'InvalidInput', 'InvalidInputPayload')
                 except:
-#                    print("Something went wrong while validating this sequence.")
-#                    print("sequence: " + sequence)
+                    log.error("Something went wrong while validating this sequence.")
+                    log.error("sequence: " + sequence)
                     common.settings.appendCommonParserNotice( thisTransaction, 'InvalidInput', 'InvalidInputPayload')
         else:
+            ##Can be ok, inputs may be provided that are not sequences.
+            log.debug("no sequence found in this input, skipping.")
             pass
-#            print("no sequence found in this input, skipping.")
+
 
 
 ## TODO Write this function
 def evaluate(thisTransaction : Transaction, thisService : Service = None):
+    log.info("evaluate was called! ...But it has not been written for this module yet.")
     pass
-    # from .evaluate import *
-    #if ('jsonObjectOutputFormat', 'Pretty') in self.transaction_in.options:
-    # evaluateSequenceSanity(thisTransaction : Transaction)
-#    print("evaluate was called! ...But it has not been written for this module yet.")
 
 def build3DStructure(thisTransaction : Transaction, thisService : Service = None):
-#    print("~~~ Sequence receive.py build3Dstructure() was called!")
+    log.info("Sequence receive.py build3Dstructure() was called.")
     startProject(thisTransaction)
     pUUID=thisTransaction.response_dict['gems_project']['pUUID']
 
     inputs = thisTransaction.request_dict['entity']['inputs']
 
     for thisInput in inputs:
-#        print("thisInput: " + str(thisInput))
+        log.debug("thisInput: " + str(thisInput))
         inputKeys = thisInput.keys()
         if "Sequence" in inputKeys:
             theSequence = thisInput['Sequence']['payload']
@@ -116,9 +125,6 @@ def build3DStructure(thisTransaction : Transaction, thisService : Service = None
         import subprocess
         subprocess.run("$GEMSHOME/gemsModules/sequence/do_the_build.bash '" + theSequence +"' " + pUUID, shell=True)
 
-
-
-
 def doDefaultService(thisTransaction : Transaction):
     # evaluate(thisTransaction : Transaction)
     # build3DStructure(thisTransaction : Transaction)
@@ -131,12 +137,11 @@ def doDefaultService(thisTransaction : Transaction):
     thisTransaction.build_outgoing_string()
 
 def receive(thisTransaction : Transaction):
-#    print("~~~\nSequence entity has received a transaction.")
-#    print(" the verbosity is : " + verbosity)
+    log.info("Sequence entity has received a transaction.")
     import gemsModules.sequence
     ## First figure out the names of each of the requested services
     if not 'services' in thisTransaction.request_dict['entity'].keys():
-#        print("'services' was not present in the request. Do the default.")
+        log.debug("'services' was not present in the request. Do the default.")
         doDefaultService(thisTransaction)
         return
 
@@ -153,20 +158,20 @@ def receive(thisTransaction : Transaction):
         #####  so, writing something ugly for now
         if i not in settings.serviceModules.keys():
             if i not in common.settings.serviceModules.keys():
-#                print("The requested service is not recognized.")
+                log.error("The requested service is not recognized.")
                 common.settings.appendCommonParserNotice( thisTransaction,'ServiceNotKnownToEntity',i)
             else:
                 pass
         ## if it is known, try to do it
         elif i == "Validate":
-#            print("Validate service requested from sequence entity.")
+            log.debug("Validate service requested from sequence entity.")
             validateCondensedSequence(thisTransaction, None)
         elif i == "Evaluate":
             evaluate(thisTransaction,  None)
         elif i == 'Build3DStructure':
             build3DStructure(thisTransaction ,  None)
         else:
-#            print("got to the else, so something is wrong")
+            log.error("got to the else, so something is wrong")
             common.settings.appendCommonParserNotice( thisTransaction,'ServiceNotKnownToEntity',i)
     thisTransaction.build_outgoing_string()
 
