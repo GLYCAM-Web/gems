@@ -731,3 +731,5 @@ std::ostream & get_cout() { return std::cout; }
 //typedef std::map<int, std::vector<Glycan::SugarName> > SugarNameClosestMatchMap;
 //%template() std::pair<int, std::vector<Glycan::SugarName> >;
 //%template(sugar_name_closest_match_map) std::map<int, std::vector<Glycan::SugarName> >;
+
+//constexpr operator size_t() { return 0; }
