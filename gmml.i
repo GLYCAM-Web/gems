@@ -10,8 +10,10 @@
 //#include "/usr/include/sql.h"
 //#include "/usr/include/sqlext.h"
 
+#include "gmml/includes/gmml.hpp"
 #include "gmml/includes/common.hpp"
 #include "gmml/includes/utils.hpp"
+#include "gmml/includes/generictypedefs.hpp"
 #include "gmml/includes/CodeUtils/codetests.hpp"
 #include "gmml/includes/InputSet/CoordinateFileSpace/coordinatefile.hpp"
 #include "gmml/includes/InputSet/CoordinateFileSpace/coordinatefileprocessingexception.hpp"
@@ -38,6 +40,7 @@
 #include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceglycam06residue.hpp"
 #include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequence.hpp"
 #include "gmml/includes/InputSet/CondensedSequenceSpace/sequencestring.hpp"
+#include "gmml/includes/InputSet/CondensedSequenceSpace/carbohydratebuilder.h"
 
 //#include "gmml/includes/InputSet/CifFileSpace/ciffileatom.hpp"
 //#include "gmml/includes/InputSet/CifFileSpace/ciffile.hpp"
@@ -154,6 +157,7 @@
 #include "gmml/includes/MolecularMetadata/AMBER/amberelements.hpp"
 #include "gmml/includes/MolecularMetadata/element.hpp"
 #include "gmml/includes/MolecularMetadata/molecularmetadata.hpp"
+#include "gmml/includes/MolecularMetadata/GLYCAM/glycam06residuecodes.hpp"
 
 #include "gmml/includes/MolecularModeling/dockingatom.hpp"
 #include "gmml/includes/MolecularModeling/moleculardynamicatom.hpp"
@@ -163,6 +167,7 @@
 #include "gmml/includes/MolecularModeling/atomnode.hpp"
 #include "gmml/includes/MolecularModeling/assembly.hpp"
 #include "gmml/includes/MolecularModeling/molecule.hpp"
+#include "gmml/includes/MolecularModeling/Selections/selections.hpp"
 
 #include "gmml/includes/InputSet/TopologyFileSpace/topologyangle.hpp"
 #include "gmml/includes/InputSet/TopologyFileSpace/topologyangletype.hpp"
@@ -177,6 +182,8 @@
 #include "gmml/includes/InputSet/TopologyFileSpace/topologyresidue.hpp"
 #include "gmml/includes/InputSet/TopologyFileSpace/topologyfileprocessingexception.hpp"
 
+//#include "gmml/includes/External_Libraries/json.hpp"
+
 %}
 
 %inline %{
@@ -186,8 +193,10 @@ std::ostream & get_cout() { return std::cout; }
 //%include "/usr/include/sql.h"
 //%include "/usr/include/sqlext.h"
 
+%include "gmml/includes/gmml.hpp"
 %include "gmml/includes/common.hpp"
 %include "gmml/includes/utils.hpp"
+%include "gmml/includes/generictypedefs.hpp"
 %include "gmml/includes/CodeUtils/codetests.hpp"
 %include "gmml/includes/InputSet/CoordinateFileSpace/coordinatefile.hpp"
 %include "gmml/includes/InputSet/CoordinateFileSpace/coordinatefileprocessingexception.hpp"
@@ -214,6 +223,7 @@ std::ostream & get_cout() { return std::cout; }
 %include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceglycam06residue.hpp"
 %include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequence.hpp"
 %include "gmml/includes/InputSet/CondensedSequenceSpace/sequencestring.hpp"
+%include "gmml/includes/InputSet/CondensedSequenceSpace/carbohydratebuilder.h"
 
 %include "gmml/includes/InputSet/PdbFileSpace/pdbatomsection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbatomcard.hpp"
@@ -324,6 +334,7 @@ std::ostream & get_cout() { return std::cout; }
 %include "gmml/includes/MolecularMetadata/AMBER/amberelements.hpp"
 %include "gmml/includes/MolecularMetadata/element.hpp"
 %include "gmml/includes/MolecularMetadata/molecularmetadata.hpp"
+%include "gmml/includes/MolecularMetadata/GLYCAM/glycam06residuecodes.hpp"
 
 %include "gmml/includes/MolecularModeling/dockingatom.hpp"
 %include "gmml/includes/MolecularModeling/moleculardynamicatom.hpp"
@@ -333,9 +344,12 @@ std::ostream & get_cout() { return std::cout; }
 %include "gmml/includes/MolecularModeling/atomnode.hpp"
 %include "gmml/includes/MolecularModeling/assembly.hpp"
 %include "gmml/includes/MolecularModeling/molecule.hpp"
+%include "gmml/includes/MolecularModeling/Selections/selections.hpp"
 
 %include "gmml/includes/GeometryTopology/grid.hpp"
 %include "gmml/includes/GeometryTopology/cell.hpp"
+%include "gmml/includes/GeometryTopology/ResidueLinkages/residue_linkage.h"
+%include "gmml/includes/GeometryTopology/ResidueLinkages/rotatable_dihedral.h"
 
 %include "gmml/includes/InputSet/TopologyFileSpace/topologyangle.hpp"
 %include "gmml/includes/InputSet/TopologyFileSpace/topologyangletype.hpp"
@@ -349,6 +363,9 @@ std::ostream & get_cout() { return std::cout; }
 %include "gmml/includes/InputSet/TopologyFileSpace/topologyfile.hpp"
 %include "gmml/includes/InputSet/TopologyFileSpace/topologyresidue.hpp"
 %include "gmml/includes/InputSet/TopologyFileSpace/topologyfileprocessingexception.hpp"
+
+//%include "gmml/includes/External_Libraries/json.hpp"
+
 
 %template(string_vector) std::vector<std::string>;
 %template(int_vector) std::vector<int>;
