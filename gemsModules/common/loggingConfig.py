@@ -21,7 +21,6 @@ def createLogger(name, logLevel = LOGGING_LEVEL):
     #print("name: " + name + ", LOGGING_LEVEL: " + str(LOGGING_LEVEL))
     debugLevel=logLevel
 
-
     if(loggers.get(name)):
         log.debug("logger already exists with name: " + name)
     else:

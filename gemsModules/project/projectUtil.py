@@ -13,7 +13,7 @@ import json, os, sys, uuid
 
 ##TO set logging verbosity for just this file, edit this var to one of the following:
 ## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.DEBUG
+logLevel = logging.ERROR
 
 if loggers.get(__name__):
     pass
@@ -28,7 +28,7 @@ If no frontend project is present, the GemsProject is the only
 project.
 """
 def startProject(thisTransaction: Transaction):
-    log.info("startProject() was called.")
+    log.info("startProject() was called.\n")
     ##TODO: Add logic to return errors if things go wrong.
     request = thisTransaction.request_dict
     keys = request.keys()
@@ -69,7 +69,7 @@ Creates a copy of uploads from the frontend
 returns the output_dir for the project as a convenience.
 """
 def copyUploadFiles(thisTransaction : Transaction):
-    log.info("copyUploadFiles() was called.")
+    log.info("copyUploadFiles() was called.\n")
     #Root of entire project
     output_dir = thisTransaction.response_dict['gems_project']['output_dir']
     log.debug("output_dir: " + output_dir)
@@ -120,7 +120,7 @@ Pass in a transaction and a string indicating what is requesting this project.
 The transaction is updated with any relevant project data.
 """
 def buildGemsProject(thisTransaction : Transaction, requestingAgent : str):
-    log.info("buildGemsProject() was called.")
+    log.info("buildGemsProject() was called.\n")
     gemsProject = GemsProject()
     gemsProject.buildProject(thisTransaction, requestingAgent)
     log.debug("gemsProject: " + str(gemsProject))

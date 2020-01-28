@@ -15,7 +15,7 @@ from . import settings
 
 ##TO set logging verbosity for just this file, edit this var to one of the following:
 ## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.DEBUG
+logLevel = logging.ERROR
 
 if loggers.get(__name__):
     pass
@@ -25,7 +25,7 @@ else:
 ##Validate can potentially handle multiple sequences. Top level iterates and
 ##  updates transaction.
 def validateCondensedSequence(thisTransaction : Transaction, thisService : Service = None):
-    log.info("~~~ validateCondensedSequence was called.")
+    log.info("~~~ validateCondensedSequence was called.\n")
     #Look in transaction for sequence
     inputs = thisTransaction.request_dict['entity']['inputs']
     log.debug("inputs: " + str(inputs))
@@ -86,15 +86,13 @@ def validateCondensedSequence(thisTransaction : Transaction, thisService : Servi
             log.debug("no sequence found in this input, skipping.")
             pass
 
-
-
 ## TODO Write this function
 def evaluate(thisTransaction : Transaction, thisService : Service = None):
-    log.info("evaluate was called! ...But it has not been written for this module yet.")
-    pass
+    log.info("evaluate was called! ...But it has not been written for this module yet.\n")
+
 
 def build3DStructure(thisTransaction : Transaction, thisService : Service = None):
-    log.info("Sequence receive.py build3Dstructure() was called.")
+    log.info("Sequence receive.py build3Dstructure() was called.\n")
     startProject(thisTransaction)
     pUUID=thisTransaction.response_dict['gems_project']['pUUID']
 
@@ -125,7 +123,11 @@ def build3DStructure(thisTransaction : Transaction, thisService : Service = None
         import subprocess
         subprocess.run("$GEMSHOME/gemsModules/sequence/do_the_build.bash '" + theSequence +"' " + pUUID, shell=True)
 
+"""
+Default service is marco polo. Should this be something else?
+"""
 def doDefaultService(thisTransaction : Transaction):
+    log.info("doDefaultService() was called.\n")
     # evaluate(thisTransaction : Transaction)
     # build3DStructure(thisTransaction : Transaction)
     if thisTransaction.response_dict is None:
@@ -137,7 +139,7 @@ def doDefaultService(thisTransaction : Transaction):
     thisTransaction.build_outgoing_string()
 
 def receive(thisTransaction : Transaction):
-    log.info("Sequence entity has received a transaction.")
+    log.info("receive() was called:\n")
     import gemsModules.sequence
     ## First figure out the names of each of the requested services
     if not 'services' in thisTransaction.request_dict['entity'].keys():
@@ -176,7 +178,6 @@ def receive(thisTransaction : Transaction):
     thisTransaction.build_outgoing_string()
 
 
-
 # Some alternate ways to interrogate lists:
 #    if any("Evaluate" in s for s in input_services ):
 #        print("It is here!")
@@ -186,7 +187,7 @@ def receive(thisTransaction : Transaction):
 
 
 def main():
-    pass
+    log.info("main() was called.\n")
 
 if __name__ == "__main__":
   main()

@@ -8,7 +8,7 @@ import traceback
 
 ##TO set logging verbosity for just this file, edit this var to one of the following:
 ## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.DEBUG
+logLevel = logging.ERROR
 
 if loggers.get(__name__):
     pass
@@ -28,7 +28,7 @@ def delegate(jsonObjectString):
     reads the identity of the top-level Entity and, if it can load a
     module for that entity, it passes the Transaction object over.
     """
-    log.info("delegate() was called.")
+    log.info("delegate() was called.\n")
     log.debug("incoming jsonObjectString: " + jsonObjectString)
 
     # Make a new Transaction object for holding I/O information.
@@ -79,7 +79,7 @@ def delegate(jsonObjectString):
 
 def doDefaultService(thisTransaction):
     """This might not be necessary... """
-    log.info("Calling the default service for the Delegator itself.")
+    log.info("Calling the default service for the Delegator.\n")
     if thisTransaction.response_dict is None:
         thisTransaction.response_dict={}
     thisTransaction.response_dict['entity']={}
@@ -90,7 +90,7 @@ def doDefaultService(thisTransaction):
 
 ## TODO:  this reception code does not conform to the current JSON schema (is close...).
 def receive(thisTransaction):
-    log.info("Delegator received a transaction.")
+    log.info("receive() was called.\n")
     log.debug("request_dict: " + str(thisTransaction.request_dict))
 
     if 'services' not in thisTransaction.request_dict['entity'].keys():

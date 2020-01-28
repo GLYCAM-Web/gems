@@ -12,7 +12,7 @@ import traceback
 
 ##TO set logging verbosity for just this file, edit this var to one of the following:
 ## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.DEBUG
+logLevel = logging.ERROR
 
 if loggers.get(__name__):
     pass
@@ -33,7 +33,7 @@ class GemsProject(BaseModel):
     requesting_agent : str = None
 
     def buildProject(self, thisTransaction : Transaction, requestingAgent : str):
-        log.info("buildProject was called.")
+        log.info("buildProject was called.\n")
         log.debug("requestingAgent: " + requestingAgent)
         self.requesting_agent = requestingAgent
         self.timestamp = datetime.now()
@@ -71,6 +71,7 @@ class GemsProject(BaseModel):
         self.updateTransaction(thisTransaction)
 
     def updateTransaction(self, thisTransaction: Transaction):
+        log.info("updateTransaction() was called.\n")
         if thisTransaction.response_dict is None:
             thisTransaction.response_dict = {}
         if not 'gems_project' in thisTransaction.response_dict:

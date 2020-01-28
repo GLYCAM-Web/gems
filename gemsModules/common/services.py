@@ -5,6 +5,7 @@ from gemsModules import common
 from gemsModules.common.settings import *
 from gemsModules.common.transaction import *
 from gemsModules.common.utils import *
+from gemsModules.common.loggingConfig import *
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 from pydantic import BaseModel, Schema
 from pydantic.schema import schema
@@ -12,44 +13,44 @@ from pydantic.schema import schema
 ## TODO: Update this method to receive actual module name, not its key.
 ## Also update methods that call common/services.py importEntity() to reflect this change.
 
+##TO set logging verbosity for just this file, edit this var to one of the following:
+## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
+logLevel = logging.ERROR
+
+if loggers.get(__name__):
+    pass
+else:
+    log = createLogger(__name__, logLevel)
+
 verbosity=common.utils.gems_environment_verbosity()
 
 def importEntity(requestedEntity):
-    if verbosity > 0 :
-        print("~~~ importEntity was called.")
-    if verbosity > 1 :
-        print("requestedEntity: " + requestedEntity)
-        print("Entities known to Common Services: " + str(subEntities))
+    log.info("importEntity() was called.\n")
+    log.debug("requestedEntity: " + requestedEntity)
+    log.debug("Entities known to Common Services: " + str(subEntities))
 
     requestedModule = '.' + subEntities[requestedEntity]
-
-    if verbosity > 1 :
-        print("requestedModule: " + requestedModule)
+    log.debug("requestedModule: " + requestedModule)
 
     module_spec = importlib.util.find_spec(requestedModule,package="gemsModules")
-
     if module_spec is None:
-        if verbosity > 0 :
-            print("The module spec returned None for rquestedEntity: " + requestedEntity)
+        log.error("The module spec returned None for rquestedEntity: " + requestedEntity)
         return None
 
-    if verbosity > 1 :
-        print("module_spec: " + str(module_spec))
+    log.debug("module_spec: " + str(module_spec))
     return importlib.import_module(requestedModule,package="gemsModules")
 
 def parseInput(thisTransaction):
+    log.info("parseInput() was called.\n")
     import json
     from io import StringIO
     from pydantic import BaseModel, ValidationError
     import jsonpickle
     io=StringIO()
 
-    #print("thisTransaction.incoming_string: " + thisTransaction.incoming_string)
-
     # Load the JSON string into the incoming dictionary
-    #
     thisTransaction.request_dict = json.loads(thisTransaction.incoming_string)
-    #print("thisTransaction.request_dict: " + str(thisTransaction.request_dict))
+    log.debug("thisTransaction.request_dict: " + str(thisTransaction.request_dict))
 
     # Check to see if there are errors.  If there are, bail, but give a reason
     #
@@ -64,31 +65,30 @@ def parseInput(thisTransaction):
         TransactionSchema(**thisTransaction.request_dict)
     except ValidationError as e:
         # TODO : Add these to the error/verbosity thing
-        print("Validation Error.")
-#        print(e.json())
-#        print(e.errors())
+        log.error("Validation Error.")
+        log.error(e.json())
+        log.error(e.errors())
         if 'entity' in e.errors()[0]['loc']:
             if 'type' in e.errors()[0]['loc']:
-                #print("Type present, but unrecognized.")
-                #print(thisTransaction.request_dict['entity']['type'])
-                #print(str(listEntities()))
+                log.error("Type present, but unrecognized.")
+                log.error(thisTransaction.request_dict['entity']['type'])
+                log.error(str(listEntities()))
                 appendCommonParserNotice(thisTransaction,'EntityNotKnown')
             else:
                 print("No 'type' present. Appending common parser notice.")
                 appendCommonParserNotice(thisTransaction,'NoEntityDefined')
 
         theResponseTypes = getTypesFromList(thisTransaction.response_dict['entity']['responses'])
-#        print(theResponseTypes)
+        log.debug(theResponseTypes)
         return theResponseTypes.count('error')
 
     # If still here, load the data into a Transaction object and return success
-    #
     thisTransaction.transaction_in = jsonpickle.decode(thisTransaction.incoming_string)
-    #print("thisTransaction.transaction_in: " + str(thisTransaction.transaction_in))
-    #print("~~~Finished parseInput()")
+    log.debug("thisTransaction.transaction_in: " + str(thisTransaction.transaction_in))
     return 0
 
 def marco(requestedEntity):
+    log.info("marco() was called.\n")
     if verbosity > 1 :
         print("The Marco method was called and is being fulfilled by CommonServices.")
     theEntity = importEntity(requestedEntity)
@@ -98,6 +98,7 @@ def marco(requestedEntity):
         return "The entity you seek is not responding properly."
 
 def getTypesFromList(theList):
+    log.info("getTypesFromList() was called.\n")
     typesInList=[]
     for i in range(len(theList)):
         thekeys=list(theList[i].keys())
@@ -119,10 +120,12 @@ def getTypesFromList(theList):
 
 ## TODO make this more generic
 def listEntities(requestedEntity='Delegator'):
+  log.info("listEntities() was called.\n")
   return list(subEntities.keys())
 
 
 def returnHelp(requestedEntity,requestedHelp):
+  log.info("returnHelp() was called.\n")
   theEntity = importEntity(requestedEntity)
   theHelp = entities.helpDict[requestedHelp]
   if theHelp == 'schemaLocation':

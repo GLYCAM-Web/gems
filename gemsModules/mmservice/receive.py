@@ -3,8 +3,19 @@ import gemsModules
 from gemsModules.common.services import *
 from gemsModules.common.transaction import *
 from gemsModules.project.projectUtil import *
+from gemsModules.common.loggingConfig import *
 import gemsModules.mmservice.settings as mmSettings
 import traceback
+
+##TO set logging verbosity for just this file, edit this var to one of the following:
+## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
+logLevel = logging.ERROR
+
+if loggers.get(__name__):
+    pass
+else:
+    log = createLogger(__name__, logLevel)
+
 
 ##  If this module is receiving a request, then there should be almost no
 ##  setup required other than whatever is specific to the modeling engine.
@@ -20,7 +31,7 @@ import traceback
 The receive() method receives a transaction, and checks for the requested service.
 """
 def receive(thisTransaction):
-    #print("mmservice receive() was called.")
+    log.info("mmservice receive() was called.")
     request = thisTransaction.request_dict
 
     if thisTransaction.response_dict is None:
@@ -35,28 +46,27 @@ def receive(thisTransaction):
         services = getTypesFromList(thisTransaction.request_dict['entity']['services'])
 
         for requestedService in services:
-            #print("requestedService: " + str(requestedService))
+            log.debug("requestedService: " + str(requestedService))
             ##Can we detect if this project has already been started?
             ##  If so, check the status of a job that exists, and start jobs that don't.
 
             if requestedService not in mmSettings.serviceModules.keys():
-                #print("The requested service is not recognized.")
-                #print("services: " + str(mmSettings.serviceModules.keys()))
+                log.debug("The requested service is not recognized.")
+                log.debug("services: " + str(mmSettings.serviceModules.keys()))
                 common.settings.appendCommonParserNotice(thisTransaction,'ServiceNotKnownToEntity', requestedService)
             elif requestedService == "Amber":
-                #print("Amber service requested.")
+                log.debug("Amber service requested.")
 
                 startProject(thisTransaction)
             else:
-                #print("The requested service is still in development.")
-                #print("serviceModules.keys(): " + str(mmSettings.serviceModules.keys()))
-                pass
+                log.error("The requested service is still in development.")
+                log.error("serviceModules.keys(): " + str(mmSettings.serviceModules.keys()))
+
     thisTransaction.build_outgoing_string()
 
 
 def doDefaultService(thisTransaction):
-    #print("doDefaultService() was called.")
-    pass
+    log.info("doDefaultService() was called.")
     # .setup.check(thisTransaction)
     # .amber.md.generate.plainMD(thisTransaction)
     # batchcompute.check(thisTransaction)

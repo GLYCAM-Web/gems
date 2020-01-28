@@ -3,64 +3,64 @@ import gemsModules
 import gmml
 from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
+from gemsModules.common.loggingConfig import *
 from . import settings
 from . import statusResponse
 from datetime import datetime
 import traceback
 
+##TO set logging verbosity for just this file, edit this var to one of the following:
+## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
+logLevel = logging.ERROR
+
+if loggers.get(__name__):
+    pass
+else:
+    log = createLogger(__name__, logLevel)
 
 def receive(thisTransaction : Transaction):
-    #print("status gemsModule receive.py receive() was called.")
+    log.info("receive() was called.\n")
 
     if not 'services' in thisTransaction.request_dict['entity'].keys():
-        #print("'services' was not present in the request. Do the default.")
-
+        log.debug("'services' was not present in the request. Do the default.")
         doDefaultService(thisTransaction)
-
         return
     else:
         services = getTypesFromList(thisTransaction.request_dict['entity']['services'])
-
         for requestedService in services:
-            #print("requestedService: " + str(requestedService))
-
+            log.debug("requestedService: " + str(requestedService))
             if requestedService not in settings.serviceModules.keys():
                 if requestedService not in common.settings.serviceModules.keys():
-                    #print("The requested service is not recognized.")
+                    log.error("The requested service is not recognized.")
                     common.settings.appendCommonParserNotice( thisTransaction, 'ServiceNotKnownToEntity', requestedService)
             elif requestedService == "GenerateReport":
                 generateReport(thisTransaction, None)
-                #print("finished generating the report. Building outgoing string.")
                 thisTransaction.build_outgoing_string()
-                #print("thisTransaction.outgoing_string: " + thisTransaction.outgoing_string)
             else:
-                pass
-#                print("Perhaps a service was added to status/settings.py, but not defined in receive.py? Likely this service is still in development.")
+                log.error("Perhaps a service was added to status/settings.py, but not defined in receive.py? Likely this service is still in development.")
+                common.settings.appendCommonParserNotice( thisTransaction, 'ServiceNotKnownToEntity', requestedService)
 
 ##This method needs to check for options. If options are not present, do the default service.
 ##    If the options are present, and specify a list of entities to report on, only report on those.
 def generateReport(thisTransaction : Transaction, thisService : Service = None):
-    #print("generateReport was called.")
+    log.info("generateReport() was called.\n")
 
     entityKeys = thisTransaction.request_dict['entity'].keys()
-    #print("entityKeys : " + str(entityKeys))
+    log.debug("entityKeys : " + str(entityKeys))
 
     if 'options' in entityKeys:
-        #print("User provided options.")
         optionsKeys = thisTransaction.request_dict['entity']['options'].keys()
         options = thisTransaction.request_dict['entity']['options']
-        #print("optionsKeys: " + str(optionsKeys))
+        log.debug("optionsKeys: " + str(optionsKeys))
         if "targets" in optionsKeys:
             for target in options['targets']:
-                #print("Report requested for target: " + str(target))
-                #print("target type: " + str(target['type']))
-
+                log.debug("Report requested for target: " + str(target))
+                log.debug("target type: " + str(target['type']))
                 if target['type'] == 'All':
                     doDefaultService(thisTransaction)
                 else:
-                    pass
-#                    print("Report requested for a specific target. Still being developed.")
-
+                    log.error("Report requested for a specific target. Still being developed.")
+                    ##TODO: Add an error to common parser to return to frontend. reportTargetUnknown
         else:
             doDefaultService(thisTransaction)
 
@@ -69,9 +69,8 @@ def generateReport(thisTransaction : Transaction, thisService : Service = None):
 
 ## The default here is to just report on every gemsModule and their corresponding services.
 def doDefaultService(thisTransaction : Transaction):
-    #print("~~~doDefaultService() was called. Generating a status report for all entities and services.")
-    #print("thisTransaction: " + str(thisTransaction))
-
+    log.info("doDefaultService() was called.\n")
+    log.debug("thisTransaction: " + str(thisTransaction))
 
     ##Header section
     if thisTransaction.response_dict is None:
@@ -80,19 +79,19 @@ def doDefaultService(thisTransaction : Transaction):
     thisTransaction.response_dict['entity'] = {}
     thisTransaction.response_dict['entity']['type']="StatusReport"
     timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-    #print("~timestamp: " + str(timestamp))
+    log.debug("timestamp: " + str(timestamp))
 
     thisTransaction.response_dict['entity']['timestamp'] = timestamp
     responses = []
     ##Entity Reporting
     for availableEntity in listEntities():
-        #print("Generating a report for entity: " + availableEntity)
+        log.debug("Generating a report for entity: " + availableEntity)
         response = {}
         thisEntity = importEntity(availableEntity)
         response.update({
             'entity' : availableEntity
         })
-        #print("thisEntity.__dict__.keys(): " + str(thisEntity.__dict__.keys()))
+        log.debug("thisEntity.__dict__.keys(): " + str(thisEntity.__dict__.keys()))
         if thisEntity.settings is not None:
             settings = thisEntity.settings
             settingsAttributes = settings.__dict__.keys()
@@ -102,27 +101,25 @@ def doDefaultService(thisTransaction : Transaction):
             response = getServiceStatuses(response, settings, settingsAttributes)
             response = getSubEntities(response, settings, settingsAttributes)
 
-            #print("\nType of response: " + str(type(response)))
-            #print("response: \n" + str(response))
+            log.debug("Type of response: " + str(type(response)))
+            log.debug("response: " + str(response))
             responses.append(response)
 
         else:
-            pass
-#            print("Could not find settings for this entity.")
-
+            log.error("Could not find settings for this entity.")
+            ##TODO: Add an error to common parser for settingsNotFound
 
     thisTransaction.response_dict.update({
         "responses": responses
     })
-    #print("\nfinished updating the transaction.")
-    #print("thisTransaction.response_dict: " + str(thisTransaction.response_dict))
-    #print("timestamp: " + str(timestamp))
+    log.debug("thisTransaction.response_dict: " + str(thisTransaction.response_dict))
 
 ##Append a status from a module's settings file to a json response object
 def getModuleStatus(response, settings, settingsAttributes):
+    log.info("getModuleStatus() was called.\n")
     if 'status' in settingsAttributes:
         status = settings.status
-        #print("     settings.status: " + status)
+        log.debug("settings.status: " + status)
         response.update({
             'status' : status
         })
@@ -130,9 +127,10 @@ def getModuleStatus(response, settings, settingsAttributes):
 
 ##Append a module status detail from a module's settings file to a json response object
 def getModuleStatusDetail(response, settings, settingsAttributes):
+    log.info("getModuleStatusDetail() was called.\n")
     if 'moduleStatusDetail' in settingsAttributes:
         moduleStatusDetail = settings.moduleStatusDetail
-        #print("     settings.moduleStatusDetail: " + moduleStatusDetail)
+        log.debug("settings.moduleStatusDetail: " + moduleStatusDetail)
         response.update({
             'moduleStatusDetail' : moduleStatusDetail
         })
@@ -140,18 +138,16 @@ def getModuleStatusDetail(response, settings, settingsAttributes):
 
 ##Append a list of module services and their statuses to a json response object
 def getServiceStatuses(response, settings, settingsAttributes):
+    log.info("getServiceStatuses() was called.\n")
     if 'servicesStatus' in settingsAttributes:
         serviceStatuses= []
         for element in settings.servicesStatus:
-            #print("serviceStatus: " + str(serviceStatus))
-            #print("serviceStatus.keys(): " + str(serviceStatus.keys()))
             service = element['service']
-            #print("service: " + service)
+            log.debug("service: " + service)
             serviceStatus = element['status']
-            #print("serviceStatus: " + serviceStatus)
+            log.debug("serviceStatus: " + str(serviceStatus))
             serviceStatusDetail = element['statusDetail']
-            #print("statusDetail: " + serviceStatusDetail)
-
+            log.info("statusDetail: " + serviceStatusDetail)
             serviceStatuses.append(element)
 
         response.update({
@@ -161,13 +157,12 @@ def getServiceStatuses(response, settings, settingsAttributes):
 
 ##Update a response with the entities an entity uses.
 def getSubEntities(response, settings, settingsAttributes):
+    log.info("getSubEntities() was called.\n")
     if 'subEntities' in settingsAttributes:
-        #print("~~~adding subentities.")
         subEntities = []
         for subEntity in settings.subEntities:
-            #print("   element: " + str(subEntity))
+            log.debug("subEntity: " + str(subEntity))
             subEntities.append(subEntity)
-
 
         response.update({
             'subEntities' : subEntities
