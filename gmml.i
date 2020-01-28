@@ -40,7 +40,7 @@
 #include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceglycam06residue.hpp"
 #include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequence.hpp"
 #include "gmml/includes/InputSet/CondensedSequenceSpace/sequencestring.hpp"
-#include "gmml/includes/InputSet/CondensedSequenceSpace/carbohydratebuilder.h"
+#include "gmml/includes/InputSet/CondensedSequenceSpace/carbohydratebuilder.hpp"
 
 //#include "gmml/includes/InputSet/CifFileSpace/ciffileatom.hpp"
 //#include "gmml/includes/InputSet/CifFileSpace/ciffile.hpp"
@@ -147,8 +147,8 @@
 #include "gmml/includes/GeometryTopology/rotation.hpp"
 #include "gmml/includes/GeometryTopology/grid.hpp"
 #include "gmml/includes/GeometryTopology/cell.hpp"
-#include "gmml/includes/GeometryTopology/ResidueLinkages/residue_linkage.h"
-#include "gmml/includes/GeometryTopology/ResidueLinkages/rotatable_dihedral.h"
+#include "gmml/includes/GeometryTopology/ResidueLinkages/residue_linkage.hpp"
+#include "gmml/includes/GeometryTopology/ResidueLinkages/rotatable_dihedral.hpp"
 
 #include "gmml/includes/MolecularMetadata/GLYCAM/amberatomtypeinfo.hpp"
 #include "gmml/includes/MolecularMetadata/GLYCAM/bondlengthbytypepair.hpp"
@@ -223,7 +223,7 @@ std::ostream & get_cout() { return std::cout; }
 %include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceglycam06residue.hpp"
 %include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequence.hpp"
 %include "gmml/includes/InputSet/CondensedSequenceSpace/sequencestring.hpp"
-%include "gmml/includes/InputSet/CondensedSequenceSpace/carbohydratebuilder.h"
+%include "gmml/includes/InputSet/CondensedSequenceSpace/carbohydratebuilder.hpp"
 
 %include "gmml/includes/InputSet/PdbFileSpace/pdbatomsection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbatomcard.hpp"
@@ -348,8 +348,8 @@ std::ostream & get_cout() { return std::cout; }
 
 %include "gmml/includes/GeometryTopology/grid.hpp"
 %include "gmml/includes/GeometryTopology/cell.hpp"
-%include "gmml/includes/GeometryTopology/ResidueLinkages/residue_linkage.h"
-%include "gmml/includes/GeometryTopology/ResidueLinkages/rotatable_dihedral.h"
+%include "gmml/includes/GeometryTopology/ResidueLinkages/residue_linkage.hpp"
+%include "gmml/includes/GeometryTopology/ResidueLinkages/rotatable_dihedral.hpp"
 
 %include "gmml/includes/InputSet/TopologyFileSpace/topologyangle.hpp"
 %include "gmml/includes/InputSet/TopologyFileSpace/topologyangletype.hpp"
