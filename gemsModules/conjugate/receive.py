@@ -3,8 +3,19 @@ import gemsModules
 from gemsModules import common
 from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
+from gemsModules.common.loggingConfig import *
+
+##TO set logging verbosity for just this file, edit this var to one of the following:
+## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
+logLevel = logging.ERROR
+
+if loggers.get(__name__):
+    pass
+else:
+    log = createLogger(__name__, logLevel)
 
 def doDefaultService(thisTransaction):
+    log.info("doDefaultService() was called.\n")
     if thisTransaction.response_dict is None:
         thisTransaction.response_dict={}
     thisTransaction.response_dict['entity']={}
@@ -14,7 +25,7 @@ def doDefaultService(thisTransaction):
     thisTransaction.build_outgoing_string()
 
 def receive(thisTransaction):
-    #print("Conjugate received it")
+    log.info("receive() was called.\n")
     doDefaultService(thisTransaction)
 
 def main():

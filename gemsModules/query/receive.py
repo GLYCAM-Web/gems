@@ -3,7 +3,18 @@ import gemsModules
 from gemsModules import common
 from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
+from gemsModules.common.loggingConfig import *
 from . import run_query
+
+##TO set logging verbosity for just this file, edit this var to one of the following:
+## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
+logLevel = logging.ERROR
+
+if loggers.get(__name__):
+    pass
+else:
+    log = createLogger(__name__, logLevel)
+
 
 def doDefaultService(thisTransaction):
     # if thisTransaction.response_dict is None:
@@ -16,7 +27,7 @@ def doDefaultService(thisTransaction):
     run_query.buildQueryString(thisTransaction)
 
 def receive(thisTransaction):
-#    print("Query received it")
+    log.info("Query received it")
     # doDefaultService(thisTransaction)
     from . import run_query
     run_query.buildQueryString(thisTransaction)
