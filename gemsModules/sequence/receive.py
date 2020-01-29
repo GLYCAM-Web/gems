@@ -15,7 +15,7 @@ from . import settings
 
 ##TO set logging verbosity for just this file, edit this var to one of the following:
 ## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.ERROR
+logLevel = logging.DEBUG
 
 if loggers.get(__name__):
     pass
@@ -87,8 +87,21 @@ def validateCondensedSequence(thisTransaction : Transaction, thisService : Servi
             pass
 
 ## TODO Write this function
-def evaluate(thisTransaction : Transaction, thisService : Service = None):
-    log.info("evaluate was called! ...But it has not been written for this module yet.\n")
+def evaluateCondensedSequence(thisTransaction : Transaction, thisService : Service = None):
+    log.info("evaluateCondensedSequence() was called.\n")
+    request_dict = thisTransaction.request_dict
+    inputs = request_dict['entity']['inputs']
+    for element in inputs:
+        log.debug("element: " + str(element))
+        if "Sequence" in element.keys():
+            sequence = element['Sequence']['payload']
+        else:
+            log.debug("Skipping")
+
+    log.debug("sequence: " + sequence)
+    builder = gmml.carbohydrateBuilder(sequence)
+    response = builder.evaluate()
+    log.debug("response: " + str(response))
 
 
 def build3DStructure(thisTransaction : Transaction, thisService : Service = None):
@@ -169,8 +182,10 @@ def receive(thisTransaction : Transaction):
             log.debug("Validate service requested from sequence entity.")
             validateCondensedSequence(thisTransaction, None)
         elif i == "Evaluate":
-            evaluate(thisTransaction,  None)
+            log.debug("Evaluate service requested from sequence entity.")
+            evaluateCondensedSequence(thisTransaction,  None)
         elif i == 'Build3DStructure':
+            log.debug("Build3DStructure service requested from sequence entity.")
             build3DStructure(thisTransaction ,  None)
         else:
             log.error("got to the else, so something is wrong")

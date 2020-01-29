@@ -8,7 +8,7 @@ import traceback
 
 ##TO set logging verbosity for just this file, edit this var to one of the following:
 ## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.ERROR
+logLevel = logging.DEBUG
 
 if loggers.get(__name__):
     pass

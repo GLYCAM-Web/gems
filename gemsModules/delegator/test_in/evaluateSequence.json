@@ -1,0 +1,49 @@
+{
+	"entity": {
+		"type": "Sequence",
+		"services": [{
+			"Evaluate": {
+				"type": "Evaluate"
+			}
+		}],
+		"inputs": [{
+			"Sequence": {
+				"payload": "DManpa1-6DManpa1-OH"
+			}
+		}]
+	},
+	"project": {
+		"_state": "<django.db.models.base.ModelState object at 0x7f32fc401750>",
+		"user_id": "2",
+		"title": "Untitled project",
+		"timestamp": "2019-12-11 14:54:36.117499+00:00",
+		"id": "aeb8179c-0290-499f-a30b-967f9629fea8",
+		"comment": " ",
+		"type": "cb",
+		"email": "",
+		"gems_version": "2016xxx",
+		"gmml_version": "2016yyy-2",
+		"ff_version": "2012xxx",
+		"parameter_version": "2014",
+		"amber_version": "2014xxx",
+		"root": " ",
+		"project_ptr_id": "aeb8179c-0290-499f-a30b-967f9629fea8",
+		"sequence": "DManpa1-6DManpa1-OH",
+		"ion": "No",
+		"solvation": "Yes",
+		"solvation_size": "8",
+		"solvation_distance": "2",
+		"solvation_shape": "REC",
+		"num_structures": "1",
+		"linkage_info": "",
+		"rotamer_info": "",
+		"rotamer_list": "",
+		"angle_info": "",
+		"md5dir": " ",
+		"md5sum": "349a1a9c122031e575816a662acc9471",
+		"job_info": "",
+		"toolDir": "/website/userdata/tools/cb",
+		"path": "/cb/media",
+		"_django_version": "2.2.2"
+	}
+}
