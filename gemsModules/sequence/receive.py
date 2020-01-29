@@ -86,7 +86,12 @@ def validateCondensedSequence(thisTransaction : Transaction, thisService : Servi
             log.debug("no sequence found in this input, skipping.")
             pass
 
-## TODO Write this function
+"""
+Evaluating a sequence requires a sequence string and a path to a prepfile.
+    1) Checks sequence for validity,
+    2) builds a default structure,
+    3) returns options that a user might want to set.
+"""
 def evaluateCondensedSequence(thisTransaction : Transaction, thisService : Service = None):
     log.info("evaluateCondensedSequence() was called.\n")
     request_dict = thisTransaction.request_dict
@@ -97,11 +102,30 @@ def evaluateCondensedSequence(thisTransaction : Transaction, thisService : Servi
             sequence = element['Sequence']['payload']
         else:
             log.debug("Skipping")
+    #TODO: test that this exists.
+    if sequence is None:
+        log.error("No sequence found in the transaction.")
+        ##TODO: return an error
+    else:
+        log.debug("sequence: " + sequence)
 
-    log.debug("sequence: " + sequence)
-    builder = gmml.carbohydrateBuilder(sequence)
-    response = builder.evaluate()
-    log.debug("response: " + str(response))
+    ##TODO: test that this exists.
+    prepfile = "./gemsModules/sequence/GLYCAM_06j-1.prep"
+
+    builder = gmml.carbohydrateBuilder(sequence, prepfile)
+    valid = builder.GetSequenceIsValid()
+    log.debug("valid: " + str(valid))
+    if valid:
+        userOptions = builder.GenerateUserOptionsJSON()
+        log.debug("userOptions: " + str(userOptions))
+
+    #     selectedRotamers = builder.GenerateRotamers()
+    #     log.debug("selectedRotamers: " + str(selectedRotamers))
+    #     ##Generates default, single 3D structure with overlaps resolved.
+    #     builder.GenerateSingle3DStructure()
+    # else:
+    #     log.error("This sequence is invalid: " + sequence)
+
 
 
 def build3DStructure(thisTransaction : Transaction, thisService : Service = None):
