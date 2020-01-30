@@ -74,6 +74,9 @@ class GemsProject(BaseModel):
         log.info("updateTransaction() was called.\n")
         if thisTransaction.response_dict is None:
             thisTransaction.response_dict = {}
+        if not 'entity' in thisTransaction.response_dict:
+            thisTransaction.response_dict['entity'] = {}
+            thisTransaction.response_dict['entity']['type'] = "Sequence"
         if not 'gems_project' in thisTransaction.response_dict:
             thisTransaction.response_dict['gems_project'] = {}
 

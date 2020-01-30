@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-import sys, os, re, importlib.util
+import json, sys, os, re, importlib.util, shutil
 import gemsModules
 import gmml
+import traceback
 
 #from gemsModules import common
 #from gemsModules import sequence
@@ -15,7 +16,7 @@ from . import settings
 
 ##TO set logging verbosity for just this file, edit this var to one of the following:
 ## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.DEBUG
+logLevel = logging.ERROR
 
 if loggers.get(__name__):
     pass
@@ -89,7 +90,8 @@ def validateCondensedSequence(thisTransaction : Transaction, thisService : Servi
 """
 Evaluating a sequence requires a sequence string and a path to a prepfile.
     1) Checks sequence for validity,
-    2) builds a default structure,
+    2) Starts a gemsProject.
+    3) builds a default structure, moving it to the output dir
     3) returns options that a user might want to set.
 """
 def evaluateCondensedSequence(thisTransaction : Transaction, thisService : Service = None):
@@ -109,27 +111,97 @@ def evaluateCondensedSequence(thisTransaction : Transaction, thisService : Servi
     else:
         log.debug("sequence: " + sequence)
 
+    GemsPath = os.environ.get('GEMSHOME')
+    if GemsPath == None:
+        this_dir, this_filename = os.path.split(__file__)
+        log.error("""
+
+        GEMSHOME environment variable is not set.
+
+        Set it using somthing like:
+
+          BASH:  export GEMSHOME=/path/to/gems
+          SH:    setenv GEMSHOME /path/to/gems
+        """)
+    log.debug("GemsPath: " + GemsPath )
     ##TODO: test that this exists.
-    prepfile = "./gemsModules/sequence/GLYCAM_06j-1.prep"
+    prepfile = GemsPath + "/gemsModules/sequence/GLYCAM_06j-1.prep"
 
     builder = gmml.carbohydrateBuilder(sequence, prepfile)
     valid = builder.GetSequenceIsValid()
     log.debug("valid: " + str(valid))
     if valid:
-        userOptions = builder.GenerateUserOptionsJSON()
-        log.debug("userOptions: " + str(userOptions))
+        #Start a gemsProject.
+        startProject(thisTransaction)
 
-    #     selectedRotamers = builder.GenerateRotamers()
-    #     log.debug("selectedRotamers: " + str(selectedRotamers))
-    #     ##Generates default, single 3D structure with overlaps resolved.
-    #     builder.GenerateSingle3DStructure()
-    # else:
-    #     log.error("This sequence is invalid: " + sequence)
+        userOptionsString = builder.GenerateUserOptionsJSON()
+        log.debug("userOptions: " + userOptionsString)
+        userOptionsJSON = json.loads(userOptionsString)
+        responses = userOptionsJSON['responses']
+        for response in responses:
+            if 'Evaluate' in response.keys():
+                linkages = response['Evaluate']['glycosidicLinkages']
+
+
+        ##Generates default, single 3D structure with overlaps resolved.
+        name = "defaultStructure"
+        extension = ".pdb"
+        filename = name
+        response_dict = thisTransaction.response_dict
+        log.debug("response_dict" + str(response_dict))
+        outputDir = response_dict['gems_project']['output_dir']
+        log.debug("outputDir: " + outputDir)
+        destination = outputDir + filename
+        log.debug("destination: " + destination)
+        log.debug("does the outputDir exist? " + str(os.path.exists(outputDir)))
+        try:
+            builder.GenerateSingle3DStructure(destination)
+        except Exception as error:
+            log.error("There was an error.")
+            log.error("Error type: " + str(type(error)))
+        log.debug("does the defuaultStructure.pdb exist? " + str(os.path.exists(destination + extension)))
+
+        if os.path.exists(destination + extension):
+            thisTransaction.response_dict['entity']['responses']=[]
+            log.debug("Creating a response for this sequence.")
+            thisTransaction.response_dict['entity']['responses'].append({
+                "SequenceEvaluation" : {
+                    "type": "Evaluate",
+                    "outputs" : [{
+                        "SequenceValidation" : {
+                            "SequenceIsValid" : valid
+                            }
+                        },{
+                        "BuildOptions": {
+                            "options" : [
+                                    { "Linkages" : linkages }
+                                ]
+                            }
+
+                        }
+                    ]
+                }
+            })
+            pUUID = response_dict['gems_project']['pUUID']
+            thisTransaction.response_dict['entity']['responses'].append({
+                "Build3DStructure":{
+                    "payload": pUUID
+                }
+            })
+
+        else:
+            log.error("failed to find the default structure.")
+            log.error("Looked for it here: " + destination)
+            ##TODO throw an error and return it.
+    else:
+        log.error("This sequence is invalid: " + sequence)
+        common.settings.appendCommonParserNotice( thisTransaction, 'InvalidInput', 'InvalidInputPayload')
 
 
 
 def build3DStructure(thisTransaction : Transaction, thisService : Service = None):
     log.info("Sequence receive.py build3Dstructure() was called.\n")
+    ##TODO: See if a project has already been started first.
     startProject(thisTransaction)
     pUUID=thisTransaction.response_dict['gems_project']['pUUID']
 
