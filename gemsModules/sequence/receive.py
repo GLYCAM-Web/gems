@@ -76,11 +76,13 @@ def validateCondensedSequence(thisTransaction : Transaction, thisService : Servi
                     else:
                         log.error("~~~\nCheckCondensedSequenceSanity returned false. Creating an error response.")
                         log.error("thisTransaction: "  + str(thisTransaction))
+                        log.error(traceback.format_exc())
                         ##appendCommonParserNotice(thisTransaction: Transaction,  noticeBrief: str, blockID: str = None)
                         common.settings.appendCommonParserNotice( thisTransaction,  'InvalidInput', 'InvalidInputPayload')
                 except:
                     log.error("Something went wrong while validating this sequence.")
                     log.error("sequence: " + sequence)
+                    log.error(traceback.format_exc())
                     common.settings.appendCommonParserNotice( thisTransaction, 'InvalidInput', 'InvalidInputPayload')
         else:
             ##Can be ok, inputs may be provided that are not sequences.
@@ -97,6 +99,7 @@ Evaluating a sequence requires a sequence string and a path to a prepfile.
 def evaluateCondensedSequence(thisTransaction : Transaction, thisService : Service = None):
     log.info("evaluateCondensedSequence() was called.\n")
     request_dict = thisTransaction.request_dict
+
     inputs = request_dict['entity']['inputs']
     for element in inputs:
         log.debug("element: " + str(element))
@@ -104,6 +107,7 @@ def evaluateCondensedSequence(thisTransaction : Transaction, thisService : Servi
             sequence = element['Sequence']['payload']
         else:
             log.debug("Skipping")
+
     #TODO: test that this exists.
     if sequence is None:
         log.error("No sequence found in the transaction.")
@@ -124,75 +128,54 @@ def evaluateCondensedSequence(thisTransaction : Transaction, thisService : Servi
           SH:    setenv GEMSHOME /path/to/gems
         """)
     log.debug("GemsPath: " + GemsPath )
+
     ##TODO: test that this exists.
     prepfile = GemsPath + "/gemsModules/sequence/GLYCAM_06j-1.prep"
+    if os.path.exists(prepfile):
+        builder = gmml.carbohydrateBuilder(sequence, prepfile)
+        valid = builder.GetSequenceIsValid()
+        log.debug("valid: " + str(valid))
+        if valid:
+            userOptionsString = builder.GenerateUserOptionsJSON()
+            log.debug("userOptions: " + userOptionsString)
+            userOptionsJSON = json.loads(userOptionsString)
+            responses = userOptionsJSON['responses']
+            for response in responses:
+                log.debug("response.keys: " + str(response.keys()))
+                if 'Evaluate' in response.keys():
+                    linkages = response['Evaluate']['glycosidicLinkages']
 
-    builder = gmml.carbohydrateBuilder(sequence, prepfile)
-    valid = builder.GetSequenceIsValid()
-    log.debug("valid: " + str(valid))
-    if valid:
-        #Start a gemsProject.
-        startProject(thisTransaction)
+                    if thisTransaction.response_dict is None:
+                        thisTransaction.response_dict={}
+                    if not 'entity' in thisTransaction.response_dict:
+                        thisTransaction.response_dict['entity']={}
+                    if not 'type' in thisTransaction.response_dict['entity']:
+                        thisTransaction.response_dict['entity']['type']='Sequence'
+                    if not 'responses' in thisTransaction.response_dict:
+                        thisTransaction.response_dict['responses']=[]
 
-        userOptionsString = builder.GenerateUserOptionsJSON()
-        log.debug("userOptions: " + userOptionsString)
-        userOptionsJSON = json.loads(userOptionsString)
-        responses = userOptionsJSON['responses']
-        for response in responses:
-            if 'Evaluate' in response.keys():
-                linkages = response['Evaluate']['glycosidicLinkages']
+                    log.debug("Creating a response for this sequence.")
+                    thisTransaction.response_dict['responses'].append({
+                        "SequenceEvaluation" : {
+                            "type": "Evaluate",
+                            "outputs" : [{
+                                "SequenceValidation" : {
+                                    "SequenceIsValid" : valid
+                                    }
+                                },{
+                                "BuildOptions": {
+                                    "options" : [
+                                            { "Linkages" : linkages }
+                                        ]
+                                    }
 
-
-        ##Generates default, single 3D structure with overlaps resolved.
-        name = "defaultStructure"
-        extension = ".pdb"
-        filename = name
-        response_dict = thisTransaction.response_dict
-        log.debug("response_dict" + str(response_dict))
-        outputDir = response_dict['gems_project']['output_dir']
-        log.debug("outputDir: " + outputDir)
-        destination = outputDir + filename
-        log.debug("destination: " + destination)
-        log.debug("does the outputDir exist? " + str(os.path.exists(outputDir)))
-        try:
-            builder.GenerateSingle3DStructure(destination)
-        except Exception as error:
-            log.error("There was an error.")
-            log.error("Error type: " + str(type(error)))
-        log.debug("does the defuaultStructure.pdb exist? " + str(os.path.exists(destination + extension)))
-
-        if os.path.exists(destination + extension):
-            thisTransaction.response_dict['entity']['responses']=[]
-            log.debug("Creating a response for this sequence.")
-            thisTransaction.response_dict['entity']['responses'].append({
-                "SequenceEvaluation" : {
-                    "type": "Evaluate",
-                    "outputs" : [{
-                        "SequenceValidation" : {
-                            "SequenceIsValid" : valid
-                            }
-                        },{
-                        "BuildOptions": {
-                            "options" : [
-                                    { "Linkages" : linkages }
-                                ]
-                            }
-
+                                }
+                            ]
                         }
-                    ]
-                }
-            })
-            pUUID = response_dict['gems_project']['pUUID']
-            thisTransaction.response_dict['entity']['responses'].append({
-                "Build3DStructure":{
-                    "payload": pUUID
-                }
-            })
-
+                    })
         else:
-            log.error("failed to find the default structure.")
-            log.error("Looked for it here: " + destination)
-            ##TODO throw an error and return it.
+            log.error("Prepfile did not exist at: " + prepfile)
+            common.settings.appendCommonParserNotice(thisTransaction, 'InvalidInput', 'InvalidInputPayload')
     else:
         log.error("This sequence is invalid: " + sequence)
         common.settings.appendCommonParserNotice( thisTransaction, 'InvalidInput', 'InvalidInputPayload')
