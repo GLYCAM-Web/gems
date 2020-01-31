@@ -118,7 +118,6 @@ def evaluateCondensedSequence(thisTransaction : Transaction, thisService : Servi
     GemsPath = getGemsHome()
     log.debug("GemsPath: " + GemsPath )
 
-    ##TODO: test that this exists.
     prepfile = GemsPath + "/gemsModules/sequence/GLYCAM_06j-1.prep"
     if os.path.exists(prepfile):
         log.debug("Instantiating the carbohydrateBuilder.")
@@ -205,8 +204,23 @@ def build3DStructure(thisTransaction : Transaction, thisService : Service = None
             return
 
         ## The original way. TODO: delete the subprocess call to the bash file.
-        import subprocess
-        subprocess.run("$GEMSHOME/gemsModules/sequence/do_the_build.bash '" + theSequence +"' " + pUUID, shell=True)
+        #import subprocess
+        #subprocess.run("$GEMSHOME/gemsModules/sequence/do_the_build.bash '" + theSequence +"' " + pUUID, shell=True)
+
+        GemsPath = getGemsHome()
+        log.debug("GemsPath: " + GemsPath)
+
+        prepfile = GemsPath + "/gemsModules/sequence/GLYCAM_06j-1.prep"
+        if os.path.exists(prepfile):
+            log.debug("Instantiating the carbohydrateBuilder.")
+
+            builder = gmml.carbohydrateBuilder(theSequence, prepfile)
+            outputDir = thisTransaction.response_dict['gems_project']['output_dir']
+            log.info("outputDir: " + outputDir)
+            destination = outputDir + pUUID
+            log.debug("destination: " + destination)
+            builder.GenerateSingle3DStructure(destination)
+
 
 """
 Default service is marco polo. Should this be something else?
