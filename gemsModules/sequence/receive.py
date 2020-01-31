@@ -108,34 +108,25 @@ def evaluateCondensedSequence(thisTransaction : Transaction, thisService : Servi
         else:
             log.debug("Skipping")
 
-    #TODO: test that this exists.
+    #Test that this exists.
     if sequence is None:
         log.error("No sequence found in the transaction.")
         ##TODO: return an error
     else:
         log.debug("sequence: " + sequence)
 
-    GemsPath = os.environ.get('GEMSHOME')
-    if GemsPath == None:
-        this_dir, this_filename = os.path.split(__file__)
-        log.error("""
-
-        GEMSHOME environment variable is not set.
-
-        Set it using somthing like:
-
-          BASH:  export GEMSHOME=/path/to/gems
-          SH:    setenv GEMSHOME /path/to/gems
-        """)
+    GemsPath = getGemsHome()
     log.debug("GemsPath: " + GemsPath )
 
     ##TODO: test that this exists.
     prepfile = GemsPath + "/gemsModules/sequence/GLYCAM_06j-1.prep"
     if os.path.exists(prepfile):
+        log.debug("Instantiating the carbohydrateBuilder.")
         builder = gmml.carbohydrateBuilder(sequence, prepfile)
-        valid = builder.GetSequenceIsValid()
-        log.debug("valid: " + str(valid))
-        if valid:
+        try:
+            valid = builder.GetSequenceIsValid()
+            log.debug("valid: " + str(valid))
+
             userOptionsString = builder.GenerateUserOptionsJSON()
             log.debug("userOptions: " + userOptionsString)
             userOptionsJSON = json.loads(userOptionsString)
@@ -173,12 +164,14 @@ def evaluateCondensedSequence(thisTransaction : Transaction, thisService : Servi
                             ]
                         }
                     })
-        else:
-            log.error("Prepfile did not exist at: " + prepfile)
-            common.settings.appendCommonParserNotice(thisTransaction, 'InvalidInput', 'InvalidInputPayload')
+        except Exception as error:
+            log.error("Something when wrong while evaluating sequence: " + sequence)
+            log.error("Error type: " + str(type(error)))
+            common.settings.appendCommonParserNotice( thisTransaction, 'InvalidInput', 'InvalidInputPayload')
     else:
-        log.error("This sequence is invalid: " + sequence)
-        common.settings.appendCommonParserNotice( thisTransaction, 'InvalidInput', 'InvalidInputPayload')
+        log.error("Prepfile did not exist at: " + prepfile)
+        common.settings.appendCommonParserNotice(thisTransaction, 'InvalidInput', 'InvalidInputPayload')
+
 
 
 
@@ -265,7 +258,23 @@ def receive(thisTransaction : Transaction):
             evaluateCondensedSequence(thisTransaction,  None)
         elif i == 'Build3DStructure':
             log.debug("Build3DStructure service requested from sequence entity.")
-            build3DStructure(thisTransaction ,  None)
+            ##first evaluate the requested structure. Only build if valid.
+            evaluateCondensedSequence(thisTransaction, None)
+            responses = thisTransaction.response_dict['responses']
+            for response in responses:
+                log.debug("response: " + str(response))
+                if 'SequenceEvaluation' in response.keys():
+                    if response['SequenceEvaluation']['type'] == "Evaluate":
+                        outputs = response['SequenceEvaluation']['outputs']
+                        for output in outputs:
+                            log.debug("output: " + str(output))
+                            if "SequenceValidation" in output.keys():
+                                if output['SequenceValidation']['SequenceIsValid'] == True:
+                                    log.debug("Valid sequence. Building default structure.")
+                                    build3DStructure(thisTransaction, None)
+                                else:
+                                    log.error("Invalid Sequence. Cannot build.")
+                                    common.settings.appendCommonParserNotice( thisTransaction,'InvalidInput',i)
         else:
             log.error("got to the else, so something is wrong")
             common.settings.appendCommonParserNotice( thisTransaction,'ServiceNotKnownToEntity',i)

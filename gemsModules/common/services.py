@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import sys,importlib.util
+import os, sys,importlib.util
 import gemsModules
 from gemsModules import common
 from gemsModules.common.settings import *
@@ -139,6 +139,21 @@ def returnHelp(requestedEntity,requestedHelp):
   if thisHelp is None:
     return "Something went wrong getting the requestedHelp from " + requestedEntity
   return thisHelp
+
+def getGemsHome():
+    log.info("getGemsHome() was called.\n")
+    GEMSHOME = os.environ.get('GEMSHOME')
+    if GEMSHOME == None:
+        log.error("""
+
+        GEMSHOME environment variable is not set.
+
+        Set it using somthing like:
+
+          BASH:  export GEMSHOME=/path/to/gems
+          SH:    setenv GEMSHOME /path/to/gems
+        """)
+    return GEMSHOME
 
 
 def main():
