@@ -64,7 +64,8 @@ subEntities = {
     'MmService' : 'mmservice',
     'Project' : 'project',
     'Sequence' : 'sequence',
-    'Status' : 'status'
+    'Status' : 'status',
+    'StructureFile' : 'structureFile'
 
 }
 

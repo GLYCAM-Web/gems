@@ -34,6 +34,9 @@ class SequenceServicesEnum(str,Enum):
 class StatusServicesEnum(str,Enum):
     generateReport = 'GenerateReport'
 
+class StructureFileServicesEnum(str, Enum):
+    amber = 'Amber'
+
 # ##
 # ## Enums for environment variables
 # ##
@@ -59,6 +62,7 @@ class EntityTypeEnum(str, Enum):
     query = 'Query'
     graph = 'Graph'
     status = "Status"
+
 
 class CommonServicesEnum(str,Enum):
     """
@@ -171,6 +175,13 @@ class StatusServices(BaseModel):
         description = 'Reporting services for gemsModules.'
         )
 
+class StructureFileServices(BaseModel):
+    structureFileServices: StructureFileServicesEnum = Schema(
+        'Amber',
+        title = "Amber Structure File Services.",
+        description = "Preprocessing for PDB files."
+        )
+
 class ExternalResource(BaseModel):
     locationType: ExternalLocationTypeEnum = Schema(
             None,
@@ -240,7 +251,7 @@ class Notice(BaseModel):
 
 class Service(BaseModel):
     """Holds information about a requested Service."""
-    typename : Union[CommonServices, DelegatorServices, GraphServices, MmServiceServices, SequenceServices, GlycoProteinServices, StatusServices ] = Schema(
+    typename : Union[CommonServices, DelegatorServices, GraphServices, MmServiceServices, SequenceServices, GlycoProteinServices, StatusServices, StructureFileServices ] = Schema(
             None,
             title='Type of Service.',
             alias='type',

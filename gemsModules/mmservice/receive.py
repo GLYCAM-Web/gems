@@ -51,8 +51,8 @@ def receive(thisTransaction):
             ##  If so, check the status of a job that exists, and start jobs that don't.
 
             if requestedService not in mmSettings.serviceModules.keys():
-                log.debug("The requested service is not recognized.")
-                log.debug("services: " + str(mmSettings.serviceModules.keys()))
+                log.error("The requested service is not recognized.")
+                log.error("services: " + str(mmSettings.serviceModules.keys()))
                 common.settings.appendCommonParserNotice(thisTransaction,'ServiceNotKnownToEntity', requestedService)
             elif requestedService == "Amber":
                 log.debug("Amber service requested.")
@@ -113,9 +113,9 @@ def main():
     try:
         parseInput(thisTransaction)
     except Exception as error:
-        print("Error parsing input.")
-        print("Error type: " + str(type(error)))
-        print(traceback.format_exc())
+        log.error("Error parsing input.")
+        log.error("Error type: " + str(type(error)))
+        log.error(traceback.format_exc())
 
     receive(thisTransaction)
 
