@@ -1,0 +1,24 @@
+{
+	"entity":
+	{
+		"type": "StructureFile",
+		"services":
+		[
+			{ "Preprocess":
+				{ "type": "Preprocess" }
+			}
+		],
+		"inputs":
+		[
+			{ "pdb_file_name" :
+				{"payload" : "1buy.pdb"}
+			}
+		],
+		"options":
+		[
+			{ "preprocessor_options" :
+				{ "targetModule" : "amber"}
+			}
+		]
+	}
+}

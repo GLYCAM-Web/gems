@@ -76,7 +76,8 @@ class GemsProject(BaseModel):
             thisTransaction.response_dict = {}
         if not 'entity' in thisTransaction.response_dict:
             thisTransaction.response_dict['entity'] = {}
-            thisTransaction.response_dict['entity']['type'] = "Sequence"
+            thisTransaction.response_dict['entity']['type'] = thisTransaction.request_dict['entity']['type']
+
         if not 'gems_project' in thisTransaction.response_dict:
             thisTransaction.response_dict['gems_project'] = {}
 

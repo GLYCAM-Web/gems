@@ -35,7 +35,7 @@ class StatusServicesEnum(str,Enum):
     generateReport = 'GenerateReport'
 
 class StructureFileServicesEnum(str, Enum):
-    amber = 'Amber'
+    preprocess = 'Preprocess'
 
 # ##
 # ## Enums for environment variables
@@ -177,8 +177,8 @@ class StatusServices(BaseModel):
 
 class StructureFileServices(BaseModel):
     structureFileServices: StructureFileServicesEnum = Schema(
-        'Amber',
-        title = "Amber Structure File Services.",
+        'Preprocess',
+        title = "Preprocessing Services For Structure Files.",
         description = "Preprocessing for PDB files."
         )
 

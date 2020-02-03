@@ -4,12 +4,13 @@ from gemsModules.common.services import *
 from gemsModules.common.transaction import *
 from gemsModules.project.projectUtil import *
 from gemsModules.common.loggingConfig import *
+from gemsModules.structureFile.amber import receive as amberReceive
 import gemsModules.structureFile.settings as structureFileSettings
 import traceback
 
 ##TO set logging verbosity for just this file, edit this var to one of the following:
 ## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.ERROR
+logLevel = logging.DEBUG
 
 if loggers.get(__name__):
     pass
@@ -42,7 +43,11 @@ def receive(thisTransaction):
 
 def doDefaultService(thisTransaction):
     log.info("doDefaultService() was called.")
-    ##Preprocess PDB will be the default.
+    ##Preprocess PDB will be the default. Given a request to the StructureFile entity,
+    ##  with no services or options defined, look for a pdb file and preprocess it for Amber.
+    amberReceive.receive(thisTransaction)
+
+
 
 
 
