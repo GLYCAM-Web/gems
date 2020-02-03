@@ -226,7 +226,7 @@ def build3DStructure(thisTransaction : Transaction, thisService : Service = None
                 log.debug("Returning response to website.")
             else:
                 log.debug("Cleanup for api requests.")
-                del thisTransaction.response_dict['gems_project']['output_dir']
+                del thisTransaction.response_dict['gems_project']
 
 
 """
