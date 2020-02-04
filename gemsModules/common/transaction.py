@@ -181,6 +181,7 @@ class StructureFileServices(BaseModel):
         title = "Preprocessing Services For Structure Files.",
         description = "Preprocessing for PDB files."
         )
+    options : Tags = None
 
 class ExternalResource(BaseModel):
     locationType: ExternalLocationTypeEnum = Schema(

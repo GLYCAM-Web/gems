@@ -9,13 +9,14 @@ from gemsModules.common.loggingConfig import *
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 from pydantic import BaseModel, Schema
 from pydantic.schema import schema
+import traceback
 
 ## TODO: Update this method to receive actual module name, not its key.
 ## Also update methods that call common/services.py importEntity() to reflect this change.
 
 ##TO set logging verbosity for just this file, edit this var to one of the following:
 ## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.ERROR
+logLevel = logging.DEBUG
 
 if loggers.get(__name__):
     pass
@@ -68,6 +69,7 @@ def parseInput(thisTransaction):
         log.error("Validation Error.")
         log.error(e.json())
         log.error(e.errors())
+        log.error(traceback.format_exc())
         if 'entity' in e.errors()[0]['loc']:
             if 'type' in e.errors()[0]['loc']:
                 log.error("Type present, but unrecognized.")
@@ -81,6 +83,10 @@ def parseInput(thisTransaction):
         theResponseTypes = getTypesFromList(thisTransaction.response_dict['entity']['responses'])
         log.debug(theResponseTypes)
         return theResponseTypes.count('error')
+    except Exception as error:
+        log.error("There was an error parsing transaction.request_dict.")
+        log.error("Error type : " + str(type(error)))
+        log.error(traceback.format_exc())
 
     # If still here, load the data into a Transaction object and return success
     thisTransaction.transaction_in = jsonpickle.decode(thisTransaction.incoming_string)

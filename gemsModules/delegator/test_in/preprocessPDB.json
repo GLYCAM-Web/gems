@@ -13,12 +13,12 @@
 			{ "pdb_file_name" :
 				{"payload" : "1buy.pdb"}
 			}
-		],
-		"options":
+		]
+	},
+	"options":
 		[
 			{ "preprocessor_options" :
 				{ "targetModule" : "amber"}
 			}
 		]
-	}
 }
