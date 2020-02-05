@@ -13,12 +13,12 @@ moduleStatusDetail = "Module framework exists. Building logic for PDB Preprocess
 
 servicesStatus = [
     {
-        "service" : "Preprocess",
+        "service" : "PreprocessForAmber",
         "status" : "In development",
         "statusDetail" : "Creating the logic used to preprocess PDB files."
     }
 ]
 
 serviceModules = {
-    'Preprocess' : 'preprocess'
+    'PreprocessForAmber' : 'preprocessForAmber'
 }

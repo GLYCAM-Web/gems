@@ -13,7 +13,7 @@ import json, os, sys, uuid
 
 ##TO set logging verbosity for just this file, edit this var to one of the following:
 ## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.ERROR
+logLevel = logging.DEBUG
 
 if loggers.get(__name__):
     pass
@@ -54,8 +54,15 @@ def startProject(thisTransaction: Transaction):
 
     if gemsProject.project_type == "cb":
         log.debug("cb projects need no input files. skipping.")
-    else:
+    elif gemsProject.project_type == "pdb":
         output_dir = copyUploadFiles(thisTransaction)
+    elif gemsProject.project_type == "md":
+        output_dir = copyUploadFiles(thisTransaction)
+    else:
+        log.error("New project type found. Please add this to projectUtil.py")
+        ##TODO: Need to figure out if upload files are needed for new
+        ## project types.
+
 
     if not os.path.exists(output_dir):
         log.debug("creating the output_dir")

@@ -1,20 +1,17 @@
 {
-	"entity": {
-		"type": "StructureFile",
-		"services": [{
-			"Preprocess": {
-				"type": "Preprocess"
+	"entity" : {
+		"type" : "StructureFile",
+		"services" : [{
+			"Preprocess" : {
+				"type" : "PreprocessForAmber"
 			}
 		}],
-		"inputs": [{
-			"pdb_file_name": "1buyForPDBtests.pdb"
+		"inputs" : [{
+			"pdb_file_name" : {
+				"payload" : "1buyForPDBtests.pdb"
+			}
 		}]
 	},
-	"options": [{
-		"preprocessor_options": {
-			"targetModule": "amber"
-		}
-	}],
 	"project": {
 		"_state": "<django.db.models.base.ModelState object at 0x7f8b9ce2c8d0>",
 		"user_id": "1",

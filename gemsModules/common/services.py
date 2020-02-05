@@ -77,6 +77,7 @@ def parseInput(thisTransaction):
                 log.error(str(listEntities()))
                 appendCommonParserNotice(thisTransaction,'EntityNotKnown')
             else:
+
                 print("No 'type' present. Appending common parser notice.")
                 appendCommonParserNotice(thisTransaction,'NoEntityDefined')
 
