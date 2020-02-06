@@ -13,7 +13,7 @@ import json, os, sys, uuid
 
 ##TO set logging verbosity for just this file, edit this var to one of the following:
 ## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.DEBUG
+logLevel = logging.ERROR
 
 if loggers.get(__name__):
     pass
@@ -81,6 +81,7 @@ def startProject(thisTransaction: Transaction):
         json.dump(request, f, ensure_ascii=False, indent=4)
 
     log.debug("Transaction: " + str(thisTransaction.__dict__))
+    return gemsProject
 
 """
 Creates a copy of uploads from the frontend
@@ -122,7 +123,7 @@ def copyUploadFiles(thisTransaction : Transaction):
                 log.debug("filename: " + filename)
 
                 source_file = os.path.join(uploads_source_dir, filename)
-                log.DEBUG("file source: " + source_file)
+                log.debug("file source: " + source_file)
 
                 destination_file = os.path.join(uploads_dest_dir, filename)
                 log.debug("file destination: " + destination_file)

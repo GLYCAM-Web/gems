@@ -1,0 +1,35 @@
+{
+	"entity": {
+		"type": "StructureFile",
+		"services": [{
+			"Preprocess": {
+				"type": "PreprocessPdbForAmber"
+			}
+		}],
+		"inputs": [{
+			"pdb_file_name": {
+				"payload": "/website/glycam-django/glycamweb/json_api/testData/1buyForPDBtests.pdb"
+			}
+		}]
+	},
+	"project": {
+		"_state": "<django.db.models.base.ModelState object at 0x7faef22f6bd0>",
+		"user_id": "1",
+		"title": "Untitled project",
+		"timestamp": "2020-02-06 22:30:24.413879+00:00",
+		"id": "37bf599b-689a-4613-a125-433211a38bcc",
+		"comment": " ",
+		"type": "pdb",
+		"email": "",
+		"gems_version": "default_gems_version_set_me",
+		"gmml_version": "default_gmml_version_set_me",
+		"ff_version": "default_gmml_version_set_me",
+		"parameter_version": "2014",
+		"amber_version": "default_amber_version_set_me",
+		"root": " ",
+		"project_ptr_id": "37bf599b-689a-4613-a125-433211a38bcc",
+		"uploaded_file_name": "/website/uploads/tools/pdb/git-ignore-me_userdata/4e45bdd2-3529-4743-a932-817f3fc1bd26/1buyForPDBtests.pdb",
+		"u_uuid": "4e45bdd2-3529-4743-a932-817f3fc1bd26",
+		"upload_path": "/website/uploads/tools/pdb/git-ignore-me_userdata/4e45bdd2-3529-4743-a932-817f3fc1bd26/"
+	}
+}

@@ -3,7 +3,7 @@
 		"type" : "StructureFile",
 		"services" : [{
 			"Preprocess" : {
-				"type" : "PreprocessForAmber"
+				"type" : "PreprocessPdbForAmber"
 			}
 		}],
 		"inputs" : [{
@@ -29,8 +29,8 @@
 		"root": "38093eb1-e106-4381-932d-d9599628d0a1",
 		"project_ptr_id": "38093eb1-e106-4381-932d-d9599628d0a1",
 		"uploaded_file_name": "1buyForPDBtests.pdb",
-		"u_uuid": "69ed1437-4def-41d5-be35-c351464fa569",
-		"upload_path": "/website/uploads/tools/pdb/git-ignore-me_userdata/69ed1437-4def-41d5-be35-c351464fa569/",
+		"u_uuid": "14d60e0f-c963-4f52-a71d-a9582347c075",
+		"upload_path": "/website/uploads/tools/pdb/git-ignore-me_userdata/14d60e0f-c963-4f52-a71d-a9582347c075/",
 		"toolDir": "/website/userdata/tools/pdb",
 		"path": "/pdb/media"
 	}
