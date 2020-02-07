@@ -30,12 +30,7 @@ def receive(thisTransaction):
 
     #Look to see if services are specified, else do default.
     if 'services' not in thisTransaction.request_dict['entity'].keys():
-        try:
-            doDefaultService(thisTransaction)
-        except Exception as error:
-            log.error("There was a problem doing the default service.")
-            log.error("Error type: " + str(type(error)))
-            log.error(traceback.format_exc())
+        doDefaultService(thisTransaction)
     else:
         services = getTypesFromList(thisTransaction.request_dict['entity']['services'])
         log.debug("requestedServices: " + str(services))
@@ -44,19 +39,11 @@ def receive(thisTransaction):
             if requestedService not in structureFileSettings.serviceModules.keys():
                 log.error("The requested service is not recognized.")
                 log.error("services: " + str(structureFileSettings.serviceModules.keys()))
-                common.settings.appendCommonParserNotice(thisTransaction,'ServiceNotKnownToEntity', requestedService)
+                appendCommonParserNotice(thisTransaction,'ServiceNotKnownToEntity', requestedService)
             elif requestedService == "PreprocessPdbForAmber":
-                try:
-                    preprocessPdbForAmber(thisTransaction)
-                except Exception as error:
-                    log.error("There was a problem preprocessing this file for Amber.")
-                    log.error("Error type: " + str(type(error)))
-                    log.error(traceback.format_exc())
-                    ##TODO: Figure out what sort of errors get caught here,
-                    ##  Then figure out appropriate error types to return
-                    ##common.settings.appendCommonParserNotice(thisTransaction, "UnknownError", requestedService)
+                preprocessPdbForAmber(thisTransaction)
             else:
-                log.warning("The rest of this module needs to be written.")
+                log.warning("Logic for this requestedService may still need to be added to structureFile/receive.py")
 
 def doDefaultService(thisTransaction):
     log.info("doDefaultService() was called.\n")
