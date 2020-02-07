@@ -86,9 +86,10 @@ def preprocessPdbForAmber(thisTransaction):
                     if "responses" not in thisTransaction.response_dict:
                         thisTransaction.response_dict['responses'] = []
 
+                    ##Return the pUUID as the payload.
                     thisTransaction.response_dict['responses'].append({
                         "PreprocessPdbForAmber" : {
-                            "payload" : updatedPdbFileName
+                            "payload" : gemsProject['pUUID']
                         }
                     })
 

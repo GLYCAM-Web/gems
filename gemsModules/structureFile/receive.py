@@ -43,7 +43,9 @@ def receive(thisTransaction):
             elif requestedService == "PreprocessPdbForAmber":
                 preprocessPdbForAmber(thisTransaction)
             else:
-                log.warning("Logic for this requestedService may still need to be added to structureFile/receive.py")
+                log.error("Logic should never reach this point. Look at structureFile/receive.py")
+
+    thisTransaction.build_outgoing_string()
 
 def doDefaultService(thisTransaction):
     log.info("doDefaultService() was called.\n")

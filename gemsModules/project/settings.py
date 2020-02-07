@@ -4,8 +4,8 @@
 WhoIAm='Project'
 
 ##Status Report
-status = "In development"
-moduleStatusDetail = "Building module framework."
+status = "Stable"
+moduleStatusDetail = "Creates Gems Projects for MMService, Sequence, and StructureFile."
 
 servicesStatus = [
     {

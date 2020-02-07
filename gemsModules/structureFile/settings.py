@@ -8,14 +8,14 @@ from pydantic import BaseModel, Schema
 WhoIAm='StructureFile'
 
 ##Status Report
-status = "In development"
-moduleStatusDetail = "Module framework exists. Building logic for PDB Preprocessing for Amber."
+status = "Stable"
+moduleStatusDetail = "PDB Pre-processing for Amber."
 
 servicesStatus = [
     {
         "service" : "PreprocessPdbForAmber",
-        "status" : "In development",
-        "statusDetail" : "Creating the logic used to preprocess PDB files."
+        "status" : "Stable",
+        "statusDetail" : "Can receive a PDB file and generate a new one that has been preprared for use with Amber."
     }
 ]
 

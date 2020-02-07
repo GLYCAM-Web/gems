@@ -22,6 +22,9 @@ class DelegatorServicesEnum(str,Enum):
 class MmServiceServicesEnum(str,Enum):
     amber = 'Amber'
 
+class ConjugateServicesEnum(str,Enum):
+    buildGlycoprotein = 'BuildGlycoprotein'
+
 class GlycoProteinServicesEnum(str,Enum):
     build3DStructure = 'Build3DStructure'
 
@@ -125,6 +128,13 @@ class Tags(BaseModel):
             None,
             description='Key-value pairs that are specific to each entity, service, etc'
             )
+
+class ConjugateServices(BaseModel):
+    conjugateServices: ConjugateServicesEnum = Schema(
+        'BuildGlycoprotein',
+        title = 'Conjugate Services',
+        description = "Services related to glycoproteins."
+        )
 
 class DelegatorServices(BaseModel):
     delegatorServices : DelegatorServicesEnum = Schema(
@@ -252,7 +262,7 @@ class Notice(BaseModel):
 
 class Service(BaseModel):
     """Holds information about a requested Service."""
-    typename : Union[CommonServices, DelegatorServices, GraphServices, MmServiceServices, SequenceServices, GlycoProteinServices, StatusServices, StructureFileServices ] = Schema(
+    typename : Union[CommonServices, ConjugateServices, DelegatorServices, GraphServices, MmServiceServices, SequenceServices, GlycoProteinServices, StatusServices, StructureFileServices ] = Schema(
             None,
             title='Type of Service.',
             alias='type',
