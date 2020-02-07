@@ -23,7 +23,7 @@ def preprocessPdbForAmber(thisTransaction):
     ## Check the files, if not happy with the file type return error.
     requestDict = thisTransaction.request_dict
     entity = requestDict['entity']['type']
-    log.debug("requestDict: " + str(requestDict))
+    log.debug("requestDict: " + str(json.dumps(requestDict, indent=2, sort_keys=False)))
     log.debug("entity: " + entity)
     gemsHome = getGemsHome()
     log.debug("gemsHome: " + gemsHome)
@@ -37,8 +37,10 @@ def preprocessPdbForAmber(thisTransaction):
         ##TODO: find a better way to verify that a file is a pdb file, as some may
         ##  legitimately not have the .pdb extension.
         if ".pdb" not in uploadFileName:
-            log.error("For now, pdb files must have the .pdb extension. May change later.")
-            ##TODO: Add logic to return an invalid input error.
+            noticeBrief = "For now, pdb files must have the .pdb extension. May change later."
+            log.error(noticeBrief)
+            ##Transaction, noticeBrief, blockID
+            appendCommonParserNotice(thisTransaction, 'InvalidInput' )
         else:
             log.debug("We have a file with a .pdb extension. Starting a gemsProject.")
             startGemsProject(thisTransaction, uploadFileName)
@@ -73,10 +75,11 @@ def preprocessPdbForAmber(thisTransaction):
                     log.debug("updatedPdbFileName: " + updatedPdbFileName)
                     pdbFile.WriteWithTheGivenModelNumber(updatedPdbFileName)
                 except Exception as error:
-                    log.error("There was an error writing the pdb file.")
+                    noticeBrief = "There was an error writing the pdb file."
+                    log.error(noticeBrief)
                     log.error("Error type: " + str(type(error)))
                     log.error(traceback.format_exc())
-                    ##TODO return a useful error.
+                    appendCommonParserNotice(thisTransaction, 'InvalidInput' )
                 else:
                     ##Build a response object for pdb responses
                     #log.debug("responseDict: " + str(thisTransaction.response_dict))
@@ -97,13 +100,17 @@ def preprocessPdbForAmber(thisTransaction):
                             del thisTransaction.response_dict['gems_project']
 
             else:
-                log.error("Request must at least have a pdb_file_name in inputs section of the entity.")
-                ##TODO:  return an invalid input error.
-
+                noticeBrief = "Request must have a pdb_file_name in inputs section of the entity."
+                log.error(noticeBrief)
+                appendCommonParserNotice(thisTransaction, 'JsonParseEror' )
 
     else:
-        log.warning("No project found in keys.")
+        noticeBrief = "No project found in keys. Still developing command-line interface."
+        log.error(noticeBrief)
         ##May be a request from the command line that does not use json api?
+        ##TODO: Add logic to do this without the interface to the frontend.
+        ##Transaction, noticeBrief, blockID
+        appendCommonParserNotice(thisTransaction, 'InvalidInput' )
 
 
 ##Amino libs
