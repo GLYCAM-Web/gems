@@ -13,7 +13,7 @@ import json, os, sys, uuid
 
 ##TO set logging verbosity for just this file, edit this var to one of the following:
 ## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.DEBUG
+logLevel = logging.ERROR
 
 if loggers.get(__name__):
     pass
@@ -58,6 +58,8 @@ def startProject(thisTransaction: Transaction):
         output_dir = copyUploadFiles(thisTransaction)
     elif gemsProject.project_type == "md":
         output_dir = copyUploadFiles(thisTransaction)
+    elif gemsProject.project_type == "gp":
+        output_dir = copyUploadFiles(thisTransaction)
     else:
         log.error("New project type found. Please add this to projectUtil.py")
         ##TODO: Need to figure out if upload files are needed for new
@@ -73,12 +75,28 @@ def startProject(thisTransaction: Transaction):
     if not os.path.exists(logs_dir):
         log.debug("creating the logs dir in project")
         os.makedirs(logs_dir)
+    try:
+        request_file = os.path.join(logs_dir,"request.json")
+        log.debug("request_file: " + request_file)
+        with open(request_file, 'w', encoding='utf-8') as f:
+            json.dump(request, f, ensure_ascii=False, indent=4)
 
-    request_file = os.path.join(logs_dir,"request.json")
-    log.debug("request_file: " + request_file)
+        project_log_file = os.path.join(logs_dir, "project.log")
+        log.debug("project_log_file: " + project_log_file)
+        with open(project_log_file, 'w', encoding='utf-8') as file:
+            log.debug("gemsProject object type: " + str(type(gemsProject)))
+            log.debug("keys: " + str(gemsProject.__dict__.keys()))
+            file.write("GEMS Project Log:\n\n")
+            file.write("Project type: " + gemsProject.project_type + "\n")
+            file.write("Status: " + gemsProject.status + "\n")
+            file.write("Timestamp: " + str(gemsProject.timestamp) + "\n")
+            file.write("pUUID: " + gemsProject.pUUID + "\n")
+            file.write("output_dir: " + gemsProject.output_dir)
 
-    with open(request_file, 'w', encoding='utf-8') as f:
-        json.dump(request, f, ensure_ascii=False, indent=4)
+    except Exception as error:
+        log.error("There was a problem writing the project logs.")
+        log.error("Error type: " + str(type(error)))
+        log.error(traceback.format_exc())
 
     log.debug("Transaction: " + str(thisTransaction.__dict__))
     return gemsProject

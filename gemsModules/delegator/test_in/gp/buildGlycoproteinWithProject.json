@@ -1,0 +1,46 @@
+{
+	"entity": {
+		"type": "Conjugate",
+		"services": [{
+			"Build": {
+				"type": "BuildGlycoprotein"
+			}
+		}],
+		"inputs": [{
+			"pdb_file_name": {
+				"payload": "/website/glycam-django/glycamweb/json_api/testData/1eer_eop_Asn.pdb"
+			}
+		}, {
+			"attachments": [{
+				"glycan": "Man9",
+				"site": "A_24"
+			}, {
+				"glycan": "Man9",
+				"site": "A_38"
+			}, {
+				"glycan": "Man9",
+				"site": "A_83"
+			}]
+		}]
+	},
+	"project": {
+		"_state": "<django.db.models.base.ModelState object at 0x7f4d21df4290>",
+		"user_id": "1",
+		"title": "Untitled project",
+		"timestamp": "2020-02-08 16:36:43.119486+00:00",
+		"id": "3207b399-17ba-47ea-a737-eb09fa1d139a",
+		"comment": " ",
+		"type": "gp",
+		"email": "",
+		"gems_version": "default_gems_version_set_me",
+		"gmml_version": "default_gmml_version_set_me",
+		"ff_version": "default_gmml_version_set_me",
+		"parameter_version": "2014",
+		"amber_version": "default_amber_version_set_me",
+		"root": " ",
+		"project_ptr_id": "3207b399-17ba-47ea-a737-eb09fa1d139a",
+		"uploaded_file_name": "/website/uploads/tools/gp/git-ignore-me_userdata/a6b803ac-44bc-43a8-9d7a-0a543688a9c9/1eer_eop_Asn.pdb",
+		"u_uuid": "a6b803ac-44bc-43a8-9d7a-0a543688a9c9",
+		"upload_path": "/website/uploads/tools/gp/git-ignore-me_userdata/a6b803ac-44bc-43a8-9d7a-0a543688a9c9/"
+	}
+}

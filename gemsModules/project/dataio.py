@@ -31,6 +31,7 @@ class GemsProject(BaseModel):
     md5sum : str = None
     project_type : str = None
     requesting_agent : str = None
+    status : str = "submitted"
 
     def buildProject(self, thisTransaction : Transaction, requestingAgent : str):
         log.info("buildProject was called.\n")
@@ -47,6 +48,8 @@ class GemsProject(BaseModel):
                 self.project_type = "cb"
             if request['entity']['type'] == 'MmService':
                 self.project_type = "md"
+            if request['entity']['type'] == 'Conjugate':
+                self.project_type = "gp"
             pass
 
         else:
@@ -81,6 +84,7 @@ class GemsProject(BaseModel):
         if not 'gems_project' in thisTransaction.response_dict:
             thisTransaction.response_dict['gems_project'] = {}
 
+        thisTransaction.response_dict['gems_project']['status'] = self.status
         thisTransaction.response_dict['gems_project']['requesting_agent'] = self.requesting_agent
         thisTransaction.response_dict['gems_project']['timestamp'] = str(self.timestamp)
         thisTransaction.response_dict['gems_project']['pUUID'] = self.pUUID
@@ -91,19 +95,21 @@ class GemsProject(BaseModel):
             thisTransaction.response_dict['gems_project']['project_type'] = self.project_type
 
     def __str__(self):
-        result = "GemsProject  - requestingAgent: "
+        result = "\nGemsProject:\nrequestingAgent: "
         result = result + self.requesting_agent
         if self.project_type is not None:
-            result = result + ", type: "
+            result = result + "\ntype: "
             result = result + self.project_type
-        result = result + ", timestamp: "
+        result = result + "\nstatus: "
+        result = result + self.status
+        result = result + "\ntimestamp: "
         result = result + str(self.timestamp)
-        result = result + ", pUUID: "
+        result = result + "\npUUID: "
         result = result + self.pUUID
-        result = result + ", output_dir: "
+        result = result + "\noutput_dir: "
         result = result + self.output_dir
         if self.md5sum is not None:
-            result = result + ", md5sum: "
+            result = result + "\nmd5sum: "
             result = result + self.md5sum
 
         return result

@@ -5,11 +5,13 @@ from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
 from gemsModules.common.loggingConfig import *
 from gemsModules.project.projectUtil import *
+from gemsModules.structureFile.amber.receive import preprocessPdbForAmber
 import gemsModules.conjugate.settings as conjugateSettings
+import subprocess
 
 ##TO set logging verbosity for just this file, edit this var to one of the following:
 ## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.DEBUG
+logLevel = logging.ERROR
 
 if loggers.get(__name__):
     pass
@@ -77,8 +79,7 @@ def buildGlycoprotein(thisTransaction):
                 attachments = element['attachments']
                 log.debug("attachments: " + str(attachments))
             else:
-                log.error("Have a look at the inputs. Expected 'pdb_file_name', and 'attachments'.")
-                log.error("found: " + str(element.keys()))
+                log.debug("found: " + str(element.keys()))
 
         ##Verify that the pdb is in fact of type PDB.
         if pdbFileName != "":
@@ -104,11 +105,76 @@ def buildGlycoprotein(thisTransaction):
             log.debug("Attachments present. Moving forward.")
 
         log.debug("Still here. Starting a project.")
-        startProject(thisTransaction)
-        ##TODO: Maybe, If no attachments list is provided, attach Man9 to all likely positions.
-        ## Alernatively, require that at least one attachment be present, though it is ok if
-        ## it only provides the name of a glycan. If no sites are defined, attach that glycan
-        ## to all likely sites.
+        gemsProject = startProject(thisTransaction)
+
+        ##Return response that the project has been started.
+        thisTransaction.response_dict['responses'].append({
+            "BuildGlycoprotein" : {
+                'project_status' : gemsProject.status,
+                'payload' : gemsProject.pUUID
+            }
+        })
+
+        ##Preprocess pdb file
+        preprocessPdbForAmber(thisTransaction)
+
+        ##Ask Glycoproteinbuilder to do its stuff.
+        ##Get the name of the preprocessed file:
+        outputDir = gemsProject.output_dir
+        preprocessedPdbFileName = "updated_pdb.pdb"
+        log.debug("preprocessedPdbFileName: " + preprocessedPdbFileName)
+        inputFileName = outputDir + "input.txt"
+        log.debug("inputFileName: " + inputFileName)
+        ##Build input.txt
+        ##For now, assuming that sites are specified in the request.
+        try:
+            with open(inputFileName, 'w', encoding='utf-8') as file:
+                file.write("Protein:\n")
+                file.write(preprocessedPdbFileName + "\n\n")
+                file.write("Protein Residue, Glycan Name:\n")
+                for attachment in attachments:
+                    file.write(attachment['site'] + "," + attachment['glycan'] + "\n")
+                file.write("END")
+                log.debug("Finished writing input.txt")
+        except Exception as error:
+            log.error("Failed to create input.txt")
+            log.error("Error type: " + str(type(error)))
+            log.error(traceback.format_exc())
+
+        log.debug("Input file created. Calling the Glycoprotein Builder Program.")
+        ##Build the command to run gp
+        log.debug("cwd: " + os.getcwd())
+        os.chdir("../GlycoProteinBuilder/bin")
+        log.debug("cwd: " + os.getcwd())
+        builderPath = os.getcwd() + "/gp_builder"
+        log.debug("builderPath: " + builderPath)
+        log.debug("inputFileName: " + inputFileName)
+        command = builderPath + " " + outputDir + " > " + outputDir + "gp.log"
+        log.debug("command: " + command)
+
+        try:
+            subprocess.call(command,stdout=sys.stdout, stderr=sys.stderr, shell=True)
+        except Exception as error:
+            log.error("There was a problem calling the GlycoproteinBuilder program.")
+            log.error("Error type: " + str(type(error)))
+            log.error(traceback.format_exc())
+
+        ##Return the pUUID as the payload.
+        thisTransaction.response_dict['responses'].append({
+            "BuildGlycoprotein" : {
+                "payload" : gemsProject.pUUID
+            }
+        })
+
+
+        ##Cleanup for non-website requesting_agents.
+        if 'gems_project' in thisTransaction.response_dict.keys():
+            if "website" == thisTransaction.response_dict['gems_project']['requesting_agent']:
+                log.debug("Returning response to website.")
+            else:
+                log.debug("Cleanup for api requests.")
+                del thisTransaction.response_dict['gems_project']
+
     else:
         ##TODO: attach an error response.
         log.error("Could not find inputs in the request.")

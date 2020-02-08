@@ -42,8 +42,11 @@ def preprocessPdbForAmber(thisTransaction):
             ##Transaction, noticeBrief, blockID
             appendCommonParserNotice(thisTransaction, 'InvalidInput' )
         else:
-            log.debug("We have a file with a .pdb extension. Starting a gemsProject.")
-            startGemsProject(thisTransaction, uploadFileName)
+            log.debug("We have a file with a .pdb extension. Checking for a gemsProject.")
+            ##Projects in which pdb preprocessing is jsut a step will already
+            ##  have been created.
+            if 'gems_project' not in thisTransaction.response_dict.keys():
+                startGemsProject(thisTransaction, uploadFileName)
             gemsProject = thisTransaction.response_dict['gems_project']
 
             ##If no inputs provided, bail.
@@ -66,11 +69,11 @@ def preprocessPdbForAmber(thisTransaction):
                 #preprocessor.Print()
 
                 seqMap = pdbFile.GetSequenceNumberMapping()
-                log.debug("Writing the preprocessed pdb to 'updatedPdb.pdb'")
+                log.debug("Writing the preprocessed pdb to 'updated_pdb.pdb'")
                 try:
                     ##Give the output file the same path as the uploaded file, but replace the name.
                     outputDir = gemsProject['output_dir']
-                    destinationFile = 'updated_pdb.txt'
+                    destinationFile = 'updated_pdb.pdb'
                     updatedPdbFileName = outputDir + destinationFile
                     log.debug("updatedPdbFileName: " + updatedPdbFileName)
                     pdbFile.WriteWithTheGivenModelNumber(updatedPdbFileName)
