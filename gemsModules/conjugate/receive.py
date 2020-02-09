@@ -143,10 +143,7 @@ def buildGlycoprotein(thisTransaction):
 
         log.debug("Input file created. Calling the Glycoprotein Builder Program.")
         ##Build the command to run gp
-        log.debug("cwd: " + os.getcwd())
-        os.chdir("../GlycoProteinBuilder/bin")
-        log.debug("cwd: " + os.getcwd())
-        builderPath = os.getcwd() + "/gp_builder"
+        builderPath = "/programs/GlycoProteinBuilder/bin/"
         log.debug("builderPath: " + builderPath)
         log.debug("inputFileName: " + inputFileName)
         command = builderPath + " " + outputDir + " > " + outputDir + "gp.log"
