@@ -133,7 +133,7 @@ def buildGlycoprotein(thisTransaction):
                 file.write(preprocessedPdbFileName + "\n\n")
                 file.write("Protein Residue, Glycan Name:\n")
                 for attachment in attachments:
-                    file.write(attachment['site'] + "," + attachment['glycan'] + "\n")
+                    file.write(attachment['chain'] + "_" + attachment['residue_number'] + "," + attachment['glycan'] + "\n")
                 file.write("END")
                 log.debug("Finished writing input.txt")
         except Exception as error:
