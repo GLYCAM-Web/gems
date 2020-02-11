@@ -5,7 +5,7 @@ from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
 from gemsModules.common.loggingConfig import *
 from gemsModules.project.projectUtil import *
-from gemsModules.structureFile.amber.receive import preprocessPdbForAmber
+from gemsModules.structureFile.amber.receive import *
 import gemsModules.conjugate.settings as conjugateSettings
 import subprocess
 
@@ -177,7 +177,6 @@ def buildGlycoprotein(thisTransaction):
         ##TODO: attach an error response.
         log.error("Could not find inputs in the request.")
         log.error(str(request.keys()))
-
 
 
 def main():

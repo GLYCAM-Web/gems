@@ -3,13 +3,16 @@ import gemsModules
 import gmml
 import traceback
 
+from collections import defaultdict
+from collections import OrderedDict
+
 from gemsModules.common.transaction import *
 from gemsModules.project.projectUtil import *
 from gemsModules.common.loggingConfig import *
 
 ##TO set logging verbosity for just this file, edit this var to one of the following:
 ## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.ERROR
+logLevel = logging.DEBUG
 
 if loggers.get(__name__):
     pass
@@ -116,6 +119,76 @@ def preprocessPdbForAmber(thisTransaction):
         ##Transaction, noticeBrief, blockID
         appendCommonParserNotice(thisTransaction, 'InvalidInput' )
 
+def getLikelySites(thisTransaction):
+    log.info("getLikelySites() was called.\n")
+    ##TODO: Check if user has provided optional prepFile and libraries.
+    ##Using defaults for now.
+    gemsHome = getGemsHome()
+    aminoLibs = getDefaultAminoLibs(gemsHome)
+    glycamLibs = gmml.string_vector()
+    otherLibs = gmml.string_vector()
+    prepFile = getDefaultPrepFile(gemsHome)
+    log.debug("aminoLibs: " + str(aminoLibs))
+    log.debug("prepFile: " + str(prepFile))
+
+    project = thisTransaction.request_dict['project']
+
+    uploadFileName = getUploadFileName(project)
+    log.debug("uploadFileName: " + uploadFileName)
+    #PDB file object:
+    pdbFile = gmml.PdbFile(uploadFileName)
+
+    preprocessor = gmml.PdbPreprocessor()
+    preprocessor.Preprocess(pdbFile, aminoLibs, glycamLibs, otherLibs, prepFile)
+    residueInfo = preprocessor.GetResidueInfoMap()
+    log.debug("residueInfo:\n" + str(residueInfo))
+    positionsDict = {}
+    for key, value in residueInfo.items():
+        log.debug("key: " + str(key))
+        log.debug("value: " + str(value))
+        chainId = value.GetResidueChainId()
+        sequenceNumber = value.GetResidueSequenceNumber()
+        residueName = value.GetResidueName()
+        log.debug("chainId: " + str(chainId) + ", sequenceNumber: " + str(sequenceNumber) + ", residueName: " + str(residueName))
+        if not positionsDict.get(chainId):
+            positionsDict[chainId] = {}
+        positionsDict[chainId][sequenceNumber] = residueName
+
+    log.debug("positionsDict: " + str(positionsDict))
+    for key in positionsDict.keys():
+        positionsDict[key] = OrderedDict(sorted(positionsDict[key].items()))
+
+    log.debug("positionsDict: " + str(positionsDict))
+
+    sasa_positions = defaultdict(list)
+    likelySites = []
+    log.debug("Looking for likely sites.")
+    for key in residueInfo.keys():
+        log.debug("key: " + key)
+        found = False
+        if 'ASN' in key or 'NLN' in key:
+            log.debug("\nFound one: " + key + "\n")
+            value = residueInfo[key]
+            chainId = value.GetResidueChainId()
+            residueNumber = value.GetResidueSequenceNumber()
+            residueName = value.GetResidueName()
+            if 'ASN' in key:
+                log.debug("ASN in key.")
+                if positionsDict.get(residueNumber + 1) != "PRO":
+                    log.debug("next residue is not PRO")
+                    if positionsDict.get(residueNumber + 2) == "SER":
+                        log.debug("next residue is SER \nappend to likely")
+                        likelySites.append(key + "_likely")
+                    if positionsDict.get(residueNumber + 2) == "THR":
+                        log.debug("next residue is THR \nappend to likely")
+                        likelySites.append(key + "_likely")
+                else:
+                    log.debug("Next residue is PRO")
+            else:
+                log.info("ASN not in key: " + key)
+
+
+    return likelySites
 
 ##Amino libs
 def getDefaultAminoLibs(gemsHome):
