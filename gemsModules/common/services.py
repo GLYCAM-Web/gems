@@ -147,6 +147,17 @@ def returnHelp(requestedEntity,requestedHelp):
     return "Something went wrong getting the requestedHelp from " + requestedEntity
   return thisHelp
 
+def getJsonApiVersion():
+    log.info("getJsonApiVersion was called.")
+    currentStableSchema = getGemsHome() + "/gemsModules/Schema/currentStableSchema"
+    try:
+        with(open currentStableSchema) as schemaFile:
+            version = schemaFile.read()
+        log.debug("json_api_version: " + version)
+    except Exception as error:
+        log.error("Failed to read the currentStableSchema file.")
+    return version
+
 def getGemsHome():
     log.info("getGemsHome() was called.\n")
     GEMSHOME = os.environ.get('GEMSHOME')

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import gemsModules
+from datetime import datetime
 from gemsModules import common
 from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
@@ -64,6 +65,12 @@ def delegate(jsonObjectString):
         ## This is where specific requested services are called.
         theEntity.receive.receive(thisTransaction)
 
+    ##Set the json_api_version in the response_dict.
+    if 'json_api_version' not in thisTransaction.response_dict.keys():
+        thisTransaction.response_dict['json_api_version'] = getJsonApiVersion()
+    if 'response_timestamp' not in thisTransaction.response_dict.keys():
+        thisTransaction.response_dict['response_timestamp'] = datetime.now()
+
     ## Check to see if an outgoing string got built.  If not, try to
     ## build one.  If that still doesn't work, make the string be a
     ## generic error output JSON object.
@@ -72,6 +79,8 @@ def delegate(jsonObjectString):
     if thisTransaction.outgoing_string is None:
         ## TODO:  write this function....
         thisTransaction.build_general_error_output()
+
+
 
     # Return whatever outgoing string got made
     log.debug("About to return whatever output I have at this point.")
