@@ -7,20 +7,20 @@
  			}
  		}],
  		"inputs": [{
- 			"pdb_ID": "1EER"
+ 			"pdb_ID": "2V95"
  		}, {
  			"attachments": [{
  				"glycan": "Man9",
  				"chain": "A",
- 				"residue_number": "24"
+ 				"residue_number": "66"
  			}, {
  				"glycan": "Man9",
  				"chain": "A",
- 				"residue_number": "38"
+ 				"residue_number": "194"
  			}, {
  				"glycan": "Man9",
  				"chain": "A",
- 				"residue_number": "83"
+ 				"residue_number": "230"
  			}]
  		}]
  	},

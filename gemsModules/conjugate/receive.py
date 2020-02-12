@@ -102,6 +102,8 @@ def buildGlycoprotein(thisTransaction):
             log.debug("Requesting pdbID: " + pdbID + " from rcsb.org")
             ##TODO: Break this up. Trying too much in a single try/except block.
             try:
+                ##Sideload pdb from rcsb.org
+                pdbID = pdbID.upper()
                 rcsbURL = "https://files.rcsb.org/download/" + pdbID + ".pdb1"
                 log.debug("rcsbURL: " + rcsbURL)
                 with urllib.request.urlopen(rcsbURL) as response:
