@@ -151,7 +151,7 @@ def getJsonApiVersion():
     log.info("getJsonApiVersion was called.")
     currentStableSchema = getGemsHome() + "/gemsModules/Schema/currentStableSchema"
     try:
-        with(open currentStableSchema) as schemaFile:
+        with open(currentStableSchema) as schemaFile:
             version = schemaFile.read()
         log.debug("json_api_version: " + version)
     except Exception as error:

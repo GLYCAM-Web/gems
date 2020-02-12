@@ -8,10 +8,11 @@ from gemsModules.project.projectUtil import *
 from gemsModules.structureFile.amber.receive import *
 import gemsModules.conjugate.settings as conjugateSettings
 import subprocess
+import urllib.request
 
 ##TO set logging verbosity for just this file, edit this var to one of the following:
 ## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.ERROR
+logLevel = logging.DEBUG
 
 if loggers.get(__name__):
     pass
@@ -60,11 +61,13 @@ def receive(thisTransaction):
 
     thisTransaction.build_outgoing_string()
 
+##TODO: Refactor so errors stop the process and return responses. Not happening this way yet.
 def buildGlycoprotein(thisTransaction):
     log.info("buildGlycoprotein() was called.\n")
     request = thisTransaction.request_dict
     log.debug("request: " + str(request))
     pdbFileName = ""
+    pdbID = ""
     attachments = []
     if 'inputs' in request['entity'].keys():
         inputs = request['entity']['inputs']
@@ -75,6 +78,8 @@ def buildGlycoprotein(thisTransaction):
             if "pdb_file_name" in element.keys():
                 pdbFileName = element['pdb_file_name']['payload']
                 log.debug("pdbFileName: " + pdbFileName)
+            elif "pdb_ID" in element.keys():
+                pdbID = element['pdb_ID']
             elif "attachments" in element.keys():
                 attachments = element['attachments']
                 log.debug("attachments: " + str(attachments))
@@ -92,8 +97,44 @@ def buildGlycoprotein(thisTransaction):
                 appendCommonParserNotice(thisTransaction, 'InvalidInput' )
             else:
                 log.debug("Looks like a pdb file. Moving forward.")
+        elif pdbID != "":
+            ##Query rcsb for the pdbID. Be prepared for failures.
+            log.debug("Requesting pdbID: " + pdbID + " from rcsb.org")
+            ##TODO: Break this up. Trying too much in a single try/except block.
+            try:
+                rcsbURL = "https://files.rcsb.org/download/" + pdbID + ".pdb1"
+                log.debug("rcsbURL: " + rcsbURL)
+                with urllib.request.urlopen(rcsbURL) as response:
+                    contentBytes = response.read()
+
+                contentString = str(contentBytes, 'utf-8')
+                log.debug("Response content object type: " + str(type(contentString)))
+                log.debug("Response content: \n" + str(contentString))
+                ##Get the uploads dir
+                if "project" in request.keys():
+                    uploadDir = request['project']['upload_path']
+                    if not os.path.exists(uploadDir):
+                        os.mkdir(uploadDir)
+                    log.debug("uploadDir: " + uploadDir)
+                    uploadFileName = uploadDir  + pdbID + ".pdb"
+                    request['project']['uploaded_file_name'] = uploadFileName
+                else:
+                    log.error("Need a project to find the upload dir.")
+
+                log.debug("uploadFileName: " + uploadFileName)
+                ##Save the string to file in the uploads dir.
+                with open(uploadFileName, "w") as uploadFile:
+                    uploadFile.write(contentString)
+
+                log.debug("Finished side-loading pdb from rcsb.org.")
+
+            except Exception as error:
+                log.error("There was a problem submitting the request to rcsb.org.")
+                log.error("pdbID: " + pdbID)
+                log.error("Error type: " + str(type(error)))
+                log.error(traceback.format_exc())
         else:
-            log.error("Failed to find a value for pdb_file_name.")
+            log.error("Failed to find a value for pdb_file_name or pdb_ID.")
             appendCommonParserNotice(thisTransaction, 'InvalidInput' )
 
 
