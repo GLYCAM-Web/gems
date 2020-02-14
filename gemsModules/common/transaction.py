@@ -15,6 +15,9 @@ from pydantic.schema import schema
 # ##
 # ## Enums for Entity-specific Services
 # ##
+class BatchComputeServicesEnum(str, Enum):
+    submit = 'Submit'
+
 class DelegatorServicesEnum(str,Enum):
     delegate = 'Delegate'
     listEntities = 'ListEntities'
@@ -55,6 +58,7 @@ class SequenceServicesPathEnum(str,Enum):
 # ## Enums relevant to all Entities & Services
 # ##
 class EntityTypeEnum(str, Enum):
+    batchCompute = 'BatchCompute'
     commonServices = 'CommonServices'
     conjugate = 'Conjugate'
     delegator = 'Delegator'
@@ -128,6 +132,13 @@ class Tags(BaseModel):
             None,
             description='Key-value pairs that are specific to each entity, service, etc'
             )
+
+class BatchComputeServices(BaseModel):
+    batchComputeServices: BatchComputeServicesEnum = Schema(
+        'Submit',
+        title= "Batch Compute Services",
+        description = "Services related to submitting jobs to Slurm."
+        )
 
 class ConjugateServices(BaseModel):
     conjugateServices: ConjugateServicesEnum = Schema(

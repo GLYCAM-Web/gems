@@ -70,7 +70,7 @@ def generateReport(thisTransaction : Transaction, thisService : Service = None):
 ## The default here is to just report on every gemsModule and their corresponding services.
 def doDefaultService(thisTransaction : Transaction):
     log.info("doDefaultService() was called.\n")
-    log.debug("thisTransaction: " + str(thisTransaction))
+    #log.debug("thisTransaction: " + str(thisTransaction))
 
     ##Header section
     if thisTransaction.response_dict is None:
@@ -84,7 +84,9 @@ def doDefaultService(thisTransaction : Transaction):
     thisTransaction.response_dict['entity']['timestamp'] = timestamp
     responses = []
     ##Entity Reporting
-    for availableEntity in listEntities():
+    entities = listEntities()
+    log.debug("entities: " + str(entities) + "\n")
+    for availableEntity in entities:
         log.debug("Generating a report for entity: " + availableEntity)
         response = {}
         thisEntity = importEntity(availableEntity)
@@ -112,7 +114,7 @@ def doDefaultService(thisTransaction : Transaction):
     thisTransaction.response_dict.update({
         "responses": responses
     })
-    log.debug("thisTransaction.response_dict: " + str(thisTransaction.response_dict))
+    #log.debug("thisTransaction.response_dict: " + str(thisTransaction.response_dict))
 
 ##Append a status from a module's settings file to a json response object
 def getModuleStatus(response, settings, settingsAttributes):

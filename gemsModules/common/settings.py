@@ -56,6 +56,7 @@ servicesStatus = [
 
 ## Module names for entities that this entity/module knows.
 subEntities = {
+    'BatchCompute' : 'batchcompute',
     'CommonServices' : 'common',
     'Conjugate' : 'conjugate',
     'Delegator' : 'delegator',

@@ -70,6 +70,10 @@ def delegate(jsonObjectString):
         thisTransaction.response_dict['json_api_version'] = getJsonApiVersion()
     if 'response_timestamp' not in thisTransaction.response_dict.keys():
         thisTransaction.response_dict['response_timestamp'] = datetime.now()
+    if 'site_host_name' not in thisTransaction.response_dict.keys():
+        if 'site_host_name' in thisTransaction.request_dict.keys():
+            thisTransaction.response_dict['site_host_name'] = thisTransaction.request_dict['site_host_name']
+
 
     ## Check to see if an outgoing string got built.  If not, try to
     ## build one.  If that still doesn't work, make the string be a
