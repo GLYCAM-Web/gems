@@ -7,8 +7,28 @@ WhoIAm='Conjugate'
 ## These should not include the Common Services.
 
 ##Status Report
-status = "Down"
-moduleStatusDetail = "In queue for development. Gems/JSON interface needed."
+status = "In development"
+moduleStatusDetail = "Currently working on Gems/JSON interface."
+
+servicesStatus = [
+    {
+        "service" : "BuildGlycoprotein",
+        "status" : "In development.",
+        "statusDetail" : "Working on receiving json api requests."
+    }
+]
+
+subEntities = [
+    {
+        "subEntity" : "StructureFile"
+    }
+]
+
+## Module names for services that this entity/module can perform.
+serviceModules = {
+    "BuildGlycoprotein" : "buildGlycoprotein"
+}
+
 
 def main():
     print("Ths script only contains dictionary-type information.")

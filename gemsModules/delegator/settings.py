@@ -35,7 +35,8 @@ subEntities = {
     'Query' : 'query',
     'Sequence' : 'sequence',
     'DrawGlycan' : 'drawglycan',
-    'Status' : 'status'
+    'Status' : 'status',
+    'StructureFile' : 'structureFile'
 }
 
 

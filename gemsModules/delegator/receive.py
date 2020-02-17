@@ -3,7 +3,17 @@ import gemsModules
 from gemsModules import common
 from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
+from gemsModules.common.loggingConfig import *
 import traceback
+
+##TO set logging verbosity for just this file, edit this var to one of the following:
+## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
+logLevel = logging.ERROR
+
+if loggers.get(__name__):
+    pass
+else:
+    log = createLogger(__name__, logLevel)
 
 def delegate(jsonObjectString):
     """
@@ -18,49 +28,37 @@ def delegate(jsonObjectString):
     reads the identity of the top-level Entity and, if it can load a
     module for that entity, it passes the Transaction object over.
     """
-
-    if verbosity > 0 :
-        print("~~~\nDelegator receive.py delegate() was called.\n~~~")
-    if verbosity > 1 :
-        print("incoming jsonObjectString: \n" + jsonObjectString)
+    log.info("delegate() was called.\n")
+    log.debug("incoming jsonObjectString: " + jsonObjectString)
 
     # Make a new Transaction object for holding I/O information.
     thisTransaction=Transaction(jsonObjectString)
 
     # If the incoming string was improperly formed, bail, but give a reason.
     if parseInput(thisTransaction) != 0:
-        if verbosity > -1 :
-            print(" There was an error parsing the input!")
+        log.error(" There was an error parsing the input!")
         thisTransaction.build_outgoing_string()
         return thisTransaction.outgoing_string
 
     # Grab the entity type
     entityType = thisTransaction.request_dict['entity']['type']
-    if verbosity > 0 :
-        print("Requested entityType: " + entityType)
+    log.debug("Requested entityType: " + entityType)
     # If the entity type is CommonServies, then something was very wrong,
     # and the JSON object is coming from internal errors.  So, just return it.
     if entityType == 'CommonServices':
-        if verbosity > -1 :
-            print("The requested entity is CommonServices, so something must have gone wrong.")
-            print("I'm returning that oject. as-is.  Delegator cannot delegate to CommonServices.")
+        log.error("The requested entity is CommonServices, so something must have gone wrong.")
+        log.error("I'm returning that oject. as-is.  Delegator cannot delegate to CommonServices.")
         return jsonObjectString
     # See if it is possible to load a module for the requested Entity
     theEntity = importEntity(entityType)
-    #print(thisTransaction.request_dict['entity']['type'])
-    #print("theEntity: " + str(theEntity))
+    log.debug("theEntity: " + str(theEntity))
 
     if theEntity is None:
-        if verbosity > -1 :
-            print("there was no entity to call.  bailing")
+        log.error("there was no entity to call.  bailing")
         appendCommonParserNotice(thisTransaction,'NoEntityDefined')
     elif not 'services' in thisTransaction.request_dict['entity'].keys():
         ## If no service is requested in the json object, do the default service.
-        if verbosity > 0 :
-            print("Calling the default service")
-        if verbosity > 1 :
-            print("could not find services in thisTransaction.request_dict['entity'].keys()")
-            print("keys: " + str(thisTransaction.request_dict['entity'].keys))
+        log.debug("No service defined in the request. Calling the default service")
         theEntity.receive.doDefaultService(thisTransaction)
     else:
         ## This is where specific requested services are called.
@@ -76,14 +74,12 @@ def delegate(jsonObjectString):
         thisTransaction.build_general_error_output()
 
     # Return whatever outgoing string got made
-    if verbosity > 0 :
-        print("About to return whatever output I have at this point.")
+    log.debug("About to return whatever output I have at this point.")
     return thisTransaction.outgoing_string
 
 def doDefaultService(thisTransaction):
     """This might not be necessary... """
-    if verbosity > 0 :
-        print("Calling the default service for the Delegator itself.")
+    log.info("Calling the default service for the Delegator.\n")
     if thisTransaction.response_dict is None:
         thisTransaction.response_dict={}
     thisTransaction.response_dict['entity']={}
@@ -94,24 +90,19 @@ def doDefaultService(thisTransaction):
 
 ## TODO:  this reception code does not conform to the current JSON schema (is close...).
 def receive(thisTransaction):
-    if verbosity > 0 :
-        print("Delegator received a transaction.")
-    if verbosity > 1 :
-        print("request_dict: " + str(thisTransaction.request_dict))
+    log.info("receive() was called.\n")
+    log.debug("request_dict: " + str(thisTransaction.request_dict))
 
     if 'services' not in thisTransaction.request_dict['entity'].keys():
         doDefaultService(thisTransaction)
     else:
         requestedServices = thisTransaction.request_dict['entity']['services']
-        if verbosity > 0 :
-            print("len(requestedServices): " + str(len(requestedServices)))
+        log.debug("len(requestedServices): " + str(len(requestedServices)))
         for element in requestedServices:
-            if verbosity > 1 :
-                print("element.keys(): " + str(element.keys()))
+            log.debug("element.keys(): " + str(element.keys()))
             if 'listEntities' in element.keys():
                 entities = listEntities("Delegator")
-                if verbosity > 1 :
-                    print("entities: " + str(entities))
+                log.debug("entities: " + str(entities))
                 if thisTransaction.response_dict is None:
                     thisTransaction.response_dict={}
                 thisTransaction.response_dict['entity']={}

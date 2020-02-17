@@ -10,7 +10,18 @@ import ast
 from gemsModules import common
 from gemsModules.common.services import *
 from gemsModules.common.transaction import *
+from gemsModules.common.loggingConfig import *
 from inspect import currentframe, getframeinfo
+
+##TO set logging verbosity for just this file, edit this var to one of the following:
+## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
+logLevel = logging.ERROR
+
+if loggers.get(__name__):
+    pass
+else:
+    log = createLogger(__name__, logLevel)
+
 
 exitMessages = {
         'GmmlNotFound':'Cannot load the GMML module',
@@ -22,7 +33,7 @@ exitCodes = {
 # import gems/gmml stuff
 import gmml
 if gmml is None:
-#    print(exitMessages["GmmlNotFound"])
+    log.error(exitMessages["GmmlNotFound"])
     sys.exit(exitCodes["GmmlNotFound"])
 
 def buildQueryString(thisTransaction : Transaction):
@@ -34,7 +45,7 @@ def buildQueryString(thisTransaction : Transaction):
     try:
         virtLocation = os.getenv('VIRTUOSO_DB') + ":" + str(8890) + "/sparql"
     except:
-#        print("Unable to find the Virtuoso Database.  Quitting.")
+        log.error("Unable to find the Virtuoso Database.  Quitting.")
         sys.exit(1)
     try:
         GemsPath = os.environ.get('GEMSHOME')
@@ -43,9 +54,9 @@ def buildQueryString(thisTransaction : Transaction):
     debugFileLocation = GemsPath + "/DebugOutput.txt"
     theseOptions = thisTransaction.transaction_in['services'][0]['formQueryString']['options']
     if theseOptions['queryType'] == "Initial":
-#        print(theseOptions)
-#        print("Printing the aglycon part:")
-#        print(theseOptions['aglycon'])
+        log.debug(theseOptions)
+        log.debug("Printing the aglycon part:")
+        log.debug(theseOptions['aglycon'])
         if theseOptions['aglycon'] == 'None':
             theseOptions['aglycon'] = ""
         temp = gmml.Assembly()
@@ -82,11 +93,11 @@ def buildQueryString(thisTransaction : Transaction):
                 str(theseOptions['output_file_type'])
                 )
     proc = subprocess.Popen(theQueryString, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    # print("HEY LOOK AT ME")
-    # print(theQueryString)
+    log.debug("HEY LOOK AT ME")
+    log.debug(theQueryString)
     (out, err) = proc.communicate()
     out = str(out.decode('utf-8'))
-    # print(out)
+    log.debug(out)
     gmml.log(getframeinfo(currentframe()).lineno, getframeinfo(currentframe()).filename, gmml.INF, str(out), GemsPath + "/queryLog.txt")
     # text_file = open(debugFileLocation, "a+")
     # text_file.write(str(out))
@@ -97,6 +108,6 @@ def buildQueryString(thisTransaction : Transaction):
     # startIndex = out.index('{')
     # out = out[startIndex:]
     # out = "\"" + out + "\""
-    # print(out)
+    log.debug(out)
     jsonObj = json.loads(out)
     thisTransaction.response_dict= jsonObj

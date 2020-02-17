@@ -4,8 +4,8 @@
 WhoIAm='Project'
 
 ##Status Report
-status = "In development"
-moduleStatusDetail = "Building module framework."
+status = "Stable"
+moduleStatusDetail = "Creates Gems Projects for MMService, Sequence, and StructureFile."
 
 servicesStatus = [
     {
@@ -19,7 +19,4 @@ serviceModules = {
     "StartProject" : "startProject"
 }
 
-##This is the directory where projects should place their output,
-## Note that the project.project_root is not included here, but is appended
-## in project instantiation.
 output_data_dir = '/website/userdata/'

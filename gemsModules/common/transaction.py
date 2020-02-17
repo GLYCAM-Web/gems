@@ -22,6 +22,9 @@ class DelegatorServicesEnum(str,Enum):
 class MmServiceServicesEnum(str,Enum):
     amber = 'Amber'
 
+class ConjugateServicesEnum(str,Enum):
+    buildGlycoprotein = 'BuildGlycoprotein'
+
 class GlycoProteinServicesEnum(str,Enum):
     build3DStructure = 'Build3DStructure'
 
@@ -33,6 +36,9 @@ class SequenceServicesEnum(str,Enum):
 
 class StatusServicesEnum(str,Enum):
     generateReport = 'GenerateReport'
+
+class StructureFileServicesEnum(str, Enum):
+    preprocessPdbForAmber = 'PreprocessPdbForAmber'
 
 # ##
 # ## Enums for environment variables
@@ -59,6 +65,7 @@ class EntityTypeEnum(str, Enum):
     query = 'Query'
     graph = 'Graph'
     status = "Status"
+
 
 class CommonServicesEnum(str,Enum):
     """
@@ -122,6 +129,13 @@ class Tags(BaseModel):
             description='Key-value pairs that are specific to each entity, service, etc'
             )
 
+class ConjugateServices(BaseModel):
+    conjugateServices: ConjugateServicesEnum = Schema(
+        'BuildGlycoprotein',
+        title = 'Conjugate Services',
+        description = "Services related to glycoproteins."
+        )
+
 class DelegatorServices(BaseModel):
     delegatorServices : DelegatorServicesEnum = Schema(
             'Delegate',
@@ -170,6 +184,14 @@ class StatusServices(BaseModel):
         title = 'Status Reporting Services',
         description = 'Reporting services for gemsModules.'
         )
+
+class StructureFileServices(BaseModel):
+    structureFileServices: StructureFileServicesEnum = Schema(
+        'PreprocessPdbForAmber',
+        title = "Preprocessing Services For Structure Files.",
+        description = "Preprocessing for PDB files."
+        )
+    options : Tags = None
 
 class ExternalResource(BaseModel):
     locationType: ExternalLocationTypeEnum = Schema(
@@ -240,7 +262,7 @@ class Notice(BaseModel):
 
 class Service(BaseModel):
     """Holds information about a requested Service."""
-    typename : Union[CommonServices, DelegatorServices, GraphServices, MmServiceServices, SequenceServices, GlycoProteinServices, StatusServices ] = Schema(
+    typename : Union[CommonServices, ConjugateServices, DelegatorServices, GraphServices, MmServiceServices, SequenceServices, GlycoProteinServices, StatusServices, StructureFileServices ] = Schema(
             None,
             title='Type of Service.',
             alias='type',

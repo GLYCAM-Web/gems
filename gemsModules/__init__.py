@@ -29,4 +29,5 @@ from . import query
 from . import sequence
 from . import graph
 from . import status
+from . import structureFile
 

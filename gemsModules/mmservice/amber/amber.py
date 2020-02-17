@@ -1,11 +1,23 @@
 #custom
 import conf
+from gemsModules.common.loggingConfig import *
+
+##TO set logging verbosity for just this file, edit this var to one of the following:
+## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
+logLevel = logging.DEBUG
+
+if loggers.get(__name__):
+    pass
+else:
+    log = createLogger(__name__, logLevel)
+
+
 class Amber_Job:
     def __init__(self, json_dict):
         #Environment settings
         #Later determine MD command by another argument that reflect what settings are needed.
         self.AMBERHOME = '/programs/amber'
-        self.MD_COMMAND = 'sander' #Later determine this based on input json file. For now, just sander 
+        self.MD_COMMAND = 'sander' #Later determine this based on input json file. For now, just sander
         self.RUN_LOG = 'run.log'
         self.RUN_PREF = conf.File_Naming.prefSTRUCTURE + conf.File_Naming.modION + conf.File_Naming.modSOLV
         self.Run_Script_Name = self.RUN_PREF + '.sh'
@@ -13,10 +25,10 @@ class Amber_Job:
         self.JobId = str (json_dict["project"]["id"])
         self.WorkDir = str (json_dict["project"]["workingDirectory"])
         #Expect the 1st member of that list to be prmtop name, the 2nd to be teh inpcrd name
-        self.PARMTOP = str (json_dict["project"]["prmtop_file_name"]) 
+        self.PARMTOP = str (json_dict["project"]["prmtop_file_name"])
         self.INPCRD = str (json_dict["project"]["inpcrd_file_name"])
-        print ("self PARMTOP is " + self.PARMTOP )
-        print ("self INPCRD is " + self.INPCRD )
+        log.debug ("self PARMTOP is " + self.PARMTOP )
+        log.debug ("self INPCRD is " + self.INPCRD )
         #input file names
         self.MININ = self.RUN_PREF + '.' + conf.File_Naming.extMININ
         self.HEATIN = self.RUN_PREF + '.' + conf.File_Naming.extHEATIN
@@ -64,7 +76,7 @@ class Amber_Job:
 
         self.phase = json_dict["project"]["system_phase"] #gas or solvent
         self.water_model = json_dict["project"]["water_model"] #tip 3p/4p/5p or none (gas phase)
-        
+
     def CreateTLeapInputFile(self): #Creates a tLeap input file that creates minimization PARMTOP and RST7 files.
         pass
 
@@ -82,7 +94,7 @@ class Amber_Job:
         min_in.write('  ibelly = 0, ntr = 0,\n')
         min_in.write('  imin = 1,\n')
         min_in.write(' /\n')
-        
+
     def CreateHeatingInputFile(self):
         heat_in = open (self.WorkDir + '/' + self.HEATIN, 'w')
         heat_in.write('Dynamic Simulation with Constant Volume\n')
@@ -225,49 +237,49 @@ class Amber_Job:
         run_script.close()
 
     def check_if_dir_content_good(self):
-        #Previous function should cd into working directory.So file path is omitted in this function. 
+        #Previous function should cd into working directory.So file path is omitted in this function.
         input_files_missing = False
         out_files_exist = False
         if os.path.isfile(self.WorkDir + "/" + self.PARMTOP) == False:
             input_files_missing = True
-            print('Parmtop file missing in sub directory %s'%(os.path.abspath(self.WorkDir)))
+            log.debug('Parmtop file missing in sub directory %s'%(os.path.abspath(self.WorkDir)))
         if os.path.isfile(self.WorkDir + "/" + self.INPCRD) == False:
-            print ("Test:" + self.WorkDir + "/" + self.INPCRD)
+            log.debug ("Test:" + self.WorkDir + "/" + self.INPCRD)
             input_file_missing = True
-            print('Inpcrd file missing in sub directory %s'%(os.path.abspath(self.WorkDir)))
+            log.debug('Inpcrd file missing in sub directory %s'%(os.path.abspath(self.WorkDir)))
         if os.path.isfile(self.WorkDir + "/" + self.MININ) == False:
             input_file_missing = True
-            print('MININ file missing in sub directory %s'%(os.path.abspath(self.WorkDir)))
+            log.debug('MININ file missing in sub directory %s'%(os.path.abspath(self.WorkDir)))
 
         if self.minimization_only != True:
             if os.path.isfile(self.WorkDir + "/" + self.HEATIN) == False:
                 input_file_missing = True
-                print('HEATIN file missing')
+                log.debug('HEATIN file missing')
             if os.path.isfile(self.WorkDir + "/" + self.EQUIIN) == False:
                 input_file_missing = True
-                print('EQUIIN file missing')
+                log.debug('EQUIIN file missing')
             if os.path.isfile(self.WorkDir + "/" + self.MDIN)  == False:
                 input_file_missing = True
-                print('MDIN file missing')
+                log.debug('MDIN file missing')
 
         if input_files_missing == True:
             return False
 
         if os.path.isfile(self.WorkDir + "/" + self.MINOUT) == True:
             out_files_exist = True
-            print('MDOUT file already exists in sub directory %s'%(os.path.abspath(os.path.curdir)))
+            log.debug('MDOUT file already exists in sub directory %s'%(os.path.abspath(os.path.curdir)))
         if os.path.isfile(self.WorkDir + "/" + self.MINCRD) == True:
             out_files_exist = True
-            print('MDCRD file already exists in sub directory %s'%(os.path.abspath(os.path.curdir)))
+            log.debug('MDCRD file already exists in sub directory %s'%(os.path.abspath(os.path.curdir)))
         if os.path.isfile(self.WorkDir + "/" + self.MININFO) == True:
             out_files_exist = True
-            print('MDINFO file already exists in sub directory %s'%(os.path.abspath(os.path.curdir)))
+            log.debug('MDINFO file already exists in sub directory %s'%(os.path.abspath(os.path.curdir)))
         if os.path.isfile(self.WorkDir + "/" + self.MINLOG) == True:
             out_files_exist = True
-            print('MINLOG file already exists in sub directory %s'%(os.path.abspath(os.path.curdir)))
+            log.debug('MINLOG file already exists in sub directory %s'%(os.path.abspath(os.path.curdir)))
         if os.path.isfile(self.WorkDir + "/" + self.MINRST) == True:
             out_files_exist = True
-            print('MINRST file already exists in sub directory %s'%(os.path.abspath(os.path.curdir)))
+            log.debug('MINRST file already exists in sub directory %s'%(os.path.abspath(os.path.curdir)))
 
 
         if out_files_exist == True:
@@ -285,7 +297,7 @@ if __name__ == "__main__":
     amber_job = Amber_Job(input_json_dict)
 
     if amber_job.check_if_dir_content_good() == True:
-        slurm_module_path = '../../batchcompute' 
+        slurm_module_path = '../../batchcompute'
         sys.path.append(os.path.abspath(slurm_module_path))
         import batchcompute
         outgoing_json_dict = {}
@@ -293,6 +305,6 @@ if __name__ == "__main__":
         outgoing_json_dict["user"] = "webdev"
         outgoing_json_dict["name"] = "testmin"
         outgoing_json_dict["workingDirectory"] = str(input_json_dict["project"]["workingDirectory"])
-        outgoing_json_dict["sbatchArgument"] = amber_job.Run_Script_Name 
+        outgoing_json_dict["sbatchArgument"] = amber_job.Run_Script_Name
 
         batchcompute.batch_compute_delegation(outgoing_json_dict)

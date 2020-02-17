@@ -1,0 +1,104 @@
+{
+	'incoming_string': '{\n\t"entity" : {\n\t\t"type" : "StructureFile",\n\t\t"services" : [{\n\t\t\t"Preprocess" : {\n\t\t\t\t"type" : "PreprocessPdbForAmber"\n\t\t\t}\n\t\t}],\n\t\t"inputs" : [{\n\t\t\t"pdb_file_name" : {\n\t\t\t\t"payload" : "1buyForPDBtests.pdb"\n\t\t\t}\n\t\t}]\n\t},\n\t"project": {\n\t\t"_state": "<django.db.models.base.ModelState object at 0x7f8b9ce2c8d0>",\n\t\t"user_id": "1",\n\t\t"title": "",\n\t\t"timestamp": "2020-02-05 00:03:20.010315+00:00",\n\t\t"id": "38093eb1-e106-4381-932d-d9599628d0a1",\n\t\t"comment": "",\n\t\t"type": "pdb",\n\t\t"email": "",\n\t\t"gems_version": "default_gems_version_set_me",\n\t\t"gmml_version": "default_gmml_version_set_me",\n\t\t"ff_version": "default_gmml_version_set_me",\n\t\t"parameter_version": "2014",\n\t\t"amber_version": "default_amber_version_set_me",\n\t\t"root": "38093eb1-e106-4381-932d-d9599628d0a1",\n\t\t"project_ptr_id": "38093eb1-e106-4381-932d-d9599628d0a1",\n\t\t"uploaded_file_name": "1buyForPDBtests.pdb",\n\t\t"u_uuid": "69ed1437-4def-41d5-be35-c351464fa569",\n\t\t"upload_path": "/website/uploads/tools/pdb/git-ignore-me_userdata/69ed1437-4def-41d5-be35-c351464fa569/",\n\t\t"toolDir": "/website/userdata/tools/pdb",\n\t\t"path": "/pdb/media"\n\t}\n}\n',
+	'request_dict': {
+		'entity': {
+			'type': 'StructureFile',
+			'services': [{
+				'Preprocess': {
+					'type': 'PreprocessPdbForAmber'
+				}
+			}],
+			'inputs': [{
+				'pdb_file_name': {
+					'payload': '1buyForPDBtests.pdb'
+				}
+			}]
+		},
+		'project': {
+			'_state': '<django.db.models.base.ModelState object at 0x7f8b9ce2c8d0>',
+			'user_id': '1',
+			'title': '',
+			'timestamp': '2020-02-05 00:03:20.010315+00:00',
+			'id': '38093eb1-e106-4381-932d-d9599628d0a1',
+			'comment': '',
+			'type': 'pdb',
+			'email': '',
+			'gems_version': 'default_gems_version_set_me',
+			'gmml_version': 'default_gmml_version_set_me',
+			'ff_version': 'default_gmml_version_set_me',
+			'parameter_version': '2014',
+			'amber_version': 'default_amber_version_set_me',
+			'root': '38093eb1-e106-4381-932d-d9599628d0a1',
+			'project_ptr_id': '38093eb1-e106-4381-932d-d9599628d0a1',
+			'uploaded_file_name': '1buyForPDBtests.pdb',
+			'u_uuid': '69ed1437-4def-41d5-be35-c351464fa569',
+			'upload_path': '/website/uploads/tools/pdb/git-ignore-me_userdata/69ed1437-4def-41d5-be35-c351464fa569/',
+			'toolDir': '/website/userdata/tools/pdb',
+			'path': '/pdb/media'
+		}
+	},
+	'transaction_in': {
+		'entity': {
+			'inputs': [{
+				'pdb_file_name': {
+					'payload': '1buyForPDBtests.pdb'
+				}
+			}],
+			'services': [{
+				'Preprocess': {
+					'type': 'PreprocessPdbForAmber'
+				}
+			}],
+			'type': 'StructureFile'
+		},
+		'project': {
+			'_state': '<django.db.models.base.ModelState object at 0x7f8b9ce2c8d0>',
+			'amber_version': 'default_amber_version_set_me',
+			'comment': '',
+			'email': '',
+			'ff_version': 'default_gmml_version_set_me',
+			'gems_version': 'default_gems_version_set_me',
+			'gmml_version': 'default_gmml_version_set_me',
+			'id': '38093eb1-e106-4381-932d-d9599628d0a1',
+			'parameter_version': '2014',
+			'path': '/pdb/media',
+			'project_ptr_id': '38093eb1-e106-4381-932d-d9599628d0a1',
+			'root': '38093eb1-e106-4381-932d-d9599628d0a1',
+			'timestamp': '2020-02-05 00:03:20.010315+00:00',
+			'title': '',
+			'toolDir': '/website/userdata/tools/pdb',
+			'type': 'pdb',
+			'u_uuid': '69ed1437-4def-41d5-be35-c351464fa569',
+			'upload_path': '/website/uploads/tools/pdb/git-ignore-me_userdata/69ed1437-4def-41d5-be35-c351464fa569/',
+			'uploaded_file_name': '1buyForPDBtests.pdb',
+			'user_id': '1'
+		}
+	},
+	'transaction_out': None,
+	'response_dict': {
+		'entity': {
+			'type': 'StructureFile'
+		},
+		'responses': [],
+		'gems_project': {
+			'requesting_agent': 'json_api',
+			'timestamp': '2020-02-05 15:55:00.607433',
+			'pUUID': '056b410f-5538-4b0c-bdde-99678fd2b892',
+			'output_dir': '/website/userdata/tools/pdb/git-ignore-me_userdata/056b410f-5538-4b0c-bdde-99678fd2b892/',
+			'project_type': 'pdb'
+		}
+	},
+	'outgoing_string': None
+} {
+	"entity": {
+		"type": "StructureFile"
+	},
+	"responses": [],
+	"gems_project": {
+		"requesting_agent": "json_api",
+		"timestamp": "2020-02-05 15:55:00.607433",
+		"pUUID": "056b410f-5538-4b0c-bdde-99678fd2b892",
+		"output_dir": "/website/userdata/tools/pdb/git-ignore-me_userdata/056b410f-5538-4b0c-bdde-99678fd2b892/",
+		"project_type": "pdb"
+	}
+}

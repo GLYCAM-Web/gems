@@ -1,10 +1,22 @@
 #!/usr/bin/env python3
 from gemsModules import common
 from gemsModules.common.transaction import *
+from gemsModules.common.loggingConfig import *
+
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 from pydantic import BaseModel, Schema
 
 ## TODO: put some of this data into an in-memory sqlite db
+
+##TO set logging verbosity for just this file, edit this var to one of the following:
+## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
+logLevel = logging.ERROR
+
+if loggers.get(__name__):
+    pass
+else:
+    log = createLogger(__name__, logLevel)
+
 
 ## Who I am
 WhoIAm='CommonServicer'
@@ -52,7 +64,8 @@ subEntities = {
     'MmService' : 'mmservice',
     'Project' : 'project',
     'Sequence' : 'sequence',
-    'Status' : 'status'
+    'Status' : 'status',
+    'StructureFile' : 'structureFile'
 
 }
 
@@ -119,7 +132,7 @@ ExitMessages = {
 
 ## TODO Make this sort of thing ultimately part of transaction.py (eg Notice class).
 def appendCommonParserNotice(thisTransaction: Transaction,  noticeBrief: str, blockID: str = None):
-#    print("appending common parser notice.")
+    log.info("appendCommonParserNotice() was called.\n")
     # Build the notice
     if thisTransaction.response_dict is None:
         thisTransaction.response_dict={}
