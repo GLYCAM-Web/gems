@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import gemsModules
+from gemsModules.batchcompute.receive import *
 from gemsModules import common
 from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
@@ -12,7 +13,7 @@ import urllib.request
 
 ##TO set logging verbosity for just this file, edit this var to one of the following:
 ## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.ERROR
+logLevel = logging.DEBUG
 
 if loggers.get(__name__):
     pass
@@ -61,7 +62,9 @@ def receive(thisTransaction):
 
     thisTransaction.build_outgoing_string()
 
-##TODO: Refactor so errors stop the process and return responses. Not happening this way yet.
+##TODO: Refactor for:
+##        proper encapsulation,
+##        Have errors stop the process and return responses. Not happening this way yet.
 def buildGlycoprotein(thisTransaction):
     log.info("buildGlycoprotein() was called.\n")
     request = thisTransaction.request_dict
@@ -69,7 +72,10 @@ def buildGlycoprotein(thisTransaction):
     pdbFileName = ""
     pdbID = ""
     attachments = []
+
     if 'inputs' in request['entity'].keys():
+        ##TODO: Move this to the structureFile module
+        ##Get the pdbID for lookup.
         inputs = request['entity']['inputs']
         log.debug("inputs: " + str(inputs))
         for element in inputs:
@@ -161,8 +167,8 @@ def buildGlycoprotein(thisTransaction):
         ##Preprocess pdb file
         preprocessPdbForAmber(thisTransaction)
 
-        ##Ask Glycoproteinbuilder to do its stuff.
-        ##Get the name of the preprocessed file:
+        ##TODO: Move this logic to a new method.
+        ##Write the Input file, which GP uses to know what to do.
         outputDir = gemsProject.output_dir
         preprocessedPdbFileName = "updated_pdb.pdb"
         log.debug("preprocessedPdbFileName: " + preprocessedPdbFileName)
@@ -185,16 +191,31 @@ def buildGlycoprotein(thisTransaction):
             log.error(traceback.format_exc())
 
         log.debug("Input file created. Calling the Glycoprotein Builder Program.")
+
         ##Build the command to run gp
-        builderPath = "/programs/GlycoProteinBuilder/bin/gp_builder"
+        builderPath = "/programs/GlycoproteinBuilder/bin/gp_builder"
         log.debug("builderPath: " + builderPath)
         log.debug("inputFileName: " + inputFileName)
         #/programs/GlycoProteinBuilder/bin/ /website/userdata/tools/gp/git-ignore-me_userdata/4f18b278-d9bb-4111-b502-d91945639fa6/ > /website/userdata/tools/gp/git-ignore-me_userdata/4f18b278-d9bb-4111-b502-d91945639fa6/gp.log
         command = builderPath + " " + outputDir + " > " + outputDir + "gp.log"
         log.debug("command: " + command)
+        sbatchArg = "gpScript.sh"
+        script = outputDir + sbatchArg
+        try:
+            with open(script, 'w', encoding='utf-8') as file:
+                file.write("#!/bin/bash\n")
+                file.write(command)
+
+        except Exception as error:
+            log.error("There was a problem writing the gp script for slurm.")
+            log.error("Error type: " + str(type(error)))
+            log.error(traceback.format_exc)
 
         try:
-            subprocess.call(command,stdout=sys.stdout, stderr=sys.stderr, shell=True)
+            resonse = submitGpScriptToSlurm(thisTransaction, gemsProject, sbatchArg)
+            log.debug("response from batchcompute: \n" + str(response))
+            ##This is what the script needs to look like in file slurm will run.
+            #subprocess.call(command,stdout=sys.stdout, stderr=sys.stderr, shell=True)
         except Exception as error:
             log.error("There was a problem calling the GlycoproteinBuilder program.")
             log.error("Error type: " + str(type(error)))

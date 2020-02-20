@@ -5,7 +5,9 @@ from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
 from gemsModules.common.loggingConfig import *
 import gemsModules.batchcompute.settings as batchcomputeSettings
+from gemsModules.batchcompute.slurm.receive import manageIncomingString
 import traceback
+import json
 
 ##TO set logging verbosity for just this file, edit this var to one of the following:
 ## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
@@ -29,6 +31,10 @@ else:
 ##  Possible actions to take:
 ##     - Return an error message
 ##     - Pass the transaction on to the Service
+
+
+##TODO: Correct the workflow. This feels wrong.I don't feel like this is going to be used this way.
+
 def receive(thisTransaction):
     log.info("receive() was called.\n")
 
@@ -36,7 +42,7 @@ def receive(thisTransaction):
     if thisTransaction.response_dict is None:
         thisTransaction.response_dict = {}
     thisTransaction.response_dict['entity'] = {}
-    thisTransaction.response_dict['entity']['type'] = "Conjugate"
+    thisTransaction.response_dict['entity']['type'] = "BatcchCompute"
     thisTransaction.response_dict['responses'] = []
 
     ##Look in transaction for the requested service. If none, do default service.
@@ -53,7 +59,7 @@ def receive(thisTransaction):
                 log.error("services: " + str(conjugateSettings.serviceModules.keys()))
                 appendCommonParserNotice(thisTransaction,'ServiceNotKnownToEntity', requestedService)
             elif requestedService == "BuildGlycoprotein":
-                submitJob(thisTransaction)
+                log.debug("")
             else:
                 log.error("Logic should never reach this point. Look at congugate/receive.py.")
 
@@ -61,10 +67,45 @@ def receive(thisTransaction):
 
 def doDefaultService(thisTransaction):
     log.info("doDefaultService() was called.\n")
-    submitJob(thisTransaction)
+    log.error("default service needs to be written for batchcompute.")
 
-def submitJob(thisTransaction):
-    log.info("submitJob() was called.\n")
+def submitGpScriptToSlurm(thisTransaction, gemsProject, sbatchArg):
+    log.info("submitGpScriptToSlurm() was called.\n")
+    log.debug("sbatchArgument: " + sbatchArg)
+    if gemsProject is not None:
+
+        outputDir = gemsProject.output_dir
+        log.debug("outputDir: " + outputDir)
+        #Remove the last /
+        outputDir = outputDir[:-1]
+        log.debug("outputDir" + outputDir)
+    else:
+        log.error("Gems project not found.")
+        appendCommonParserNotice(thisTransaction, "InvalidInput")
+
+    log.debug("Found the script.")
+    jobInfoObject = {}
+    jobInfoObject.update({
+        "partition" : "glycoprotein",
+        "user" : "webdev",
+        "name" : "gw-slurm-glycoprotein",
+        "workingDirectory" : outputDir,
+        "sbatchArgument" : sbatchArg
+        })
+
+    log.debug("jobInfoObject: " + str(jobInfoObject))
+    try:
+        response = manageIncomingString(json.dumps(jobInfoObject))
+        log.debug("response from manageIncomingString:\n " + str(response).replace("\\", ""))
+    except Exception as error:
+        log.error("There was a problem calling manageIncomingString()")
+        log.error("Error type: "+ str(type(error)))
+        log.error(traceback.format_exc())
+        response = error
+
+    return response
+
+
 
 ##
 ##  Main:
