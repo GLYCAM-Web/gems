@@ -86,9 +86,9 @@ def submitGpScriptToSlurm(thisTransaction, gemsProject, sbatchArg):
     log.debug("Found the script.")
     jobInfoObject = {}
     jobInfoObject.update({
-        "partition" : "glycoprotein",
+        "partition" : "amber",
         "user" : "webdev",
-        "name" : "gw-slurm-glycoprotein",
+        "name" : "gp-test",
         "workingDirectory" : outputDir,
         "sbatchArgument" : sbatchArg
         })

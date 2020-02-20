@@ -193,7 +193,7 @@ def buildGlycoprotein(thisTransaction):
         log.debug("Input file created. Calling the Glycoprotein Builder Program.")
 
         ##Build the command to run gp
-        builderPath = "/programs/GlycoproteinBuilder/bin/gp_builder"
+        builderPath = "/programs/GlycoProteinBuilder/bin/gp_builder"
         log.debug("builderPath: " + builderPath)
         log.debug("inputFileName: " + inputFileName)
         #/programs/GlycoProteinBuilder/bin/ /website/userdata/tools/gp/git-ignore-me_userdata/4f18b278-d9bb-4111-b502-d91945639fa6/ > /website/userdata/tools/gp/git-ignore-me_userdata/4f18b278-d9bb-4111-b502-d91945639fa6/gp.log
@@ -204,7 +204,10 @@ def buildGlycoprotein(thisTransaction):
         try:
             with open(script, 'w', encoding='utf-8') as file:
                 file.write("#!/bin/bash\n")
-                file.write(command)
+                file.write('GPPATH="' + builderPath + '"\n')
+                file.write('WorkDir="' + outputDir + '"\n')
+                file.write('COMMAND="${GPPATH} ${WorkDir} > ${WorkDir}gp.log"\n')
+                file.write('eval ${COMMAND}')
 
         except Exception as error:
             log.error("There was a problem writing the gp script for slurm.")
@@ -217,7 +220,7 @@ def buildGlycoprotein(thisTransaction):
             ##This is what the script needs to look like in file slurm will run.
             #subprocess.call(command,stdout=sys.stdout, stderr=sys.stderr, shell=True)
         except Exception as error:
-            log.error("There was a problem calling the GlycoproteinBuilder program.")
+            log.error("There was a problem calling the GlycoProteinBuilder program.")
             log.error("Error type: " + str(type(error)))
             log.error(traceback.format_exc())
 
