@@ -1,4 +1,5 @@
 import os, sys, importlib.util
+import urllib.request
 import gemsModules
 import gmml
 import traceback
@@ -19,8 +20,7 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__, logLevel)
 
-##TODO: figure out how to stack receive calls to nested modules.
-##  Moving on so it won't be a bottleneck
+##May be sent a file attachment or a pdbID for sideloading from rcsb.org.
 def preprocessPdbForAmber(thisTransaction):
     log.info("preprocessPdbForAmber() was called.\n")
     ## Check the files, if not happy with the file type return error.
@@ -35,7 +35,21 @@ def preprocessPdbForAmber(thisTransaction):
     if "project" in requestDict.keys():
         log.debug("found a project in the request.")
         project = requestDict['project']
-        uploadFileName = getUploadFileName(project)
+
+        if 'inputs' in requestDict['entity'].keys():
+            inputs = requestDict['entity']['inputs']
+            uploadFileName = ""
+            for element in inputs:
+                ##Only sideload if uploadFileName is not ""
+                if "pdb_file_name" in element.keys():
+                    log.debug("looking for the attached pdb file.")
+                    uploadFileName = getUploadFileName(project)
+                elif uploadFileName == "" and "pdb_ID" in element.keys():
+                    log.debug("Side-loading pdb from rcsb.org.")
+                    pdbID = element['pdb_ID']
+                    uploadDir = project['upload_path']
+                    uploadFileName = sideloadPdbFromRcsb(pdbID, uploadDir)
+        log.debug("uploadFileName: " + uploadFileName)
 
         ##TODO: find a better way to verify that a file is a pdb file, as some may
         ##  legitimately not have the .pdb extension.
@@ -119,6 +133,39 @@ def preprocessPdbForAmber(thisTransaction):
         ##Transaction, noticeBrief, blockID
         appendCommonParserNotice(thisTransaction, 'InvalidInput' )
 
+##Returns the filename of a pdb file that is written to the dir you offer.
+## Creates the dir if it doesn't exist.
+def sideloadPdbFromRcsb(pdbID, uploadDir):
+    log.info("sideloadPdbFromRcsb() was called.\n")
+
+    ##Sideload pdb from rcsb.org
+    pdbID = pdbID.upper()
+    rcsbURL = "https://files.rcsb.org/download/" + pdbID + ".pdb1"
+    log.debug("rcsbURL: " + rcsbURL)
+    with urllib.request.urlopen(rcsbURL) as response:
+        contentBytes = response.read()
+
+    contentString = str(contentBytes, 'utf-8')
+    log.debug("Response content object type: " + str(type(contentString)))
+    log.debug("Response content: \n" + str(contentString))
+    ##Get the uploads dir
+    log.debug("uploadDir: " + uploadDir)
+    if not os.path.exists(uploadDir):
+        os.mkdir(uploadDir)
+
+    uploadFileName = uploadDir  + pdbID + ".pdb"
+
+    log.debug("uploadFileName: " + uploadFileName)
+    ##Save the string to file in the uploads dir.
+    with open(uploadFileName, "w") as uploadFile:
+        uploadFile.write(contentString)
+
+    log.debug("Finished side-loading pdb from rcsb.org.")
+    return uploadFileName
+
+
+
+##Warning, this needs testing before trusting. Be skeptical.
 def getLikelySites(thisTransaction):
     log.info("getLikelySites() was called.\n")
     ##TODO: Check if user has provided optional prepFile and libraries.

@@ -106,41 +106,17 @@ def buildGlycoprotein(thisTransaction):
         elif pdbID != "":
             ##Query rcsb for the pdbID. Be prepared for failures.
             log.debug("Requesting pdbID: " + pdbID + " from rcsb.org")
-            ##TODO: Break this up. Trying too much in a single try/except block.
             try:
-                ##Sideload pdb from rcsb.org
-                pdbID = pdbID.upper()
-                rcsbURL = "https://files.rcsb.org/download/" + pdbID + ".pdb1"
-                log.debug("rcsbURL: " + rcsbURL)
-                with urllib.request.urlopen(rcsbURL) as response:
-                    contentBytes = response.read()
-
-                contentString = str(contentBytes, 'utf-8')
-                log.debug("Response content object type: " + str(type(contentString)))
-                log.debug("Response content: \n" + str(contentString))
-                ##Get the uploads dir
                 if "project" in request.keys():
                     uploadDir = request['project']['upload_path']
-                    if not os.path.exists(uploadDir):
-                        os.mkdir(uploadDir)
-                    log.debug("uploadDir: " + uploadDir)
-                    uploadFileName = uploadDir  + pdbID + ".pdb"
+                    uploadFileName = sideloadPdbFromRcsb(pdbID, uploadDir)
                     request['project']['uploaded_file_name'] = uploadFileName
-                else:
-                    log.error("Need a project to find the upload dir.")
-
-                log.debug("uploadFileName: " + uploadFileName)
-                ##Save the string to file in the uploads dir.
-                with open(uploadFileName, "w") as uploadFile:
-                    uploadFile.write(contentString)
-
-                log.debug("Finished side-loading pdb from rcsb.org.")
-
             except Exception as error:
                 log.error("There was a problem submitting the request to rcsb.org.")
                 log.error("pdbID: " + pdbID)
                 log.error("Error type: " + str(type(error)))
                 log.error(traceback.format_exc())
+                appendCommonParserNotice(thisTransaction, 'InvalidInput' )
         else:
             log.error("Failed to find a value for pdb_file_name or pdb_ID.")
             appendCommonParserNotice(thisTransaction, 'InvalidInput' )
@@ -215,7 +191,7 @@ def buildGlycoprotein(thisTransaction):
             log.error(traceback.format_exc)
 
         try:
-            resonse = submitGpScriptToSlurm(thisTransaction, gemsProject, sbatchArg)
+            response = submitGpScriptToSlurm(thisTransaction, gemsProject, sbatchArg)
             log.debug("response from batchcompute: \n" + str(response))
             ##This is what the script needs to look like in file slurm will run.
             #subprocess.call(command,stdout=sys.stdout, stderr=sys.stderr, shell=True)
