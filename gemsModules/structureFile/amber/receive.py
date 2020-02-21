@@ -20,105 +20,83 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__, logLevel)
 
-##May be sent a file attachment or a pdbID for sideloading from rcsb.org.
+##  Prepare a pdb for use with Amber.
+#   @param thisTransaction A request containing either the path to an uploaded pdb, or a pdbID for sideloading.
 def preprocessPdbForAmber(thisTransaction):
     log.info("preprocessPdbForAmber() was called.\n")
-    ## Check the files, if not happy with the file type return error.
+
     requestDict = thisTransaction.request_dict
     entity = requestDict['entity']['type']
-    log.debug("requestDict: " + str(json.dumps(requestDict, indent=2, sort_keys=False)))
-    log.debug("entity: " + entity)
+    log.debug("requestDict: \n" + str(json.dumps(requestDict, indent=2, sort_keys=False)))
     gemsHome = getGemsHome()
     log.debug("gemsHome: " + gemsHome)
 
     ## project, here, is a frontend project, not gemsProject.
     if "project" in requestDict.keys():
         log.debug("found a project in the request.")
-        project = requestDict['project']
-
-        if 'inputs' in requestDict['entity'].keys():
-            inputs = requestDict['entity']['inputs']
-            uploadFileName = ""
-            for element in inputs:
-                ##Only sideload if uploadFileName is not ""
-                if "pdb_file_name" in element.keys():
-                    log.debug("looking for the attached pdb file.")
-                    uploadFileName = getUploadFileName(project)
-                elif uploadFileName == "" and "pdb_ID" in element.keys():
-                    log.debug("Side-loading pdb from rcsb.org.")
-                    pdbID = element['pdb_ID']
-                    uploadDir = project['upload_path']
-                    uploadFileName = sideloadPdbFromRcsb(pdbID, uploadDir)
-
-        log.debug("uploadFileName: " + uploadFileName)
-
-        ##TODO: find a better way to verify that a file is a pdb file, as some may
-        ##  legitimately not have the .pdb extension.
-        if ".pdb" not in uploadFileName:
-            noticeBrief = "For now, pdb files must have the .pdb extension. May change later."
-            log.error(noticeBrief)
-            ##Transaction, noticeBrief, blockID
+        try:
+            uploadedFileName = getUploadedFileNameFromTransaction(thisTransaction)
+        except AttributeError as error:
+            log.error("There was a problem finding the uploaded file name in the transaction.")
             appendCommonParserNotice(thisTransaction, 'InvalidInput' )
         else:
-            log.debug("We have a file with a .pdb extension. Checking for a gemsProject.")
-            ##Projects in which pdb preprocessing is jsut a step will already
-            ##  have been created.
-            if 'gems_project' not in thisTransaction.response_dict.keys():
-                startGemsProject(thisTransaction, uploadFileName)
-            gemsProject = thisTransaction.response_dict['gems_project']
+            uploadFileName = getUploadedFileNameFromTransaction(thisTransaction)
+            log.debug("uploadFileName: " + uploadFileName)
 
-            ##TODO: Check if user has provided optional prepFile and libraries.
-            aminoLibs = getDefaultAminoLibs(gemsHome)
-            glycamLibs = gmml.string_vector()
-            otherLibs = gmml.string_vector()
-            prepFile = getDefaultPrepFile(gemsHome)
-            log.debug("aminoLibs: " + str(aminoLibs))
-            log.debug("prepFile: " + str(prepFile))
-
-            #PDB file object:
-            pdbFile = gmml.PdbFile(uploadFileName)
-
-            preprocessor = gmml.PdbPreprocessor()
-            preprocessor.Preprocess(pdbFile, aminoLibs, glycamLibs, otherLibs, prepFile)
-            preprocessor.ApplyPreprocessingWithTheGivenModelNumber(pdbFile, aminoLibs, glycamLibs, prepFile)
-
-            ##Doesn't appear to be used. Do we need this for something?
-            seqMap = pdbFile.GetSequenceNumberMapping()
-            log.debug("Writing the preprocessed pdb to 'updated_pdb.pdb'")
-            try:
-                ##Give the output file the same path as the uploaded file, but replace the name.
-                outputDir = gemsProject['output_dir']
-                destinationFile = 'updated_pdb.pdb'
-                updatedPdbFileName = outputDir + destinationFile
-                log.debug("updatedPdbFileName: " + updatedPdbFileName)
-                pdbFile.WriteWithTheGivenModelNumber(updatedPdbFileName)
-            except Exception as error:
-                noticeBrief = "There was an error writing the pdb file."
+            ##TODO: find a better way to verify that a file is a pdb file, as some may
+            ##  legitimately not have the .pdb extension.
+            if ".pdb" not in uploadFileName:
+                noticeBrief = "For now, pdb files must have the .pdb extension. May change later."
                 log.error(noticeBrief)
-                log.error("Error type: " + str(type(error)))
-                log.error(traceback.format_exc())
+                ##Transaction, noticeBrief, blockID
                 appendCommonParserNotice(thisTransaction, 'InvalidInput' )
             else:
-                ##Build a response object for pdb responses
-                #log.debug("responseDict: " + str(thisTransaction.response_dict))
-                if "responses" not in thisTransaction.response_dict:
-                    thisTransaction.response_dict['responses'] = []
+                log.debug("We have a file with a .pdb extension. Checking for a gemsProject.")
+                ##Projects in which pdb preprocessing is jsut a step will already
+                ##  have been created.
+                if 'gems_project' not in thisTransaction.response_dict.keys():
+                    startGemsProject(thisTransaction, uploadFileName)
+                gemsProject = thisTransaction.response_dict['gems_project']
 
-                ##Return the pUUID as the payload.
-                thisTransaction.response_dict['responses'].append({
-                    "PreprocessPdbForAmber" : {
-                        "payload" : gemsProject['pUUID']
-                    }
-                })
+                ##TODO: Check if user has provided optional prepFile and libraries.
+                ##TODO: Error handling and type checking needed here.
+                aminoLibs = getDefaultAminoLibs(gemsHome)
+                glycamLibs = gmml.string_vector()
+                otherLibs = gmml.string_vector()
+                prepFile = getDefaultPrepFile(gemsHome)
 
-                if 'gems_project' in thisTransaction.response_dict.keys():
-                    if "website" == thisTransaction.response_dict['gems_project']['requesting_agent']:
-                        log.debug("Returning response to website.")
+                #PDB file object:
+                pdbFile = gmml.PdbFile(uploadFileName)
+
+                preprocessor = gmml.PdbPreprocessor()
+                preprocessor.Preprocess(pdbFile, aminoLibs, glycamLibs, otherLibs, prepFile)
+                preprocessor.ApplyPreprocessingWithTheGivenModelNumber(pdbFile, aminoLibs, glycamLibs, prepFile)
+
+                ##Doesn't appear to be used. Do we need this for something?
+                seqMap = pdbFile.GetSequenceNumberMapping()
+
+                try:
+                    ##Give the output file the same path as the uploaded file, but replace the name.
+                    outputDir = gemsProject['output_dir']
+                    writePdb(pdbFile, outputDir)
+                except IOError as error:
+                    log.error("Failed to write the pdb. Make sure the outputDir exists.")
+                except Exception as error:
+                    noticeBrief = "There was an error writing the pdb file."
+                    log.error(noticeBrief)
+                    log.error("Error type: " + str(type(error)))
+                    log.error(traceback.format_exc())
+                    appendCommonParserNotice(thisTransaction, 'InvalidInput' )
+                else:
+                    try:
+                        buildPdbResponse(thisTransaction)
+                    except AttributeError as error:
+                        log.error("There was a problem building the pdbResponse.")
+                        log.error(traceback.format_exc())
+                        appendCommonParserNotice(thisTransaction, 'InvalidInput' )
                     else:
-                        log.debug("Cleanup for api requests.")
-                        del thisTransaction.response_dict['gems_project']
-
-
+                        ##Remove gemsProject if user agent is not website.
+                        cleanGemsProject(thisTransaction)
 
     else:
         noticeBrief = "No project found in keys. Still developing command-line interface."
@@ -128,8 +106,82 @@ def preprocessPdbForAmber(thisTransaction):
         ##Transaction, noticeBrief, blockID
         appendCommonParserNotice(thisTransaction, 'InvalidInput' )
 
+##  Looks for a project in the transaction,
+#       checks for either a pdb file or pdbID.
+#   @param thisTransaction
+def getUploadedFileNameFromTransaction(thisTransaction : Transaction):
+    log.info("getUploadedFileNameFromTransaction() was called.\n")
+    if 'inputs' in thisTransaction.request_dict['entity'].keys():
+        log.debug("found inputs")
+        inputs = thisTransaction.request_dict['entity']['inputs']
+        uploadFileName = ""
+        project = thisTransaction.request_dict['project']
+        for element in inputs:
+            log.debug("element: " + str(element))
+            ##Only sideload if uploadFileName is not ""
+            if "pdb_file_name" in element.keys():
+                log.debug("looking for the attached pdb file.")
+                uploadFileName = getUploadFileName(project)
+            elif uploadFileName == "" and "pdb_ID" in element.keys():
+                log.debug("Side-loading pdb from rcsb.org.")
+                pdbID = element['pdb_ID']
+                uploadDir = project['upload_path']
+                uploadFileName = sideloadPdbFromRcsb(pdbID, uploadDir)
+            log.debug("returning uploadFileName: " + uploadFileName)
+            return uploadFileName
+    else:
+
+        log.error("No inputs found in request.")
+        raise AttributeError
+
+
+
+
+##  Write the pdb file to the outputDir
+#   @param pdbFile as created by gmml.PdbFile()
+#   @param outputDir destination for pdb file
+def writePdb(pdbFile, outputDir):
+    log.info("writePdb() was called.\n")
+    if os.path.exists(outputDir):
+        log.debug("Writing the preprocessed pdb to 'updated_pdb.pdb'")
+        destinationFile = 'updated_pdb.pdb'
+        updatedPdbFileName = outputDir + destinationFile
+        log.debug("updatedPdbFileName: " + updatedPdbFileName)
+        pdbFile.WriteWithTheGivenModelNumber(updatedPdbFileName)
+    else:
+        raise IOError
+
+## Adds a pdb response to responses. Transaction should have a gems project already.
+##  @param thisTransaction The transaction object that needs a response appended to it.
+def buildPdbResponse(thisTransaction : Transaction):
+    log.info("buildPdbResponse() was called.\n")
+    pUUID = getProjectpUUID(thisTransaction)
+    if pUUID is not None:
+        thisTransaction.response_dict['responses'].append({
+            "PreprocessPdbForAmber" : {
+                "payload" : pUUID
+            }
+        })
+    else:
+        raise AttributeError
+
+
+##If the requesting agent is the website, leave the gems project.
+#   Otherwise remove it.
+#   @param thisTransaction The transaction object provides the requesting agent.
+def cleanGemsProject(thisTransaction : Transaction):
+    log.info("cleanGemsProject() was called.\n")
+    if 'gems_project' in thisTransaction.response_dict.keys():
+        if "website" == thisTransaction.response_dict['gems_project']['requesting_agent']:
+            log.debug("Returning response to website.")
+        else:
+            log.debug("Cleanup for api requests.")
+            del thisTransaction.response_dict['gems_project']
+
 ##Returns the filename of a pdb file that is written to the dir you offer.
-## Creates the dir if it doesn't exist.
+#   Creates the dir if it doesn't exist.
+#   @param pdbID String to be used for the RCSB search.
+#   @param uploadDir Destination path for the sideloaded pdb file.
 def sideloadPdbFromRcsb(pdbID, uploadDir):
     log.info("sideloadPdbFromRcsb() was called.\n")
 

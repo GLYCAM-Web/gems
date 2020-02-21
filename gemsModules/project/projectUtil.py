@@ -163,6 +163,19 @@ def buildGemsProject(thisTransaction : Transaction, requestingAgent : str):
     log.debug("gemsProject: " + str(gemsProject))
     return gemsProject
 
+##  Looks at the gemsProject in a transaction to return the pUUID.
+#   @param thisTransaction Transaction object should contain a gemsProject.Else returns none.
+def getProjectpUUID(thisTransaction : Transaction):
+    log.info("getProjectpUUID() was called.\n")
+    pUUID = None
+    if 'gems_project' in thisTransaction.response_dict.keys():
+        pUUID = thisTransaction.response_dict['gems_project']['pUUID']
+    else:
+        log.error("Cannot get pUUID from a transaction that has no gems_project.")
+        log.error("thisTransaction: \n" + str(thisTransaction.response_dict.keys()))
+    log.debug("pUUID: " + str(pUUID))
+    return pUUID
+
 
 def main():
     if len(sys.argv) == 2:
