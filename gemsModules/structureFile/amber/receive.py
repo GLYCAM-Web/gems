@@ -49,6 +49,7 @@ def preprocessPdbForAmber(thisTransaction):
                     pdbID = element['pdb_ID']
                     uploadDir = project['upload_path']
                     uploadFileName = sideloadPdbFromRcsb(pdbID, uploadDir)
+
         log.debug("uploadFileName: " + uploadFileName)
 
         ##TODO: find a better way to verify that a file is a pdb file, as some may
@@ -66,64 +67,58 @@ def preprocessPdbForAmber(thisTransaction):
                 startGemsProject(thisTransaction, uploadFileName)
             gemsProject = thisTransaction.response_dict['gems_project']
 
-            ##If no inputs provided, bail.
-            if "inputs" in requestDict["entity"]:
-                ##TODO: Check if user has provided optional prepFile and libraries.
-                ##Using defaults for now.
-                aminoLibs = getDefaultAminoLibs(gemsHome)
-                glycamLibs = gmml.string_vector()
-                otherLibs = gmml.string_vector()
-                prepFile = getDefaultPrepFile(gemsHome)
-                log.debug("aminoLibs: " + str(aminoLibs))
-                log.debug("prepFile: " + str(prepFile))
+            ##TODO: Check if user has provided optional prepFile and libraries.
+            aminoLibs = getDefaultAminoLibs(gemsHome)
+            glycamLibs = gmml.string_vector()
+            otherLibs = gmml.string_vector()
+            prepFile = getDefaultPrepFile(gemsHome)
+            log.debug("aminoLibs: " + str(aminoLibs))
+            log.debug("prepFile: " + str(prepFile))
 
-                #PDB file object:
-                pdbFile = gmml.PdbFile(uploadFileName)
+            #PDB file object:
+            pdbFile = gmml.PdbFile(uploadFileName)
 
-                preprocessor = gmml.PdbPreprocessor()
-                preprocessor.Preprocess(pdbFile, aminoLibs, glycamLibs, otherLibs, prepFile)
-                preprocessor.ApplyPreprocessingWithTheGivenModelNumber(pdbFile, aminoLibs, glycamLibs, prepFile)
-                #preprocessor.Print()
+            preprocessor = gmml.PdbPreprocessor()
+            preprocessor.Preprocess(pdbFile, aminoLibs, glycamLibs, otherLibs, prepFile)
+            preprocessor.ApplyPreprocessingWithTheGivenModelNumber(pdbFile, aminoLibs, glycamLibs, prepFile)
 
-                seqMap = pdbFile.GetSequenceNumberMapping()
-                log.debug("Writing the preprocessed pdb to 'updated_pdb.pdb'")
-                try:
-                    ##Give the output file the same path as the uploaded file, but replace the name.
-                    outputDir = gemsProject['output_dir']
-                    destinationFile = 'updated_pdb.pdb'
-                    updatedPdbFileName = outputDir + destinationFile
-                    log.debug("updatedPdbFileName: " + updatedPdbFileName)
-                    pdbFile.WriteWithTheGivenModelNumber(updatedPdbFileName)
-                except Exception as error:
-                    noticeBrief = "There was an error writing the pdb file."
-                    log.error(noticeBrief)
-                    log.error("Error type: " + str(type(error)))
-                    log.error(traceback.format_exc())
-                    appendCommonParserNotice(thisTransaction, 'InvalidInput' )
-                else:
-                    ##Build a response object for pdb responses
-                    #log.debug("responseDict: " + str(thisTransaction.response_dict))
-                    if "responses" not in thisTransaction.response_dict:
-                        thisTransaction.response_dict['responses'] = []
-
-                    ##Return the pUUID as the payload.
-                    thisTransaction.response_dict['responses'].append({
-                        "PreprocessPdbForAmber" : {
-                            "payload" : gemsProject['pUUID']
-                        }
-                    })
-
-                    if 'gems_project' in thisTransaction.response_dict.keys():
-                        if "website" == thisTransaction.response_dict['gems_project']['requesting_agent']:
-                            log.debug("Returning response to website.")
-                        else:
-                            log.debug("Cleanup for api requests.")
-                            del thisTransaction.response_dict['gems_project']
-
-            else:
-                noticeBrief = "Request must have a pdb_file_name in inputs section of the entity."
+            ##Doesn't appear to be used. Do we need this for something?
+            seqMap = pdbFile.GetSequenceNumberMapping()
+            log.debug("Writing the preprocessed pdb to 'updated_pdb.pdb'")
+            try:
+                ##Give the output file the same path as the uploaded file, but replace the name.
+                outputDir = gemsProject['output_dir']
+                destinationFile = 'updated_pdb.pdb'
+                updatedPdbFileName = outputDir + destinationFile
+                log.debug("updatedPdbFileName: " + updatedPdbFileName)
+                pdbFile.WriteWithTheGivenModelNumber(updatedPdbFileName)
+            except Exception as error:
+                noticeBrief = "There was an error writing the pdb file."
                 log.error(noticeBrief)
-                appendCommonParserNotice(thisTransaction, 'JsonParseEror' )
+                log.error("Error type: " + str(type(error)))
+                log.error(traceback.format_exc())
+                appendCommonParserNotice(thisTransaction, 'InvalidInput' )
+            else:
+                ##Build a response object for pdb responses
+                #log.debug("responseDict: " + str(thisTransaction.response_dict))
+                if "responses" not in thisTransaction.response_dict:
+                    thisTransaction.response_dict['responses'] = []
+
+                ##Return the pUUID as the payload.
+                thisTransaction.response_dict['responses'].append({
+                    "PreprocessPdbForAmber" : {
+                        "payload" : gemsProject['pUUID']
+                    }
+                })
+
+                if 'gems_project' in thisTransaction.response_dict.keys():
+                    if "website" == thisTransaction.response_dict['gems_project']['requesting_agent']:
+                        log.debug("Returning response to website.")
+                    else:
+                        log.debug("Cleanup for api requests.")
+                        del thisTransaction.response_dict['gems_project']
+
+
 
     else:
         noticeBrief = "No project found in keys. Still developing command-line interface."
