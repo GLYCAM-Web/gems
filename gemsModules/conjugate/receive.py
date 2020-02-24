@@ -13,7 +13,7 @@ import urllib.request
 
 ##TO set logging verbosity for just this file, edit this var to one of the following:
 ## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.ERROR
+logLevel = logging.DEBUG
 
 if loggers.get(__name__):
     pass
@@ -62,6 +62,27 @@ def receive(thisTransaction):
 
     thisTransaction.build_outgoing_string()
 
+##Pass a transaction, get a dict of attachments if present, otherwise error.
+#   @param transaction
+def getAttachmentsFromTransaction(thisTransaction):
+    log.info("getAttachmentsFromTransaction() was called.\n")
+
+    if "inputs" in thisTransaction.request_dict['entity'].keys():
+        inputs = thisTransaction.request_dict['entity']['inputs']
+        attachmentsFound = False
+        for element in inputs:
+            log.debug("element: " + str(element))
+            log.debug("keys: " + str(element.keys()))
+            if "attachments" in element.keys():
+                attachments = element['attachments']
+                attachmentsFound = True
+        if attachmentsFound:
+            return attachments
+        else:
+            raise AttributeError
+    else:
+        raise AttributeError
+
 ##TODO: Refactor for:
 ##        proper encapsulation,
 ##        Have errors stop the process and return responses. Not happening this way yet.
@@ -73,63 +94,15 @@ def buildGlycoprotein(thisTransaction):
     pdbID = ""
     attachments = []
 
-    if 'inputs' in request['entity'].keys():
-        ##TODO: Move this to the structureFile module
-        ##Get the pdbID for lookup.
-        inputs = request['entity']['inputs']
-        log.debug("inputs: " + str(inputs))
-        for element in inputs:
-            log.debug("element: " + str(element))
-            log.debug("keys: " + str(element.keys()))
-            if "pdb_file_name" in element.keys():
-                pdbFileName = element['pdb_file_name']['payload']
-                log.debug("pdbFileName: " + pdbFileName)
-            elif "pdb_ID" in element.keys():
-                pdbID = element['pdb_ID']
-            elif "attachments" in element.keys():
-                attachments = element['attachments']
-                log.debug("attachments: " + str(attachments))
-            else:
-                log.debug("found: " + str(element.keys()))
+    attachments = getAttachmentsFromTransaction(thisTransaction)
+    log.debug("attachments: " + str(attachments))
 
-        ##Verify that the pdb is in fact of type PDB.
-        if pdbFileName != "":
-            ##TODO: find a better way to verify that a file is a pdb file, as some may
-            ##  legitimately not have the .pdb extension.
-            if ".pdb" not in pdbFileName:
-                noticeBrief = "For now, pdb files must have the .pdb extension. May change later."
-                log.error(noticeBrief)
-                ##Transaction, noticeBrief, blockID
-                appendCommonParserNotice(thisTransaction, 'InvalidInput' )
-            else:
-                log.debug("Looks like a pdb file. Moving forward.")
-        elif pdbID != "":
-            ##Query rcsb for the pdbID. Be prepared for failures.
-            log.debug("Requesting pdbID: " + pdbID + " from rcsb.org")
-            try:
-                if "project" in request.keys():
-                    uploadDir = request['project']['upload_path']
-                    uploadFileName = sideloadPdbFromRcsb(pdbID, uploadDir)
-                    request['project']['uploaded_file_name'] = uploadFileName
-            except Exception as error:
-                log.error("There was a problem submitting the request to rcsb.org.")
-                log.error("pdbID: " + pdbID)
-                log.error("Error type: " + str(type(error)))
-                log.error(traceback.format_exc())
-                appendCommonParserNotice(thisTransaction, 'InvalidInput' )
-        else:
-            log.error("Failed to find a value for pdb_file_name or pdb_ID.")
-            appendCommonParserNotice(thisTransaction, 'InvalidInput' )
-
-
-        ##For now, require attachments.
-        if len(attachments) == 0:
-            log.error("BuildGlycoprotein requests require 'attachments'.")
-            appendCommonParserNotice(thisTransaction, 'InvalidInput' )
-        else:
-            log.debug("Attachments present. Moving forward.")
-
-        log.debug("Still here. Starting a project.")
+    ##For now, require attachments.
+    if len(attachments) == 0:
+        log.error("BuildGlycoprotein requests require 'attachments'.")
+        appendCommonParserNotice(thisTransaction, 'InvalidInput' )
+    else:
+        log.debug("Attachments present.")
         gemsProject = startProject(thisTransaction)
 
         ##Return response that the project has been started.
@@ -207,7 +180,6 @@ def buildGlycoprotein(thisTransaction):
             }
         })
 
-
         ##Cleanup for non-website requesting_agents.
         if 'gems_project' in thisTransaction.response_dict.keys():
             if "website" == thisTransaction.response_dict['gems_project']['requesting_agent']:
@@ -216,10 +188,6 @@ def buildGlycoprotein(thisTransaction):
                 log.debug("Cleanup for api requests.")
                 del thisTransaction.response_dict['gems_project']
 
-    else:
-        ##TODO: attach an error response.
-        log.error("Could not find inputs in the request.")
-        log.error(str(request.keys()))
 
 
 def main():

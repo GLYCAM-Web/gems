@@ -13,7 +13,7 @@ from gemsModules.common.loggingConfig import *
 
 ##TO set logging verbosity for just this file, edit this var to one of the following:
 ## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.ERROR
+logLevel = logging.DEBUG
 
 if loggers.get(__name__):
     pass
@@ -35,14 +35,12 @@ def preprocessPdbForAmber(thisTransaction):
     if "project" in requestDict.keys():
         log.debug("found a project in the request.")
         try:
-            uploadedFileName = getUploadedFileNameFromTransaction(thisTransaction)
+            uploadFileName  = getUploadedFileNameFromTransaction(thisTransaction)
         except AttributeError as error:
             log.error("There was a problem finding the uploaded file name in the transaction.")
             appendCommonParserNotice(thisTransaction, 'InvalidInput' )
         else:
-            uploadFileName = getUploadedFileNameFromTransaction(thisTransaction)
             log.debug("uploadFileName: " + uploadFileName)
-
             ##TODO: find a better way to verify that a file is a pdb file, as some may
             ##  legitimately not have the .pdb extension.
             if ".pdb" not in uploadFileName:
