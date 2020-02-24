@@ -163,6 +163,18 @@ def buildGemsProject(thisTransaction : Transaction, requestingAgent : str):
     log.debug("gemsProject: " + str(gemsProject))
     return gemsProject
 
+##If the requesting agent is the website, leave the gems project.
+#   Otherwise remove it.
+#   @param thisTransaction The transaction object provides the requesting agent.
+def cleanGemsProject(thisTransaction : Transaction):
+    log.info("cleanGemsProject() was called.\n")
+    if 'gems_project' in thisTransaction.response_dict.keys():
+        if "website" == thisTransaction.response_dict['gems_project']['requesting_agent']:
+            log.debug("Returning response to website.")
+        else:
+            log.debug("Cleanup for api requests.")
+            del thisTransaction.response_dict['gems_project']
+
 ##  Looks at the gemsProject in a transaction to return the pUUID.
 #   @param thisTransaction Transaction object should contain a gemsProject.Else returns none.
 def getProjectpUUID(thisTransaction : Transaction):
