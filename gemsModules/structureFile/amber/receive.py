@@ -35,14 +35,12 @@ def preprocessPdbForAmber(thisTransaction):
     if "project" in requestDict.keys():
         log.debug("found a project in the request.")
         try:
-            uploadedFileName = getUploadedFileNameFromTransaction(thisTransaction)
+            uploadFileName  = getUploadedFileNameFromTransaction(thisTransaction)
         except AttributeError as error:
             log.error("There was a problem finding the uploaded file name in the transaction.")
             appendCommonParserNotice(thisTransaction, 'InvalidInput' )
         else:
-            uploadFileName = getUploadedFileNameFromTransaction(thisTransaction)
             log.debug("uploadFileName: " + uploadFileName)
-
             ##TODO: find a better way to verify that a file is a pdb file, as some may
             ##  legitimately not have the .pdb extension.
             if ".pdb" not in uploadFileName:
@@ -166,17 +164,7 @@ def buildPdbResponse(thisTransaction : Transaction):
         raise AttributeError
 
 
-##If the requesting agent is the website, leave the gems project.
-#   Otherwise remove it.
-#   @param thisTransaction The transaction object provides the requesting agent.
-def cleanGemsProject(thisTransaction : Transaction):
-    log.info("cleanGemsProject() was called.\n")
-    if 'gems_project' in thisTransaction.response_dict.keys():
-        if "website" == thisTransaction.response_dict['gems_project']['requesting_agent']:
-            log.debug("Returning response to website.")
-        else:
-            log.debug("Cleanup for api requests.")
-            del thisTransaction.response_dict['gems_project']
+
 
 ##Returns the filename of a pdb file that is written to the dir you offer.
 #   Creates the dir if it doesn't exist.

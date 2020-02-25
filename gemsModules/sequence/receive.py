@@ -23,6 +23,225 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__, logLevel)
 
+
+##Evaluating a sequence requires a sequence string and a path to a prepfile.
+#    1) Checks sequence for validity,
+#    2) Starts a gemsProject.
+#    3) builds a default structure, moving it to the output dir
+#    3) returns options that a user might want to set.
+#   @param transaction
+#   @param service
+def evaluateCondensedSequence(thisTransaction : Transaction, thisService : Service = None):
+    log.info("evaluateCondensedSequence() was called.\n")
+    sequence = getSequenceFromTransaction(thisTransaction)
+
+    #Test that this exists.
+    if sequence is None:
+        log.error("No sequence found in the transaction.")
+        raise AttributeError
+    else:
+        log.debug("sequence: " + sequence)
+
+    builder = getCbBuilderForSequence(sequence)
+    log.debug("builder object type: " + str(type(builder)))
+
+    appendEvaluationResponse(thisTransaction, builder)
+
+
+def build3DStructure(thisTransaction : Transaction, thisService : Service = None):
+    log.info("Sequence receive.py build3Dstructure() was called.\n")
+    ##TODO: See if a project has already been started first.
+    startProject(thisTransaction)
+    pUUID=thisTransaction.response_dict['gems_project']['pUUID']
+
+    sequence = getSequenceFromTransaction(thisTransaction)
+
+    if sequence is None:
+        raise AttributeError
+    else:
+        appendBuild3DStructureResponse(thisTransaction, pUUID)
+
+    builder = getCbBuilderForSequence(sequence)
+    outputDir = thisTransaction.response_dict['gems_project']['output_dir']
+    log.info("outputDir: " + outputDir)
+    destination = outputDir + pUUID
+    log.debug("destination: " + destination)
+    builder.GenerateSingle3DStructure(destination)
+
+    cleanGemsProject(thisTransaction)
+
+
+##  Give a transaction and pUUID, and this method builds the json response and
+#       appends that to the transaction.
+def appendBuild3DStructureResponse(thisTransaction : Transaction, pUUID : str):
+    log.info("appendBuild3DStructureResonse() was called.\n")
+    if thisTransaction.response_dict is None:
+        thisTransaction.response_dict={}
+    if not 'entity' in thisTransaction.response_dict:
+        thisTransaction.response_dict['entity']={}
+    if not 'type' in thisTransaction.response_dict['entity']:
+        thisTransaction.response_dict['entity']['type']='Sequence'
+    if not 'responses' in thisTransaction.response_dict:
+        thisTransaction.response_dict['responses']=[]
+
+    thisTransaction.response_dict['responses'].append({'Build3DStructure': {'payload': pUUID }})
+
+
+##  Pass a sequence string, get a builder for that sequence.
+##  @param sequence GLYCAM Condensed string sequence.
+def getCbBuilderForSequence(sequence : str):
+    log.info("getCbBuilderForSequence() was called.\n")
+    GemsPath = getGemsHome()
+    log.debug("GemsPath: " + GemsPath )
+
+    prepfile = GemsPath + "/gemsModules/sequence/GLYCAM_06j-1.prep"
+    if os.path.exists(prepfile):
+        log.debug("Instantiating the carbohydrateBuilder.")
+        builder = gmml.carbohydrateBuilder(sequence, prepfile)
+        return builder
+    else:
+        log.error("Prepfile did not exist at: " + prepfile)
+        raise FileNotFoundError
+
+##  Builds the json response based on this builder.
+def appendEvaluationResponse(thisTransaction : Transaction, builder):
+    log.info("appendEvaluationResponse() was called.\n")
+    valid = builder.GetSequenceIsValid()
+    log.debug("valid: " + str(valid))
+    userOptionsString = builder.GenerateUserOptionsJSON()
+    log.debug("userOptions: " + userOptionsString)
+    userOptionsJSON = json.loads(userOptionsString)
+    optionsResponses = userOptionsJSON['responses']
+    for response in optionsResponses:
+        log.debug("response.keys: " + str(response.keys()))
+        if 'Evaluate' in response.keys():
+            linkages = response['Evaluate']['glycosidicLinkages']
+
+            if thisTransaction.response_dict is None:
+                thisTransaction.response_dict={}
+            if not 'entity' in thisTransaction.response_dict:
+                thisTransaction.response_dict['entity']={}
+            if not 'type' in thisTransaction.response_dict['entity']:
+                thisTransaction.response_dict['entity']['type']='Sequence'
+            if not 'responses' in thisTransaction.response_dict:
+                thisTransaction.response_dict['responses']=[]
+
+            log.debug("Creating a response for this sequence.")
+            thisTransaction.response_dict['responses'].append({
+                "SequenceEvaluation" : {
+                    "type": "Evaluate",
+                    "outputs" : [{
+                        "SequenceValidation" : {
+                            "SequenceIsValid" : valid
+                            }
+                        },{
+                        "BuildOptions": {
+                            "options" : [
+                                    { "Linkages" : linkages }
+                                ]
+                            }
+
+                        }
+                    ]
+                }
+            })
+
+## Give a transaction, get a sequence. Note that if more than one input
+#   contains a "Sequence" key, only the last sequence is returned.
+#   @param Transaction
+def getSequenceFromTransaction(thisTransaction: Transaction):
+    log.info("getSequenceFromTransaction() was called.\n")
+    inputs = thisTransaction.request_dict['entity']['inputs']
+    for element in inputs:
+        log.debug("element: " + str(element))
+        if "Sequence" in element.keys():
+            sequence = element['Sequence']['payload']
+        else:
+            log.debug("Skipping")
+    return sequence
+
+"""
+Default service is marco polo. Should this be something else?
+"""
+def doDefaultService(thisTransaction : Transaction):
+    log.info("doDefaultService() was called.\n")
+    # evaluate(thisTransaction : Transaction)
+    # build3DStructure(thisTransaction : Transaction)
+    if thisTransaction.response_dict is None:
+        thisTransaction.response_dict={}
+    thisTransaction.response_dict['entity']={}
+    thisTransaction.response_dict['entity']['type']='SequenceDefault'
+    thisTransaction.response_dict['responses']=[]
+    thisTransaction.response_dict['responses'].append({'DefaultTest': {'payload':marco('Sequence')}})
+    thisTransaction.build_outgoing_string()
+
+def receive(thisTransaction : Transaction):
+    log.info("receive() was called:\n")
+    import gemsModules.sequence
+    ## First figure out the names of each of the requested services
+    if not 'services' in thisTransaction.request_dict['entity'].keys():
+        log.debug("'services' was not present in the request. Do the default.")
+        doDefaultService(thisTransaction)
+        return
+    input_services = thisTransaction.request_dict['entity']['services']
+    theServices=getTypesFromList(input_services)
+    ## for each requested service
+    for i in theServices:
+        #####  the automated module loading doesn't work, and I can't figure out how to make it work,
+              # that is:
+              #  requestedModule='.'+settings.serviceModules[i]
+              #  the_spec = importlib.util.find_spec('.sequence.entity.evaluate',gemsModules)
+              # .... and many variants thereof
+        #####  so, writing something ugly for now
+        if i not in settings.serviceModules.keys():
+            if i not in common.settings.serviceModules.keys():
+                log.error("The requested service is not recognized.")
+                common.settings.appendCommonParserNotice( thisTransaction,'ServiceNotKnownToEntity',i)
+            else:
+                pass
+        ## if it is known, try to do it
+        elif i == "Validate":
+            log.debug("Validate service requested from sequence entity.")
+            validateCondensedSequence(thisTransaction, None)
+        elif i == "Evaluate":
+            log.debug("Evaluate service requested from sequence entity.")
+            evaluateCondensedSequence(thisTransaction,  None)
+        elif i == 'Build3DStructure':
+            log.debug("Build3DStructure service requested from sequence entity.")
+            ##first evaluate the requested structure. Only build if valid.
+            evaluateCondensedSequence(thisTransaction, None)
+
+            if checkEvaluationResponseValidity(thisTransaction):
+                log.debug("Valid sequence. Building default structure.")
+                build3DStructure(thisTransaction, None)
+            else:
+                log.error("Invalid Sequence. Cannot build.")
+                common.settings.appendCommonParserNotice( thisTransaction,'InvalidInput',i)
+        else:
+            log.error("got to the else, so something is wrong")
+            common.settings.appendCommonParserNotice( thisTransaction,'ServiceNotKnownToEntity',i)
+    thisTransaction.build_outgoing_string()
+
+
+##  Looks at a transaction object to see if an evalutaion response exists and returns a boolean.
+def checkEvaluationResponseValidity(thisTransaction):
+    log.info("checkEvaluationResponseValidity() was called.\n")
+    valid = False
+    responses = thisTransaction.response_dict['responses']
+    for response in responses:
+        log.debug("response: " + str(response))
+        if 'SequenceEvaluation' in response.keys():
+            if response['SequenceEvaluation']['type'] == "Evaluate":
+                outputs = response['SequenceEvaluation']['outputs']
+                for output in outputs:
+                    log.debug("output: " + str(output))
+                    if "SequenceValidation" in output.keys():
+                        valid = output['SequenceValidation']['SequenceIsValid']
+        else:
+            raise AttributeError
+    return valid
+
+
 ##Validate can potentially handle multiple sequences. Top level iterates and
 ##  updates transaction.
 def validateCondensedSequence(thisTransaction : Transaction, thisService : Service = None):
@@ -88,218 +307,6 @@ def validateCondensedSequence(thisTransaction : Transaction, thisService : Servi
             ##Can be ok, inputs may be provided that are not sequences.
             log.debug("no sequence found in this input, skipping.")
             pass
-
-"""
-Evaluating a sequence requires a sequence string and a path to a prepfile.
-    1) Checks sequence for validity,
-    2) Starts a gemsProject.
-    3) builds a default structure, moving it to the output dir
-    3) returns options that a user might want to set.
-"""
-def evaluateCondensedSequence(thisTransaction : Transaction, thisService : Service = None):
-    log.info("evaluateCondensedSequence() was called.\n")
-    request_dict = thisTransaction.request_dict
-
-    inputs = request_dict['entity']['inputs']
-    for element in inputs:
-        log.debug("element: " + str(element))
-        if "Sequence" in element.keys():
-            sequence = element['Sequence']['payload']
-        else:
-            log.debug("Skipping")
-
-    #Test that this exists.
-    if sequence is None:
-        log.error("No sequence found in the transaction.")
-        ##TODO: return an error
-    else:
-        log.debug("sequence: " + sequence)
-
-    GemsPath = getGemsHome()
-    log.debug("GemsPath: " + GemsPath )
-
-    prepfile = GemsPath + "/gemsModules/sequence/GLYCAM_06j-1.prep"
-    if os.path.exists(prepfile):
-        log.debug("Instantiating the carbohydrateBuilder.")
-        builder = gmml.carbohydrateBuilder(sequence, prepfile)
-        try:
-            valid = builder.GetSequenceIsValid()
-            log.debug("valid: " + str(valid))
-
-            userOptionsString = builder.GenerateUserOptionsJSON()
-            log.debug("userOptions: " + userOptionsString)
-            userOptionsJSON = json.loads(userOptionsString)
-            responses = userOptionsJSON['responses']
-            for response in responses:
-                log.debug("response.keys: " + str(response.keys()))
-                if 'Evaluate' in response.keys():
-                    linkages = response['Evaluate']['glycosidicLinkages']
-
-                    if thisTransaction.response_dict is None:
-                        thisTransaction.response_dict={}
-                    if not 'entity' in thisTransaction.response_dict:
-                        thisTransaction.response_dict['entity']={}
-                    if not 'type' in thisTransaction.response_dict['entity']:
-                        thisTransaction.response_dict['entity']['type']='Sequence'
-                    if not 'responses' in thisTransaction.response_dict:
-                        thisTransaction.response_dict['responses']=[]
-
-                    log.debug("Creating a response for this sequence.")
-                    thisTransaction.response_dict['responses'].append({
-                        "SequenceEvaluation" : {
-                            "type": "Evaluate",
-                            "outputs" : [{
-                                "SequenceValidation" : {
-                                    "SequenceIsValid" : valid
-                                    }
-                                },{
-                                "BuildOptions": {
-                                    "options" : [
-                                            { "Linkages" : linkages }
-                                        ]
-                                    }
-
-                                }
-                            ]
-                        }
-                    })
-        except Exception as error:
-            log.error("Something when wrong while evaluating sequence: " + sequence)
-            log.error("Error type: " + str(type(error)))
-            common.settings.appendCommonParserNotice( thisTransaction, 'InvalidInput', 'InvalidInputPayload')
-    else:
-        log.error("Prepfile did not exist at: " + prepfile)
-        common.settings.appendCommonParserNotice(thisTransaction, 'InvalidInput', 'InvalidInputPayload')
-
-
-
-
-def build3DStructure(thisTransaction : Transaction, thisService : Service = None):
-    log.info("Sequence receive.py build3Dstructure() was called.\n")
-    ##TODO: See if a project has already been started first.
-    startProject(thisTransaction)
-    pUUID=thisTransaction.response_dict['gems_project']['pUUID']
-
-    inputs = thisTransaction.request_dict['entity']['inputs']
-
-    for thisInput in inputs:
-        log.debug("thisInput: " + str(thisInput))
-        inputKeys = thisInput.keys()
-        if "Sequence" in inputKeys:
-            theSequence = thisInput['Sequence']['payload']
-            if thisTransaction.response_dict is None:
-                thisTransaction.response_dict={}
-            if not 'entity' in thisTransaction.response_dict:
-                thisTransaction.response_dict['entity']={}
-            if not 'type' in thisTransaction.response_dict['entity']:
-                thisTransaction.response_dict['entity']['type']='Sequence'
-            if not 'responses' in thisTransaction.response_dict:
-                thisTransaction.response_dict['responses']=[]
-
-            thisTransaction.response_dict['responses'].append({'Build3DStructure': {'payload': pUUID }})
-
-        if theSequence is None:
-            #sequence is required. Attach an error response and return.
-            common.settings.appendCommonParserNotice(thisTransaction,'ServiceNotKnownToEntity','Expected Sequence')
-            return
-
-        ## The original way. TODO: delete the subprocess call to the bash file.
-        #import subprocess
-        #subprocess.run("$GEMSHOME/gemsModules/sequence/do_the_build.bash '" + theSequence +"' " + pUUID, shell=True)
-
-        GemsPath = getGemsHome()
-        log.debug("GemsPath: " + GemsPath)
-
-        prepfile = GemsPath + "/gemsModules/sequence/GLYCAM_06j-1.prep"
-        if os.path.exists(prepfile):
-            log.debug("Instantiating the carbohydrateBuilder.")
-
-            builder = gmml.carbohydrateBuilder(theSequence, prepfile)
-            outputDir = thisTransaction.response_dict['gems_project']['output_dir']
-            log.info("outputDir: " + outputDir)
-            destination = outputDir + pUUID
-            log.debug("destination: " + destination)
-            builder.GenerateSingle3DStructure(destination)
-
-        if 'gems_project' in thisTransaction.response_dict.keys():
-            if "website" == thisTransaction.response_dict['gems_project']['requesting_agent']:
-                log.debug("Returning response to website.")
-            else:
-                log.debug("Cleanup for api requests.")
-                del thisTransaction.response_dict['gems_project']
-
-
-"""
-Default service is marco polo. Should this be something else?
-"""
-def doDefaultService(thisTransaction : Transaction):
-    log.info("doDefaultService() was called.\n")
-    # evaluate(thisTransaction : Transaction)
-    # build3DStructure(thisTransaction : Transaction)
-    if thisTransaction.response_dict is None:
-        thisTransaction.response_dict={}
-    thisTransaction.response_dict['entity']={}
-    thisTransaction.response_dict['entity']['type']='SequenceDefault'
-    thisTransaction.response_dict['responses']=[]
-    thisTransaction.response_dict['responses'].append({'DefaultTest': {'payload':marco('Sequence')}})
-    thisTransaction.build_outgoing_string()
-
-def receive(thisTransaction : Transaction):
-    log.info("receive() was called:\n")
-    import gemsModules.sequence
-    ## First figure out the names of each of the requested services
-    if not 'services' in thisTransaction.request_dict['entity'].keys():
-        log.debug("'services' was not present in the request. Do the default.")
-        doDefaultService(thisTransaction)
-        return
-
-    input_services = thisTransaction.request_dict['entity']['services']
-    theServices=getTypesFromList(input_services)
-
-    ## for each requested service
-    for i in theServices:
-        #####  the automated module loading doesn't work, and I can't figure out how to make it work,
-              # that is:
-              #  requestedModule='.'+settings.serviceModules[i]
-              #  the_spec = importlib.util.find_spec('.sequence.entity.evaluate',gemsModules)
-              # .... and many variants thereof
-        #####  so, writing something ugly for now
-        if i not in settings.serviceModules.keys():
-            if i not in common.settings.serviceModules.keys():
-                log.error("The requested service is not recognized.")
-                common.settings.appendCommonParserNotice( thisTransaction,'ServiceNotKnownToEntity',i)
-            else:
-                pass
-        ## if it is known, try to do it
-        elif i == "Validate":
-            log.debug("Validate service requested from sequence entity.")
-            validateCondensedSequence(thisTransaction, None)
-        elif i == "Evaluate":
-            log.debug("Evaluate service requested from sequence entity.")
-            evaluateCondensedSequence(thisTransaction,  None)
-        elif i == 'Build3DStructure':
-            log.debug("Build3DStructure service requested from sequence entity.")
-            ##first evaluate the requested structure. Only build if valid.
-            evaluateCondensedSequence(thisTransaction, None)
-            responses = thisTransaction.response_dict['responses']
-            for response in responses:
-                log.debug("response: " + str(response))
-                if 'SequenceEvaluation' in response.keys():
-                    if response['SequenceEvaluation']['type'] == "Evaluate":
-                        outputs = response['SequenceEvaluation']['outputs']
-                        for output in outputs:
-                            log.debug("output: " + str(output))
-                            if "SequenceValidation" in output.keys():
-                                if output['SequenceValidation']['SequenceIsValid'] == True:
-                                    log.debug("Valid sequence. Building default structure.")
-                                    build3DStructure(thisTransaction, None)
-                                else:
-                                    log.error("Invalid Sequence. Cannot build.")
-                                    common.settings.appendCommonParserNotice( thisTransaction,'InvalidInput',i)
-        else:
-            log.error("got to the else, so something is wrong")
-            common.settings.appendCommonParserNotice( thisTransaction,'ServiceNotKnownToEntity',i)
-    thisTransaction.build_outgoing_string()
 
 
 # Some alternate ways to interrogate lists:
