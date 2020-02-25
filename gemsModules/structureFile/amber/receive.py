@@ -44,11 +44,12 @@ def preprocessPdbForAmber(thisTransaction):
             log.debug("uploadFileName: " + uploadFileName)
             ##TODO: find a better way to verify that a file is a pdb file, as some may
             ##  legitimately not have the .pdb extension.
-            if ".pdb" not in uploadFileName:
+            if not hasPdbExtension(uploadFileName):
                 noticeBrief = "For now, pdb files must have the .pdb extension. May change later."
                 log.error(noticeBrief)
                 ##Transaction, noticeBrief, blockID
                 appendCommonParserNotice(thisTransaction, 'InvalidInput' )
+                return
             else:
                 log.debug("We have a file with a .pdb extension. Checking for a gemsProject.")
                 ##Projects in which pdb preprocessing is jsut a step will already
@@ -103,7 +104,17 @@ def preprocessPdbForAmber(thisTransaction):
         ##May be a request from the command line that does not use json api?
         ##TODO: Add logic to do this without the interface to the frontend.
         ##Transaction, noticeBrief, blockID
-        appendCommonParserNotice(thisTransaction, 'InvalidInput' )
+        appendCommonParserNotice(thisTransaction, 'InvalidInput')
+
+
+##  Simple. Maybe too simple. Pass a string, if it contains .pdb, returns true. Else false.
+#   @param filename as a string
+def hasPdbExtension(filename : str):
+    log.info("hasPdbExtension was called().\n")
+    if ".pdb" in filename:
+        return True
+    else:
+        return False
 
 ##  Looks for a project in the transaction,
 #       checks for either a pdb file or pdbID.
