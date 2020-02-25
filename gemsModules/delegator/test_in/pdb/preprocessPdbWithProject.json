@@ -7,9 +7,7 @@
 			}
 		}],
 		"inputs": [{
-			"pdb_file_name": {
-				"payload": "/website/glycam-django/glycamweb/json_api/testData/1buyForPDBtests.pdb"
-			}
+			"pdb_ID": "2V95"
 		}]
 	},
 	"project": {

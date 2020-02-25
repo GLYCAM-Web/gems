@@ -1,4 +1,5 @@
 import os, sys, importlib.util
+import pathlib
 import urllib.request
 import gemsModules
 import gmml
@@ -13,7 +14,7 @@ from gemsModules.common.loggingConfig import *
 
 ##TO set logging verbosity for just this file, edit this var to one of the following:
 ## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.ERROR
+logLevel = logging.DEBUG
 
 if loggers.get(__name__):
     pass
@@ -182,11 +183,11 @@ def sideloadPdbFromRcsb(pdbID, uploadDir):
 
     contentString = str(contentBytes, 'utf-8')
     log.debug("Response content object type: " + str(type(contentString)))
-    log.debug("Response content: \n" + str(contentString))
+    #log.debug("Response content: \n" + str(contentString))
     ##Get the uploads dir
     log.debug("uploadDir: " + uploadDir)
     if not os.path.exists(uploadDir):
-        os.mkdir(uploadDir)
+        pathlib.Path(uploadDir).mkdir(parents=True, exist_ok=True)
 
     uploadFileName = uploadDir  + pdbID + ".pdb"
 
