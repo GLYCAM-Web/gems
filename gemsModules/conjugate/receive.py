@@ -146,7 +146,7 @@ def buildGlycoprotein(thisTransaction):
         log.debug("builderPath: " + builderPath)
         log.debug("inputFileName: " + inputFileName)
         #/programs/GlycoProteinBuilder/bin/ /website/userdata/tools/gp/git-ignore-me_userdata/4f18b278-d9bb-4111-b502-d91945639fa6/ > /website/userdata/tools/gp/git-ignore-me_userdata/4f18b278-d9bb-4111-b502-d91945639fa6/gp.log
-        command = builderPath + " " + outputDir + " > " + outputDir + "gp.log"
+        command = builderPath + " " + outputDir + " > " + outputDir + "/logs/gp.log"
         log.debug("command: " + command)
         sbatchArg = "gpScript.sh"
         script = outputDir + sbatchArg
