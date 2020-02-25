@@ -130,7 +130,7 @@ def copyUploadFiles(thisTransaction : Transaction):
 
         if not os.path.exists(uploads_source_dir):
             ##TODO: return the actual error.
-            log.dbug("Returning an error. Upload_path indicated, but not present.")
+            log.debug("Returning an error. Upload_path indicated, but not present.")
             pass
         else:
             log.debug("Copying upload files to the backend.")
