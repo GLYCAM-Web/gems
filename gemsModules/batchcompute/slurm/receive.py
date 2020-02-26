@@ -41,7 +41,10 @@ def submit(thisSlurmJobInfo):
         if p.returncode != 0 :
             return "SLURM submit got non-zero exit upon attempt to submit."
         else:
-            return str(outputhere)
+            log.debug("outputhere in raw form: " + str(outputhere))
+            theOutput=outputhere.decode("utf-8")
+            log.debug("outputhere stripped: " + theOutput)
+            return theOutput
     except Exception as error:
         log.error("Was unable to submit the job.")
         log.error("Error type: " + str(type(error)))
@@ -128,7 +131,6 @@ def manageIncomingString(jsonObjectString):
             log.error("Got none response")
             ##TODO: return a proper error response
         else:
-            log.debug("theResponse: " + str(theResponse))
             return theResponse
 
 

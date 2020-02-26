@@ -60,7 +60,7 @@ jsonObjectString=utils.JSON_From_Command_Line(sys.argv)
 
 from gemsModules.batchcompute.slurm.receive import manageIncomingString
 responseObjectString=manageIncomingString(jsonObjectString)
-sys.stdout.write(responseObjectString)
+sys.stdout.write(str(responseObjectString))
 
 
 

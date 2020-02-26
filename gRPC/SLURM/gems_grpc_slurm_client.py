@@ -37,4 +37,4 @@ class GemsGrpcSlurmClient():
 if __name__ == '__main__':
     logging.basicConfig()
     gems_grpc_slurm_client = GemsGrpcSlurmClient(json="{ \"hello\": \"hello world!\" }")
-    print(gems_grpc_slurm_client.response)
+    print(gems_grpc_slurm_client)
