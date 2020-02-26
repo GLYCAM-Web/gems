@@ -27,6 +27,8 @@ class MmServiceServicesEnum(str,Enum):
 
 class ConjugateServicesEnum(str,Enum):
     buildGlycoprotein = 'BuildGlycoprotein'
+    evaluate = 'Evaluate'
+    status = 'Status'
 
 class GlycoProteinServicesEnum(str,Enum):
     build3DStructure = 'Build3DStructure'
