@@ -69,7 +69,7 @@ def delegate(jsonObjectString):
     if 'json_api_version' not in thisTransaction.response_dict.keys():
         thisTransaction.response_dict['json_api_version'] = getJsonApiVersion()
     if 'response_timestamp' not in thisTransaction.response_dict.keys():
-        thisTransaction.response_dict['response_timestamp'] = datetime.now()
+        thisTransaction.response_dict['response_timestamp'] = str(datetime.now())
     if 'site_host_name' not in thisTransaction.response_dict.keys():
         if 'site_host_name' in thisTransaction.request_dict.keys():
             thisTransaction.response_dict['site_host_name'] = thisTransaction.request_dict['site_host_name']
@@ -78,10 +78,15 @@ def delegate(jsonObjectString):
     ## Check to see if an outgoing string got built.  If not, try to
     ## build one.  If that still doesn't work, make the string be a
     ## generic error output JSON object.
+    log.debug("Most of the work is finished now.  About to build the response, if not already built.")
+    log.debug("The resquest dict is:  \n" + str(thisTransaction.request_dict) + "\n")
+    log.debug("The response dict is:  \n" + str(thisTransaction.response_dict) + "\n")
     if thisTransaction.outgoing_string is None:
+        log.debug("An outgoing string does not already exist.  About to build one.")
         thisTransaction.build_outgoing_string()
     if thisTransaction.outgoing_string is None:
         ## TODO:  write this function....
+        log.debug("An outgoing string STILL does not exist.  About to build an error response.")
         thisTransaction.build_general_error_output()
 
 
