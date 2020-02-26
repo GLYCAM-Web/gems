@@ -62,47 +62,24 @@ def receive(thisTransaction):
 
     thisTransaction.build_outgoing_string()
 
-##Pass a transaction, get a dict of attachments if present, otherwise error.
-#   @param transaction
-def getAttachmentsFromTransaction(thisTransaction):
-    log.info("getAttachmentsFromTransaction() was called.\n")
-
-    if "inputs" in thisTransaction.request_dict['entity'].keys():
-        inputs = thisTransaction.request_dict['entity']['inputs']
-        attachmentsFound = False
-        for element in inputs:
-            log.debug("element: " + str(element))
-            log.debug("keys: " + str(element.keys()))
-            if "attachments" in element.keys():
-                attachments = element['attachments']
-                attachmentsFound = True
-        if attachmentsFound:
-            return attachments
-        else:
-            raise AttributeError
-    else:
-        raise AttributeError
-
 ##TODO: Refactor for:
 ##        proper encapsulation,
 ##        Have errors stop the process and return responses. Not happening this way yet.
 def buildGlycoprotein(thisTransaction):
     log.info("buildGlycoprotein() was called.\n")
-    request = thisTransaction.request_dict
-    log.debug("request: " + str(request))
     pdbFileName = ""
     pdbID = ""
-    attachments = []
+    attachmentSites = []
 
-    attachments = getAttachmentsFromTransaction(thisTransaction)
-    log.debug("attachments: " + str(attachments))
+    attachmentSites = getAttachmentSitesFromTransaction(thisTransaction)
+    log.debug("attachmentSites: " + str(attachmentSites))
 
-    ##For now, require attachments.
-    if len(attachments) == 0:
-        log.error("BuildGlycoprotein requests require 'attachments'.")
+    ##For now, require attachmentSites.
+    if len(attachmentSites) == 0:
+        log.error("BuildGlycoprotein requests require 'attachmentSites'.")
         appendCommonParserNotice(thisTransaction, 'InvalidInput' )
     else:
-        log.debug("Attachments present.")
+        log.debug("attachmentSites present.")
         gemsProject = startProject(thisTransaction)
 
         ##Return response that the project has been started.
@@ -113,61 +90,14 @@ def buildGlycoprotein(thisTransaction):
             }
         })
 
-        ##Preprocess pdb file
         preprocessPdbForAmber(thisTransaction)
-
-        ##TODO: Move this logic to a new method.
-        ##Write the Input file, which GP uses to know what to do.
-        outputDir = gemsProject.output_dir
-        preprocessedPdbFileName = "updated_pdb.pdb"
-        log.debug("preprocessedPdbFileName: " + preprocessedPdbFileName)
-        inputFileName = outputDir + "input.txt"
-        log.debug("inputFileName: " + inputFileName)
-        ##Build input.txt
-        ##For now, assuming that sites are specified in the request.
-        try:
-            with open(inputFileName, 'w', encoding='utf-8') as file:
-                file.write("Protein:\n")
-                file.write(preprocessedPdbFileName + "\n\n")
-                file.write("Protein Residue, Glycan Name:\n")
-                for attachment in attachments:
-                    file.write(attachment['chain'] + "_" + attachment['residue_number'] + "," + attachment['glycan'] + "\n")
-                file.write("END")
-                log.debug("Finished writing input.txt")
-        except Exception as error:
-            log.error("Failed to create input.txt")
-            log.error("Error type: " + str(type(error)))
-            log.error(traceback.format_exc())
-
-        log.debug("Input file created. Calling the Glycoprotein Builder Program.")
-
-        ##Build the command to run gp
-        builderPath = "/programs/GlycoProteinBuilder/bin/gp_builder"
-        log.debug("builderPath: " + builderPath)
-        log.debug("inputFileName: " + inputFileName)
-        #/programs/GlycoProteinBuilder/bin/ /website/userdata/tools/gp/git-ignore-me_userdata/4f18b278-d9bb-4111-b502-d91945639fa6/ > /website/userdata/tools/gp/git-ignore-me_userdata/4f18b278-d9bb-4111-b502-d91945639fa6/gp.log
-        command = builderPath + " " + outputDir + " > " + outputDir + "gp.log"
-        log.debug("command: " + command)
-        sbatchArg = "gpScript.sh"
-        script = outputDir + sbatchArg
-        try:
-            with open(script, 'w', encoding='utf-8') as file:
-                file.write("#!/bin/bash\n")
-                file.write('GPPATH="' + builderPath + '"\n')
-                file.write('WorkDir="' + outputDir + '"\n')
-                file.write('COMMAND="${GPPATH} ${WorkDir} > ${WorkDir}gp.log"\n')
-                file.write('eval ${COMMAND}')
-
-        except Exception as error:
-            log.error("There was a problem writing the gp script for slurm.")
-            log.error("Error type: " + str(type(error)))
-            log.error(traceback.format_exc)
+        inputFileName = writeGpInputFile(gemsProject, attachmentSites)
+        sbatchArg = writeGpScript(inputFileName, gemsProject)
 
         try:
             response = submitGpScriptToSlurm(thisTransaction, gemsProject, sbatchArg)
             log.debug("response from batchcompute: \n" + str(response))
-            ##This is what the script needs to look like in file slurm will run.
-            #subprocess.call(command,stdout=sys.stdout, stderr=sys.stderr, shell=True)
+
         except Exception as error:
             log.error("There was a problem calling the GlycoProteinBuilder program.")
             log.error("Error type: " + str(type(error)))
@@ -180,15 +110,87 @@ def buildGlycoprotein(thisTransaction):
             }
         })
 
-        ##Cleanup for non-website requesting_agents.
-        if 'gems_project' in thisTransaction.response_dict.keys():
-            if "website" == thisTransaction.response_dict['gems_project']['requesting_agent']:
-                log.debug("Returning response to website.")
-            else:
-                log.debug("Cleanup for api requests.")
-                del thisTransaction.response_dict['gems_project']
+        cleanGemsProject(thisTransaction)
+
+##  Writes the file that slurm is expected to run. Returns the sbatchArg needed for submission
+#   @param inputFileName
+#   @param gemsProject
+def writeGpScript(inputFileName, gemsProject):
+    log.info("writeGpScript() was called.\n")
+    ##Build the command to run gp
+    builderPath = "/programs/GlycoProteinBuilder/bin/gp_builder"
+    log.debug("builderPath: " + builderPath)
+    log.debug("inputFileName: " + inputFileName)
+
+    outputDir = gemsProject.output_dir
+    #/programs/GlycoProteinBuilder/bin/ /website/userdata/tools/gp/git-ignore-me_userdata/4f18b278-d9bb-4111-b502-d91945639fa6/ > /website/userdata/tools/gp/git-ignore-me_userdata/4f18b278-d9bb-4111-b502-d91945639fa6/gp.log
+    command = builderPath + " " + outputDir + " > " + outputDir + "/logs/gp.log"
+    log.debug("command: " + command)
+    sbatchArg = "gpScript.sh"
+    script = outputDir + sbatchArg
+    try:
+        with open(script, 'w', encoding='utf-8') as file:
+            file.write("#!/bin/bash\n")
+            file.write('GPPATH="' + builderPath + '"\n')
+            file.write('WorkDir="' + outputDir + '"\n')
+            file.write('COMMAND="${GPPATH} ${WorkDir} > ${WorkDir}gp.log"\n')
+            file.write('eval ${COMMAND}')
+        return sbatchArg
+
+    except Exception as error:
+        log.error("There was a problem writing the gp script for slurm.")
+        log.error("Error type: " + str(type(error)))
+        log.error(traceback.format_exc)
+
+    
 
 
+def writeGpInputFile(gemsProject, attachmentSites):
+    log.info("writeGpInputFile() was called.\n")
+    ##Write the Input file, which GP uses to know what to do.
+    outputDir = gemsProject.output_dir
+    preprocessedPdbFileName = "updated_pdb.pdb"
+    log.debug("preprocessedPdbFileName: " + preprocessedPdbFileName)
+    inputFileName = outputDir + "input.txt"
+    log.debug("inputFileName: " + inputFileName)
+    ##Build input.txt
+    ##For now, assuming that sites are specified in the request.
+    try:
+        with open(inputFileName, 'w', encoding='utf-8') as file:
+            file.write("Protein:\n")
+            file.write(preprocessedPdbFileName + "\n\n")
+            file.write("Protein Residue, Glycan Name:\n")
+            for attachment in attachmentSites:
+                file.write(attachment['chain'] + "_" + attachment['residue_number'] + "," + attachment['glycan'] + "\n")
+            file.write("END")
+            log.debug("Finished writing input.txt")
+        return inputFileName
+    except Exception as error:
+        log.error("Failed to create input.txt")
+        log.error("Error type: " + str(type(error)))
+        log.error(traceback.format_exc())
+        raise error
+
+##Pass a transaction, get a dict of attachmentSites if present, otherwise error.
+#   @param transaction
+def getAttachmentSitesFromTransaction(thisTransaction):
+    log.info("getAttachmentSitesFromTransaction() was called.\n")
+
+    if "inputs" in thisTransaction.request_dict['entity'].keys():
+        inputs = thisTransaction.request_dict['entity']['inputs']
+        attachmentSitesFound = False
+        for element in inputs:
+            log.debug("element: " + str(element))
+            log.debug("keys: " + str(element.keys()))
+            if "attachments" in element.keys():
+                attachmentSites = element['attachments']
+                attachmentSitesFound = True
+        if attachmentSitesFound:
+            return attachmentSites
+        else:
+            raise AttributeError
+    else:
+        raise AttributeError
 
 def main():
   import importlib.util, os, sys
