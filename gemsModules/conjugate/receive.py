@@ -62,9 +62,7 @@ def receive(thisTransaction):
 
     thisTransaction.build_outgoing_string()
 
-##TODO: Refactor for:
-##        proper encapsulation,
-##        Have errors stop the process and return responses. Not happening this way yet.
+##TODO: Have errors stop the process and return responses. Not happening this way yet.
 def buildGlycoprotein(thisTransaction):
     log.info("buildGlycoprotein() was called.\n")
     pdbFileName = ""
@@ -80,15 +78,10 @@ def buildGlycoprotein(thisTransaction):
         appendCommonParserNotice(thisTransaction, 'InvalidInput' )
     else:
         log.debug("attachmentSites present.")
-        gemsProject = startProject(thisTransaction)
-
-        ##Return response that the project has been started.
-        thisTransaction.response_dict['responses'].append({
-            "BuildGlycoprotein" : {
-                'project_status' : gemsProject.status,
-                'payload' : gemsProject.pUUID
-            }
-        })
+        if "gems_project" not in thisTransaction.response_dict.keys():
+            gemsProject = startProject(thisTransaction)
+        else:
+            log.debug("gemsProject already present.")
 
         preprocessPdbForAmber(thisTransaction)
         inputFileName = writeGpInputFile(gemsProject, attachmentSites)
@@ -102,15 +95,63 @@ def buildGlycoprotein(thisTransaction):
             log.error("There was a problem calling the GlycoProteinBuilder program.")
             log.error("Error type: " + str(type(error)))
             log.error(traceback.format_exc())
+        else:
+            responseConfig = buildResponseConfig(gemsProject)
+            appendResponse(thisTransaction, responseConfig)
 
-        ##Return the pUUID as the payload.
-        thisTransaction.response_dict['responses'].append({
-            "BuildGlycoprotein" : {
-                "payload" : gemsProject.pUUID
-            }
-        })
 
         cleanGemsProject(thisTransaction)
+
+
+##Pass in a gemsProject and get a responseConfig dict.
+def buildResponseConfig(gemsProject):
+    try:
+        downloadUrl = getDownloadUrl(gemsProject.pUUID)
+    except AttributeError as error:
+        raise error
+    else:
+        config = {
+            "entity" : "Conjugate",
+            "respondingService" : "BuildGlycoprotein",
+            "responses" : [
+                {
+                    'project_status' : gemsProject.status,
+                    'payload' : gemsProject.pUUID,
+                    'downloadUrl' : downloadUrl
+                }
+            ]
+        }
+    return config
+
+def getDownloadUrl(pUUID : str):
+    log.info("getDownloadUrl was called.")
+    try:
+        versionsFile = "/website/userdata/VERSIONS.sh"
+        with open(versionsFile) as file:
+            content = file.read()
+
+        siteHostName = getSiteHostName(content)
+
+        url = "http://" + siteHostName + "/json/download/gp/" + pUUID
+        log.debug("url : " + url )
+        return url
+    except AttributeError as error:
+        log.error("Something went wrong building the downloadUrl.")
+        raise error
+
+def getSiteHostName(content):
+    log.info("getSiteHostName was called.")
+    lines = content.split("\n")
+    for line in lines:
+        if 'SITE_HOST_NAME' in line:
+            start = line.index("=") + 1
+            siteHostName = line[start:].replace('"', '')
+            log.debug("siteHostName: " + siteHostName)
+    if siteHostName is not None:
+        return siteHostName
+    else:
+        log.error("Never did find a siteHostName.")
+        raise AttributeError
 
 ##  Writes the file that slurm is expected to run. Returns the sbatchArg needed for submission
 #   @param inputFileName

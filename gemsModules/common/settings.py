@@ -52,7 +52,7 @@ servicesStatus = [
     }
 ]
 
-
+schemaLocation = "/website/userdata/"
 
 ## Module names for entities that this entity/module knows.
 subEntities = {

@@ -130,13 +130,13 @@ def listEntities(requestedEntity='Delegator'):
   log.info("listEntities() was called.\n")
   return list(subEntities.keys())
 
-
 def returnHelp(requestedEntity,requestedHelp):
   log.info("returnHelp() was called.\n")
   theEntity = importEntity(requestedEntity)
   theHelp = entities.helpDict[requestedHelp]
   if theHelp == 'schemaLocation':
-    return "Here there should be a location for the schema"  ## TODO:  make this do something real
+    schema_location = settings.schemaLocation
+    return schema_location  ## TODO:  make this do something real
   if not hasattr(theEntity, 'helpme'):
     return "No help available for " + requestedEntity
   helpLocation = getattr(theEntity, 'helpme')
@@ -152,7 +152,7 @@ def getJsonApiVersion():
     currentStableSchema = getGemsHome() + "/gemsModules/Schema/currentStableSchema"
     try:
         with open(currentStableSchema) as schemaFile:
-            version = schemaFile.read()
+            version = schemaFile.read().strip()
         log.debug("json_api_version: " + version)
     except Exception as error:
         log.error("Failed to read the currentStableSchema file.")
@@ -172,6 +172,57 @@ def getGemsHome():
           SH:    setenv GEMSHOME /path/to/gems
         """)
     return GEMSHOME
+
+##  Send a transaction and a response. This method checks the response validity and
+#   updates the transaction with a response for you, though they may be errors.
+def appendResponse(thisTransaction, responseConfig):
+    log.info("appendResponse() was called.\n")
+    ## Check the responseConfig:
+    if 'entity' in responseConfig.keys():
+        entity = responseConfig['entity']
+        log.debug("entity: " + entity)
+    else:
+        log.error("Please add the entity type to your responseConfig object.")
+        appendCommonParserNotice(thisTransaction, 'IncompleteResponseError')
+    
+    if 'respondingService' in responseConfig.keys():
+        respondingService = responseConfig['respondingService']
+        log.debug("respondingService: " + respondingService)
+    else:
+        log.error("Please add a respondingService field to your responseConfig object.")
+        appendCommonParserNotice(thisTransaction,'IncompleteResponseError')
+
+    if 'responses' in responseConfig.keys():
+        responses = responseConfig['responses']
+        if entity is not None and respondingService is not None and responses is not None:
+            if thisTransaction.response_dict == None:
+                thisTransaction.response_dict = {}
+
+            if 'entity' not in thisTransaction.response_dict.keys():
+                thisTransaction.response_dict['entity'] = {}
+                thisTransaction.response_dict['entity']['type'] = entity
+
+
+            if 'responses' not in thisTransaction.response_dict.keys():
+                thisTransaction.response_dict['responses'] = []
+
+            for response in responses:
+                resource = {respondingService : response }
+
+                thisTransaction.response_dict['responses'].append(resource)
+
+            try:
+                TransactionSchema(**thisTransaction.response_dict)
+                log.debug("Passes validation against schema.")
+            except ValidationError as e:
+                log.error("Validation Error.")
+                appendCommonParserNotice(thisTransaction,'JsonParseEror')
+        else:
+            log.Error("Incomplete responseConfig.")
+        
+    else:
+        log.error("Please add at a list of responses to your responseConfig object.")
+        appendCommonParserNotice(thisTransaction,'IcompleteResponseError')
 
 
 def main():

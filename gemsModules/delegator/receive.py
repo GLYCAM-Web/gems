@@ -66,6 +66,8 @@ def delegate(jsonObjectString):
         theEntity.receive.receive(thisTransaction)
 
     ##Set the json_api_version in the response_dict.
+    if thisTransaction.response_dict is None:
+        thisTransaction.response_dict = {}
     if 'json_api_version' not in thisTransaction.response_dict.keys():
         thisTransaction.response_dict['json_api_version'] = getJsonApiVersion()
     if 'response_timestamp' not in thisTransaction.response_dict.keys():
@@ -88,8 +90,6 @@ def delegate(jsonObjectString):
         ## TODO:  write this function....
         log.debug("An outgoing string STILL does not exist.  About to build an error response.")
         thisTransaction.build_general_error_output()
-
-
 
     # Return whatever outgoing string got made
     log.debug("About to return whatever output I have at this point.")
@@ -132,6 +132,30 @@ def receive(thisTransaction):
 #                print("About to segfault, I hope.")
                 from . import isegfault
                 return
+            if 'returnSchema' in element.keys():
+                log.debug("returnSchema was requested.")
+                schema =  getJsonSchema()
+                responseConfig = {
+                    "entity" : "Delegator",
+                    "respondingService" : "returnSchema",
+                    "responses" : [
+                        { "payload" : schema}
+                    ]
+                }
+
+                appendResponse(thisTransaction, responseConfig)
+
+##  Return the content of the current schema, as defined in CurrentStableSchema
+def getJsonSchema():
+    log.info("getJsonSchema() was called.\n")
+    versionFilename = getGemsHome() + "/gemsModules/Schema/currentStableSchema"
+    with open(versionFilename, 'r') as versionFile:
+        currentStableVersion = versionFile.read().strip()
+    schemaFileName = getGemsHome() + "/gemsModules/Schema/" + currentStableVersion + "/schema.json"
+    with open(schemaFileName, 'r') as schemaFile:
+        content = schemaFile.read()
+    #log.debug("schema content: \n" + content )
+    return content
 
 def main():
   import importlib.util, os, sys
