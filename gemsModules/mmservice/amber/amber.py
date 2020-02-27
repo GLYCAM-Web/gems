@@ -5,7 +5,7 @@ from . import conf
 
 ##TO set logging verbosity for just this file, edit this var to one of the following:
 ## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.DEBUG
+logLevel = logging.ERROR
 
 if loggers.get(__name__):
     pass
@@ -58,6 +58,8 @@ class Amber_Job:
         self.HEATINFO = self.RUN_PREF + '.' + conf.File_Naming.extHEATINFO
         self.EQUIINFO = self.RUN_PREF + '.' + conf.File_Naming.extEQUIINFO
         self.MDINFO = self.RUN_PREF + '.' + conf.File_Naming.extMDINFO
+        #PDB file names
+        self.MINPDB = self.RUN_PREF + '_min.' + conf.File_Naming.extPDB 
         #logfile names
         self.MINLOG = self.RUN_PREF + '.' + conf.File_Naming.extMINLOG
         self.HEATLOG = self.RUN_PREF + '.' + conf.File_Naming.extHEATLOG
@@ -195,10 +197,12 @@ class Amber_Job:
         run_script.write("  -inf  " + self.MININFO + " \\\n\n")
         run_script.write("if grep -q \'" + self.MD_DONE_TEXT + "\' " + self.MINOUT + " ; then\n")
         run_script.write("    echo \"Minimization of webid ${RUN_ID} appears to be complete on $(date).\" >> ${LOGFILE}\n")
+        run_script.write("    ambpdb -p " + self.PARMTOP + " -c " + self.INPCRD + " > " + self.MINPDB + " 2> " + self.MINPDB + ".stderr\n")
         run_script.write("else\n")
         run_script.write("    echo \"Minimization of webid ${RUN_ID} appears to have failed on $(date).Check " + self.MINOUT + "\" >> ${LOGFILE}\n")
         run_script.write("    exit 1\n")
         run_script.write("fi\n")
+
 
         if self.minimization_only != True:
             run_script.write("${MD_COMMAND} \\\n")
@@ -300,18 +304,18 @@ class Amber_Job:
         elif input_files_missing == False and out_files_exist == False:
             return True
 
-if __name__ == "__main__":
+
+def manageIncomingString(jsonObjectString: str):
     import os,sys,json
-    input_json_dict = {}
-    with open('amberMdRequest.json') as input_json:
-        input_json_dict = json.load(input_json)
+#    input_json_dict = {}
+    input_json_dict = json.loads(jsonObjectString)
 
     amber_job = Amber_Job(input_json_dict)
 
     if amber_job.check_if_dir_content_good() == True:
+        from gemsModules.batchcompute import batchcompute
         slurm_module_path = '../../batchcompute'
         sys.path.append(os.path.abspath(slurm_module_path))
-        import batchcompute
         outgoing_json_dict = {}
         outgoing_json_dict["partition"] = "amber"
         outgoing_json_dict["user"] = "webdev"
@@ -320,3 +324,45 @@ if __name__ == "__main__":
         outgoing_json_dict["sbatchArgument"] = amber_job.Run_Script_Name
 
         batchcompute.batch_compute_delegation(outgoing_json_dict)
+
+def main():
+    import importlib.util, os, sys
+    #from importlib import util
+    if importlib.util.find_spec("gemsModules") is None:
+        this_dir, this_filename = os.path.split(__file__)
+        sys.path.append(this_dir + "/../")
+        if importlib.util.find_spec("common") is None:
+            print("I cannot find the Common Servicer.  No clue what to do. Exiting")
+            sys.exit(1)
+        else:
+            from common import utils
+    else:
+        from gemsModules.common import utils
+    jsonObjectString=utils.JSON_From_Command_Line(sys.argv)
+    try:
+        responseObject=manageIncomingString(jsonObjectString)
+    except Exception as error:
+        print("\nThe mmservice.amber module captured an error.")
+        print("Error type: " + str(type(error)))
+        print(traceback.format_exc())
+        ##TODO: see about exploring this error and returning more info. Temp solution for now.
+        responseObject = {
+            'response' : {
+                'type' : 'UnknownError',
+                'notice' : {
+                    'code' : '500',
+                    'brief' : 'unknownError',
+                    'blockID' : 'unknown',
+                    'message' : 'Not sure what went wrong. Error captured by the mmservice.amber gemsModule.'
+                }
+            }
+        }
+        responseObjectString = str(responseObject)
+
+
+    print("\nmmservice.amber is returning this: \n" +  responseObjectString)
+
+
+if __name__ == "__main__":
+    main()
+

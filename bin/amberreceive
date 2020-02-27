@@ -59,30 +59,6 @@ jsonObjectString=utils.JSON_From_Command_Line(sys.argv)
 
 
 from gemsModules.mmservice.amber import amber
-from gemsModules.mmservice.amber.amber import *
-from gemsModules import batchcompute
-from gemsModules.batchcompute import batchcompute
-from gemsModules.batchcompute.batchcompute import *
-import os,sys,json
+from gemsModules.mmservice.amber.amber import manageIncomingString
 
-input_json_dict = {}
-input_json_dict = json.loads(jsonObjectString)
-
-amber_job = Amber_Job(input_json_dict)
-
-if amber_job.check_if_dir_content_good() == True:
-    slurm_module_path = '../../batchcompute'
-    sys.path.append(os.path.abspath(slurm_module_path))
-    outgoing_json_dict = {}
-    outgoing_json_dict["partition"] = "amber"
-    outgoing_json_dict["user"] = "webdev"
-    outgoing_json_dict["name"] = "testmin"
-    outgoing_json_dict["workingDirectory"] = str(input_json_dict["project"]["workingDirectory"])
-    outgoing_json_dict["sbatchArgument"] = amber_job.Run_Script_Name
-
-    batchcompute.batch_compute_delegation(outgoing_json_dict)
-else:
-    log.critical("Amber directory is bad")
-
-
-
+manageIncomingString(jsonObjectString)

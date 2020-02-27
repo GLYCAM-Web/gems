@@ -4,6 +4,10 @@ import gemsModules
 import gmml
 import traceback
 
+## Get rid of these after the bad subprocess code is gone
+import subprocess,signal
+from subprocess import *
+
 #from gemsModules import common
 #from gemsModules import sequence
 #from gemsModules.sequence.receive import *
@@ -64,9 +68,27 @@ def build3DStructure(thisTransaction : Transaction, thisService : Service = None
     builder = getCbBuilderForSequence(sequence)
     outputDir = thisTransaction.response_dict['gems_project']['output_dir']
     log.info("outputDir: " + outputDir)
-    destination = outputDir + pUUID
+    destination = outputDir + 'structure'
     log.debug("destination: " + destination)
     builder.GenerateSingle3DStructure(destination)
+
+    amberSubmissionJson='{"project" : \
+    {\
+    "id":"' + pUUID + '", \
+    "workingDirectory":"' + outputDir + '", \
+    "type":"minimization", \
+    "system_phase":"gas", \
+    "water_model":"none" \
+    } \
+}'
+    # TODO:  Make this resemble real code....
+    the_json_file = outputDir + "amber_submission.json"
+    min_json_in = open (the_json_file , 'w')
+    min_json_in.write(amberSubmissionJson)
+    min_json_in.close()
+        
+    from gemsModules.mmservice.amber.amber import manageIncomingString
+    manageIncomingString(amberSubmissionJson)
 
     cleanGemsProject(thisTransaction)
 
