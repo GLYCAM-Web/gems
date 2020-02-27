@@ -13,7 +13,7 @@ import urllib.request
 
 ##TO set logging verbosity for just this file, edit this var to one of the following:
 ## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.DEBUG
+logLevel = logging.ERROR
 
 if loggers.get(__name__):
     pass
@@ -102,19 +102,56 @@ def buildGlycoprotein(thisTransaction):
 
         cleanGemsProject(thisTransaction)
 
+
+##Pass in a gemsProject and get a responseConfig dict.
 def buildResponseConfig(gemsProject):
-    config = {
-        "entity" : "Conjugate",
-        "respondingService" : "BuildGlycoprotein",
-        "responses" : [
-            {
-                'project_status' : gemsProject.status,
-                'payload' : gemsProject.pUUID
-            }
-        ]
-    }
+    try:
+        downloadUrl = getDownloadUrl(gemsProject.pUUID)
+    except AttributeError as error:
+        raise error
+    else:
+        config = {
+            "entity" : "Conjugate",
+            "respondingService" : "BuildGlycoprotein",
+            "responses" : [
+                {
+                    'project_status' : gemsProject.status,
+                    'payload' : gemsProject.pUUID,
+                    'downloadUrl' : downloadUrl
+                }
+            ]
+        }
     return config
 
+def getDownloadUrl(pUUID : str):
+    log.info("getDownloadUrl was called.")
+    try:
+        versionsFile = "/website/userdata/VERSIONS.sh"
+        with open(versionsFile) as file:
+            content = file.read()
+
+        siteHostName = getSiteHostName(content)
+
+        url = "http://" + siteHostName + "/json/download/gp/" + pUUID
+        log.debug("url : " + url )
+        return url
+    except AttributeError as error:
+        log.error("Something went wrong building the downloadUrl.")
+        raise error
+
+def getSiteHostName(content):
+    log.info("getSiteHostName was called.")
+    lines = content.split("\n")
+    for line in lines:
+        if 'SITE_HOST_NAME' in line:
+            start = line.index("=") + 1
+            siteHostName = line[start:].replace('"', '')
+            log.debug("siteHostName: " + siteHostName)
+    if siteHostName is not None:
+        return siteHostName
+    else:
+        log.error("Never did find a siteHostName.")
+        raise AttributeError
 
 ##  Writes the file that slurm is expected to run. Returns the sbatchArg needed for submission
 #   @param inputFileName
