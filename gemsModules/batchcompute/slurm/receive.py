@@ -131,7 +131,12 @@ def manageIncomingString(jsonObjectString):
             log.error("Got none response")
             ##TODO: return a proper error response
         else:
-            return theResponse
+            thisSlurmJobInfo.copyJobinfoInToOut()
+            thisSlurmJobInfo.addSbatchResponseToJobinfoOut(theResponse)
+            log.debug("The outgoing dictionary is: \n")
+            log.debug(str(thisSlurmJobInfo.outgoing_dict))
+            log.debug("\n")
+            return thisSlurmJobInfo.outgoing_dict
 
 
 def main():
