@@ -13,7 +13,7 @@ import urllib.request
 
 ##TO set logging verbosity for just this file, edit this var to one of the following:
 ## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.ERROR
+logLevel = logging.DEBUG
 
 if loggers.get(__name__):
     pass
@@ -62,9 +62,7 @@ def receive(thisTransaction):
 
     thisTransaction.build_outgoing_string()
 
-##TODO: Refactor for:
-##        proper encapsulation,
-##        Have errors stop the process and return responses. Not happening this way yet.
+##TODO: Have errors stop the process and return responses. Not happening this way yet.
 def buildGlycoprotein(thisTransaction):
     log.info("buildGlycoprotein() was called.\n")
     pdbFileName = ""
@@ -80,15 +78,10 @@ def buildGlycoprotein(thisTransaction):
         appendCommonParserNotice(thisTransaction, 'InvalidInput' )
     else:
         log.debug("attachmentSites present.")
-        gemsProject = startProject(thisTransaction)
-
-        ##Return response that the project has been started.
-        thisTransaction.response_dict['responses'].append({
-            "BuildGlycoprotein" : {
-                'project_status' : gemsProject.status,
-                'payload' : gemsProject.pUUID
-            }
-        })
+        if "gems_project" not in thisTransaction.response_dict.keys():
+            gemsProject = startProject(thisTransaction)
+        else:
+            log.debug("gemsProject already present.")
 
         preprocessPdbForAmber(thisTransaction)
         inputFileName = writeGpInputFile(gemsProject, attachmentSites)
@@ -102,15 +95,26 @@ def buildGlycoprotein(thisTransaction):
             log.error("There was a problem calling the GlycoProteinBuilder program.")
             log.error("Error type: " + str(type(error)))
             log.error(traceback.format_exc())
+        else:
+            responseConfig = buildResponseConfig(gemsProject)
+            appendResponse(thisTransaction, responseConfig)
 
-        ##Return the pUUID as the payload.
-        thisTransaction.response_dict['responses'].append({
-            "BuildGlycoprotein" : {
-                "payload" : gemsProject.pUUID
-            }
-        })
 
         cleanGemsProject(thisTransaction)
+
+def buildResponseConfig(gemsProject):
+    config = {
+        "entity" : "Conjugate",
+        "respondingService" : "BuildGlycoprotein",
+        "responses" : [
+            {
+                'project_status' : gemsProject.status,
+                'payload' : gemsProject.pUUID
+            }
+        ]
+    }
+    return config
+
 
 ##  Writes the file that slurm is expected to run. Returns the sbatchArg needed for submission
 #   @param inputFileName
