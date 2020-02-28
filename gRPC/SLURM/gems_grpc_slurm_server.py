@@ -98,7 +98,7 @@ class GemsGrpcSlurmReceiver(gems_grpc_slurm_pb2_grpc.GemsGrpcSlurmServicer):
             return gems_grpc_slurm_pb2.GemsGrpcSlurmResponse(output=theResponse)
 
         log.debug("The request input is >>>"+request.input+"<<<")
-        log.debug("GEMSHOME is >>>"+GEMSHOME+"<<<")
+        log.debug("GEMSHOME is >>>"+GemsPath+"<<<")
         os.environ['GEMS_DEBUG_VERBOSITY']='-1'
         jobsubmissioncommand = GemsPath+"/bin/slurmreceive"
         try:
