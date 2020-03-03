@@ -171,6 +171,7 @@ def buildGemsProject(thisTransaction : Transaction, requestingAgent : str):
     log.debug("gemsProject: " + str(gemsProject))
     return gemsProject
 
+
 ##If the requesting agent is the website, leave the gems project.
 #   Otherwise remove it.
 #   @param thisTransaction The transaction object provides the requesting agent.
@@ -211,6 +212,9 @@ def getDownloadUrl(pUUID : str, appName : str):
             content = file.read()
 
         siteHostName = getSiteHostName(content)
+
+        ##Note: It may one day be necessary to edit http to https in production responses.
+        ##      It also may not be necessary. Doing nothing until need arrises.
 
         url = "http://" + siteHostName + "/json/download/" + appName +"/" + pUUID
         log.debug("url : " + url )

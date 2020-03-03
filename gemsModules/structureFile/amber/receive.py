@@ -14,7 +14,7 @@ from gemsModules.common.loggingConfig import *
 
 ##TO set logging verbosity for just this file, edit this var to one of the following:
 ## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.ERROR
+logLevel = logging.DEBUG
 
 if loggers.get(__name__):
     pass
@@ -22,90 +22,81 @@ else:
     log = createLogger(__name__, logLevel)
 
 ##TODO: Refactor for better encapsulation.
+##TODO: Redo error handling.
 ##  Prepare a pdb for use with Amber.
 #   @param thisTransaction A request containing either the path to an uploaded pdb, or a pdbID for sideloading.
 def preprocessPdbForAmber(thisTransaction):
     log.info("preprocessPdbForAmber() was called.\n")
 
     requestDict = thisTransaction.request_dict
-    entity = requestDict['entity']['type']
+    entity = getEntityType(thisTransaction)
     log.debug("requestDict: \n" + str(json.dumps(requestDict, indent=2, sort_keys=False)))
     gemsHome = getGemsHome()
     log.debug("gemsHome: " + gemsHome)
+    try:
+        uploadFileName = getUploadedFileNameFromTransaction(thisTransaction)
+        log.debug("uploadFileName: " + uploadFileName)
+    except Exception as error:
+        log.error("There was a problem finding the uploadFileName in the transaction.")
+        log.error("Error type: " + str(type(error)))
+        log.errror(traceback.format_exc())
+        appendCommonParserNotice(thisTransaction, 'InvalidInput' )
+        return
+    ##TODO: find a better way to verify that a file is a pdb file, as some may
+    ##  legitimately not have the .pdb extension.
+    if not hasPdbExtension(uploadFileName):
+        noticeBrief = "For now, pdb files must have the .pdb extension. May change later."
+        log.error(noticeBrief)
+        ##Transaction, noticeBrief, blockID
+        appendCommonParserNotice(thisTransaction, 'InvalidInput' )
+        return
+    else:
+        log.debug("We have a file with a .pdb extension. Checking for a gemsProject.")
+        ##Projects in which pdb preprocessing is jsut a step will already
+        ##  have been created.
+        if 'gems_project' not in thisTransaction.response_dict.keys():
+            gemsProject =startPdbGemsProject(thisTransaction, uploadFileName)
 
-    ## project, here, is a frontend project, not gemsProject.
-    if "project" in requestDict.keys():
-        log.debug("found a project in the request.")
+        ##TODO: Check if user has provided optional prepFile and libraries.
+        ##TODO: Error handling needed here.
+        aminoLibs = getDefaultAminoLibs(gemsHome)
+        glycamLibs = gmml.string_vector()
+        otherLibs = gmml.string_vector()
+        prepFile = getDefaultPrepFile(gemsHome)
+
+        #PDB file object:
+        pdbFile = gmml.PdbFile(uploadFileName)
+
+        preprocessor = gmml.PdbPreprocessor()
+        preprocessor.Preprocess(pdbFile, aminoLibs, glycamLibs, otherLibs, prepFile)
+        preprocessor.ApplyPreprocessingWithTheGivenModelNumber(pdbFile, aminoLibs, glycamLibs, prepFile)
+
+        ##Doesn't appear to be used. Do we need this for something?
+        seqMap = pdbFile.GetSequenceNumberMapping()
+
         try:
-            uploadFileName  = getUploadedFileNameFromTransaction(thisTransaction)
-        except AttributeError as error:
-            log.error("There was a problem finding the uploaded file name in the transaction.")
+            ##Give the output file the same path as the uploaded file, but replace the name.
+            outputDir = gemsProject.output_dir
+            log.debug("outputDir: " + outputDir)
+            writePdb(pdbFile, outputDir)
+        except IOError as error:
+            log.error("Failed to write the pdb. Make sure the outputDir exists.")
+        except Exception as error:
+            noticeBrief = "There was an error writing the pdb file."
+            log.error(noticeBrief)
+            log.error("Error type: " + str(type(error)))
+            log.error(traceback.format_exc())
             appendCommonParserNotice(thisTransaction, 'InvalidInput' )
         else:
-            log.debug("uploadFileName: " + uploadFileName)
-            ##TODO: find a better way to verify that a file is a pdb file, as some may
-            ##  legitimately not have the .pdb extension.
-            if not hasPdbExtension(uploadFileName):
-                noticeBrief = "For now, pdb files must have the .pdb extension. May change later."
-                log.error(noticeBrief)
-                ##Transaction, noticeBrief, blockID
+            try:
+                buildPdbResponse(thisTransaction)
+            except AttributeError as error:
+                log.error("There was a problem building the pdbResponse.")
+                log.error(traceback.format_exc())
                 appendCommonParserNotice(thisTransaction, 'InvalidInput' )
-                return
             else:
-                log.debug("We have a file with a .pdb extension. Checking for a gemsProject.")
-                ##Projects in which pdb preprocessing is jsut a step will already
-                ##  have been created.
-                if 'gems_project' not in thisTransaction.response_dict.keys():
-                    startGemsProject(thisTransaction, uploadFileName)
-                gemsProject = thisTransaction.response_dict['gems_project']
-
-                ##TODO: Check if user has provided optional prepFile and libraries.
-                ##TODO: Error handling and type checking needed here.
-                aminoLibs = getDefaultAminoLibs(gemsHome)
-                glycamLibs = gmml.string_vector()
-                otherLibs = gmml.string_vector()
-                prepFile = getDefaultPrepFile(gemsHome)
-
-                #PDB file object:
-                pdbFile = gmml.PdbFile(uploadFileName)
-
-                preprocessor = gmml.PdbPreprocessor()
-                preprocessor.Preprocess(pdbFile, aminoLibs, glycamLibs, otherLibs, prepFile)
-                preprocessor.ApplyPreprocessingWithTheGivenModelNumber(pdbFile, aminoLibs, glycamLibs, prepFile)
-
-                ##Doesn't appear to be used. Do we need this for something?
-                seqMap = pdbFile.GetSequenceNumberMapping()
-
-                try:
-                    ##Give the output file the same path as the uploaded file, but replace the name.
-                    outputDir = gemsProject['output_dir']
-                    writePdb(pdbFile, outputDir)
-                except IOError as error:
-                    log.error("Failed to write the pdb. Make sure the outputDir exists.")
-                except Exception as error:
-                    noticeBrief = "There was an error writing the pdb file."
-                    log.error(noticeBrief)
-                    log.error("Error type: " + str(type(error)))
-                    log.error(traceback.format_exc())
-                    appendCommonParserNotice(thisTransaction, 'InvalidInput' )
-                else:
-                    try:
-                        buildPdbResponse(thisTransaction)
-                    except AttributeError as error:
-                        log.error("There was a problem building the pdbResponse.")
-                        log.error(traceback.format_exc())
-                        appendCommonParserNotice(thisTransaction, 'InvalidInput' )
-                    else:
-                        ##Remove gemsProject if user agent is not website.
-                        cleanGemsProject(thisTransaction)
-
-    else:
-        noticeBrief = "No project found in keys. Still developing command-line interface."
-        log.error(noticeBrief)
-        ##May be a request from the command line that does not use json api?
-        ##TODO: Add logic to do this without the interface to the frontend.
-        ##Transaction, noticeBrief, blockID
-        appendCommonParserNotice(thisTransaction, 'InvalidInput')
+                ##Remove gemsProject if user agent is not website.
+                cleanGemsProject(thisTransaction)
 
 
 ##  Simple. Maybe too simple. Pass a string, if it contains .pdb, returns true. Else false.
@@ -179,8 +170,6 @@ def buildPdbResponse(thisTransaction : Transaction):
         raise AttributeError
 
 
-
-
 ##Returns the filename of a pdb file that is written to the dir you offer.
 #   Creates the dir if it doesn't exist.
 #   @param pdbID String to be used for the RCSB search.
@@ -252,14 +241,15 @@ def getUploadFileName(project):
     return uploadFileName
 
 ##Starts the project, and updates the transaction.
-def startGemsProject(thisTransaction, uploadFileName):
-    log.info("startGemsProject() was called.\n")
+def startPdbGemsProject(thisTransaction, uploadFileName):
+    log.info("startPdbGemsProject() was called.\n")
     ##Start a gemsProject
     if os.path.exists(uploadFileName):
         log.debug("Found the upload file")
         if uploadFileName.endswith(".pdb"):
             log.debug("File extension agrees this is a pdb file.")
-            startProject(thisTransaction)
+            gemsProject = startProject(thisTransaction)
+            return gemsProject
         else:
             log.error("File extension is not '.pdb' not sure what to do.")
             ##TODO: Add logic to validate pdb file type if no extension exists.

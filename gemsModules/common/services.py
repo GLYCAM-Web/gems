@@ -16,7 +16,7 @@ import traceback
 
 ##TO set logging verbosity for just this file, edit this var to one of the following:
 ## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.ERROR
+logLevel = logging.DEBUG
 
 if loggers.get(__name__):
     pass
@@ -147,8 +147,9 @@ def returnHelp(requestedEntity,requestedHelp):
     return "Something went wrong getting the requestedHelp from " + requestedEntity
   return thisHelp
 
+##  Looks at currentStableSchema file and returns the version it finds there.
 def getJsonApiVersion():
-    log.info("getJsonApiVersion was called.")
+    log.info("getJsonApiVersion() was called.\n")
     currentStableSchema = getGemsHome() + "/gemsModules/Schema/currentStableSchema"
     try:
         with open(currentStableSchema) as schemaFile:
@@ -158,6 +159,7 @@ def getJsonApiVersion():
         log.error("Failed to read the currentStableSchema file.")
     return version
 
+##  Looks for an environment var with GEMSHOME and returns it.
 def getGemsHome():
     log.info("getGemsHome() was called.\n")
     GEMSHOME = os.environ.get('GEMSHOME')
@@ -173,6 +175,14 @@ def getGemsHome():
         """)
     return GEMSHOME
 
+##  Give a transaction, return its requested entity type
+#   @param  transaction
+def getEntityType(thisTransaction):
+    log.info("getEntityType() was called.\n")
+    entity = thisTransaction.request_dict['entity']['type']
+    log.debug("entity: " + entity)
+    return entity
+
 ##  Send a transaction and a response. This method checks the response validity and
 #   updates the transaction with a response for you, though they may be errors.
 def appendResponse(thisTransaction, responseConfig):
@@ -184,7 +194,7 @@ def appendResponse(thisTransaction, responseConfig):
     else:
         log.error("Please add the entity type to your responseConfig object.")
         appendCommonParserNotice(thisTransaction, 'IncompleteResponseError')
-    
+
     if 'respondingService' in responseConfig.keys():
         respondingService = responseConfig['respondingService']
         log.debug("respondingService: " + respondingService)
@@ -219,7 +229,7 @@ def appendResponse(thisTransaction, responseConfig):
                 appendCommonParserNotice(thisTransaction,'JsonParseEror')
         else:
             log.Error("Incomplete responseConfig.")
-        
+
     else:
         log.error("Please add at a list of responses to your responseConfig object.")
         appendCommonParserNotice(thisTransaction,'IcompleteResponseError')
