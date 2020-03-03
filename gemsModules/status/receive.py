@@ -6,7 +6,7 @@ from gemsModules.common.transaction import * # might need whole file...
 from gemsModules.common.loggingConfig import *
 from . import settings
 from . import statusResponse
-from datetime import datetime
+
 import traceback
 
 ##TO set logging verbosity for just this file, edit this var to one of the following:
@@ -71,18 +71,7 @@ def generateReport(thisTransaction : Transaction, thisService : Service = None):
 ## The default here is to just report on every gemsModule and their corresponding services.
 def doDefaultService(thisTransaction : Transaction):
     log.info("doDefaultService() was called.\n")
-    #log.debug("thisTransaction: " + str(thisTransaction))
 
-    ##Header section
-    if thisTransaction.response_dict is None:
-        thisTransaction.response_dict = {}
-
-    thisTransaction.response_dict['entity'] = {}
-    thisTransaction.response_dict['entity']['type']="StatusReport"
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-    log.debug("timestamp: " + str(timestamp))
-
-    thisTransaction.response_dict['entity']['timestamp'] = timestamp
     responses = []
     ##Entity Reporting
     entities = listEntities()
@@ -112,9 +101,20 @@ def doDefaultService(thisTransaction : Transaction):
             log.error("Could not find settings for this entity.")
             ##TODO: Add an error to common parser for settingsNotFound
 
-    thisTransaction.response_dict.update({
-        "responses": responses
-    })
+    responseConfig = buildStatusResponseConfig(responses)
+    appendResponse(thisTransaction, responseConfig)
+
+##Just stick em on there.
+##  @param transaction
+##  @param resonses
+def buildStatusResponseConfig(responses):
+    log.info("buildStatusResponseConfig() was called.\n")
+    config = {
+        "entity" : "Status",
+        "respondingService": "GenerateReport",
+        "responses" : responses
+    }
+    return config
     #log.debug("thisTransaction.response_dict: " + str(thisTransaction.response_dict))
 
 ##Append a status from a module's settings file to a json response object

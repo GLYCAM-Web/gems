@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os, sys,importlib.util
+from datetime import datetime
 import gemsModules
 from gemsModules import common
 from gemsModules.common.settings import *
@@ -185,6 +186,8 @@ def getEntityType(thisTransaction):
 
 ##  Send a transaction and a response. This method checks the response validity and
 #   updates the transaction with a response for you, though they may be errors.
+#   @param transaction
+#   @param responseConfig
 def appendResponse(thisTransaction, responseConfig):
     log.info("appendResponse() was called.\n")
     ## Check the responseConfig:
@@ -211,6 +214,11 @@ def appendResponse(thisTransaction, responseConfig):
             if 'entity' not in thisTransaction.response_dict.keys():
                 thisTransaction.response_dict['entity'] = {}
                 thisTransaction.response_dict['entity']['type'] = entity
+
+            if 'timestamp' not in thisTransaction.response_dict['entity'].keys():
+                timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+                log.debug("timestamp: " + timestamp)
+                thisTransaction.response_dict['entity']['timestamp'] = timestamp
 
 
             if 'responses' not in thisTransaction.response_dict.keys():

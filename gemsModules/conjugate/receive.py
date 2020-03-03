@@ -96,7 +96,7 @@ def buildGlycoprotein(thisTransaction):
             log.error("Error type: " + str(type(error)))
             log.error(traceback.format_exc())
         else:
-            responseConfig = buildResponseConfig(gemsProject)
+            responseConfig = buildGPResponseConfig(gemsProject)
             appendResponse(thisTransaction, responseConfig)
 
 
@@ -104,7 +104,8 @@ def buildGlycoprotein(thisTransaction):
 
 
 ##Pass in a gemsProject and get a responseConfig dict.
-def buildResponseConfig(gemsProject):
+def buildGPResponseConfig(gemsProject):
+    log.info("buildGPResponseConfig() was called.\n")
     try:
         downloadUrl = getDownloadUrl(gemsProject.pUUID, "gp")
     except AttributeError as error:
