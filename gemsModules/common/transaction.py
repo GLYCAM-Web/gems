@@ -41,6 +41,7 @@ class SequenceServicesEnum(str,Enum):
 
 class StatusServicesEnum(str,Enum):
     generateReport = 'GenerateReport'
+    getJobStatus = 'GetJobStatus'
 
 class StructureFileServicesEnum(str, Enum):
     preprocessPdbForAmber = 'PreprocessPdbForAmber'

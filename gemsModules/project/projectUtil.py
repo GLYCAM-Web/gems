@@ -87,7 +87,7 @@ def startProject(thisTransaction: Transaction):
         log.debug("project_log_file: " + project_log_file)
         with open(project_log_file, 'w', encoding='utf-8') as file:
             log.debug("gemsProject object type: " + str(type(gemsProject)))
-            log.debug("keys: " + str(gemsProject.__dict__.keys()))
+
             file.write("GEMS Project Log:\n\n")
             file.write("Project type: " + gemsProject.project_type + "\n")
             file.write("Status: " + gemsProject.status + "\n")
@@ -105,11 +105,10 @@ def startProject(thisTransaction: Transaction):
 
 
 ##TODO: Refactor for better encapsulation
-##TODO: Use Doxygen-style comments.
-"""
-Creates a copy of uploads from the frontend
-returns the output_dir for the project as a convenience.
-"""
+##  Creates a copy of uploads from the frontend
+#   returns the output_dir for the project as a convenience.
+#   @param transaction
+
 def copyUploadFiles(thisTransaction : Transaction):
     log.info("copyUploadFiles() was called.\n")
     #Root of entire project
