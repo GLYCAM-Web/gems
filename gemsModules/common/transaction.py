@@ -2,7 +2,7 @@
 from enum import Enum, auto
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 from typing import ForwardRef
-from pydantic import BaseModel, Schema
+from pydantic import BaseModel, Field
 from pydantic.schema import schema
 
 # ####
@@ -130,76 +130,76 @@ class ResourceStringFormatEnum(str, Enum):
 # ####  The order will be guided mostly by dependency
 # ####
 class Tags(BaseModel):
-    options : Dict[str,str] = Schema(
+    options : Dict[str,str] = Field(
             None,
             description='Key-value pairs that are specific to each entity, service, etc'
             )
 
 class BatchComputeServices(BaseModel):
-    batchComputeServices: BatchComputeServicesEnum = Schema(
+    batchComputeServices: BatchComputeServicesEnum = Field(
         'Submit',
         title= "Batch Compute Services",
         description = "Services related to submitting jobs to Slurm."
         )
 
 class ConjugateServices(BaseModel):
-    conjugateServices: ConjugateServicesEnum = Schema(
+    conjugateServices: ConjugateServicesEnum = Field(
         'BuildGlycoprotein',
         title = 'Conjugate Services',
         description = "Services related to glycoproteins."
         )
 
 class DelegatorServices(BaseModel):
-    delegatorServices : DelegatorServicesEnum = Schema(
+    delegatorServices : DelegatorServicesEnum = Field(
             'Delegate',
             title = 'Delegator Services',
             description = 'Services available to the Delegator Entity'
             )
 
 class GraphServices(BaseModel):
-    graphServices : GraphServicesEnum = Schema(
+    graphServices : GraphServicesEnum = Field(
         'DrawGlycan',
         title = "Graph Services",
         description = 'Services related to drawing graphs.'
         )
 
 class SequenceServices(BaseModel):
-    sequenceServices : SequenceServicesEnum = Schema(
+    sequenceServices : SequenceServicesEnum = Field(
             'Build3DStructure',
             title = 'Sequence Services',
             description = 'Services available to the Sequence Entity'
             )
 
 class MmServiceServices(BaseModel):
-    mmserviceServices : MmServiceServicesEnum = Schema(
+    mmserviceServices : MmServiceServicesEnum = Field(
         'Amber',
         title = 'Amber MmService Services',
         description = 'Molecular Modeling services that use Amber.'
     )
 
 class CommonServices(BaseModel):
-    commonServices : CommonServicesEnum = Schema(
+    commonServices : CommonServicesEnum = Field(
             'DefaultService',
             title = 'Common Services',
             description = 'Services available to all Entities'
             )
 
 class GlycoProteinServices(BaseModel):
-    glycoProteinServices : GlycoProteinServicesEnum = Schema(
+    glycoProteinServices : GlycoProteinServicesEnum = Field(
             'Build3DStructure',
             title = 'GlycoProtein Services',
             description = 'Services available to the GlycoProtein Entity'
             )
 
 class StatusServices(BaseModel):
-    statusServices : StatusServicesEnum = Schema(
+    statusServices : StatusServicesEnum = Field(
         'GenerateReport',
         title = 'Status Reporting Services',
         description = 'Reporting services for gemsModules.'
         )
 
 class StructureFileServices(BaseModel):
-    structureFileServices: StructureFileServicesEnum = Schema(
+    structureFileServices: StructureFileServicesEnum = Field(
         'PreprocessPdbForAmber',
         title = "Preprocessing Services For Structure Files.",
         description = "Preprocessing for PDB files."
@@ -207,12 +207,12 @@ class StructureFileServices(BaseModel):
     options : Tags = None
 
 class ExternalResource(BaseModel):
-    locationType: ExternalLocationTypeEnum = Schema(
+    locationType: ExternalLocationTypeEnum = Field(
             None,
             title='External Location Type',
             description='The kind of location that is specified in the Payload.'
             )
-    resourceFormat: ExternalFormatEnum = Schema(
+    resourceFormat: ExternalFormatEnum = Field(
             None,
             title='Resource Format',
             description='The format of the external data.',
@@ -220,7 +220,7 @@ class ExternalResource(BaseModel):
     options : Tags = None
 
 class EmbeddedResource(BaseModel):
-    resourceFormat: ResourceStringFormatEnum = Schema(
+    resourceFormat: ResourceStringFormatEnum = Field(
             ResourceStringFormatEnum.glycamCondensed,
             title='Resource Format',
             description='The format of the data embedded in the Payload.'
@@ -233,14 +233,14 @@ class ResourceDescriptor(BaseModel):
 
 class Resource(BaseModel):
     """Information describing a resource containing data."""
-    metadata : ResourceDescriptor = Schema(
+    metadata : ResourceDescriptor = Field(
             None
             )
-    payload : str = Schema(
+    payload : str = Field(
         None,
         description='The thing that is described in the Descriptor'
         )
-    tags : List[Dict[str,str]] = Schema(
+    tags : List[Dict[str,str]] = Field(
         None,
         description='List of arbitrary Key:Value pairs initially interpreted as string literals.'
         )
@@ -248,24 +248,24 @@ class Resource(BaseModel):
 
 class Notice(BaseModel):
     """Description of a Notice."""
-    noticeType: NoticeTypeEnum = Schema(
+    noticeType: NoticeTypeEnum = Field(
             None,
             title='Type',
             alias='type'
             )
-    noticeCode: str = Schema(
+    noticeCode: str = Field(
             None,
             title='Code',
             alias='code',
             description='Code associated with this notice.'
             )
-    noticeBrief: str = Schema(
+    noticeBrief: str = Field(
             None,
             title='Brief',
             alias='brief',
             description='Brief title, status or name for this notice or notice type.'
             )
-    noticeMessage : str = Schema(
+    noticeMessage : str = Field(
             None,
             title='Message',
             alias='message',
@@ -275,14 +275,14 @@ class Notice(BaseModel):
 
 class Service(BaseModel):
     """Holds information about a requested Service."""
-    typename : Union[CommonServices, ConjugateServices, DelegatorServices, GraphServices, MmServiceServices, SequenceServices, GlycoProteinServices, StatusServices, StructureFileServices ] = Schema(
+    typename : Union[CommonServices, ConjugateServices, DelegatorServices, GraphServices, MmServiceServices, SequenceServices, GlycoProteinServices, StatusServices, StructureFileServices ] = Field(
             None,
             title='Type of Service.',
             alias='type',
             description='The services available will vary by Entity.'
             )
     inputs : List[Resource] = None
-    requestID : str = Schema(
+    requestID : str = Field(
             None,
             title = 'Request ID',
             description = 'User-specified ID that will be echoed in responses.'
@@ -291,17 +291,17 @@ class Service(BaseModel):
 
 class Response(BaseModel):
     """Holds information about a response to a service request."""
-    typename : str = Schema(
+    typename : str = Field(
             None,
             title='Type of Service.',
             alias='type',
             description='The type service that this is in response to.'
             )
-    notice : Notice = Schema(
+    notice : Notice = Field(
             None
             )
     outputs : List[Resource] = None
-    requestID : str = Schema(
+    requestID : str = Field(
             None,
             title = 'Request ID',
             description = 'User-specified ID from the service request.'
@@ -313,13 +313,13 @@ class Response(BaseModel):
 # ####
 class Entity(BaseModel):
     """Holds information about the main object responsible for a service."""
-    entityType: EntityTypeEnum = Schema(
+    entityType: EntityTypeEnum = Field(
             ...,
             title='Type',
             alias='type'
             )
     inputs : List[Resource] = None
-    requestID : str = Schema(
+    requestID : str = Field(
             None,
             title = 'Request ID',
             description = 'User-specified ID that will be echoed in responses.'
