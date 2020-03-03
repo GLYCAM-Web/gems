@@ -19,6 +19,7 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__, logLevel)
 
+##TODO: Use Doxygen-style comments.
 """
 The backend project is not the same as the project model in the frontend.
 """

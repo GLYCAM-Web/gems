@@ -86,7 +86,7 @@ def build3DStructure(thisTransaction : Transaction, thisService : Service = None
     min_json_in = open (the_json_file , 'w')
     min_json_in.write(amberSubmissionJson)
     min_json_in.close()
-        
+
     from gemsModules.mmservice.amber.amber import manageIncomingString
     manageIncomingString(amberSubmissionJson)
 
@@ -263,7 +263,7 @@ def checkEvaluationResponseValidity(thisTransaction):
             raise AttributeError
     return valid
 
-
+##TODO: Look into deprecating this method. Evaluate does what this does and more.
 ##Validate can potentially handle multiple sequences. Top level iterates and
 ##  updates transaction.
 def validateCondensedSequence(thisTransaction : Transaction, thisService : Service = None):

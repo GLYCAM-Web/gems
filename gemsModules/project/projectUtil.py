@@ -20,6 +20,8 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__, logLevel)
 
+##TODO: Refactor for better encapsulation
+##TODO: Use Doxygen-style comments.
 """
 Pass in a transaction, if a frontend project is in the request,
 a GemsProject is created with any relevant data, and the
@@ -101,6 +103,9 @@ def startProject(thisTransaction: Transaction):
     log.debug("Transaction: " + str(thisTransaction.__dict__))
     return gemsProject
 
+
+##TODO: Refactor for better encapsulation
+##TODO: Use Doxygen-style comments.
 """
 Creates a copy of uploads from the frontend
 returns the output_dir for the project as a convenience.
@@ -152,6 +157,9 @@ def copyUploadFiles(thisTransaction : Transaction):
         pass
     return output_dir
 
+
+
+##TODO: Use Doxygen-style comments.
 """
 Pass in a transaction and a string indicating what is requesting this project.
 The transaction is updated with any relevant project data.

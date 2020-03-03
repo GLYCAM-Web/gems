@@ -21,6 +21,7 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__, logLevel)
 
+##TODO: Refactor for better encapsulation.
 ##  Prepare a pdb for use with Amber.
 #   @param thisTransaction A request containing either the path to an uploaded pdb, or a pdbID for sideloading.
 def preprocessPdbForAmber(thisTransaction):

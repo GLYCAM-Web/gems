@@ -27,6 +27,9 @@ else:
 ##  (unless you write modules for using tleap to build, etc.....)
 ##
 
+
+##TODO: Refactor for better encapsulation
+##TODO: Use Doxygen-style comments.
 """
 The receive() method receives a transaction, and checks for the requested service.
 """

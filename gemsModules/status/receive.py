@@ -67,6 +67,7 @@ def generateReport(thisTransaction : Transaction, thisService : Service = None):
     else:
         doDefaultService(thisTransaction)
 
+##TODO: Refactor for better encapsulation
 ## The default here is to just report on every gemsModule and their corresponding services.
 def doDefaultService(thisTransaction : Transaction):
     log.info("doDefaultService() was called.\n")

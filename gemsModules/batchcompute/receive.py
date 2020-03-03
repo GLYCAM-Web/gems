@@ -33,8 +33,8 @@ else:
 ##     - Pass the transaction on to the Service
 
 
-##TODO: Correct the workflow. This feels wrong.I don't feel like this is going to be used this way.
-
+##TODO: Refactor for better encapsulation
+##TODO: Use Doxygen-style comments.
 def receive(thisTransaction):
     log.info("receive() was called.\n")
 
