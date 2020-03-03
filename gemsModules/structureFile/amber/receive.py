@@ -55,8 +55,8 @@ def preprocessPdbForAmber(thisTransaction):
         ##Projects in which pdb preprocessing is jsut a step will already
         ##  have been created.
         if 'gems_project' not in thisTransaction.response_dict.keys():
-            gemsProject =startPdbGemsProject(thisTransaction, uploadFileName)
-
+            gemsProject = startPdbGemsProject(thisTransaction, uploadFileName)
+        
         ##TODO: Check if user has provided optional prepFile and libraries.
         ##TODO: Error handling needed here.
         aminoLibs = getDefaultAminoLibs(gemsHome)
@@ -76,7 +76,7 @@ def preprocessPdbForAmber(thisTransaction):
 
         try:
             ##Give the output file the same path as the uploaded file, but replace the name.
-            outputDir = gemsProject.output_dir
+            outputDir = thisTransaction.response_dict['gems_project']['output_dir']
             log.debug("outputDir: " + outputDir)
             writePdb(pdbFile, outputDir)
         except IOError as error:
