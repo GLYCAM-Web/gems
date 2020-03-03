@@ -6,7 +6,6 @@ from gemsModules.common.transaction import * # might need whole file...
 from gemsModules.common.loggingConfig import *
 from . import settings
 from . import statusResponse
-
 import traceback
 
 ##TO set logging verbosity for just this file, edit this var to one of the following:
@@ -34,69 +33,42 @@ def receive(thisTransaction : Transaction):
                     log.error("The requested service is not recognized.")
                     common.settings.appendCommonParserNotice( thisTransaction, 'ServiceNotKnownToEntity', requestedService)
             elif requestedService == "GenerateReport":
-                generateReport(thisTransaction, None)
+                generateReport(thisTransaction)
                 thisTransaction.build_outgoing_string()
             else:
                 log.error("Perhaps a service was added to status/settings.py, but not defined in receive.py? Likely this service is still in development.")
                 common.settings.appendCommonParserNotice( thisTransaction, 'ServiceNotKnownToEntity', requestedService)
 
-##This method needs to check for options. If options are not present, do the default service.
-##    If the options are present, and specify a list of entities to report on, only report on those.
-def generateReport(thisTransaction : Transaction, thisService : Service = None):
-    log.info("generateReport() was called.\n")
 
-    entityKeys = thisTransaction.request_dict['entity'].keys()
-    log.debug("entityKeys : " + str(entityKeys))
-
-    if 'options' in entityKeys:
-        optionsKeys = thisTransaction.request_dict['entity']['options'].keys()
-        options = thisTransaction.request_dict['entity']['options']
-        log.debug("optionsKeys: " + str(optionsKeys))
-        if "targets" in optionsKeys:
-            for target in options['targets']:
-                log.debug("Report requested for target: " + str(target))
-                log.debug("target type: " + str(target['type']))
-                if target['type'] == 'All':
-                    doDefaultService(thisTransaction)
-                else:
-                    log.error("Report requested for a specific target. Still being developed.")
-                    ##TODO: Add an error to common parser to return to frontend. reportTargetUnknown
-        else:
-            doDefaultService(thisTransaction)
-
-    else:
-        doDefaultService(thisTransaction)
-
-##TODO: Refactor for better encapsulation
-## The default here is to just report on every gemsModule and their corresponding services.
 def doDefaultService(thisTransaction : Transaction):
     log.info("doDefaultService() was called.\n")
+    generateReport(thisTransaction)
 
+
+## Reports on every gemsModule and their corresponding services.
+def generateReport(thisTransaction : Transaction):
+    log.info("doDefaultService() was called.\n")
     responses = []
     ##Entity Reporting
     entities = listEntities()
     log.debug("entities: " + str(entities) + "\n")
+
     for availableEntity in entities:
         log.debug("Generating a report for entity: " + availableEntity)
         response = {}
         thisEntity = importEntity(availableEntity)
-        response.update({
-            'entity' : availableEntity
-        })
-        log.debug("thisEntity.__dict__.keys(): " + str(thisEntity.__dict__.keys()))
+        response.update( {'entity' : availableEntity} )
+        
         if thisEntity.settings is not None:
             settings = thisEntity.settings
             settingsAttributes = settings.__dict__.keys()
-
             response = getModuleStatus(response, settings, settingsAttributes)
             response = getModuleStatusDetail(response, settings, settingsAttributes)
             response = getServiceStatuses(response, settings, settingsAttributes)
             response = getSubEntities(response, settings, settingsAttributes)
-
             log.debug("Type of response: " + str(type(response)))
             log.debug("response: " + str(response))
             responses.append(response)
-
         else:
             log.error("Could not find settings for this entity.")
             ##TODO: Add an error to common parser for settingsNotFound
