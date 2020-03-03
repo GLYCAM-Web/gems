@@ -168,9 +168,11 @@ def buildPdbResponse(thisTransaction : Transaction):
     log.info("buildPdbResponse() was called.\n")
     pUUID = getProjectpUUID(thisTransaction)
     if pUUID is not None:
+        downloadUrl = getDownloadUrl(pUUID, "pdb")
         thisTransaction.response_dict['responses'].append({
             "PreprocessPdbForAmber" : {
-                "payload" : pUUID
+                "payload" : pUUID,
+                "downloadUrl" : downloadUrl
             }
         })
     else:

@@ -106,7 +106,13 @@ def appendBuild3DStructureResponse(thisTransaction : Transaction, pUUID : str):
     if not 'responses' in thisTransaction.response_dict:
         thisTransaction.response_dict['responses']=[]
 
-    thisTransaction.response_dict['responses'].append({'Build3DStructure': {'payload': pUUID }})
+    downloadUrl = getDownloadUrl(pUUID, "cb")
+    thisTransaction.response_dict['responses'].append({
+        'Build3DStructure': {
+            'payload': pUUID ,
+            'downloadUrl': downloadUrl
+        }
+    })
 
 
 ##  Pass a sequence string, get a builder for that sequence.

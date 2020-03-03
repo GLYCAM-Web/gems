@@ -106,7 +106,7 @@ def buildGlycoprotein(thisTransaction):
 ##Pass in a gemsProject and get a responseConfig dict.
 def buildResponseConfig(gemsProject):
     try:
-        downloadUrl = getDownloadUrl(gemsProject.pUUID)
+        downloadUrl = getDownloadUrl(gemsProject.pUUID, "gp")
     except AttributeError as error:
         raise error
     else:
@@ -123,35 +123,7 @@ def buildResponseConfig(gemsProject):
         }
     return config
 
-def getDownloadUrl(pUUID : str):
-    log.info("getDownloadUrl was called.")
-    try:
-        versionsFile = "/website/userdata/VERSIONS.sh"
-        with open(versionsFile) as file:
-            content = file.read()
 
-        siteHostName = getSiteHostName(content)
-
-        url = "http://" + siteHostName + "/json/download/gp/" + pUUID
-        log.debug("url : " + url )
-        return url
-    except AttributeError as error:
-        log.error("Something went wrong building the downloadUrl.")
-        raise error
-
-def getSiteHostName(content):
-    log.info("getSiteHostName was called.")
-    lines = content.split("\n")
-    for line in lines:
-        if 'SITE_HOST_NAME' in line:
-            start = line.index("=") + 1
-            siteHostName = line[start:].replace('"', '')
-            log.debug("siteHostName: " + siteHostName)
-    if siteHostName is not None:
-        return siteHostName
-    else:
-        log.error("Never did find a siteHostName.")
-        raise AttributeError
 
 ##  Writes the file that slurm is expected to run. Returns the sbatchArg needed for submission
 #   @param inputFileName
@@ -183,7 +155,7 @@ def writeGpScript(inputFileName, gemsProject):
         log.error("Error type: " + str(type(error)))
         log.error(traceback.format_exc)
 
-    
+
 
 
 def writeGpInputFile(gemsProject, attachmentSites):

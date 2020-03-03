@@ -197,6 +197,45 @@ def getProjectpUUID(thisTransaction : Transaction):
     return pUUID
 
 
+## Pass a pUUID and an appName, get a download url.
+#   appNames should look like frontend app abbreviations, cb, pdb, gp etc...
+#   @param  pUUID
+#   @param  appName
+def getDownloadUrl(pUUID : str, appName : str):
+    log.info("getDownloadUrl was called.")
+    log.debug("pUUID: " + pUUID)
+    log.debug("appName: " + appName)
+    try:
+        versionsFile = "/website/userdata/VERSIONS.sh"
+        with open(versionsFile) as file:
+            content = file.read()
+
+        siteHostName = getSiteHostName(content)
+
+        url = "http://" + siteHostName + "/json/download/" + appName +"/" + pUUID
+        log.debug("url : " + url )
+        return url
+    except AttributeError as error:
+        log.error("Something went wrong building the downloadUrl.")
+        raise error
+
+##  Intended for use by getDownloadUrl. Content is the text contained in
+#   the versionsFile.
+#   @param content
+def getSiteHostName(content):
+    log.info("getSiteHostName was called.")
+    lines = content.split("\n")
+    for line in lines:
+        if 'SITE_HOST_NAME' in line:
+            start = line.index("=") + 1
+            siteHostName = line[start:].replace('"', '')
+            log.debug("siteHostName: " + siteHostName)
+    if siteHostName is not None:
+        return siteHostName
+    else:
+        log.error("Never did find a siteHostName.")
+        raise AttributeError
+
 def main():
     if len(sys.argv) == 2:
         jsonObjectString = utils.JSON_From_Command_Line(sys.argv)
