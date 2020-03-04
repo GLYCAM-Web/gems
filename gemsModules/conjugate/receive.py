@@ -138,8 +138,6 @@ def writeGpScript(inputFileName, gemsProject):
 
     outputDir = gemsProject.output_dir
     #/programs/GlycoProteinBuilder/bin/ /website/userdata/tools/gp/git-ignore-me_userdata/4f18b278-d9bb-4111-b502-d91945639fa6/ > /website/userdata/tools/gp/git-ignore-me_userdata/4f18b278-d9bb-4111-b502-d91945639fa6/gp.log
-    command = builderPath + " " + outputDir + " > " + outputDir + "/logs/gp.log"
-    log.debug("command: " + command)
     sbatchArg = "gpScript.sh"
     script = outputDir + sbatchArg
     try:
@@ -147,7 +145,7 @@ def writeGpScript(inputFileName, gemsProject):
             file.write("#!/bin/bash\n")
             file.write('GPPATH="' + builderPath + '"\n')
             file.write('WorkDir="' + outputDir + '"\n')
-            file.write('COMMAND="${GPPATH} ${WorkDir} > ${WorkDir}gp.log"\n')
+            file.write('COMMAND="${GPPATH} ${WorkDir} > ${WorkDir}/logs/gp.log"\n')
             file.write('eval ${COMMAND}')
         return sbatchArg
 

@@ -10,24 +10,33 @@
 			"pdb_ID": "2V95"
 		}]
 	},
+	"options": {
+		"json_api_version": "0.0.1"
+	},
 	"project": {
-		"_state": "<django.db.models.base.ModelState object at 0x7faef22f6bd0>",
+		"_state": "<django.db.models.base.ModelState object at 0x7f1ae71fac50>",
 		"user_id": "1",
 		"title": "Untitled project",
-		"timestamp": "2020-02-06 22:30:24.413879+00:00",
-		"id": "37bf599b-689a-4613-a125-433211a38bcc",
+		"timestamp": "2020-03-04 16:18:15.737848+00:00",
+		"id": "190ffc9a-40f8-4982-b834-2e715d670c60",
 		"comment": " ",
 		"type": "pdb",
 		"email": "",
-		"gems_version": "default_gems_version_set_me",
-		"gmml_version": "default_gmml_version_set_me",
-		"ff_version": "default_gmml_version_set_me",
-		"parameter_version": "2014",
-		"amber_version": "default_amber_version_set_me",
+		"gems_version": "f4a243eb101d505df749ab11d314df8f624cf494",
+		"gems_branch": "gems-dev",
+		"gmml_version": "ee0f976fc54a8c49e6680964e8f2758c06f566bf",
+		"gmml_branch": "gmml-dev",
+		"site_mode": "CONTAINERS",
+		"site_host_name": "172.25.0.2",
+		"ff_version": "",
+		"parameter_version": "",
+		"amber_version": "",
+		"json_api_version": "0.0.1",
+		"requesting_agent": "json_api",
 		"root": " ",
-		"project_ptr_id": "37bf599b-689a-4613-a125-433211a38bcc",
-		"uploaded_file_name": "/website/uploads/tools/pdb/git-ignore-me_userdata/4e45bdd2-3529-4743-a932-817f3fc1bd26/1buyForPDBtests.pdb",
-		"u_uuid": "4e45bdd2-3529-4743-a932-817f3fc1bd26",
-		"upload_path": "/website/uploads/tools/pdb/git-ignore-me_userdata/4e45bdd2-3529-4743-a932-817f3fc1bd26/"
+		"project_ptr_id": "190ffc9a-40f8-4982-b834-2e715d670c60",
+		"uploaded_file_name": " ",
+		"u_uuid": "f4fd2642-b6f5-49b3-adbc-7dcc4f23a285",
+		"upload_path": "/website/uploads/tools/pdb/git-ignore-me_userdata/f4fd2642-b6f5-49b3-adbc-7dcc4f23a285/"
 	}
 }

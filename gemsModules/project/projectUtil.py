@@ -20,7 +20,7 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__, logLevel)
 
-##TODO: Refactor for better encapsulation
+##TODO: Add better error handling.
 ##TODO: Use Doxygen-style comments.
 """
 Pass in a transaction, if a frontend project is in the request,
@@ -31,77 +31,97 @@ project.
 """
 def startProject(thisTransaction: Transaction):
     log.info("startProject() was called.\n")
-    ##TODO: Add logic to return errors if things go wrong.
     request = thisTransaction.request_dict
-    keys = request.keys()
-    if 'project' in keys:
-        log.debug("found a project in the request")
-        project = request['project']
-        if '_django_version' in project.keys():
-            log.debug("website project present.")
-            ##The project was requested via web interface
-            gemsProject = buildGemsProject(thisTransaction, "website")
-        else:
-            ##The project was requested via json_api
-            log.debug("Project was requested via json_api")
-            gemsProject = buildGemsProject(thisTransaction, "json_api")
-
-        log.debug("project type: " + gemsProject.project_type)
-
-    else:
-        log.debug("Project needs to be created without the frontend.")
-        gemsProject = buildGemsProject(thisTransaction, "command_line")
-
-    output_dir = thisTransaction.response_dict['gems_project']['output_dir']
-
-    if gemsProject.project_type == "cb":
-        log.debug("cb projects need no input files. skipping.")
-    elif gemsProject.project_type == "pdb":
-        output_dir = copyUploadFiles(thisTransaction)
-    elif gemsProject.project_type == "md":
-        output_dir = copyUploadFiles(thisTransaction)
-    elif gemsProject.project_type == "gp":
-        output_dir = copyUploadFiles(thisTransaction)
-    else:
-        log.error("New project type found. Please add this to projectUtil.py")
-        ##TODO: Need to figure out if upload files are needed for new
-        ## project types.
-
-
-    if not os.path.exists(output_dir):
-        log.debug("creating the output_dir")
-        os.makedirs(output_dir)
-
-    #Start a log file for the project and put it in uUUID dir
-    logs_dir = output_dir + "logs/"
-    if not os.path.exists(logs_dir):
-        log.debug("creating the logs dir in project")
-        os.makedirs(logs_dir)
+    project = getFrontendProjectFromTransaction(thisTransaction)
+    requestingAgent = getRequestingAgentFromTransaction(thisTransaction)
+    gemsProject = buildGemsProject(thisTransaction, requestingAgent)
+    output_dir = getOutputDir(thisTransaction)
+    if gemsProject.hasInputFiles:
+        copyUploadFiles(thisTransaction)
     try:
-        request_file = os.path.join(logs_dir,"request.json")
-        log.debug("request_file: " + request_file)
-        with open(request_file, 'w', encoding='utf-8') as f:
-            json.dump(request, f, ensure_ascii=False, indent=4)
-
-        project_log_file = os.path.join(logs_dir, "project.log")
-        log.debug("project_log_file: " + project_log_file)
-        with open(project_log_file, 'w', encoding='utf-8') as file:
-            log.debug("gemsProject object type: " + str(type(gemsProject)))
-
-            file.write("GEMS Project Log:\n\n")
-            file.write("Project type: " + gemsProject.project_type + "\n")
-            file.write("Status: " + gemsProject.status + "\n")
-            file.write("Timestamp: " + str(gemsProject.timestamp) + "\n")
-            file.write("pUUID: " + gemsProject.pUUID + "\n")
-            file.write("output_dir: " + gemsProject.output_dir)
-
+        logs_dir = setupProjectDirs(output_dir)
+        writeRequestToFile(request, logs_dir)
+        writeProjectLogFile(gemsProject, logs_dir)
     except Exception as error:
         log.error("There was a problem writing the project logs.")
         log.error("Error type: " + str(type(error)))
         log.error(traceback.format_exc())
 
-    log.debug("Transaction: " + str(thisTransaction.__dict__))
+    #log.debug("Transaction: " + str(thisTransaction.__dict__))
     return gemsProject
+
+## Pass in a transaction, figure out the requestingAgent.
+#   Default is command line, replaced if a frontend project exists.
+#   @param transaction
+def getRequestingAgentFromTransaction(thisTransaction: Transaction):
+    log.info("getRequestingAgentFromTransaction() was called.\n")
+    project = getFrontendProjectFromTransaction(thisTransaction)
+    requestingAgent = "command_line"
+    if project is not None:
+        requestingAgent = project['requesting_agent']
+    return requestingAgent
+
+
+##  Pass in a transaction, get the frontend project
+#   @param transaction
+def getFrontendProjectFromTransaction(thisTransaction: Transaction):
+    log.info("getRequestFromTransaction() was called.\n")
+    project = thisTransaction.request_dict['project']
+    return project
+
+##  Pass in a transaction, get the outputDir
+#   @param outputDir
+def getOutputDir(thisTransaction: Transaction):
+    log.info("getOutputDir() was called.\n")
+    output_dir = thisTransaction.response_dict['gems_project']['output_dir']
+     ##Check that the outpur_dir exists. Create it if not.
+    if not os.path.exists (output_dir):
+        log.debug("Creating a output_dir at: " + output_dir)
+        os.makedirs(output_dir)
+    log.debug("output_dir: " + output_dir)
+    return output_dir
+
+##  Creates dirs if needed in preparation for writing files.
+#   @param outputDir
+def setupProjectDirs(outputDir):
+    log.info("setupProjectDirs() was called.\n")
+    if not os.path.exists(outputDir):
+        log.debug("creating the outputDir")
+        os.makedirs(outputDir)
+
+    #Start a log file for the project and put it in uUUID dir
+    logs_dir = outputDir + "logs/"
+    if not os.path.exists(logs_dir):
+        log.debug("creating the logs dir in project")
+        os.makedirs(logs_dir)
+
+    log.debug("logs_dir: " + logs_dir)
+    return logs_dir
+
+
+## Write the original request to file.
+#   @param request
+#   @param logsDir
+def writeRequestToFile(request, logsDir):
+    log.info("writeRequestToFile() was called.\n")
+    requestFileName = os.path.join(logsDir,"request.json")
+    log.debug("requestFileName: " + requestFileName)
+    with open(requestFileName, 'w', encoding='utf-8') as file:
+        json.dump(request, file, ensure_ascii=False, indent=4)
+
+
+## Writes the gems project to file in json format.
+#   @param gemsProject
+#   @param logsDir
+def writeProjectLogFile(gemsProject, logsDir):
+    log.info("writeProjectLogFile() was called.\n")
+    logFileName = gemsProject.project_type + "ProjectLog.json"
+    project_log_file = os.path.join(logsDir, logFileName)
+    log.debug("project_log_file: " + project_log_file)
+    with open(project_log_file, 'w', encoding='utf-8') as file:
+        jsonString = json.dumps(gemsProject.__dict__, indent=4, sort_keys=True, default=str)
+        log.debug("jsonString: \n" + jsonString )
+        file.write(jsonString)
 
 
 ##TODO: Refactor for better encapsulation
@@ -111,15 +131,9 @@ def startProject(thisTransaction: Transaction):
 
 def copyUploadFiles(thisTransaction : Transaction):
     log.info("copyUploadFiles() was called.\n")
-    #Root of entire project
-    output_dir = thisTransaction.response_dict['gems_project']['output_dir']
+    output_dir = getOutputDir(thisTransaction)
     log.debug("output_dir: " + output_dir)
-
-    if not os.path.exists(output_dir):
-        log.debug("creating the output_dir")
-        os.makedirs(output_dir)
-
-    project = thisTransaction.request_dict['project']
+    project = getFrontendProjectFromTransaction(thisTransaction)
     if 'u_uuid' in project.keys():
         uUUID = project['u_uuid']
         uploads_dest_dir = output_dir + "uploads/" + uUUID + "/"
