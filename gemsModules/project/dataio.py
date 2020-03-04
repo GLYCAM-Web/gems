@@ -59,11 +59,9 @@ class GemsProject(BaseModel):
             else:
                 log.error("Received a request for an unknown entity type.")
 
-            projectKeys = request['project'].keys()
-            ##This is meant to be different from the frontend project timestamp.
-            if 'md5sum' in projectKeys:
-                self.md5sum = request['project']['md5sum']
-            if 'type' in projectKeys:
+            if 'md5Sum' in request['project'].keys():
+                self.md5sum = request['project']['md5Sum']
+            if 'type' in request['project'].keys():
                 self.project_type = request['project']['type']
         else:
             log.error("Still developing command_line logic for projects.")
