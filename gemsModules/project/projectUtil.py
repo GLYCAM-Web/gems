@@ -13,7 +13,7 @@ import json, os, sys, uuid
 
 ##TO set logging verbosity for just this file, edit this var to one of the following:
 ## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.ERROR
+logLevel = logging.DEBUG
 
 if loggers.get(__name__):
     pass
@@ -176,6 +176,7 @@ def buildGemsProject(thisTransaction : Transaction, requestingAgent : str):
 #   @param thisTransaction The transaction object provides the requesting agent.
 def cleanGemsProject(thisTransaction : Transaction):
     log.info("cleanGemsProject() was called.\n")
+    log.debug("response_dict.keys(): " + str(thisTransaction.response_dict.keys()))
     if 'gems_project' in thisTransaction.response_dict.keys():
         if "website" == thisTransaction.response_dict['gems_project']['requesting_agent']:
             log.debug("Returning response to website.")
