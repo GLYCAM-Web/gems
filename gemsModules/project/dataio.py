@@ -38,23 +38,18 @@ class GemsProject(BaseModel):
     def buildProject(self, thisTransaction : Transaction, requestingAgent : str):
         log.info("buildProject was called.\n")
         log.debug("requestingAgent: " + requestingAgent)
+        request = thisTransaction.request_dict
         self.requesting_agent = requestingAgent
         self.timestamp = datetime.now()
-        request = thisTransaction.request_dict
+        self.pUUID = str(uuid.uuid4())
 
         if self.requesting_agent != 'command_line':
             ##There will be no frontend project here.
-            if request['entity']['type'] == 'Sequence':
-                self.project_type = "cb"
-            elif request['entity']['type'] == 'MmService':
-                self.project_type = "md"
+            if request['entity']['type'] == 'MmService':
                 self.hasInputFiles = True
             elif request['entity']['type'] == 'Conjugate':
-                self.project_type = "gp"
                 self.hasInputFiles = True
             elif request['entity']['type'] == "StructureFile":
-                projectType = getStructureFileProjectType(request)
-                self.project_type =  projectType
                 self.hasInputFiles = True
             else:
                 log.error("Received a request for an unknown entity type.")
@@ -66,15 +61,10 @@ class GemsProject(BaseModel):
         else:
             log.error("Still developing command_line logic for projects.")
 
-        self.pUUID = str(uuid.uuid4())
-        log.debug("pUUID: " + str(self.pUUID))
-
         self.output_dir = projectSettings.output_data_dir + "tools/" + self.project_type + "/git-ignore-me_userdata/" + self.pUUID + "/"
-        log.debug("output_dir: " + self.output_dir)
 
         ##Check that the outpur_dir exists. Create it if not.
         if not os.path.exists (self.output_dir):
-            log.debug("Creating a output_dir at: " + self.output_dir)
             os.makedirs(self.output_dir)
 
         self.updateTransaction(thisTransaction)

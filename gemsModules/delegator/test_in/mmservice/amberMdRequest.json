@@ -26,6 +26,8 @@
 		"ff_version": "2012xxx",
 		"parameter_version": "2014",
 		"amber_version": "2014xxx",
+		"json_api_version": "0.0.1",
+        "requesting_agent": "json_api",
 		"root": " ",
 		"project_ptr_id": "f2ee0a5f-a940-443e-8f21-a5e0ffeedf85",
 		"system_phase": "in solvent",
