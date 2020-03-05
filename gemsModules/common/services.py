@@ -215,10 +215,10 @@ def appendResponse(thisTransaction, responseConfig):
                 thisTransaction.response_dict['entity'] = {}
                 thisTransaction.response_dict['entity']['type'] = entity
 
-            if 'timestamp' not in thisTransaction.response_dict['entity'].keys():
+            if 'timestamp' not in thisTransaction.response_dict.keys():
                 timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
                 log.debug("timestamp: " + timestamp)
-                thisTransaction.response_dict['entity']['timestamp'] = timestamp
+                thisTransaction.response_dict['timestamp'] = timestamp
 
 
             if 'responses' not in thisTransaction.response_dict.keys():
