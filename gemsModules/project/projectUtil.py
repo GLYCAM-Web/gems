@@ -152,7 +152,7 @@ def getUploadsDestinationDir(project, output_dir):
 def getUploadsSourceDir(project):
     log.info("getUploadsSourceDir() was called.\n")
     uploads_source_dir = project['upload_path']
-     if not os.path.exists(uploads_source_dir):
+    if not os.path.exists(uploads_source_dir):
         raise FileNotFoundError
     else:
         return uploads_source_dir
