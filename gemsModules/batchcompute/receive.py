@@ -59,7 +59,7 @@ def receive(thisTransaction):
                 log.error("services: " + str(conjugateSettings.serviceModules.keys()))
                 appendCommonParserNotice(thisTransaction,'ServiceNotKnownToEntity', requestedService)
             elif requestedService == "BuildGlycoprotein":
-                log.debug("")
+                log.debug("received a request to BuildGlycoprotein.")
             else:
                 log.error("Logic should never reach this point. Look at congugate/receive.py.")
 
