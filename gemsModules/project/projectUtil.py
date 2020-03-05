@@ -20,22 +20,22 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__, logLevel)
 
-##TODO: Add better error handling.
-##TODO: Use Doxygen-style comments.
-"""
-Pass in a transaction, if a frontend project is in the request,
-a GemsProject is created with any relevant data, and the
-transaction is updated with the gemsProject.
-If no frontend project is present, the GemsProject is the only
-project.
-"""
+
+##  Pass in a transaction, if a frontend project is in the request,
+#   a GemsProject is created with any relevant data, and the
+#   transaction is updated with the gemsProject.
+#   If no frontend project is present, the GemsProject is the only
+#   project.
+#   @param transaction
 def startProject(thisTransaction: Transaction):
     log.info("startProject() was called.\n")
+    ##TODO: Add better error handling.
     request = thisTransaction.request_dict
     project = getFrontendProjectFromTransaction(thisTransaction)
     requestingAgent = getRequestingAgentFromTransaction(thisTransaction)
     gemsProject = buildGemsProject(thisTransaction, requestingAgent)
     output_dir = getOutputDir(thisTransaction)
+
     if gemsProject.hasInputFiles:
         try:
             copyUploadFiles(thisTransaction)
@@ -205,11 +205,11 @@ def copyUploadFiles(thisTransaction : Transaction):
         log.error(traceback.format_exc())
         raise error
 
-##TODO: Use Doxygen-style comments.
-"""
-Pass in a transaction and a string indicating what is requesting this project.
-The transaction is updated with any relevant project data.
-"""
+
+##Pass in a transaction and a string indicating what is requesting this project.
+#   The transaction is updated with any relevant project data.
+#   @param transaction
+#   @param requestingAgent
 def buildGemsProject(thisTransaction : Transaction, requestingAgent : str):
     log.info("buildGemsProject() was called.\n")
     gemsProject = GemsProject()
@@ -257,12 +257,7 @@ def getDownloadUrl(pUUID : str, appName : str):
         versionsFile = "/website/userdata/VERSIONS.sh"
         with open(versionsFile) as file:
             content = file.read()
-
         siteHostName = getSiteHostName(content)
-
-        ##Note: It may one day be necessary to edit http to https in production responses.
-        ##      It also may not be necessary. Doing nothing until need arrises.
-
         url = "http://" + siteHostName + "/json/download/" + appName +"/" + pUUID
         log.debug("url : " + url )
         return url
