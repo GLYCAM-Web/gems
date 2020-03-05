@@ -44,21 +44,19 @@ class GemsProject(BaseModel):
         self.pUUID = str(uuid.uuid4())
 
         if self.requesting_agent != 'command_line':
-            ##There will be no frontend project here.
             if request['entity']['type'] == 'MmService':
                 self.hasInputFiles = True
             elif request['entity']['type'] == 'Conjugate':
                 self.hasInputFiles = True
             elif request['entity']['type'] == "StructureFile":
                 self.hasInputFiles = True
-            else:
-                log.error("Received a request for an unknown entity type.")
 
             if 'md5Sum' in request['project'].keys():
                 self.md5sum = request['project']['md5Sum']
             if 'type' in request['project'].keys():
                 self.project_type = request['project']['type']
         else:
+            ##There will be no frontend project here.
             log.error("Still developing command_line logic for projects.")
 
         self.output_dir = projectSettings.output_data_dir + "tools/" + self.project_type + "/git-ignore-me_userdata/" + self.pUUID + "/"
