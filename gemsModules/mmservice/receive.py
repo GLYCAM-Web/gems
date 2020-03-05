@@ -52,7 +52,6 @@ def receive(thisTransaction):
             log.debug("requestedService: " + str(requestedService))
             ##Can we detect if this project has already been started?
             ##  If so, check the status of a job that exists, and start jobs that don't.
-
             if requestedService not in mmSettings.serviceModules.keys():
                 log.error("The requested service is not recognized.")
                 log.error("services: " + str(mmSettings.serviceModules.keys()))

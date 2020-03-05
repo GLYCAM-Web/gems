@@ -37,7 +37,14 @@ def startProject(thisTransaction: Transaction):
     gemsProject = buildGemsProject(thisTransaction, requestingAgent)
     output_dir = getOutputDir(thisTransaction)
     if gemsProject.hasInputFiles:
-        copyUploadFiles(thisTransaction)
+        try:
+            copyUploadFiles(thisTransaction)
+        except Exception as error:
+            log.error("There was a problem uploading the input.")
+            log.error("Error type: " + str(type(error)))
+            log.error(traceback.format_exc())
+            raise error
+
     try:
         logs_dir = setupProjectDirs(output_dir)
         writeRequestToFile(request, logs_dir)
@@ -46,6 +53,7 @@ def startProject(thisTransaction: Transaction):
         log.error("There was a problem writing the project logs.")
         log.error("Error type: " + str(type(error)))
         log.error(traceback.format_exc())
+        raise error
 
     #log.debug("Transaction: " + str(thisTransaction.__dict__))
     return gemsProject
@@ -123,6 +131,31 @@ def writeProjectLogFile(gemsProject, logsDir):
         log.debug("jsonString: \n" + jsonString )
         file.write(jsonString)
 
+##  Pass in a frontend project, and an output_dir, receive the name of the
+#   dir that uploaded input files should be copied too.
+#   @param project
+#   @param output_dir
+def getUploadsDestinationDir(project, output_dir):
+    log.info("getUploadsDestinationDir() was called.\n")
+    u_uuid = project['u_uuid']
+    uploads_dest_dir = output_dir + "uploads/" + u_uuid + "/"
+    log.debug("uploads_dest_dir: " + uploads_dest_dir)
+    if not os.path.exists(uploads_dest_dir):
+        #print("creating the uploads dir")
+        os.makedirs(uploads_dest_dir)
+    return uploads_dest_dir
+
+
+##  Pass a frontend project and get the upload path or an error if
+#   it does not exist.
+#   @param  project
+def getUploadsSourceDir(project):
+    log.info("getUploadsSourceDir() was called.\n")
+    uploads_source_dir = project['upload_path']
+     if not os.path.exists(uploads_source_dir):
+        raise FileNotFoundError
+    else:
+        return uploads_source_dir
 
 ##TODO: Refactor for better encapsulation
 ##  Creates a copy of uploads from the frontend
@@ -133,44 +166,44 @@ def copyUploadFiles(thisTransaction : Transaction):
     log.info("copyUploadFiles() was called.\n")
     output_dir = getOutputDir(thisTransaction)
     log.debug("output_dir: " + output_dir)
-    project = getFrontendProjectFromTransaction(thisTransaction)
-    if 'u_uuid' in project.keys():
-        uUUID = project['u_uuid']
-        uploads_dest_dir = output_dir + "uploads/" + uUUID + "/"
-        log.debug("uploads_dest_dir: " + uploads_dest_dir)
+    try:
+        project = getFrontendProjectFromTransaction(thisTransaction)
+    except Exception as error:
+        log.error("There was a problem finding the frontend project.")
+        log.error("Error type: " + str(type(error)))
+        log.error(traceback.format_exc())
+        raise error
 
-        if not os.path.exists(uploads_dest_dir):
-            #print("creating the uploads dir")
-            os.makedirs(uploads_dest_dir)
-
-        uploads_source_dir = project['upload_path']
+    try:
+        uploads_dest_dir = getUploadsDestinationDir(project, output_dir)
+    except Exception as error:
+        log.error("There was a problem creating the destination for upload files.")
+        log.error("Error type: " + str(type(error)))
+        log.error(traceback.format_exc())
+        raise error
+    try:
+        uploads_source_dir = getUploadsSourceDir(project)
         log.debug("uploads_source_dir: " + uploads_source_dir)
-
-        if not os.path.exists(uploads_source_dir):
-            ##TODO: return the actual error.
-            log.debug("Returning an error. Upload_path indicated, but not present.")
-            pass
-        else:
-            log.debug("Copying upload files to the backend.")
-            uploads_dir = os.fsencode(uploads_source_dir)
-
-            for upload_file in os.listdir(uploads_dir):
-                filename = os.fsdecode(upload_file)
-                log.debug("filename: " + filename)
-
-                source_file = os.path.join(uploads_source_dir, filename)
-                log.debug("file source: " + source_file)
-
-                destination_file = os.path.join(uploads_dest_dir, filename)
-                log.debug("file destination: " + destination_file)
-
-                copyfile(source_file, destination_file)
-    else:
-        log.debug("no uUUID found. May be ok, if there are no uploads needed.")
-        pass
-    return output_dir
-
-
+    except Exception as error:
+        log.error("There was a problem finding the upload files.")
+        log.error("Error type: " + str(type(error)))
+        log.error(traceback.format_exc())
+        raise error
+    try:
+        uploads_dir = os.fsencode(uploads_source_dir)
+        for upload_file in os.listdir(uploads_dir):
+            filename = os.fsdecode(upload_file)
+            log.debug("filename: " + filename)
+            source_file = os.path.join(uploads_source_dir, filename)
+            log.debug("file source: " + source_file)
+            destination_file = os.path.join(uploads_dest_dir, filename)
+            log.debug("file destination: " + destination_file)
+            copyfile(source_file, destination_file)
+    except Exception as error:
+        log.error("There was a problem copying the upload files into the project's output_dir.")
+        log.error("Error type: " + str(type(error)))
+        log.error(traceback.format_exc())
+        raise error
 
 ##TODO: Use Doxygen-style comments.
 """
