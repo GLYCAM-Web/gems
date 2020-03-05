@@ -54,7 +54,9 @@ def preprocessPdbForAmber(thisTransaction):
         log.debug("We have a file with a .pdb extension. Checking for a gemsProject.")
         ##Projects in which pdb preprocessing is jsut a step will already
         ##  have been created.
-        if 'gems_project' not in thisTransaction.response_dict.keys():
+        if thisTransaction.response_dict == None: 
+            gemsProject = startPdbGemsProject(thisTransaction, uploadFileName)
+        elif 'gems_project' not in thisTransaction.response_dict.keys():
             gemsProject = startPdbGemsProject(thisTransaction, uploadFileName)
         
         ##TODO: Check if user has provided optional prepFile and libraries.
@@ -73,11 +75,11 @@ def preprocessPdbForAmber(thisTransaction):
 
         ##Doesn't appear to be used. Do we need this for something?
         seqMap = pdbFile.GetSequenceNumberMapping()
-
-        try:
-            ##Give the output file the same path as the uploaded file, but replace the name.
-            outputDir = thisTransaction.response_dict['gems_project']['output_dir']
-            log.debug("outputDir: " + outputDir)
+        ##Give the output file the same path as the uploaded file, but replace the name.
+        outputDir = getOutputDir(thisTransaction)
+        log.debug("outputDir: " + outputDir)  
+          
+        try:   
             writePdb(pdbFile, outputDir)
         except IOError as error:
             log.error("Failed to write the pdb. Make sure the outputDir exists.")
@@ -89,7 +91,8 @@ def preprocessPdbForAmber(thisTransaction):
             appendCommonParserNotice(thisTransaction, 'InvalidInput' )
         else:
             try:
-                buildPdbResponse(thisTransaction)
+                responseConfig = buildPdbResponseConfig(thisTransaction)
+                appendResponse(thisTransaction, responseConfig)
             except AttributeError as error:
                 log.error("There was a problem building the pdbResponse.")
                 log.error(traceback.format_exc())
@@ -153,21 +156,22 @@ def writePdb(pdbFile, outputDir):
     else:
         raise IOError
 
-## Adds a pdb response to responses. Transaction should have a gems project already.
-##  @param thisTransaction The transaction object that needs a response appended to it.
-def buildPdbResponse(thisTransaction : Transaction):
-    log.info("buildPdbResponse() was called.\n")
-    pUUID = getProjectpUUID(thisTransaction)
-    if pUUID is not None:
-        downloadUrl = getDownloadUrl(pUUID, "pdb")
-        thisTransaction.response_dict['responses'].append({
-            "PreprocessPdbForAmber" : {
-                "payload" : pUUID,
-                "downloadUrl" : downloadUrl
+def buildPdbResponseConfig(thisTransaction : Transaction):
+    log.info("buildPdbResponseConfig() was called.\n")
+    gemsProject = thisTransaction.response_dict['gems_project']
+    downloadUrl = getDownloadUrl(gemsProject['pUUID'], "pdb")
+    config = {
+        "entity" : "StructureFile",
+        "respondingService" : "PreprocessPdbForAmber",
+        "responses" : [
+            {
+                "project_status" : gemsProject['status'],
+                'payload' : gemsProject['pUUID'],
+                'downloadUrl' : downloadUrl
             }
-        })
-    else:
-        raise AttributeError
+        ]
+    }
+    return config
 
 
 ##Returns the filename of a pdb file that is written to the dir you offer.
