@@ -240,7 +240,8 @@ def getProjectpUUID(thisTransaction : Transaction):
         pUUID = thisTransaction.response_dict['gems_project']['pUUID']
     else:
         log.error("Cannot get pUUID from a transaction that has no gems_project.")
-        log.error("thisTransaction: \n" + str(thisTransaction.response_dict.keys()))
+        log.error("thisTransaction's keys: \n" + str(thisTransaction.response_dict.keys()))
+        raise AttributeError
     log.debug("pUUID: " + str(pUUID))
     return pUUID
 

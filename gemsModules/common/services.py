@@ -206,8 +206,8 @@ def appendResponse(thisTransaction, responseConfig):
         appendCommonParserNotice(thisTransaction,'IncompleteResponseError')
 
     if 'responses' in responseConfig.keys():
-        responses = responseConfig['responses']
-        if entity is not None and respondingService is not None and responses is not None:
+        responsesToWrite = responseConfig['responses']
+        if entity is not None and respondingService is not None and responsesToWrite is not None:
             if thisTransaction.response_dict == None:
                 thisTransaction.response_dict = {}
 
@@ -224,7 +224,7 @@ def appendResponse(thisTransaction, responseConfig):
             if 'responses' not in thisTransaction.response_dict.keys():
                 thisTransaction.response_dict['responses'] = []
 
-            for response in responses:
+            for response in responsesToWrite:
                 resource = {respondingService : response }
 
                 thisTransaction.response_dict['responses'].append(resource)

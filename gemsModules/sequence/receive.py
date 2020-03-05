@@ -20,7 +20,7 @@ from . import settings
 
 ##TO set logging verbosity for just this file, edit this var to one of the following:
 ## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.ERROR
+logLevel = logging.DEBUG
 
 if loggers.get(__name__):
     pass
@@ -38,32 +38,116 @@ else:
 def evaluateCondensedSequence(thisTransaction : Transaction, thisService : Service = None):
     log.info("evaluateCondensedSequence() was called.\n")
     sequence = getSequenceFromTransaction(thisTransaction)
-
     #Test that this exists.
     if sequence is None:
         log.error("No sequence found in the transaction.")
         raise AttributeError
     else:
         log.debug("sequence: " + sequence)
-
     builder = getCbBuilderForSequence(sequence)
-    log.debug("builder object type: " + str(type(builder)))
+    valid = builder.GetSequenceIsValid()
+    linkages = getLinkageOptionsFromBuilder(builder)
+    responseConfig = buildEvaluationResponseConfig(valid, linkages)
+    appendResponse(thisTransaction, responseConfig)
+    return valid
 
-    appendEvaluationResponse(thisTransaction, builder)
+
+##  Pass in validation result and linkages, get a responseConfig.
+#   @param valid
+#   @param linkages
+def buildEvaluationResponseConfig(valid, linkages):
+    log.info("buildEvaluationResponseConfig() was called. \n")
+    config = {
+        "entity" : "Sequence",
+        "respondingService" : "SequenceEvaluation",
+        "responses" : [{
+            "type": "Evaluate",
+            "outputs" : [{
+                "SequenceValidation" : {
+                    "SequenceIsValid" : valid
+                }
+            },{
+                "BuildOptions": {
+                    "options" : [
+                        { "Linkages" : linkages }
+                    ]
+                }
+            }]
+        }]
+    }
+
+    return config
+
+def build3dStructureResponseConfig(gemsProject):
+    log.info("build3dStructureResponseConfig() was called.\n")
+    downloadUrl = getDownloadUrl(gemsProject['pUUID'], "cb")
+    config = {
+        "entity" : "Sequence",
+        "respondingService" : "Build3DStructure",
+        "responses" : [{
+            'payload' : gemsProject['pUUID'],
+            'downloadUrl' : downloadUrl
+        }]
+    }
+
+    return config
+##  Give a transaction and pUUID, and this method builds the json response and
+#       appends that to the transaction.
+def appendBuild3DStructureResponse(thisTransaction : Transaction, pUUID : str):
+    log.info("appendBuild3DStructureResonse() was called.\n")
+    if thisTransaction.response_dict is None:
+        thisTransaction.response_dict={}
+    if not 'entity' in thisTransaction.response_dict:
+        thisTransaction.response_dict['entity']={}
+    if not 'type' in thisTransaction.response_dict['entity']:
+        thisTransaction.response_dict['entity']['type']='Sequence'
+    if not 'responses' in thisTransaction.response_dict:
+        thisTransaction.response_dict['responses']=[]
+
+    downloadUrl = getDownloadUrl(pUUID, "cb")
+    thisTransaction.response_dict['responses'].append({
+        'Build3DStructure': {
+            'payload': pUUID ,
+            'downloadUrl': downloadUrl
+        }
+    })
+
+
+##  Pass a cb builder, get linkage options.
+#   @param  builder
+def getLinkageOptionsFromBuilder(builder):
+    log.info("getLinkageOptionsFromBuilder() was called.\n")
+    userOptionsString = builder.GenerateUserOptionsJSON()
+    userOptionsJSON = json.loads(userOptionsString)
+    optionsResponses = userOptionsJSON['responses']
+    for response in optionsResponses:
+        log.debug("response.keys: " + str(response.keys()))
+        if 'Evaluate' in response.keys():
+            linkages = response['Evaluate']['glycosidicLinkages']
+
+    return linkages
 
 
 def build3DStructure(thisTransaction : Transaction, thisService : Service = None):
     log.info("Sequence receive.py build3Dstructure() was called.\n")
     ##TODO: See if a project has already been started first.
     startProject(thisTransaction)
-    pUUID=thisTransaction.response_dict['gems_project']['pUUID']
+    try:
+        pUUID=getProjectpUUID(thisTransaction)
+    except Exception as error:
+        log.error("There was a problem finding the project pUUID.")
+        log.error("Error type: " + str(type(error)))
+        log.error(traceback.format_exc())
+        raise error
 
     sequence = getSequenceFromTransaction(thisTransaction)
 
     if sequence is None:
         raise AttributeError
     else:
-        appendBuild3DStructureResponse(thisTransaction, pUUID)
+        gemsProject = thisTransaction.response_dict['gems_project']
+        responseConfig = build3dStructureResponseConfig(gemsProject)
+        appendResponse(thisTransaction, responseConfig)
 
     builder = getCbBuilderForSequence(sequence)
     outputDir = thisTransaction.response_dict['gems_project']['output_dir']
@@ -93,26 +177,6 @@ def build3DStructure(thisTransaction : Transaction, thisService : Service = None
     cleanGemsProject(thisTransaction)
 
 
-##  Give a transaction and pUUID, and this method builds the json response and
-#       appends that to the transaction.
-def appendBuild3DStructureResponse(thisTransaction : Transaction, pUUID : str):
-    log.info("appendBuild3DStructureResonse() was called.\n")
-    if thisTransaction.response_dict is None:
-        thisTransaction.response_dict={}
-    if not 'entity' in thisTransaction.response_dict:
-        thisTransaction.response_dict['entity']={}
-    if not 'type' in thisTransaction.response_dict['entity']:
-        thisTransaction.response_dict['entity']['type']='Sequence'
-    if not 'responses' in thisTransaction.response_dict:
-        thisTransaction.response_dict['responses']=[]
-
-    downloadUrl = getDownloadUrl(pUUID, "cb")
-    thisTransaction.response_dict['responses'].append({
-        'Build3DStructure': {
-            'payload': pUUID ,
-            'downloadUrl': downloadUrl
-        }
-    })
 
 
 ##  Pass a sequence string, get a builder for that sequence.
@@ -130,49 +194,6 @@ def getCbBuilderForSequence(sequence : str):
     else:
         log.error("Prepfile did not exist at: " + prepfile)
         raise FileNotFoundError
-
-##  Builds the json response based on this builder.
-def appendEvaluationResponse(thisTransaction : Transaction, builder):
-    log.info("appendEvaluationResponse() was called.\n")
-    valid = builder.GetSequenceIsValid()
-    log.debug("valid: " + str(valid))
-    userOptionsString = builder.GenerateUserOptionsJSON()
-    log.debug("userOptions: " + userOptionsString)
-    userOptionsJSON = json.loads(userOptionsString)
-    optionsResponses = userOptionsJSON['responses']
-    for response in optionsResponses:
-        log.debug("response.keys: " + str(response.keys()))
-        if 'Evaluate' in response.keys():
-            linkages = response['Evaluate']['glycosidicLinkages']
-
-            if thisTransaction.response_dict is None:
-                thisTransaction.response_dict={}
-            if not 'entity' in thisTransaction.response_dict:
-                thisTransaction.response_dict['entity']={}
-            if not 'type' in thisTransaction.response_dict['entity']:
-                thisTransaction.response_dict['entity']['type']='Sequence'
-            if not 'responses' in thisTransaction.response_dict:
-                thisTransaction.response_dict['responses']=[]
-
-            log.debug("Creating a response for this sequence.")
-            thisTransaction.response_dict['responses'].append({
-                "SequenceEvaluation" : {
-                    "type": "Evaluate",
-                    "outputs" : [{
-                        "SequenceValidation" : {
-                            "SequenceIsValid" : valid
-                            }
-                        },{
-                        "BuildOptions": {
-                            "options" : [
-                                    { "Linkages" : linkages }
-                                ]
-                            }
-
-                        }
-                    ]
-                }
-            })
 
 ## Give a transaction, get a sequence. Note that if more than one input
 #   contains a "Sequence" key, only the last sequence is returned.
@@ -237,9 +258,9 @@ def receive(thisTransaction : Transaction):
         elif i == 'Build3DStructure':
             log.debug("Build3DStructure service requested from sequence entity.")
             ##first evaluate the requested structure. Only build if valid.
-            evaluateCondensedSequence(thisTransaction, None)
+            valid = evaluateCondensedSequence(thisTransaction, None)
 
-            if checkEvaluationResponseValidity(thisTransaction):
+            if valid:
                 log.debug("Valid sequence. Building default structure.")
                 build3DStructure(thisTransaction, None)
             else:
@@ -251,23 +272,24 @@ def receive(thisTransaction : Transaction):
     thisTransaction.build_outgoing_string()
 
 
-##  Looks at a transaction object to see if an evalutaion response exists and returns a boolean.
-def checkEvaluationResponseValidity(thisTransaction):
-    log.info("checkEvaluationResponseValidity() was called.\n")
-    valid = False
-    responses = thisTransaction.response_dict['responses']
-    for response in responses:
-        log.debug("response: " + str(response))
-        if 'SequenceEvaluation' in response.keys():
-            if response['SequenceEvaluation']['type'] == "Evaluate":
-                outputs = response['SequenceEvaluation']['outputs']
-                for output in outputs:
-                    log.debug("output: " + str(output))
-                    if "SequenceValidation" in output.keys():
-                        valid = output['SequenceValidation']['SequenceIsValid']
-        else:
-            raise AttributeError
-    return valid
+# ##  Looks at a transaction object to see if an evalutaion response exists and returns a boolean.
+# def checkEvaluationResponseValidity(thisTransaction):
+#     log.info("checkEvaluationResponseValidity() was called.\n")
+#     valid = False
+#     log.debug("transactionResponses")
+#     responses = thisTransaction.response_dict['responses']
+#     for response in responses:
+#         log.debug("response: " + str(response))
+#         if 'SequenceEvaluation' in response.keys():
+#             if response['SequenceEvaluation']['type'] == "Evaluate":
+#                 outputs = response['SequenceEvaluation']['outputs']
+#                 for output in outputs:
+#                     log.debug("output: " + str(output))
+#                     if "SequenceValidation" in output.keys():
+#                         valid = output['SequenceValidation']['SequenceIsValid']
+#         else:
+#             raise AttributeError
+#     return valid
 
 ##TODO: Look into deprecating this method. Evaluate does what this does and more.
 ##Validate can potentially handle multiple sequences. Top level iterates and
