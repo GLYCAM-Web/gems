@@ -13,14 +13,10 @@ import gems_grpc_slurm_pb2_grpc
 
 from gemsModules.common.loggingConfig import *
 
-##TO set logging verbosity for just this file, edit this var to one of the following:
-## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.INFO
-
 if loggers.get(__name__):
     pass
 else:
-    log = createLogger(__name__, logLevel)
+    log = createLogger(__name__)
 
 
 brief_to_code = {

@@ -18,14 +18,10 @@ from gemsModules.common.transaction import * # might need whole file...
 from gemsModules.common.loggingConfig import *
 from . import settings
 
-##TO set logging verbosity for just this file, edit this var to one of the following:
-## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.ERROR
-
 if loggers.get(__name__):
     pass
 else:
-    log = createLogger(__name__, logLevel)
+    log = createLogger(__name__)
 
 
 ##Evaluating a sequence requires a sequence string and a path to a prepfile.
@@ -151,7 +147,7 @@ def build3DStructure(thisTransaction : Transaction, thisService : Service = None
 
     builder = getCbBuilderForSequence(sequence)
     outputDir = thisTransaction.response_dict['gems_project']['output_dir']
-    log.info("outputDir: " + outputDir)
+    log.debug("outputDir: " + outputDir)
     destination = outputDir + 'structure'
     log.debug("destination: " + destination)
     builder.GenerateSingle3DStructure(destination)

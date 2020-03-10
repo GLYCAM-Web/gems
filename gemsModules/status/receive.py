@@ -8,14 +8,10 @@ from . import settings
 from . import statusResponse
 import traceback
 
-##TO set logging verbosity for just this file, edit this var to one of the following:
-## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.ERROR
-
 if loggers.get(__name__):
     pass
 else:
-    log = createLogger(__name__, logLevel)
+    log = createLogger(__name__)
 
 def receive(thisTransaction : Transaction):
     log.info("receive() was called.\n")

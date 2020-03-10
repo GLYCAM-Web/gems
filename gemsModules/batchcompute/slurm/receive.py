@@ -7,14 +7,10 @@ import traceback
 from gemsModules.batchcompute.slurm.dataio import *
 from gemsModules.common.loggingConfig import *
 
-##TO set logging verbosity for just this file, edit this var to one of the following:
-## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.ERROR
-
 if loggers.get(__name__):
     pass
 else:
-    log = createLogger(__name__, logLevel)
+    log = createLogger(__name__)
 
 def submit(thisSlurmJobInfo):
     log.debug("submit() was called.\n")

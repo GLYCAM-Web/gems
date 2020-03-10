@@ -8,14 +8,10 @@ import gems_grpc_slurm_pb2_grpc
 
 from gemsModules.common.loggingConfig import *
 
-##TO set logging verbosity for just this file, edit this var to one of the following:
-## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.ERROR
-
 if loggers.get(__name__):
     pass
 else:
-    log = createLogger(__name__, logLevel)
+    log = createLogger(__name__)
 
 
 class GemsGrpcSlurmClient():
@@ -25,7 +21,7 @@ class GemsGrpcSlurmClient():
 
     def run(self):
 
-        log.info("gRPC Slurm client called")
+        log.info("gRPC Slurm client called.\n")
         theHost=os.environ.get('GEMS_GRPC_SLURM_HOST')
         log.debug("the host is:  " + theHost)
         if theHost is None:

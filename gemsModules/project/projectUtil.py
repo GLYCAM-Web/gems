@@ -11,14 +11,10 @@ from datetime import datetime
 
 import json, os, sys, uuid
 
-##TO set logging verbosity for just this file, edit this var to one of the following:
-## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.ERROR
-
 if loggers.get(__name__):
     pass
 else:
-    log = createLogger(__name__, logLevel)
+    log = createLogger(__name__)
 
 
 ##  Pass in a transaction, if a frontend project is in the request,
@@ -251,7 +247,7 @@ def getProjectpUUID(thisTransaction : Transaction):
 #   @param  pUUID
 #   @param  appName
 def getDownloadUrl(pUUID : str, appName : str):
-    log.info("getDownloadUrl was called.")
+    log.info("getDownloadUrl was called.\n")
     log.debug("pUUID: " + pUUID)
     log.debug("appName: " + appName)
     try:
@@ -270,7 +266,7 @@ def getDownloadUrl(pUUID : str, appName : str):
 #   the versionsFile.
 #   @param content
 def getSiteHostName(content):
-    log.info("getSiteHostName was called.")
+    log.info("getSiteHostName was called.\n")
     lines = content.split("\n")
     for line in lines:
         if 'SITE_HOST_NAME' in line:

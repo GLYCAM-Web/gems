@@ -3,14 +3,10 @@ from gemsModules.common.loggingConfig import *
 from gemsModules.common.loggingConfig import *
 from . import conf
 
-##TO set logging verbosity for just this file, edit this var to one of the following:
-## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.ERROR
-
 if loggers.get(__name__):
     pass
 else:
-    log = createLogger(__name__, logLevel)
+    log = createLogger(__name__)
 
 class Amber_Job:
     def __init__(self, json_dict):
