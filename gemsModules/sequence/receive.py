@@ -152,6 +152,8 @@ def build3DStructure(thisTransaction : Transaction, thisService : Service = None
     log.debug("destination: " + destination)
     builder.GenerateSingle3DStructure(destination)
 
+## This needs to move - Sequence should not be deciding how 
+## minimization will happen.  That is the job of mmservice.
     amberSubmissionJson='{"project" : \
     {\
     "id":"' + pUUID + '", \
@@ -169,6 +171,9 @@ def build3DStructure(thisTransaction : Transaction, thisService : Service = None
 
     from gemsModules.mmservice.amber.amber import manageIncomingString
     manageIncomingString(amberSubmissionJson)
+## everything up to here -- all the amber stuff --
+## is what needs to move
+
 
     cleanGemsProject(thisTransaction)
 

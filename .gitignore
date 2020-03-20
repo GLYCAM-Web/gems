@@ -14,5 +14,7 @@ gemsModules/Docs/html
 *.swp
 *~
 *git-ignore-me*
+Doxygen/html
+Doxygen/docs_build.log
 
 testing*
