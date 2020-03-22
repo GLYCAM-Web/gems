@@ -46,50 +46,91 @@ def delegate(jsonObjectString):
         log.error("The requested entity is CommonServices, so something must have gone wrong.")
         log.error("I'm returning that oject. as-is.  Delegator cannot delegate to CommonServices.")
         return jsonObjectString
-    # See if it is possible to load a module for the requested Entity
-    theEntity = importEntity(entityType)
-    log.debug("theEntity: " + str(theEntity))
 
-    if theEntity is None:
-        log.error("there was no entity to call.  bailing")
-        appendCommonParserNotice(thisTransaction,'NoEntityDefined')
-    elif not 'services' in thisTransaction.request_dict['entity'].keys():
-        ## If no service is requested in the json object, do the default service.
-        log.debug("No service defined in the request. Calling the default service")
-        theEntity.receive.doDefaultService(thisTransaction)
+
+    ### See if it is possible to load a module for the requested Entity
+    try:
+        theEntity = importEntity(entityType)
+        log.debug("theEntity: " + str(theEntity))
+    except Exception as error:
+        error_msg = "There was a problem importing the entity."
+        log.error(error_msg)
+        log.error("Error type: " + str(type(error)))
+        appendCommonParserNotice(thisTransaction, error_msg)
     else:
-        ## This is where specific requested services are called.
-        theEntity.receive.receive(thisTransaction)
+        ##Figure out what service to do.
+        try:
+            if theEntity is None:
+                log.error("there was no entity to call.  bailing")
+                appendCommonParserNotice(thisTransaction,'NoEntityDefined')
+            elif not 'services' in thisTransaction.request_dict['entity'].keys():
+                ## If no service is requested in the json object, do the default service.
+                log.debug("No service defined in the request. Calling the default service")
+                theEntity.receive.doDefaultService(thisTransaction)
+            else:
+                ## This is where specific requested services are called.
+                theEntity.receive.receive(thisTransaction)
+        except Exception as error:
+            error_msg = "There was a problem determining which service to do."
+            log.error("Error type: " + str(type(error)))
+            appendCommonParserNotice(thisTransaction, error_msg)
 
-    ##Set the json_api_version in the response_dict.
-    if thisTransaction.response_dict is None:
-        thisTransaction.response_dict = {}
-    if 'json_api_version' not in thisTransaction.response_dict.keys():
-        thisTransaction.response_dict['json_api_version'] = getJsonApiVersion()
-    if 'response_timestamp' not in thisTransaction.response_dict.keys():
-        thisTransaction.response_dict['response_timestamp'] = str(datetime.now())
+        ##Set the json_api_version in the response_dict.
+        try:
+            setResponseApiVersion(thisTransaction)
+        except Exception as error:
+            error_msg  = "There was a problem setting the response JSON API version."
+            log.error(error_msg)
+            log.error("Error type: " + str(type(error)))
+            appendCommonParserNotice(thisTransaction, error_msg)
+        else:
+            ##Set the response timestamp.
+            setResponseTimestamp(thisTransaction)
+            
+            ## Set the response site host.
+            setResponseSiteHost(thisTransaction)
+
+            ## Build outgoing string or error.
+            log.debug("The resquest dict is:  \n" + str(thisTransaction.request_dict) + "\n")
+            log.debug("The response dict is:  \n" + str(thisTransaction.response_dict) + "\n")
+            if thisTransaction.outgoing_string is None:
+                log.debug("An outgoing string does not already exist.  About to build one.")
+                try:
+                    thisTransaction.build_outgoing_string()
+                except Exception as error:
+                    error_msg = "There was a problem building the outgoing string."
+                    log.error(error_msg)
+                    log.error("Error type: " + str(type(error)))
+                    appendCommonParserNotice(thisTransaction, error_msg)
+
+
+    # Return whatever outgoing string was made
+    log.debug("About to return whatever output I have at this point.")
+    return thisTransaction.outgoing_string
+
+def setResponseSiteHost(thisTransaction):
+    log.info("setResponseSiteHost() was called.\n")
     if 'site_host_name' not in thisTransaction.response_dict.keys():
         if 'site_host_name' in thisTransaction.request_dict.keys():
             thisTransaction.response_dict['site_host_name'] = thisTransaction.request_dict['site_host_name']
 
+def setResponseTimestamp(thisTransaction):
+    log.info("setResponseTimestamp() was called.\n")
+    if 'response_timestamp' not in thisTransaction.response_dict.keys():
+        thisTransaction.response_dict['response_timestamp'] = str(datetime.now())
 
-    ## Check to see if an outgoing string got built.  If not, try to
-    ## build one.  If that still doesn't work, make the string be a
-    ## generic error output JSON object.
-    log.debug("Most of the work is finished now.  About to build the response, if not already built.")
-    log.debug("The resquest dict is:  \n" + str(thisTransaction.request_dict) + "\n")
-    log.debug("The response dict is:  \n" + str(thisTransaction.response_dict) + "\n")
-    if thisTransaction.outgoing_string is None:
-        log.debug("An outgoing string does not already exist.  About to build one.")
-        thisTransaction.build_outgoing_string()
-    if thisTransaction.outgoing_string is None:
-        ## TODO:  write this function....
-        log.debug("An outgoing string STILL does not exist.  About to build an error response.")
-        thisTransaction.build_general_error_output()
 
-    # Return whatever outgoing string got made
-    log.debug("About to return whatever output I have at this point.")
-    return thisTransaction.outgoing_string
+def setResponseApiVersion(thisTransaction):
+    log.info("setResponseApiVersion() was called.\n")
+    if thisTransaction.response_dict is None:
+        thisTransaction.response_dict = {}
+    if 'json_api_version' not in thisTransaction.response_dict.keys():
+        try:
+            thisTransaction.response_dict['json_api_version'] = getCurrentStableJsonApiVersion()
+        except Exception as error:
+            log.error("There was a problem getting the current stable json api version.")
+            raise error
+    
 
 def doDefaultService(thisTransaction):
     """This might not be necessary... """

@@ -22,21 +22,33 @@ else:
 
 verbosity=common.utils.gems_environment_verbosity()
 
+
+##  Pass in the name of an entity, receive a module or an error.
 def importEntity(requestedEntity):
     log.info("importEntity() was called.\n")
     log.debug("requestedEntity: " + requestedEntity)
     log.debug("Entities known to Common Services: " + str(subEntities))
 
-    requestedModule = '.' + subEntities[requestedEntity]
-    log.debug("requestedModule: " + requestedModule)
+    try:
+        requestedModule = '.' + subEntities[requestedEntity]
+        log.debug("requestedModule: " + requestedModule)
+    except Exception as error:
+        log.error("There was a problem finding the requested entity. Does it exist? requestedEntity: " + requestedEntity)
+        raise error
+    else:
+        try:
+            module_spec = importlib.util.find_spec(requestedModule,package="gemsModules")
+        except Exception as error:
+            log.error("There was a problem importing the requested module.")
+            raise error
+        else:
 
-    module_spec = importlib.util.find_spec(requestedModule,package="gemsModules")
-    if module_spec is None:
-        log.error("The module spec returned None for rquestedEntity: " + requestedEntity)
-        return None
+            if module_spec is None:
+                log.error("The module spec returned None for rquestedEntity: " + requestedEntity)
+                raise FileNotFoundError(requestedEntity)
 
-    log.debug("module_spec: " + str(module_spec))
-    return importlib.import_module(requestedModule,package="gemsModules")
+            log.debug("module_spec: " + str(module_spec))
+            return importlib.import_module(requestedModule,package="gemsModules")
 
 def parseInput(thisTransaction):
     log.info("parseInput() was called.\n")
@@ -145,8 +157,8 @@ def returnHelp(requestedEntity,requestedHelp):
   return thisHelp
 
 ##  Looks at currentStableSchema file and returns the version it finds there.
-def getJsonApiVersion():
-    log.info("getJsonApiVersion() was called.\n")
+def getCurrentStableJsonApiVersion():
+    log.info("getCurrentStableJsonApiVersion() was called.\n")
     currentStableSchema = getGemsHome() + "/gemsModules/Schema/currentStableSchema"
     try:
         with open(currentStableSchema) as schemaFile:
@@ -154,7 +166,9 @@ def getJsonApiVersion():
         log.debug("json_api_version: " + version)
     except Exception as error:
         log.error("Failed to read the currentStableSchema file.")
-    return version
+        raise error
+    else:
+        return version
 
 ##  Looks for an environment var with GEMSHOME and returns it.
 def getGemsHome():
