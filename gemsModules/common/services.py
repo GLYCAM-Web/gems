@@ -63,45 +63,21 @@ def parseInput(thisTransaction):
     log.debug("thisTransaction.request_dict: " + str(thisTransaction.request_dict))
 
     # Check to see if there are errors.  If there are, bail, but give a reason
-    #
-    ## TODO:  This will break really easily.  The 'response' part needs to refer to the
-    ## response from this activity rather than the zeroth response.  That said, at this
-    ## point, the response will usually be the zeroth one.
-    ## A construction maybe like:  if ('X','Y') in this.big.object.items():
     if thisTransaction.request_dict is None:
         appendCommonParserNotice(thisTransaction,'JsonParseError')
-        return thisTransaction.response_dict['entity']['responses'][0]['notices']['code']
+        raise AttributeError("request_dict")
     try:
         TransactionSchema(**thisTransaction.request_dict)
-    except ValidationError as e:
-        # TODO : Add these to the error/verbosity thing
-        log.error("Validation Error.")
-        log.error(e.json())
-        log.error(e.errors())
-        log.error(traceback.format_exc())
-        if 'entity' in e.errors()[0]['loc']:
-            if 'type' in e.errors()[0]['loc']:
-                log.error("Type present, but unrecognized.")
-                log.error(thisTransaction.request_dict['entity']['type'])
-                log.error(str(listEntities()))
-                appendCommonParserNotice(thisTransaction,'EntityNotKnown')
-            else:
-
-                print("No 'type' present. Appending common parser notice.")
-                appendCommonParserNotice(thisTransaction,'NoEntityDefined')
-
-        theResponseTypes = getTypesFromList(thisTransaction.response_dict['entity']['responses'])
-        log.debug(theResponseTypes)
-        return theResponseTypes.count('error')
     except Exception as error:
         log.error("There was an error parsing transaction.request_dict.")
         log.error("Error type : " + str(type(error)))
         log.error(traceback.format_exc())
-
-    # If still here, load the data into a Transaction object and return success
-    thisTransaction.transaction_in = jsonpickle.decode(thisTransaction.incoming_string)
-    log.debug("thisTransaction.transaction_in: " + str(thisTransaction.transaction_in))
-    return 0
+        raise error
+    else:
+        # If still here, load the data into a Transaction object and return success
+        thisTransaction.transaction_in = jsonpickle.decode(thisTransaction.incoming_string)
+        log.debug("thisTransaction.transaction_in: " + str(thisTransaction.transaction_in))
+        return 0
 
 def marco(requestedEntity):
     log.info("marco() was called.\n")
@@ -184,6 +160,7 @@ def getGemsHome():
           BASH:  export GEMSHOME=/path/to/gems
           SH:    setenv GEMSHOME /path/to/gems
         """)
+        raise AttributeError("GEMSHOME")
     return GEMSHOME
 
 ##  Give a transaction, return its requested entity type

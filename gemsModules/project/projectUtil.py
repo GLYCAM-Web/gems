@@ -77,13 +77,18 @@ def getFrontendProjectFromTransaction(thisTransaction: Transaction):
 #   @param outputDir
 def getOutputDir(thisTransaction: Transaction):
     log.info("getOutputDir() was called.\n")
-    output_dir = thisTransaction.response_dict['gems_project']['output_dir']
-     ##Check that the outpur_dir exists. Create it if not.
-    if not os.path.exists (output_dir):
-        log.debug("Creating a output_dir at: " + output_dir)
-        os.makedirs(output_dir)
-    log.debug("output_dir: " + output_dir)
-    return output_dir
+    try:
+        output_dir = thisTransaction.response_dict['gems_project']['output_dir']
+    except Exception as error:
+        log.error("There was a problem geting the output_dir from the response_dict.")
+        raise error
+    else:
+        ##Check that the outpur_dir exists. Create it if not.
+        if not os.path.exists (output_dir):
+            log.debug("Creating a output_dir at: " + output_dir)
+            os.makedirs(output_dir)
+        log.debug("output_dir: " + output_dir)
+        return output_dir
 
 ##  Creates dirs if needed in preparation for writing files.
 #   @param outputDir

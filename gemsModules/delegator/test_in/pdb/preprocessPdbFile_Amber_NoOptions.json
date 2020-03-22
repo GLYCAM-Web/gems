@@ -3,24 +3,24 @@
 		"type": "StructureFile",
 		"services": [{
 			"Preprocess": {
-				"type": "Preprocess"
+				"type": "PreprocessPdbForAmber"
 			}
 		}],
 		"inputs": [{
 			"pdb_file_name": "1buy.pdb"
 		}]
 	},
-	"options": [{
+	"options": {
 		"preprocessor_options": {
 			"targetModule": "amber"
 		}
-	}],
+	},
 	"project": {
-		"_state": "<django.db.models.base.ModelState object at 0x7f6e2eb4af90>",
+		"_state": "<django.db.models.base.ModelState object at 0x7f6e2eada310>",
 		"user_id": "1",
 		"title": "",
-		"timestamp": "2020-03-22 17:38:20.300634+00:00",
-		"id": "2f589277-377e-438f-9edd-c19a77ec23b7",
+		"timestamp": "2020-03-22 21:01:55.706037+00:00",
+		"id": "d3c9a119-ebb4-402f-bd5a-3e1fbb00ecd0",
 		"comment": "",
 		"type": "pdb",
 		"email": "",
@@ -35,11 +35,11 @@
 		"amber_version": "",
 		"json_api_version": "0.0.1",
 		"requesting_agent": "website",
-		"root": "2f589277-377e-438f-9edd-c19a77ec23b7",
-		"project_ptr_id": "2f589277-377e-438f-9edd-c19a77ec23b7",
+		"root": "d3c9a119-ebb4-402f-bd5a-3e1fbb00ecd0",
+		"project_ptr_id": "d3c9a119-ebb4-402f-bd5a-3e1fbb00ecd0",
 		"uploaded_file_name": "1buy.pdb",
-		"u_uuid": "8eed9985-bf9d-49b9-84ce-5d64882d1ba7",
-		"upload_path": "/website/uploads/tools/pdb/git-ignore-me_userdata/8eed9985-bf9d-49b9-84ce-5d64882d1ba7/",
+		"u_uuid": "d02b2b47-93d7-425b-bcc4-8d00408c3a30",
+		"upload_path": "/website/uploads/tools/pdb/git-ignore-me_userdata/d02b2b47-93d7-425b-bcc4-8d00408c3a30/",
 		"pdb_id": " ",
 		"toolDir": "/website/userdata/tools/pdb",
 		"path": "/pdb/media",

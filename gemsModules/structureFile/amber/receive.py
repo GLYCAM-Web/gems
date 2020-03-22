@@ -27,19 +27,19 @@ def preprocessPdbForAmber(thisTransaction):
     requestDict = thisTransaction.request_dict
     entity = getEntityType(thisTransaction)
     log.debug("requestDict: \n" + str(json.dumps(requestDict, indent=2, sort_keys=False)))
-    gemsHome = getGemsHome()
-    log.debug("gemsHome: " + gemsHome)
+    
+    ### Grab the pdb input.
     try:
-        uploadFileName = getUploadedFileNameFromTransaction(thisTransaction)
+        uploadFileName = getInput(thisTransaction)
         log.debug("uploadFileName: " + uploadFileName)
     except Exception as error:
         log.error("There was a problem finding the uploadFileName in the transaction.")
         log.error("Error type: " + str(type(error)))
-        log.errror(traceback.format_exc())
+        log.error(traceback.format_exc())
         appendCommonParserNotice(thisTransaction, 'InvalidInput' )
         return
-    ##TODO: find a better way to verify that a file is a pdb file, as some may
-    ##  legitimately not have the .pdb extension.
+    
+    ### Check for a .pdb file extension.
     if not hasPdbExtension(uploadFileName):
         noticeBrief = "For now, pdb files must have the .pdb extension. May change later."
         log.error(noticeBrief)
@@ -55,47 +55,92 @@ def preprocessPdbForAmber(thisTransaction):
         elif 'gems_project' not in thisTransaction.response_dict.keys():
             gemsProject = startPdbGemsProject(thisTransaction, uploadFileName)
         
+        try:
+            pdbFile = generatePdbOutput(uploadFileName)
+        except Exception as error:
+            log.error("There was a problem generating the PDB output.")
+        else:
+        
+            try:
+                ### Write the output
+                writePdbOutput(thisTransaction, pdbFile)
+            except Exception as error:
+                log.error("There was a problem writing the pdb output.")
+            else:
+                ##Remove gemsProject if user agent is not website.
+                cleanGemsProject(thisTransaction) 
+
+##  Pass in an uploadFileName and get a new, preprocessed pdbFile object, 
+#       ready to be written to file.
+#   @param uploadFileName
+def generatePdbOutput(uploadFileName):
+    log.info("generatePdbOutput() was called.\n")
+    try:
+        gemsHome = getGemsHome()
+        log.debug("gemsHome: " + gemsHome)
+    except Exception as error:
+        log.error("There was a problem getting GEMSHOME.")
+        raise error
+    else:
         ##TODO: Check if user has provided optional prepFile and libraries.
-        ##TODO: Error handling needed here.
         aminoLibs = getDefaultAminoLibs(gemsHome)
+        prepFile = getDefaultPrepFile(gemsHome)
         glycamLibs = gmml.string_vector()
         otherLibs = gmml.string_vector()
-        prepFile = getDefaultPrepFile(gemsHome)
+        preprocessor = gmml.PdbPreprocessor()
 
         #PDB file object:
         pdbFile = gmml.PdbFile(uploadFileName)
 
-        preprocessor = gmml.PdbPreprocessor()
-        preprocessor.Preprocess(pdbFile, aminoLibs, glycamLibs, otherLibs, prepFile)
-        preprocessor.ApplyPreprocessingWithTheGivenModelNumber(pdbFile, aminoLibs, glycamLibs, prepFile)
+        try:
+            ### Preprocess
+            preprocessor.Preprocess(pdbFile, aminoLibs, glycamLibs, otherLibs, prepFile)
+        except Exception as error:
+            log.error("There was a problem preprocessing with gmml.")
+            raise error
+        else:
+            try:
+                ### Apply preprocessing
+                preprocessor.ApplyPreprocessingWithTheGivenModelNumber(pdbFile, aminoLibs, glycamLibs, prepFile)
+            except:
+                log.error("There was a problem applying the preprocessing.")
+                raise error
+            else:
+                ##Get the sequence mapping.
+                try:
+                    seqMap = pdbFile.GetSequenceNumberMapping()
+                    log.debug("seqMap: " + str(seqMap))
+                except Exception as error:
+                    log.error("Therre was a problem getting the sequence mapping.")
+                    raise error
 
-        ##Doesn't appear to be used. Do we need this for something?
-        seqMap = pdbFile.GetSequenceNumberMapping()
-        ##Give the output file the same path as the uploaded file, but replace the name.
+def writePdbOutput(thisTransaction, pdbFile):
+    log.info("writePdbOutput() was called.\n")
+    ### Give the output file the same path as the uploaded file, but replace the name.
+    try:
         outputDir = getOutputDir(thisTransaction)
         log.debug("outputDir: " + outputDir)  
-          
+    except Exception as error:
+        log.error("There was a problem getting the output dir from the transaction.")
+        raise error
+    else:
+
+        ### Write the file
         try:   
             writePdb(pdbFile, outputDir)
-        except IOError as error:
-            log.error("Failed to write the pdb. Make sure the outputDir exists.")
         except Exception as error:
-            noticeBrief = "There was an error writing the pdb file."
-            log.error(noticeBrief)
-            log.error("Error type: " + str(type(error)))
-            log.error(traceback.format_exc())
-            appendCommonParserNotice(thisTransaction, 'InvalidInput' )
+            log.error("There was an error writing the pdb file.")
+            raise error        
         else:
+
+            ### Build a response
             try:
                 responseConfig = buildPdbResponseConfig(thisTransaction)
                 appendResponse(thisTransaction, responseConfig)
-            except AttributeError as error:
+            except Exception as error:
                 log.error("There was a problem building the pdbResponse.")
-                log.error(traceback.format_exc())
-                appendCommonParserNotice(thisTransaction, 'InvalidInput' )
-            else:
-                ##Remove gemsProject if user agent is not website.
-                cleanGemsProject(thisTransaction)
+                raise error
+                           
 
 
 ##  Simple. Maybe too simple. Pass a string, if it contains .pdb, returns true. Else false.
@@ -110,12 +155,10 @@ def hasPdbExtension(filename : str):
 ##  Looks for a project in the transaction,
 #       checks for either a pdb file or pdbID.
 #   @param thisTransaction
-def getUploadedFileNameFromTransaction(thisTransaction : Transaction):
-    log.info("getUploadedFileNameFromTransaction() was called.\n")
+def getInput(thisTransaction : Transaction):
+    log.info("getInput() was called.\n")
     if 'inputs' in thisTransaction.request_dict['entity'].keys():
-        log.debug("found inputs")
         inputs = thisTransaction.request_dict['entity']['inputs']
-        uploadFileName = ""
         project = thisTransaction.request_dict['project']
         for element in inputs:
             log.debug("element: " + str(element))
@@ -123,17 +166,23 @@ def getUploadedFileNameFromTransaction(thisTransaction : Transaction):
             if "pdb_file_name" in element.keys():
                 log.debug("looking for the attached pdb file.")
                 uploadFileName = getUploadFileName(project)
-            elif uploadFileName == "" and "pdb_ID" in element.keys():
+                return uploadFileName
+            else:
+                ##Look for a pdb ID to sideload.
                 log.debug("Side-loading pdb from rcsb.org.")
                 pdbID = element['pdb_ID']
                 uploadDir = project['upload_path']
-                uploadFileName = sideloadPdbFromRcsb(pdbID, uploadDir)
-            log.debug("returning uploadFileName: " + uploadFileName)
-            return uploadFileName
+                try:
+                    uploadFileName = sideloadPdbFromRcsb(pdbID, uploadDir)
+                except Exception as error:
+                    log.error("There was a problem sideloading the pdb from the RCSB.")
+                    raise error
+                else:
+                    log.debug("returning uploadFileName: " + uploadFileName)
+                    return uploadFileName
     else:
-
         log.error("No inputs found in request.")
-        raise AttributeError
+        raise AttributeError("inputs")
 
 
 
@@ -179,28 +228,37 @@ def sideloadPdbFromRcsb(pdbID, uploadDir):
 
     ##Sideload pdb from rcsb.org
     pdbID = pdbID.upper()
+    log.debug("pdbID: " + pdbID)
+
     rcsbURL = "https://files.rcsb.org/download/" + pdbID + ".pdb1"
     log.debug("rcsbURL: " + rcsbURL)
-    with urllib.request.urlopen(rcsbURL) as response:
-        contentBytes = response.read()
+    try:
+        with urllib.request.urlopen(rcsbURL) as response:
+            contentBytes = response.read()
+    except Exception as error:
+        log.error("There was a problem sideloading the requested pdb from RCSB.")
+        raise error
+    else:
 
-    contentString = str(contentBytes, 'utf-8')
-    log.debug("Response content object type: " + str(type(contentString)))
-    #log.debug("Response content: \n" + str(contentString))
-    ##Get the uploads dir
-    log.debug("uploadDir: " + uploadDir)
-    if not os.path.exists(uploadDir):
-        pathlib.Path(uploadDir).mkdir(parents=True, exist_ok=True)
+        contentString = str(contentBytes, 'utf-8')
+        log.debug("Response content object type: " + str(type(contentString)))
+        #log.debug("Response content: \n" + str(contentString))
+        ##Get the uploads dir
+        log.debug("uploadDir: " + uploadDir)
+        if not os.path.exists(uploadDir):
+            pathlib.Path(uploadDir).mkdir(parents=True, exist_ok=True)
 
-    uploadFileName = uploadDir  + pdbID + ".pdb"
-
-    log.debug("uploadFileName: " + uploadFileName)
-    ##Save the string to file in the uploads dir.
-    with open(uploadFileName, "w") as uploadFile:
-        uploadFile.write(contentString)
-
-    log.debug("Finished side-loading pdb from rcsb.org.")
-    return uploadFileName
+        uploadFileName = uploadDir  + pdbID + ".pdb"
+        log.debug("uploadFileName: " + uploadFileName)
+        try:
+            ##Save the string to file in the uploads dir.
+            with open(uploadFileName, "w") as uploadFile:
+                uploadFile.write(contentString)
+        except Exception as error:
+            log.error("There was a problem writing the sideloaded content into the file.")
+            raise error
+        else:
+            return uploadFileName
 
 
 ##Amino libs
