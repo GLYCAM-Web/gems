@@ -71,8 +71,17 @@ def delegate(jsonObjectString):
                 ## This is where specific requested services are called.
                 theEntity.receive.receive(thisTransaction)
         except Exception as error:
-            error_msg = "There was a problem determining which service to do."
+            error_msg = str(error)
+
+            log.error("~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+            log.error("There was a problem providing the requested service.")
             log.error("Error type: " + str(type(error)))
+            log.error("Error: " +  error_msg)
+            log.error("Error code: " + str(error.code))
+            if str(type(error)) == "<class 'urllib.error.HTTPError'>":
+                log.error("Error reason: " + str(error.reason))
+            log.error(traceback.format_exc())
+            log.error("~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
             appendCommonParserNotice(thisTransaction, error_msg)
 
         ##Set the json_api_version in the response_dict.

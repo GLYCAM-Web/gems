@@ -34,10 +34,7 @@ def preprocessPdbForAmber(thisTransaction):
         log.debug("uploadFileName: " + uploadFileName)
     except Exception as error:
         log.error("There was a problem finding the uploadFileName in the transaction.")
-        log.error("Error type: " + str(type(error)))
-        log.error(traceback.format_exc())
-        appendCommonParserNotice(thisTransaction, 'InvalidInput' )
-        return
+        raise error
     
     ### Check for a .pdb file extension.
     if not hasPdbExtension(uploadFileName):
@@ -236,7 +233,7 @@ def sideloadPdbFromRcsb(pdbID, uploadDir):
         with urllib.request.urlopen(rcsbURL) as response:
             contentBytes = response.read()
     except Exception as error:
-        log.error("There was a problem sideloading the requested pdb from RCSB.")
+        log.error("There was a problem sideloading the requested pdb from RCSB: \n" + str(error) + "\n")
         raise error
     else:
 
