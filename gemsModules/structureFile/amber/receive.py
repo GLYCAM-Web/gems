@@ -23,49 +23,43 @@ else:
 #   @param thisTransaction A request containing either the path to an uploaded pdb, or a pdbID for sideloading.
 def preprocessPdbForAmber(thisTransaction):
     log.info("preprocessPdbForAmber() was called.\n")
-
-    requestDict = thisTransaction.request_dict
-    entity = getEntityType(thisTransaction)
-    log.debug("requestDict: \n" + str(json.dumps(requestDict, indent=2, sort_keys=False)))
+    log.debug("requestDict: \n" + str(json.dumps(thisTransaction.request_dict, indent=2, sort_keys=False)))
     
     ### Grab the pdb input.
     try:
         uploadFileName = getInput(thisTransaction)
-        log.debug("uploadFileName: " + uploadFileName)
+        log.debug("~~~uploadFileName: " + uploadFileName)
     except Exception as error:
         log.error("There was a problem finding the uploadFileName in the transaction.")
         raise error
-    
-    ### Check for a .pdb file extension.
-    if not hasPdbExtension(uploadFileName):
-        noticeBrief = "For now, pdb files must have the .pdb extension. May change later."
-        log.error(noticeBrief)
-        ##Transaction, noticeBrief, blockID
-        appendCommonParserNotice(thisTransaction, 'InvalidInput' )
-        return
     else:
-        log.debug("We have a file with a .pdb extension. Checking for a gemsProject.")
-        ##Projects in which pdb preprocessing is jsut a step will already
-        ##  have been created.
-        if thisTransaction.response_dict == None: 
-            gemsProject = startPdbGemsProject(thisTransaction, uploadFileName)
-        elif 'gems_project' not in thisTransaction.response_dict.keys():
-            gemsProject = startPdbGemsProject(thisTransaction, uploadFileName)
-        
         try:
-            pdbFile = generatePdbOutput(uploadFileName)
+            ##Projects in which pdb preprocessing is jsut a step will already
+            ##  have been created.
+            if thisTransaction.response_dict == None: 
+                gemsProject = startPdbGemsProject(thisTransaction, uploadFileName)
+            elif 'gems_project' not in thisTransaction.response_dict.keys():
+                gemsProject = startPdbGemsProject(thisTransaction, uploadFileName)
         except Exception as error:
-            log.error("There was a problem generating the PDB output.")
+            log.error("There was a problem starting a pdb gemsProject.")
+            raise error
         else:
-        
+
+            ### generate the processed pdb's content
             try:
-                ### Write the output
-                writePdbOutput(thisTransaction, pdbFile)
+                pdbFile = generatePdbOutput(uploadFileName)
             except Exception as error:
-                log.error("There was a problem writing the pdb output.")
+                log.error("There was a problem generating the PDB output.")
             else:
-                ##Remove gemsProject if user agent is not website.
-                cleanGemsProject(thisTransaction) 
+
+                ### Write the content to file
+                try:
+                    writePdbOutput(thisTransaction, pdbFile)
+                except Exception as error:
+                    log.error("There was a problem writing the pdb output.")
+                else:
+                    ##Remove gemsProject if user agent is not website.
+                    cleanGemsProject(thisTransaction) 
 
 ##  Pass in an uploadFileName and get a new, preprocessed pdbFile object, 
 #       ready to be written to file.
@@ -164,7 +158,7 @@ def getInput(thisTransaction : Transaction):
                 log.debug("looking for the attached pdb file.")
                 uploadFileName = getUploadFileName(project)
                 return uploadFileName
-            else:
+            elif "pdb_ID" in element.keys():
                 ##Look for a pdb ID to sideload.
                 log.debug("Side-loading pdb from rcsb.org.")
                 pdbID = element['pdb_ID']
@@ -177,6 +171,8 @@ def getInput(thisTransaction : Transaction):
                 else:
                     log.debug("returning uploadFileName: " + uploadFileName)
                     return uploadFileName
+            else:
+                log.debug("element.keys(): " + str(element.keys()))
     else:
         log.error("No inputs found in request.")
         raise AttributeError("inputs")
@@ -215,6 +211,33 @@ def buildPdbResponseConfig(thisTransaction : Transaction):
     }
     return config
 
+def makeRequest(url):
+    log.info("makeRequest() was called. url: " + url)
+    try:
+        with urllib.request.urlopen(url) as response:
+            contentBytes = response.read()
+            return contentBytes
+    except Exception as error:
+        raise error
+
+def getContentBytes(pdbID):
+    log.info("getContentBytes() was called. \n")
+    try:
+        rcsbURL = "https://files.rcsb.org/download/" + pdbID + ".pdb1"
+        contentBytes = makeRequest(rcsbURL)
+        return contentBytes
+    except Exception as error:
+        ## Check if the 1 at the end is the issue.
+        try:
+            rcsbURL = "https://files.rcsb.org/download/" + pdbID + ".pdb"
+            log.debug("Trying again with url: " + rcsbURL)
+            with urllib.request.urlopen(rcsbURL) as response:
+                contentBytes = response.read()
+                return contentBytes
+        except Exception as error:
+            log.error("There was a problem requesting this pdb from RCSB.org.")
+            raise error
+
 
 ##Returns the filename of a pdb file that is written to the dir you offer.
 #   Creates the dir if it doesn't exist.
@@ -226,17 +249,12 @@ def sideloadPdbFromRcsb(pdbID, uploadDir):
     ##Sideload pdb from rcsb.org
     pdbID = pdbID.upper()
     log.debug("pdbID: " + pdbID)
-
-    rcsbURL = "https://files.rcsb.org/download/" + pdbID + ".pdb1"
-    log.debug("rcsbURL: " + rcsbURL)
     try:
-        with urllib.request.urlopen(rcsbURL) as response:
-            contentBytes = response.read()
+        contentBytes =  getContentBytes(pdbID)
     except Exception as error:
-        log.error("There was a problem sideloading the requested pdb from RCSB: \n" + str(error) + "\n")
+        log.error("There was a problem getting the content from the RCSB.")
         raise error
     else:
-
         contentString = str(contentBytes, 'utf-8')
         log.debug("Response content object type: " + str(type(contentString)))
         #log.debug("Response content: \n" + str(contentString))
@@ -286,27 +304,17 @@ def getUploadFileName(project):
     else:
         log.error("No uploaded_file_name found in project.")
 
-
-    if os.path.exists(uploadFileName):
-        log.debug("uploadFile found.")
-    else:
-        log.error("uploadFile not found.")
-        ##TODO: return a useful error here, invalid input.
-
     return uploadFileName
 
 ##Starts the project, and updates the transaction.
 def startPdbGemsProject(thisTransaction, uploadFileName):
     log.info("startPdbGemsProject() was called.\n")
-    ##Start a gemsProject
-    if os.path.exists(uploadFileName):
-        log.debug("Found the upload file")
-        if uploadFileName.endswith(".pdb"):
-            log.debug("File extension agrees this is a pdb file.")
-            gemsProject = startProject(thisTransaction)
-            return gemsProject
-        else:
-            log.error("File extension is not '.pdb' not sure what to do.")
-            ##TODO: Add logic to validate pdb file type if no extension exists.
-    else:
-        log.error("Upload file could not be found.")
+    try:
+        ##Start a gemsProject        
+        gemsProject = startProject(thisTransaction)
+        return gemsProject
+    except Exception as error:
+        log.error("There was a problem starting the gemsProject.")
+        raise error
+        
+    

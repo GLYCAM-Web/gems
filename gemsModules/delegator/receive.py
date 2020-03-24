@@ -32,6 +32,7 @@ def delegate(jsonObjectString):
     thisTransaction=Transaction(jsonObjectString)
 
     # If the incoming string was improperly formed, bail, but give a reason.
+    ##TODO: Look at this more closely. Predates current error handling approach.
     if parseInput(thisTransaction) != 0:
         log.error(" There was an error parsing the input!")
         thisTransaction.build_outgoing_string()
@@ -47,71 +48,62 @@ def delegate(jsonObjectString):
         log.error("I'm returning that oject. as-is.  Delegator cannot delegate to CommonServices.")
         return jsonObjectString
 
-
     ### See if it is possible to load a module for the requested Entity
     try:
         theEntity = importEntity(entityType)
         log.debug("theEntity: " + str(theEntity))
     except Exception as error:
-        error_msg = "There was a problem importing the entity."
+        error_msg = "There was a problem importing the entity: " + str(error)
         log.error(error_msg)
-        log.error("Error type: " + str(type(error)))
+        log.error(traceback.format_exc())
         appendCommonParserNotice(thisTransaction, error_msg)
     else:
         ##Figure out what service to do.
-        try:
-            if theEntity is None:
-                log.error("there was no entity to call.  bailing")
-                appendCommonParserNotice(thisTransaction,'NoEntityDefined')
-            elif not 'services' in thisTransaction.request_dict['entity'].keys():
-                ## If no service is requested in the json object, do the default service.
-                log.debug("No service defined in the request. Calling the default service")
-                theEntity.receive.doDefaultService(thisTransaction)
-            else:
+        if theEntity is None:
+            log.error("there was no entity to call.  bailing")
+            appendCommonParserNotice(thisTransaction,'NoEntityDefined')
+        elif not 'services' in thisTransaction.request_dict['entity'].keys():
+            ## If no service is requested in the json object, do the default service.
+            log.debug("No service defined in the request. Calling the default service")
+            theEntity.receive.doDefaultService(thisTransaction)
+        else:
+            try:
                 ## This is where specific requested services are called.
                 theEntity.receive.receive(thisTransaction)
-        except Exception as error:
-            error_msg = str(error)
+            except Exception as error:
+                error_msg = str(error)
+                log.error("There was a problem providing the requested service: " + str(error))
+                log.error(traceback.format_exc())
+                appendCommonParserNotice(thisTransaction, error_msg)
+            else:
 
-            log.error("~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-            log.error("There was a problem providing the requested service.")
-            log.error("Error type: " + str(type(error)))
-            log.error("Error: " +  error_msg)
-            log.error("Error code: " + str(error.code))
-            if str(type(error)) == "<class 'urllib.error.HTTPError'>":
-                log.error("Error reason: " + str(error.reason))
-            log.error(traceback.format_exc())
-            log.error("~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-            appendCommonParserNotice(thisTransaction, error_msg)
-
-        ##Set the json_api_version in the response_dict.
-        try:
-            setResponseApiVersion(thisTransaction)
-        except Exception as error:
-            error_msg  = "There was a problem setting the response JSON API version."
-            log.error(error_msg)
-            log.error("Error type: " + str(type(error)))
-            appendCommonParserNotice(thisTransaction, error_msg)
-        else:
-            ##Set the response timestamp.
-            setResponseTimestamp(thisTransaction)
-            
-            ## Set the response site host.
-            setResponseSiteHost(thisTransaction)
-
-            ## Build outgoing string or error.
-            log.debug("The resquest dict is:  \n" + str(thisTransaction.request_dict) + "\n")
-            log.debug("The response dict is:  \n" + str(thisTransaction.response_dict) + "\n")
-            if thisTransaction.outgoing_string is None:
-                log.debug("An outgoing string does not already exist.  About to build one.")
+                ##Set the json_api_version in the response_dict.
                 try:
-                    thisTransaction.build_outgoing_string()
+                    setResponseApiVersion(thisTransaction)
                 except Exception as error:
-                    error_msg = "There was a problem building the outgoing string."
+                    error_msg  = "There was a problem setting the response JSON API version: " + str(error)
                     log.error(error_msg)
-                    log.error("Error type: " + str(type(error)))
+                    log.error(traceback.format_exc())
                     appendCommonParserNotice(thisTransaction, error_msg)
+                else:
+                    ##Set the response timestamp.
+                    setResponseTimestamp(thisTransaction)
+                    
+                    ## Set the response site host.
+                    setResponseSiteHost(thisTransaction)
 
+                    ## Build outgoing string or error.
+                    log.debug("The resquest dict is:  \n" + str(thisTransaction.request_dict) + "\n")
+                    log.debug("The response dict is:  \n" + str(thisTransaction.response_dict) + "\n")
+                    if thisTransaction.outgoing_string is None:
+                        log.debug("An outgoing string does not already exist.  About to build one.")
+                        try:
+                            thisTransaction.build_outgoing_string()
+                        except Exception as error:
+                            error_msg = "There was a problem building the outgoing string: " + str(error)
+                            log.error(error_msg)
+                            log.error("Error type: " + str(type(error)))
+                            appendCommonParserNotice(thisTransaction, error_msg)
 
     # Return whatever outgoing string was made
     log.debug("About to return whatever output I have at this point.")

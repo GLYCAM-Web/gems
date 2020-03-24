@@ -53,7 +53,7 @@ class GemsProject(BaseModel):
                 self.project_type = request['project']['type']
         else:
             ##There will be no frontend project here.
-            log.error("Still developing command_line logic for projects.")
+            log.warning("Still developing command_line logic for projects.")
 
         self.output_dir = projectSettings.output_data_dir + "tools/" + self.project_type + "/git-ignore-me_userdata/" + self.pUUID + "/"
 

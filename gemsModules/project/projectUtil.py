@@ -25,44 +25,60 @@ else:
 #   @param transaction
 def startProject(thisTransaction: Transaction):
     log.info("startProject() was called.\n")
-    ##TODO: Add better error handling.
-    request = thisTransaction.request_dict
-    project = getFrontendProjectFromTransaction(thisTransaction)
-    requestingAgent = getRequestingAgentFromTransaction(thisTransaction)
-    gemsProject = buildGemsProject(thisTransaction, requestingAgent)
-    output_dir = getOutputDir(thisTransaction)
 
-    if gemsProject.hasInputFiles:
-        try:
-            copyUploadFiles(thisTransaction)
-        except Exception as error:
-            log.error("There was a problem uploading the input.")
-            log.error("Error type: " + str(type(error)))
-            log.error(traceback.format_exc())
-            raise error
-
+    ### Check for a frontend project.
     try:
-        logs_dir = setupProjectDirs(output_dir)
-        writeRequestToFile(request, logs_dir)
-        writeProjectLogFile(gemsProject, logs_dir)
+        project = getFrontendProjectFromTransaction(thisTransaction)
     except Exception as error:
-        log.error("There was a problem writing the project logs.")
-        log.error("Error type: " + str(type(error)))
-        log.error(traceback.format_exc())
+        log.error("There was a problem getting the frontend project from the transaction.")
         raise error
+    else:
+        ### Figure out who is asking.
+        requestingAgent = getRequestingAgentFromTransaction(thisTransaction)
+        
+        ### Start a gemsProject
+        gemsProject = buildGemsProject(thisTransaction, requestingAgent)
 
-    #log.debug("Transaction: " + str(thisTransaction.__dict__))
-    return gemsProject
+        ### Find the output dir.
+        try:
+            output_dir = getOutputDir(thisTransaction)
+        except Exception as error:
+            log.error("There was a problem getting the output dir.")
+            raise error
+        else:
+
+            ### Copy any upload files.
+            if gemsProject.hasInputFiles:
+                try:
+                    copyUploadFiles(thisTransaction)
+                except Exception as error:
+                    log.error("There was a problem uploading the input.")
+                    raise error
+
+            ### Write the logs to file.
+            try:
+                logs_dir = setupProjectDirs(output_dir)
+                request = thisTransaction.request_dict
+                writeRequestToFile(request, logs_dir)
+                writeProjectLogFile(gemsProject, logs_dir)
+                return gemsProject
+            except Exception as error:
+                log.error("There was a problem writing the project logs.")
+                raise error
+
 
 ## Pass in a transaction, figure out the requestingAgent.
 #   Default is command line, replaced if a frontend project exists.
 #   @param transaction
 def getRequestingAgentFromTransaction(thisTransaction: Transaction):
     log.info("getRequestingAgentFromTransaction() was called.\n")
+
     project = getFrontendProjectFromTransaction(thisTransaction)
     requestingAgent = "command_line"
     if project is not None:
         requestingAgent = project['requesting_agent']
+
+    log.debug("requestingAgent: " + requestingAgent)
     return requestingAgent
 
 
@@ -70,8 +86,12 @@ def getRequestingAgentFromTransaction(thisTransaction: Transaction):
 #   @param transaction
 def getFrontendProjectFromTransaction(thisTransaction: Transaction):
     log.info("getRequestFromTransaction() was called.\n")
-    project = thisTransaction.request_dict['project']
-    return project
+    if 'project' in thisTransaction.request_dict.keys():
+        project = thisTransaction.request_dict['project']
+        log.debug("frontend project: " + str(project))
+        return project
+    else:
+        return None
 
 ##  Pass in a transaction, get the outputDir
 #   @param outputDir
@@ -94,18 +114,26 @@ def getOutputDir(thisTransaction: Transaction):
 #   @param outputDir
 def setupProjectDirs(outputDir):
     log.info("setupProjectDirs() was called.\n")
-    if not os.path.exists(outputDir):
-        log.debug("creating the outputDir")
-        os.makedirs(outputDir)
+    try:
+        if not os.path.exists(outputDir):
+            log.debug("creating the outputDir")
+            os.makedirs(outputDir)
+    except:
+        log.error("There was a problem with the output dir.")
+        raise error
+    else:
+        #Start a log file for the project and put it in uUUID dir
+        logs_dir = outputDir + "logs/"
+        try:
+            if not os.path.exists(logs_dir):
+                log.debug("creating the logs dir in project")
+                os.makedirs(logs_dir)
 
-    #Start a log file for the project and put it in uUUID dir
-    logs_dir = outputDir + "logs/"
-    if not os.path.exists(logs_dir):
-        log.debug("creating the logs dir in project")
-        os.makedirs(logs_dir)
-
-    log.debug("logs_dir: " + logs_dir)
-    return logs_dir
+            log.debug("logs_dir: " + logs_dir)
+            return logs_dir
+        except Exception as error:
+            log.error("There was a problem with the logs dir.")
+            raise error
 
 
 ## Write the original request to file.
@@ -115,8 +143,13 @@ def writeRequestToFile(request, logsDir):
     log.info("writeRequestToFile() was called.\n")
     requestFileName = os.path.join(logsDir,"request.json")
     log.debug("requestFileName: " + requestFileName)
-    with open(requestFileName, 'w', encoding='utf-8') as file:
-        json.dump(request, file, ensure_ascii=False, indent=4)
+    try:
+        with open(requestFileName, 'w', encoding='utf-8') as file:
+            json.dump(request, file, ensure_ascii=False, indent=4)
+    except Exception as error:
+        log.error("There was a problem writing the request to file.")
+        raise error
+
 
 
 ## Writes the gems project to file in json format.

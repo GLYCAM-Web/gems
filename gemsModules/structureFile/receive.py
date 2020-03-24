@@ -35,7 +35,7 @@ def receive(thisTransaction):
                 try:
                     preprocessPdbForAmber(thisTransaction)
                 except Exception as error:
-                    log.error("There was a problem preprocessing the PDB for amber.")
+                    log.error("There was a problem preprocessing the PDB for amber: " + str(error))
                     raise error
                 else:
                     thisTransaction.build_outgoing_string()
