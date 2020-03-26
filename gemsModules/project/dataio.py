@@ -15,10 +15,9 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__)
 
-##TODO: Use Doxygen-style comments.
-"""
-The backend project is not the same as the project model in the frontend.
-"""
+
+## The backend project is not the same as the project model in the frontend.
+##TODO: Add error handling.
 class GemsProject(BaseModel):
     timestamp : datetime = None
     ## The name of the output dir is the pUUID
@@ -34,6 +33,7 @@ class GemsProject(BaseModel):
     def buildProject(self, thisTransaction : Transaction, requestingAgent : str):
         log.info("buildProject was called.\n")
         log.debug("requestingAgent: " + requestingAgent)
+
         request = thisTransaction.request_dict
         self.requesting_agent = requestingAgent
         self.timestamp = datetime.now()

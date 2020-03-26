@@ -67,7 +67,7 @@ def startProject(thisTransaction: Transaction):
                 raise error
 
 
-## Pass in a transaction, figure out the requestingAgent.
+## Pass in a transaction, figure out the requestingAgent. OK if it doesn't exist.
 #   Default is command line, replaced if a frontend project exists.
 #   @param transaction
 def getRequestingAgentFromTransaction(thisTransaction: Transaction):
