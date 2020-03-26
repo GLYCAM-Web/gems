@@ -50,7 +50,7 @@ def startProject(thisTransaction: Transaction):
             ### Copy any upload files.
             if gemsProject.hasInputFiles:
                 try:
-                    copyUploadFiles(thisTransaction)
+                    copyUploadFiles(thisTransaction, gemsProject)
                 except Exception as error:
                     log.error("There was a problem uploading the input.")
                     raise error
@@ -196,7 +196,7 @@ def getUploadsSourceDir(project):
 #   returns the output_dir for the project as a convenience.
 #   @param transaction
 
-def copyUploadFiles(thisTransaction : Transaction):
+def copyUploadFiles(thisTransaction : Transaction, gemsProject : GemsProject):
     log.info("copyUploadFiles() was called.\n")
     output_dir = getOutputDir(thisTransaction)
     log.debug("output_dir: " + output_dir)
@@ -233,6 +233,7 @@ def copyUploadFiles(thisTransaction : Transaction):
             destination_file = os.path.join(uploads_dest_dir, filename)
             log.debug("file destination: " + destination_file)
             copyfile(source_file, destination_file)
+            gemsProject.setUploadFileName(destination_file, thisTransaction)
     except Exception as error:
         log.error("There was a problem copying the upload files into the project's output_dir.")
         log.error("Error type: " + str(type(error)))

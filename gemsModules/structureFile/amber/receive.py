@@ -51,7 +51,8 @@ def preprocessPdbForAmber(thisTransaction):
             log.debug("completed uploadFileName: " + uploadFileName)
             ### generate the processed pdb's content
             try:
-                pdbFile = generatePdbOutput(uploadFileName)
+                pdbFile = generatePdbOutput(thisTransaction)
+                log.debug("pdbFile output: " + str(pdbFile))
             except Exception as error:
                 log.error("There was a problem generating the PDB output.")
             else:
@@ -68,7 +69,7 @@ def preprocessPdbForAmber(thisTransaction):
 ##  Pass in an uploadFileName and get a new, preprocessed pdbFile object, 
 #       ready to be written to file.
 #   @param uploadFileName
-def generatePdbOutput(uploadFileName):
+def generatePdbOutput(thisTransaction):
     log.info("generatePdbOutput() was called.\n")
     try:
         gemsHome = getGemsHome()
@@ -90,6 +91,9 @@ def generatePdbOutput(uploadFileName):
         log.debug("preprocessor: " + str(preprocessor))
 
         try:
+            ### Get the fileName from the transaction.
+            gemsProject = thisTransaction.response_dict['gems_project']
+            uploadFileName = gemsProject['upload_file_name']
             #PDB file object:
             log.debug("uploadFileName: " + uploadFileName)
             pdbFile = gmml.PdbFile(uploadFileName)
@@ -183,7 +187,7 @@ def getInput(thisTransaction : Transaction):
 
 
             elif "pdb_ID" in element.keys():
-                ##Look for a pdb ID to sideload.
+                ### Look for a pdb ID to sideload.
                 log.debug("Side-loading pdb from rcsb.org.")
                 pdbID = element['pdb_ID']
                 uploadDir = frontendProject['upload_path']

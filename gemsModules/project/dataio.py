@@ -29,6 +29,7 @@ class GemsProject(BaseModel):
     requesting_agent : str = None
     status : str = "submitted"
     hasInputFiles : bool = False
+    uploadFileName : str = None
 
     def buildProject(self, thisTransaction : Transaction, requestingAgent : str):
         log.info("buildProject was called.\n")
@@ -62,6 +63,13 @@ class GemsProject(BaseModel):
             os.makedirs(self.output_dir)
 
         self.updateTransaction(thisTransaction)
+
+    def setUploadFileName(self, fileName : str, thisTransaction : Transaction):
+        log.info("setUploadFileName was called.\n")
+
+        log.debug("fileName: " + fileName)
+        self.uploadFileName = fileName
+        thisTransaction.response_dict['gems_project']['upload_file_name'] = self.uploadFileName
 
     def updateTransaction(self, thisTransaction: Transaction):
         log.info("updateTransaction() was called.\n")
@@ -101,6 +109,9 @@ class GemsProject(BaseModel):
         result = result + self.output_dir
         result = result + "\nhasInputFiles: "
         result = result + str(self.hasInputFiles)
+        if self.uploadFileName is not None:
+            result = result + "\nuploadFileName: "
+            result = result + str(self.uploadFileName)
         if self.md5sum is not None:
             result = result + "\nmd5sum: "
             result = result + self.md5sum
