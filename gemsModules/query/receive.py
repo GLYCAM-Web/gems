@@ -4,16 +4,12 @@ from gemsModules import common
 from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
 from gemsModules.common.loggingConfig import *
-from . import run_query
-
-##TO set logging verbosity for just this file, edit this var to one of the following:
-## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.ERROR
+from gemsModules.query import run_query
 
 if loggers.get(__name__):
     pass
 else:
-    log = createLogger(__name__, logLevel)
+    log = createLogger(__name__)
 
 
 def doDefaultService(thisTransaction):

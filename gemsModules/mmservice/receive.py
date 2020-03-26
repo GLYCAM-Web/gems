@@ -7,14 +7,10 @@ from gemsModules.common.loggingConfig import *
 import gemsModules.mmservice.settings as mmSettings
 import traceback
 
-##TO set logging verbosity for just this file, edit this var to one of the following:
-## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.ERROR
-
 if loggers.get(__name__):
     pass
 else:
-    log = createLogger(__name__, logLevel)
+    log = createLogger(__name__)
 
 
 ##  If this module is receiving a request, then there should be almost no
@@ -27,6 +23,9 @@ else:
 ##  (unless you write modules for using tleap to build, etc.....)
 ##
 
+
+##TODO: Refactor for better encapsulation
+##TODO: Use Doxygen-style comments.
 """
 The receive() method receives a transaction, and checks for the requested service.
 """
@@ -49,7 +48,6 @@ def receive(thisTransaction):
             log.debug("requestedService: " + str(requestedService))
             ##Can we detect if this project has already been started?
             ##  If so, check the status of a job that exists, and start jobs that don't.
-
             if requestedService not in mmSettings.serviceModules.keys():
                 log.error("The requested service is not recognized.")
                 log.error("services: " + str(mmSettings.serviceModules.keys()))

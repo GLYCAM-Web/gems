@@ -14,11 +14,17 @@ moduleStatusDetail = "Can receive requests. Currently working on report generati
 servicesStatus = [
     {
         "service" : "GenerateReport",
-        "status" : "In development.",
-        "statusDetail" : "Knows when it receives a request. If no entities or services are specified, tries to generate a report for all. Cannot generate specific reports yet."
+        "status" : "Stable.",
+        "statusDetail" : "Generates a backend report for all entities."
+    },
+    {
+    	"service" : "GetJobStatus",
+    	"status" : "In development",
+    	"statusDetail" : "Building service infrastructure."
     }
 ]
 
 serviceModules = {
-    "GenerateReport" :"generateReport"
+    "GenerateReport" :"generateReport",
+    "GetJobStatus" : "getJobStatus"
 }

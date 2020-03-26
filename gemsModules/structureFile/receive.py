@@ -8,25 +8,15 @@ from gemsModules.structureFile.amber.receive import preprocessPdbForAmber
 import gemsModules.structureFile.settings as structureFileSettings
 import traceback
 
-##TO set logging verbosity for just this file, edit this var to one of the following:
-## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.ERROR
 
 if loggers.get(__name__):
     pass
 else:
-    log = createLogger(__name__, logLevel)
+    log = createLogger(__name__)
 
 def receive(thisTransaction):
     log.info("receive() was called.\n")
     #log.debug("thisTransaction: " + str(thisTransaction.__dict__))
-
-    ##Begin building a response dict for holding output.
-    if thisTransaction.response_dict is None:
-        thisTransaction.response_dict = {}
-    thisTransaction.response_dict['entity'] = {}
-    thisTransaction.response_dict['entity']['type'] = "StructureFile"
-    thisTransaction.response_dict['responses'] = []
 
     #Look to see if services are specified, else do default.
     if 'services' not in thisTransaction.request_dict['entity'].keys():

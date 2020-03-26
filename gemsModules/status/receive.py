@@ -6,17 +6,12 @@ from gemsModules.common.transaction import * # might need whole file...
 from gemsModules.common.loggingConfig import *
 from . import settings
 from . import statusResponse
-from datetime import datetime
 import traceback
-
-##TO set logging verbosity for just this file, edit this var to one of the following:
-## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.ERROR
 
 if loggers.get(__name__):
     pass
 else:
-    log = createLogger(__name__, logLevel)
+    log = createLogger(__name__)
 
 def receive(thisTransaction : Transaction):
     log.info("receive() was called.\n")
@@ -34,85 +29,61 @@ def receive(thisTransaction : Transaction):
                     log.error("The requested service is not recognized.")
                     common.settings.appendCommonParserNotice( thisTransaction, 'ServiceNotKnownToEntity', requestedService)
             elif requestedService == "GenerateReport":
-                generateReport(thisTransaction, None)
+                generateReport(thisTransaction)
                 thisTransaction.build_outgoing_string()
             else:
                 log.error("Perhaps a service was added to status/settings.py, but not defined in receive.py? Likely this service is still in development.")
                 common.settings.appendCommonParserNotice( thisTransaction, 'ServiceNotKnownToEntity', requestedService)
 
-##This method needs to check for options. If options are not present, do the default service.
-##    If the options are present, and specify a list of entities to report on, only report on those.
-def generateReport(thisTransaction : Transaction, thisService : Service = None):
-    log.info("generateReport() was called.\n")
 
-    entityKeys = thisTransaction.request_dict['entity'].keys()
-    log.debug("entityKeys : " + str(entityKeys))
-
-    if 'options' in entityKeys:
-        optionsKeys = thisTransaction.request_dict['entity']['options'].keys()
-        options = thisTransaction.request_dict['entity']['options']
-        log.debug("optionsKeys: " + str(optionsKeys))
-        if "targets" in optionsKeys:
-            for target in options['targets']:
-                log.debug("Report requested for target: " + str(target))
-                log.debug("target type: " + str(target['type']))
-                if target['type'] == 'All':
-                    doDefaultService(thisTransaction)
-                else:
-                    log.error("Report requested for a specific target. Still being developed.")
-                    ##TODO: Add an error to common parser to return to frontend. reportTargetUnknown
-        else:
-            doDefaultService(thisTransaction)
-
-    else:
-        doDefaultService(thisTransaction)
-
-## The default here is to just report on every gemsModule and their corresponding services.
 def doDefaultService(thisTransaction : Transaction):
     log.info("doDefaultService() was called.\n")
-    log.debug("thisTransaction: " + str(thisTransaction))
+    generateReport(thisTransaction)
 
-    ##Header section
-    if thisTransaction.response_dict is None:
-        thisTransaction.response_dict = {}
 
-    thisTransaction.response_dict['entity'] = {}
-    thisTransaction.response_dict['entity']['type']="StatusReport"
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-    log.debug("timestamp: " + str(timestamp))
-
-    thisTransaction.response_dict['entity']['timestamp'] = timestamp
+## Reports on every gemsModule and their corresponding services.
+def generateReport(thisTransaction : Transaction):
+    log.info("doDefaultService() was called.\n")
     responses = []
     ##Entity Reporting
-    for availableEntity in listEntities():
+    entities = listEntities()
+    log.debug("entities: " + str(entities) + "\n")
+
+    for availableEntity in entities:
         log.debug("Generating a report for entity: " + availableEntity)
         response = {}
         thisEntity = importEntity(availableEntity)
-        response.update({
-            'entity' : availableEntity
-        })
-        log.debug("thisEntity.__dict__.keys(): " + str(thisEntity.__dict__.keys()))
+        response.update( {'entity' : availableEntity} )
+        
         if thisEntity.settings is not None:
             settings = thisEntity.settings
             settingsAttributes = settings.__dict__.keys()
-
             response = getModuleStatus(response, settings, settingsAttributes)
             response = getModuleStatusDetail(response, settings, settingsAttributes)
             response = getServiceStatuses(response, settings, settingsAttributes)
             response = getSubEntities(response, settings, settingsAttributes)
-
             log.debug("Type of response: " + str(type(response)))
             log.debug("response: " + str(response))
             responses.append(response)
-
         else:
             log.error("Could not find settings for this entity.")
             ##TODO: Add an error to common parser for settingsNotFound
 
-    thisTransaction.response_dict.update({
-        "responses": responses
-    })
-    log.debug("thisTransaction.response_dict: " + str(thisTransaction.response_dict))
+    responseConfig = buildStatusResponseConfig(responses)
+    appendResponse(thisTransaction, responseConfig)
+
+##Just stick em on there.
+##  @param transaction
+##  @param resonses
+def buildStatusResponseConfig(responses):
+    log.info("buildStatusResponseConfig() was called.\n")
+    config = {
+        "entity" : "Status",
+        "respondingService": "GenerateReport",
+        "responses" : responses
+    }
+    return config
+    #log.debug("thisTransaction.response_dict: " + str(thisTransaction.response_dict))
 
 ##Append a status from a module's settings file to a json response object
 def getModuleStatus(response, settings, settingsAttributes):

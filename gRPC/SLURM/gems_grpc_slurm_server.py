@@ -2,7 +2,7 @@
 
 from concurrent import futures
 import time
-import logging
+import logging  ## this might not be necessary - maybe used by gRPC?
 
 import grpc
 import os,sys,subprocess,signal
@@ -10,6 +10,14 @@ from subprocess import *
 
 import gems_grpc_slurm_pb2
 import gems_grpc_slurm_pb2_grpc
+
+from gemsModules.common.loggingConfig import *
+
+if loggers.get(__name__):
+    pass
+else:
+    log = createLogger(__name__)
+
 
 brief_to_code = {
     'GemsHomeNotSet' :              1 ,
@@ -70,12 +78,13 @@ def JSON_Error_Response(theBrief,theExitCode,theStdout,theStderr,theExceptionErr
     return thereturn
 
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
-print("Hello from gems_grpc_slurm_server.py")
+log.info("Hello from gems_grpc_slurm_server.py")
 
 class GemsGrpcSlurmReceiver(gems_grpc_slurm_pb2_grpc.GemsGrpcSlurmServicer):
 
     def GemsGrpcSlurmReceiver(self, request, context):
         from datetime import datetime
+        log.info("gRPC Slurm server has been called.")
         now = datetime.now()
         dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
 
@@ -84,6 +93,8 @@ class GemsGrpcSlurmReceiver(gems_grpc_slurm_pb2_grpc.GemsGrpcSlurmServicer):
             theResponse=JSON_Error_Response('GemsHomeNotSet')
             return gems_grpc_slurm_pb2.GemsGrpcSlurmResponse(output=theResponse)
 
+        log.debug("The request input is >>>"+request.input+"<<<")
+        log.debug("GEMSHOME is >>>"+GemsPath+"<<<")
         os.environ['GEMS_DEBUG_VERBOSITY']='-1'
         jobsubmissioncommand = GemsPath+"/bin/slurmreceive"
         try:
@@ -93,46 +104,47 @@ class GemsGrpcSlurmReceiver(gems_grpc_slurm_pb2_grpc.GemsGrpcSlurmServicer):
             # Check to see if there were any errors, either by exit code or existence of stderr
             theErrorReturned=None
             if p.returncode == -11 or p.returncode == 139:
+                log.ERROR("gRPC Slurm server caught a segfault.")
                 theErrorReturned='CaughtSegFault'
             elif p.returncode != 0 :
                 theErrorReturned='UnknownError'
+                log.ERROR("gRPC Slurm server caught an unknown error.")
             elif errorshere :
                 theErrorReturned='HaveStderr'
+                log.ERROR("gRPC Slurm server found output to STDERR despite a zero exit code.")
             # If there was an error, return an error report
             if theErrorReturned is not None:
                 theResponse=JSON_Error_Response(theErrorReturned,p.returncode,str(outputhere),str(errorshere),None)
-                sys.stderr.write("For date-time stamp: " + dt_string)
-                sys.stderr.write("For this submission: "  + jobsubmissioncommand) 
-                sys.stderr.write("This is the result: "  + theResponse)
+                log.error("For date-time stamp: " + dt_string)
+                log.error("For this submission: "  + jobsubmissioncommand) 
+                log.error("This is the result: "  + theResponse)
                 return gems_grpc_slurm_pb2.GemsGrpcSlurmResponse(output=theResponse)
         # If even that failed, still send something back
         except Exception as error:
-            sys.stderr.write("For date-time stamp: " + dt_string)
-            sys.stderr.write("Caught exception:  "  + str(error))
+            log.error("For date-time stamp: " + dt_string)
+            log.error("Caught exception while trying to run the subprocess:  "  + str(error))
             theResponse=JSON_Error_Response('CaughtException',None,None,None,str(error))
             return gems_grpc_slurm_pb2.GemsGrpcSlurmResponse(output=theResponse)
         # If no errors detected, return the standard output
         return gems_grpc_slurm_pb2.GemsGrpcSlurmResponse(output=outputhere)
 
 def serve():
-    print("Starting to serve Slurm via GRPC.")
+    log.info("Starting to serve Slurm via GRPC.")
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     gems_grpc_slurm_pb2_grpc.add_GemsGrpcSlurmServicer_to_server(GemsGrpcSlurmReceiver(), server)
-    # server.add_insecure_port(os.environ.get('GEMS_GRPC_SLURM_HOST') + ':' + os.environ.get('GEMS_GRPC_SLURM_PORT'))
-    # server.add_insecure_port('[::]:50505')
     # TODO  Add capability for a secure port
     thePort=os.environ.get('GEMS_GRPC_SLURM_PORT')
     if thePort is None:
-        print("The GEMS_GRPC_SLURM_PORT is not set.  Exiting.")
+        log.error("The GEMS_GRPC_SLURM_PORT is not set.  Exiting.")
         sys.exit(1)
     server.add_insecure_port('[::]:' + thePort)
     server.start()
     try:
         while True:
-            print("Starting sleepytime.")
+            log.info("Starting sleepytime.")
             time.sleep(_ONE_DAY_IN_SECONDS)
     except KeyboardInterrupt:
-        print("Caught keyboard interrupt")
+        log.info("Caught keyboard interrupt")
         server.stop(0)
 
 if __name__ == '__main__':

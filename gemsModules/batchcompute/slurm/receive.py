@@ -5,8 +5,15 @@ from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
 import traceback
 from gemsModules.batchcompute.slurm.dataio import *
+from gemsModules.common.loggingConfig import *
+
+if loggers.get(__name__):
+    pass
+else:
+    log = createLogger(__name__)
 
 def submit(thisSlurmJobInfo):
+    log.debug("submit() was called.\n")
     import os, sys, subprocess, signal
     from subprocess import Popen
 
@@ -17,24 +24,27 @@ def submit(thisSlurmJobInfo):
         try:
             os.chdir(thisSlurmJobInfo.incoming_dict['workingDirectory'])
         except Exception as error:
-            print("Was unable to change to the working directory.")
-            print("Error type: " + str(type(error)))
-            print(traceback.format_exc())
+            log.error("Was unable to change to the working directory.")
+            log.error("Error type: " + str(type(error)))
+            log.error(traceback.format_exc())
             return "Was unable to change to the working directory."
-#    print("The current directory is:  " + os.getcwd() )
+    log.debug("The current directory is:  " + os.getcwd() )
     try:
-        print ("In func submit(), incoming dict sbatchArg is: " + thisSlurmJobInfo.incoming_dict['sbatchArgument'] + "\n")
+        log.debug ("In func submit(), incoming dict sbatchArg is: " + thisSlurmJobInfo.incoming_dict['sbatchArgument'] + "\n")
         p = subprocess.Popen( [ 'sbatch', thisSlurmJobInfo.incoming_dict["slurm_runscript_name"] ] ,
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (outputhere,errorshere) = p.communicate()
         if p.returncode != 0 :
             return "SLURM submit got non-zero exit upon attempt to submit."
         else:
-            return str(outputhere)
+            log.debug("outputhere in raw form: " + str(outputhere))
+            theOutput=outputhere.decode("utf-8")
+            log.debug("outputhere stripped: " + theOutput)
+            return theOutput
     except Exception as error:
-        print("Was unable to submit the job.")
-        print("Error type: " + str(type(error)))
-        print(traceback.format_exc())
+        log.error("Was unable to submit the job.")
+        log.error("Error type: " + str(type(error)))
+        log.error(traceback.format_exc())
         return "Was unable to submit the job."
 
 def writeSlurmSubmissionScript(path, thisSlurmJobInfo):
@@ -42,7 +52,9 @@ def writeSlurmSubmissionScript(path, thisSlurmJobInfo):
     try:
         script = open(path, "w")
     except Exception as error:
-        print("Cannnot write slurm run script. Aborting")
+        log.error("Cannnot write slurm run script. Aborting")
+        log.error("Error type: " + str(type(error)))
+        log.error(traceback.format_exc())
         sys.exit(1)
 
     incoming_dict = thisSlurmJobInfo.incoming_dict
@@ -66,10 +78,8 @@ def manageIncomingString(jsonObjectString):
     """
     import os, sys, socket
 
-    if verbosity > 0 :
-        print("~~~\nbatchcompute.slurm receive.py submit() was called.\n~~~")
-    if verbosity > 1 :
-        print("incoming jsonObjectString: \n" + jsonObjectString)
+    log.info("manageIncomingString() was called.\n")
+    log.debug("incoming jsonObjectString: \n" + jsonObjectString)
 
     # Make a new SlurmJobInfo object for holding I/O information.
     thisSlurmJobInfo=SlurmJobInfo(jsonObjectString)
@@ -78,41 +88,51 @@ def manageIncomingString(jsonObjectString):
     # Figure out whether we need to send this to a different machine
     useGRPC=True
     thePort=os.environ.get('GEMS_GRPC_SLURM_PORT')
-    print("the port is: " + thePort)
+    log.debug("the port is: " + thePort)
     if thePort is None:
-        print("cant find grpc slurm submission port. using localhost")
+        log.debug("cant find grpc slurm submission port. using localhost")
         useGRPC=False
     theHost=os.environ.get('GEMS_GRPC_SLURM_HOST')
-    print("the host is: " + theHost)
+    log.debug("the host is: " + theHost)
     if theHost is None:
-        print("cant find grpc slurm submission host. using localhost")
+        log.debug("cant find grpc slurm submission host. using localhost")
         useGRPC=False
     else:
         localHost = socket.gethostname()
-        print("the local host is: " + localHost)
+        log.debug("the local host is: " + localHost)
         if theHost == localHost:
             useGRPC=False
     thisSlurmJobInfo.incoming_dict["slurm_runscript_name"] = "slurm_submit.sh"
-    slurm_runscript_path = thisSlurmJobInfo.incoming_dict["workingDirectory"] + "/" + thisSlurmJobInfo.incoming_dict["slurm_runscript_name"] 
-    print ("Slurm runscript path: " + slurm_runscript_path + "\n")
+    slurm_runscript_path = thisSlurmJobInfo.incoming_dict["workingDirectory"] + "/" + thisSlurmJobInfo.incoming_dict["slurm_runscript_name"]
+    log.debug ("Slurm runscript path: " + slurm_runscript_path + "\n")
     writeSlurmSubmissionScript(slurm_runscript_path, thisSlurmJobInfo)
 
+    log.debug("useGRPC: " + str(useGRPC))
     if useGRPC:
         gemsPath = os.environ.get('GEMSHOME')
         if gemsPath is None:
             return "Cannot determine GEMSHOME."
         sys.path.append(gemsPath + "/gRPC/SLURM")
-        import grpc 
+        import grpc
         import gems_grpc_slurm_client
 
+        log.debug("submitting to gems_grpc_slurm_client.")
         submission = gems_grpc_slurm_client.GemsGrpcSlurmClient(json=jsonObjectString)
         return submission.response
+
     else:
+        log.debug("not using grpc.")
         theResponse = submit(thisSlurmJobInfo)
         if theResponse is None:
-            print("Got none response")
+            log.error("Got none response")
+            ##TODO: return a proper error response
         else:
-            return theResponse
+            thisSlurmJobInfo.copyJobinfoInToOut()
+            thisSlurmJobInfo.addSbatchResponseToJobinfoOut(theResponse)
+            log.debug("The outgoing dictionary is: \n")
+            log.debug(str(thisSlurmJobInfo.outgoing_dict))
+            log.debug("\n")
+            return thisSlurmJobInfo.outgoing_dict
 
 
 def main():
@@ -142,8 +162,8 @@ def main():
         print("\nThe Slurm Job sumbit module captured an error.")
         print("Error type: " + str(type(error)))
         print(traceback.format_exc())
-  
-  
+
+
     print("\ndelegator is returning this: \n" +  responseObjectString)
 
 

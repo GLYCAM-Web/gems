@@ -13,14 +13,10 @@ from gemsModules.common.transaction import *
 from gemsModules.common.loggingConfig import *
 from inspect import currentframe, getframeinfo
 
-##TO set logging verbosity for just this file, edit this var to one of the following:
-## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.ERROR
-
 if loggers.get(__name__):
     pass
 else:
-    log = createLogger(__name__, logLevel)
+    log = createLogger(__name__)
 
 
 exitMessages = {

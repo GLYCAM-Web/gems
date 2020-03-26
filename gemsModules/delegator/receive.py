@@ -1,19 +1,16 @@
 #!/usr/bin/env python3
 import gemsModules
+from datetime import datetime
 from gemsModules import common
 from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
 from gemsModules.common.loggingConfig import *
 import traceback
 
-##TO set logging verbosity for just this file, edit this var to one of the following:
-## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.ERROR
-
 if loggers.get(__name__):
     pass
 else:
-    log = createLogger(__name__, logLevel)
+    log = createLogger(__name__)
 
 def delegate(jsonObjectString):
     """
@@ -64,13 +61,30 @@ def delegate(jsonObjectString):
         ## This is where specific requested services are called.
         theEntity.receive.receive(thisTransaction)
 
+    ##Set the json_api_version in the response_dict.
+    if thisTransaction.response_dict is None:
+        thisTransaction.response_dict = {}
+    if 'json_api_version' not in thisTransaction.response_dict.keys():
+        thisTransaction.response_dict['json_api_version'] = getJsonApiVersion()
+    if 'response_timestamp' not in thisTransaction.response_dict.keys():
+        thisTransaction.response_dict['response_timestamp'] = str(datetime.now())
+    if 'site_host_name' not in thisTransaction.response_dict.keys():
+        if 'site_host_name' in thisTransaction.request_dict.keys():
+            thisTransaction.response_dict['site_host_name'] = thisTransaction.request_dict['site_host_name']
+
+
     ## Check to see if an outgoing string got built.  If not, try to
     ## build one.  If that still doesn't work, make the string be a
     ## generic error output JSON object.
+    log.debug("Most of the work is finished now.  About to build the response, if not already built.")
+    log.debug("The resquest dict is:  \n" + str(thisTransaction.request_dict) + "\n")
+    log.debug("The response dict is:  \n" + str(thisTransaction.response_dict) + "\n")
     if thisTransaction.outgoing_string is None:
+        log.debug("An outgoing string does not already exist.  About to build one.")
         thisTransaction.build_outgoing_string()
     if thisTransaction.outgoing_string is None:
         ## TODO:  write this function....
+        log.debug("An outgoing string STILL does not exist.  About to build an error response.")
         thisTransaction.build_general_error_output()
 
     # Return whatever outgoing string got made
@@ -114,6 +128,30 @@ def receive(thisTransaction):
 #                print("About to segfault, I hope.")
                 from . import isegfault
                 return
+            if 'returnSchema' in element.keys():
+                log.debug("returnSchema was requested.")
+                schema =  getJsonSchema()
+                responseConfig = {
+                    "entity" : "Delegator",
+                    "respondingService" : "returnSchema",
+                    "responses" : [
+                        { "payload" : schema}
+                    ]
+                }
+
+                appendResponse(thisTransaction, responseConfig)
+
+##  Return the content of the current schema, as defined in CurrentStableSchema
+def getJsonSchema():
+    log.info("getJsonSchema() was called.\n")
+    versionFilename = getGemsHome() + "/gemsModules/Schema/currentStableSchema"
+    with open(versionFilename, 'r') as versionFile:
+        currentStableVersion = versionFile.read().strip()
+    schemaFileName = getGemsHome() + "/gemsModules/Schema/" + currentStableVersion + "/schema.json"
+    with open(schemaFileName, 'r') as schemaFile:
+        content = schemaFile.read()
+    #log.debug("schema content: \n" + content )
+    return content
 
 def main():
   import importlib.util, os, sys

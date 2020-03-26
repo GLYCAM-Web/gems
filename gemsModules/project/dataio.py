@@ -10,15 +10,12 @@ from pydantic.schema import schema
 from gemsModules.common.loggingConfig import *
 import traceback
 
-##TO set logging verbosity for just this file, edit this var to one of the following:
-## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.ERROR
-
 if loggers.get(__name__):
     pass
 else:
-    log = createLogger(__name__, logLevel)
+    log = createLogger(__name__)
 
+##TODO: Use Doxygen-style comments.
 """
 The backend project is not the same as the project model in the frontend.
 """
@@ -32,43 +29,36 @@ class GemsProject(BaseModel):
     project_type : str = None
     requesting_agent : str = None
     status : str = "submitted"
+    hasInputFiles : bool = False
 
     def buildProject(self, thisTransaction : Transaction, requestingAgent : str):
         log.info("buildProject was called.\n")
         log.debug("requestingAgent: " + requestingAgent)
+        request = thisTransaction.request_dict
         self.requesting_agent = requestingAgent
         self.timestamp = datetime.now()
-        request = thisTransaction.request_dict
-        log.debug("request: " + str(request))
-        keys = request.keys()
-        log.debug("keys: " + str(keys))
-        if self.requesting_agent == 'command_line':
-            ##There will be no frontend project here.
-            if request['entity']['type'] == 'Sequence':
-                self.project_type = "cb"
-            if request['entity']['type'] == 'MmService':
-                self.project_type = "md"
-            if request['entity']['type'] == 'Conjugate':
-                self.project_type = "gp"
-            pass
-
-        else:
-            projectKeys = request['project'].keys()
-            ##This is meant to be different from the frontend project timestamp.
-            if 'md5sum' in projectKeys:
-                self.md5sum = request['project']['md5sum']
-            if 'type' in projectKeys:
-                self.project_type = request['project']['type']
-
         self.pUUID = str(uuid.uuid4())
-        log.debug("pUUID: " + str(self.pUUID))
+
+        if self.requesting_agent != 'command_line':
+            if request['entity']['type'] == 'MmService':
+                self.hasInputFiles = True
+            elif request['entity']['type'] == 'Conjugate':
+                self.hasInputFiles = True
+            elif request['entity']['type'] == "StructureFile":
+                self.hasInputFiles = True
+
+            if 'md5Sum' in request['project'].keys():
+                self.md5sum = request['project']['md5Sum']
+            if 'type' in request['project'].keys():
+                self.project_type = request['project']['type']
+        else:
+            ##There will be no frontend project here.
+            log.error("Still developing command_line logic for projects.")
 
         self.output_dir = projectSettings.output_data_dir + "tools/" + self.project_type + "/git-ignore-me_userdata/" + self.pUUID + "/"
-        log.debug("output_dir: " + self.output_dir)
 
         ##Check that the outpur_dir exists. Create it if not.
         if not os.path.exists (self.output_dir):
-            log.debug("Creating a output_dir at: " + self.output_dir)
             os.makedirs(self.output_dir)
 
         self.updateTransaction(thisTransaction)
@@ -89,6 +79,7 @@ class GemsProject(BaseModel):
         thisTransaction.response_dict['gems_project']['timestamp'] = str(self.timestamp)
         thisTransaction.response_dict['gems_project']['pUUID'] = self.pUUID
         thisTransaction.response_dict['gems_project']['output_dir'] = self.output_dir
+        thisTransaction.response_dict['gems_project']['hasInputFiles'] = self.hasInputFiles
         if self.md5sum is not None:
             thisTransaction.response_dict['gems_project']['md5sum'] = self.md5sum
         if self.project_type is not None:
@@ -108,11 +99,25 @@ class GemsProject(BaseModel):
         result = result + self.pUUID
         result = result + "\noutput_dir: "
         result = result + self.output_dir
+        result = result + "\nhasInputFiles: "
+        result = result + str(self.hasInputFiles)
         if self.md5sum is not None:
             result = result + "\nmd5sum: "
             result = result + self.md5sum
 
         return result
+
+##  Figures out the type of structure file being preprocessed.
+def getStructureFileProjectType(request):
+    projectType = "not set"
+    services = request['entity']['services']
+    for service in services:
+        if 'Preprocess' in service.keys():
+            if 'type' in service['Preprocess'].keys():
+                if 'PreprocessPdbForAmber' == service['Preprocess']['type']:
+                    projectType = "pdb"
+
+    return projectType
 
 
 def generateGemsProjectSchema():

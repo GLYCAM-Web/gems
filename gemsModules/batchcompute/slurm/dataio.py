@@ -6,6 +6,13 @@ from pydantic import BaseModel,  Field
 from pydantic.schema import schema
 
 from gemsModules.common import transaction
+from gemsModules.common.loggingConfig import *
+
+if loggers.get(__name__):
+    pass
+else:
+    log = createLogger(__name__)
+
 
 class SlurmJobInfoSchema(BaseModel):
     partition: str = Field(
@@ -62,6 +69,9 @@ class SlurmJobInfo:
         self.incoming_string = incoming_string
         self.incoming_dict : {} =  None
         self.jobinfo_in : SlurmJobInfoSchema = None
+        self.jobinfo_out : SlurmJobInfoSchema = None
+        self.outgoing_dict : {} =  None
+        self.outgoing_string = None
 
     def parseIncomingString(self):
         import json
@@ -85,6 +95,30 @@ class SlurmJobInfo:
         # If still here, load the data into a Transaction object and return success
         self.jobinfo_in = jsonpickle.decode(self.incoming_string)
 
+    def copyJobinfoInToOut(self):
+        if self.jobinfo_in is None: self.parseIncomingString()
+
+        self.jobinfo_out = self.jobinfo_in
+        self.outgoing_dict = self.incoming_dict
+
+    def addSbatchResponseToJobinfoOut(self, response: str):
+        if self.outgoing_dict is None:
+            log.error("There is nowhere to put the JobID.  This will probably cause trouble.")
+            return
+        self.outgoing_dict["schedulerResponse"]=response
+        responseOK=True
+        responseList=response.split()
+        if str(responseList[0]) != "Submitted":
+            responseOK=False
+        if responseList[1] != "batch":
+            responseOK=False
+        if responseList[2] != "job":
+            responseOK=False
+        if responseOK is True:
+            self.outgoing_dict["jobID"]=responseList[3]
+            log.debug("JobID " + responseList[3] + " was added to the dictionary.")
+        else:
+            log.error("The sbatch response has an unexpected form:  >>>"+response+"<<<")
 
 ##
 ##  Others to add one day:

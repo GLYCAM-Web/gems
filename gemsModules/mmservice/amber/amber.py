@@ -1,16 +1,12 @@
-#custom
-import conf
+import os, sys
 from gemsModules.common.loggingConfig import *
-
-##TO set logging verbosity for just this file, edit this var to one of the following:
-## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-logLevel = logging.DEBUG
+from gemsModules.common.loggingConfig import *
+from . import conf
 
 if loggers.get(__name__):
     pass
 else:
-    log = createLogger(__name__, logLevel)
-
+    log = createLogger(__name__)
 
 class Amber_Job:
     def __init__(self, json_dict):
@@ -19,17 +15,21 @@ class Amber_Job:
         self.AMBERHOME = '/programs/amber'
         self.MD_COMMAND = 'sander' #Later determine this based on input json file. For now, just sander
         self.RUN_LOG = 'run.log'
-        self.RUN_PREF = conf.File_Naming.prefSTRUCTURE + conf.File_Naming.modION + conf.File_Naming.modSOLV
-        self.Run_Script_Name = self.RUN_PREF + '.sh'
+        self.RUN_PREF = conf.File_Naming.prefSTRUCTURE
+#        self.RUN_PREF = conf.File_Naming.prefSTRUCTURE + conf.File_Naming.modION + conf.File_Naming.modSOLV
+        self.Run_Script_Name = self.RUN_PREF + '.bash'
 	#Job id
         self.JobId = str (json_dict["project"]["id"])
         self.WorkDir = str (json_dict["project"]["workingDirectory"])
         #Expect the 1st member of that list to be prmtop name, the 2nd to be teh inpcrd name
-        self.PARMTOP = str (json_dict["project"]["prmtop_file_name"])
-        self.INPCRD = str (json_dict["project"]["inpcrd_file_name"])
+#        self.PARMTOP = str (json_dict["project"]["prmtop_file_name"])
+#        self.INPCRD = str (json_dict["project"]["inpcrd_file_name"])
+        self.PARMTOP =  self.RUN_PREF + '.' +  conf.File_Naming.extPARM
+        self.INPCRD =  self.RUN_PREF + '.' +  conf.File_Naming.extINPCRD
         log.debug ("self PARMTOP is " + self.PARMTOP )
         log.debug ("self INPCRD is " + self.INPCRD )
         #input file names
+        self.LEAPIN = self.RUN_PREF + '.' + conf.File_Naming.extLEAPIN
         self.MININ = self.RUN_PREF + '.' + conf.File_Naming.extMININ
         self.HEATIN = self.RUN_PREF + '.' + conf.File_Naming.extHEATIN
         self.EQUIIN = self.RUN_PREF + '.' + conf.File_Naming.extEQUIIN
@@ -54,6 +54,8 @@ class Amber_Job:
         self.HEATINFO = self.RUN_PREF + '.' + conf.File_Naming.extHEATINFO
         self.EQUIINFO = self.RUN_PREF + '.' + conf.File_Naming.extEQUIINFO
         self.MDINFO = self.RUN_PREF + '.' + conf.File_Naming.extMDINFO
+        #PDB file names
+        self.MINPDB = self.RUN_PREF + '_min.' + conf.File_Naming.extPDB 
         #logfile names
         self.MINLOG = self.RUN_PREF + '.' + conf.File_Naming.extMINLOG
         self.HEATLOG = self.RUN_PREF + '.' + conf.File_Naming.extHEATLOG
@@ -64,10 +66,12 @@ class Amber_Job:
         #other parameters
         if json_dict["project"]["type"] == "minimization":
             self.minimization_only = True;
+            self.CreateTLeapInputFile()
             self.CreateMinimizationInputFile()
             self.CreateSubmissionScript(json_dict)
         else:
             self.minimization_only = False;
+            self.CreateTLeapInputFile()
             self.CreateMinimizationInputFile()
             self.CreateHeatingInputFile()
             self.CreateEquilibrationInputFile()
@@ -78,22 +82,24 @@ class Amber_Job:
         self.water_model = json_dict["project"]["water_model"] #tip 3p/4p/5p or none (gas phase)
 
     def CreateTLeapInputFile(self): #Creates a tLeap input file that creates minimization PARMTOP and RST7 files.
-        pass
+        tleap_in = open (self.WorkDir + '/' + self.LEAPIN, 'w')
+        log.debug("Attempting to open this file as tleap in >>>" + self.WorkDir + '/' + self.LEAPIN + "<<<")
+        tleap_in.write('verbosity 0\n')
+        tleap_in.write('logfile leap.log\n')
+        tleap_in.write('source leaprc.GLYCAM_06j-1 \n')
+        tleap_in.write('loadoff structure.off \n')
+        tleap_in.write('check CONDENSEDSEQUENCE \n')
+        tleap_in.write('saveamberparm CONDENSEDSEQUENCE ' + self.PARMTOP + ' ' + self.INPCRD + '\n')
+        tleap_in.write('quit\n')
 
     def CreateMinimizationInputFile(self):
         min_in = open (self.WorkDir + '/' + self.MININ, 'w')
-        min_in.write('Constant Volume Minimization\n')
-        min_in.write(' # Control section\n')
+        min_in.write('Gas Phase Minimization\n')
         min_in.write(' &cntrl\n')
-        min_in.write('  ntxo = 1,\n')
-        min_in.write('  ntwx = 500, ntpr = 500,\n')
-        min_in.write('  nsnb = 25, dielc = 80, cut = 12.0,\n')
-        min_in.write('  ntb = 1,\n')
-        min_in.write('  maxcyc = 10000, ntmin = 1, ncyc = 10000, dx0 = 0.01, drms = 0.0001,\n')
-        min_in.write('  ntp = 0,\n')
-        min_in.write('  ibelly = 0, ntr = 0,\n')
-        min_in.write('  imin = 1,\n')
-        min_in.write(' /\n')
+        min_in.write('  imin = 1, maxcyc = 10000, ncyc = 5000, dt = 0.001 ,\n')
+        min_in.write('  ntb = 0, cut = 20.0, ntmin = 1, nscm = 100, dielc = 1 ,\n')
+        min_in.write('  ntxo = 1, ntwr = 1,\n')
+        min_in.write(' &end \n')
 
     def CreateHeatingInputFile(self):
         heat_in = open (self.WorkDir + '/' + self.HEATIN, 'w')
@@ -155,9 +161,13 @@ class Amber_Job:
         run_script.write("export AMBERHOME=" + self.AMBERHOME + "\n")
         run_script.write("echo \"Sourcing amber.sh \" > ${LOGFILE}" + "\n")
         run_script.write("source ${AMBERHOME}/amber.sh\n")
+
+
         #For now don't call tleap to make Prmtop and rst7, they are provided by the user. The create tleap input file function is currently empty
-        #run_script.write("echo \"Running tleap...\" >> ${LOGFILE}" + "\n")
-        #run_script.write("tleap -f tleap.in\n")
+        run_script.write("echo \"Running tleap...\" >> ${LOGFILE}" + "\n")
+        run_script.write("tleap -f " + self.LEAPIN + "\n")
+
+
         run_script.write("echo \"Running sander...\" >> ${LOGFILE}" + "\n")
         run_script.write("\n")
         run_script.write("cd " + self.WorkDir + "\n")
@@ -183,10 +193,12 @@ class Amber_Job:
         run_script.write("  -inf  " + self.MININFO + " \\\n\n")
         run_script.write("if grep -q \'" + self.MD_DONE_TEXT + "\' " + self.MINOUT + " ; then\n")
         run_script.write("    echo \"Minimization of webid ${RUN_ID} appears to be complete on $(date).\" >> ${LOGFILE}\n")
+        run_script.write("    ambpdb -p " + self.PARMTOP + " -c " + self.INPCRD + " > " + self.MINPDB + " 2> " + self.MINPDB + ".stderr\n")
         run_script.write("else\n")
         run_script.write("    echo \"Minimization of webid ${RUN_ID} appears to have failed on $(date).Check " + self.MINOUT + "\" >> ${LOGFILE}\n")
         run_script.write("    exit 1\n")
         run_script.write("fi\n")
+
 
         if self.minimization_only != True:
             run_script.write("${MD_COMMAND} \\\n")
@@ -240,13 +252,13 @@ class Amber_Job:
         #Previous function should cd into working directory.So file path is omitted in this function.
         input_files_missing = False
         out_files_exist = False
-        if os.path.isfile(self.WorkDir + "/" + self.PARMTOP) == False:
-            input_files_missing = True
-            log.debug('Parmtop file missing in sub directory %s'%(os.path.abspath(self.WorkDir)))
-        if os.path.isfile(self.WorkDir + "/" + self.INPCRD) == False:
-            log.debug ("Test:" + self.WorkDir + "/" + self.INPCRD)
-            input_file_missing = True
-            log.debug('Inpcrd file missing in sub directory %s'%(os.path.abspath(self.WorkDir)))
+#        if os.path.isfile(self.WorkDir + "/" + self.PARMTOP) == False:
+#            input_files_missing = True
+#            log.debug('Parmtop file missing in sub directory %s'%(os.path.abspath(self.WorkDir)))
+#        if os.path.isfile(self.WorkDir + "/" + self.INPCRD) == False:
+#            log.debug ("Test:" + self.WorkDir + "/" + self.INPCRD)
+#            input_file_missing = True
+#            log.debug('Inpcrd file missing in sub directory %s'%(os.path.abspath(self.WorkDir)))
         if os.path.isfile(self.WorkDir + "/" + self.MININ) == False:
             input_file_missing = True
             log.debug('MININ file missing in sub directory %s'%(os.path.abspath(self.WorkDir)))
@@ -288,18 +300,18 @@ class Amber_Job:
         elif input_files_missing == False and out_files_exist == False:
             return True
 
-if __name__ == "__main__":
+
+def manageIncomingString(jsonObjectString: str):
     import os,sys,json
-    input_json_dict = {}
-    with open('amberMdRequest.json') as input_json:
-        input_json_dict = json.load(input_json)
+#    input_json_dict = {}
+    input_json_dict = json.loads(jsonObjectString)
 
     amber_job = Amber_Job(input_json_dict)
 
     if amber_job.check_if_dir_content_good() == True:
+        from gemsModules.batchcompute import batchcompute
         slurm_module_path = '../../batchcompute'
         sys.path.append(os.path.abspath(slurm_module_path))
-        import batchcompute
         outgoing_json_dict = {}
         outgoing_json_dict["partition"] = "amber"
         outgoing_json_dict["user"] = "webdev"
@@ -308,3 +320,45 @@ if __name__ == "__main__":
         outgoing_json_dict["sbatchArgument"] = amber_job.Run_Script_Name
 
         batchcompute.batch_compute_delegation(outgoing_json_dict)
+
+def main():
+    import importlib.util, os, sys
+    #from importlib import util
+    if importlib.util.find_spec("gemsModules") is None:
+        this_dir, this_filename = os.path.split(__file__)
+        sys.path.append(this_dir + "/../")
+        if importlib.util.find_spec("common") is None:
+            print("I cannot find the Common Servicer.  No clue what to do. Exiting")
+            sys.exit(1)
+        else:
+            from common import utils
+    else:
+        from gemsModules.common import utils
+    jsonObjectString=utils.JSON_From_Command_Line(sys.argv)
+    try:
+        responseObject=manageIncomingString(jsonObjectString)
+    except Exception as error:
+        print("\nThe mmservice.amber module captured an error.")
+        print("Error type: " + str(type(error)))
+        print(traceback.format_exc())
+        ##TODO: see about exploring this error and returning more info. Temp solution for now.
+        responseObject = {
+            'response' : {
+                'type' : 'UnknownError',
+                'notice' : {
+                    'code' : '500',
+                    'brief' : 'unknownError',
+                    'blockID' : 'unknown',
+                    'message' : 'Not sure what went wrong. Error captured by the mmservice.amber gemsModule.'
+                }
+            }
+        }
+        responseObjectString = str(responseObject)
+
+
+    print("\nmmservice.amber is returning this: \n" +  responseObjectString)
+
+
+if __name__ == "__main__":
+    main()
+

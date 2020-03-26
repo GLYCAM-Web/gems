@@ -1,13 +1,15 @@
-prefSTRUCTURE='struct'  # default prefix for a structure file
+prefSTRUCTURE='mol'  # default prefix for a structure file
 
 ##
 ## File Extensions - the part after the final period (.)
 ##
 # General extensions
 extPDB='pdb'  # all varieties of PDB-style file
+extOFF='off'  # OFF files
 extMMCIF='mmcif'  # mm-cif files
 extTEXT='txt'  # A plain-text file, usually ASCII
 extRUNLOG='runlog'  # log for the GLYCAM-Web process
+
 # AMBER-related extensions
 extPARM='parm7'  # AMBER parameter-topology file
 extINPCRD='rst7'  # AMBER input-coordinate file
@@ -17,20 +19,26 @@ extEQUICRD='equicrd'
 extMDCRD='mdcrd'  # AMBER coordinate trajectory
 extMDVEL='mdvel'  # AMBER velocity trajectory
 extMDCRDBOX='crdbox'  # AMBER coordinate trajectory with periodic boundary
+
+extLEAPIN='leapin'
 extMININ='minin'
 extHEATIN='heatin'
 extEQUIIN='equiin'
 extMDIN='mdin'  # AMBER molecular dynamics input file
+
 extMINOUT='minout'
 extHEATOUT='heatout'
 extEQUIOUT='equiout'
 extMDOUT='mdout'  # AMBER molecular dynamics output file
+
 extMDCRDREF='rst7'  # AMBER molecular dynamics reference coordinate file
 extMDRST='rst7'  # AMBER molecular dynamics reference coordinate file
+
 extMININFO='mininfo'
 extHEATINFO='heatinfo'
 extEQUIINFO='equiinfo'
 extMDINFO='mdinfo'  # AMBER molecular dynamics simulation information file
+
 extMINLOG='minlog'
 extHEATLOG='heatlog'
 extEQUILOG='equilog'

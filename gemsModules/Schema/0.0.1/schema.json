@@ -9,15 +9,15 @@
       "$ref": "#/definitions/Project"
     },
     "options": {
-      "$ref": "#/definitions/Options"
+      "$ref": "#/definitions/Tags"
     }
   },
   "required": [
     "entity"
   ],
   "definitions": {
-    "Options": {
-      "title": "Options",
+    "Tags": {
+      "title": "Tags",
       "type": "object",
       "properties": {
         "options": {
@@ -50,7 +50,7 @@
           "type": "string"
         },
         "options": {
-          "$ref": "#/definitions/Options"
+          "$ref": "#/definitions/Tags"
         }
       }
     },
@@ -80,7 +80,7 @@
           "type": "string"
         },
         "options": {
-          "$ref": "#/definitions/Options"
+          "$ref": "#/definitions/Tags"
         }
       }
     },
@@ -130,7 +130,154 @@
           }
         },
         "options": {
-          "$ref": "#/definitions/Options"
+          "$ref": "#/definitions/Tags"
+        }
+      }
+    },
+    "CommonServices": {
+      "title": "CommonServices",
+      "type": "object",
+      "properties": {
+        "commonServices": {
+          "title": "Common Services",
+          "description": "Services available to all Entities",
+          "default": "DefaultService",
+          "enum": [
+            "Evaluate",
+            "DefaultService",
+            "Marco",
+            "ListEntities",
+            "ListServices",
+            "ReturnHelp",
+            "ReturnSchema"
+          ],
+          "type": "string"
+        }
+      }
+    },
+    "ConjugateServices": {
+      "title": "ConjugateServices",
+      "type": "object",
+      "properties": {
+        "conjugateServices": {
+          "title": "Conjugate Services",
+          "description": "Services related to glycoproteins.",
+          "default": "BuildGlycoprotein",
+          "enum": [
+            "BuildGlycoprotein",
+            "Evaluate",
+            "Status"
+          ],
+          "type": "string"
+        }
+      }
+    },
+    "DelegatorServices": {
+      "title": "DelegatorServices",
+      "type": "object",
+      "properties": {
+        "delegatorServices": {
+          "title": "Delegator Services",
+          "description": "Services available to the Delegator Entity",
+          "default": "Delegate",
+          "enum": [
+            "Delegate",
+            "ListEntities"
+          ],
+          "type": "string"
+        }
+      }
+    },
+    "GraphServices": {
+      "title": "GraphServices",
+      "type": "object",
+      "properties": {
+        "graphServices": {
+          "title": "Graph Services",
+          "description": "Services related to drawing graphs.",
+          "default": "DrawGlycan",
+          "enum": [
+            "DrawGlycan"
+          ],
+          "type": "string"
+        }
+      }
+    },
+    "MmServiceServices": {
+      "title": "MmServiceServices",
+      "type": "object",
+      "properties": {
+        "mmserviceServices": {
+          "title": "Amber MmService Services",
+          "description": "Molecular Modeling services that use Amber.",
+          "default": "Amber",
+          "enum": [
+            "Amber"
+          ],
+          "type": "string"
+        }
+      }
+    },
+    "SequenceServices": {
+      "title": "SequenceServices",
+      "type": "object",
+      "properties": {
+        "sequenceServices": {
+          "title": "Sequence Services",
+          "description": "Services available to the Sequence Entity",
+          "default": "Build3DStructure",
+          "enum": [
+            "Build3DStructure"
+          ],
+          "type": "string"
+        }
+      }
+    },
+    "GlycoProteinServices": {
+      "title": "GlycoProteinServices",
+      "type": "object",
+      "properties": {
+        "glycoProteinServices": {
+          "title": "GlycoProtein Services",
+          "description": "Services available to the GlycoProtein Entity",
+          "default": "Build3DStructure",
+          "enum": [
+            "Build3DStructure"
+          ],
+          "type": "string"
+        }
+      }
+    },
+    "StatusServices": {
+      "title": "StatusServices",
+      "type": "object",
+      "properties": {
+        "statusServices": {
+          "title": "Status Reporting Services",
+          "description": "Reporting services for gemsModules.",
+          "default": "GenerateReport",
+          "enum": [
+            "GenerateReport"
+          ],
+          "type": "string"
+        }
+      }
+    },
+    "StructureFileServices": {
+      "title": "StructureFileServices",
+      "type": "object",
+      "properties": {
+        "structureFileServices": {
+          "title": "Preprocessing Services For Structure Files.",
+          "description": "Preprocessing for PDB files.",
+          "default": "PreprocessPdbForAmber",
+          "enum": [
+            "PreprocessPdbForAmber"
+          ],
+          "type": "string"
+        },
+        "options": {
+          "$ref": "#/definitions/Tags"
         }
       }
     },
@@ -144,70 +291,67 @@
           "description": "The services available will vary by Entity.",
           "anyOf": [
             {
-              "title": "CommonServices",
-              "type": "object",
-              "properties": {
-                "commonServices": {
-                  "title": "Common Services",
-                  "description": "Services available to all Entities",
-                  "default": "DefaultService",
-                  "enum": [
-                    "Marco",
-                    "Evaluate",
-                    "ListEntities",
-                    "ListServices",
-                    "ReturnHelp",
-                    "ReturnSchema",
-                    "DefaultService"
-                  ],
-                  "type": "string"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/CommonServices"
                 }
-              }
+              ]
             },
             {
-              "title": "DelegatorServices",
-              "type": "object",
-              "properties": {
-                "delegatorServices": {
-                  "title": "Delegator  Services",
-                  "description": "Services available to the Delegator Entity",
-                  "default": "Delegate",
-                  "enum": [
-                    "Delegate"
-                  ],
-                  "type": "string"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ConjugateServices"
                 }
-              }
+              ]
             },
             {
-              "title": "SequenceServices",
-              "type": "object",
-              "properties": {
-                "sequenceServices": {
-                  "title": "Sequence  Services",
-                  "description": "Services available to the Sequence Entity",
-                  "default": "Build3DStructure",
-                  "enum": [
-                    "Build3DStructure"
-                  ],
-                  "type": "string"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DelegatorServices"
                 }
-              }
+              ]
             },
             {
-              "title": "GlycoProteinServices",
-              "type": "object",
-              "properties": {
-                "glycoProteinServices": {
-                  "title": "GlycoProtein  Services",
-                  "description": "Services available to the GlycoProtein Entity",
-                  "default": "Build3DStructure",
-                  "enum": [
-                    "Build3DStructure"
-                  ],
-                  "type": "string"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/GraphServices"
                 }
-              }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/MmServiceServices"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/SequenceServices"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/GlycoProteinServices"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/StatusServices"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/StructureFileServices"
+                }
+              ]
             }
           ]
         },
@@ -224,7 +368,7 @@
           "type": "string"
         },
         "options": {
-          "$ref": "#/definitions/Options"
+          "$ref": "#/definitions/Tags"
         }
       }
     },
@@ -259,7 +403,7 @@
           "type": "string"
         },
         "options": {
-          "$ref": "#/definitions/Options"
+          "$ref": "#/definitions/Tags"
         }
       }
     },
@@ -276,8 +420,12 @@
         "notice": {
           "$ref": "#/definitions/Notice"
         },
-        "output": {
-          "$ref": "#/definitions/Resource"
+        "outputs": {
+          "title": "Outputs",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Resource"
+          }
         },
         "requestID": {
           "title": "Request ID",
@@ -285,7 +433,7 @@
           "type": "string"
         },
         "options": {
-          "$ref": "#/definitions/Options"
+          "$ref": "#/definitions/Tags"
         }
       }
     },
@@ -297,12 +445,17 @@
         "type": {
           "title": "Type",
           "enum": [
-            "Delegator",
-            "Sequence",
+            "BatchCompute",
             "CommonServices",
+            "Conjugate",
+            "Delegator",
             "Glycoprotein",
+            "MmService",
+            "Sequence",
             "StructureFile",
-            "Conjugate"
+            "Query",
+            "Graph",
+            "Status"
           ],
           "type": "string"
         },
@@ -333,7 +486,7 @@
           }
         },
         "options": {
-          "$ref": "#/definitions/Options"
+          "$ref": "#/definitions/Tags"
         }
       },
       "required": [
@@ -352,7 +505,7 @@
           }
         },
         "options": {
-          "$ref": "#/definitions/Options"
+          "$ref": "#/definitions/Tags"
         }
       }
     }
