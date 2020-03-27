@@ -66,6 +66,7 @@ def preprocessPdbForAmber(thisTransaction):
                     ##Remove gemsProject if user agent is not website.
                     cleanGemsProject(thisTransaction) 
 
+
 ##  Pass in an uploadFileName and get a new, preprocessed pdbFile object, 
 #       ready to be written to file.
 #   @param uploadFileName
@@ -80,13 +81,13 @@ def generatePdbOutput(thisTransaction):
     else:
         ##TODO: Check if user has provided optional prepFile and libraries.
         aminoLibs = getDefaultAminoLibs(gemsHome)
-        log.debug("aminoLibs: " + str(aminoLibs))
+        
         prepFile = getDefaultPrepFile(gemsHome)
-        log.debug("prepFile: " + str(prepFile))
+
         glycamLibs = gmml.string_vector()
-        log.debug("glycamLibs: " + str(glycamLibs))
+        
         otherLibs = gmml.string_vector()
-        log.debug("otherLibs: " + str(otherLibs))
+        
         preprocessor = gmml.PdbPreprocessor()
         log.debug("preprocessor: " + str(preprocessor))
 
@@ -105,8 +106,10 @@ def generatePdbOutput(thisTransaction):
             try:
                 ### Preprocess
                 preprocessor.Preprocess(pdbFile, aminoLibs, glycamLibs, otherLibs, prepFile)
+                
             except Exception as error:
                 log.error("There was a problem preprocessing with gmml.")
+                log.error(traceback.format_exc())
                 raise error
             else:
                 try:
@@ -123,6 +126,9 @@ def generatePdbOutput(thisTransaction):
                     except Exception as error:
                         log.error("Therre was a problem getting the sequence mapping.")
                         raise error
+                    else:
+                        return pdbFile
+
 
 def writePdbOutput(thisTransaction, pdbFile):
     log.info("writePdbOutput() was called.\n")
@@ -306,7 +312,9 @@ def sideloadPdbFromRcsb(pdbID, uploadDir):
             return uploadFileName
 
 
-##Amino libs
+## A method for providing default Amino libs
+##TODO:  Update these paths to those in programs/Amber
+#   @param gemsHome
 def getDefaultAminoLibs(gemsHome):
     log.info("getDefaultAminoLibs() was called.\n")
     amino_libs = gmml.string_vector()
@@ -314,6 +322,8 @@ def getDefaultAminoLibs(gemsHome):
     amino_libs.push_back(gemsHome + "/gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminont12.lib")
     amino_libs.push_back(gemsHome + "/gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminoct12.lib")
 
+    for item in amino_libs:
+        log.debug("amino_libs item: " + str(item))
     return amino_libs
 
 ##Prep file
@@ -321,6 +331,8 @@ def getDefaultPrepFile(gemsHome):
     log.info("getDefaultPrepFile() was called.\n")
     prepFile = gmml.string_vector()
     prepFile.push_back(gemsHome + "/gmml/dat/CurrentParams/leaprc_GLYCAM_06j-1_2014-03-14/GLYCAM_06j-1.prep")
+    for item in prepFile:
+        log.debug("prepFile item: " + str(item))
     return prepFile
 
 ## Only gets the file name. Not the path.
