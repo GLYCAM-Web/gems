@@ -2,9 +2,22 @@
 	"entity": {
 		"type": "StructureFile"
 	},
+	"gems_project": {
+		"status": "submitted",
+		"requesting_agent": "website",
+		"timestamp": "2020-03-30 15:00:05.991918",
+		"pUUID": "34bb24e1-57be-4130-bf48-516a51197261",
+		"output_dir": "/website/userdata/tools/pdb/git-ignore-me_userdata/34bb24e1-57be-4130-bf48-516a51197261/",
+		"hasInputFiles": true,
+		"project_type": "pdb",
+		"upload_file_name": "/website/userdata/tools/pdb/git-ignore-me_userdata/34bb24e1-57be-4130-bf48-516a51197261/uploads/512209ef-2c2a-45ef-9714-586a0d35ba30/2V95.pdb"
+	},
+	"timestamp": "2020-03-30_15:00:06",
 	"responses": [{
 		"PreprocessPdbForAmber": {
-			"payload": "/website/userdata/tools/pdb/git-ignore-me_userdata/6d7a4f30-1652-4c7f-b67d-c370bc9507ab/updated_pdb.txt"
+			"project_status": "submitted",
+			"payload": "34bb24e1-57be-4130-bf48-516a51197261",
+			"downloadUrl": "http://172.25.0.2/json/download/pdb/34bb24e1-57be-4130-bf48-516a51197261"
 		}
 	}]
 }

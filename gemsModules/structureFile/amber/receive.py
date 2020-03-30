@@ -106,6 +106,9 @@ def generatePdbOutput(thisTransaction):
             try:
                 ### Preprocess
                 preprocessor.Preprocess(pdbFile, aminoLibs, glycamLibs, otherLibs, prepFile)
+
+                updateTransactionWithPreprocessorOptions(thisTransaction, preprocessor)
+                
                 
             except Exception as error:
                 log.error("There was a problem preprocessing with gmml.")
@@ -129,6 +132,211 @@ def generatePdbOutput(thisTransaction):
                     else:
                         return pdbFile
 
+
+##  Adds any options data to the transaction's response. Used for options tables by the frontend.
+#   @param thisTransaction
+#   @param preprocessor
+def updateTransactionWithPreprocessorOptions(thisTransaction, preprocessor):
+    log.info("updateTransactionWithPreprocessorOptions() was called.\n")
+
+    ### Update the Histidine Protonation data, HIS
+    updateHISData(thisTransaction, preprocessor)
+
+    ### Update the Disulfide Bond data, CYS
+    updateCYSData(thisTransaction, preprocessor)
+
+    ### Update the Unrecognized Residue data, UNRES
+    updateUNRESData(thisTransaction, preprocessor)
+
+    ### Update the Chain Termination data, TER
+    updateTERData(thisTransaction, preprocessor)
+
+    ### Update the Replaced Hydrogen data, HYD
+    updateHYDData(thisTransaction, preprocessor)
+
+    ### Update the Unrecognized Heavy Atoms data, HVY
+    updateHVYData(thisTransaction, preprocessor)
+
+    ### Update the Missing Residues data, MIS
+    updateMISData(thisTransaction, preprocessor)
+
+
+##  Updates the transaction with Missing Residue data from a pdb
+#   @param thisTransaction
+#   @param preprocessor
+def updateMISData(thisTransaction, preprocessor):
+    log.info("updateMISData() was called.\n")
+    
+    missingResidues = preprocessor.GetMissingResidues()
+    log.info("length of missingResidues: " + str(len(missingResidues)))
+
+    for item in missingResidues: 
+        chainID = item.GetResidueChainId()
+        log.debug("chainID: " + chainID)
+        startSequenceNumber = str(item.GetStartingResidueSequenceNumber())
+        log.debug("startSequenceNumber: " + startSequenceNumber)
+        endSequenceNumber = str(item.GetEndingResidueSequenceNumber())
+        log.debug("endSequenceNumber: " + endSequenceNumber)
+        residueBeforeGap = str(item.GetResidueBeforeGap())
+        log.debug("residueBeforeGap: " + residueBeforeGap)
+        residueAfterGap = str(item.GetResidueAfterGap())
+        log.debug("residueAfterGap: " + residueAfterGap)
+        startInsertionCode = item.GetStartingResidueInsertionCode()
+        log.debug("startInsertionCode: " + startInsertionCode)
+        endInsertionCode = item.GetEndingResidueInsertionCode()
+        log.debug("endInsertionCode: " + endInsertionCode)
+
+
+
+    ##TODO: Add to the response in the transaction
+    log.debug("Add to response in transaction.")
+
+
+##  Updates the transaction with Unrecognized Heavy Atom data from a pdb
+#   @param thisTransaction
+#   @param preprocessor
+def updateHVYData(thisTransaction, preprocessor):
+    log.info("updateHVYData() was called.\n")
+
+    hvyAtoms = preprocessor.GetUnrecognizedHeavyAtoms()
+    log.info("length of hvyAtoms: " + str(len(hvyAtoms)))
+
+    for item in hvyAtoms:
+        index = str(item.GetAtomSerialNumber())
+        log.debug("index: " + index)
+        atomName = item.GetAtomName()
+        log.debug("atomName: " + atomName)
+        residueName == item.GetResidueName()
+        log.debug("residueName: " + residueName)
+        chainID = item.GetResidueChainId()
+        log.debug("chainID: " + chainID)
+        residueNumber = str(item.GetResidueSequenceNumber())
+        log.debug("residueNumber: " + residueNumber)
+        insertionCode = str(item.GetResidueInsertionCode())
+        log.debug("insertionCode: " + insertionCode)
+
+    ##TODO: Add to the response in the transaction
+    log.debug("Add to response in transaction.")
+
+
+##  Updates the transaction with Replaced Hydrogen data from a pdb
+#   @param thisTransaction
+#   @param preprocessor
+def updateHYDData(thisTransaction, preprocessor):
+    log.info("updateHYDData() was called.\n")
+
+    replacedHydrogens = preprocessor.GetReplacedHydrogens()
+    log.info("length of replacedHydrogens: " + str(len(replacedHydrogens)))
+
+    for item in replacedHydrogens:
+        index = str(item.GetAtomSerialNumber())
+        log.debug("index: " + index)
+        atomName = item.GetAtomName()
+        log.debug("atomName: " + atomName)
+        residueName = item.GetResidueName()
+        log.debug("residueName: " + residueName)
+        chainID = item.GetResidueChainId()
+        log.debug("chainID: " + chainID)
+        residueNumber = str(item.GetResidueSequenceNumber())
+        log.debug("residueNumber: " + residueNumber)
+        insertionCode = item.GetResidueInsertionCode()
+        log.debug("insertionCode: " + insertionCode)
+
+    ##TODO: Add to the response in the transaction
+    log.debug("Add to response in transaction.")
+
+
+##  Updates the transaction with Chain Termination data from a pdb
+#   @param thisTransaction
+#   @param preprocessor
+def updateTERData(thisTransaction, preprocessor):
+    log.info("updateTERData() was called.\n")
+
+    chainTerminations = preprocessor.GetChainTerminations()
+    log.debug("length of chainTerminations: " + str(len(chainTerminations)))
+
+    for item in chainTerminations:
+        chainID = item.GetResidueChainId()
+        log.debug("chainID: " + chainID)
+        startIndex = str(item.GetStartingResidueSequenceNumber())
+        log.debug("startIndex: " + startIndex)
+        startInsertion = str(item.GetStartingResidueInsertionCode())
+        log.debug("startInsertion: " + startInsertion)
+        endIndex = str(item.GetEndingResidueSequenceNumber())
+        log.debug("endIndex: " + endIndex)
+        endInsertion = str(item.GetEndingResidueInsertionCode())
+        log.debug("endInsertion: " + endInsertion)
+
+    ##TODO: Add to the response in the transaction
+    log.debug("Add to response in transaction.")        
+
+
+
+##  Updates the transaction with Unrecognized Residue data from a pdb
+#   @param thisTransaction
+#   @param preprocessor
+def updateUNRESData(thisTransaction, preprocessor):
+    log.info("updateUNRESData() was called.\n")
+
+    unrecognizedResidues = preprocessor.GetUnrecognizedResidues()
+    log.debug("length of unrecognizedResidues: " + str(len(unrecognizedResidues)))
+
+    for item in unrecognizedResidues:
+        chainID = item.GetResidueChainId()
+        log.debug("chainID: " + chainID)
+        index = str(item.GetResidueSequenceNumber())
+        log.debug("index: " + index)
+        insertionCode = item.GetResidueInsertionCode()
+        log.debug("insertionCode: " + insertionCode)
+        name = item.GetResidueName()
+        log.debug("name: " + name)
+        isMidChain = str(item.GetMiddleOfChain())
+        log.debug("isMidChain: " + isMidChain)
+
+    ##TODO: Add to the response in the transaction
+    log.debug("Add to response in transaction.")
+
+##  Updates the transaction with Disulfide Bonding data from a pdb
+#   @param thisTransaction
+#   @param preprocessor
+def updateCYSData(thisTransaction, preprocessor):
+    log.info("updateCYSData() was called.\n")
+
+    disulfideBonds = preprocessor.GetDisulfideBonds()
+    log.debug("length of disulfideBonds: " + str(len(disulfideBonds)))
+
+    for item in disulfideBonds:
+        residue1Number = item.GetResidueSequenceNumber1()
+        log.debug("residue1Number: " + residue1Number)
+        residue2Number = item.GetResidueSequenceNumber2()
+        log.debug("residue2Number: " + residue2Number)
+        distance = str(item.GetDistance())
+        log.debug("distance: " + distance)
+
+    ##TODO: Add to the response in the transaction
+    log.debug("Add to response in transaction.")
+
+##  Updates the transaction with Histidine mapping data from a pdb
+#   @param thisTransaction
+#   @param preprocessor
+def updateHISData(thisTransaction, preprocessor):
+    log.info("updateHISData() was called.\n")
+
+    histidineMappings = preprocessor.GetHistidineMappings()
+    log.debug("length of histidineMappings: " + str(len(histidineMappings)))
+
+    for item in histidineMappings:
+        chainID = item.GetResidueChainId()
+        log.debug("chainID: " + chainID)
+        residueNumber = str(item.GetResidueSequenceNumber())
+        log.debug("residueNumber: " + residueNumber)
+        insertionCode = item.GetResidueInsertionCode()
+        log.debug("instertionCode: " + insertionCode)
+        mappingFormat = item.GetStringFormatOfSelectedMapping()
+        log.debug("mappingFormat: " + mappingFormat)
+
+    ##TODO: Add to the response in the transaction
+    log.debug("Add to response in transaction.")
 
 def writePdbOutput(thisTransaction, pdbFile):
     log.info("writePdbOutput() was called.\n")
