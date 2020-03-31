@@ -48,6 +48,8 @@ def preprocessPdbForAmber(thisTransaction):
             # outputDir = getOutputDir(thisTransaction)
             # frontendProject = thisTransaction.request_dict['project']
             # uploadFileName = getUploadsDestinationDir(frontendProject, outputDir)
+
+
             log.debug("completed uploadFileName: " + uploadFileName)
             ### generate the processed pdb's content
             try:
@@ -55,6 +57,7 @@ def preprocessPdbForAmber(thisTransaction):
                 log.debug("pdbFile output: " + str(pdbFile))
             except Exception as error:
                 log.error("There was a problem generating the PDB output.")
+                raise error
             else:
 
                 ### Write the content to file
@@ -62,6 +65,7 @@ def preprocessPdbForAmber(thisTransaction):
                     writePdbOutput(thisTransaction, pdbFile)
                 except Exception as error:
                     log.error("There was a problem writing the pdb output.")
+                    raise error
                 else:
                     ##Remove gemsProject if user agent is not website.
                     cleanGemsProject(thisTransaction) 
@@ -81,56 +85,62 @@ def generatePdbOutput(thisTransaction):
     else:
         ##TODO: Check if user has provided optional prepFile and libraries.
         aminoLibs = getDefaultAminoLibs(gemsHome)
-        
         prepFile = getDefaultPrepFile(gemsHome)
-
         glycamLibs = gmml.string_vector()
-        
         otherLibs = gmml.string_vector()
-        
         preprocessor = gmml.PdbPreprocessor()
         log.debug("preprocessor: " + str(preprocessor))
 
+
+        ### Get the fileName from the transaction.
+        project = thisTransaction.request_dict['project']
         try:
-            ### Get the fileName from the transaction.
-            gemsProject = thisTransaction.response_dict['gems_project']
-            uploadFileName = gemsProject['upload_file_name']
-            #PDB file object:
-            log.debug("uploadFileName: " + uploadFileName)
-            pdbFile = gmml.PdbFile(uploadFileName)
-            log.debug("pdbFile: " + str(pdbFile))
+            outputDir = getOutputDir(thisTransaction)
         except Exception as error:
-            log.error("There was a problem creating the pdbFile object from the uploaded pdb file.")
+            log.error("There was a problem getting the output dir.")
+            log.error(traceback.format_exc())
             raise error
         else:
+            projectDir  = getProjectUploadsDir(project, outputDir)
+            uploadedFileName = project['uploaded_file_name']
+            log.debug("uploadedFileName: " + uploadedFileName)
+            uploadedPDB = projectDir + uploadedFileName
+            #PDB file object:
+            log.debug("uploadedPDB: " + uploadedPDB)
             try:
-                ### Preprocess
-                preprocessor.Preprocess(pdbFile, aminoLibs, glycamLibs, otherLibs, prepFile)
-
-                updateTransactionWithPreprocessorOptions(thisTransaction, preprocessor)
-                
-                
+                pdbFile = gmml.PdbFile(uploadedPDB)
+                log.debug("pdbFile: " + str(pdbFile))
             except Exception as error:
-                log.error("There was a problem preprocessing with gmml.")
-                log.error(traceback.format_exc())
+                log.error("There was a problem creating the pdbFile object from the uploaded pdb file.")
+                log.error(traceback.format_exc)
                 raise error
             else:
                 try:
-                    ### Apply preprocessing
-                    preprocessor.ApplyPreprocessingWithTheGivenModelNumber(pdbFile, aminoLibs, glycamLibs, prepFile)
-                except:
-                    log.error("There was a problem applying the preprocessing.")
+                    ### Preprocess
+                    preprocessor.Preprocess(pdbFile, aminoLibs, glycamLibs, otherLibs, prepFile)
+                    updateTransactionWithPreprocessorOptions(thisTransaction, preprocessor)
+                    
+                except Exception as error:
+                    log.error("There was a problem preprocessing with gmml.")
+                    log.error(traceback.format_exc())
                     raise error
                 else:
-                    ##Get the sequence mapping.
                     try:
-                        seqMap = pdbFile.GetSequenceNumberMapping()
-                        log.debug("seqMap: " + str(seqMap))
-                    except Exception as error:
-                        log.error("Therre was a problem getting the sequence mapping.")
+                        ### Apply preprocessing
+                        preprocessor.ApplyPreprocessingWithTheGivenModelNumber(pdbFile, aminoLibs, glycamLibs, prepFile)
+                    except:
+                        log.error("There was a problem applying the preprocessing.")
                         raise error
                     else:
-                        return pdbFile
+                        ##Get the sequence mapping.
+                        try:
+                            seqMap = pdbFile.GetSequenceNumberMapping()
+                            log.debug("seqMap: " + str(seqMap))
+                        except Exception as error:
+                            log.error("Therre was a problem getting the sequence mapping.")
+                            raise error
+                        else:
+                            return pdbFile
 
 
 ##  Adds any options data to the transaction's response. Used for options tables by the frontend.
@@ -206,7 +216,7 @@ def updateHVYData(thisTransaction, preprocessor):
         log.debug("index: " + index)
         atomName = item.GetAtomName()
         log.debug("atomName: " + atomName)
-        residueName == item.GetResidueName()
+        residueName = item.GetResidueName()
         log.debug("residueName: " + residueName)
         chainID = item.GetResidueChainId()
         log.debug("chainID: " + chainID)
@@ -306,9 +316,9 @@ def updateCYSData(thisTransaction, preprocessor):
     log.debug("length of disulfideBonds: " + str(len(disulfideBonds)))
 
     for item in disulfideBonds:
-        residue1Number = item.GetResidueSequenceNumber1()
+        residue1Number = str(item.GetResidueSequenceNumber1())
         log.debug("residue1Number: " + residue1Number)
-        residue2Number = item.GetResidueSequenceNumber2()
+        residue2Number = str(item.GetResidueSequenceNumber2())
         log.debug("residue2Number: " + residue2Number)
         distance = str(item.GetDistance())
         log.debug("distance: " + distance)
@@ -396,7 +406,7 @@ def getInput(thisTransaction : Transaction):
             if "pdb_file_name" in element.keys():
                 log.debug("looking for the attached pdb file.")
                 uploadFileName = getUploadFileName(frontendProject)
-
+                log.debug("uploadFileName: " + uploadFileName)
                 return uploadFileName
 
 
@@ -413,7 +423,31 @@ def getInput(thisTransaction : Transaction):
                     raise error
                 else:
                     log.debug("returning uploadFileName: " + uploadFileName)
+                    frontendProject['uploaded_file_name'] = uploadFileName
                     return uploadFileName
+
+            elif "metadata" in element.keys():
+                if "descriptor" in element['metadata'].keys():
+                    descriptor = element['metadata']['descriptor']
+                    
+                    if "resourceFormat" in descriptor.keys():
+                        resourceFormat = descriptor['resourceFormat']
+                        if resourceFormat == "PDBID":
+                            log.debug("Side-loading pdb from rcsb.org.")
+                            if "payload" in element.keys():
+                                uploadFileName = sideloadPdbFromRcsb(element['payload'], frontendProject['upload_path'])
+                                frontendProject['uploaded_file_name'] = uploadFileName
+
+                        else:
+                            if "locationType" in descriptor.keys():
+                                locationType = descriptor['locationType']
+                                if resourceFormat == "PDB" and locationType == "file-path":
+                                    log.debug("upload file provided.")
+                                    if "payload" in element.keys():
+                                        uploadFileName = element['payload']
+                                        return uploadFileName
+
+
             else:
                 log.debug("element.keys(): " + str(element.keys()))
 
@@ -507,17 +541,20 @@ def sideloadPdbFromRcsb(pdbID, uploadDir):
         if not os.path.exists(uploadDir):
             pathlib.Path(uploadDir).mkdir(parents=True, exist_ok=True)
 
-        uploadFileName = uploadDir  + pdbID + ".pdb"
-        log.debug("uploadFileName: " + uploadFileName)
+        pdbFileName = pdbID + ".pdb"
+
+
+        uploadTarget = uploadDir  + pdbFileName
+        log.debug("uploadTarget: " + uploadTarget)
         try:
             ##Save the string to file in the uploads dir.
-            with open(uploadFileName, "w") as uploadFile:
+            with open(uploadTarget, "w") as uploadFile:
                 uploadFile.write(contentString)
         except Exception as error:
             log.error("There was a problem writing the sideloaded content into the file.")
             raise error
         else:
-            return uploadFileName
+            return pdbFileName
 
 
 ## A method for providing default Amino libs
