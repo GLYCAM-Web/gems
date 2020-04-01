@@ -5,19 +5,102 @@
 	"gems_project": {
 		"status": "submitted",
 		"requesting_agent": "website",
-		"timestamp": "2020-03-30 15:00:05.991918",
-		"pUUID": "34bb24e1-57be-4130-bf48-516a51197261",
-		"output_dir": "/website/userdata/tools/pdb/git-ignore-me_userdata/34bb24e1-57be-4130-bf48-516a51197261/",
+		"timestamp": "2020-04-01 16:58:35.929640",
+		"pUUID": "d991f271-12ac-4d64-a948-c6add5f95af7",
+		"output_dir": "/website/userdata/tools/pdb/git-ignore-me_userdata/d991f271-12ac-4d64-a948-c6add5f95af7/",
 		"hasInputFiles": true,
-		"project_type": "pdb",
-		"upload_file_name": "/website/userdata/tools/pdb/git-ignore-me_userdata/34bb24e1-57be-4130-bf48-516a51197261/uploads/512209ef-2c2a-45ef-9714-586a0d35ba30/2V95.pdb"
+		"project_type": "pdb"
 	},
-	"timestamp": "2020-03-30_15:00:06",
 	"responses": [{
+		"PreprocessingOptions": {
+			"hisData": [{
+				"chainID": "A",
+				"residueNumber": "32",
+				"insertionCode": "?",
+				"mappingFormat": "HID"
+			}, {
+				"chainID": "A",
+				"residueNumber": "94",
+				"insertionCode": "?",
+				"mappingFormat": "HID"
+			}],
+			"cysData": [{
+				"residue1Number": "7",
+				"residue2Number": "161",
+				"distance": "2.0197"
+			}, {
+				"residue1Number": "29",
+				"residue2Number": "33",
+				"distance": "2.0216"
+			}],
+			"unresData": [],
+			"terData": [{
+				"chainID": "A",
+				"startIndex": "1",
+				"startInsertion": "?",
+				"endIndex": "166",
+				"endInsertion": "?"
+			}],
+			"hydData": [{
+				"index": "6",
+				"atomName": "H1",
+				"residueName": "ALA",
+				"chainID": "A",
+				"residueNumber": "1",
+				"insertionCode": "?"
+			}, {
+				"index": "7",
+				"atomName": "H2",
+				"residueName": "ALA",
+				"chainID": "A",
+				"residueNumber": "1",
+				"insertionCode": "?"
+			}, {
+				"index": "8",
+				"atomName": "H3",
+				"residueName": "ALA",
+				"chainID": "A",
+				"residueNumber": "1",
+				"insertionCode": "?"
+			}, {
+				"index": "109",
+				"atomName": "HZZ",
+				"residueName": "CYS",
+				"chainID": "A",
+				"residueNumber": "7",
+				"insertionCode": "?"
+			}],
+			"hvyData": [{
+				"index": "31",
+				"atomName": "SI",
+				"residueName": "PRO",
+				"chainID": "A",
+				"residueNumber": "3",
+				"insertionCode": "?"
+			}, {
+				"index": "107",
+				"atomName": "SI",
+				"residueName": "CYS",
+				"chainID": "A",
+				"residueNumber": "7",
+				"insertionCode": "?"
+			}],
+			"misData": [{
+				"chainID": "A",
+				"startSequenceNumber": "1",
+				"endSequenceNumber": "166",
+				"residueBeforeGap": "3",
+				"residueAfterGap": "7",
+				"startInsertionCode": "?",
+				"endInsertionCode": "?"
+			}]
+		}
+	}, {
 		"PreprocessPdbForAmber": {
 			"project_status": "submitted",
-			"payload": "34bb24e1-57be-4130-bf48-516a51197261",
-			"downloadUrl": "http://172.25.0.2/json/download/pdb/34bb24e1-57be-4130-bf48-516a51197261"
+			"payload": "d991f271-12ac-4d64-a948-c6add5f95af7",
+			"downloadUrl": "http://172.25.0.2/json/download/pdb/d991f271-12ac-4d64-a948-c6add5f95af7"
 		}
-	}]
+	}],
+	"timestamp": "2020-04-01_16:58:36"
 }

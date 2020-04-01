@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import os, sys,importlib.util
+import math, os, sys,importlib.util
 from datetime import datetime
 import gemsModules
 from gemsModules import common
@@ -229,6 +229,17 @@ def appendResponse(thisTransaction, responseConfig):
         log.error("Please add at a list of responses to your responseConfig object.")
         appendCommonParserNotice(thisTransaction,'IcompleteResponseError')
 
+
+##  Logic borrowed from https://realpython.com/python-rounding/
+#   @param number
+#   @param decimals
+def roundHalfUp(number, decimals=0):
+    log.info("roundHalfUp() was called.\n ")
+    log.debug("number before rounding: " + str(number))
+    multiplier = 10 ** decimals
+    roundedNumber = math.floor(number * multiplier + 0.5) / multiplier
+    log.debug("roundedNumber: " + str(roundedNumber))
+    return roundedNumber
 
 def main():
     import importlib, os, sys
