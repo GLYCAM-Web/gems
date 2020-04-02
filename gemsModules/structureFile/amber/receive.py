@@ -159,47 +159,68 @@ def updateTransactionWithPreprocessorOptions(thisTransaction, preprocessor):
     response["PreprocessingOptions"] = {}
 
     ### Update the Histidine Protonation data, HIS
-    response['PreprocessingOptions']['hisData'] = {}
-    hisData = updateHISData(thisTransaction, preprocessor)
-    response['PreprocessingOptions']['hisData'] = hisData
+    hisData = buildHistidineProtonationsDict(thisTransaction, preprocessor)
+    if len(hisData) != 0:
+        response['PreprocessingOptions']['histidineProtonation'] = {}
+        response['PreprocessingOptions']['histidineProtonation'] = hisData
+    else:
+        log.debug("length of hisData: " + str(len(hisData)))
 
-    ### Update the Disulfide Bond data, CYS
-    response['PreprocessingOptions']['cysData'] = {}
-    cysData = updateCYSData(thisTransaction, preprocessor)
-    response['PreprocessingOptions']['cysData'] = cysData
+    ### Update the Disulfide Bond data, CYS 
+    cysData = buildDisulfideBondsDict(thisTransaction, preprocessor)
+    if len(cysData) != 0:
+        response['PreprocessingOptions']['disulfideBonds'] = {}
+        response['PreprocessingOptions']['disulfideBonds'] = cysData
+    else:
+        log.debug("length of cysData: " + str(len(cysData)))
 
     ### Update the Unrecognized Residue data, UNRES
-    response['PreprocessingOptions']['unresData'] = {}
-    unresData = updateUNRESData(thisTransaction, preprocessor)
-    response['PreprocessingOptions']['unresData'] = unresData
+    unresData = buildUnrecognizedResiduesDict(thisTransaction, preprocessor)
+    if len(unresData) != 0:
+        response['PreprocessingOptions']['unrecognizedResidues'] = {}
+        response['PreprocessingOptions']['unrecognizedResidues'] = unresData
+    else:
+        log.debug("length of unresData: " + str(len(unresData)))
 
     ### Update the Chain Termination data, TER
-    response['PreprocessingOptions']['terData'] = {}
-    terData = updateTERData(thisTransaction, preprocessor)
-    response['PreprocessingOptions']['terData'] = terData
+    terData = buildChainTerminationsDict(thisTransaction, preprocessor)
+    if len(terData) != 0: 
+        response['PreprocessingOptions']['chainTerminations'] = {}
+        response['PreprocessingOptions']['chainTerminations'] = terData
+    else:
+        log.debug("length of terData: " + str(len(terData)))
 
     ### Update the Replaced Hydrogen data, HYD
-    response['PreprocessingOptions']['hydData'] = {}
-    hydData = updateHYDData(thisTransaction, preprocessor)
-    response['PreprocessingOptions']['hydData'] = hydData
+    hydData = buildReplacedHydrogensDict(thisTransaction, preprocessor)
+    if len(hydData) != 0:
+        response['PreprocessingOptions']['replacedHydrogens'] = {}
+        response['PreprocessingOptions']['replacedHydrogens'] = hydData
+    else:
+        log.debug("length of hydData: " + str(len(hydData)))
 
     ### Update the Unrecognized Heavy Atoms data, HVY
-    response['PreprocessingOptions']['hvyData'] = {}
-    hvyData = updateHVYData(thisTransaction, preprocessor)
-    response['PreprocessingOptions']['hvyData'] = hvyData
+    hvyData = buildUnrecognizedHeavyAtomsDict(thisTransaction, preprocessor)
+    if len(hvyData) != 0:
+        response['PreprocessingOptions']['unrecognizedHeavyAtoms'] = {}
+        response['PreprocessingOptions']['unrecognizedHeavyAtoms'] = hvyData
+    else:
+        log.debug("length of hvyData: " + str(len(hvyData)))
 
     ### Update the Missing Residues data, MIS
-    response['PreprocessingOptions']['misData'] = {}
-    misData = updateMISData(thisTransaction, preprocessor)
-    response['PreprocessingOptions']['misData'] = misData
+    misData = buildMissingResiduesDict(thisTransaction, preprocessor)
+    if len(misData) != 0:
+        response['PreprocessingOptions']['missingResidues'] = {}
+        response['PreprocessingOptions']['missingResidues'] = misData
+    else:
+        log.debug("length of misData: " + str(len(misData)))
 
     thisTransaction.response_dict['responses'].append(response)
 
-##  Updates the transaction with Missing Residue data from a pdb
+##  Give a transaction and a preprocessor object, get a dict with Missing Residue data from a pdb
 #   @param thisTransaction
 #   @param preprocessor
-def updateMISData(thisTransaction, preprocessor):
-    log.info("updateMISData() was called.\n")
+def buildMissingResiduesDict(thisTransaction, preprocessor):
+    log.info("buildMissingResiduesDict() was called.\n")
     
     misData = []
     missingResidues = preprocessor.GetMissingResidues()
@@ -228,23 +249,25 @@ def updateMISData(thisTransaction, preprocessor):
         log.debug("residueAfterGap: " + residueAfterGap)
 
         startInsertionCode = item.GetStartingResidueInsertionCode()
-        mapping['startInsertionCode'] = startInsertionCode
-        log.debug("startInsertionCode: " + startInsertionCode)
+        if "?" not in startInsertionCode:
+            mapping['startInsertionCode'] = startInsertionCode
+            log.debug("startInsertionCode: " + startInsertionCode)
 
         endInsertionCode = item.GetEndingResidueInsertionCode()
-        mapping['endInsertionCode'] = endInsertionCode
-        log.debug("endInsertionCode: " + endInsertionCode)
+        if "?" not in endInsertionCode:
+            mapping['endInsertionCode'] = endInsertionCode
+            log.debug("endInsertionCode: " + endInsertionCode)
 
         misData.append(mapping)
 
     return misData
 
 
-##  Updates the transaction with Unrecognized Heavy Atom data from a pdb
+##  Give a transaction and a preprocessor object, get a dict with Unrecognized Heavy Atom data from a pdb
 #   @param thisTransaction
 #   @param preprocessor
-def updateHVYData(thisTransaction, preprocessor):
-    log.info("updateHVYData() was called.\n")
+def buildUnrecognizedHeavyAtomsDict(thisTransaction, preprocessor):
+    log.info("buildUnrecognizedHeavyAtomsDict() was called.\n")
 
     hvyData = []
     hvyAtoms = preprocessor.GetUnrecognizedHeavyAtoms()
@@ -273,19 +296,20 @@ def updateHVYData(thisTransaction, preprocessor):
         log.debug("residueNumber: " + residueNumber)
 
         insertionCode = str(item.GetResidueInsertionCode())
-        mapping['insertionCode'] = insertionCode
-        log.debug("insertionCode: " + insertionCode)
+        if "?" not in insertionCode:
+            mapping['insertionCode'] = insertionCode
+            log.debug("insertionCode: " + insertionCode)
 
         hvyData.append(mapping)
 
     return hvyData
 
 
-##  Updates the transaction with Replaced Hydrogen data from a pdb
+##  Give a transaction and a preprocessor object, get a dict with Replaced Hydrogen data from a pdb
 #   @param thisTransaction
 #   @param preprocessor
-def updateHYDData(thisTransaction, preprocessor):
-    log.info("updateHYDData() was called.\n")
+def buildReplacedHydrogensDict(thisTransaction, preprocessor):
+    log.info("buildReplacedHydrogensDict() was called.\n")
 
     hydData = []
     replacedHydrogens = preprocessor.GetReplacedHydrogens()
@@ -314,19 +338,20 @@ def updateHYDData(thisTransaction, preprocessor):
         log.debug("residueNumber: " + residueNumber)
 
         insertionCode = item.GetResidueInsertionCode()
-        mapping['insertionCode'] = insertionCode
-        log.debug("insertionCode: " + insertionCode)
+        if "?" not in insertionCode:
+            mapping['insertionCode'] = insertionCode
+            log.debug("insertionCode: " + insertionCode)
 
         hydData.append(mapping)
 
     return hydData
 
 
-##  Updates the transaction with Chain Termination data from a pdb
+##  Give a transaction and a preprocessor object, get a dict with Chain Termination data from a pdb
 #   @param thisTransaction
 #   @param preprocessor
-def updateTERData(thisTransaction, preprocessor):
-    log.info("updateTERData() was called.\n")
+def buildChainTerminationsDict(thisTransaction, preprocessor):
+    log.info("buildChainTerminationsDict() was called.\n")
 
     terData = []
     chainTerminations = preprocessor.GetChainTerminations()
@@ -343,27 +368,29 @@ def updateTERData(thisTransaction, preprocessor):
         log.debug("startIndex: " + startIndex)
 
         startInsertion = str(item.GetStartingResidueInsertionCode())
-        mapping['startInsertion'] = startInsertion
-        log.debug("startInsertion: " + startInsertion)
+        if "?" not in startInsertion:
+            mapping['startInsertion'] = startInsertion
+            log.debug("startInsertion: " + startInsertion)
 
         endIndex = str(item.GetEndingResidueSequenceNumber())
         mapping['endIndex'] = endIndex
         log.debug("endIndex: " + endIndex)
 
         endInsertion = str(item.GetEndingResidueInsertionCode())
-        mapping['endInsertion'] = endInsertion
-        log.debug("endInsertion: " + endInsertion)
+        if "?" not in endInsertion:
+            mapping['endInsertion'] = endInsertion
+            log.debug("endInsertion: " + endInsertion)
         terData.append(mapping)
 
     return terData       
 
 
 
-##  Updates the transaction with Unrecognized Residue data from a pdb
+##  Give a transaction and a preprocessor object, get a dict with Unrecognized Residue data from a pdb
 #   @param thisTransaction
 #   @param preprocessor
-def updateUNRESData(thisTransaction, preprocessor):
-    log.info("updateUNRESData() was called.\n")
+def buildUnrecognizedResiduesDict(thisTransaction, preprocessor):
+    log.info("buildUnrecognizedResiduesDict() was called.\n")
 
     unresData = []
     unrecognizedResidues = preprocessor.GetUnrecognizedResidues()
@@ -380,8 +407,9 @@ def updateUNRESData(thisTransaction, preprocessor):
         log.debug("index: " + index)
 
         insertionCode = item.GetResidueInsertionCode()
-        mapping['insertionCode'] = insertionCode
-        log.debug("insertionCode: " + insertionCode)
+        if "?" not in insertionCode:    
+            mapping['insertionCode'] = insertionCode
+            log.debug("insertionCode: " + insertionCode)
 
         name = item.GetResidueName()
         mapping['name'] = name
@@ -395,11 +423,11 @@ def updateUNRESData(thisTransaction, preprocessor):
 
     return unresData
 
-##  Updates the transaction with Disulfide Bonding data from a pdb
+##  Give a transaction and a preprocessor object, get a dict with Disulfide Bonding data from a pdb
 #   @param thisTransaction
 #   @param preprocessor
-def updateCYSData(thisTransaction, preprocessor):
-    log.info("updateCYSData() was called.\n")
+def buildDisulfideBondsDict(thisTransaction, preprocessor):
+    log.info("buildDisulfideBondsDict() was called.\n")
 
     cysData = []
     disulfideBonds = preprocessor.GetDisulfideBonds()
@@ -424,11 +452,11 @@ def updateCYSData(thisTransaction, preprocessor):
     return cysData
 
 
-##  Updates the transaction with Histidine mapping data from a pdb
+##  Give a transaction and a preprocessor object, get a dict with Histidine mapping data from a pdb
 #   @param thisTransaction
 #   @param preprocessor
-def updateHISData(thisTransaction, preprocessor):
-    log.info("updateHISData() was called.\n")
+def buildHistidineProtonationsDict(thisTransaction, preprocessor):
+    log.info("buildHistidineProtonationsDict() was called.\n")
 
     histidineMappings = preprocessor.GetHistidineMappings()
     log.debug("length of histidineMappings: " + str(len(histidineMappings)))
@@ -444,8 +472,9 @@ def updateHISData(thisTransaction, preprocessor):
         log.debug("residueNumber: " + residueNumber)
 
         insertionCode = item.GetResidueInsertionCode()
-        mapping['insertionCode'] = insertionCode
-        log.debug("instertionCode: " + insertionCode)
+        if "?" not in insertionCode:
+            mapping['insertionCode'] = insertionCode
+            log.debug("instertionCode: " + insertionCode)
 
         mappingFormat = item.GetStringFormatOfSelectedMapping()
         mapping['mappingFormat'] = mappingFormat
@@ -455,6 +484,10 @@ def updateHISData(thisTransaction, preprocessor):
 
     return hisData
 
+
+## Wrapper for file writing homework
+#   @param thisTransaction
+#   @param pdbFile
 def writePdbOutput(thisTransaction, pdbFile):
     log.info("writePdbOutput() was called.\n")
     ### Give the output file the same path as the uploaded file, but replace the name.
