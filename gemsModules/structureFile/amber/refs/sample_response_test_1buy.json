@@ -1,0 +1,93 @@
+{
+	"entity": {
+		"type": "StructureFile"
+	},
+	"gems_project": {
+		"status": "submitted",
+		"requesting_agent": "website",
+		"timestamp": "2020-04-02 12:53:37.023860",
+		"pUUID": "875d8f64-7e53-4324-ade3-a19fd266f418",
+		"output_dir": "/website/userdata/tools/pdb/git-ignore-me_userdata/875d8f64-7e53-4324-ade3-a19fd266f418/",
+		"hasInputFiles": true,
+		"project_type": "pdb"
+	},
+	"responses": [{
+		"PreprocessingOptions": {
+			"histidineProtonation": [{
+				"chainID": "A",
+				"residueNumber": "32",
+				"mappingFormat": "HID"
+			}, {
+				"chainID": "A",
+				"residueNumber": "94",
+				"mappingFormat": "HID"
+			}],
+			"disulfideBonds": [{
+				"residue1Number": "7",
+				"residue2Number": "161",
+				"distance": "2.0197"
+			}, {
+				"residue1Number": "29",
+				"residue2Number": "33",
+				"distance": "2.0216"
+			}],
+			"chainTerminations": [{
+				"chainID": "A",
+				"startIndex": "1",
+				"endIndex": "166"
+			}],
+			"replacedHydrogens": [{
+				"index": "6",
+				"atomName": "H1",
+				"residueName": "ALA",
+				"chainID": "A",
+				"residueNumber": "1"
+			}, {
+				"index": "7",
+				"atomName": "H2",
+				"residueName": "ALA",
+				"chainID": "A",
+				"residueNumber": "1"
+			}, {
+				"index": "8",
+				"atomName": "H3",
+				"residueName": "ALA",
+				"chainID": "A",
+				"residueNumber": "1"
+			}, {
+				"index": "109",
+				"atomName": "HZZ",
+				"residueName": "CYS",
+				"chainID": "A",
+				"residueNumber": "7"
+			}],
+			"unrecognizedHeavyAtoms": [{
+				"index": "31",
+				"atomName": "SI",
+				"residueName": "PRO",
+				"chainID": "A",
+				"residueNumber": "3"
+			}, {
+				"index": "107",
+				"atomName": "SI",
+				"residueName": "CYS",
+				"chainID": "A",
+				"residueNumber": "7"
+			}],
+			"missingResidues": [{
+				"chainID": "A",
+				"startSequenceNumber": "1",
+				"endSequenceNumber": "166",
+				"residueBeforeGap": "3",
+				"residueAfterGap": "7"
+			}]
+		}
+	}, {
+		"PreprocessPdbForAmber": {
+			"project_status": "submitted",
+			"payload": "875d8f64-7e53-4324-ade3-a19fd266f418",
+			"downloadUrl": "http://172.25.0.2/json/download/pdb/875d8f64-7e53-4324-ade3-a19fd266f418"
+		}
+	}],
+	"timestamp": "2020-04-02_12:53:37"
+}
