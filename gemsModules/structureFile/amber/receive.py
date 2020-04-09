@@ -318,11 +318,19 @@ def buildMissingResiduesDict(thisTransaction, preprocessor):
         mapping['chainID'] = chainID
         log.debug("chainID: " + chainID)
 
+        ### If an insertion code is found, just append it to the sequence number.
         startSequenceNumber = str(item.GetStartingResidueSequenceNumber())
+        startInsertionCode = item.GetStartingResidueInsertionCode()
+        if "?" not in startInsertionCode:
+            startSequenceNumber = startSequenceNumber + startInsertionCode
         mapping['startSequenceNumber'] = startSequenceNumber
         log.debug("startSequenceNumber: " + startSequenceNumber)
 
+        ### If an insertion code is found, just append it to the sequence number.
         endSequenceNumber = str(item.GetEndingResidueSequenceNumber())
+        endInsertionCode = item.GetEndingResidueInsertionCode()
+        if "?" not in endInsertionCode:
+            endSequenceNumber = endSequenceNumber + endInsertionCode
         mapping['endSequenceNumber'] = endSequenceNumber
         log.debug("endSequenceNumber: " + endSequenceNumber)
 
@@ -333,16 +341,6 @@ def buildMissingResiduesDict(thisTransaction, preprocessor):
         residueAfterGap = str(item.GetResidueAfterGap())
         mapping['residueAfterGap'] = residueAfterGap
         log.debug("residueAfterGap: " + residueAfterGap)
-
-        startInsertionCode = item.GetStartingResidueInsertionCode()
-        if "?" not in startInsertionCode:
-            mapping['startInsertionCode'] = startInsertionCode
-            log.debug("startInsertionCode: " + startInsertionCode)
-
-        endInsertionCode = item.GetEndingResidueInsertionCode()
-        if "?" not in endInsertionCode:
-            mapping['endInsertionCode'] = endInsertionCode
-            log.debug("endInsertionCode: " + endInsertionCode)
 
         misData.append(mapping)
 
@@ -377,14 +375,14 @@ def buildUnrecognizedHeavyAtomsDict(thisTransaction, preprocessor):
         mapping['chainID'] = chainID
         log.debug("chainID: " + chainID)
 
+        ### If an insertion code is found, just append it to the sequence number.
         residueNumber = str(item.GetResidueSequenceNumber())
+        insertionCode = str(item.GetResidueInsertionCode())
+        if "?" not in insertionCode:
+            residueNumber = residueNumber + insertionCode
         mapping['residueNumber'] = residueNumber
         log.debug("residueNumber: " + residueNumber)
 
-        insertionCode = str(item.GetResidueInsertionCode())
-        if "?" not in insertionCode:
-            mapping['insertionCode'] = insertionCode
-            log.debug("insertionCode: " + insertionCode)
 
         hvyData.append(mapping)
 
@@ -419,14 +417,15 @@ def buildReplacedHydrogensDict(thisTransaction, preprocessor):
         mapping['chainID'] = chainID
         log.debug("chainID: " + chainID)
 
+        ### If an insertion code is found, just append it to the sequence number.
         residueNumber = str(item.GetResidueSequenceNumber())
+        insertionCode = item.GetResidueInsertionCode()
+        if "?" not in insertionCode:
+            residueNumber = residueNumber + insertionCode
+
         mapping['residueNumber'] = residueNumber
         log.debug("residueNumber: " + residueNumber)
 
-        insertionCode = item.GetResidueInsertionCode()
-        if "?" not in insertionCode:
-            mapping['insertionCode'] = insertionCode
-            log.debug("insertionCode: " + insertionCode)
 
         hydData.append(mapping)
 
@@ -449,23 +448,23 @@ def buildChainTerminationsDict(thisTransaction, preprocessor):
         mapping['chainID'] = chainID
         log.debug("chainID: " + chainID)
 
+        ### If an insertion code is found, just append it to the start index.
         startIndex = str(item.GetStartingResidueSequenceNumber())
+        startInsertion = str(item.GetStartingResidueInsertionCode())
+        if "?" not in startInsertion:
+            startIndex = startIndex + startInsertion
+
         mapping['startIndex'] = startIndex
         log.debug("startIndex: " + startIndex)
 
-        startInsertion = str(item.GetStartingResidueInsertionCode())
-        if "?" not in startInsertion:
-            mapping['startInsertion'] = startInsertion
-            log.debug("startInsertion: " + startInsertion)
-
+        ### If an insertion code is found, just append it to the end index.
         endIndex = str(item.GetEndingResidueSequenceNumber())
+        endInsertion = str(item.GetEndingResidueInsertionCode())
+        if "?" not in endInsertion:
+            endIndex = endIndex + endInsertion
         mapping['endIndex'] = endIndex
         log.debug("endIndex: " + endIndex)
 
-        endInsertion = str(item.GetEndingResidueInsertionCode())
-        if "?" not in endInsertion:
-            mapping['endInsertion'] = endInsertion
-            log.debug("endInsertion: " + endInsertion)
         terData.append(mapping)
 
     return terData       
@@ -488,14 +487,13 @@ def buildUnrecognizedResiduesDict(thisTransaction, preprocessor):
         mapping['chainID'] = chainID
         log.debug("chainID: " + chainID)
 
+        ### If an insertion code is found, just append it to the index.
         index = str(item.GetResidueSequenceNumber())
+        insertionCode = item.GetResidueInsertionCode()
+        if "?" not in insertionCode: 
+            index = index + insertionCode
         mapping['index'] = index
         log.debug("index: " + index)
-
-        insertionCode = item.GetResidueInsertionCode()
-        if "?" not in insertionCode:    
-            mapping['insertionCode'] = insertionCode
-            log.debug("insertionCode: " + insertionCode)
 
         name = item.GetResidueName()
         mapping['name'] = name
@@ -508,6 +506,7 @@ def buildUnrecognizedResiduesDict(thisTransaction, preprocessor):
         unresData.append(mapping)
 
     return unresData
+
 
 ##  Give a transaction and a preprocessor object, get a dict with Disulfide Bonding data from a pdb
 #   @param thisTransaction
@@ -553,14 +552,15 @@ def buildHistidineProtonationsDict(thisTransaction, preprocessor):
         mapping['chainID'] = chainID
         log.debug("chainID: " + chainID)
 
+        ### if an insertionCode is found, just append that to the residueNumber.
         residueNumber = str(item.GetResidueSequenceNumber())
-        mapping['residueNumber'] = residueNumber
-        log.debug("residueNumber: " + residueNumber)
-
         insertionCode = item.GetResidueInsertionCode()
         if "?" not in insertionCode:
-            mapping['insertionCode'] = insertionCode
-            log.debug("instertionCode: " + insertionCode)
+            residueNumber = residueNumber + insertionCode
+
+        mapping['residueNumber'] = residueNumber
+        log.debug("residueNumber: " + residueNumber)
+        
 
         mappingFormat = item.GetStringFormatOfSelectedMapping()
         mapping['mappingFormat'] = mappingFormat
