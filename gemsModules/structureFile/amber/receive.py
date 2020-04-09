@@ -157,12 +157,22 @@ def updateTransactionWithPreprocessorOptions(thisTransaction, preprocessor):
         thisTransaction.response_dict['responses'] = []
     response = {}
     response["PreprocessingOptions"] = {}
+    tableMetaData ={}
 
     ### Update the Histidine Protonation data, HIS
     hisData = buildHistidineProtonationsDict(thisTransaction, preprocessor)
     if len(hisData) != 0:
         response['PreprocessingOptions']['histidineProtonation'] = {}
         response['PreprocessingOptions']['histidineProtonation'] = hisData
+
+        tableMetaData.update({
+            "histidineProtonation" : { 
+                "tableLabel" : "Histidine Protonation",  
+                "interactionRequirement" : "optional",
+                "urgency" : "info",
+                "count" : str(len(hisData))
+            }
+        })
     else:
         log.debug("length of hisData: " + str(len(hisData)))
 
@@ -171,6 +181,16 @@ def updateTransactionWithPreprocessorOptions(thisTransaction, preprocessor):
     if len(cysData) != 0:
         response['PreprocessingOptions']['disulfideBonds'] = {}
         response['PreprocessingOptions']['disulfideBonds'] = cysData
+
+        ### a value of "warning" indicates optional action can be taken, but is not needed.
+        tableMetaData.update({
+            'disulfideBonds' : { 
+                "tableLabel" : "Disulfide Bonds", 
+                "interactionRequirement" : "optional",
+                "urgency" : "warning",
+                "count" : str(len(cysData))
+            }
+        })
     else:
         log.debug("length of cysData: " + str(len(cysData)))
 
@@ -179,6 +199,18 @@ def updateTransactionWithPreprocessorOptions(thisTransaction, preprocessor):
     if len(unresData) != 0:
         response['PreprocessingOptions']['unrecognizedResidues'] = {}
         response['PreprocessingOptions']['unrecognizedResidues'] = unresData
+        urgencyLevel = getUrgencyLevelForUnrecognizedResidues(unresData)
+
+         ### Any mid-chain unrecognized residues cause error level urgency,
+         #  terminals just get warnings.
+        tableMetaData.update({
+            'unrecognizedResidues' : { 
+                "tableLabel" : "Unrecognized Residues", 
+                "interactionRequirement" : "none",
+                "urgency" : urgencyLevel,
+                "count" : str(len(unresData))
+            }
+        })
     else:
         log.debug("length of unresData: " + str(len(unresData)))
 
@@ -187,6 +219,15 @@ def updateTransactionWithPreprocessorOptions(thisTransaction, preprocessor):
     if len(terData) != 0: 
         response['PreprocessingOptions']['chainTerminations'] = {}
         response['PreprocessingOptions']['chainTerminations'] = terData
+
+        tableMetaData.update({
+            'chainTerminations' : {
+                "tableLabel" : "Chain Terminations", 
+                "interactionRequirement" : "optional",
+                "urgency" : "warning",
+                "count" : str(len(terData))
+            }
+        })
     else:
         log.debug("length of terData: " + str(len(terData)))
 
@@ -195,6 +236,15 @@ def updateTransactionWithPreprocessorOptions(thisTransaction, preprocessor):
     if len(hydData) != 0:
         response['PreprocessingOptions']['replacedHydrogens'] = {}
         response['PreprocessingOptions']['replacedHydrogens'] = hydData
+
+        tableMetaData.update({
+            'replacedHydrogens' : {
+                "tableLabel" : "Replaced Hydrogens", 
+                "interactionRequirement" : "none",
+                "urgency" : "info",
+                "count" : str(len(hydData))
+            }
+        })
     else:
         log.debug("length of hydData: " + str(len(hydData)))
 
@@ -203,6 +253,16 @@ def updateTransactionWithPreprocessorOptions(thisTransaction, preprocessor):
     if len(hvyData) != 0:
         response['PreprocessingOptions']['unrecognizedHeavyAtoms'] = {}
         response['PreprocessingOptions']['unrecognizedHeavyAtoms'] = hvyData
+
+        ### If any of these exist, we've got nothing. No can do.
+        tableMetaData.update({
+            'unrecognizedHeavyAtoms' : {
+                "tableLabel" : "Unrecognized Heavy Atoms", 
+                "interactionRequirement": "none",
+                "urgency": "error",
+                "count" : str(len(hvyData))
+            }
+        } )
     else:
         log.debug("length of hvyData: " + str(len(hvyData)))
 
@@ -211,10 +271,36 @@ def updateTransactionWithPreprocessorOptions(thisTransaction, preprocessor):
     if len(misData) != 0:
         response['PreprocessingOptions']['missingResidues'] = {}
         response['PreprocessingOptions']['missingResidues'] = misData
+
+        tableMetaData.update({
+            'missingResidues' : {
+                "tableLabel" : "Missing Residues", 
+                "interactionRequirement": "optional",
+                "urgency": "warning",
+                "count" : str(len(misData))
+            }
+        })
     else:
         log.debug("length of misData: " + str(len(misData)))
 
+    ## Add the tableMetaData to the response.
+    response.update({"tableMetaData" : tableMetaData})
     thisTransaction.response_dict['responses'].append(response)
+
+
+##  If all midChain values are false, this is warning level. 
+#   Any midChain value of true makes this an error level.
+#   @param unresData
+def getUrgencyLevelForUnrecognizedResidues(unresData):
+    log.info("getUrgencyLevelForUnrecognizedResidues() was called.\n")
+    urgencyLevel = "warning"
+
+    for item in unresData:
+        if item['isMidChain'] == "True":
+            urgencyLevel = "error"
+
+    log.debug("urgencyLevel: " + urgencyLevel)
+    return urgencyLevel
 
 ##  Give a transaction and a preprocessor object, get a dict with Missing Residue data from a pdb
 #   @param thisTransaction
