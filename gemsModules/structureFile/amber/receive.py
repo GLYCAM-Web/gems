@@ -187,7 +187,7 @@ def updateTransactionWithPreprocessorOptions(thisTransaction, preprocessor):
             'disulfideBonds' : { 
                 "tableLabel" : "Disulfide Bonds", 
                 "interactionRequirement" : "optional",
-                "urgency" : "warning",
+                "urgency" : "info",
                 "count" : str(len(cysData))
             }
         })
@@ -224,7 +224,7 @@ def updateTransactionWithPreprocessorOptions(thisTransaction, preprocessor):
             'chainTerminations' : {
                 "tableLabel" : "Chain Terminations", 
                 "interactionRequirement" : "optional",
-                "urgency" : "warning",
+                "urgency" : "info",
                 "count" : str(len(terData))
             }
         })
