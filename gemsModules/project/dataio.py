@@ -15,10 +15,9 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__)
 
-##TODO: Use Doxygen-style comments.
-"""
-The backend project is not the same as the project model in the frontend.
-"""
+
+## The backend project is not the same as the project model in the frontend.
+##TODO: Add error handling.
 class GemsProject(BaseModel):
     timestamp : datetime = None
     ## The name of the output dir is the pUUID
@@ -34,6 +33,7 @@ class GemsProject(BaseModel):
     def buildProject(self, thisTransaction : Transaction, requestingAgent : str):
         log.info("buildProject was called.\n")
         log.debug("requestingAgent: " + requestingAgent)
+
         request = thisTransaction.request_dict
         self.requesting_agent = requestingAgent
         self.timestamp = datetime.now()
@@ -53,7 +53,7 @@ class GemsProject(BaseModel):
                 self.project_type = request['project']['type']
         else:
             ##There will be no frontend project here.
-            log.error("Still developing command_line logic for projects.")
+            log.warning("Still developing command_line logic for projects.")
 
         self.output_dir = projectSettings.output_data_dir + "tools/" + self.project_type + "/git-ignore-me_userdata/" + self.pUUID + "/"
 
@@ -62,6 +62,7 @@ class GemsProject(BaseModel):
             os.makedirs(self.output_dir)
 
         self.updateTransaction(thisTransaction)
+
 
     def updateTransaction(self, thisTransaction: Transaction):
         log.info("updateTransaction() was called.\n")
@@ -101,6 +102,7 @@ class GemsProject(BaseModel):
         result = result + self.output_dir
         result = result + "\nhasInputFiles: "
         result = result + str(self.hasInputFiles)
+        
         if self.md5sum is not None:
             result = result + "\nmd5sum: "
             result = result + self.md5sum

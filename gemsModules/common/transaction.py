@@ -4,6 +4,13 @@ from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 from typing import ForwardRef
 from pydantic import BaseModel, Field
 from pydantic.schema import schema
+from gemsModules.common.loggingConfig import *
+import traceback
+
+if loggers.get(__name__):
+    pass
+else:
+    log = createLogger(__name__)
 
 # ####
 # ####  Enums
@@ -374,10 +381,15 @@ class Transaction:
 #        if self.transaction_in.options is not None:
 #            if ('jsonObjectOutputFormat', 'Pretty') in self.transaction_in.options:
 #                isPretty = True
-        if isPretty:
-            self.outgoing_string=json.dumps(self.response_dict, indent=4)
-        else:
-            self.outgoing_string=json.dumps(self.response_dict)
+
+        try:
+            if isPretty:
+                self.outgoing_string=json.dumps(self.response_dict, indent=4)
+            else:
+                self.outgoing_string=json.dumps(self.response_dict)
+        except Exception as error:
+            log.error("There was a problem dumping the response_dict to string.")
+            raise error
 
 
     def build_general_error_output(self):

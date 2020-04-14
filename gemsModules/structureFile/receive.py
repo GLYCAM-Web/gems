@@ -30,18 +30,28 @@ def receive(thisTransaction):
                 log.error("The requested service is not recognized.")
                 log.error("services: " + str(structureFileSettings.serviceModules.keys()))
                 appendCommonParserNotice(thisTransaction,'ServiceNotKnownToEntity', requestedService)
+                raise AttributeError(requestedService)
             elif requestedService == "PreprocessPdbForAmber":
-                preprocessPdbForAmber(thisTransaction)
-            else:
-                log.error("Logic should never reach this point. Look at structureFile/receive.py")
-
-    thisTransaction.build_outgoing_string()
+                try:
+                    preprocessPdbForAmber(thisTransaction)
+                except Exception as error:
+                    log.error("There was a problem preprocessing the PDB for amber: " + str(error))
+                    raise error
+                else:
+                    thisTransaction.build_outgoing_string()
 
 def doDefaultService(thisTransaction):
     log.info("doDefaultService() was called.\n")
     ##Preprocess PDB will be the default. Given a request to the StructureFile entity,
     ##  with no services or options defined, look for a pdb file and preprocess it for Amber.
-    preprocessPdbForAmber(thisTransaction)
+    try:
+        preprocessPdbForAmber(thisTransaction)
+    except Exception as error:
+        log.error("There was a problem doing the default service in the structureFile module.")
+        raise error
+    else:
+        thisTransaction.build_outgoing_string()
+
 
 def main():
     GemsPath = getGemsHome()

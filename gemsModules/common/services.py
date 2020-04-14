@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import os, sys,importlib.util
+import math, os, sys,importlib.util
 from datetime import datetime
 import gemsModules
 from gemsModules import common
@@ -22,21 +22,33 @@ else:
 
 verbosity=common.utils.gems_environment_verbosity()
 
+
+##  Pass in the name of an entity, receive a module or an error.
 def importEntity(requestedEntity):
     log.info("importEntity() was called.\n")
     log.debug("requestedEntity: " + requestedEntity)
     log.debug("Entities known to Common Services: " + str(subEntities))
 
-    requestedModule = '.' + subEntities[requestedEntity]
-    log.debug("requestedModule: " + requestedModule)
+    try:
+        requestedModule = '.' + subEntities[requestedEntity]
+        log.debug("requestedModule: " + requestedModule)
+    except Exception as error:
+        log.error("There was a problem finding the requested entity. Does it exist? requestedEntity: " + requestedEntity)
+        raise error
+    else:
+        try:
+            module_spec = importlib.util.find_spec(requestedModule,package="gemsModules")
+        except Exception as error:
+            log.error("There was a problem importing the requested module.")
+            raise error
+        else:
 
-    module_spec = importlib.util.find_spec(requestedModule,package="gemsModules")
-    if module_spec is None:
-        log.error("The module spec returned None for rquestedEntity: " + requestedEntity)
-        return None
+            if module_spec is None:
+                log.error("The module spec returned None for rquestedEntity: " + requestedEntity)
+                raise FileNotFoundError(requestedEntity)
 
-    log.debug("module_spec: " + str(module_spec))
-    return importlib.import_module(requestedModule,package="gemsModules")
+            log.debug("module_spec: " + str(module_spec))
+            return importlib.import_module(requestedModule,package="gemsModules")
 
 def parseInput(thisTransaction):
     log.info("parseInput() was called.\n")
@@ -51,45 +63,21 @@ def parseInput(thisTransaction):
     log.debug("thisTransaction.request_dict: " + str(thisTransaction.request_dict))
 
     # Check to see if there are errors.  If there are, bail, but give a reason
-    #
-    ## TODO:  This will break really easily.  The 'response' part needs to refer to the
-    ## response from this activity rather than the zeroth response.  That said, at this
-    ## point, the response will usually be the zeroth one.
-    ## A construction maybe like:  if ('X','Y') in this.big.object.items():
     if thisTransaction.request_dict is None:
         appendCommonParserNotice(thisTransaction,'JsonParseError')
-        return thisTransaction.response_dict['entity']['responses'][0]['notices']['code']
+        raise AttributeError("request_dict")
     try:
         TransactionSchema(**thisTransaction.request_dict)
-    except ValidationError as e:
-        # TODO : Add these to the error/verbosity thing
-        log.error("Validation Error.")
-        log.error(e.json())
-        log.error(e.errors())
-        log.error(traceback.format_exc())
-        if 'entity' in e.errors()[0]['loc']:
-            if 'type' in e.errors()[0]['loc']:
-                log.error("Type present, but unrecognized.")
-                log.error(thisTransaction.request_dict['entity']['type'])
-                log.error(str(listEntities()))
-                appendCommonParserNotice(thisTransaction,'EntityNotKnown')
-            else:
-
-                print("No 'type' present. Appending common parser notice.")
-                appendCommonParserNotice(thisTransaction,'NoEntityDefined')
-
-        theResponseTypes = getTypesFromList(thisTransaction.response_dict['entity']['responses'])
-        log.debug(theResponseTypes)
-        return theResponseTypes.count('error')
     except Exception as error:
         log.error("There was an error parsing transaction.request_dict.")
         log.error("Error type : " + str(type(error)))
         log.error(traceback.format_exc())
-
-    # If still here, load the data into a Transaction object and return success
-    thisTransaction.transaction_in = jsonpickle.decode(thisTransaction.incoming_string)
-    log.debug("thisTransaction.transaction_in: " + str(thisTransaction.transaction_in))
-    return 0
+        raise error
+    else:
+        # If still here, load the data into a Transaction object and return success
+        thisTransaction.transaction_in = jsonpickle.decode(thisTransaction.incoming_string)
+        log.debug("thisTransaction.transaction_in: " + str(thisTransaction.transaction_in))
+        return 0
 
 def marco(requestedEntity):
     log.info("marco() was called.\n")
@@ -145,8 +133,8 @@ def returnHelp(requestedEntity,requestedHelp):
   return thisHelp
 
 ##  Looks at currentStableSchema file and returns the version it finds there.
-def getJsonApiVersion():
-    log.info("getJsonApiVersion() was called.\n")
+def getCurrentStableJsonApiVersion():
+    log.info("getCurrentStableJsonApiVersion() was called.\n")
     currentStableSchema = getGemsHome() + "/gemsModules/Schema/currentStableSchema"
     try:
         with open(currentStableSchema) as schemaFile:
@@ -154,7 +142,9 @@ def getJsonApiVersion():
         log.debug("json_api_version: " + version)
     except Exception as error:
         log.error("Failed to read the currentStableSchema file.")
-    return version
+        raise error
+    else:
+        return version
 
 ##  Looks for an environment var with GEMSHOME and returns it.
 def getGemsHome():
@@ -170,6 +160,7 @@ def getGemsHome():
           BASH:  export GEMSHOME=/path/to/gems
           SH:    setenv GEMSHOME /path/to/gems
         """)
+        raise AttributeError("GEMSHOME")
     return GEMSHOME
 
 ##  Give a transaction, return its requested entity type
@@ -238,6 +229,17 @@ def appendResponse(thisTransaction, responseConfig):
         log.error("Please add at a list of responses to your responseConfig object.")
         appendCommonParserNotice(thisTransaction,'IcompleteResponseError')
 
+
+##  Logic borrowed from https://realpython.com/python-rounding/
+#   @param number
+#   @param decimals
+def roundHalfUp(number, decimals=0):
+    log.info("roundHalfUp() was called.\n ")
+    log.debug("number before rounding: " + str(number))
+    multiplier = 10 ** decimals
+    roundedNumber = math.floor(number * multiplier + 0.5) / multiplier
+    log.debug("roundedNumber: " + str(roundedNumber))
+    return roundedNumber
 
 def main():
     import importlib, os, sys
