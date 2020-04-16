@@ -75,6 +75,13 @@ def buildQueryString(thisTransaction : Transaction):
                 str(virtLocation),
                 str(theseOptions['output_file_type'])
                 )
+    elif theseOptions['queryType'] == "Download_List":
+       #Do something here
+      log.debug("Running Download request for PDB list") 
+        
+    elif theseOptions['queryType'] == "Download_All":
+        log.debug("Running Download request for all data")
+        
     proc = subprocess.Popen(theQueryString, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     print(theQueryString)
     (out, err) = proc.communicate()
