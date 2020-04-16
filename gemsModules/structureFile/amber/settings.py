@@ -20,3 +20,13 @@ servicesStatus = [
 ]
 
 
+descriptions = {
+	"histidineProtonation" : "Here is the description for the purpose behind the Histidine Protonation data.",
+	"disulfideBonds" : "Here is the description for the purpose behind the Disulfide Bonds data",
+	"unrecognizedResidues" : "Here is the description for the purpose behind the Unrecognized Residue data",
+	"chainTerminations" : "Here is the description for the purpose behind the Chain Terminations data",
+	"replacedHydrogens" : "Here is the description for the purpose behind the Replaced Hydrogens data",
+	"unrecognizedHeavyAtoms" : "Here is the description for the purpose behind the Unrecognized Heavy Atoms data",
+	"missingResidues" : "Here is the description for the purpose behind the Missing Residues data"
+}
+

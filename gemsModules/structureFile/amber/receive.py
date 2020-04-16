@@ -11,6 +11,7 @@ from collections import OrderedDict
 from gemsModules.common.transaction import *
 from gemsModules.project.projectUtil import *
 from gemsModules.common.loggingConfig import *
+import gemsModules.structureFile.amber.settings as amberStructureSettings
 
 if loggers.get(__name__):
     pass
@@ -170,7 +171,8 @@ def updateTransactionWithPreprocessorOptions(thisTransaction, preprocessor):
                 "tableLabel" : "Histidine Protonation",  
                 "interactionRequirement" : "optional",
                 "urgency" : "info",
-                "count" : str(len(hisData))
+                "count" : str(len(hisData)),
+                "description" : amberStructureSettings.descriptions['histidineProtonation']
             }
         })
     else:
@@ -188,7 +190,8 @@ def updateTransactionWithPreprocessorOptions(thisTransaction, preprocessor):
                 "tableLabel" : "Disulfide Bonds", 
                 "interactionRequirement" : "optional",
                 "urgency" : "info",
-                "count" : str(len(cysData))
+                "count" : str(len(cysData)),
+                "description" : amberStructureSettings.descriptions['disulfideBonds']
             }
         })
     else:
@@ -208,7 +211,8 @@ def updateTransactionWithPreprocessorOptions(thisTransaction, preprocessor):
                 "tableLabel" : "Unrecognized Residues", 
                 "interactionRequirement" : "none",
                 "urgency" : urgencyLevel,
-                "count" : str(len(unresData))
+                "count" : str(len(unresData)),
+                "description" : amberStructureSettings.descriptions['unrecognizedResidues']
             }
         })
     else:
@@ -225,7 +229,8 @@ def updateTransactionWithPreprocessorOptions(thisTransaction, preprocessor):
                 "tableLabel" : "Chain Terminations", 
                 "interactionRequirement" : "optional",
                 "urgency" : "info",
-                "count" : str(len(terData))
+                "count" : str(len(terData)),
+                "description" : amberStructureSettings.descriptions['chainTerminations']
             }
         })
     else:
@@ -242,7 +247,8 @@ def updateTransactionWithPreprocessorOptions(thisTransaction, preprocessor):
                 "tableLabel" : "Replaced Hydrogens", 
                 "interactionRequirement" : "none",
                 "urgency" : "info",
-                "count" : str(len(hydData))
+                "count" : str(len(hydData)),
+                "description" : amberStructureSettings.descriptions['replacedHydrogens']
             }
         })
     else:
@@ -260,7 +266,8 @@ def updateTransactionWithPreprocessorOptions(thisTransaction, preprocessor):
                 "tableLabel" : "Unrecognized Heavy Atoms", 
                 "interactionRequirement": "none",
                 "urgency": "error",
-                "count" : str(len(hvyData))
+                "count" : str(len(hvyData)),
+                "description" : amberStructureSettings.descriptions['unrecognizedHeavyAtoms']
             }
         } )
     else:
@@ -277,7 +284,8 @@ def updateTransactionWithPreprocessorOptions(thisTransaction, preprocessor):
                 "tableLabel" : "Missing Residues", 
                 "interactionRequirement": "optional",
                 "urgency": "warning",
-                "count" : str(len(misData))
+                "count" : str(len(misData)),
+                "description" : amberStructureSettings.descriptions['missingResidues']
             }
         })
     else:
