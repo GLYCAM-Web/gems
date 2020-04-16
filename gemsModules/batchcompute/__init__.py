@@ -1,6 +1,2 @@
-import conf
-import job_status_json
-import log_file
-import simulation
-import slurm
-import SMAT
+from . import conf, helpme, job_status_json, log_file, receive, settings, slurm
+

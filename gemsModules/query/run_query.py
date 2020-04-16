@@ -10,6 +10,14 @@ import ast
 from gemsModules import common
 from gemsModules.common.services import *
 from gemsModules.common.transaction import *
+from gemsModules.common.loggingConfig import *
+from inspect import currentframe, getframeinfo
+
+if loggers.get(__name__):
+    pass
+else:
+    log = createLogger(__name__)
+
 
 exitMessages = {
         'GmmlNotFound':'Cannot load the GMML module',
@@ -21,7 +29,7 @@ exitCodes = {
 # import gems/gmml stuff
 import gmml
 if gmml is None:
-    print(exitMessages["GmmlNotFound"])
+    log.error(exitMessages["GmmlNotFound"])
     sys.exit(exitCodes["GmmlNotFound"])
 
 def buildQueryString(thisTransaction : Transaction):
@@ -33,13 +41,18 @@ def buildQueryString(thisTransaction : Transaction):
     try:
         virtLocation = os.getenv('VIRTUOSO_DB') + ":" + str(8890) + "/sparql"
     except:
-        print("Unable to find the Virtuoso Database.  Quitting.")
+        log.error("Unable to find the Virtuoso Database.  Quitting.")
         sys.exit(1)
+    try:
+        GemsPath = os.environ.get('GEMSHOME')
+    except:
+        sys.exit(1)
+    debugFileLocation = GemsPath + "/DebugOutput.txt"
     theseOptions = thisTransaction.transaction_in['services'][0]['formQueryString']['options']
     if theseOptions['queryType'] == "Initial":
-        print(theseOptions)
-        print("Printing the aglycon part:")
-        print(theseOptions['aglycon'])
+        log.debug(theseOptions)
+        log.debug("Printing the aglycon part:")
+        log.debug(theseOptions['aglycon'])
         if theseOptions['aglycon'] == 'None':
             theseOptions['aglycon'] = ""
         temp = gmml.Assembly()
@@ -83,14 +96,21 @@ def buildQueryString(thisTransaction : Transaction):
         log.debug("Running Download request for all data")
         
     proc = subprocess.Popen(theQueryString, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    print(theQueryString)
+    log.debug("HEY LOOK AT ME")
+    log.debug(theQueryString)
     (out, err) = proc.communicate()
     out = str(out.decode('utf-8'))
+    log.debug(out)
+    gmml.log(getframeinfo(currentframe()).lineno, getframeinfo(currentframe()).filename, gmml.INF, str(out), GemsPath + "/queryLog.txt")
+    # text_file = open(debugFileLocation, "a+")
+    # text_file.write(str(out))
+    # text_file.write(str(theQueryString))
+    # text_file.close()
     #variable out contains results of curl command that returns some unnecessary information about curl version at the begginging
     #to avoid that we consider result string starting from '{'
-    startIndex = out.index('{')
-    out = out[startIndex:]
+    # startIndex = out.index('{')
+    # out = out[startIndex:]
     # out = "\"" + out + "\""
-    print(out)
+    log.debug(out)
     jsonObj = json.loads(out)
     thisTransaction.response_dict= jsonObj

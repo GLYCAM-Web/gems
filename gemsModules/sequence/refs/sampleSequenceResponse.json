@@ -1,0 +1,18 @@
+{
+	"entity": {
+		"type": "Sequence"
+	},
+	"gems_project": {
+		"requesting_agent": "json_api",
+		"timestamp": "2020-01-30 15:32:27.668544",
+		"pUUID": "ce4310fe-e345-489f-935f-3262f6ae0938",
+		"output_dir": "/website/userdata/tools/cb/git-ignore-me_userdata/ce4310fe-e345-489f-935f-3262f6ae0938/",
+		"md5sum": " ",
+		"project_type": "cb"
+	},
+	"responses": [{
+		"Build3DStructure": {
+			"payload": "ce4310fe-e345-489f-935f-3262f6ae0938"
+		}
+	}]
+}

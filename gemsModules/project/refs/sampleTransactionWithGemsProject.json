@@ -1,0 +1,113 @@
+{
+	"incoming_string": "... Easier this way. This is not meant to be used... ",
+	"request_dict": {
+		"entity": {
+			"type": "Sequence",
+			"services": [{
+				"Evaluate": {
+					"type": "Evaluate"
+				}
+			}],
+			"inputs": [{
+				"Sequence": {
+					"payload": "DManpa1-6DManpa1-OH"
+				}
+			}]
+		},
+		"project": {
+			"_state": "<django.db.models.base.ModelState object at 0x7f32fc401750>",
+			"user_id": "2",
+			"title": "Untitled project",
+			"timestamp": "2019-12-11 14:54:36.117499+00:00",
+			"id": "aeb8179c-0290-499f-a30b-967f9629fea8",
+			"comment": " ",
+			"type": "cb",
+			"email": "",
+			"gems_version": "2016xxx",
+			"gmml_version": "2016yyy-2",
+			"ff_version": "2012xxx",
+			"parameter_version": "2014",
+			"amber_version": "2014xxx",
+			"root": " ",
+			"project_ptr_id": "aeb8179c-0290-499f-a30b-967f9629fea8",
+			"sequence": "DManpa1-6DManpa1-OH",
+			"ion": "No",
+			"solvation": "Yes",
+			"solvation_size": "8",
+			"solvation_distance": "2",
+			"solvation_shape": "REC",
+			"num_structures": "1",
+			"linkage_info": "",
+			"rotamer_info": "",
+			"rotamer_list": "",
+			"angle_info": "",
+			"md5dir": " ",
+			"md5sum": "349a1a9c122031e575816a662acc9471",
+			"job_info": "",
+			"toolDir": "/website/userdata/tools/cb",
+			"path": "/cb/media",
+			"_django_version": "2.2.2"
+		}
+	},
+	"transaction_in": {
+		"entity": {
+			"inputs": [{
+				"Sequence": {
+					"payload": "DManpa1-6DManpa1-OH"
+				}
+			}],
+			"services": [{
+				"Evaluate": {
+					"type": "Evaluate"
+				}
+			}],
+			"type": "Sequence"
+		},
+		"project": {
+			"_django_version": "2.2.2",
+			"_state": "<django.db.models.base.ModelState object at 0x7f32fc401750>",
+			"amber_version": "2014xxx",
+			"angle_info": "",
+			"comment": " ",
+			"email": "",
+			"ff_version": "2012xxx",
+			"gems_version": "2016xxx",
+			"gmml_version": "2016yyy-2",
+			"id": "aeb8179c-0290-499f-a30b-967f9629fea8",
+			"ion": "No",
+			"job_info": "",
+			"linkage_info": "",
+			"md5dir": " ",
+			"md5sum": "349a1a9c122031e575816a662acc9471",
+			"num_structures": "1",
+			"parameter_version": "2014",
+			"path": "/cb/media",
+			"project_ptr_id": "aeb8179c-0290-499f-a30b-967f9629fea8",
+			"root": " ",
+			"rotamer_info": "",
+			"rotamer_list": "",
+			"sequence": "DManpa1-6DManpa1-OH",
+			"solvation": "Yes",
+			"solvation_distance": "2",
+			"solvation_shape": "REC",
+			"solvation_size": "8",
+			"timestamp": "2019-12-11 14:54:36.117499+00:00",
+			"title": "Untitled project",
+			"toolDir": "/website/userdata/tools/cb",
+			"type": "cb",
+			"user_id": "2"
+		}
+	},
+	"transaction_out": None,
+	"response_dict": {
+		"gems_project": {
+			"requesting_agent": "website",
+			"timestamp": "2020-01-29 15:22:23.921431",
+			"pUUID": "183a8d9e-4efc-4026-acdd-a01d2ea74fda",
+			"output_dir": "/website/userdata/tools/cb/git-ignore-me_userdata/183a8d9e-4efc-4026-acdd-a01d2ea74fda/",
+			"md5sum": "349a1a9c122031e575816a662acc9471",
+			"project_type": "cb"
+		}
+	},
+	"outgoing_string": None
+}

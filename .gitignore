@@ -5,6 +5,7 @@ gmml.py
 gmml_wrap.cxx
 gmml_wrap.o
 log.log
+gemsModules/Docs/html
 
 ## general things to ignore
 *__pycache__
@@ -13,6 +14,7 @@ log.log
 *.swp
 *~
 *git-ignore-me*
+Doxygen/html
+Doxygen/docs_build.log
 
 testing*
-tests/*

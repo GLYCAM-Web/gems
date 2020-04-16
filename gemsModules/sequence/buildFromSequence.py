@@ -2,27 +2,33 @@
 import sys
 import os
 import gmml
+from gemsModules.common.loggingConfig import *
+
+if loggers.get(__name__):
+    pass
+else:
+    log = createLogger(__name__)
 
 
 def getPrepFileName():
-    print("Getting prepfile name.")
+    log.info("getPrepFileName() was called.\n")
     try:
         prepFileName = sys.argv[1]
         return prepFileName
     except Exception as error:
-        print("There was a problem getting the prepfile.")
-        print("Error type: " + str(type(error)))
-        print("Error details: " + str(error))
+        log.error("There was a problem getting the prepfile.")
+        log.error("Error type: " + str(type(error)))
+        log.error("Error details: " + str(error))
         return error
 
 #buildThis(theSequence,  prepFile, offFile, pdbFile)
 # TODO: fix this. It breaks everything.
 def buildThis(sequence, prepFile, offFile, pdbFile):
-    print("~~~ buildFromSequence.py's doTheBuild() was called.")
-    print("sequence: " + sequence)
-    print("prepFile: " + prepFile)
-    print("offFile: " + offFile)
-    print("pdbFile: " + pdbFile)
+    log.info("buildThis() was called.\n")
+    log.debug("sequence: " + sequence)
+    log.debug("prepFile: " + prepFile)
+    log.debug("offFile: " + offFile)
+    log.debug("pdbFile: " + pdbFile)
 
     prep = gmml.PrepFile(prepFile)
     assembly = gmml.Assembly()
@@ -34,12 +40,11 @@ def buildThis(sequence, prepFile, offFile, pdbFile):
     content.Write(pdbFile)
 
 
-
 def logHello():
-    print("Hello")
+    log.info("Hello")
 
 def main():
-    print("~~~ buildFromSequence.py was called.")
+    log.info("buildFromSequence.py was called.")
     thisFileName = sys.argv[0]
 
     prepFileName = sys.argv[1]
@@ -50,11 +55,11 @@ def main():
 
     outPdbFileName = sys.argv[4]
 
-    #print("thisFile: " + thisFileName)
-    print("prepFile: " + prepFileName)
-    print("sequence: " + sequence)
-    print("outOff: " + outOffFileName)
-    print("outPdb: " + outPdbFileName)
+    log.debug("thisFile: " + thisFileName)
+    log.debug("prepFile: " + prepFileName)
+    log.debug("sequence: " + sequence)
+    log.debug("outOff: " + outOffFileName)
+    log.debug("outPdb: " + outPdbFileName)
 
     prep = gmml.PrepFile(prepFileName)
     assembly = gmml.Assembly()

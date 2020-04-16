@@ -1,91 +1,96 @@
 #!/usr/bin/env python3
-import sys,importlib.util
+import math, os, sys,importlib.util
+from datetime import datetime
 import gemsModules
-from gemsModules import common 
-from gemsModules.common.transaction import *
+from gemsModules import common
 from gemsModules.common.settings import *
+from gemsModules.common.transaction import *
+from gemsModules.common.utils import *
+from gemsModules.common.loggingConfig import *
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 from pydantic import BaseModel, Schema
 from pydantic.schema import schema
+import traceback
+
+## TODO: Update this method to receive actual module name, not its key.
+## Also update methods that call common/services.py importEntity() to reflect this change.
+
+if loggers.get(__name__):
+    pass
+else:
+    log = createLogger(__name__)
+
+verbosity=common.utils.gems_environment_verbosity()
 
 
-"""
-TODO: Update this method to receive actual module name, not its key.
-Also update methods that call common/services.py importEntity() to reflect this change.
-"""
+##  Pass in the name of an entity, receive a module or an error.
 def importEntity(requestedEntity):
-  print("~~~ importEntity was called.")
-  import gemsModules
+    log.info("importEntity() was called.\n")
+    log.debug("requestedEntity: " + requestedEntity)
+    log.debug("Entities known to Common Services: " + str(subEntities))
 
-  print("requestedEntity: " + requestedEntity)
-  #print("common entityModules: " + str(entityModules))
+    try:
+        requestedModule = '.' + subEntities[requestedEntity]
+        log.debug("requestedModule: " + requestedModule)
+    except Exception as error:
+        log.error("There was a problem finding the requested entity. Does it exist? requestedEntity: " + requestedEntity)
+        raise error
+    else:
+        try:
+            module_spec = importlib.util.find_spec(requestedModule,package="gemsModules")
+        except Exception as error:
+            log.error("There was a problem importing the requested module.")
+            raise error
+        else:
 
-  requestedModule = '.' + entityModules[requestedEntity]
+            if module_spec is None:
+                log.error("The module spec returned None for rquestedEntity: " + requestedEntity)
+                raise FileNotFoundError(requestedEntity)
 
-  #print("requestedModule: " + requestedModule)
-  
-  module_spec = importlib.util.find_spec(requestedModule,package="gemsModules")
-
-  if module_spec is None: 
-    print("The module spec returned None for rquestedEntity: " + requestedEntity)
-    return None
-
-  print("module_spec: " + str(module_spec))
-  return importlib.import_module(requestedModule,package="gemsModules")
+            log.debug("module_spec: " + str(module_spec))
+            return importlib.import_module(requestedModule,package="gemsModules")
 
 def parseInput(thisTransaction):
+    log.info("parseInput() was called.\n")
     import json
     from io import StringIO
     from pydantic import BaseModel, ValidationError
     import jsonpickle
     io=StringIO()
 
-    print("~~~\nparseInput() was called.")
-    print("thisTransaction.incoming_string: " + thisTransaction.incoming_string)
-
     # Load the JSON string into the incoming dictionary
-    #
     thisTransaction.request_dict = json.loads(thisTransaction.incoming_string)
-    #print("thisTransaction.request_dict: " + str(thisTransaction.request_dict))
+    log.debug("thisTransaction.request_dict: " + str(thisTransaction.request_dict))
 
     # Check to see if there are errors.  If there are, bail, but give a reason
-    #
-    ## TODO:  This will break really easily.  The 'response' part needs to refer to the
-    ## response from this activity rather than the zeroth response.  That said, at this 
-    ## point, the response will usually be the zeroth one.
-    ## A construction maybe like:  if ('X','Y') in this.big.object.items():
     if thisTransaction.request_dict is None:
         appendCommonParserNotice(thisTransaction,'JsonParseError')
-        return thisTransaction.response_dict['entity']['responses'][0]['notices']['code']
+        raise AttributeError("request_dict")
     try:
         TransactionSchema(**thisTransaction.request_dict)
-    except ValidationError as e:
-#        print(e.json())
-#        print(e.errors())
-        if 'entity' in e.errors()[0]['loc']:
-            if 'type' in e.errors()[0]['loc']:
-                appendCommonParserNotice(thisTransaction,'NoTypeForEntity')
-            else:
-                appendCommonParserNotice(thisTransaction,'NoEntityDefined')
-        theResponseTypes = getTypesFromList(thisTransaction.response_dict['entity']['responses'])
-#        print(theResponseTypes)
-        return theResponseTypes.count('error')
-
-    # If still here, load the data into a Transaction object and return success
-    #
-    thisTransaction.transaction_in = jsonpickle.decode(thisTransaction.incoming_string)
-    print("thisTransaction.transaction_in: " + str(thisTransaction.transaction_in))
-    print("~~~Finished parseInput()")
-    return 0
+    except Exception as error:
+        log.error("There was an error parsing transaction.request_dict.")
+        log.error("Error type : " + str(type(error)))
+        log.error(traceback.format_exc())
+        raise error
+    else:
+        # If still here, load the data into a Transaction object and return success
+        thisTransaction.transaction_in = jsonpickle.decode(thisTransaction.incoming_string)
+        log.debug("thisTransaction.transaction_in: " + str(thisTransaction.transaction_in))
+        return 0
 
 def marco(requestedEntity):
-  theEntity = importEntity(requestedEntity)
-  if hasattr(theEntity, 'entity'):
-    return "Polo"
-  else:
-    return "The entity you seek is not responding properly."
+    log.info("marco() was called.\n")
+    if verbosity > 1 :
+        print("The Marco method was called and is being fulfilled by CommonServices.")
+    theEntity = importEntity(requestedEntity)
+    if hasattr(theEntity, 'receive'):
+        return "Polo"
+    else:
+        return "The entity you seek is not responding properly."
 
 def getTypesFromList(theList):
+    log.info("getTypesFromList() was called.\n")
     typesInList=[]
     for i in range(len(theList)):
         thekeys=list(theList[i].keys())
@@ -107,18 +112,18 @@ def getTypesFromList(theList):
 
 ## TODO make this more generic
 def listEntities(requestedEntity='Delegator'):
-  print("~~~\nlistEntities() was called.")
-  print("entityModules: " + str(entityModules))
-  return list(entityModules.keys())
-
+  log.info("listEntities() was called.\n")
+  return list(subEntities.keys())
 
 def returnHelp(requestedEntity,requestedHelp):
+  log.info("returnHelp() was called.\n")
   theEntity = importEntity(requestedEntity)
   theHelp = entities.helpDict[requestedHelp]
   if theHelp == 'schemaLocation':
-    return "Here there should be a location for the schema"  ## TODO:  make this do something real
+    schema_location = settings.schemaLocation
+    return schema_location  ## TODO:  make this do something real
   if not hasattr(theEntity, 'helpme'):
-    return "No help available for " + requestedEntity 
+    return "No help available for " + requestedEntity
   helpLocation = getattr(theEntity, 'helpme')
   if not hasattr(helpLocation,theHelp):
     return "The requestedHelp is not available for " + requestedEntity
@@ -127,30 +132,143 @@ def returnHelp(requestedEntity,requestedHelp):
     return "Something went wrong getting the requestedHelp from " + requestedEntity
   return thisHelp
 
+##  Looks at currentStableSchema file and returns the version it finds there.
+def getCurrentStableJsonApiVersion():
+    log.info("getCurrentStableJsonApiVersion() was called.\n")
+    currentStableSchema = getGemsHome() + "/gemsModules/Schema/currentStableSchema"
+    try:
+        with open(currentStableSchema) as schemaFile:
+            version = schemaFile.read().strip()
+        log.debug("json_api_version: " + version)
+    except Exception as error:
+        log.error("Failed to read the currentStableSchema file.")
+        raise error
+    else:
+        return version
+
+##  Looks for an environment var with GEMSHOME and returns it.
+def getGemsHome():
+    log.info("getGemsHome() was called.\n")
+    GEMSHOME = os.environ.get('GEMSHOME')
+    if GEMSHOME == None:
+        log.error("""
+
+        GEMSHOME environment variable is not set.
+
+        Set it using somthing like:
+
+          BASH:  export GEMSHOME=/path/to/gems
+          SH:    setenv GEMSHOME /path/to/gems
+        """)
+        raise AttributeError("GEMSHOME")
+    return GEMSHOME
+
+##  Give a transaction, return its requested entity type
+#   @param  transaction
+def getEntityType(thisTransaction):
+    log.info("getEntityType() was called.\n")
+    entity = thisTransaction.request_dict['entity']['type']
+    log.debug("entity: " + entity)
+    return entity
+
+##  Send a transaction and a response. This method checks the response validity and
+#   updates the transaction with a response for you, though they may be errors.
+#   @param transaction
+#   @param responseConfig
+def appendResponse(thisTransaction, responseConfig):
+    log.info("appendResponse() was called.\n")
+    ## Check the responseConfig:
+    if 'entity' in responseConfig.keys():
+        entity = responseConfig['entity']
+        log.debug("entity: " + entity)
+    else:
+        log.error("Please add the entity type to your responseConfig object.")
+        appendCommonParserNotice(thisTransaction, 'IncompleteResponseError')
+
+    if 'respondingService' in responseConfig.keys():
+        respondingService = responseConfig['respondingService']
+        log.debug("respondingService: " + respondingService)
+    else:
+        log.error("Please add a respondingService field to your responseConfig object.")
+        appendCommonParserNotice(thisTransaction,'IncompleteResponseError')
+
+    if 'responses' in responseConfig.keys():
+        responsesToWrite = responseConfig['responses']
+        if entity is not None and respondingService is not None and responsesToWrite is not None:
+            if thisTransaction.response_dict == None:
+                thisTransaction.response_dict = {}
+
+            if 'entity' not in thisTransaction.response_dict.keys():
+                thisTransaction.response_dict['entity'] = {}
+                thisTransaction.response_dict['entity']['type'] = entity
+
+            if 'timestamp' not in thisTransaction.response_dict.keys():
+                timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+                log.debug("timestamp: " + timestamp)
+                thisTransaction.response_dict['timestamp'] = timestamp
+
+
+            if 'responses' not in thisTransaction.response_dict.keys():
+                thisTransaction.response_dict['responses'] = []
+
+            for response in responsesToWrite:
+                resource = {respondingService : response }
+
+                thisTransaction.response_dict['responses'].append(resource)
+
+            try:
+                TransactionSchema(**thisTransaction.response_dict)
+                log.debug("Passes validation against schema.")
+            except ValidationError as e:
+                log.error("Validation Error.")
+                appendCommonParserNotice(thisTransaction,'JsonParseEror')
+        else:
+            log.Error("Incomplete responseConfig.")
+
+    else:
+        log.error("Please add at a list of responses to your responseConfig object.")
+        appendCommonParserNotice(thisTransaction,'IcompleteResponseError')
+
+
+##  Logic borrowed from https://realpython.com/python-rounding/
+#   @param number
+#   @param decimals
+def roundHalfUp(number, decimals=0):
+    log.info("roundHalfUp() was called.\n ")
+    log.debug("number before rounding: " + str(number))
+    multiplier = 10 ** decimals
+    roundedNumber = math.floor(number * multiplier + 0.5) / multiplier
+    log.debug("roundedNumber: " + str(roundedNumber))
+    return roundedNumber
 
 def main():
-  import importlib, os, sys
-  from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
-  from pydantic import BaseModel, Schema
-  from pydantic.schema import schema
-  if importlib.util.find_spec("gemsModules") is None:
-    this_dir, this_filename = os.path.split(__file__)
-    sys.path.append(this_dir + "/../")
-    if importlib.util.find_spec("common") is None:
-      print("Something went horribly wrong.  No clue what to do.")
-      sys.exit(1)
+    import importlib, os, sys
+    from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
+    from pydantic import BaseModel, Schema
+    from pydantic.schema import schema
+    if importlib.util.find_spec("gemsModules") is None:
+      this_dir, this_filename = os.path.split(__file__)
+      sys.path.append(this_dir + "/../")
+      if importlib.util.find_spec("common") is None:
+        print("Something went horribly wrong.  No clue what to do.")
+        return
+      else:
+        from common import utils
     else:
-      from common import utils
-  else:
-    from gemsModules.common import utils
-  utils.investigate_gems_setup(sys.argv)
-
-  with open(sys.argv[1], 'r') as file:
-    data = file.read().replace('\n', '')
+      from gemsModules.common import utils
+#  utils.investigate_gems_setup(sys.argv)
+#
+#  with open(sys.argv[1], 'r') as file:
+#    data = file.read().replace('\n', '')
     # Make a new Transaction object for holding I/O information.
+    data=utils.JSON_From_Command_Line(sys.argv)
+    print("The object is:")
+    print(data)
     thisTransaction=Transaction(data)
     parseInput(thisTransaction)
+    print("finished parsing")
+
 
 
 if __name__ == "__main__":
-  main() 
+  main()

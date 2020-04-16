@@ -4,20 +4,20 @@ import json
 import os
 import sys
 #Import custom packages
-import conf
-import SMAT
-import log_file
-import job_status_json
+from batchcompute import conf
+from batchcompute import SMAT
+from batchcompute import log_file
+from batchcompute import job_status_json
 import query
-import job_status_key_values
-import slurm
+from batchcompute import SMAT
+from batchcompute import slurm
 
 class Simulation:
     def __init__(self, SMAT_ENTRY, WEB_ID, SLURM_JOB_OBJ = None):
         self.SMAT_ENTRY = SMAT_ENTRY
         self.SLURM_JOB = SLURM_JOB_OBJ
         self.WEBID = WEB_ID
-        self.RUN_PREF = conf.File_Naming.prefSTRUCTURE 
+        self.RUN_PREF = conf.File_Naming.prefSTRUCTURE
         if self.SMAT_ENTRY[SMAT.key_and_values.IONS_KEY] == SMAT.key_and_values.IONS_YES:
             self.RUN_PREF = self.RUN_PREF + conf.File_Naming.modION
         if self.SMAT_ENTRY[SMAT.key_and_values.TYPE_KEY] == SMAT.key_and_values.TYPE_SOL:
@@ -107,13 +107,13 @@ class Simulation:
             "  -x    " + self.MDCRD + " \\\n",
             "  -inf  " + self.MDINFO + " \\\n",
         ]
-        # Add an additional parameter if using pmemd." 
+        # Add an additional parameter if using pmemd."
         # If not, add a blank line"
         if self.MD_TYPE == SMAT.key_and_values.TYPE_SOL:
             script_list.append("  -l    " + self.MDLOG + "\n")
         else:
             script_list.append("\n")
-            
+
         script_list_continued = [
             "if grep -q \'" + self.MD_DONE_TEXT + "\' " + self.MDOUT + " ; then\n",
             "    echo \"Minimization of webid ${RUN_ID} appears to be complete on $(date).\" >> ${LOGFILE}\n",
@@ -130,7 +130,7 @@ class Simulation:
         MDOUT_PATH = self.LABEL + '/' + self.MDOUT
         out_str = ""
         if os.path.isfile(MDOUT_PATH) == True:
-            quoted_keyword =   self.MD_DONE_TEXT 
+            quoted_keyword =   self.MD_DONE_TEXT
             command = "grep " + quoted_keyword + " " + MDOUT_PATH
             check_mdout = subprocess.Popen([command], stdout = subprocess.PIPE, stderr = subprocess.PIPE, shell = True)
             std_out, std_err = check_mdout.communicate()
@@ -139,9 +139,9 @@ class Simulation:
             if std_out_str != "":
                 self.SLURM_JOB.status[job_status_key_values.STATUS_KEY] = job_status_key_values.STATUS_COMPLETE
                 self.SMAT_ENTRY[SMAT.key_and_values.STATUS_KEY] = SMAT.key_and_values.STATUS_COMPLETE
-      
-        
-            
+
+
+
 def check_if_dir_content_good(simulation_obj, SMAT_ENTRY):
     input_files_missing = False
     out_files_exist = False
@@ -155,7 +155,7 @@ def check_if_dir_content_good(simulation_obj, SMAT_ENTRY):
         print("MDIN doesn't exist:" + simulation_obj.MDIN)
         input_file_missing = True
         print('MDIN file missing in sub directory %s'%(os.path.abspath(os.path.curdir))) ## FIXME
-    
+
     if input_files_missing == True:
         log_file_name = '/global.log'
         log_file.AppendLogFile('..' + log_file_name, 'Error, one or more input files are missing in working directory: %s\n'%(os.path.abspath(os.path.curdir)) ) ## FIXME

@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package GemsGrpcSlurm;
+
+// The JSON service definition.
+service GemsGrpcSlurm {
+	rpc GemsGrpcSlurmReceiver (GemsGrpcSlurmRequest) returns (GemsGrpcSlurmResponse) {}
+}
+
+// The request message containing a JSON object as a string.
+message GemsGrpcSlurmRequest {
+	string input = 1;
+}
+
+// The response message containing a JSON object as a string.
+message GemsGrpcSlurmResponse {
+	string output = 1;
+}
