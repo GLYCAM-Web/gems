@@ -520,21 +520,59 @@ def buildDisulfideBondsDict(thisTransaction, preprocessor):
 
     for item in disulfideBonds:
         mapping = {}
+
+        ### TODO:Dummy method. Replace with GMML logic
+        amberResidueName = getAmberResidueName(item)
+
+        ### Residue 1
+        residue1ChainId = item.GetResidueChainId1()
+        mapping['residue1ChainId'] = residue1ChainId
+        log.debug("residue1ChainId: " + residue1ChainId)
+
         residue1Number = str(item.GetResidueSequenceNumber1())
         mapping['residue1Number'] = residue1Number
         log.debug("residue1Number: " + residue1Number)
+
+        mapping['residue1AmberResidueName'] = amberResidueName
+        log.debug("residue1AmberResidueName: " + amberResidueName)
+
+        ### Residue2
+        residue2ChainId = item.GetResidueChainId2()
+        mapping['residue2ChainId'] = residue2ChainId
+        log.debug("residue2ChainId: " + residue2ChainId)
 
         residue2Number = str(item.GetResidueSequenceNumber2())
         mapping['residue2Number'] = residue2Number
         log.debug("residue2Number: " + residue2Number)
 
+        mapping['residue2AmberResidueName'] = amberResidueName
+        log.debug("residue2AmberResidueName: " + amberResidueName)
+        
+        ### Distance
         distance = str(roundHalfUp(item.GetDistance(), 4))
         mapping['distance'] = distance
         log.debug("distance: " + distance)
 
+        ### Bonded
+        bonded = str(item.GetIsBonded())
+        mapping['bonded'] = bonded
+        log.debug("bonded: " + bonded)
+
         cysData.append(mapping)
 
     return cysData
+
+
+def getAmberResidueName(item):
+    log.info("getAmberResidueName() was called.")
+    ### TODO: Replace this dummy gems method with gmml logic.
+    amberResidueName = ""
+    if item.GetIsBonded():
+        amberResidueName = "CYX"
+    else:
+        amberResidueName = "CYS"
+
+    return amberResidueName
 
 
 ##  Give a transaction and a preprocessor object, get a dict with Histidine mapping data from a pdb
