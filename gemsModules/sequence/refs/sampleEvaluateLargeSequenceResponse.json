@@ -1,0 +1,91 @@
+{
+	"entity": {
+		"type": "Sequence"
+	},
+	"timestamp": "2020-04-23_14:43:17",
+	"responses": [{
+		"SequenceEvaluation": {
+			"type": "Evaluate",
+			"outputs": [{
+				"SequenceValidation": {
+					"SequenceIsValid": true
+				}
+			}, {
+				"BuildOptions": {
+					"geometricElements": [{
+						"Linkages": [{
+							"21": {
+								"likelyRotamers": {
+									"Omega": ["gg", "gt"]
+								},
+								"linkageSequence": "DManpa1-6DManpb",
+								"linkageName": "DManpa1-6DManpb",
+								"possibleRotamers": {
+									"Omega": ["gg", "gt"]
+								}
+							},
+							"25": {
+								"likelyRotamers": {
+									"Omega": ["gg", "gt", "tg"],
+									"Phi": ["t", "-g"]
+								},
+								"linkageSequence": "DNeu5Acpa2-6DGalpb",
+								"linkageName": "DNeu5Acpa2-6DGalpb",
+								"possibleRotamers": {
+									"Omega": ["gg", "gt", "tg"],
+									"Phi": ["t", "-g"]
+								}
+							},
+							"27": {
+								"likelyRotamers": {
+									"Omega": ["gg", "gt", "tg"],
+									"Phi": ["t", "-g"]
+								},
+								"linkageSequence": "DNeu5Acpa2-6DGalpb",
+								"linkageName": "DNeu5Acpa2-6DGalpb",
+								"possibleRotamers": {
+									"Omega": ["gg", "gt", "tg"],
+									"Phi": ["t", "-g"]
+								}
+							},
+							"29": {
+								"likelyRotamers": {
+									"Omega": ["gg", "gt"]
+								},
+								"linkageSequence": "DGlcNAcpb1-6DManpa",
+								"linkageName": "DGlcNAcpb1-6DManpa",
+								"possibleRotamers": {
+									"Omega": ["gg", "gt"]
+								}
+							},
+							"31": {
+								"likelyRotamers": {
+									"Omega": ["gg", "gt", "tg"],
+									"Phi": ["t", "-g"]
+								},
+								"linkageSequence": "DNeu5Acpa2-6DGalpb",
+								"linkageName": "DNeu5Acpa2-6DGalpb",
+								"possibleRotamers": {
+									"Omega": ["gg", "gt", "tg"],
+									"Phi": ["t", "-g"]
+								}
+							},
+							"33": {
+								"likelyRotamers": {
+									"Omega": ["gg", "gt", "tg"],
+									"Phi": ["t", "-g"]
+								},
+								"linkageSequence": "DNeu5Acpa2-6DGalpb",
+								"linkageName": "DNeu5Acpa2-6DGalpb",
+								"possibleRotamers": {
+									"Omega": ["gg", "gt", "tg"],
+									"Phi": ["t", "-g"]
+								}
+							}
+						}]
+					}]
+				}
+			}]
+		}
+	}]
+}

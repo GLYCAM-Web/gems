@@ -24,13 +24,16 @@ else:
     log = createLogger(__name__)
 
 
-##Evaluating a sequence requires a sequence string and a path to a prepfile.
+##  @brief Evaluate a condensed sequence 
+#    @detail Evaluating a sequence requires a sequence string and a path to a prepfile.
 #    1) Checks sequence for validity,
 #    2) Starts a gemsProject.
 #    3) builds a default structure, moving it to the output dir
-#    3) returns options that a user might want to set.
-#   @param transaction
-#   @param service
+#    3) appends options to transaction
+#    4) returns boolan valid
+#   @param Transaction thisTransaction
+#   @param Service service
+#   @return boolean valid
 def evaluateCondensedSequence(thisTransaction : Transaction, thisService : Service = None):
     log.info("evaluateCondensedSequence() was called.\n")
     sequence = getSequenceFromTransaction(thisTransaction)
@@ -48,9 +51,10 @@ def evaluateCondensedSequence(thisTransaction : Transaction, thisService : Servi
     return valid
 
 
-##  Pass in validation result and linkages, get a responseConfig.
-#   @param valid
-#   @param linkages
+##  @brief Pass in validation result and linkages, get a responseConfig.
+#   @param boolean valid
+#   @param dict linkages
+#   @return dict config
 def buildEvaluationResponseConfig(valid, linkages):
     log.info("buildEvaluationResponseConfig() was called. \n")
     config = {
@@ -64,7 +68,7 @@ def buildEvaluationResponseConfig(valid, linkages):
                 }
             },{
                 "BuildOptions": {
-                    "options" : [
+                    "geometricElements" : [
                         { "Linkages" : linkages }
                     ]
                 }
@@ -74,6 +78,10 @@ def buildEvaluationResponseConfig(valid, linkages):
 
     return config
 
+
+##  @brief Pass in a gemsProject and get a responseConfig.
+#   @param GemsProject gemsProject
+#   @return dict config
 def build3dStructureResponseConfig(gemsProject):
     log.info("build3dStructureResponseConfig() was called.\n")
     downloadUrl = getDownloadUrl(gemsProject['pUUID'], "cb")
@@ -87,8 +95,12 @@ def build3dStructureResponseConfig(gemsProject):
     }
 
     return config
-##  Give a transaction and pUUID, and this method builds the json response and
-#       appends that to the transaction.
+
+
+##  @brief Give a transaction and pUUID, and this method builds the json response and
+#   appends that to the transaction.
+#   @param Transaction thisTransaction
+#   @param String uUUID - Upload ID for user provided input.
 def appendBuild3DStructureResponse(thisTransaction : Transaction, pUUID : str):
     log.info("appendBuild3DStructureResonse() was called.\n")
     if thisTransaction.response_dict is None:
@@ -109,8 +121,9 @@ def appendBuild3DStructureResponse(thisTransaction : Transaction, pUUID : str):
     })
 
 
-##  Pass a cb builder, get linkage options.
-#   @param  builder
+##  @brief Pass a cb builder, get linkage options.
+#   @param  CarbohydrateBuilder builder - GMML class.
+#   @return dict linkages
 def getLinkageOptionsFromBuilder(builder):
     log.info("getLinkageOptionsFromBuilder() was called.\n")
     userOptionsString = builder.GenerateUserOptionsJSON()
@@ -120,10 +133,30 @@ def getLinkageOptionsFromBuilder(builder):
         log.debug("response.keys: " + str(response.keys()))
         if 'Evaluate' in response.keys():
             linkages = response['Evaluate']['glycosidicLinkages']
+            ## Creating a new dict that can hold a new, derived field.
+            updatedLinkages = []
+            for element in linkages:
+                log.debug("element: " + str(element))
+                copy = {}
+                for key in element.keys():
+                    log.debug("key: " + key)
+                    log.debug("element[" + key + "]: " + str(element[key]))
+                    copy[key] = {}
+                    for gmmlKey in element[key]:
+                        copy[key].update({
+                            gmmlKey : element[key][gmmlKey],
+                            'linkageSequence' : element[key]['linkageName']
+                        })
+                updatedLinkages.append(copy)
 
-    return linkages
+    log.debug("updatedLinkages: " + str(updatedLinkages))
+    return updatedLinkages
 
 
+
+##  @brief Creates a jobsubmission for Amber. Submits that. Updates the transaction to reflect this.
+#   @param Transaction thisTransaction
+#   @param Service service
 def build3DStructure(thisTransaction : Transaction, thisService : Service = None):
     log.info("Sequence receive.py build3Dstructure() was called.\n")
     ##TODO: See if a project has already been started first.
@@ -178,10 +211,9 @@ def build3DStructure(thisTransaction : Transaction, thisService : Service = None
     cleanGemsProject(thisTransaction)
 
 
-
-
-##  Pass a sequence string, get a builder for that sequence.
-##  @param sequence GLYCAM Condensed string sequence.
+##  @brief Pass a sequence string, get a builder for that sequence.
+##  @param String sequence - GLYCAM Condensed string sequence.
+#   @return CarbohydrateBuilder object from gmml.
 def getCbBuilderForSequence(sequence : str):
     log.info("getCbBuilderForSequence() was called.\n")
     GemsPath = getGemsHome()
@@ -196,9 +228,11 @@ def getCbBuilderForSequence(sequence : str):
         log.error("Prepfile did not exist at: " + prepfile)
         raise FileNotFoundError
 
-## Give a transaction, get a sequence. Note that if more than one input
+
+##  @brief Give a transaction, get a sequence. Note that if more than one input
 #   contains a "Sequence" key, only the last sequence is returned.
-#   @param Transaction
+#   @param Transaction thisTransaction
+#   @return String sequence
 def getSequenceFromTransaction(thisTransaction: Transaction):
     log.info("getSequenceFromTransaction() was called.\n")
     inputs = thisTransaction.request_dict['entity']['inputs']
@@ -210,9 +244,9 @@ def getSequenceFromTransaction(thisTransaction: Transaction):
             log.debug("Skipping")
     return sequence
 
-"""
-Default service is marco polo. Should this be something else?
-"""
+
+##  @brief Default service is marco polo. Should this be something else?
+#   @param Transaction this Transaction
 def doDefaultService(thisTransaction : Transaction):
     log.info("doDefaultService() was called.\n")
     # evaluate(thisTransaction : Transaction)
@@ -225,6 +259,9 @@ def doDefaultService(thisTransaction : Transaction):
     thisTransaction.response_dict['responses'].append({'DefaultTest': {'payload':marco('Sequence')}})
     thisTransaction.build_outgoing_string()
 
+
+##  @brief The main way Delegator interacts with this module. Request handling.
+#   @param Transaction thisTransactrion
 def receive(thisTransaction : Transaction):
     log.info("receive() was called:\n")
     import gemsModules.sequence
@@ -292,9 +329,8 @@ def receive(thisTransaction : Transaction):
 #             raise AttributeError
 #     return valid
 
-##TODO: Look into deprecating this method. Evaluate does what this does and more.
-##Validate can potentially handle multiple sequences. Top level iterates and
-##  updates transaction.
+##  @brief Only validate a condensed sequence. Boolean result.
+#   @deprecated.
 def validateCondensedSequence(thisTransaction : Transaction, thisService : Service = None):
     log.info("~~~ validateCondensedSequence was called.\n")
     #Look in transaction for sequence
