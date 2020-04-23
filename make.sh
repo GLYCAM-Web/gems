@@ -198,6 +198,8 @@ while [ ${i} -le $# ]; do
         WRAP_GMML="${!i}"
     elif [ "$argument" = "debug" ]||[ "$argument" = "no_debug" ];then
         DEBUG="${!i}"
+    elif [ "$argument" = "optimize" ]||[ "$argument" = "no_optimize" ]||[ "$argument" = "O1" ]||[ "$argument" = "O2" ];then
+        OPTIMIZE="${!i}"
     fi
     i=$[$i+1]
 done
@@ -214,6 +216,7 @@ printf "GEMSHOME: $GEMSHOME\n"
 printf "TARGET_MAKE_FILE: $TARGET_MAKE_FILE\n"
 printf "CLEAN: $CLEAN\n"
 printf "DEBUG: $DEBUG\n"
+printf "OPTIMIZE: $OPTIMIZE\n"
 printf "WRAP_GMML: $WRAP_GMML\n\n"
 
 ################################################################
@@ -221,7 +224,7 @@ printf "WRAP_GMML: $WRAP_GMML\n\n"
 ################################################################
 
 cd gmml/
-./make.sh $CLEAN $DEBUG
+./make.sh $CLEAN $DEBUG $OPTIMIZE
 cd ../
 
 ################################################################
