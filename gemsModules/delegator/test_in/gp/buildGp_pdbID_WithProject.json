@@ -11,16 +11,14 @@
  		}, {
  			"attachments": [{
  				"glycan": "Man9",
- 				"chain": "A",
- 				"residue_number": "66"
+ 				"site" : "A_66"
  			}, {
  				"glycan": "Man9",
- 				"chain": "A",
- 				"residue_number": "194"
+ 				"site" : "A_194"
+
  			}, {
  				"glycan": "Man9",
- 				"chain": "A",
- 				"residue_number": "230"
+ 				"site" : "A_230"
  			}]
  		}]
  	},
