@@ -132,22 +132,30 @@ def getLinkageOptionsFromBuilder(builder):
     for response in optionsResponses:
         log.debug("response.keys: " + str(response.keys()))
         if 'Evaluate' in response.keys():
-            linkages = response['Evaluate']['glycosidicLinkages']
-            ## Creating a new dict that can hold a new, derived field.
-            updatedLinkages = []
-            for element in linkages:
-                log.debug("element: " + str(element))
-                copy = {}
-                for key in element.keys():
-                    log.debug("key: " + key)
-                    log.debug("element[" + key + "]: " + str(element[key]))
-                    copy[key] = {}
-                    for gmmlKey in element[key]:
-                        copy[key].update({
-                            gmmlKey : element[key][gmmlKey],
-                            'linkageSequence' : element[key]['linkageName']
-                        })
-                updatedLinkages.append(copy)
+            if "glycosidicLinkages" in response['Evaluate'].keys():
+                linkages = response['Evaluate']['glycosidicLinkages']
+                if linkages != None:
+                    ## Creating a new dict that can hold a new, derived field.
+                    updatedLinkages = []
+                    for element in linkages:
+                        log.debug("element: " + str(element))
+                        if element == None:
+                            return None
+                        copy = {}
+                        for key in element.keys():
+                            log.debug("key: " + key)
+                            log.debug("element[" + key + "]: " + str(element[key]))
+                            copy[key] = {}
+                            for gmmlKey in element[key]:
+                                copy[key].update({
+                                    gmmlKey : element[key][gmmlKey],
+                                    'linkageSequence' : element[key]['linkageName']
+                                })
+                        updatedLinkages.append(copy)
+                else:
+                    return None
+            else: 
+                return None
 
     log.debug("updatedLinkages: " + str(updatedLinkages))
     return updatedLinkages
