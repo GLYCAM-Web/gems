@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import json, sys, os, re, importlib.util, shutil
+import json, sys, os, re, importlib.util, shutil, uuid
 import gemsModules
 import gmml
 import traceback
@@ -7,12 +7,14 @@ import traceback
 ## Get rid of these after the bad subprocess code is gone
 import subprocess,signal
 from subprocess import *
+from datetime import datetime
 
 #from gemsModules import common
 #from gemsModules import sequence
 #from gemsModules.sequence.receive import *
 import gemsModules.common.utils
 from gemsModules.project.projectUtil import *
+from gemsModules.project import settings as projectSettings
 from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
 from gemsModules.common.loggingConfig import *
@@ -160,6 +162,15 @@ def getLinkageOptionsFromBuilder(builder):
     log.debug("updatedLinkages: " + str(updatedLinkages))
     return updatedLinkages
 
+##  @brief Use a sequence to get a unique seqUUID.
+#   Uses uuid5, which uses SHA-1 rather than Md5Sum
+#   @param sequence
+#   @return uuid seqUUID
+def getSeqUUIDForSequence(sequence):
+    log.info("getSeqUUDIFor() was called. sequence: " + sequence)
+    seqUUID = str(uuid.uuid5(uuid.NAMESPACE_DNS, sequence))
+    log.debug("seqUUID: " + seqUUID)
+    return seqUUID
 
 
 ##  @brief Creates a jobsubmission for Amber. Submits that. Updates the transaction to reflect this.
@@ -216,7 +227,7 @@ def build3DStructure(thisTransaction : Transaction, thisService : Service = None
 ## is what needs to move
 
 
-    cleanGemsProject(thisTransaction)
+    #cleanGemsProject(thisTransaction)
 
 
 ##  @brief Pass a sequence string, get a builder for that sequence.
@@ -308,7 +319,15 @@ def receive(thisTransaction : Transaction):
 
             if valid:
                 log.debug("Valid sequence. Building default structure.")
-                build3DStructure(thisTransaction, None)
+
+                structureExists = checkIfStructureExists(thisTransaction)
+                if structureExists:
+                    ##TODO: return response with payload of the existing build
+                    log.debug("Returning response with payload of existing build.")
+                else:
+                    log.debug("Structure does not exist yet.")
+                    build3DStructure(thisTransaction, None)
+                    registerBuild(thisTransaction)
             else:
                 log.error("Invalid Sequence. Cannot build.")
                 common.settings.appendCommonParserNotice( thisTransaction,'InvalidInput',i)
@@ -316,6 +335,175 @@ def receive(thisTransaction : Transaction):
             log.error("got to the else, so something is wrong")
             common.settings.appendCommonParserNotice( thisTransaction,'ServiceNotKnownToEntity',i)
     thisTransaction.build_outgoing_string()
+
+def registerBuild(thisTransaction):
+    log.info("registerBuild() was called.")
+    structureMap = {}
+    sequence = getSequenceFromTransaction(thisTransaction)
+    seqUUID = getSeqUUIDForSequence(sequence)
+    timestamp = str(datetime.now())
+    structureMap.update({
+        "sequence":sequence,
+        "seqUUID": seqUUID,
+        "timestamp": timestamp
+    })
+
+    ##TODO: Create a dir for seqUUID
+    userDataDir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/"
+    seqUUIDPath = userDataDir + seqUUID
+    
+    if not os.path.exists(seqUUIDPath):
+        os.makedirs(seqUUIDPath)
+
+    ##TODO: Create a symbolioc pointer to the pUUID dir
+    outputDir = getOutputDir(thisTransaction)
+    try:
+        isDefault = checkIfDefaultStructureRequest(thisTransaction)
+        if isDefault:
+            link = seqUUIDPath + "/default"
+            # if not os.path.exists(dest):
+            #     os.makedirs(dest)
+        else:
+            link = buildRotamerDirName(thisTransaction)
+        
+        if os.path.exists(outputDir):
+            target = outputDir
+            log.debug("target: " + target)
+            log.debug("link: " + link)
+            os.symlink(target, link)
+        else:
+            raise FileNotFoundError(outputDir)
+        
+    except Exception as error:
+        log.error("There was a problem creating the symbolic link.")
+        raise error
+    else:
+        ##TODO: Determine if the default structure was requested or not.
+        ## For now, assume the default structure was requested.
+        
+        solvationRequested = checkIfSolvationRequested(thisTransaction)
+        if solvationRequested == "Yes":
+            solvationShape = getSolvationShape(thisTransaction)
+        else:
+            solvationShape = ""
+        forceField = getForceFieldFromRequest(thisTransaction)
+
+        ##TODO: Update the json file for future reference.
+        structureMappingFilename = seqUUIDPath + "/structureMapping.json"
+        structureMap.update({
+            "isDefault": isDefault,
+            "solvationRequested": solvationRequested,
+            "solvationShape": solvationShape,
+            "forceField": forceField,
+        })
+        log.debug("Attempting to write the structure mapping data to file.")
+        log.debug("structureMap: " + str(structureMap))
+        try:
+            if not os.path.exists(structureMappingFilename):
+                with open(structureMappingFilename, 'w', encoding='utf-8') as jsonFile:
+                    jsonString = json.dump(structureMap, jsonFile, ensure_ascii=False, indent=4)
+                    #jsonFile.write(jsonString)
+            else:
+                log.debug("The structureMapping.json file exists. Adding a new record.")
+                ##TODO: Write this logic.
+        except Exception as error:
+            log.error("There was a problem writing the structure mapping to file.")
+            raise error
+
+def buildRotamerDirName(thisTransaction):
+    log.info("buildRotamerDirName() was called.")
+    ##TODO: Write this logic when building structures with selectedRotamers exists.
+    log.error("buildRotamerDirName still needs to be written.")
+
+def getSolvationShape(thisTransaction):
+    log.info("getSolvationShape() was called.")
+    project = getFrontendProjectFromTransaction(thisTransaction)
+    if project is not None:
+        return project['solvation_shape']
+    else:
+        ##TODO: write logic for commandline users to specify solvent shapes other than the default.
+        return "REC"
+
+
+
+##  @brief Look at the transaction to see if a force field is specified
+#   @param Transaction thisTransaction
+#   @return String either "default" or the force field name.
+def getForceFieldFromRequest(thisTransaction):
+    log.info("getForceFieldFromRequest() was called.")
+    project = getFrontendProjectFromTransaction(thisTransaction)
+    if project is not None:
+        if project['ff_version'] == "":
+            return "default"
+        else:
+            return project['ff_version']
+
+    else:
+        ##TODO: write logic for commandline users to specify forcefields other than the default
+        return "default"
+
+## @brief Look at the transaction to see if solvation was requested.
+#  @param Transaction thisTransaction
+#   @return Boolean solvationRequested
+def checkIfSolvationRequested(thisTransaction):
+    log.info("checkIfSolvationRequested() was called.")
+    project = getFrontendProjectFromTransaction(thisTransaction)
+    if project is not None:
+        if project['solvation'] == "Yes":
+            return True
+        else:
+            return False
+    else:
+        log.error("This logic is still in development.")
+        ##TODO: figure out how one might specify a request for solvation if there is not a frontend project.
+        #           This applies to command line users that don't use the website or JSON API
+
+##  @brief In Development!!! Always returns true for now.
+#   @param Transaction thisTransaction
+#   @return Boolean isDefault
+def checkIfDefaultStructureRequest(thisTransaction):
+    log.info("checkIfDefaultStructureRequest was called().")
+    ##TODO: write real logic for this after the json request for selectedRotamers exists.
+    return True
+
+
+##  @brief Looks up the sequence and generates an seqUUID, then checks for existing builds.
+#   @note This does not yet check for builds with rotamers specified yet, still in development.
+#   @param Transaction thisTransaction
+#   @return Boolean structureExists
+def checkIfStructureExists(thisTransaction):
+    log.info("checkIfStructureExists() was called.")
+    structureExists = False
+    sequence = getSequenceFromTransaction(thisTransaction)
+    seqUUID = getSeqUUIDForSequence(sequence)
+    userDataDir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/"
+    log.debug("userDataDir: " + userDataDir)
+    try:
+        log.debug("Walking the userDataDir.")
+
+        for element in os.walk(userDataDir):
+            rootPath = element[0]
+            dirNames = element[1]
+            fileNames = element[2]
+
+            log.debug("rootPath: " + str(rootPath))
+            log.debug("dirNames: " + str(dirNames))
+            log.debug("fileNames: " + str(fileNames))
+            for dirName in dirNames:
+                log.debug("dirName: " + dirName)
+                log.debug("seqUUID: " + seqUUID)
+                if seqUUID == dirName:
+                    log.debug("This sequence has had one or more models previously built.")
+                    log.debug("Still need to write code to check if any rotamers are specified.")
+                    ##TODO: Write the logic that checks the transaction for selectedRotamers
+                    ##TODO: Write the logic that checks if a structure has been built with those selectedRotamers.
+                    return True
+
+    except Exception as error:
+        log.error("There was a problem checking if this structure exists.")
+        raise error
+    else:
+        return structureExists
 
 
 # ##  Looks at a transaction object to see if an evalutaion response exists and returns a boolean.

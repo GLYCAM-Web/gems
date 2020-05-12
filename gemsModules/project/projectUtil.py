@@ -93,8 +93,9 @@ def getFrontendProjectFromTransaction(thisTransaction: Transaction):
     else:
         return None
 
-##  Pass in a transaction, get the outputDir
-#   @param outputDir
+##  @brief Pass in a transaction, get the outputDir
+#   @param Transaction thisTransaction
+#   @return output_dir
 def getOutputDir(thisTransaction: Transaction):
     log.info("getOutputDir() was called.\n")
     try:
