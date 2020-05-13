@@ -252,6 +252,8 @@ def buildGemsProject(thisTransaction : Transaction, requestingAgent : str):
     return gemsProject
 
 
+
+
 ##If the requesting agent is the website, leave the gems project.
 #   Otherwise remove it.
 #   @param thisTransaction The transaction object provides the requesting agent.

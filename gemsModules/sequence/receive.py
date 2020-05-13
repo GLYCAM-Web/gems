@@ -263,6 +263,14 @@ def getSequenceFromTransaction(thisTransaction: Transaction):
             log.debug("Skipping")
     return sequence
 
+def getOptionsFromTransaction(thisTransaction: Transaction):
+    log.info("getOptionsFromTransaction() was called.")
+    if "options" in thisTransaction.request_dict.keys():
+        log.debug("Found options.")
+        return thisTransaction.request_dict['options']
+    else:
+        log.debug("No options found.")
+        return None
 
 ##  @brief Default service is marco polo. Should this be something else?
 #   @param Transaction this Transaction
@@ -320,14 +328,14 @@ def receive(thisTransaction : Transaction):
             if valid:
                 log.debug("Valid sequence. Building default structure.")
 
-                structureExists = checkIfStructureExists(thisTransaction)
-                if structureExists:
-                    ##TODO: return response with payload of the existing build
+                if checkIfDefaultStructureRequest(thisTransaction):
                     log.debug("Returning response with payload of existing build.")
+                    respondWithExistingDefaultStructure(thisTransaction)
                 else:
                     log.debug("Structure does not exist yet.")
                     build3DStructure(thisTransaction, None)
                     registerBuild(thisTransaction)
+
             else:
                 log.error("Invalid Sequence. Cannot build.")
                 common.settings.appendCommonParserNotice( thisTransaction,'InvalidInput',i)
@@ -335,6 +343,24 @@ def receive(thisTransaction : Transaction):
             log.error("got to the else, so something is wrong")
             common.settings.appendCommonParserNotice( thisTransaction,'ServiceNotKnownToEntity',i)
     thisTransaction.build_outgoing_string()
+
+def respondWithExistingDefaultStructure(thisTransaction):
+    log.info("respondWithExistingDefaultStructure() was called.")
+    sequence = getSequenceFromTransaction(thisTransaction)
+    seqUUID = getSeqUUIDForSequence(sequence)
+    
+    config = {
+        "entity":"Sequence",
+        "respondingService":"Build3DStructure",
+        "responses": [{
+            'payload': seqUUID,
+            'download' : getDownloadUrl(seqUUID, "cb") 
+        }]
+    }
+    appendResponse(thisTransaction, config)
+    
+
+
 
 def registerBuild(thisTransaction):
     log.info("registerBuild() was called.")
@@ -359,6 +385,7 @@ def registerBuild(thisTransaction):
     outputDir = getOutputDir(thisTransaction)
     try:
         isDefault = checkIfDefaultStructureRequest(thisTransaction)
+        log.debug("isDefault: " + str(isDefault))
         if isDefault:
             link = seqUUIDPath + "/default"
             # if not os.path.exists(dest):
@@ -463,20 +490,31 @@ def checkIfSolvationRequested(thisTransaction):
 #   @return Boolean isDefault
 def checkIfDefaultStructureRequest(thisTransaction):
     log.info("checkIfDefaultStructureRequest was called().")
-    ##TODO: write real logic for this after the json request for selectedRotamers exists.
-    return True
+    options  = getOptionsFromTransaction(thisTransaction)
+    log.debug("options: " + str(options))
+
+    if options == None:
+        return True
+    else:
+        ## The presense of rotamers in options means this is not a request
+        # for the default structure.
+        if "rotamers" in options.keys():
+            return False
+        else:
+            return True
 
 
 ##  @brief Looks up the sequence and generates an seqUUID, then checks for existing builds.
 #   @param Transaction thisTransaction
 #   @return Boolean structureExists
-def checkIfStructureExists(thisTransaction):
-    log.info("checkIfStructureExists() was called.")
+def checkIfDefaultStructureExists(thisTransaction):
+    log.info("checkIfDefaultStructureExists() was called.")
     structureExists = False
     sequence = getSequenceFromTransaction(thisTransaction)
     seqUUID = getSeqUUIDForSequence(sequence)
     userDataDir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/"
     log.debug("userDataDir: " + userDataDir)
+    options = getOptionsFromTransaction(thisTransaction)
     try:
         log.debug("Walking the userDataDir.")
 
@@ -492,12 +530,8 @@ def checkIfStructureExists(thisTransaction):
                 log.debug("dirName: " + dirName)
                 log.debug("seqUUID: " + seqUUID)
                 if seqUUID == dirName:
-                    log.debug("This sequence has had one or more models previously built.")
-                    log.debug("Still need to write code to check if any rotamers are specified.")
-                    ##TODO: Write the logic that checks the transaction for selectedRotamers
-                    ##TODO: Write the logic that checks if a structure has been built with those selectedRotamers.
                     return True
-
+                    
     except Exception as error:
         log.error("There was a problem checking if this structure exists.")
         raise error

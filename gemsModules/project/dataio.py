@@ -30,6 +30,7 @@ class GemsProject(BaseModel):
     status : str = "submitted"
     hasInputFiles : bool = False
 
+
     def buildProject(self, thisTransaction : Transaction, requestingAgent : str):
         log.info("buildProject was called.\n")
         log.debug("requestingAgent: " + requestingAgent)
@@ -85,6 +86,7 @@ class GemsProject(BaseModel):
             thisTransaction.response_dict['gems_project']['md5sum'] = self.md5sum
         if self.project_type is not None:
             thisTransaction.response_dict['gems_project']['project_type'] = self.project_type
+
 
     def __str__(self):
         result = "\nGemsProject:\nrequestingAgent: "

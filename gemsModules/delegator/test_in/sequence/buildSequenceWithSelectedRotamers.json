@@ -1,0 +1,63 @@
+{
+	"entity": {
+		"type": "Sequence",
+		"services": [{
+			"Build": {
+				"type": "Build3DStructure"
+			}
+		}],
+		"inputs": [{
+			"Sequence": {
+				"payload": "DManpa1-2DManpa1-2DManpa1-3[DManpa1-6]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH"
+			}
+		}]
+	},
+	"options": {
+		"rotamers": [{
+			"linkageLabel": "10",
+			"dihedralName": "omega",
+			"rotamerName": "gg"
+		}, {
+			"linkageLabel": " 10",
+			"dihedralName": "omega",
+			"rotamerName": "gt"
+		}]
+	},
+	"project": {
+		"_state": "<django.db.models.base.ModelState object at 0x7f3bb4075650>",
+		"user_id": "2",
+		"title": "Now what?",
+		"timestamp": "2020-05-13 17:10:45.379718+00:00",
+		"id": "8f01d9dd-2802-4a1a-9a36-722b32c7d534",
+		"comment": "Springer",
+		"type": "cb",
+		"email": "",
+		"gems_version": "b385d529f99418c1eebe4155b91c08a7941ebb39",
+		"gems_branch": "structureTracking",
+		"gmml_version": "82afc57666c0758614e12cdbfbf615f6459e4f32",
+		"gmml_branch": "gmml-dev",
+		"site_mode": "CONTAINERS",
+		"site_host_name": "172.25.0.2",
+		"ff_version": "",
+		"parameter_version": "",
+		"amber_version": "",
+		"json_api_version": "0.0.1",
+		"requesting_agent": "website",
+		"root": " ",
+		"project_ptr_id": "8f01d9dd-2802-4a1a-9a36-722b32c7d534",
+		"sequence": "DManpa1-2DManpa1-2DManpa1-3[DManpa1-6]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH",
+		"ion": "No",
+		"solvation": "no",
+		"solvation_size": "8",
+		"solvation_distance": "2",
+		"solvation_shape": "REC",
+		"num_structures": "1",
+		"linkage_info": "",
+		"rotamer_info": "",
+		"rotamer_list": "['10_omega_gg', '10_omega_gt']",
+		"angle_info": "",
+		"md5dir": " ",
+		"md5sum": "e7cfaa834146d4c23b201a096f8e3e7b",
+		"job_info": ""
+	}
+}
