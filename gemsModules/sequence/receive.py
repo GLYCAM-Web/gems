@@ -468,7 +468,6 @@ def checkIfDefaultStructureRequest(thisTransaction):
 
 
 ##  @brief Looks up the sequence and generates an seqUUID, then checks for existing builds.
-#   @note This does not yet check for builds with rotamers specified yet, still in development.
 #   @param Transaction thisTransaction
 #   @return Boolean structureExists
 def checkIfStructureExists(thisTransaction):
