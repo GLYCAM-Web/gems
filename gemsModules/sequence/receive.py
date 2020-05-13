@@ -329,13 +329,16 @@ def receive(thisTransaction : Transaction):
                 log.debug("Valid sequence. Building default structure.")
 
                 if checkIfDefaultStructureRequest(thisTransaction):
-                    log.debug("Returning response with payload of existing build.")
-                    respondWithExistingDefaultStructure(thisTransaction)
+                    if checkIfDefaultStructureExists(thisTransaction):
+                        log.debug("Returning response with payload of existing build.")
+                        respondWithExistingDefaultStructure(thisTransaction)
+                    else:
+                        log.debug("Default structure does not exist yet.")
+                        build3DStructure(thisTransaction, None)
+                        registerBuild(thisTransaction)
                 else:
-                    log.debug("Structure does not exist yet.")
-                    build3DStructure(thisTransaction, None)
-                    registerBuild(thisTransaction)
-
+                    log.error("The code for building structures with selectedRotamers does not exist yet.")
+                    
             else:
                 log.error("Invalid Sequence. Cannot build.")
                 common.settings.appendCommonParserNotice( thisTransaction,'InvalidInput',i)
