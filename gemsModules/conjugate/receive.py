@@ -132,7 +132,7 @@ def writeGpScript(inputFileName, gemsProject):
     log.debug("builderPath: " + builderPath)
     log.debug("inputFileName: " + inputFileName)
 
-    outputDir = gemsProject.output_dir
+    outputDir = gemsProject.project_dir
     #/programs/GlycoProteinBuilder/bin/ /website/userdata/tools/gp/git-ignore-me_userdata/4f18b278-d9bb-4111-b502-d91945639fa6/ > /website/userdata/tools/gp/git-ignore-me_userdata/4f18b278-d9bb-4111-b502-d91945639fa6/gp.log
     sbatchArg = "gpScript.sh"
     script = outputDir + sbatchArg
@@ -156,7 +156,7 @@ def writeGpScript(inputFileName, gemsProject):
 def writeGpInputFile(gemsProject, attachmentSites):
     log.info("writeGpInputFile() was called.\n")
     ##Write the Input file, which GP uses to know what to do.
-    outputDir = gemsProject.output_dir
+    outputDir = gemsProject.project_dir
     preprocessedPdbFileName = "updated_pdb.pdb"
     log.debug("preprocessedPdbFileName: " + preprocessedPdbFileName)
     inputFileName = outputDir + "input.txt"

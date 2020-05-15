@@ -149,7 +149,7 @@ Note: This is very dynamic: it will change while in dev. Take this with a grain 
 			"requesting_agent": "json_api",
 			"timestamp": "2020-01-07 08:13:55.730982",
 			"pUUID": "23f80687-4282-4e98-9fca-364d83aa986f",
-			"output_dir": "/website/userdata/tools/md/git-ignore-me_userdata/23f80687-4282-4e98-9fca-364d83aa986f/",
+			"project_dir": "/website/userdata/tools/md/git-ignore-me_userdata/23f80687-4282-4e98-9fca-364d83aa986f/",
 			"project_type": "md"
 		}
 	},

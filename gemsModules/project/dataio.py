@@ -16,20 +16,23 @@ else:
     log = createLogger(__name__)
 
 
-## The backend project is not the same as the project model in the frontend.
+##  @brief The primary way of tracking data related to a project
+#   @detail This is the generic project object. See subtypes for more specific fields
 ##TODO: Add error handling.
 class GemsProject(BaseModel):
+    title : str = None
+    comment : str = None
     timestamp : datetime = None
+    projectType : str = None
     ## The name of the output dir is the pUUID
     pUUID : str = None
-    ## The output path
-    output_dir : str = None
+    ## The project path. Used to be output dir, but now that is reserved for subdirs.
+    project_dir : str = None
     md5sum : str = None
     project_type : str = None
     requesting_agent : str = None
     status : str = "submitted"
     hasInputFiles : bool = False
-
 
     def buildProject(self, thisTransaction : Transaction, requestingAgent : str):
         log.info("buildProject was called.\n")
@@ -56,11 +59,11 @@ class GemsProject(BaseModel):
             ##There will be no frontend project here.
             log.warning("Still developing command_line logic for projects.")
 
-        self.output_dir = projectSettings.output_data_dir + "tools/" + self.project_type + "/git-ignore-me_userdata/" + self.pUUID + "/"
+        self.project_dir = projectSettings.output_data_dir + "tools/" + self.project_type + "/git-ignore-me_userdata/" + self.pUUID + "/"
 
         ##Check that the outpur_dir exists. Create it if not.
-        if not os.path.exists (self.output_dir):
-            os.makedirs(self.output_dir)
+        if not os.path.exists (self.project_dir):
+            os.makedirs(self.project_dir)
 
         self.updateTransaction(thisTransaction)
 
@@ -80,7 +83,7 @@ class GemsProject(BaseModel):
         thisTransaction.response_dict['gems_project']['requesting_agent'] = self.requesting_agent
         thisTransaction.response_dict['gems_project']['timestamp'] = str(self.timestamp)
         thisTransaction.response_dict['gems_project']['pUUID'] = self.pUUID
-        thisTransaction.response_dict['gems_project']['output_dir'] = self.output_dir
+        thisTransaction.response_dict['gems_project']['project_dir'] = self.project_dir
         thisTransaction.response_dict['gems_project']['hasInputFiles'] = self.hasInputFiles
         if self.md5sum is not None:
             thisTransaction.response_dict['gems_project']['md5sum'] = self.md5sum
@@ -100,8 +103,8 @@ class GemsProject(BaseModel):
         result = result + str(self.timestamp)
         result = result + "\npUUID: "
         result = result + self.pUUID
-        result = result + "\noutput_dir: "
-        result = result + self.output_dir
+        result = result + "\nproject_dir: "
+        result = result + self.project_dir
         result = result + "\nhasInputFiles: "
         result = result + str(self.hasInputFiles)
         
@@ -110,6 +113,14 @@ class GemsProject(BaseModel):
             result = result + self.md5sum
 
         return result
+
+## @brief cbProject is a typed project that inherits all the fields from GemsProject and adds its own.
+#   
+class CbProject(GemsProject):
+    sequence : str = None
+    status : str = "submitted"
+    structureCount : int = 1
+    structureMapping : dict = None
 
 ##  Figures out the type of structure file being preprocessed.
 def getStructureFileProjectType(request):

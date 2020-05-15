@@ -104,7 +104,7 @@
 			"requesting_agent": "website",
 			"timestamp": "2020-01-29 15:22:23.921431",
 			"pUUID": "183a8d9e-4efc-4026-acdd-a01d2ea74fda",
-			"output_dir": "/website/userdata/tools/cb/git-ignore-me_userdata/183a8d9e-4efc-4026-acdd-a01d2ea74fda/",
+			"project_dir": "/website/userdata/tools/cb/git-ignore-me_userdata/183a8d9e-4efc-4026-acdd-a01d2ea74fda/",
 			"md5sum": "349a1a9c122031e575816a662acc9471",
 			"project_type": "cb"
 		}

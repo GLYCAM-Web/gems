@@ -70,7 +70,7 @@ def submitGpScriptToSlurm(thisTransaction, gemsProject, sbatchArg):
     log.debug("sbatchArgument: " + sbatchArg)
     if gemsProject is not None:
 
-        outputDir = gemsProject.output_dir
+        outputDir = gemsProject.project_dir
         log.debug("outputDir: " + outputDir)
         #Remove the last /
         outputDir = outputDir[:-1]

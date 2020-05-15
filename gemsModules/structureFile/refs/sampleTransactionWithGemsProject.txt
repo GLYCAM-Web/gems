@@ -84,7 +84,7 @@
 			'requesting_agent': 'json_api',
 			'timestamp': '2020-02-05 15:55:00.607433',
 			'pUUID': '056b410f-5538-4b0c-bdde-99678fd2b892',
-			'output_dir': '/website/userdata/tools/pdb/git-ignore-me_userdata/056b410f-5538-4b0c-bdde-99678fd2b892/',
+			'project_dir': '/website/userdata/tools/pdb/git-ignore-me_userdata/056b410f-5538-4b0c-bdde-99678fd2b892/',
 			'project_type': 'pdb'
 		}
 	},
@@ -98,7 +98,7 @@
 		"requesting_agent": "json_api",
 		"timestamp": "2020-02-05 15:55:00.607433",
 		"pUUID": "056b410f-5538-4b0c-bdde-99678fd2b892",
-		"output_dir": "/website/userdata/tools/pdb/git-ignore-me_userdata/056b410f-5538-4b0c-bdde-99678fd2b892/",
+		"project_dir": "/website/userdata/tools/pdb/git-ignore-me_userdata/056b410f-5538-4b0c-bdde-99678fd2b892/",
 		"project_type": "pdb"
 	}
 }

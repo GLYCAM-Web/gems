@@ -45,12 +45,6 @@ def preprocessPdbForAmber(thisTransaction):
             raise error
         else:
 
-            ###build the path to the uploaded pdb file.
-            # outputDir = getOutputDir(thisTransaction)
-            # frontendProject = thisTransaction.request_dict['project']
-            # uploadFileName = getUploadsDestinationDir(frontendProject, outputDir)
-
-
             log.debug("completed uploadFileName: " + uploadFileName)
             ### generate the processed pdb's content
             try:
@@ -96,13 +90,13 @@ def generatePdbOutput(thisTransaction):
         ### Get the fileName from the transaction.
         project = thisTransaction.request_dict['project']
         try:
-            outputDir = getOutputDir(thisTransaction)
+            projectDir = getProjectDir(thisTransaction)
         except Exception as error:
-            log.error("There was a problem getting the output dir.")
+            log.error("There was a problem getting the projectDir.")
             log.error(traceback.format_exc())
             raise error
         else:
-            projectDir  = getProjectUploadsDir(project, outputDir)
+            projectDir  = getProjectUploadsDir(project, projectDir)
             uploadedFileName = project['uploaded_file_name']
             log.debug("uploadedFileName: " + uploadedFileName)
             uploadedPDB = projectDir + uploadedFileName
@@ -624,8 +618,8 @@ def writePdbOutput(thisTransaction, pdbFile):
     log.info("writePdbOutput() was called.\n")
     ### Give the output file the same path as the uploaded file, but replace the name.
     try:
-        outputDir = getOutputDir(thisTransaction)
-        log.debug("outputDir: " + outputDir)  
+        projectDir = getProjectDir(thisTransaction)
+        log.debug("projectDir: " + projectDir)  
     except Exception as error:
         log.error("There was a problem getting the output dir from the transaction.")
         raise error
@@ -633,7 +627,7 @@ def writePdbOutput(thisTransaction, pdbFile):
 
         ### Write the file
         try:   
-            writePdb(pdbFile, outputDir)
+            writePdb(pdbFile, projectDir)
         except Exception as error:
             log.error("There was an error writing the pdb file.")
             raise error        
@@ -730,15 +724,15 @@ def getInput(thisTransaction : Transaction):
         raise AttributeError("inputs")
 
 
-##  Write the pdb file to the outputDir
+##  Write the pdb file to the projectDir
 #   @param pdbFile as created by gmml.PdbFile()
-#   @param outputDir destination for pdb file
-def writePdb(pdbFile, outputDir):
+#   @param projectDir destination for pdb file
+def writePdb(pdbFile, projectDir):
     log.info("writePdb() was called.\n")
-    if os.path.exists(outputDir):
+    if os.path.exists(projectDir):
         log.debug("Writing the preprocessed pdb to 'updated_pdb.pdb'")
         destinationFile = 'updated_pdb.pdb'
-        updatedPdbFileName = outputDir + destinationFile
+        updatedPdbFileName = projectDir + destinationFile
         log.debug("updatedPdbFileName: " + updatedPdbFileName)
         pdbFile.WriteWithTheGivenModelNumber(updatedPdbFileName)
     else:

@@ -92,6 +92,8 @@ def build3dStructureResponseConfig(gemsProject):
         "respondingService" : "Build3DStructure",
         "responses" : [{
             'payload' : gemsProject['pUUID'],
+            'sequence' : gemsProject['sequence'],
+            'seqUUID' : getSeqUUIDForSequence(sequence),
             'downloadUrl' : downloadUrl
         }]
     }
@@ -191,43 +193,62 @@ def build3DStructure(thisTransaction : Transaction, thisService : Service = None
     sequence = getSequenceFromTransaction(thisTransaction)
 
     if sequence is None:
-        raise AttributeError
+        raise AttributeError("sequence")
     else:
         gemsProject = thisTransaction.response_dict['gems_project']
         responseConfig = build3dStructureResponseConfig(gemsProject)
         appendResponse(thisTransaction, responseConfig)
 
     builder = getCbBuilderForSequence(sequence)
-    outputDir = thisTransaction.response_dict['gems_project']['output_dir']
-    log.debug("outputDir: " + outputDir)
-    destination = outputDir + 'structure'
-    log.debug("destination: " + destination)
-    builder.GenerateSingle3DStructure(destination)
+    try:
+        projectDir = getProjectDirSubDir(thisTransaction)
+    except Exception as error:
+        log.error("There was a problem getting this build's subdir.")
+        raise error
+    else:
+        destination = projectDir + 'structure'
+        log.debug("destination: " + destination)
+        builder.GenerateSingle3DStructure(destination)
 
-## This needs to move - Sequence should not be deciding how 
-## minimization will happen.  That is the job of mmservice.
-    amberSubmissionJson='{"project" : \
-    {\
-    "id":"' + pUUID + '", \
-    "workingDirectory":"' + outputDir + '", \
-    "type":"minimization", \
-    "system_phase":"gas", \
-    "water_model":"none" \
-    } \
-}'
-    # TODO:  Make this resemble real code....
-    the_json_file = outputDir + "amber_submission.json"
-    min_json_in = open (the_json_file , 'w')
-    min_json_in.write(amberSubmissionJson)
-    min_json_in.close()
+    ## This needs to move - Sequence should not be deciding how 
+    ## minimization will happen.  That is the job of mmservice.
+        amberSubmissionJson='{"project" : \
+        {\
+        "id":"' + pUUID + '", \
+        "workingDirectory":"' + projectDir + '", \
+        "type":"minimization", \
+        "system_phase":"gas", \
+        "water_model":"none" \
+        } \
+    }'
+        # TODO:  Make this resemble real code....
+        the_json_file = projectDir + "amber_submission.json"
+        min_json_in = open (the_json_file , 'w')
+        min_json_in.write(amberSubmissionJson)
+        min_json_in.close()
 
-    from gemsModules.mmservice.amber.amber import manageIncomingString
-    manageIncomingString(amberSubmissionJson)
-## everything up to here -- all the amber stuff --
-## is what needs to move
+        from gemsModules.mmservice.amber.amber import manageIncomingString
+        manageIncomingString(amberSubmissionJson)
+    ## everything up to here -- all the amber stuff --
+    ## is what needs to move
 
+def getProjectDirSubDir(thisTransaction: Transaction):
+    log.info("getProjectDirSubDir() was called.")
+    projectDir = thisTransaction.response_dict['gems_project']['project_dir']
+    log.debug("projectDir: " + projectDir)
 
-    #cleanGemsProject(thisTransaction)
+    ## If default structure, subdir name is 'default'
+    if checkIfDefaultStructureRequest(thisTransaction):
+        projectDir = projectDir + "default/"
+        if not os.path.exists(projectDir):
+            os.makedirs(projecDir)
+
+    else:
+        log.error("Still writing the logic to handle builds with selectedRotamers.")
+        ##TODO: provide the subdir based on this doc: 
+        ## http://128.192.9.183/eln/gwscratch/2020/01/10/succinct-rotamer-set-labeling-for-sequences/
+        raise AttributeError("rotamerSubdir")
+    return projectDir 
 
 
 ##  @brief Pass a sequence string, get a builder for that sequence.
@@ -384,25 +405,26 @@ def registerBuild(thisTransaction):
     if not os.path.exists(seqUUIDPath):
         os.makedirs(seqUUIDPath)
 
-    ##TODO: Create a symbolioc pointer to the pUUID dir
-    outputDir = getOutputDir(thisTransaction)
+    projectDir = getProjectDir(thisTransaction)
     try:
         isDefault = checkIfDefaultStructureRequest(thisTransaction)
         log.debug("isDefault: " + str(isDefault))
         if isDefault:
             link = seqUUIDPath + "/default"
-            # if not os.path.exists(dest):
-            #     os.makedirs(dest)
+            projectDir = projectDir + "/default"
         else:
             link = buildRotamerDirName(thisTransaction)
         
-        if os.path.exists(outputDir):
-            target = outputDir
+        if os.path.exists(projectDir):
+            target = projectDir
+            ##What is being linked to is the projecDir or the 
             log.debug("target: " + target)
+            ##This will be the symbolic link
             log.debug("link: " + link)
             os.symlink(target, link)
         else:
-            raise FileNotFoundError(outputDir)
+            log.error("Failed to find the target dir for the symbolic link.")
+            raise FileNotFoundError(projectDir)
         
     except Exception as error:
         log.error("There was a problem creating the symbolic link.")
@@ -439,6 +461,7 @@ def registerBuild(thisTransaction):
         except Exception as error:
             log.error("There was a problem writing the structure mapping to file.")
             raise error
+
 
 def buildRotamerDirName(thisTransaction):
     log.info("buildRotamerDirName() was called.")

@@ -7,7 +7,7 @@
 		"requesting_agent": "website",
 		"timestamp": "2020-04-09 09:05:28.057693",
 		"pUUID": "93f03245-29e5-4d51-8594-6c4a5d8be6d0",
-		"output_dir": "/website/userdata/tools/pdb/git-ignore-me_userdata/93f03245-29e5-4d51-8594-6c4a5d8be6d0/",
+		"project_dir": "/website/userdata/tools/pdb/git-ignore-me_userdata/93f03245-29e5-4d51-8594-6c4a5d8be6d0/",
 		"hasInputFiles": true,
 		"project_type": "pdb"
 	},
