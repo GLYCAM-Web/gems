@@ -28,6 +28,7 @@ class GemsProject(BaseModel):
     pUUID : str = None
     ## The project path. Used to be output dir, but now that is reserved for subdirs.
     project_dir : str = None
+    md5sum : str = None
     project_type : str = None
     requesting_agent : str = None
     status : str = "submitted"
@@ -45,19 +46,18 @@ class GemsProject(BaseModel):
         if self.requesting_agent != 'command_line':
             if request['entity']['type'] == 'MmService':
                 self.hasInputFiles = True
-                self.project_type = "md"
             elif request['entity']['type'] == 'Conjugate':
                 self.hasInputFiles = True
-                self.project_type = "gp"
             elif request['entity']['type'] == "StructureFile":
                 self.hasInputFiles = True
-                self.project_type = "pdb"
-            elif request['entity']['type'] = "Sequence":
-                self.project_type = "cb"
+
+            if 'md5Sum' in request['project'].keys():
+                self.md5sum = request['project']['md5Sum']
+            if 'type' in request['project'].keys():
+                self.project_type = request['project']['type']
         else:
             ##There will be no frontend project here.
             log.warning("Still developing command_line logic for projects.")
-            ##TODO build a project with defaults for those who don't use the frontend.
 
         self.project_dir = projectSettings.output_data_dir + "tools/" + self.project_type + "/git-ignore-me_userdata/" + self.pUUID + "/"
 
