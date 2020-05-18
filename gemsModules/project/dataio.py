@@ -18,109 +18,100 @@ else:
 
 ##  @brief The primary way of tracking data related to a project
 #   @detail This is the generic project object. See subtypes for more specific fields
-##TODO: Add error handling.
-class GemsProject(BaseModel):
-    title : str = None
-    comment : str = None
-    timestamp : datetime = None
-    projectType : str = None
+##TODO: Add this class signature back in when ready for pydantic validation.
+#class GemsProject(BaseModel):
+class GemsProject():
     ## The name of the output dir is the pUUID
     pUUID : str = None
+    timestamp : datetime = None
+
+    title : str = None
+    comment : str = None
+    
+    
+
     ## The project path. Used to be output dir, but now that is reserved for subdirs.
     project_dir : str = None
-    project_type : str = None
     requesting_agent : str = None
-    status : str = "submitted"
-    hasInputFiles : bool = False
+    has_input_files : bool = False
+    gems_version : str = None
+    gems_branch : str = None
+    gmml_version : str = None
+    gmml_branch : str = None
+    site_mode : str = None
+    site_host_name : str = None
+    force_field : str = None
+    parameter_version : str = None
+    amber_version : str = None
+    json_api_version : str = None
+    
+    project_type : str = None
 
-    def buildProject(self, thisTransaction : Transaction, requestingAgent : str):
-        log.info("buildProject was called.\n")
-        log.debug("requestingAgent: " + requestingAgent)
-
+    def __init__(self, thisTransaction : Transaction):
+        log.info("GemsProject.__init__() was called.")
         request = thisTransaction.request_dict
-        self.requesting_agent = requestingAgent
-        self.timestamp = datetime.now()
-        self.pUUID = str(uuid.uuid4())
+        log.debug("request: " + str(request))
+        if 'project' in request.keys():
+            log.debug("found a project in the request.")
+            fe_project = request['project']
 
-        if self.requesting_agent != 'command_line':
-            if request['entity']['type'] == 'MmService':
-                self.hasInputFiles = True
-                self.project_type = "md"
-            elif request['entity']['type'] == 'Conjugate':
-                self.hasInputFiles = True
-                self.project_type = "gp"
-            elif request['entity']['type'] == "StructureFile":
-                self.hasInputFiles = True
-                self.project_type = "pdb"
-            elif request['entity']['type'] = "Sequence":
-                self.project_type = "cb"
-        else:
-            ##There will be no frontend project here.
-            log.warning("Still developing command_line logic for projects.")
-            ##TODO build a project with defaults for those who don't use the frontend.
-
-        self.project_dir = projectSettings.output_data_dir + "tools/" + self.project_type + "/git-ignore-me_userdata/" + self.pUUID + "/"
-
-        ##Check that the outpur_dir exists. Create it if not.
-        if not os.path.exists (self.project_dir):
-            os.makedirs(self.project_dir)
-
-        self.updateTransaction(thisTransaction)
-
-
-    def updateTransaction(self, thisTransaction: Transaction):
-        log.info("updateTransaction() was called.\n")
-        if thisTransaction.response_dict is None:
-            thisTransaction.response_dict = {}
-        if not 'entity' in thisTransaction.response_dict:
-            thisTransaction.response_dict['entity'] = {}
-            thisTransaction.response_dict['entity']['type'] = thisTransaction.request_dict['entity']['type']
-
-        if not 'gems_project' in thisTransaction.response_dict:
-            thisTransaction.response_dict['gems_project'] = {}
-
-        thisTransaction.response_dict['gems_project']['status'] = self.status
-        thisTransaction.response_dict['gems_project']['requesting_agent'] = self.requesting_agent
-        thisTransaction.response_dict['gems_project']['timestamp'] = str(self.timestamp)
-        thisTransaction.response_dict['gems_project']['pUUID'] = self.pUUID
-        thisTransaction.response_dict['gems_project']['project_dir'] = self.project_dir
-        thisTransaction.response_dict['gems_project']['hasInputFiles'] = self.hasInputFiles
-        if self.md5sum is not None:
-            thisTransaction.response_dict['gems_project']['md5sum'] = self.md5sum
-        if self.project_type is not None:
-            thisTransaction.response_dict['gems_project']['project_type'] = self.project_type
+            ## Random uuid for the project uuid.
+            self.pUUID = str(uuid.uuid4())
+            self.timestamp = datetime.now()
+            
+            if 'title' in fe_project.keys():
+                self.title = fe_project['title']
+            if 'comment' in fe_project.keys():
+                self.comment = fe_project['comment']
+            if 'type' in fe_project.keys():
+                self.project_type = fe_project['project_type']
+            if 'requesting_agent' in fe_project.keys():
+                self.requesting_agent = fe_project['requesting_agent']
+            if 'gems_version' in fe_project.keys():
+                self.gems_version = fe_project['gems_version']
+            if 'gems_branch' in fe_project.keys():
+                self.gems_branch = fe_project['gems_branch']
+            if 'gmml_version' in fe_project.keys():
+                self.gmml_version = fe_project['gmml_version']
+            if 'gmml_branch' in fe_project.keys():
+                self.gmml_branch = fe_project['gmml_branch']
+            if 'site_mode' in fe_project.keys():
+                self.site_mode = fe_project['site_mode']
+            if 'site_host_name' in fe_project.keys():
+                self.site_host_name = fe_project['site_host_name']
+            if 'force_field' in fe_project.keys():
+                self.force_field = fe_project['force_field']
+            if 'parameter_version' in fe_project.keys():
+                self.parameter_version =  fe_project['parameter_version']
+            if 'amber_version' in fe_project.keys():
+                self.amber_version = fe_project['amber_version']
+            if 'json_api_version' in fe_project.keys():
+                self.json_api_version = fe_project['json_api_version']
+                
+            
 
 
-    def __str__(self):
-        result = "\nGemsProject:\nrequestingAgent: "
-        result = result + self.requesting_agent
-        if self.project_type is not None:
-            result = result + "\ntype: "
-            result = result + self.project_type
-        result = result + "\nstatus: "
-        result = result + self.status
-        result = result + "\ntimestamp: "
-        result = result + str(self.timestamp)
-        result = result + "\npUUID: "
-        result = result + self.pUUID
-        result = result + "\nproject_dir: "
-        result = result + self.project_dir
-        result = result + "\nhasInputFiles: "
-        result = result + str(self.hasInputFiles)
-        
-        if self.md5sum is not None:
-            result = result + "\nmd5sum: "
-            result = result + self.md5sum
-
-        return result
 
 ## @brief cbProject is a typed project that inherits all the fields from GemsProject and adds its own.
 #   
 class CbProject(GemsProject):
     sequence : str = None
-    status : str = "submitted"
-    structureCount : int = 1
-    structureMapping : dict = None
+    seqUUID : str = None
+    structure_count : int = 1
+    structure_mappings : []
+    
+
+## Details and location of the build of a single pose of a structure.
+class StructureMapping():
+    ##  Path to the dir that holds this build. 
+    #   May or may not be in this project dir.
+    structure_path : str = None
+    ion : str = "No"
+    solvation : str = "No"
+    solvation_size : str = None
+    solvation_distance : str = None
+    splvation_shape : str = "REC"
+    timestamp : str = None
 
 ##  Figures out the type of structure file being preprocessed.
 def getStructureFileProjectType(request):
@@ -134,9 +125,10 @@ def getStructureFileProjectType(request):
 
     return projectType
 
+##TODO: pydantic homework when model has settled down.
 
-def generateGemsProjectSchema():
-    print(GemsProject.schema_json(indent=2))
+# def generateGemsProjectSchema():
+#     print(GemsProject.schema_json(indent=2))
 
 if __name__ == "__main__":
     generateGemsProjectSchema()

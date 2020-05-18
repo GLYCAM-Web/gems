@@ -26,45 +26,38 @@ else:
 def startProject(thisTransaction: Transaction):
     log.info("startProject() was called.\n")
 
-    ### Check for a frontend project.
+    ### Figure out who is asking.
+    requestingAgent = getRequestingAgentFromTransaction(thisTransaction)
+    
+    ### Start a gemsProject
+    gemsProject = buildGemsProject(thisTransaction, requestingAgent)
+
+    ### Find the projectDir.
     try:
-        project = getFrontendProjectFromTransaction(thisTransaction)
+        project_dir = getProjectDir(thisTransaction)
     except Exception as error:
-        log.error("There was a problem getting the frontend project from the transaction.")
+        log.error("There was a problem getting the projectDir.")
         raise error
     else:
-        ### Figure out who is asking.
-        requestingAgent = getRequestingAgentFromTransaction(thisTransaction)
-        
-        ### Start a gemsProject
-        gemsProject = buildGemsProject(thisTransaction, requestingAgent)
 
-        ### Find the projectDir.
-        try:
-            project_dir = getProjectDir(thisTransaction)
-        except Exception as error:
-            log.error("There was a problem getting the projectDir.")
-            raise error
-        else:
-
-            ### Copy any upload files.
-            if gemsProject.hasInputFiles:
-                try:
-                    copyUploadFilesToProject(thisTransaction, gemsProject)
-                except Exception as error:
-                    log.error("There was a problem uploading the input.")
-                    raise error
-
-            ### Write the logs to file.
+        ### Copy any upload files.
+        if gemsProject.hasInputFiles:
             try:
-                logs_dir = setupProjectDirs(projectDir)
-                request = thisTransaction.request_dict
-                writeRequestToFile(request, logs_dir)
-                writeProjectLogFile(gemsProject, logs_dir)
-                return gemsProject
+                copyUploadFilesToProject(thisTransaction, gemsProject)
             except Exception as error:
-                log.error("There was a problem writing the project logs.")
+                log.error("There was a problem uploading the input.")
                 raise error
+
+        ### Write the logs to file.
+        try:
+            logs_dir = setupProjectDirs(project_dir)
+            request = thisTransaction.request_dict
+            writeRequestToFile(request, logs_dir)
+            writeProjectLogFile(gemsProject, logs_dir)
+            return gemsProject
+        except Exception as error:
+            log.error("There was a problem writing the project logs.")
+            raise error
 
 
 ## Pass in a transaction, figure out the requestingAgent. OK if it doesn't exist.
@@ -96,7 +89,7 @@ def getFrontendProjectFromTransaction(thisTransaction: Transaction):
 ##  @brief Pass in a transaction, get the projectDir
 #   @param Transaction thisTransaction
 #   @return project_dir
-def getProjecttDir(thisTransaction: Transaction):
+def getProjectDir(thisTransaction: Transaction):
     log.info("getProjectDir() was called.\n")
     try:
         project_dir = thisTransaction.response_dict['gems_project']['project_dir']
@@ -245,8 +238,8 @@ def copyUploadFilesToProject(thisTransaction : Transaction, gemsProject : GemsPr
 #   @param requestingAgent
 def buildGemsProject(thisTransaction : Transaction, requestingAgent : str):
     log.info("buildGemsProject() was called.\n")
-    gemsProject = GemsProject()
-    gemsProject.buildProject(thisTransaction, requestingAgent)
+    gemsProject = GemsProject(thisTransaction)
+
     log.debug("gemsProject: " + str(gemsProject))
     return gemsProject
 

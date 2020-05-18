@@ -398,7 +398,7 @@ def registerBuild(thisTransaction):
         "timestamp": timestamp
     })
 
-    ##TODO: Create a dir for seqUUID
+    ## userDataDir is the top level dir that holds all projects, not a specific user's data.
     userDataDir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/"
     seqUUIDPath = userDataDir + seqUUID
     
