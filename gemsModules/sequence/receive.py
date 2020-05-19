@@ -86,7 +86,9 @@ def buildEvaluationResponseConfig(valid, linkages):
 #   @return dict config
 def build3dStructureResponseConfig(gemsProject):
     log.info("build3dStructureResponseConfig() was called.\n")
+    log.debug("gemsProject: " + str(gemsProject))
     downloadUrl = getDownloadUrl(gemsProject['pUUID'], "cb")
+    sequence = gemsProject['sequence']
     config = {
         "entity" : "Sequence",
         "respondingService" : "Build3DStructure",
@@ -164,15 +166,7 @@ def getLinkageOptionsFromBuilder(builder):
     log.debug("updatedLinkages: " + str(updatedLinkages))
     return updatedLinkages
 
-##  @brief Use a sequence to get a unique seqUUID.
-#   Uses uuid5, which uses SHA-1 rather than Md5Sum
-#   @param sequence
-#   @return uuid seqUUID
-def getSeqUUIDForSequence(sequence):
-    log.info("getSeqUUDIFor() was called. sequence: " + sequence)
-    seqUUID = str(uuid.uuid5(uuid.NAMESPACE_DNS, sequence))
-    log.debug("seqUUID: " + seqUUID)
-    return seqUUID
+
 
 
 ##  @brief Creates a jobsubmission for Amber. Submits that. Updates the transaction to reflect this.
@@ -234,21 +228,21 @@ def build3DStructure(thisTransaction : Transaction, thisService : Service = None
 
 def getProjectDirSubDir(thisTransaction: Transaction):
     log.info("getProjectDirSubDir() was called.")
-    projectDir = thisTransaction.response_dict['gems_project']['project_dir']
-    log.debug("projectDir: " + projectDir)
+    project_dir = thisTransaction.response_dict['gems_project']['project_dir']
+    log.debug("project_dir: " + project_dir)
 
     ## If default structure, subdir name is 'default'
     if checkIfDefaultStructureRequest(thisTransaction):
-        projectDir = projectDir + "default/"
-        if not os.path.exists(projectDir):
-            os.makedirs(projecDir)
+        project_dir = project_dir + "default/"
+        if not os.path.exists(project_dir):
+            os.makedirs(project_dir)
 
     else:
         log.error("Still writing the logic to handle builds with selectedRotamers.")
         ##TODO: provide the subdir based on this doc: 
         ## http://128.192.9.183/eln/gwscratch/2020/01/10/succinct-rotamer-set-labeling-for-sequences/
         raise AttributeError("rotamerSubdir")
-    return projectDir 
+    return project_dir 
 
 
 ##  @brief Pass a sequence string, get a builder for that sequence.
@@ -268,21 +262,6 @@ def getCbBuilderForSequence(sequence : str):
         log.error("Prepfile did not exist at: " + prepfile)
         raise FileNotFoundError
 
-
-##  @brief Give a transaction, get a sequence. Note that if more than one input
-#   contains a "Sequence" key, only the last sequence is returned.
-#   @param Transaction thisTransaction
-#   @return String sequence
-def getSequenceFromTransaction(thisTransaction: Transaction):
-    log.info("getSequenceFromTransaction() was called.\n")
-    inputs = thisTransaction.request_dict['entity']['inputs']
-    for element in inputs:
-        log.debug("element: " + str(element))
-        if "Sequence" in element.keys():
-            sequence = element['Sequence']['payload']
-        else:
-            log.debug("Skipping")
-    return sequence
 
 def getOptionsFromTransaction(thisTransaction: Transaction):
     log.info("getOptionsFromTransaction() was called.")

@@ -18,19 +18,17 @@ else:
 
 
 ##  Pass in a transaction, if a frontend project is in the request,
-#   a GemsProject is created with any relevant data, and the
-#   transaction is updated with the gemsProject.
-#   If no frontend project is present, the GemsProject is the only
+#   a gems_project is created with any relevant data, and the
+#   transaction is updated with the gems_project.
+#   If no frontend project is present, the gems_project is the only
 #   project.
 #   @param transaction
 def startProject(thisTransaction: Transaction):
     log.info("startProject() was called.\n")
-
-    ### Figure out who is asking.
-    requestingAgent = getRequestingAgentFromTransaction(thisTransaction)
     
-    ### Start a gemsProject
-    gemsProject = buildGemsProject(thisTransaction, requestingAgent)
+    ### Start a gems_project
+    gems_project = CbProject(thisTransaction)
+    log.debug("gems_project, after instantiation: \n" + str(gems_project))
 
     ### Find the projectDir.
     try:
@@ -41,9 +39,9 @@ def startProject(thisTransaction: Transaction):
     else:
 
         ### Copy any upload files.
-        if gemsProject.hasInputFiles:
+        if gems_project.has_input_files:
             try:
-                copyUploadFilesToProject(thisTransaction, gemsProject)
+                copyUploadFilesToProject(thisTransaction, gems_project)
             except Exception as error:
                 log.error("There was a problem uploading the input.")
                 raise error
@@ -53,8 +51,8 @@ def startProject(thisTransaction: Transaction):
             logs_dir = setupProjectDirs(project_dir)
             request = thisTransaction.request_dict
             writeRequestToFile(request, logs_dir)
-            writeProjectLogFile(gemsProject, logs_dir)
-            return gemsProject
+            writeProjectLogFile(gems_project, logs_dir)
+            return gems_project
         except Exception as error:
             log.error("There was a problem writing the project logs.")
             raise error
@@ -92,9 +90,10 @@ def getFrontendProjectFromTransaction(thisTransaction: Transaction):
 def getProjectDir(thisTransaction: Transaction):
     log.info("getProjectDir() was called.\n")
     try:
+        log.debug("thisTransaction: " + str(thisTransaction.response_dict))
         project_dir = thisTransaction.response_dict['gems_project']['project_dir']
     except Exception as error:
-        log.error("There was a problem geting the project_dir from the response_dict.")
+        log.error("There was a problem geting the project_dir from the response_dict." + str(error))
         raise error
     else:
         ##Check that the outpur_dir exists. Create it if not.
@@ -147,15 +146,15 @@ def writeRequestToFile(request, logsDir):
 
 
 ## Writes the gems project to file in json format.
-#   @param gemsProject
+#   @param gems_project
 #   @param logsDir
-def writeProjectLogFile(gemsProject, logsDir):
+def writeProjectLogFile(gems_project, logsDir):
     log.info("writeProjectLogFile() was called.\n")
-    logFileName = gemsProject.project_type + "ProjectLog.json"
+    logFileName = gems_project.project_type + "ProjectLog.json"
     project_log_file = os.path.join(logsDir, logFileName)
     log.debug("project_log_file: " + project_log_file)
     with open(project_log_file, 'w', encoding='utf-8') as file:
-        jsonString = json.dumps(gemsProject.__dict__, indent=4, sort_keys=True, default=str)
+        jsonString = json.dumps(gems_project.__dict__, indent=4, sort_keys=True, default=str)
         log.debug("jsonString: \n" + jsonString )
         file.write(jsonString)
 
@@ -188,7 +187,7 @@ def getUploadsSourceDir(project):
 
 ##  Creates a copy of uploads from the frontend
 #   @param transaction
-def copyUploadFilesToProject(thisTransaction : Transaction, gemsProject : GemsProject):
+def copyUploadFilesToProject(thisTransaction : Transaction, gems_project : gems_project):
     log.info("copyUploadFilesToProject() was called.\n")
     project_dir = getProjectDir(thisTransaction)
     log.debug("project_dir: " + project_dir)
@@ -236,12 +235,12 @@ def copyUploadFilesToProject(thisTransaction : Transaction, gemsProject : GemsPr
 #   The transaction is updated with any relevant project data.
 #   @param transaction
 #   @param requestingAgent
-def buildGemsProject(thisTransaction : Transaction, requestingAgent : str):
-    log.info("buildGemsProject() was called.\n")
-    gemsProject = GemsProject(thisTransaction)
+def buildgems_project(thisTransaction : Transaction, requestingAgent : str):
+    log.info("buildgems_project() was called.\n")
+    gems_project = gems_project(thisTransaction)
 
-    log.debug("gemsProject: " + str(gemsProject))
-    return gemsProject
+    log.debug("gems_project: " + str(gems_project))
+    return gems_project
 
 
 
@@ -249,8 +248,8 @@ def buildGemsProject(thisTransaction : Transaction, requestingAgent : str):
 ##If the requesting agent is the website, leave the gems project.
 #   Otherwise remove it.
 #   @param thisTransaction The transaction object provides the requesting agent.
-def cleanGemsProject(thisTransaction : Transaction):
-    log.info("cleanGemsProject() was called.\n")
+def cleangems_project(thisTransaction : Transaction):
+    log.info("cleangems_project() was called.\n")
     log.debug("response_dict.keys(): " + str(thisTransaction.response_dict.keys()))
     if 'gems_project' in thisTransaction.response_dict.keys():
         if "website" == thisTransaction.response_dict['gems_project']['requesting_agent']:
@@ -259,8 +258,8 @@ def cleanGemsProject(thisTransaction : Transaction):
             log.debug("Cleanup for api requests.")
             del thisTransaction.response_dict['gems_project']
 
-##  Looks at the gemsProject in a transaction to return the pUUID.
-#   @param thisTransaction Transaction object should contain a gemsProject.Else returns none.
+##  Looks at the gems_project in a transaction to return the pUUID.
+#   @param thisTransaction Transaction object should contain a gems_project.Else returns none.
 def getProjectpUUID(thisTransaction : Transaction):
     log.info("getProjectpUUID() was called.\n")
     pUUID = None
@@ -310,6 +309,32 @@ def getSiteHostName(content):
     else:
         log.error("Never did find a siteHostName.")
         raise AttributeError
+
+
+##  @brief Give a transaction, get a sequence. Note that if more than one input
+#   contains a "Sequence" key, only the last sequence is returned.
+#   @param Transaction thisTransaction
+#   @return String sequence
+def getSequenceFromTransaction(thisTransaction: Transaction):
+    log.info("getSequenceFromTransaction() was called.\n")
+    inputs = thisTransaction.request_dict['entity']['inputs']
+    for element in inputs:
+        log.debug("element: " + str(element))
+        if "Sequence" in element.keys():
+            sequence = element['Sequence']['payload']
+        else:
+            log.debug("Skipping")
+    return sequence
+
+##  @brief Use a sequence to get a unique seqUUID.
+#   Uses uuid5, which uses SHA-1 rather than Md5Sum
+#   @param sequence
+#   @return uuid seqUUID
+def getSeqUUIDForSequence(sequence):
+    log.info("getSeqUUDIFor() was called. sequence: " + sequence)
+    seqUUID = str(uuid.uuid5(uuid.NAMESPACE_DNS, sequence))
+    log.debug("seqUUID: " + seqUUID)
+    return seqUUID
 
 def main():
     if len(sys.argv) == 2:
