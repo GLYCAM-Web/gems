@@ -213,7 +213,7 @@ def appendResponse(thisTransaction, responseConfig):
 
             for response in responsesToWrite:
                 resource = {respondingService : response }
-
+                log.debug("Adding a resource to the response: " + str(resource))
                 thisTransaction.response_dict['responses'].append(resource)
 
             try:

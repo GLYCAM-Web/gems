@@ -326,15 +326,15 @@ def getSequenceFromTransaction(thisTransaction: Transaction):
             log.debug("Skipping")
     return sequence
 
-##  @brief Use a sequence to get a unique seqUUID.
+##  @brief Use a sequence to get a unique seqID.
 #   Uses uuid5, which uses SHA-1 rather than Md5Sum
 #   @param sequence
-#   @return uuid seqUUID
-def getSeqUUIDForSequence(sequence):
+#   @return uuid seqID
+def getSeqIDForSequence(sequence):
     log.info("getSeqUUDIFor() was called. sequence: " + sequence)
-    seqUUID = str(uuid.uuid5(uuid.NAMESPACE_DNS, sequence))
-    log.debug("seqUUID: " + seqUUID)
-    return seqUUID
+    seqID = str(uuid.uuid5(uuid.NAMESPACE_DNS, sequence))
+    log.debug("seqID: " + seqID)
+    return seqID
 
 def main():
     if len(sys.argv) == 2:

@@ -173,20 +173,20 @@ class gems_project():
 #   
 class CbProject(gems_project):
     sequence : str = ""
-    seqUUID : str = ""
+    seqID : str = ""
     structure_count : int = 1
     #structure_mappings : []
 
     def __init__(self, thisTransaction):
         super().__init__(thisTransaction)
 
-        from gemsModules.project.projectUtil import getSequenceFromTransaction, getSeqUUIDForSequence
+        from gemsModules.project.projectUtil import getSequenceFromTransaction, getSeqIDForSequence
         
         request = thisTransaction.request_dict
         sequence = getSequenceFromTransaction(thisTransaction)
         if sequence is not "":
             self.sequence = sequence
-            self.seqUUID = getSeqUUIDForSequence(sequence)
+            self.seqID = getSeqIDForSequence(sequence)
         inputs = request['entity']['inputs']
         requested_structure_count = 0
         for element in inputs:
@@ -198,7 +198,7 @@ class CbProject(gems_project):
     def __str__(self):
         result = super().__str__()
         result = result + "\nsequence: " + self.sequence
-        result = result + "\nseqUUID: " + self.seqUUID
+        result = result + "\nseqID: " + self.seqID
         result = result + "\nstructure_count: " + str(self.structure_count)
         #result = result + "\nstructure_mappings: " + str(self.structure_mappings)
         return result
@@ -206,7 +206,7 @@ class CbProject(gems_project):
     def updateTransaction(self, thisTransaction : Transaction):
         super().updateTransaction(thisTransaction)
         thisTransaction.response_dict['gems_project']['sequence'] = self.sequence
-        thisTransaction.response_dict['gems_project']['seqUUID'] = self.seqUUID
+        thisTransaction.response_dict['gems_project']['seqID'] = self.seqID
         thisTransaction.response_dict['gems_project']['structure_count'] = str(self.structure_count)
    
 

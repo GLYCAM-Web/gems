@@ -95,10 +95,12 @@ def build3dStructureResponseConfig(gemsProject):
         "responses" : [{
             'payload' : gemsProject['pUUID'],
             'sequence' : gemsProject['sequence'],
-            'seqUUID' : getSeqUUIDForSequence(sequence),
+            'seqID' : getSeqIDForSequence(sequence),
             'downloadUrl' : downloadUrl
         }]
     }
+
+    log.debug("returning 3dStructureResponseConfig: " + str(config))
 
     return config
 
@@ -172,8 +174,8 @@ def getLinkageOptionsFromBuilder(builder):
 ##  @brief Creates a jobsubmission for Amber. Submits that. Updates the transaction to reflect this.
 #   @param Transaction thisTransaction
 #   @param Service service
-def build3DStructure(thisTransaction : Transaction, thisService : Service = None):
-    log.info("Sequence receive.py build3Dstructure() was called.\n")
+def buildDefault3DStructure(thisTransaction : Transaction, thisService : Service = None):
+    log.info("Sequence receive.py buildDefault3Dstructure() was called.\n")
     ##TODO: See if a project has already been started first.
     startProject(thisTransaction)
     try:
@@ -334,7 +336,7 @@ def receive(thisTransaction : Transaction):
                         respondWithExistingDefaultStructure(thisTransaction)
                     else:
                         log.debug("Default structure does not exist yet.")
-                        build3DStructure(thisTransaction, None)
+                        buildDefault3DStructure(thisTransaction, None)
                         registerBuild(thisTransaction)
                 else:
                     log.error("The code for building structures with selectedRotamers does not exist yet.")
@@ -350,14 +352,14 @@ def receive(thisTransaction : Transaction):
 def respondWithExistingDefaultStructure(thisTransaction):
     log.info("respondWithExistingDefaultStructure() was called.")
     sequence = getSequenceFromTransaction(thisTransaction)
-    seqUUID = getSeqUUIDForSequence(sequence)
+    seqID = getSeqIDForSequence(sequence)
     
     config = {
         "entity":"Sequence",
         "respondingService":"Build3DStructure",
         "responses": [{
-            'payload': seqUUID,
-            'download' : getDownloadUrl(seqUUID, "cb") 
+            'payload': seqID,
+            'download' : getDownloadUrl(seqID, "cb") 
         }]
     }
     appendResponse(thisTransaction, config)
@@ -369,27 +371,27 @@ def registerBuild(thisTransaction):
     log.info("registerBuild() was called.")
     structureMap = {}
     sequence = getSequenceFromTransaction(thisTransaction)
-    seqUUID = getSeqUUIDForSequence(sequence)
+    seqID = getSeqIDForSequence(sequence)
     timestamp = str(datetime.now())
     structureMap.update({
         "sequence":sequence,
-        "seqUUID": seqUUID,
+        "seqID": seqID,
         "timestamp": timestamp
     })
 
     ## userDataDir is the top level dir that holds all projects, not a specific user's data.
     userDataDir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/"
-    seqUUIDPath = userDataDir + seqUUID
+    seqIDPath = userDataDir + seqID
     
-    if not os.path.exists(seqUUIDPath):
-        os.makedirs(seqUUIDPath)
+    if not os.path.exists(seqIDPath):
+        os.makedirs(seqIDPath)
 
     projectDir = getProjectDir(thisTransaction)
     try:
         isDefault = checkIfDefaultStructureRequest(thisTransaction)
         log.debug("isDefault: " + str(isDefault))
         if isDefault:
-            link = seqUUIDPath + "/default"
+            link = seqIDPath + "/default"
             projectDir = projectDir + "/default"
         else:
             link = buildRotamerDirName(thisTransaction)
@@ -420,7 +422,7 @@ def registerBuild(thisTransaction):
         forceField = getForceFieldFromRequest(thisTransaction)
 
         ##TODO: Update the json file for future reference.
-        structureMappingFilename = seqUUIDPath + "/structureMapping.json"
+        structureMappingFilename = seqIDPath + "/structureMapping.json"
         structureMap.update({
             "isDefault": isDefault,
             "solvationRequested": solvationRequested,
@@ -509,14 +511,14 @@ def checkIfDefaultStructureRequest(thisTransaction):
             return True
 
 
-##  @brief Looks up the sequence and generates an seqUUID, then checks for existing builds.
+##  @brief Looks up the sequence and generates an seqID, then checks for existing builds.
 #   @param Transaction thisTransaction
 #   @return Boolean structureExists
 def checkIfDefaultStructureExists(thisTransaction):
     log.info("checkIfDefaultStructureExists() was called.")
     structureExists = False
     sequence = getSequenceFromTransaction(thisTransaction)
-    seqUUID = getSeqUUIDForSequence(sequence)
+    seqID = getSeqIDForSequence(sequence)
     userDataDir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/"
     log.debug("userDataDir: " + userDataDir)
     options = getOptionsFromTransaction(thisTransaction)
@@ -533,8 +535,8 @@ def checkIfDefaultStructureExists(thisTransaction):
             log.debug("fileNames: " + str(fileNames))
             for dirName in dirNames:
                 log.debug("dirName: " + dirName)
-                log.debug("seqUUID: " + seqUUID)
-                if seqUUID == dirName:
+                log.debug("seqID: " + seqID)
+                if seqID == dirName:
                     return True
                     
     except Exception as error:
