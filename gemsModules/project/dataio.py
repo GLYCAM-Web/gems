@@ -62,8 +62,8 @@ class gems_project():
                 self.title = fe_project['title']
             if 'comment' in fe_project.keys():
                 self.comment = fe_project['comment']
-            if 'type' in fe_project.keys():
-                self.project_type = fe_project['type']
+            if 'project_type' in fe_project.keys():
+                self.project_type = fe_project['project_type']
                 if self.project_type == "cb":
                     has_input_files = False
                 elif self.project_type == "md":
@@ -98,6 +98,7 @@ class gems_project():
             ##  In a commandline request, a frontend project may not be included.
             #   This is where we give defaults for whatever is needed.
             self.requesting_agent = "command line"
+            log.debug("request entity type: " + reqiest['entity']['type'])
             if request['entity']['type'] == "Sequence":
                 self.project_type = "cb"
                 self.has_input_files = False

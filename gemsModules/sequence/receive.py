@@ -467,10 +467,10 @@ def getForceFieldFromRequest(thisTransaction):
     log.info("getForceFieldFromRequest() was called.")
     project = getFrontendProjectFromTransaction(thisTransaction)
     if project is not None:
-        if project['ff_version'] == "":
+        if project['force_field'] == "":
             return "default"
         else:
-            return project['ff_version']
+            return project['force_field']
 
     else:
         ##TODO: write logic for commandline users to specify forcefields other than the default
