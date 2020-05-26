@@ -1,56 +1,58 @@
 {
-	"entity": {
-		"type": "Sequence",
-		"services": [{
-			"Build": {
-				"type": "Build3DStructure"
-			}
-		}],
-		"inputs": [{
-			"Sequence": {
-				"payload": "DManpa1-OH"
-			}
-		}]
-	},
-	"options": {
-		"json_api_version": "0.0.1"
-	},
-	"project": {
-		"_state": "<django.db.models.base.ModelState object at 0x7f1ae7173a50>",
-		"user_id": "1",
-		"title": "Untitled project",
-		"timestamp": "2020-03-04 13:39:19.895690+00:00",
-		"id": "cd728314-19ef-4c57-b1e6-c4650c8e3dc0",
-		"comment": " ",
-		"type": "cb",
-		"email": "",
-		"gems_version": "f4a243eb101d505df749ab11d314df8f624cf494",
-		"gems_branch": "gems-dev",
-		"gmml_version": "ee0f976fc54a8c49e6680964e8f2758c06f566bf",
-		"gmml_branch": "gmml-dev",
-		"site_mode": "CONTAINERS",
-		"site_host_name": "172.25.0.2",
-		"ff_version": "",
-		"parameter_version": "",
-		"amber_version": "",
-		"json_api_version": "0.0.1",
-		"requesting_agent": "json_api",
-		"root": " ",
-		"project_ptr_id": "cd728314-19ef-4c57-b1e6-c4650c8e3dc0",
-		"sequence": "DManpa1-OH",
-		"ion": "No",
-		"solvation": "Yes",
-		"solvation_size": "8",
-		"solvation_distance": "2",
-		"solvation_shape": "REC",
-		"num_structures": "1",
-		"linkage_info": "",
-		"rotamer_info": "",
-		"rotamer_list": "",
-		"angle_info": "",
-		"md5dir": " ",
-		"md5sum": " ",
-		"job_info": "",
-		"md5Sum": "5b384e14c7955e833d2d430e8f4d9e1e"
-	}
+    "entity": {
+        "type": "Sequence",
+        "services": [
+            {
+                "Build": {
+                    "type": "Build3DStructure"
+                }
+            }
+        ],
+        "inputs": [
+            {
+                "Sequence": {
+                    "payload": "DManpa1-OH"
+                }
+            }
+        ]
+    },
+    "project": {
+        "_state": "<django.db.models.base.ModelState object at 0x7f0830ba0e10>",
+        "id": "30840a71-da47-444d-9aa4-20cf9b267d69",
+        "user_id": "None",
+        "email": "",
+        "title": "Untitled project",
+        "comment": " ",
+        "timestamp": "2020-05-22 20:55:08.747913+00:00",
+        "project_type": "cb",
+        "projID": " ",
+        "requesting_agent": "website",
+        "gems_version": "67609a02341afd07739494b0097fb003cc66adc9",
+        "gems_branch": "structureTracking",
+        "gmml_version": "82afc57666c0758614e12cdbfbf615f6459e4f32",
+        "gmml_branch": "gmml-dev",
+        "site_mode": "CONTAINERS",
+        "site_host_name": "172.25.0.2",
+        "force_field": "",
+        "parameter_version": "",
+        "amber_version": "",
+        "json_api_version": "0.0.1",
+        "userproject_ptr_id": "30840a71-da47-444d-9aa4-20cf9b267d69",
+        "sequence": "DManpa1-OH",
+        "seqID": "None",
+        "ion": "No",
+        "solvation": "Yes",
+        "solvation_size": "8",
+        "solvation_distance": "2",
+        "solvation_shape": "REC",
+        "num_structures": "1",
+        "linkage_info": "",
+        "rotamer_info": "",
+        "rotamer_list": "",
+        "angle_info": "",
+        "job_info": "",
+        "toolDir": "/website/userdata/tools/cb",
+        "path": "/cb/media",
+        "_django_version": "2.2.2"
+    }
 }

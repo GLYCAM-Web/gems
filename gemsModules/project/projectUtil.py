@@ -34,7 +34,7 @@ def startProject(thisTransaction: Transaction):
     try:
         project_dir = getProjectDir(thisTransaction)
     except Exception as error:
-        log.error("There was a problem getting the projectDir.")
+        log.error("There was a problem getting the projectDir: " + str(error))
         raise error
     else:
 
@@ -43,7 +43,7 @@ def startProject(thisTransaction: Transaction):
             try:
                 copyUploadFilesToProject(thisTransaction, gems_project)
             except Exception as error:
-                log.error("There was a problem uploading the input.")
+                log.error("There was a problem uploading the input: " + str(error))
                 raise error
 
         ### Write the logs to file.
@@ -54,7 +54,7 @@ def startProject(thisTransaction: Transaction):
             writeProjectLogFile(gems_project, logs_dir)
             return gems_project
         except Exception as error:
-            log.error("There was a problem writing the project logs.")
+            log.error("There was a problem writing the project logs: " + str(error))
             raise error
 
 
@@ -262,7 +262,7 @@ def cleangems_project(thisTransaction : Transaction):
 #   @param thisTransaction Transaction object should contain a gems_project.Else returns none.
 def getProjectpUUID(thisTransaction : Transaction):
     log.info("getProjectpUUID() was called.\n")
-    pUUID = None
+    pUUID = ""
     if 'gems_project' in thisTransaction.response_dict.keys():
         pUUID = thisTransaction.response_dict['gems_project']['pUUID']
     else:
@@ -270,7 +270,10 @@ def getProjectpUUID(thisTransaction : Transaction):
         log.error("thisTransaction's keys: \n" + str(thisTransaction.response_dict.keys()))
         raise AttributeError
     log.debug("pUUID: " + str(pUUID))
-    return pUUID
+    if pUUID == "":
+        raise AttributeError("pUUID")
+    else:
+        return pUUID
 
 
 ## Pass a pUUID and an appName, get a download url.
@@ -318,13 +321,17 @@ def getSiteHostName(content):
 def getSequenceFromTransaction(thisTransaction: Transaction):
     log.info("getSequenceFromTransaction() was called.\n")
     inputs = thisTransaction.request_dict['entity']['inputs']
+    sequence = ""
     for element in inputs:
         log.debug("element: " + str(element))
         if "Sequence" in element.keys():
             sequence = element['Sequence']['payload']
         else:
             log.debug("Skipping")
-    return sequence
+    if sequence == "":
+        raise AttributeError("Sequence")
+    else:
+        return sequence
 
 ##  @brief Use a sequence to get a unique seqID.
 #   Uses uuid5, which uses SHA-1 rather than Md5Sum

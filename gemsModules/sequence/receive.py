@@ -168,65 +168,64 @@ def getLinkageOptionsFromBuilder(builder):
     log.debug("updatedLinkages: " + str(updatedLinkages))
     return updatedLinkages
 
-
-
-
 ##  @brief Creates a jobsubmission for Amber. Submits that. Updates the transaction to reflect this.
 #   @param Transaction thisTransaction
 #   @param Service service
 def buildDefault3DStructure(thisTransaction : Transaction, thisService : Service = None):
     log.info("Sequence receive.py buildDefault3Dstructure() was called.\n")
-    ##TODO: See if a project has already been started first.
-    startProject(thisTransaction)
     try:
-        pUUID=getProjectpUUID(thisTransaction)
+        startProject(thisTransaction)
     except Exception as error:
-        log.error("There was a problem finding the project pUUID.")
-        log.error("Error type: " + str(type(error)))
-        log.error(traceback.format_exc())
-        raise error
-
-    sequence = getSequenceFromTransaction(thisTransaction)
-
-    if sequence is None:
-        raise AttributeError("sequence")
-    else:
-        gemsProject = thisTransaction.response_dict['gems_project']
-        responseConfig = build3dStructureResponseConfig(gemsProject)
-        appendResponse(thisTransaction, responseConfig)
-
-    builder = getCbBuilderForSequence(sequence)
-    try:
-        projectDir = getProjectDirSubDir(thisTransaction)
-    except Exception as error:
-        log.error("There was a problem getting this build's subdir.")
+        log.error("There was a problem starting a GemsProject for this request: " + str(error))
         raise error
     else:
-        destination = projectDir + 'structure'
-        log.debug("destination: " + destination)
-        builder.GenerateSingle3DStructure(destination)
+        try:
+            pUUID=getProjectpUUID(thisTransaction)
+        except Exception as error:
+            log.error("There was a problem finding the project pUUID: " + str(error))
+            raise error
+        else:
+            try:
+                sequence = getSequenceFromTransaction(thisTransaction)
+            except Exception as error:
+                log.error("There was a problem getting a sequence from the transaction: " + str(error))
+            else:
+                gemsProject = thisTransaction.response_dict['gems_project']
+                responseConfig = build3dStructureResponseConfig(gemsProject)
+                appendResponse(thisTransaction, responseConfig)
 
-    ## This needs to move - Sequence should not be deciding how 
-    ## minimization will happen.  That is the job of mmservice.
-        amberSubmissionJson='{"project" : \
-        {\
-        "id":"' + pUUID + '", \
-        "workingDirectory":"' + projectDir + '", \
-        "type":"minimization", \
-        "system_phase":"gas", \
-        "water_model":"none" \
-        } \
-    }'
-        # TODO:  Make this resemble real code....
-        the_json_file = projectDir + "amber_submission.json"
-        min_json_in = open (the_json_file , 'w')
-        min_json_in.write(amberSubmissionJson)
-        min_json_in.close()
+                builder = getCbBuilderForSequence(sequence)
+                try:
+                    projectDir = getProjectDirSubDir(thisTransaction)
+                except Exception as error:
+                    log.error("There was a problem getting this build's subdir: " + str(error))
+                    raise error
+                else:
+                    destination = projectDir + 'structure'
+                    log.debug("destination: " + destination)
+                    builder.GenerateSingle3DStructure(destination)
 
-        from gemsModules.mmservice.amber.amber import manageIncomingString
-        manageIncomingString(amberSubmissionJson)
-    ## everything up to here -- all the amber stuff --
-    ## is what needs to move
+                    ## This needs to move - Sequence should not be deciding how 
+                    ## minimization will happen.  That is the job of mmservice.
+                    amberSubmissionJson='{"project" : \
+                        {\
+                        "id":"' + pUUID + '", \
+                        "workingDirectory":"' + projectDir + '", \
+                        "type":"minimization", \
+                        "system_phase":"gas", \
+                        "water_model":"none" \
+                        } \
+                    }'
+                    # TODO:  Make this resemble real code....
+                    the_json_file = projectDir + "amber_submission.json"
+                    min_json_in = open (the_json_file , 'w')
+                    min_json_in.write(amberSubmissionJson)
+                    min_json_in.close()
+
+                    from gemsModules.mmservice.amber.amber import manageIncomingString
+                    manageIncomingString(amberSubmissionJson)
+                ## everything up to here -- all the amber stuff --
+                ## is what needs to move
 
 def getProjectDirSubDir(thisTransaction: Transaction):
     log.info("getProjectDirSubDir() was called.")
@@ -333,11 +332,24 @@ def receive(thisTransaction : Transaction):
                 if checkIfDefaultStructureRequest(thisTransaction):
                     if checkIfDefaultStructureExists(thisTransaction):
                         log.debug("Returning response with payload of existing build.")
-                        respondWithExistingDefaultStructure(thisTransaction)
+                        try:
+                            respondWithExistingDefaultStructure(thisTransaction)
+                        except Exception as error:
+                            log.error("There was a problem responding with an existing default structure: " + str(error))
+                            common.settings.appendCommonParserNotice(thisTransaction, 'InvalidInput', i)
                     else:
                         log.debug("Default structure does not exist yet.")
-                        buildDefault3DStructure(thisTransaction, None)
-                        registerBuild(thisTransaction)
+                        try:
+                            buildDefault3DStructure(thisTransaction, None)
+                        except Exception as error:
+                            log.error("There was a problem building the default 3D structure: " + str(error))
+                            common.settings.appendCommonParserNotice(thisTransaction, 'InvalidInput', i)
+                        else:
+                            try:
+                                registerBuild(thisTransaction)
+                            except Exception as error:
+                                log.error("There was a problem regitstering this build: " + str(error))
+                                common.settings.appendCommonParserNotice(thisTransaction, "unknown", i)
                 else:
                     log.error("The code for building structures with selectedRotamers does not exist yet.")
                     
@@ -351,18 +363,41 @@ def receive(thisTransaction : Transaction):
 
 def respondWithExistingDefaultStructure(thisTransaction):
     log.info("respondWithExistingDefaultStructure() was called.")
-    sequence = getSequenceFromTransaction(thisTransaction)
-    seqID = getSeqIDForSequence(sequence)
-    
-    config = {
-        "entity":"Sequence",
-        "respondingService":"Build3DStructure",
-        "responses": [{
-            'payload': seqID,
-            'download' : getDownloadUrl(seqID, "cb") 
-        }]
-    }
-    appendResponse(thisTransaction, config)
+    ##  Even preexisting builds need projects.
+    try:
+        startProject(thisTransaction)
+    except Exception as error:
+        log.error("There was a problem starting a project for this request: " + str(error))
+        raise error
+    else:
+        try:
+            sequence = getSequenceFromTransaction(thisTransaction)
+        except Exception as error:
+            log.error("There was a problem getting the sequence from the request: " + str(error))
+            raise error
+        else:
+            try:
+                seqID = getSeqIDForSequence(sequence)
+            except Exception as error:
+                log.error("There was a problem getting the seqID for this sequence: " + str(error))
+                raise error
+            else:
+                try:
+                    projID = getProjectpUUID(thisTransaction)
+                except Exception as error:
+                    log.error("There was a problem getting the pUUID from the GemsProject: " + str(error))
+                    raise error
+                else:
+                    config = {
+                        "entity":"Sequence",
+                        "respondingService":"Build3DStructure",
+                        "responses": [{
+                            'payload': projID,
+                            'download' : getDownloadUrl(seqID, "cb"),
+                            'seqID' : seqID
+                        }]
+                    }
+                    appendResponse(thisTransaction, config)
     
 
 
@@ -465,9 +500,10 @@ def getSolvationShape(thisTransaction):
 #   @return String either "default" or the force field name.
 def getForceFieldFromRequest(thisTransaction):
     log.info("getForceFieldFromRequest() was called.")
-    project = getFrontendProjectFromTransaction(thisTransaction)
-    if project is not None:
-        if project['force_field'] == "":
+    feProject = getFrontendProjectFromTransaction(thisTransaction)
+    if feProject is not None:
+        log.debug("feProject keys: " + str(feProject.keys()))
+        if feProject['force_field'] == "":
             return "default"
         else:
             return project['force_field']
