@@ -351,7 +351,9 @@ def receive(thisTransaction : Transaction):
                                 log.error("There was a problem regitstering this build: " + str(error))
                                 common.settings.appendCommonParserNotice(thisTransaction, "unknown", i)
                 else:
-                    log.error("The code for building structures with selectedRotamers does not exist yet.")
+                    log.debug("Received a request to build with selectedRotamers.")
+                    selectedRotamers = getSelectedRotamersFromTransaction(thisTransaction)
+                    log.debug("selectedRotamers: " + str(selectedRotamers))
                     
             else:
                 log.error("Invalid Sequence. Cannot build.")
@@ -361,7 +363,16 @@ def receive(thisTransaction : Transaction):
             common.settings.appendCommonParserNotice( thisTransaction,'ServiceNotKnownToEntity',i)
     thisTransaction.build_outgoing_string()
 
-def respondWithExistingDefaultStructure(thisTransaction):
+def getSelectedRotamersFromTransaction(thisTransaction : Transaction):
+    log.info("getSelectedRotamersFromTransaction() was called.")
+    options  = getOptionsFromTransaction(thisTransaction)
+    log.debug("options: " + str(options))
+    return options['rotamers']
+
+
+
+##  @brief Call this if the default structure for a sequence already exists.
+def respondWithExistingDefaultStructure(thisTransaction: Transaction):
     log.info("respondWithExistingDefaultStructure() was called.")
     ##  Even preexisting builds need projects.
     try:
@@ -537,13 +548,16 @@ def checkIfDefaultStructureRequest(thisTransaction):
     log.debug("options: " + str(options))
 
     if options == None:
+        log.debug("No options found, returning true.")
         return True
     else:
         ## The presense of rotamers in options means this is not a request
         # for the default structure.
         if "rotamers" in options.keys():
+            log.debug("Rotamers found, returning False.")
             return False
         else:
+            log.debug("No options found, returning True.")
             return True
 
 
