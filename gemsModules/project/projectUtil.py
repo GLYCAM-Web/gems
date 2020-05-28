@@ -316,6 +316,8 @@ def getSiteHostName(content):
 
 ##  @brief Give a transaction, get a sequence. Note that if more than one input
 #   contains a "Sequence" key, only the last sequence is returned.
+#   @detail Note that this method is only good for transactions with a single sequence.
+#           A new method would be required if/when the need to get a list of sequences arrives.
 #   @param Transaction thisTransaction
 #   @return String sequence
 def getSequenceFromTransaction(thisTransaction: Transaction):

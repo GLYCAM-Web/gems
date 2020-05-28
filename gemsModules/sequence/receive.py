@@ -298,9 +298,10 @@ def receive(thisTransaction : Transaction):
         log.debug("'services' was not present in the request. Do the default.")
         doDefaultService(thisTransaction)
         return
+
     input_services = thisTransaction.request_dict['entity']['services']
     theServices=getTypesFromList(input_services)
-    ## for each requested service
+    ## for each requested service:
     for i in theServices:
         #####  the automated module loading doesn't work, and I can't figure out how to make it work,
               # that is:
@@ -308,6 +309,8 @@ def receive(thisTransaction : Transaction):
               #  the_spec = importlib.util.find_spec('.sequence.entity.evaluate',gemsModules)
               # .... and many variants thereof
         #####  so, writing something ugly for now
+        ## Only work on recognized services. Add an error and carry on checking other services if an unknown service is found.
+        ##  TODO: Add a check for options like "On fail quit"
         if i not in settings.serviceModules.keys():
             if i not in common.settings.serviceModules.keys():
                 log.error("The requested service is not recognized.")
@@ -315,59 +318,120 @@ def receive(thisTransaction : Transaction):
             else:
                 pass
         ## if it is known, try to do it
-        elif i == "Validate":
-            log.debug("Validate service requested from sequence entity.")
-            validateCondensedSequence(thisTransaction, None)
         elif i == "Evaluate":
             log.debug("Evaluate service requested from sequence entity.")
-            evaluateCondensedSequence(thisTransaction,  None)
+            try:
+                evaluateCondensedSequence(thisTransaction,  None)
+            except Exception as error:
+                log.error("There was a problem evaluating the condensed sequence: " + str(error)) 
+                common.settings.appendCommonParserNotice( thisTransaction, 'InvalidInput', 'InvalidInputPayload')
         elif i == 'Build3DStructure':
             log.debug("Build3DStructure service requested from sequence entity.")
-            ##first evaluate the requested structure. Only build if valid.
-            valid = evaluateCondensedSequence(thisTransaction, None)
-
-            if valid:
-                log.debug("Valid sequence. Building default structure.")
-
-                if checkIfDefaultStructureRequest(thisTransaction):
-                    if checkIfDefaultStructureExists(thisTransaction):
-                        log.debug("Returning response with payload of existing build.")
-                        try:
-                            respondWithExistingDefaultStructure(thisTransaction)
-                        except Exception as error:
-                            log.error("There was a problem responding with an existing default structure: " + str(error))
-                            common.settings.appendCommonParserNotice(thisTransaction, 'InvalidInput', i)
-                    else:
-                        log.debug("Default structure does not exist yet.")
-                        try:
-                            buildDefault3DStructure(thisTransaction, None)
-                        except Exception as error:
-                            log.error("There was a problem building the default 3D structure: " + str(error))
-                            common.settings.appendCommonParserNotice(thisTransaction, 'InvalidInput', i)
-                        else:
-                            try:
-                                registerBuild(thisTransaction)
-                            except Exception as error:
-                                log.error("There was a problem regitstering this build: " + str(error))
-                                common.settings.appendCommonParserNotice(thisTransaction, "unknown", i)
-                else:
-                    log.debug("Received a request to build with selectedRotamers.")
-                    selectedRotamers = getSelectedRotamersFromTransaction(thisTransaction)
-                    log.debug("selectedRotamers: " + str(selectedRotamers))
-                    
+            try:
+                ##first evaluate the requested structure. Only build if valid.
+                valid = evaluateCondensedSequence(thisTransaction, None)
+            except Exception as error:
+                log.error("There was a problem evaluating the condensed sequence: " + str(error)) 
             else:
-                log.error("Invalid Sequence. Cannot build.")
-                common.settings.appendCommonParserNotice( thisTransaction,'InvalidInput',i)
+                if valid:
+                    log.debug("Valid sequence.")
+
+                    ## Begin Structure generation logic. This chunk either builds or returns a pointer to a build
+                    #   of a collection of structures.
+                    if checkIfDefaultStructureRequest(thisTransaction):
+                        if checkIfDefaultStructureExists(thisTransaction):
+                            log.debug("Returning response with payload of existing build.")
+                            try:
+                                respondWithExistingDefaultStructure(thisTransaction)
+                            except Exception as error:
+                                log.error("There was a problem responding with an existing default structure: " + str(error))
+                                common.settings.appendCommonParserNotice(thisTransaction, 'InvalidInput', i)
+                        else:
+                            log.debug("Default structure does not exist yet.")
+                            try:
+                                buildDefault3DStructure(thisTransaction, None)
+                            except Exception as error:
+                                log.error("There was a problem building the default 3D structure: " + str(error))
+                                common.settings.appendCommonParserNotice(thisTransaction, 'InvalidInput', i)
+                            else:
+                                try:
+                                    registerBuild(thisTransaction)
+                                except Exception as error:
+                                    log.error("There was a problem regitstering this build: " + str(error))
+                                    common.settings.appendCommonParserNotice(thisTransaction, "unknown", i)
+                    else:
+                        log.debug("Received a request to build with selectedRotamers.")
+                        structureSetConfig = buildStructureInfo(thisTransaction)
+
+                    ## End Structure generation logic.
+                    
+                else:
+                    log.error("Invalid Sequence. Cannot build.")
+                    common.settings.appendCommonParserNotice( thisTransaction,'InvalidInput',i)
+        ## Validate is rarely used, but useful for the json api user that would like to know if a list of 
+        #   sequences is valid or not, without the overhead of evaluation or building structures.
+        elif i == "Validate":
+            log.debug("Validate service requested from sequence entity.")
+            try:
+                validateCondensedSequence(thisTransaction, None)
+            except Exception as error:
+                log.error("There was a problem validating the condensed sequence: " + str(error)) 
+                common.settings.appendCommonParserNotice( thisTransaction, 'InvalidInput', 'InvalidInputPayload')
         else:
             log.error("got to the else, so something is wrong")
             common.settings.appendCommonParserNotice( thisTransaction,'ServiceNotKnownToEntity',i)
+
+    ## prepares the transaction for return to the requestor, success or fail.     
     thisTransaction.build_outgoing_string()
 
-def getSelectedRotamersFromTransaction(thisTransaction : Transaction):
-    log.info("getSelectedRotamersFromTransaction() was called.")
-    options  = getOptionsFromTransaction(thisTransaction)
-    log.debug("options: " + str(options))
-    return options['rotamers']
+##TODO build a json object with all the options that trigger a new build. 
+#   History: This object needs to handle the same data as a structure mapping table. 
+#   That means a structureInfo is the json version of the structure mapping config.
+def buildStructureInfo(thisTransaction : Transaction):
+    log.info("buildStructureInfo() was called.")
+    config = {}
+    #The list of dict objects describing each linkage
+    rotamerData = getRotamerDataFromTransaction(thisTransaction)
+
+    log.debug("rotamerData: " + str(rotamerData))
+    
+    linkageCount = len(rotamerData)
+    log.debug("linkageCount: " + str(linkageCount))
+    linkageConformers = []
+    for linkage in rotamerData:
+        linkageLabel = linkage['linkageLabel']
+        log.debug("linkageLabel: " + linkageLabel)
+        dihedrals = rotamerData['dihedrals']
+        log.debug("dihedrals: " + dihedrals)
+        for dihedral in rotamerData['dihedrals']:
+            dihedralName = dihedral['dihedralName']
+            for rotamer in dihedral['selectedRotamers']:
+                conformer = { 
+                    'linkageLabel' : linkageLabel,
+                    'dihedralName' : dihedralName,
+                    'rotamer' : rotamer
+                }
+                linkageConformers.append(conformer)
+
+    log.debug("linkageConformers: " + str(linkageConformers))
+
+    
+    return config
+
+def getRotamerDataFromTransaction(thisTransaction: Transaction):
+    log.info("getRotamerDataFromTransaction() was called.")
+    request = thisTransaction.request_dict
+    if "options" in request.keys():
+        if "geometryOptions" in request['options'].keys():
+            if 'rotamerData' in request['options']['geometryOptions'].keys():
+                rotamerData = request['options']['geometryOptions']['rotamerData']
+                
+                return rotamerData
+            else:
+                raise AttributeError("rotamerData")
+        else:
+            raise AttributeError("geometryOptions")
+   
 
 
 
@@ -551,13 +615,14 @@ def checkIfDefaultStructureRequest(thisTransaction):
         log.debug("No options found, returning true.")
         return True
     else:
+        log.debug("options.keys(): " + str(options.keys()))
         ## The presense of rotamers in options means this is not a request
         # for the default structure.
-        if "rotamers" in options.keys():
-            log.debug("Rotamers found, returning False.")
+        if "geometryOptions" in options.keys():
+            log.debug("geometryOptions found, returning False.")
             return False
         else:
-            log.debug("No options found, returning True.")
+            log.debug("No geometryOptions found, returning True.")
             return True
 
 
@@ -567,33 +632,38 @@ def checkIfDefaultStructureRequest(thisTransaction):
 def checkIfDefaultStructureExists(thisTransaction):
     log.info("checkIfDefaultStructureExists() was called.")
     structureExists = False
-    sequence = getSequenceFromTransaction(thisTransaction)
-    seqID = getSeqIDForSequence(sequence)
-    userDataDir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/"
-    log.debug("userDataDir: " + userDataDir)
-    options = getOptionsFromTransaction(thisTransaction)
     try:
-        log.debug("Walking the userDataDir.")
-
-        for element in os.walk(userDataDir):
-            rootPath = element[0]
-            dirNames = element[1]
-            fileNames = element[2]
-
-            log.debug("rootPath: " + str(rootPath))
-            log.debug("dirNames: " + str(dirNames))
-            log.debug("fileNames: " + str(fileNames))
-            for dirName in dirNames:
-                log.debug("dirName: " + dirName)
-                log.debug("seqID: " + seqID)
-                if seqID == dirName:
-                    return True
-                    
+        sequence = getSequenceFromTransaction(thisTransaction)
     except Exception as error:
-        log.error("There was a problem checking if this structure exists.")
+        log.error("There was a problem getting the sequence from the transaction: "  + str(error))
         raise error
     else:
-        return structureExists
+        seqID = getSeqIDForSequence(sequence)
+        userDataDir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/"
+        log.debug("userDataDir: " + userDataDir)
+        options = getOptionsFromTransaction(thisTransaction)
+        try:
+            log.debug("Walking the userDataDir.")
+
+            for element in os.walk(userDataDir):
+                rootPath = element[0]
+                dirNames = element[1]
+                fileNames = element[2]
+
+                log.debug("rootPath: " + str(rootPath))
+                log.debug("dirNames: " + str(dirNames))
+                log.debug("fileNames: " + str(fileNames))
+                for dirName in dirNames:
+                    log.debug("dirName: " + dirName)
+                    log.debug("seqID: " + seqID)
+                    if seqID == dirName:
+                        return True
+                        
+        except Exception as error:
+            log.error("There was a problem checking if this structure exists.")
+            raise error
+        else:
+            return structureExists
 
 
 # ##  Looks at a transaction object to see if an evalutaion response exists and returns a boolean.
