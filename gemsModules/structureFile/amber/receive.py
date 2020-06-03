@@ -22,48 +22,38 @@ else:
 #   @param thisTransaction A request containing either the path to an uploaded pdb, or a pdbID for sideloading.
 def preprocessPdbForAmber(thisTransaction):
     log.info("preprocessPdbForAmber() was called.\n")
-    log.debug("requestDict: \n" + str(json.dumps(thisTransaction.request_dict, indent=2, sort_keys=False)))
-    
-    ### Grab the pdb input.
     try:
-        uploadFileName = getInput(thisTransaction)
-        log.debug("~~~uploadFileName: " + uploadFileName)
+        ### Some projects will already have been created. 
+        #   However, these two conditions need new projects.
+        if thisTransaction.response_dict == None: 
+            gemsProject = startProject(thisTransaction)
+        elif 'gems_project' not in thisTransaction.response_dict.keys():
+            gemsProject = startProject(thisTransaction)
+
+        prettyPrint(thisTransaction.request_dict)
+
     except Exception as error:
-        log.error("There was a problem finding the uploadFileName in the transaction.")
+        log.error("There was a problem starting a pdb gemsProject.")
         raise error
     else:
-
+        uploadFileName = thisTransaction.response_dict['gems_project']['uploadFileName']
+        log.debug("completed uploadFileName: " + uploadFileName)
+        ### generate the processed pdb's content
         try:
-            ### Some projects will already have been created. 
-            if thisTransaction.response_dict == None: 
-                gemsProject = startPdbGemsProject(thisTransaction)
-            elif 'gems_project' not in thisTransaction.response_dict.keys():
-                gemsProject = startPdbGemsProject(thisTransaction)
-
+            pdbFile = generatePdbOutput(thisTransaction)
+            log.debug("pdbFile output: " + str(pdbFile))
         except Exception as error:
-            log.error("There was a problem starting a pdb gemsProject.")
+            log.error("There was a problem generating the PDB output.")
             raise error
         else:
 
-            log.debug("completed uploadFileName: " + uploadFileName)
-            ### generate the processed pdb's content
+            ### Write the content to file
             try:
-                pdbFile = generatePdbOutput(thisTransaction)
-                log.debug("pdbFile output: " + str(pdbFile))
+                writePdbOutput(thisTransaction, pdbFile)
             except Exception as error:
-                log.error("There was a problem generating the PDB output.")
+                log.error("There was a problem writing the pdb output.")
                 raise error
-            else:
 
-                ### Write the content to file
-                try:
-                    writePdbOutput(thisTransaction, pdbFile)
-                except Exception as error:
-                    log.error("There was a problem writing the pdb output.")
-                    raise error
-                else:
-                    ##Remove gemsProject if user agent is not website.
-                    cleanGemsProject(thisTransaction) 
 
 
 ##  Pass in an uploadFileName and get a new, preprocessed pdbFile object, 

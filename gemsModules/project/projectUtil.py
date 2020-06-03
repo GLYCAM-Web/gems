@@ -25,37 +25,57 @@ else:
 #   @param transaction
 def startProject(thisTransaction: Transaction):
     log.info("startProject() was called.\n")
-    
-    ### Start a gems_project
-    gems_project = CbProject(thisTransaction)
-    log.debug("gems_project, after instantiation: \n" + str(gems_project))
-
-    ### Find the projectDir.
     try:
-        project_dir = getProjectDir(thisTransaction)
+        entity = thisTransaction.request_dict['entity']['type'] 
     except Exception as error:
-        log.error("There was a problem getting the projectDir: " + str(error))
+        log.error("There was a problem finding the entity in this transaction: " + str(error))
         raise error
     else:
-
-        ### Copy any upload files.
-        if gems_project.has_input_files:
-            try:
-                copyUploadFilesToProject(thisTransaction, gems_project)
-            except Exception as error:
-                log.error("There was a problem uploading the input: " + str(error))
-                raise error
-
-        ### Write the logs to file.
         try:
-            logs_dir = setupProjectDirs(project_dir)
-            request = thisTransaction.request_dict
-            writeRequestToFile(request, logs_dir)
-            writeProjectLogFile(gems_project, logs_dir)
-            return gems_project
+            ### Start a gems_project
+            if entity == "Sequence":
+                log.debug("building a cb project.")
+                gems_project = CbProject(thisTransaction)
+                log.debug("gems_project, after instantiation: \n" + str(gems_project))
+            elif entity == "StructureFile":
+                log.debug("building a pdb project.")
+                gems_project = PdbProject(thisTransaction)
+                log.debug("gems_project, after instantiation: \n" + str(gems_project))
+            elif entity == "Conjugate":
+                log.debug("building a gp project.")
+                gems_project = GpProject(thisTransaction)
+                log.debug("gems_project, after instantiation: \n" + str(gems_project))
+            else:
+                log.error("Need to write code to instantiate projects for entity type: " + entity)
+                raise TypeError("entity: " + entity)
         except Exception as error:
-            log.error("There was a problem writing the project logs: " + str(error))
+            log.error("There was a problem starting the project: " + str(error))
             raise error
+        else:
+            ### Find the projectDir.
+            try:
+                project_dir = getProjectDir(thisTransaction)
+            except Exception as error:
+                log.error("There was a problem getting the projectDir: " + str(error))
+                raise error
+            else:
+                ### Copy any upload files.
+                if gems_project.has_input_files == "true":
+                    try:
+                        copyUploadFilesToProject(thisTransaction, gems_project)
+                    except Exception as error:
+                        log.error("There was a problem uploading the input: " + str(error))
+                        raise error
+                ### Write the logs to file.
+                try:
+                    logs_dir = setupProjectDirs(project_dir)
+                    request = thisTransaction.request_dict
+                    writeRequestToFile(request, logs_dir)
+                    writeProjectLogFile(gems_project, logs_dir)
+                    return gems_project
+                except Exception as error:
+                    log.error("There was a problem writing the project logs: " + str(error))
+                    raise error
 
 
 ## Pass in a transaction, figure out the requestingAgent. OK if it doesn't exist.
@@ -90,17 +110,20 @@ def getFrontendProjectFromTransaction(thisTransaction: Transaction):
 def getProjectDir(thisTransaction: Transaction):
     log.info("getProjectDir() was called.\n")
     try:
-        log.debug("thisTransaction: " + str(thisTransaction.response_dict))
         project_dir = thisTransaction.response_dict['gems_project']['project_dir']
+        log.debug("project_dir: " + project_dir)
     except Exception as error:
         log.error("There was a problem geting the project_dir from the response_dict." + str(error))
         raise error
     else:
+        log.debug("Checking to see if the project_dir exists.")
         ##Check that the outpur_dir exists. Create it if not.
         if not os.path.exists (project_dir):
             log.debug("Creating a project_dir at: " + project_dir)
             os.makedirs(project_dir)
-        log.debug("project_dir: " + project_dir)
+        else:
+            log.debug("project_dir already exists, no need to create it.")
+
         return project_dir
 
 ##  Creates dirs if needed in preparation for writing files.
@@ -180,7 +203,7 @@ def getUploadsSourceDir(project):
     log.info("getUploadsSourceDir() was called.\n")
     uploads_source_dir = project['upload_path']
     if not os.path.exists(uploads_source_dir):
-        raise FileNotFoundError
+        raise FileNotFoundError(uploads_source_dir)
     else:
         return uploads_source_dir
 

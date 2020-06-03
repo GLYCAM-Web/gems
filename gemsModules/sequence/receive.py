@@ -389,34 +389,50 @@ def receive(thisTransaction : Transaction):
 #   That means a structureInfo is the json version of the structure mapping config.
 def buildStructureInfo(thisTransaction : Transaction):
     log.info("buildStructureInfo() was called.")
-    config = {}
+    structureInfo = {}
     #The list of dict objects describing each linkage
     rotamerData = getRotamerDataFromTransaction(thisTransaction)
 
-    log.debug("rotamerData: " + str(rotamerData))
-    
     linkageCount = len(rotamerData)
     log.debug("linkageCount: " + str(linkageCount))
+    log.debug("\nrotamerData:\n")
+    prettyPrint(rotamerData)
     linkageConformers = []
-    for linkage in rotamerData:
-        linkageLabel = linkage['linkageLabel']
+    #For tracking linkages
+    linkageLabels = []
+    sequenceConformers = []
+    sequenceConformerString = ""
+
+
+    for linkageData in rotamerData:
+        log.debug("start a new conformer ")
+        linkageLabel = linkageData['linkageLabel']
         log.debug("linkageLabel: " + linkageLabel)
-        dihedrals = rotamerData['dihedrals']
-        log.debug("dihedrals: " + dihedrals)
-        for dihedral in rotamerData['dihedrals']:
+
+        dihedrals = linkageData['dihedrals']
+        log.debug("dihedrals: " + str(dihedrals))
+        for dihedral in dihedrals:
             dihedralName = dihedral['dihedralName']
             for rotamer in dihedral['selectedRotamers']:
+
                 conformer = { 
                     'linkageLabel' : linkageLabel,
                     'dihedralName' : dihedralName,
                     'rotamer' : rotamer
                 }
-                linkageConformers.append(conformer)
+                linkageConformerString =  conformer["linkageLabel"] + "_" + conformer['dihedralName'] + "_" + conformer['rotamer'] 
+                log.debug("linkageConformerString: " + linkageConformerString)
+                sequenceConformerString = sequenceConformerString + linkageConformerString + "," 
+                log.debug("sequenceConformerString: " + sequenceConformerString)             
 
-    log.debug("linkageConformers: " + str(linkageConformers))
+    log.debug("linkageConformers: \n")
+    prettyPrint(linkageConformers)
 
-    
-    return config
+    # config.update({
+    #     "linkageCount" : linkageCount,
+    #     "sequenceConformers" : sequenceConformers
+    # })
+    return structureInfo
 
 def getRotamerDataFromTransaction(thisTransaction: Transaction):
     log.info("getRotamerDataFromTransaction() was called.")

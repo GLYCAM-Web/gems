@@ -4,6 +4,7 @@ import json
 import uuid
 from datetime import datetime
 from gemsModules.common.transaction import *
+from gemsModules.common.services import *
 from gemsModules.project import settings as project_settings
 from pydantic import BaseModel, Field
 from pydantic.schema import schema
@@ -25,13 +26,13 @@ class gems_project():
     pUUID : str = ""
     title : str = ""
     comment : str = ""
-    timestamp : datetime = None
+    timestamp : str =""
     project_type : str = ""
 
     ## The project path. Used to be output dir, but now that is reserved for subdirs.
     project_dir : str = ""
     requesting_agent : str = ""
-    has_input_files : bool = False
+    has_input_files : str = ""
     gems_version : str = ""
     gems_branch : str = ""
     gmml_version : str = ""
@@ -52,7 +53,7 @@ class gems_project():
 
         ## Random uuid for the project uuid.
         self.pUUID = str(uuid.uuid4()) 
-        self.timestamp = datetime.now()
+        self.timestamp = str(datetime.now())
 
         if 'project' in request.keys():
             log.debug("found a project in the request.")
@@ -62,16 +63,6 @@ class gems_project():
                 self.title = fe_project['title']
             if 'comment' in fe_project.keys():
                 self.comment = fe_project['comment']
-            if 'project_type' in fe_project.keys():
-                self.project_type = fe_project['project_type']
-                if self.project_type == "cb":
-                    has_input_files = False
-                elif self.project_type == "md":
-                    has_input_files = True
-                elif self.project_type == "gp":
-                    has_input_files = True
-                elif self.project_type == "pdb":
-                    has_input_files = True
             if 'requesting_agent' in fe_project.keys():
                 self.requesting_agent = fe_project['requesting_agent']
             if 'gems_version' in fe_project.keys():
@@ -112,17 +103,16 @@ class gems_project():
                 self.project_type = "pdb"
                 self.has_input_files = True
 
-        self.project_dir = project_settings.output_data_dir + "tools/" +  self.project_type  + "/git-ignore-me_userdata/" + self.pUUID + "/"   
+          
             
     def __str__(self):
         result = "\ngems_project:"
-        result = result + "\ntype: " + self.project_type
         result = result + "\ncomment: " + self.comment
-        result = result + "\ntimestamp: " + str(self.timestamp)
+        result = result + "\ntimestamp: " + self.timestamp
         result = result + "\nproject_type: " + self.project_type
         result = result + "\npUUID: " + self.pUUID
         result = result + "\nrequesting_agent: " + self.requesting_agent
-        result = result + "\nhas_input_files: " + str(self.has_input_files)
+        result = result + "\nhas_input_files: " + self.has_input_files
         result = result + "\ngems_version: "  + self.gems_version
         result = result + "\ngems_branch: "  + self.gems_branch
         result = result + "\ngmml_version: "  + self.gmml_version
@@ -148,7 +138,7 @@ class gems_project():
 
         thisTransaction.response_dict['gems_project']['title'] = self.title
         thisTransaction.response_dict['gems_project']['comment'] = self.comment
-        thisTransaction.response_dict['gems_project']['timestamp'] = str(self.timestamp)
+        thisTransaction.response_dict['gems_project']['timestamp'] = self.timestamp
         thisTransaction.response_dict['gems_project']['project_type'] = self.project_type
         thisTransaction.response_dict['gems_project']['pUUID'] = self.pUUID
         thisTransaction.response_dict['gems_project']['requesting_agent'] = self.requesting_agent
@@ -180,9 +170,9 @@ class CbProject(gems_project):
 
     def __init__(self, thisTransaction):
         super().__init__(thisTransaction)
-
+        log.info("CbProject.__init__() was called.")
         from gemsModules.project.projectUtil import getSequenceFromTransaction, getSeqIDForSequence
-        
+        self.project_type = "cb"
         request = thisTransaction.request_dict
         sequence = getSequenceFromTransaction(thisTransaction)
         if sequence is not "":
@@ -194,10 +184,13 @@ class CbProject(gems_project):
             if 'Sequence' in element.keys():
                 requested_structure_count = requested_structure_count + 1
         structure_count = requested_structure_count
+
+        self.project_dir = project_settings.output_data_dir + "tools/" +  self.project_type  + "/git-ignore-me_userdata/" + self.pUUID + "/" 
         self.updateTransaction(thisTransaction)
 
     def __str__(self):
         result = super().__str__()
+        result = result + "\nproject_type: " + self.project_type
         result = result + "\nsequence: " + self.sequence
         result = result + "\nseqID: " + self.seqID
         result = result + "\nstructure_count: " + str(self.structure_count)
@@ -206,10 +199,73 @@ class CbProject(gems_project):
 
     def updateTransaction(self, thisTransaction : Transaction):
         super().updateTransaction(thisTransaction)
+        log.info("CbProject.updateTransaction() was called.")
         thisTransaction.response_dict['gems_project']['sequence'] = self.sequence
         thisTransaction.response_dict['gems_project']['seqID'] = self.seqID
         thisTransaction.response_dict['gems_project']['structure_count'] = str(self.structure_count)
    
+class PdbProject(gems_project):
+    uploadFileName : str = ""
+    status : str = ""
+
+    def __init__(self, thisTransaction):
+        super().__init__(thisTransaction)
+        from gemsModules.structureFile.amber.receive import getInput
+        log.info("PdbProject.__init__() was called.")
+        self.project_type = "pdb"
+        self.has_input_files = "true"
+        self.uploadFileName = getInput(thisTransaction)
+        log.debug("uploadFileName: " + self.uploadFileName)
+        self.status = "submitted"
+        self.project_dir = project_settings.output_data_dir + "tools/" +  self.project_type  + "/git-ignore-me_userdata/" + self.pUUID + "/" 
+        self.updateTransaction(thisTransaction)
+
+    def __str__(self): 
+        result = super().__str__()
+        result = result + "\nproject_type: " + self.project_type
+        result = result + "\nuploadFileName: " + self.uploadFileName
+        result = result + "\nstatus: " + self.status
+        return result
+
+    def updateTransaction(self, thisTransaction : Transaction):
+        super().updateTransaction(thisTransaction)
+        log.info("PdbProject.updateTransaction() was called.")
+        filename = self.uploadFileName
+        log.debug("uploadFileName: " + filename)
+
+        thisTransaction.response_dict['gems_project']['status'] = self.status
+        thisTransaction.response_dict['gems_project']['uploadFileName'] = filename
+
+class GpProject(gems_project):
+    pdbProjectID : str = ""
+    status : str = ""
+
+    def __init__(self, thisTransaction):
+        super().__init__(thisTransaction)
+        log.info("GpProject.__init__() was called.")
+        pdbProject = PdbProject(thisTransaction)
+        log.debug(str(pdbProject.__dict__))
+        self.pdbProjectId = pdbProject.pUUID
+        self.status = "submitted"
+        self.project_type = "gp"
+        self.has_input_files = "true"
+        self.project_dir = project_settings.output_data_dir + "tools/" +  self.project_type  + "/git-ignore-me_userdata/" + self.pUUID + "/" 
+        self.updateTransaction(thisTransaction)
+
+    def __str__(self):
+        result = super().__str__()
+        result = result + "\npdbProjectId: " + self.pdbProjectID
+        result = result + "\nstatus: " + self.status
+        return result
+
+    def updateTransaction(self, thisTransaction : Transaction):
+        super().updateTransaction(thisTransaction)
+        log.info("GpProject.updateTransaction() was called.")
+        thisTransaction.response_dict['gems_project']['pdbProjectID'] = self.pdbProjectID
+        thisTransaction.response_dict['gems_project']['status'] = self.status
+
+
+
 
 ## Details and location of the build of a single pose of a structure.
 class StructureMapping():

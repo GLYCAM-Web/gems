@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import math, os, sys,importlib.util
+import json, math, os, sys,importlib.util
 from datetime import datetime
 import gemsModules
 from gemsModules import common
@@ -228,6 +228,14 @@ def appendResponse(thisTransaction, responseConfig):
     else:
         log.error("Please add at a list of responses to your responseConfig object.")
         appendCommonParserNotice(thisTransaction,'IcompleteResponseError')
+
+
+##  @brief Convenience method for cleaning and speeding up log reading of dict objects.
+#   @detail Useful for assessing json objects.
+def prettyPrint(myObj):
+    log.info("prettyPrint() was called.")
+    log.debug("myObj objectType: " + str(type(myObj)))
+    log.debug("myObj, pretty: \n" + json.dumps(myObj, indent=4, sort_keys=False))
 
 
 ##  Logic borrowed from https://realpython.com/python-rounding/
