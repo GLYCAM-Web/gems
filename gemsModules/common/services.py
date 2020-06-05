@@ -235,7 +235,14 @@ def appendResponse(thisTransaction, responseConfig):
 def prettyPrint(myObj):
     log.info("prettyPrint() was called.")
     log.debug("myObj objectType: " + str(type(myObj)))
-    log.debug("myObj, pretty: \n" + json.dumps(myObj, indent=4, sort_keys=False))
+    preparedObj = {}
+    for field in myObj.keys():
+        if type(myObj[field] != str):
+            preparedObj[field] = str(myObj[field])
+        else:
+            preparedObj[field] = myObj[field]
+
+    log.debug("myObj, pretty: \n" + json.dumps(preparedObj, indent=4, sort_keys=False))
 
 
 ##  Logic borrowed from https://realpython.com/python-rounding/

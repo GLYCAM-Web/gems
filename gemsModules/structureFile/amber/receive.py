@@ -78,7 +78,8 @@ def generatePdbOutput(thisTransaction):
 
 
         ### Get the fileName from the transaction.
-        project = thisTransaction.request_dict['project']
+        project = getFrontendProjectFromTransaction(thisTransaction)
+        log.debug("Object type for frontend project: " + str(type(project)))
         try:
             projectDir = getProjectDir(thisTransaction)
         except Exception as error:

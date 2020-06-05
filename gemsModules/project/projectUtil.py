@@ -60,7 +60,7 @@ def startProject(thisTransaction: Transaction):
                 raise error
             else:
                 ### Copy any upload files.
-                if gems_project.has_input_files == "true":
+                if gems_project.has_input_files:
                     try:
                         copyUploadFilesToProject(thisTransaction, gems_project)
                     except Exception as error:
@@ -96,10 +96,10 @@ def getRequestingAgentFromTransaction(thisTransaction: Transaction):
 ##  Pass in a transaction, get the frontend project
 #   @param transaction
 def getFrontendProjectFromTransaction(thisTransaction: Transaction):
-    log.info("getRequestFromTransaction() was called.\n")
+    log.info("getFrontendProjectFromTransaction() was called.\n")
     if 'project' in thisTransaction.request_dict.keys():
         project = thisTransaction.request_dict['project']
-        log.debug("frontend project: " + str(project))
+        log.debug("Object type for frontend project: " + str(type(project)))
         return project
     else:
         return None
@@ -187,6 +187,8 @@ def writeProjectLogFile(gems_project, logsDir):
 #   @param project_dir
 def getProjectUploadsDir(project, project_dir):
     log.info("getProjectUploadsDir() was called.\n")
+    log.debug("Object type for project: " + str(type(project)))
+    log.debug("project.keys(): " + str(project.keys()))
     u_uuid = project['u_uuid']
     project_uploads_dir = project_dir + "uploads/" + u_uuid + "/"
     log.debug("project_uploads_dir: " + project_uploads_dir)
@@ -210,12 +212,13 @@ def getUploadsSourceDir(project):
 
 ##  Creates a copy of uploads from the frontend
 #   @param transaction
-def copyUploadFilesToProject(thisTransaction : Transaction, gems_project : gems_project):
+def copyUploadFilesToProject(thisTransaction : Transaction, gems_project : GemsProject):
     log.info("copyUploadFilesToProject() was called.\n")
     project_dir = getProjectDir(thisTransaction)
     log.debug("project_dir: " + project_dir)
     try:
         project = getFrontendProjectFromTransaction(thisTransaction)
+        log.debug("Object type for frontend project: " + str(type(project)))
     except Exception as error:
         log.error("There was a problem finding the frontend project.")
         log.error("Error type: " + str(type(error)))
@@ -254,32 +257,6 @@ def copyUploadFilesToProject(thisTransaction : Transaction, gems_project : gems_
         raise error
 
 
-##Pass in a transaction and a string indicating what is requesting this project.
-#   The transaction is updated with any relevant project data.
-#   @param transaction
-#   @param requestingAgent
-def buildgems_project(thisTransaction : Transaction, requestingAgent : str):
-    log.info("buildgems_project() was called.\n")
-    gems_project = gems_project(thisTransaction)
-
-    log.debug("gems_project: " + str(gems_project))
-    return gems_project
-
-
-
-
-##If the requesting agent is the website, leave the gems project.
-#   Otherwise remove it.
-#   @param thisTransaction The transaction object provides the requesting agent.
-def cleangems_project(thisTransaction : Transaction):
-    log.info("cleangems_project() was called.\n")
-    log.debug("response_dict.keys(): " + str(thisTransaction.response_dict.keys()))
-    if 'gems_project' in thisTransaction.response_dict.keys():
-        if "website" == thisTransaction.response_dict['gems_project']['requesting_agent']:
-            log.debug("Returning response to website.")
-        else:
-            log.debug("Cleanup for api requests.")
-            del thisTransaction.response_dict['gems_project']
 
 ##  Looks at the gems_project in a transaction to return the pUUID.
 #   @param thisTransaction Transaction object should contain a gems_project.Else returns none.
