@@ -5,6 +5,7 @@ from typing import ForwardRef
 from pydantic import BaseModel, Field
 from pydantic.schema import schema
 from gemsModules.common.loggingConfig import *
+from gemsModules.project import dataio as ProjectModels
 import traceback
 
 if loggers.get(__name__):
@@ -131,6 +132,13 @@ class ResourceStringFormatEnum(str, Enum):
     glytoucanAccessionID = 'GlyTouCanID'
     glycamSequenceID = 'GlycamSequenceID'
     glycamNickName = 'GlycamNickName'
+
+## Update me when adding new project types.
+class ProjectTypeEnum(str,Enum):
+    gemsProject = 'GemsProject'
+    cbProject = 'CbProject'
+    pdbProject = 'PdbProject'
+    gpProject = 'GpProject'
 
 # ####
 # ####  Definition Objects
@@ -342,13 +350,16 @@ class Entity(BaseModel):
 
 #Entity.update_forward_refs()
 
+##For the frontend project.
 class Project(BaseModel):
     resources : List[Resource] = None
     options : Tags = None
 
+
 class TransactionSchema(BaseModel):
     entity : Entity
     project : Project = None
+    GemsProjedt : ProjectModels.GemsProject = None
     options : Tags = None
 
 # ####
@@ -381,7 +392,19 @@ class Transaction:
 #        if self.transaction_in.options is not None:
 #            if ('jsonObjectOutputFormat', 'Pretty') in self.transaction_in.options:
 #                isPretty = True
+        log.info("build_outgoing_string() was called.")
+        log.debug("response_dict: \n" + str(self.response_dict))
+        for key in self.response_dict.keys():
+            log.debug("key: " + key)
+            log.debug("valueType: " + str(type(self.response_dict[key])))
+            if key == 'gems_project':
+                log.debug("\ngems_project: \n")
+                for element in self.response_dict['gems_project'].keys():
+                    log.debug("~ element: " + element)
+                    if type(self.response_dict['gems_project'][element]) != str:
+                        self.response_dict['gems_project'][element] = str(self.response_dict['gems_project'][element])
 
+                    log.debug("~ valueType: " + str(type(self.response_dict['gems_project'][element])))
         try:
             if isPretty:
                 self.outgoing_string=json.dumps(self.response_dict, indent=4)

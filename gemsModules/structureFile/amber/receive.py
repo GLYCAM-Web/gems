@@ -645,17 +645,17 @@ def hasPdbExtension(filename : str):
 
 ##  Looks for a project in the transaction,
 #       checks for either a pdb file or pdbID.
-#   @param thisTransaction
-def getInput(thisTransaction : Transaction):
+#   @param request_dict
+def getInput(request_dict : dict):
     log.info("getInput() was called.\n")
 
     ### Grab the inputs from the entity
-    if 'inputs' in thisTransaction.request_dict['entity'].keys():
-        inputs = thisTransaction.request_dict['entity']['inputs']
+    if 'inputs' in request_dict['entity'].keys():
+        inputs = request_dict['entity']['inputs']
 
         uploadFileName = ""
         ### Get the frontend project
-        frontendProject = thisTransaction.request_dict['project']
+        frontendProject = request_dict['project']
         for element in inputs:
             log.debug("element: " + str(element))
 

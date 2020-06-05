@@ -23,7 +23,7 @@ else:
 #   If no frontend project is present, the gems_project is the only
 #   project.
 #   @param transaction
-def startProject(thisTransaction: Transaction):
+def startProject(thisTransaction : Transaction):
     log.info("startProject() was called.\n")
     try:
         entity = thisTransaction.request_dict['entity']['type'] 
@@ -35,15 +35,15 @@ def startProject(thisTransaction: Transaction):
             ### Start a gems_project
             if entity == "Sequence":
                 log.debug("building a cb project.")
-                gems_project = CbProject(thisTransaction)
+                gems_project = CbProject(thisTransaction.request_dict)
                 log.debug("gems_project, after instantiation: \n" + str(gems_project))
             elif entity == "StructureFile":
                 log.debug("building a pdb project.")
-                gems_project = PdbProject(thisTransaction)
+                gems_project = PdbProject(thisTransaction.request_dict)
                 log.debug("gems_project, after instantiation: \n" + str(gems_project))
             elif entity == "Conjugate":
                 log.debug("building a gp project.")
-                gems_project = GpProject(thisTransaction)
+                gems_project = GpProject(thisTransaction.request_dict)
                 log.debug("gems_project, after instantiation: \n" + str(gems_project))
             else:
                 log.error("Need to write code to instantiate projects for entity type: " + entity)
@@ -52,30 +52,37 @@ def startProject(thisTransaction: Transaction):
             log.error("There was a problem starting the project: " + str(error))
             raise error
         else:
-            ### Find the projectDir.
+
             try:
-                project_dir = getProjectDir(thisTransaction)
+                updateTransaction(gems_project, thisTransaction)
             except Exception as error:
-                log.error("There was a problem getting the projectDir: " + str(error))
+                log.error("There was a problem updating thisTransaction: " + str(error))
                 raise error
             else:
-                ### Copy any upload files.
-                if gems_project.has_input_files:
-                    try:
-                        copyUploadFilesToProject(thisTransaction, gems_project)
-                    except Exception as error:
-                        log.error("There was a problem uploading the input: " + str(error))
-                        raise error
-                ### Write the logs to file.
+                ### Find the projectDir.
                 try:
-                    logs_dir = setupProjectDirs(project_dir)
-                    request = thisTransaction.request_dict
-                    writeRequestToFile(request, logs_dir)
-                    writeProjectLogFile(gems_project, logs_dir)
-                    return gems_project
+                    project_dir = getProjectDir(thisTransaction)
                 except Exception as error:
-                    log.error("There was a problem writing the project logs: " + str(error))
+                    log.error("There was a problem getting the projectDir: " + str(error))
                     raise error
+                else:
+                    ### Copy any upload files.
+                    if gems_project.has_input_files:
+                        try:
+                            copyUploadFilesToProject(thisTransaction, gems_project)
+                        except Exception as error:
+                            log.error("There was a problem uploading the input: " + str(error))
+                            raise error
+                    ### Write the logs to file.
+                    try:
+                        logs_dir = setupProjectDirs(project_dir)
+                        request = thisTransaction.request_dict
+                        writeRequestToFile(request, logs_dir)
+                        writeProjectLogFile(gems_project, logs_dir)
+                        return gems_project
+                    except Exception as error:
+                        log.error("There was a problem writing the project logs: " + str(error))
+                        raise error
 
 
 ## Pass in a transaction, figure out the requestingAgent. OK if it doesn't exist.
@@ -344,6 +351,15 @@ def getSeqIDForSequence(sequence):
     seqID = str(uuid.uuid5(uuid.NAMESPACE_DNS, sequence))
     log.debug("seqID: " + seqID)
     return seqID
+
+
+def updateTransaction(gems_project, thisTransaction):
+    log.info("updateTransaction() was called.")
+    if thisTransaction.response_dict == None:
+        thisTransaction.response_dict = {}
+
+    thisTransaction.response_dict['gems_project'] = gems_project.__dict__
+    log.debug("thisTransaction: \n" + str(thisTransaction))
 
 def main():
     if len(sys.argv) == 2:

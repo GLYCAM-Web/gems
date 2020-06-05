@@ -3,7 +3,6 @@ import  os, sys
 import json
 import uuid
 from datetime import datetime
-from gemsModules.common.transaction import *
 from gemsModules.common.services import *
 from gemsModules.project import settings as project_settings
 from pydantic import BaseModel, Field, ValidationError
@@ -19,7 +18,7 @@ else:
 
 ##  @brief The primary way of tracking data related to a project
 #   @detail This is the generic project object. See subtypes for more specific fields
-class GemsProject():
+class GemsProject(BaseModel):
     ## The name of the output dir is the pUUID
     pUUID : str = ""
     title : str = ""
@@ -44,18 +43,18 @@ class GemsProject():
     
     
 
-    def __init__(self, thisTransaction : Transaction):
+    def __init__(self, request_dict : dict):
+        super().__init__()
         log.info("GemsProject.__init__() was called.")
-        request = thisTransaction.request_dict
-        log.debug("request: " + str(request))
+        log.debug("request_dict: " + str(request_dict))
 
         ## Random uuid for the project uuid.
         self.pUUID = str(uuid.uuid4()) 
         self.timestamp = datetime.now()
 
-        if 'project' in request.keys():
-            log.debug("found a project in the request.")
-            fe_project = request['project']
+        if 'project' in request_dict.keys():
+            log.debug("found a project in the request_dict.")
+            fe_project = request_dict['project']
             
             if 'title' in fe_project.keys():
                 self.title = fe_project['title']
@@ -87,17 +86,17 @@ class GemsProject():
             ##  In a commandline request, a frontend project may not be included.
             #   This is where we give defaults for whatever is needed.
             self.requesting_agent = "command line"
-            log.debug("request entity type: " + request['entity']['type'])
-            if request['entity']['type'] == "Sequence":
+            log.debug("request entity type: " + request_dict['entity']['type'])
+            if request_dict['entity']['type'] == "Sequence":
                 self.project_type = "cb"
                 self.has_input_files = False
-            elif request['entity']['type'] == "MmService":
+            elif request_dict['entity']['type'] == "MmService":
                 self.project_type = "md"
                 self.has_input_files = True
-            elif request['entity']['type'] == "Conjugate":
+            elif request_dict['entity']['type'] == "Conjugate":
                 self.project_type = "gp"
                 self.has_input_files = True
-            elif request['entity']['type'] == "StructureFile":
+            elif request_dict['entity']['type'] == "StructureFile":
                 self.project_type = "pdb"
                 self.has_input_files = True
 
@@ -123,35 +122,6 @@ class GemsProject():
         result = result + "\njson_api_version: "  + self.json_api_version
         return result
 
-    def updateTransaction(self, thisTransaction: Transaction):
-        log.info("updateTransaction() was called.\n")
-        if thisTransaction.response_dict is None:
-            thisTransaction.response_dict = {}
-        if not 'entity' in thisTransaction.response_dict:
-            thisTransaction.response_dict['entity'] = {}
-            thisTransaction.response_dict['entity']['type'] = thisTransaction.request_dict['entity']['type']
-
-        if not 'gems_project' in thisTransaction.response_dict:
-            thisTransaction.response_dict['gems_project'] = {}
-
-        thisTransaction.response_dict['gems_project']['title'] = self.title
-        thisTransaction.response_dict['gems_project']['comment'] = self.comment
-        thisTransaction.response_dict['gems_project']['timestamp'] = str(self.timestamp)
-        thisTransaction.response_dict['gems_project']['project_type'] = self.project_type
-        thisTransaction.response_dict['gems_project']['pUUID'] = self.pUUID
-        thisTransaction.response_dict['gems_project']['requesting_agent'] = self.requesting_agent
-        thisTransaction.response_dict['gems_project']['has_input_files'] = str(self.has_input_files)
-        thisTransaction.response_dict['gems_project']['gems_version'] = self.gems_version
-        thisTransaction.response_dict['gems_project']['gems_branch'] = self.gems_branch
-        thisTransaction.response_dict['gems_project']['gmml_version'] = self.gmml_version
-        thisTransaction.response_dict['gems_project']['gmml_branch'] = self.gmml_branch
-        thisTransaction.response_dict['gems_project']['site_mode'] = self.site_mode
-        thisTransaction.response_dict['gems_project']['site_host_name'] = self.site_host_name
-        thisTransaction.response_dict['gems_project']['force_field'] = self.force_field
-        thisTransaction.response_dict['gems_project']['parameter_version'] = self.parameter_version
-        thisTransaction.response_dict['gems_project']['amber_version'] = self.amber_version
-        thisTransaction.response_dict['gems_project']['json_api_version'] = self.json_api_version
-        thisTransaction.response_dict['gems_project']['project_dir'] = self.project_dir
 
 
 ## @brief cbProject is a typed project that inherits all the fields from gems_project and adds its own.
@@ -162,17 +132,20 @@ class CbProject(GemsProject):
     structure_count : int = 1
     #structure_mappings : []
 
-    def __init__(self, thisTransaction: Transaction):
-        super().__init__(thisTransaction)
+    def __init__(self, request_dict: dict):
+        super().__init__(request_dict)
         log.info("CbProject.__init__() was called.")
         from gemsModules.project.projectUtil import getSequenceFromTransaction, getSeqIDForSequence
         self.project_type = "cb"
-        request = thisTransaction.request_dict
-        sequence = getSequenceFromTransaction(thisTransaction)
+        inputs = request_dict['entity']['inputs']
+        sequence = ""
+        for element in inputs:
+            if "Sequence" not in element.keys():
+                sequence = element['Sequence']['payload']
         if sequence is not "":
             self.sequence = sequence
             self.seqID = getSeqIDForSequence(sequence)
-        inputs = request['entity']['inputs']
+        inputs = request_dict['entity']['inputs']
         requested_structure_count = 0
         for element in inputs:
             if 'Sequence' in element.keys():
@@ -180,7 +153,6 @@ class CbProject(GemsProject):
         structure_count = requested_structure_count
 
         self.project_dir = project_settings.output_data_dir + "tools/" +  self.project_type  + "/git-ignore-me_userdata/" + self.pUUID + "/" 
-        self.updateTransaction(thisTransaction)
 
     def __str__(self):
         result = super().__str__()
@@ -191,28 +163,20 @@ class CbProject(GemsProject):
         #result = result + "\nstructure_mappings: " + str(self.structure_mappings)
         return result
 
-    def updateTransaction(self, thisTransaction : Transaction):
-        super().updateTransaction(thisTransaction)
-        log.info("CbProject.updateTransaction() was called.")
-        thisTransaction.response_dict['gems_project']['sequence'] = self.sequence
-        thisTransaction.response_dict['gems_project']['seqID'] = self.seqID
-        thisTransaction.response_dict['gems_project']['structure_count'] = str(self.structure_count)
-   
 class PdbProject(GemsProject):
     uploadFileName : str = ""
     status : str = ""
 
-    def __init__(self, thisTransaction: Transaction):
-        super().__init__(thisTransaction)
+    def __init__(self, request_dict: dict):
+        super().__init__(request_dict)
         from gemsModules.structureFile.amber.receive import getInput
         log.info("PdbProject.__init__() was called.")
         self.project_type = "pdb"
         self.has_input_files = True
-        self.uploadFileName = getInput(thisTransaction)
+        self.uploadFileName = getInput(request_dict)
         log.debug("uploadFileName: " + self.uploadFileName)
         self.status = "submitted"
         self.project_dir = project_settings.output_data_dir + "tools/" +  self.project_type  + "/git-ignore-me_userdata/" + self.pUUID + "/" 
-        self.updateTransaction(thisTransaction)
 
     def __str__(self): 
         result = super().__str__()
@@ -221,44 +185,28 @@ class PdbProject(GemsProject):
         result = result + "\nstatus: " + self.status
         return result
 
-    def updateTransaction(self, thisTransaction : Transaction):
-        super().updateTransaction(thisTransaction)
-        log.info("PdbProject.updateTransaction() was called.")
-        filename = self.uploadFileName
-        log.debug("uploadFileName: " + filename)
-
-        thisTransaction.response_dict['gems_project']['status'] = self.status
-        thisTransaction.response_dict['gems_project']['uploadFileName'] = filename
 
 class GpProject(GemsProject):
     pdbProjectID : str = ""
     status : str = ""
 
-    def __init__(self, thisTransaction : Transaction):
-        super().__init__(thisTransaction)
+    def __init__(self, request_dict : dict):
+        super().__init__(request_dict)
         log.info("GpProject.__init__() was called.")
-        pdbProject = PdbProject(thisTransaction)
+        pdbProject = PdbProject(request_dict)
         log.debug(str(pdbProject.__dict__))
         self.pdbProjectId = pdbProject.pUUID
         self.status = "submitted"
         self.project_type = "gp"
         self.has_input_files = True
         self.project_dir = project_settings.output_data_dir + "tools/" +  self.project_type  + "/git-ignore-me_userdata/" + self.pUUID + "/" 
-        self.updateTransaction(thisTransaction)
+ 
 
     def __str__(self):
         result = super().__str__()
         result = result + "\npdbProjectId: " + self.pdbProjectID
         result = result + "\nstatus: " + self.status
         return result
-
-    def updateTransaction(self, thisTransaction : Transaction):
-        super().updateTransaction(thisTransaction)
-        log.info("GpProject.updateTransaction() was called.")
-        thisTransaction.response_dict['gems_project']['pdbProjectID'] = self.pdbProjectID
-        thisTransaction.response_dict['gems_project']['status'] = self.status
-
-
 
 
 ## Details and location of the build of a single pose of a structure.
@@ -274,9 +222,9 @@ class StructureMapping():
     timestamp : str = None
 
 ##  Figures out the type of structure file being preprocessed.
-def getStructureFileProjectType(request):
+def getStructureFileProjectType(request_dict):
     projectType = "not set"
-    services = request['entity']['services']
+    services = request_dict['entity']['services']
     for service in services:
         if 'Preprocess' in service.keys():
             if 'type' in service['Preprocess'].keys():
