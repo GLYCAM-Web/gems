@@ -75,7 +75,7 @@ def buildGlycoprotein(thisTransaction):
     else:
         log.debug("attachmentSites present.")
         if "gems_project" not in thisTransaction.response_dict.keys():
-            log.debug("Need to create a new PdbProject.")
+            log.debug("Need to create a new project.")
             gemsProject = startProject(thisTransaction)
             log.debug("\ngpProject: \n")
             prettyPrint(gemsProject.__dict__)
@@ -197,9 +197,9 @@ def getAttachmentSitesFromTransaction(thisTransaction):
         if attachmentSitesFound:
             return attachmentSites
         else:
-            raise AttributeError
+            raise AttributeError("Could not find attachments in request inputs.")
     else:
-        raise AttributeError
+        raise AttributeError("Could not find inputs.")
 
 def main():
   import importlib.util, os, sys

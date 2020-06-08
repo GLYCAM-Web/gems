@@ -188,17 +188,19 @@ class PdbProject(GemsProject):
 
 class GpProject(GemsProject):
     pdbProjectID : str = ""
+    uploadFileName : str = ""
     status : str = ""
 
     def __init__(self, request_dict : dict):
         super().__init__(request_dict)
         log.info("GpProject.__init__() was called.")
         pdbProject = PdbProject(request_dict)
-        log.debug(str(pdbProject.__dict__))
-        self.pdbProjectId = pdbProject.pUUID
+        log.debug("pdbProject: \n" + str(pdbProject.__dict__))
+        self.pdbProjectID = pdbProject.pUUID
         self.status = "submitted"
         self.project_type = "gp"
         self.has_input_files = True
+        self.uploadFileName = pdbProject.uploadFileName
         self.project_dir = project_settings.output_data_dir + "tools/" +  self.project_type  + "/git-ignore-me_userdata/" + self.pUUID + "/" 
  
 

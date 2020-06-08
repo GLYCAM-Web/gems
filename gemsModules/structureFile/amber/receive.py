@@ -29,6 +29,8 @@ def preprocessPdbForAmber(thisTransaction):
             gemsProject = startProject(thisTransaction)
         elif 'gems_project' not in thisTransaction.response_dict.keys():
             gemsProject = startProject(thisTransaction)
+        else:
+            log.debug("response_dict or gems_project already exists, not starting a project.")
 
         prettyPrint(thisTransaction.request_dict)
 
