@@ -30,6 +30,7 @@ class GemsProject(BaseModel):
     project_dir : str = ""
     requesting_agent : str = ""
     has_input_files : bool = None
+    
     gems_version : str = ""
     gems_branch : str = ""
     gmml_version : str = ""

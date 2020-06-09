@@ -95,6 +95,7 @@ def delegate(jsonObjectString):
                     ## Build outgoing string or error.
                     log.debug("The resquest dict is:  \n" + str(thisTransaction.request_dict) + "\n")
                     log.debug("The response dict is:  \n" + str(thisTransaction.response_dict) + "\n")
+              
                     if thisTransaction.outgoing_string is None:
                         log.debug("An outgoing string does not already exist.  About to build one.")
                         try:

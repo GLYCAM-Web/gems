@@ -247,20 +247,7 @@ class ResourceDescriptor(BaseModel):
     """Metadata about the resource (where, what, etc.)."""
     descriptor: Union[EmbeddedResource,ExternalResource]
 
-class Resource(BaseModel):
-    """Information describing a resource containing data."""
-    metadata : ResourceDescriptor = Field(
-            None
-            )
-    payload : str = Field(
-        None,
-        description='The thing that is described in the Descriptor'
-        )
-    tags : List[Dict[str,str]] = Field(
-        None,
-        description='List of arbitrary Key:Value pairs initially interpreted as string literals.'
-        )
-    options : Tags = None
+ 
 
 class Notice(BaseModel):
     """Description of a Notice."""
@@ -289,6 +276,25 @@ class Notice(BaseModel):
             )
     options : Tags = None
 
+class Resource(BaseModel):
+    """Information describing a resource containing data."""
+    metadata : ResourceDescriptor = Field(
+            None
+            )
+    payload : str = Field(
+        None,
+        description='The thing that is described in the Descriptor'
+        )
+    tags : List[Dict[str,str]] = Field(
+        None,
+        description='List of arbitrary Key:Value pairs initially interpreted as string literals.'
+        )
+    options : Tags = None
+
+    notice : Notice = Field(
+        None
+    ) 
+
 class Service(BaseModel):
     """Holds information about a requested Service."""
     typename : Union[CommonServices, ConjugateServices, DelegatorServices, GraphServices, MmServiceServices, SequenceServices, GlycoProteinServices, StatusServices, StructureFileServices ] = Field(
@@ -298,12 +304,14 @@ class Service(BaseModel):
             description='The services available will vary by Entity.'
             )
     inputs : List[Resource] = None
+    outputs : List[Resource] = None
     requestID : str = Field(
             None,
             title = 'Request ID',
             description = 'User-specified ID that will be echoed in responses.'
             )
     options : Tags = None
+    project : ProjectModels.GemsProject = None
 
 class Response(BaseModel):
     """Holds information about a response to a service request."""
@@ -313,10 +321,7 @@ class Response(BaseModel):
             alias='type',
             description='The type service that this is in response to.'
             )
-    notice : Notice = Field(
-            None
-            )
-    outputs : List[Resource] = None
+    
     requestID : str = Field(
             None,
             title = 'Request ID',
@@ -359,8 +364,9 @@ class Project(BaseModel):
 class TransactionSchema(BaseModel):
     entity : Entity
     project : Project = None
-    GemsProjedt : ProjectModels.GemsProject = None
+    # gems_project : ProjectModels.GemsProject = None
     options : Tags = None
+    # echoed_response: str = None
 
 # ####
 # ####  Container for use in the modules

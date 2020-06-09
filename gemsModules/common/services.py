@@ -8,7 +8,7 @@ from gemsModules.common.transaction import *
 from gemsModules.common.utils import *
 from gemsModules.common.loggingConfig import *
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
-from pydantic import BaseModel, Schema
+from pydantic import BaseModel, Schema, ValidationError
 from pydantic.schema import schema
 import traceback
 
@@ -207,7 +207,6 @@ def appendResponse(thisTransaction, responseConfig):
                 log.debug("timestamp: " + timestamp)
                 thisTransaction.response_dict['timestamp'] = timestamp
 
-
             if 'responses' not in thisTransaction.response_dict.keys():
                 thisTransaction.response_dict['responses'] = []
 
@@ -215,16 +214,23 @@ def appendResponse(thisTransaction, responseConfig):
                 resource = {respondingService : response }
                 log.debug("Adding a resource to the response: " + str(resource))
                 thisTransaction.response_dict['responses'].append(resource)
+            # if 'echoed_response' not in thisTransaction.response_dict.keys():
+            #     thisTransaction.response_dict['echoed_response'] = {}
+
+            # if 'payload' not in thisTransaction.response_dict['echoed_response']:
+            #     thisTransaction.response_dict['echoed_response']['payload'] = {}
+
+            # thisTransaction.response_dict['echoed_response']['payload'] = "echoed payload goes here"
 
             try:
                 TransactionSchema(**thisTransaction.response_dict)
                 log.debug("Passes validation against schema.")
             except ValidationError as e:
-                log.error("Validation Error.")
+                log.error("Validation Error: " + str(e))
                 appendCommonParserNotice(thisTransaction,'JsonParseEror')
         else:
             log.Error("Incomplete responseConfig.")
-
+            appendCommonParserNotice(thisTransaction,'IcompleteResponseError')
     else:
         log.error("Please add at a list of responses to your responseConfig object.")
         appendCommonParserNotice(thisTransaction,'IcompleteResponseError')
