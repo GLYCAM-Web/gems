@@ -696,7 +696,7 @@ def getInput(request_dict : dict):
                             if "payload" in element.keys():
                                 uploadFileName = sideloadPdbFromRcsb(element['payload'], frontendProject['upload_path'])
                                 frontendProject['uploaded_file_name'] = uploadFileName
-
+                                return uploadFileName
                         else:
                             if "locationType" in descriptor.keys():
                                 locationType = descriptor['locationType']
@@ -705,6 +705,13 @@ def getInput(request_dict : dict):
                                     if "payload" in element.keys():
                                         uploadFileName = element['payload']
                                         return uploadFileName
+
+                    else:
+                        log.error("The descriptor element requires a resourceFormat. resourceFormat not found.")
+                        raise AttributeError("resourceFormat")
+                else:
+                    log.error("The metadata element requires a descriptor. descriptor not found.")
+                    raise AttributeError("descriptor")
 
 
             else:
@@ -755,6 +762,7 @@ def makeRequest(url):
             contentBytes = response.read()
             return contentBytes
     except Exception as error:
+        log.error("There was a problem making the request: " + str(error))
         raise error
 
 def getContentBytes(pdbID):
@@ -766,13 +774,13 @@ def getContentBytes(pdbID):
     except Exception as error:
         ## Check if the 1 at the end is the issue.
         try:
-            rcsbURL = "https://files.rcsb.org/download/" + pdbID + ".pdb"
-            log.debug("Trying again with url: " + rcsbURL)
-            with urllib.request.urlopen(rcsbURL) as response:
-                contentBytes = response.read()
-                return contentBytes
+            log.debug("First request failed. Trying again with a slight edit...")
+            rcsbURL2 = "https://files.rcsb.org/download/" + pdbID + ".pdb"
+            log.debug("Trying again with url: " + rcsbURL2)
+            contentBytes = makeRequest(rcsbURL2)
+            return contentBytes
         except Exception as error:
-            log.error("There was a problem requesting this pdb from RCSB.org.")
+            log.error("There was a problem requesting this pdb from RCSB.org: " + str(error))
             raise error
 
 

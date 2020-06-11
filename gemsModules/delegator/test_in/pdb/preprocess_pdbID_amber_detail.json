@@ -7,7 +7,13 @@
 			}
 		}],
 		"inputs": [{
-			"pdb_file_name": "1buy.pdb"
+			"metadata" : {
+				"descriptor" : {
+					"locationType" : "uri",
+					"resourceFormat" : "PDBID"
+				}
+			},
+			"payload" : "1BUY"
 		}]
 	},
 	"options": {
@@ -37,9 +43,9 @@
 		"requesting_agent": "website",
 		"root": "d3c9a119-ebb4-402f-bd5a-3e1fbb00ecd0",
 		"project_ptr_id": "d3c9a119-ebb4-402f-bd5a-3e1fbb00ecd0",
-		"uploaded_file_name": "1buy.pdb",
+		"uploaded_file_name": "test_1buy.pdb",
 		"u_uuid": "d02b2b47-93d7-425b-bcc4-8d00408c3a30",
-		"upload_path": "/website/uploads/tools/pdb/git-ignore-me_userdata/d02b2b47-93d7-425b-bcc4-8d00408c3a30/",
+		"upload_path": "/website/TESTS/pdb/test_in/options/",
 		"pdb_id": " ",
 		"toolDir": "/website/userdata/tools/pdb",
 		"path": "/pdb/media",
