@@ -89,10 +89,10 @@ def generatePdbOutput(thisTransaction):
             log.error(traceback.format_exc())
             raise error
         else:
-            projectDir  = getProjectUploadsDir(project, projectDir)
+            projectUploadDir  = getProjectUploadsDir(project, projectDir)
             uploadedFileName = project['uploaded_file_name']
             log.debug("uploadedFileName: " + uploadedFileName)
-            uploadedPDB = projectDir + uploadedFileName
+            uploadedPDB = projectUploadDir + uploadedFileName
             #PDB file object:
             log.debug("uploadedPDB: " + uploadedPDB)
             try:

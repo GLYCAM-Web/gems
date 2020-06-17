@@ -82,11 +82,16 @@ def buildGlycoprotein(thisTransaction):
         else:
             log.debug("gemsProject already present.")
 
+        log.debug("\n1)First, preprocess the PDB file.\n")
         preprocessPdbForAmber(thisTransaction)
+        log.debug("\nFinished preprocessing pdb.\n")
         inputFileName = writeGpInputFile(gemsProject, attachmentSites)
+        log.debug("Finished writing GP input file: " + inputFileName)
         sbatchArg = writeGpScript(inputFileName, gemsProject)
+        log.debug("Finished writing the GP script: " + sbatchArg)
 
         try:
+            log.debug("\n2)Then build the cocomplex.\n")
             response = submitGpScriptToSlurm(thisTransaction, gemsProject, sbatchArg)
             log.debug("response from batchcompute: \n" + str(response))
 
@@ -97,6 +102,7 @@ def buildGlycoprotein(thisTransaction):
         else:
             responseConfig = buildGPResponseConfig(gemsProject)
             appendResponse(thisTransaction, responseConfig)
+            log.debug("Finished submitting GP request to slurm.")
 
 
 
