@@ -19,28 +19,13 @@
 	}]
 }
 
+
 [
 	[
 		{"linkageLabel": "15", "dihedralName": "omega", "rotamer": "gt"}, 
 		{"linkageLabel": "18", "dihedralName": "phi", "rotamer": "-g"}, 
 		{"linkageLabel": "18", "dihedralName": "omega", "rotamer": "tg"}
 	], [
-		{"linkageLabel": "15", "dihedralName": "omega", "rotamer": "gg"}, 
-		{"linkageLabel": "18", "dihedralName": "phi", "rotamer": "t"}, {
-		"linkageLabel": "18", "dihedralName": "omega", "rotamer": "gt"}
-	], [
-		{"linkageLabel": "15", "dihedralName": "omega", "rotamer": "gt"}, 
-		{"linkageLabel": "18", "dihedralName": "phi", "rotamer": "-g"}, 
-		{"linkageLabel": "18", "dihedralName": "omega", "rotamer": "gg"}
-	], [
-		{"linkageLabel": "15", "dihedralName": "omega", "rotamer": "gt"}, 
-		{"linkageLabel": "18", "dihedralName": "phi", "rotamer": "-g"}, 
-		{"linkageLabel": "18", "dihedralName": "omega", "rotamer": "tg"}
-	], [
-		{"linkageLabel": "15", "dihedralName": "omega", "rotamer": "gg"}, 
-		{"linkageLabel": "18", "dihedralName": "phi", "rotamer": "t"}, 
-		{"linkageLabel": "18", "dihedralName": "omega", "rotamer": "tg"}
-	], [
 		{"linkageLabel": "15", "dihedralName": "omega", "rotamer": "gt"}, 
 		{"linkageLabel": "18", "dihedralName": "phi", "rotamer": "-g"}, 
 		{"linkageLabel": "18", "dihedralName": "omega", "rotamer": "gt"}
@@ -49,28 +34,39 @@
 		{"linkageLabel": "18", "dihedralName": "phi", "rotamer": "-g"}, 
 		{"linkageLabel": "18", "dihedralName": "omega", "rotamer": "gg"}
 	], [
-		{"linkageLabel": "15", "dihedralName": "omega", "rotamer": "gg"}, 
+		{"linkageLabel": "15", "dihedralName": "omega", "rotamer": "gt"}, 
 		{"linkageLabel": "18", "dihedralName": "phi", "rotamer": "t"}, 
 		{"linkageLabel": "18", "dihedralName": "omega", "rotamer": "tg"}
 	], [
 		{"linkageLabel": "15", "dihedralName": "omega", "rotamer": "gt"}, 
+		{"linkageLabel": "18", "dihedralName": "phi", "rotamer": "t"}, 
+		{"linkageLabel": "18", "dihedralName": "omega", "rotamer": "gt"}
+	], [
+		{"linkageLabel": "15", "dihedralName": "omega", "rotamer": "gt"}, 
+		{"linkageLabel": "18", "dihedralName": "phi", "rotamer": "t"}, 
+		{"linkageLabel": "18", "dihedralName": "omega", "rotamer": "gg"}
+	], [
+		{"linkageLabel": "15", "dihedralName": "omega", "rotamer": "gg"}, 
 		{"linkageLabel": "18", "dihedralName": "phi", "rotamer": "-g"}, 
 		{"linkageLabel": "18", "dihedralName": "omega", "rotamer": "tg"}
 	], [
-		{"linkageLabel": "15", "dihedralName": "omega", "rotamer": "gt"}, 
+		{"linkageLabel": "15", "dihedralName": "omega", "rotamer": "gg"}, 
 		{"linkageLabel": "18", "dihedralName": "phi", "rotamer": "-g"}, 
+		{"linkageLabel": "18", "dihedralName": "omega", "rotamer": "gt"}
+	], [
+		{"linkageLabel": "15", "dihedralName": "omega", "rotamer": "gg"}, 
+		{"linkageLabel": "18", "dihedralName": "phi", "rotamer": "-g"}, 
+		{"linkageLabel": "18", "dihedralName": "omega", "rotamer": "gg"}
+	], [
+		{"linkageLabel": "15", "dihedralName": "omega", "rotamer": "gg"}, 
+		{"linkageLabel": "18", "dihedralName": "phi", "rotamer": "t"}, 
+		{"linkageLabel": "18", "dihedralName": "omega", "rotamer": "tg"}
+	], [
+		{"linkageLabel": "15", "dihedralName": "omega", "rotamer": "gg"}, 
+		{"linkageLabel": "18", "dihedralName": "phi", "rotamer": "t"}, 
 		{"linkageLabel": "18", "dihedralName": "omega", "rotamer": "gt"}
 	], [
 		{"linkageLabel": "15", "dihedralName": "omega", "rotamer": "gg"}, 
 		{"linkageLabel": "18", "dihedralName": "phi", "rotamer": "t"}, 
 		{"linkageLabel": "18", "dihedralName": "omega", "rotamer": "gg"}
-	], [
-		{"linkageLabel": "15", "dihedralName": "omega", "rotamer": "gt"}, 
-		{"linkageLabel": "18", "dihedralName": "phi", "rotamer": "-g"}, 
-		{"linkageLabel": "18", "dihedralName": "omega", "rotamer": "tg"}
-	], [
-		{"linkageLabel": "15", "dihedralName": "omega", "rotamer": "gt"}, 
-		{"linkageLabel": "18", "dihedralName": "phi", "rotamer": "-g"}, 
-		{"linkageLabel": "18", "dihedralName": "omega", "rotamer": "tg"}
-	]
-]
+	]]
