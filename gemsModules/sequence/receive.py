@@ -363,7 +363,14 @@ def receive(thisTransaction : Transaction):
                         log.debug("Received a request to build with selectedRotamers.")
                         structureSetConfig = buildStructureInfo(thisTransaction)
 
-                    ## End Structure generation logic.
+                        ##TODO: Need an equivalent to buildDefault3DStructure that:
+                        ##          -Creates all needed directories
+                        ##          -Interacts with gmml CarbohydrateBuilder
+                        ##          -Submits each sequence to slurm for building.
+                        ##      Then we need to register the build, which will involve updating the logic in
+                        ##          registerBuild to allow for setting rotamers.
+                        ##      Need to update responses with lists of sequence download dirs and data to show the user.
+                        ## End Structure generation logic.
                     
                 else:
                     log.error("Invalid Sequence. Cannot build.")
@@ -384,7 +391,10 @@ def receive(thisTransaction : Transaction):
     ## prepares the transaction for return to the requestor, success or fail.     
     thisTransaction.build_outgoing_string()
 
-
+##  @brief Object for tracking the parsing of rotamerData
+#   @param rotamerData is list of nested dict objects from the frontend that 
+#          represents user's rotamer selections.
+#   @TODO: Move this to a better file for this stuff.
 class RotamerCounter():
     linkages = []
     activeLevel = 0
@@ -418,55 +428,77 @@ class RotamerCounter():
         return result
 
 
-##TODO build a json object with all the options that trigger a new build. 
-#   History: This object needs to handle the same data as a structure mapping table. 
-#   That means a structureInfo is the json version of the structure mapping config.
+##  @brief Parses user's selected rotamers (rotamerData) into a list of 
+#           structures to request.
+#   @detail With a limit of 64 structures to request at a time, users select
+#           each rotamer they want for each linkage. This code creates the 
+#           list of unique permutations possible for those selections.
+#   @param Transaction 
+#   @TODO: Move this to a better file for this stuff.
 def buildStructureInfo(thisTransaction : Transaction):
     log.info("buildStructureInfo() was called.")
     
-    #The list of dict objects describing each linkage
+    #RotamerData is the list of dict objects describing each linkage
     rotamerData = getRotamerDataFromTransaction(thisTransaction)
-
+    sequences = []
     linkageCount = len(rotamerData)
     log.debug("linkageCount: " + str(linkageCount))
     log.debug("\nrotamerData:\n" + str(rotamerData))
 
-    sequences = []
-
     ##Rotamer counter objects allow the logic to track the rotamer selection.
     rotamerCounter = RotamerCounter(rotamerData)
-        
-    ## Should make one conformer.
     log.debug("rotamerCounter: " + str(rotamerCounter.__dict__))
+
+    ##How many structures have been requested?
+    requestedStructureCount = getRequestedStructureCount(rotamerCounter)
+    log.debug("requestedStructureCount: " + str(requestedStructureCount))
+    
+    ##Define when to stop.
+    while len(sequences) < requestedStructureCount and len(sequences) <= 64:
+        ##Build the list
+        sequence = getNextSequence(rotamerData, rotamerCounter, sequences)
+        sequences.append(sequence)     
+        log.debug("sequence list length: " + str(len(sequences)))
+        
+    ##Useful logging for maintenance
+    log.debug("sequences: ")
+    for element in sequences:
+        log.debug("~")
+        for item in element:
+            log.debug( str(item) )
+
+    log.debug("sequenceCount: " + str(len(sequences)))
+
+    ##Add the sequences to structureInfo
+    structureInfo = {
+        "sequences" : sequences
+    }
+
+    ##TODO: What else is needed for this? Solvent? Ions? Etc...
+
+    return structureInfo
+
+
+##  @brief Uses the rotamerCounter to multiply the number of rotamer selections for each
+#       linkage-dihedral pair
+#   @param rotamerCounter
+#   @TODO: Move this to a better file for this stuff.
+def getRequestedStructureCount(rotamerCounter):
+    log.info("getRequestedStructureCount() was called.")
     requestedStructureCount = 1
     for linkage in rotamerCounter.linkages:
         x = int(linkage['count'])
         requestedStructureCount = requestedStructureCount * x
 
-    log.debug("requestedStructureCount: " + str(requestedStructureCount))
-    
-    ##Define when to stop.
-    while len(sequences) < requestedStructureCount and len(sequences) <= 64:
-        sequence = getNextSequence(rotamerData, rotamerCounter, sequences)
-        sequences.append(sequence)     
-        log.debug("sequence list length: " + str(len(sequences)))
-        
-
-    log.debug("sequences: " + str(sequences))
-    log.debug("sequenceCount: " + str(len(sequences)))
-    structureInfo = {
-        "sequences" : sequences
-    }
-
-    return structureInfo
+    return requestedStructureCount
 
 
-## Only increment counters once per sequence, upon reaching the final element in rotamerCounter.linkages
+##  @brief Grab the next sequence indicated by the rotamerCounter object. 
+#   @detail Handles things at the sequence level, grabbing conformer config dicts 
+#       and updating the rotamerCounter object so the next one will be the correct one.
+#   @TODO: Move this to a better file for this stuff.
 def getNextSequence(rotamerData, rotamerCounter, sequences):
     log.debug("getNextSequence() was called.")
-    if len(sequences) > 0:
-        lastSequence = sequences[len(sequences) - 1]
-    
     sequence = []
 
     log.debug("\n\nrotamerCounter before building a sequence: \n" + str(rotamerCounter) + "\n")
@@ -480,7 +512,7 @@ def getNextSequence(rotamerData, rotamerCounter, sequences):
         if len(sequences) == 0: 
             log.debug("first sequence. Getting the first thing found for each label-dihedral pair.")
             ##First sequence. Grab the first element found in each element.
-            getNextConformer(rotamerData, counterObj, sequence)
+            addNextConformer(rotamerData, counterObj, sequence)
             if i == len(rotamerCounter.linkages) - 1:
                 log.debug("decrementing counters for the first time.")
                 log.debug("\n\nrotamerCounter before: \n" + str(rotamerCounter))
@@ -489,7 +521,7 @@ def getNextSequence(rotamerData, rotamerCounter, sequences):
         else:
             log.debug("Sequences exist, need to check against those.")
             ## The lastLeafConformer  is the conformer of the leaf of the previous sequence.
-            getNextConformer(rotamerData, counterObj, sequence)
+            addNextConformer(rotamerData, counterObj, sequence)
             if i == len(rotamerCounter.linkages) - 1:
                 log.debug("\n\nrotamerCounter before: \n" + str(rotamerCounter))
                 decrementCounters(rotamerCounter)
@@ -498,47 +530,38 @@ def getNextSequence(rotamerData, rotamerCounter, sequences):
     log.debug("\n\nreturning this sequence: \n " + str(sequence) + "\n")
     return sequence
 
-## All incrementing and resetting of indices belongs here.
+##  @brief  Makes decisions about what rotamers the next sequence should use.
+#   @detail Behaves like an odometer: iteration needs to allow for rotamer reuse after
+#           a reset. Between resets, decrements are used.
+#   @param  rotamerCounter
+#   @TODO: Move this to a better file for this stuff.
 def decrementCounters(rotamerCounter):
-    log.debug("decrementCounters() was called.")
+    log.info("decrementCounters() was called.")
     leafNode = rotamerCounter.linkages[len(rotamerCounter.linkages) - 1]
-    log.debug("leafNode['currentIndex']: " + str(leafNode['currentIndex']))
 
     if leafNode['currentIndex'] == 0:
-        log.debug("Need to reset.")
         updateCount = 1
-        log.debug("rotamerCounter.activeLevel: " + str(rotamerCounter.activeLevel))
         thisIndex = len(rotamerCounter.linkages) - 1
 
-        #All work is done above the active level.
+        #All decrementing work to be done above the active level.
         while thisIndex > rotamerCounter.activeLevel:
-            log.debug("resetting the linkage at thisIndex: " + str(thisIndex))
             rotamerCounter.linkages[thisIndex]['currentIndex'] = rotamerCounter.linkages[thisIndex]['count'] - 1
             thisIndex = thisIndex - 1
 
-        ## And finally, the active linkage.
+        ## The active linkage.
         activeLinkage = rotamerCounter.linkages[rotamerCounter.activeLevel]
-        log.debug("activeLinkage before reset: " + str(activeLinkage))
         ## reset active linkage and increment its parent once.
         activeLinkage['currentIndex'] = activeLinkage['count'] - 1
 
-        ## decrement the parent, if possible.
+        ## decrement the parent, when appropriate.
         parentIndex = rotamerCounter.activeLevel - 1
-        log.debug("parentIndex: " + str(parentIndex))
         parentLinkage = rotamerCounter.linkages[parentIndex]
         if parentIndex > 0:
-            log.debug("decrementing the parent.")
-            log.debug("parentLinkage, before decrementing: " + str(parentLinkage))
             parentLinkage['currentIndex'] = parentLinkage['currentIndex'] - 1
             rotamerCounter.activeLevel = parentIndex
-            log.debug("parentLinkage, after decrementing: " + str(parentLinkage))
         elif parentIndex == 0:
-            log.debug("The final linkage.")
             if parentLinkage['currentIndex'] > 0:
-                log.debug("parentLinkage, before decrementing: " + str(parentLinkage))
                 parentLinkage['currentIndex'] = parentLinkage['currentIndex'] - 1
-                log.debug("parentLinkage, after decrementing: " + str(parentLinkage))
-                log.debug("Root hit. No parent to update.")
                 rotamerCounter.rootHits = rotamerCounter.rootHits + 1
                 rotamerCounter.activeLevel = len(rotamerCounter.linkages) - 1
                 resetCount = 1
@@ -548,25 +571,21 @@ def decrementCounters(rotamerCounter):
             else:
                 log.debug("I think we are done with updating parent linkages?")
 
-
-
         updateCount = updateCount + 1
-        log.debug("rotamerCounter.activeLevel: " + str(rotamerCounter.activeLevel))
-        log.debug("new updateCount: " + str(updateCount))
-        log.debug("Finished resetting the indices.")
-
-
     else:
-        log.debug("Only decrementing the leafNode.")
         leafNode['currentIndex'] = leafNode['currentIndex'] - 1
-        log.debug("leafNode['currentIndex']: " + str(leafNode['currentIndex']))
 
 
-## Within a sequence, a conformer represents the state (rotamer) of a single label-dihedral pair.
-# Just get whatever rotamer is indicated in counterObj['currentIndex']
-# Do not increment indices.
-def getNextConformer(rotamerData, counterObj, sequence):
-    log.debug("getNextConformer() was called.")
+##  @brief  Updates the sequence with the next config object for a linkage based on the counterObj
+#   @detail Within a sequence, a conformer represents the state (rotamer) of a single label-dihedral pair.
+#           Just gets whatever rotamer is indicated in counterObj['currentIndex'], which puts all
+#           selection responsibility in the counter and decrementCounters(). Does not increment indices.
+#   @param  rotamerData
+#   @param  counterObj
+#   @param  sequence  Not the string, but a list of conformers currently being built.
+#   @TODO: Move this to a better file for this stuff.
+def addNextConformer(rotamerData, counterObj, sequence):
+    log.debug("addNextConformer() was called.")
     myLabel = counterObj['label']
     myDihedral = counterObj['dihedral']
     myCount = counterObj['count']
@@ -593,53 +612,11 @@ def getNextConformer(rotamerData, counterObj, sequence):
                         'rotamer' : rotamer
                     }
                     sequence.append(conformer)
-    
 
-# def sequenceConfIsUnique(mySequence, sequences):
-#     log.debug("sequenceConfIsUnique() was called.")
-#     unique = True
-
-#     if len(sequences) == 0:
-#         log.debug("First sequence is always unique")
-#         unique == True
-#     else:
-#         mySequenceLength = len(mySequence)
-#         for existingSequence in sequences:
-#             log.debug("existingSequence: " + str(existingSequence))
-#             log.debug("mySequence: " + str(mySequence))
-#             if str(mySequence) in str(existingSequence):
-#                 log.debug("This sequence is not unique. Returning false.")
-#                 return False
-
-#     return unique
-
-
-
-def getConformtationByIndex(rotamerData, linkageIndex, dihedralIndex, rotamerIndex):
-    log.info("getConformationByIndex was called.")
-    log.debug("linkageIndex: " + str(linkageIndex))
-    log.debug("dihedralIndex: " + str(dihedralIndex))
-    log.debug("rotamerIndex:  " + str(rotamerIndex))
-
-    linkageLabel = rotamerData[linkageIndex]['linkageLabel']
-    log.debug("linkageLabel: " + linkageLabel)
-
-    dihedralName = rotamerData[linkageIndex]['dihedrals'][dihedralIndex]
-    log.debug("dihedralName: " + dihedralName)
-
-    rotamer = rotamerData[linkageIndex]['dihedrals'][dihedralIndex]['selectedRotamers'][rotamerIndex]
-    conformer = { 
-        'linkageLabel' : linkageLabel,
-        'dihedralName' : dihedralName,
-        'rotamer' : rotamer
-    }
-    return conformer
-
-
-
-
-
-
+##  @brief  Finds rotamerData in the transaction
+#   @param  Transaction
+#   @return rotamerData
+#   @TODO: Move this to a better file for this stuff.
 def getRotamerDataFromTransaction(thisTransaction: Transaction):
     log.info("getRotamerDataFromTransaction() was called.")
     request = thisTransaction.request_dict
@@ -653,11 +630,11 @@ def getRotamerDataFromTransaction(thisTransaction: Transaction):
                 raise AttributeError("rotamerData")
         else:
             raise AttributeError("geometryOptions")
-   
-
 
 
 ##  @brief Call this if the default structure for a sequence already exists.
+#   @detail Builds a project and a response config object. Updates the transaction.
+#   @param Transaction
 def respondWithExistingDefaultStructure(thisTransaction: Transaction):
     log.info("respondWithExistingDefaultStructure() was called.")
     ##  Even preexisting builds need projects.
@@ -695,10 +672,13 @@ def respondWithExistingDefaultStructure(thisTransaction: Transaction):
                         }]
                     }
                     appendResponse(thisTransaction, config)
-    
 
 
-
+##  @brief  Creates the directories and files needed to store a file that can be
+#           reused via symlink.
+#   @detail Still being worked on, but works for default structures.
+#   ##TODO: Needs cleanup, documentation, and error handling.
+#   @param  Transaction
 def registerBuild(thisTransaction):
     log.info("registerBuild() was called.")
     structureMap = {}
@@ -775,12 +755,17 @@ def registerBuild(thisTransaction):
             log.error("There was a problem writing the structure mapping to file.")
             raise error
 
-
+##  @brief  Placeholder for now. Needs to be written.
+##  @TODO: Write this logic when building structures with selectedRotamers exists.
+##  @TODO: Move this to a better file.
 def buildRotamerDirName(thisTransaction):
     log.info("buildRotamerDirName() was called.")
-    ##TODO: Write this logic when building structures with selectedRotamers exists.
+
     log.error("buildRotamerDirName still needs to be written.")
 
+##  @brief  Gets the shape from the user request in transactions or returns default.
+#   @param Transaction
+#   @return String solvent_shape
 def getSolvationShape(thisTransaction):
     log.info("getSolvationShape() was called.")
     project = getFrontendProjectFromTransaction(thisTransaction)
@@ -811,7 +796,7 @@ def getForceFieldFromRequest(thisTransaction):
 
 ## @brief Look at the transaction to see if solvation was requested.
 #  @param Transaction thisTransaction
-#   @return Boolean solvationRequested
+#  @return Boolean solvationRequested
 def checkIfSolvationRequested(thisTransaction):
     log.info("checkIfSolvationRequested() was called.")
     project = getFrontendProjectFromTransaction(thisTransaction)
@@ -825,7 +810,7 @@ def checkIfSolvationRequested(thisTransaction):
         ##TODO: figure out how one might specify a request for solvation if there is not a frontend project.
         #           This applies to command line users that don't use the website or JSON API
 
-##  @brief In Development!!! Always returns true for now.
+##  @brief Looks at a transaction to determine if the user is requesting the default structure
 #   @param Transaction thisTransaction
 #   @return Boolean isDefault
 def checkIfDefaultStructureRequest(thisTransaction):
@@ -887,25 +872,6 @@ def checkIfDefaultStructureExists(thisTransaction):
         else:
             return structureExists
 
-
-# ##  Looks at a transaction object to see if an evalutaion response exists and returns a boolean.
-# def checkEvaluationResponseValidity(thisTransaction):
-#     log.info("checkEvaluationResponseValidity() was called.\n")
-#     valid = False
-#     log.debug("transactionResponses")
-#     responses = thisTransaction.response_dict['responses']
-#     for response in responses:
-#         log.debug("response: " + str(response))
-#         if 'SequenceEvaluation' in response.keys():
-#             if response['SequenceEvaluation']['type'] == "Evaluate":
-#                 outputs = response['SequenceEvaluation']['outputs']
-#                 for output in outputs:
-#                     log.debug("output: " + str(output))
-#                     if "SequenceValidation" in output.keys():
-#                         valid = output['SequenceValidation']['SequenceIsValid']
-#         else:
-#             raise AttributeError
-#     return valid
 
 ##  @brief Only validate a condensed sequence. Boolean result.
 #   @deprecated.
