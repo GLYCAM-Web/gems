@@ -384,55 +384,261 @@ def receive(thisTransaction : Transaction):
     ## prepares the transaction for return to the requestor, success or fail.     
     thisTransaction.build_outgoing_string()
 
+
+class RotamerCounter():
+    linkages = []
+    activeLevel = 0
+    rootHits = 0
+
+    def __init__(self, rotamerData):
+        for linkage in rotamerData:
+            label = linkage['linkageLabel']
+            for dihedral in linkage['dihedrals']:
+                name = dihedral['dihedralName']
+                count = len(dihedral['selectedRotamers'])
+                log.debug("count: " + str(count))
+                thisLinkageCountingObj = {
+                    'label' : label,
+                    'dihedral' : name,
+                    'count' : count,
+                    'currentIndex' : count - 1
+                }
+                self.linkages.append(thisLinkageCountingObj)
+
+        ## Instantiate to the index of the last element in the list.
+        self.activeLevel = len(self.linkages) - 1
+
+
+    def __str__(self):
+        result = "\nactiveLevel: " + str(self.activeLevel)
+        result = result + "\nlinkages: " 
+        for linkage in self.linkages:
+            result = result + "\n" + str(linkage)
+
+        return result
+
+
 ##TODO build a json object with all the options that trigger a new build. 
 #   History: This object needs to handle the same data as a structure mapping table. 
 #   That means a structureInfo is the json version of the structure mapping config.
 def buildStructureInfo(thisTransaction : Transaction):
     log.info("buildStructureInfo() was called.")
-    structureInfo = {}
+    
     #The list of dict objects describing each linkage
     rotamerData = getRotamerDataFromTransaction(thisTransaction)
 
     linkageCount = len(rotamerData)
     log.debug("linkageCount: " + str(linkageCount))
-    log.debug("\nrotamerData:\n")
-    prettyPrint(rotamerData)
-    linkageConformers = []
-    #For tracking linkages
-    linkageLabels = []
-    sequenceConformers = []
-    sequenceConformerString = ""
+    log.debug("\nrotamerData:\n" + str(rotamerData))
 
+    sequences = []
+
+    ##Rotamer counter objects allow the logic to track the rotamer selection.
+    rotamerCounter = RotamerCounter(rotamerData)
+        
+    ## Should make one conformer.
+    log.debug("rotamerCounter: " + str(rotamerCounter.__dict__))
+    requestedStructureCount = 1
+    for linkage in rotamerCounter.linkages:
+        x = int(linkage['count'])
+        requestedStructureCount = requestedStructureCount * x
+
+    log.debug("requestedStructureCount: " + str(requestedStructureCount))
+    
+    ##Define when to stop.
+    while len(sequences) < requestedStructureCount and len(sequences) <= 64:
+        sequence = getNextSequence(rotamerData, rotamerCounter, sequences)
+        sequences.append(sequence)     
+        log.debug("sequence list length: " + str(len(sequences)))
+        
+
+    log.debug("sequences: " + str(sequences))
+    log.debug("sequenceCount: " + str(len(sequences)))
+    structureInfo = {
+        "sequences" : sequences
+    }
+
+    return structureInfo
+
+
+## Only increment counters once per sequence, upon reaching the final element in rotamerCounter.linkages
+def getNextSequence(rotamerData, rotamerCounter, sequences):
+    log.debug("getNextSequence() was called.")
+    if len(sequences) > 0:
+        lastSequence = sequences[len(sequences) - 1]
+    
+    sequence = []
+
+    log.debug("\n\nrotamerCounter before building a sequence: \n" + str(rotamerCounter) + "\n")
+
+    ##Iterate through the rotamerCounter grabbing the keys for
+    #   grabbing the right rotamers from rotamer date
+    for i in range(len(rotamerCounter.linkages)) :
+        counterObj = rotamerCounter.linkages[i]
+        log.debug("Looking up this linkage at i: " + str(i) + ": " +  str(counterObj))
+
+        if len(sequences) == 0: 
+            log.debug("first sequence. Getting the first thing found for each label-dihedral pair.")
+            ##First sequence. Grab the first element found in each element.
+            getNextConformer(rotamerData, counterObj, sequence)
+            if i == len(rotamerCounter.linkages) - 1:
+                log.debug("decrementing counters for the first time.")
+                log.debug("\n\nrotamerCounter before: \n" + str(rotamerCounter))
+                decrementCounters(rotamerCounter)
+                log.debug("\n\nrotamerCounter after: \n" + str(rotamerCounter))
+        else:
+            log.debug("Sequences exist, need to check against those.")
+            ## The lastLeafConformer  is the conformer of the leaf of the previous sequence.
+            getNextConformer(rotamerData, counterObj, sequence)
+            if i == len(rotamerCounter.linkages) - 1:
+                log.debug("\n\nrotamerCounter before: \n" + str(rotamerCounter))
+                decrementCounters(rotamerCounter)
+                log.debug("\n\nrotamerCounter after: \n" + str(rotamerCounter))
+        
+    log.debug("\n\nreturning this sequence: \n " + str(sequence) + "\n")
+    return sequence
+
+## All incrementing and resetting of indices belongs here.
+def decrementCounters(rotamerCounter):
+    log.debug("decrementCounters() was called.")
+    leafNode = rotamerCounter.linkages[len(rotamerCounter.linkages) - 1]
+    log.debug("leafNode['currentIndex']: " + str(leafNode['currentIndex']))
+
+    if leafNode['currentIndex'] == 0:
+        log.debug("Need to reset.")
+        updateCount = 1
+        log.debug("rotamerCounter.activeLevel: " + str(rotamerCounter.activeLevel))
+        thisIndex = len(rotamerCounter.linkages) - 1
+
+        #All work is done above the active level.
+        while thisIndex > rotamerCounter.activeLevel:
+            log.debug("resetting the linkage at thisIndex: " + str(thisIndex))
+            rotamerCounter.linkages[thisIndex]['currentIndex'] = rotamerCounter.linkages[thisIndex]['count'] - 1
+            thisIndex = thisIndex - 1
+
+        ## And finally, the active linkage.
+        activeLinkage = rotamerCounter.linkages[rotamerCounter.activeLevel]
+        log.debug("activeLinkage before reset: " + str(activeLinkage))
+        ## reset active linkage and increment its parent once.
+        activeLinkage['currentIndex'] = activeLinkage['count'] - 1
+
+        ## decrement the parent, if possible.
+        parentIndex = rotamerCounter.activeLevel - 1
+        log.debug("parentIndex: " + str(parentIndex))
+        parentLinkage = rotamerCounter.linkages[parentIndex]
+        if parentIndex > 0:
+            log.debug("decrementing the parent.")
+            log.debug("parentLinkage, before decrementing: " + str(parentLinkage))
+            parentLinkage['currentIndex'] = parentLinkage['currentIndex'] - 1
+            rotamerCounter.activeLevel = parentIndex
+            log.debug("parentLinkage, after decrementing: " + str(parentLinkage))
+        elif parentIndex == 0:
+            log.debug("The final linkage.")
+            if parentLinkage['currentIndex'] > 0:
+                log.debug("parentLinkage, before decrementing: " + str(parentLinkage))
+                parentLinkage['currentIndex'] = parentLinkage['currentIndex'] - 1
+                log.debug("parentLinkage, after decrementing: " + str(parentLinkage))
+                log.debug("Root hit. No parent to update.")
+                rotamerCounter.rootHits = rotamerCounter.rootHits + 1
+                rotamerCounter.activeLevel = len(rotamerCounter.linkages) - 1
+                resetCount = 1
+                while resetCount < len(rotamerCounter.linkages):
+                    rotamerCounter.linkages[resetCount]['currentIndex'] = rotamerCounter.linkages[resetCount]['count'] - 1
+                    resetCount = resetCount + 1
+            else:
+                log.debug("I think we are done with updating parent linkages?")
+
+
+
+        updateCount = updateCount + 1
+        log.debug("rotamerCounter.activeLevel: " + str(rotamerCounter.activeLevel))
+        log.debug("new updateCount: " + str(updateCount))
+        log.debug("Finished resetting the indices.")
+
+
+    else:
+        log.debug("Only decrementing the leafNode.")
+        leafNode['currentIndex'] = leafNode['currentIndex'] - 1
+        log.debug("leafNode['currentIndex']: " + str(leafNode['currentIndex']))
+
+
+## Within a sequence, a conformer represents the state (rotamer) of a single label-dihedral pair.
+# Just get whatever rotamer is indicated in counterObj['currentIndex']
+# Do not increment indices.
+def getNextConformer(rotamerData, counterObj, sequence):
+    log.debug("getNextConformer() was called.")
+    myLabel = counterObj['label']
+    myDihedral = counterObj['dihedral']
+    myCount = counterObj['count']
+    myCurrentIndex = counterObj['currentIndex']
 
     for linkageData in rotamerData:
-        log.debug("start a new conformer ")
-        linkageLabel = linkageData['linkageLabel']
-        log.debug("linkageLabel: " + linkageLabel)
+        linkageLabel = linkageData['linkageLabel'].strip()
+        log.debug("Looking for linkageLabel: " + linkageLabel)
+        if linkageLabel == myLabel:
+            log.debug("Found the linkage. Looking for the dihedral.")
 
-        dihedrals = linkageData['dihedrals']
-        log.debug("dihedrals: " + str(dihedrals))
-        for dihedral in dihedrals:
-            dihedralName = dihedral['dihedralName']
-            for rotamer in dihedral['selectedRotamers']:
+            for dihedral in linkageData['dihedrals']:
+                dihedralName = dihedral['dihedralName']
+                log.debug("Looking for dihedralName: " + dihedralName)  
+                if dihedralName == myDihedral:
+                    log.debug("Found the dihedral for this linkage.")
+                    log.debug("myCurrentIndex: " + str(myCurrentIndex))
+                    rotamer = dihedral['selectedRotamers'][myCurrentIndex]
+                    log.debug("rotamer: " + rotamer)
+                
+                    conformer = {
+                        'linkageLabel' : linkageLabel,
+                        'dihedralName' : dihedralName,
+                        'rotamer' : rotamer
+                    }
+                    sequence.append(conformer)
+    
 
-                conformer = { 
-                    'linkageLabel' : linkageLabel,
-                    'dihedralName' : dihedralName,
-                    'rotamer' : rotamer
-                }
-                linkageConformerString =  conformer["linkageLabel"] + "_" + conformer['dihedralName'] + "_" + conformer['rotamer'] 
-                log.debug("linkageConformerString: " + linkageConformerString)
-                sequenceConformerString = sequenceConformerString + linkageConformerString + "," 
-                log.debug("sequenceConformerString: " + sequenceConformerString)             
+# def sequenceConfIsUnique(mySequence, sequences):
+#     log.debug("sequenceConfIsUnique() was called.")
+#     unique = True
 
-    log.debug("linkageConformers: \n")
-    prettyPrint(linkageConformers)
+#     if len(sequences) == 0:
+#         log.debug("First sequence is always unique")
+#         unique == True
+#     else:
+#         mySequenceLength = len(mySequence)
+#         for existingSequence in sequences:
+#             log.debug("existingSequence: " + str(existingSequence))
+#             log.debug("mySequence: " + str(mySequence))
+#             if str(mySequence) in str(existingSequence):
+#                 log.debug("This sequence is not unique. Returning false.")
+#                 return False
 
-    # config.update({
-    #     "linkageCount" : linkageCount,
-    #     "sequenceConformers" : sequenceConformers
-    # })
-    return structureInfo
+#     return unique
+
+
+
+def getConformtationByIndex(rotamerData, linkageIndex, dihedralIndex, rotamerIndex):
+    log.info("getConformationByIndex was called.")
+    log.debug("linkageIndex: " + str(linkageIndex))
+    log.debug("dihedralIndex: " + str(dihedralIndex))
+    log.debug("rotamerIndex:  " + str(rotamerIndex))
+
+    linkageLabel = rotamerData[linkageIndex]['linkageLabel']
+    log.debug("linkageLabel: " + linkageLabel)
+
+    dihedralName = rotamerData[linkageIndex]['dihedrals'][dihedralIndex]
+    log.debug("dihedralName: " + dihedralName)
+
+    rotamer = rotamerData[linkageIndex]['dihedrals'][dihedralIndex]['selectedRotamers'][rotamerIndex]
+    conformer = { 
+        'linkageLabel' : linkageLabel,
+        'dihedralName' : dihedralName,
+        'rotamer' : rotamer
+    }
+    return conformer
+
+
+
+
+
 
 def getRotamerDataFromTransaction(thisTransaction: Transaction):
     log.info("getRotamerDataFromTransaction() was called.")
