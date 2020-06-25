@@ -90,11 +90,11 @@ def buildQueryString(thisTransaction : Transaction):
                 )
     elif theseOptions['queryType'] == "Download_List":
        #Do something here
-      log.debug("Running Download request for PDB list") 
-        
+      log.debug("Running Download request for PDB list")
+
     elif theseOptions['queryType'] == "Download_All":
         log.debug("Running Download request for all data")
-        
+
     proc = subprocess.Popen(theQueryString, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     log.debug("HEY LOOK AT ME")
     log.debug(theQueryString)
@@ -114,3 +114,4 @@ def buildQueryString(thisTransaction : Transaction):
     log.debug(out)
     jsonObj = json.loads(out)
     thisTransaction.response_dict= jsonObj
+    thisTransaction.outgoing_string= json.dumps(jsonObj)
