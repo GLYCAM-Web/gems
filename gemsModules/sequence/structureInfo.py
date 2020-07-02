@@ -5,6 +5,7 @@ from datetime import datetime
 from pydantic import BaseModel, Field, ValidationError
 from pydantic.schema import schema
 from gemsModules.common.loggingConfig import *
+from gemsModules.common.transaction import *
 
 if loggers.get(__name__):
 	pass
@@ -253,6 +254,24 @@ def getRequestedStructureCount(rotamerCounter):
         requestedStructureCount = requestedStructureCount * x
 
     return requestedStructureCount
+
+##  @brief  Finds rotamerData in the transaction
+#   @param  Transaction
+#   @return rotamerData
+#   @TODO: Move this to a better file for this stuff.
+def getRotamerDataFromTransaction(thisTransaction: Transaction):
+    log.info("getRotamerDataFromTransaction() was called.")
+    request = thisTransaction.request_dict
+    if "options" in request.keys():
+        if "geometryOptions" in request['options'].keys():
+            if 'rotamerData' in request['options']['geometryOptions'].keys():
+                rotamerData = request['options']['geometryOptions']['rotamerData']
+                
+                return rotamerData
+            else:
+                raise AttributeError("rotamerData")
+        else:
+            raise AttributeError("geometryOptions")
 
 
 ##  @brief Parses user's selected rotamers (rotamerData) into a list of 

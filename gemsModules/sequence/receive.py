@@ -18,8 +18,9 @@ from gemsModules.project import settings as projectSettings
 from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
 from gemsModules.common.loggingConfig import *
-from . import settings
-from . import structureInfo
+from . import settings as sequenceSettings
+
+from .structureInfo import *
 
 if loggers.get(__name__):
     pass
@@ -304,6 +305,7 @@ def receive(thisTransaction : Transaction):
     theServices=getTypesFromList(input_services)
     ## for each requested service:
     for i in theServices:
+        log.debug("service, i: " + i)
         #####  the automated module loading doesn't work, and I can't figure out how to make it work,
               # that is:
               #  requestedModule='.'+settings.serviceModules[i]
@@ -312,9 +314,9 @@ def receive(thisTransaction : Transaction):
         #####  so, writing something ugly for now
         ## Only work on recognized services. Add an error and carry on checking other services if an unknown service is found.
         ##  TODO: Add a check for options like "On fail quit"
-        if i not in settings.serviceModules.keys():
+        if i not in sequenceSettings.serviceModules.keys():
             if i not in common.settings.serviceModules.keys():
-                log.error("The requested service is not recognized.")
+                log.error("The requested service is not recognized. Try: " + str(sequenceSettings.serviceModules.keys()))
                 common.settings.appendCommonParserNotice( thisTransaction,'ServiceNotKnownToEntity',i)
             else:
                 pass
@@ -391,25 +393,6 @@ def receive(thisTransaction : Transaction):
 
     ## prepares the transaction for return to the requestor, success or fail.     
     thisTransaction.build_outgoing_string()
-
-
-##  @brief  Finds rotamerData in the transaction
-#   @param  Transaction
-#   @return rotamerData
-#   @TODO: Move this to a better file for this stuff.
-def getRotamerDataFromTransaction(thisTransaction: Transaction):
-    log.info("getRotamerDataFromTransaction() was called.")
-    request = thisTransaction.request_dict
-    if "options" in request.keys():
-        if "geometryOptions" in request['options'].keys():
-            if 'rotamerData' in request['options']['geometryOptions'].keys():
-                rotamerData = request['options']['geometryOptions']['rotamerData']
-                
-                return rotamerData
-            else:
-                raise AttributeError("rotamerData")
-        else:
-            raise AttributeError("geometryOptions")
 
 
 ##  @brief Call this if the default structure for a sequence already exists.
