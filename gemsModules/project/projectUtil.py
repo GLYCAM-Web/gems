@@ -332,7 +332,7 @@ def getSequenceFromTransaction(thisTransaction: Transaction):
     inputs = thisTransaction.request_dict['entity']['inputs']
     sequence = ""
     for element in inputs:
-        log.debug("element: " + str(element))
+        #log.debug("element: " + str(element))
         if "Sequence" in element.keys():
             sequence = element['Sequence']['payload']
         else:

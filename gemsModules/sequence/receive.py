@@ -364,7 +364,9 @@ def receive(thisTransaction : Transaction):
                                     common.settings.appendCommonParserNotice(thisTransaction, "unknown", i)
                     else:
                         log.debug("Received a request to build with selectedRotamers.")
-                        structureSetConfig = buildStructureInfo(thisTransaction)
+                        structureInfo = buildStructureInfo(thisTransaction)
+                        log.debug("\n\nstructureInfo:")
+                        prettyPrint(structureInfo.__dict__)
 
                         ##TODO: Need an equivalent to buildDefault3DStructure that:
                         ##          -Creates all needed directories

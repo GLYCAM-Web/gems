@@ -6,81 +6,82 @@ from pydantic import BaseModel, Field, ValidationError
 from pydantic.schema import schema
 from gemsModules.common.loggingConfig import *
 from gemsModules.common.transaction import *
+from gemsModules.project.projectUtil import *
 
 if loggers.get(__name__):
-	pass
+    pass
 else:
-	log = createLogger(__name__)
+    log = createLogger(__name__)
 
 
-##	Enums
+##    Enums
 
-##	@class BuildTypeEnum(str, Enum)
-#	@brief The possible built types a structure can assume.
+##    @class BuildTypeEnum(str, Enum)
+#    @brief The possible built types a structure can assume.
 class BuildTypeEnum(str, Enum):
-	gasPhase = "gas-phase"
-	solvent = "solvent"
+    gasPhase = "gas-phase"
+    solvent = "solvent"
 
-##	@class JobStatusEnum(str, Enum)
-#	@brief	The possible statuses of a given job.
+##    @class JobStatusEnum(str, Enum)
+#    @brief    The possible statuses of a given job.
 class JobStatusEnum(str, Enum):
-	new = "new"
-	building = "building"
-	ready = "ready"
-	submitted = "submitted"
-	complete = "complete"
-	failed = "failed"
-	delayed = "delayed"
+    new = "new"
+    building = "building"
+    ready = "ready"
+    submitted = "submitted"
+    complete = "complete"
+    failed = "failed"
+    delayed = "delayed"
 
 
-##	@class RotamerConformation
-#	@brief	An object that represents a single requested pose for a single linkage
+##    @class RotamerConformation
+#    @brief    An object that represents a single requested pose for a single linkage
 class RotamerConformation(BaseModel):
-	##Linkage Labels may be arbitrary, but they must be unique.
-	linkageLabel : str = ""
-	dihedralName : str = ""
-	rotamer : str = ""
+    ##Linkage Labels may be arbitrary, but they must be unique.
+    linkageLabel : str = ""
+    dihedralName : str = ""
+    rotamer : str = ""
 
-## 	@class BuildState
-#	@brief An object that represents one requested build state.
+##     @class BuildState
+#    @brief An object that represents one requested build state.
 class BuildState(BaseModel):
-	## Labels may be either "structure" if there is only one for this project.
-	#	or, they may be a terse label,
-	#	or they may be uuids if the terse label is > 32 char long.
-	label : str = ""
-	buildType : BuildTypeEnum = Field(
-		...,
-		title="Type",
-		alias="type",
-		description="The possible built types a structure can assume."
-		) ##Use an enum here. gas-phase, solvent
+    ## Labels may be either "structure" if there is only one for this project.
+    #    or, they may be a terse label,
+    #    or they may be uuids if the terse label is > 32 char long.
+    label : str = ""
+    buildType : BuildTypeEnum = Field(
+        None,
+        title = "Type",
+        alias = "type",
+        description = "The possible built types a structure can assume."
+        ) ##Use an enum here. gas-phase, solvent
 
-	status : JobStatusEnum = Field(
-		...,
-		title="status",
-		alias="status",
-		description="The possible statuses of a given job."
-		) ##Use an enum here. new, building, ready, submitted, complete, failed, delayed
+    status : JobStatusEnum = Field(
+        None,
+        title = "status",
+        alias = "status",
+        description = "The possible statuses of a given job."
+        ) ##Use an enum here. new, building, ready, submitted, complete, failed, delayed
 
-	date : datetime = None
-	ions : str = "No" ## Is there a benefit for this to be a String? Boolean?
-	energy : str = "" ## kcal/mol
-	forceField : str = "" ##
-	sequenceConformation : List[RotamerConformation] = None
+    date : datetime = None
+    ions : str = "No" ## Is there a benefit for this to be a String? Boolean?
+    energy : str = "" ## kcal/mol
+    forceField : str = "" ##
+    sequenceConformation : List[RotamerConformation] = None
 
-##	@class StructureInfo
-#	@brief An object to represent the data previously held in the Structure_Mapping_Table.
-#	@detail This object holds the data that describes a series of ways that this single structure
-#			has been built. Each variation of a rotamer or from gas-phase to solvated, etc...
-#			represents a different build state, and each gets a record in this object.
-#			This object can be used to track a request, and a copy of it could be used to track 
-#			the progress of that requested series of jobs.
+##    @class StructureInfo
+#    @brief An object to represent the data previously held in the Structure_Mapping_Table.
+#    @detail This object holds the data that describes a series of ways that this single structure
+#            has been built. Each variation of a rotamer or from gas-phase to solvated, etc...
+#            represents a different build state, and each gets a record in this object.
+#            This object can be used to track a request, and a copy of it could be used to track 
+#            the progress of that requested series of jobs.
 class StructureInfo(BaseModel):
-	## Useful to know what this all applies to.
-	sequence : str = ""
-	## A build state is a descriptive object that can be used to request a pdb file 
-	#	of a sequence in a specific pose, with various other settings as well.
-	buildStates : List[BuildState] = None
+    ## Useful to know what this all applies to.
+    sequence : str = ""
+    ## A build state is a descriptive object that can be used to request a pdb file 
+    #    of a sequence in a specific pose, with various other settings as well.
+    buildStates : List[BuildState] = None
 
 
 ##  @brief Object for tracking the parsing of rotamerData
@@ -283,50 +284,64 @@ def getRotamerDataFromTransaction(thisTransaction: Transaction):
 #   @TODO: Move this to a better file for this stuff.
 def buildStructureInfo(thisTransaction : Transaction):
     log.info("buildStructureInfo() was called.")
-    
-    #RotamerData is the list of dict objects describing each linkage
-    rotamerData = getRotamerDataFromTransaction(thisTransaction)
-    sequences = []
-    linkageCount = len(rotamerData)
-    log.debug("linkageCount: " + str(linkageCount))
-    log.debug("\nrotamerData:\n" + str(rotamerData))
 
-    ##Rotamer counter objects allow the logic to track the rotamer selection.
-    rotamerCounter = RotamerCounter(rotamerData)
-    log.debug("rotamerCounter: " + str(rotamerCounter.__dict__))
+    structureInfo = StructureInfo()
+    structureInfo.buildStates = []
+    try:
+        sequence = getSequenceFromTransaction(thisTransaction)
+        log.debug("sequence: " + str(sequence))
+        structureInfo.sequence = sequence
+        ##TODO: Also grab the following from the request, or set defaults:
+        ##    buildType, ions, forceField, date.
+    except Exception as error:
+        log.error("There was a problem getting the sequence from the transaction: " + str(error))
+        raise error
+    else:
+        try:
+            #RotamerData is the list of dict objects describing each linkage
+            rotamerData = getRotamerDataFromTransaction(thisTransaction)
+        except Exception as error:
+            log.error("There was a problem getting rotamerData from the transaction: " + str(error))
+            raise error
+        else:
+            sequences = []
+            linkageCount = len(rotamerData)
+            log.debug("linkageCount: " + str(linkageCount))
+            log.debug("\nrotamerData:\n" + str(rotamerData))
 
-    ##How many structures have been requested?
-    requestedStructureCount = getRequestedStructureCount(rotamerCounter)
-    log.debug("requestedStructureCount: " + str(requestedStructureCount))
-    
-    ##Define when to stop.
-    while len(sequences) < requestedStructureCount and len(sequences) <= 64:
-        ##Build the list
-        sequence = getNextSequence(rotamerData, rotamerCounter, sequences)
-        sequences.append(sequence)     
-        log.debug("sequence list length: " + str(len(sequences)))
-        
-    ##Useful logging for maintenance
-    log.debug("sequences: ")
-    for element in sequences:
-        log.debug("~")
-        for item in element:
-            log.debug( str(item) )
+            ##Rotamer counter objects allow the logic to track the rotamer selection.
+            rotamerCounter = RotamerCounter(rotamerData)
+            log.debug("rotamerCounter: " + str(rotamerCounter.__dict__))
 
-    log.debug("sequenceCount: " + str(len(sequences)))
+            ##How many structures have been requested?
+            requestedStructureCount = getRequestedStructureCount(rotamerCounter)
+            log.debug("requestedStructureCount: " + str(requestedStructureCount))
+            
+            ##Define when to stop.
+            while len(sequences) < requestedStructureCount and len(sequences) <= 64:
+                buildState = BuildState()
+                ##Build the sequenceConformation
+                sequenceConf = getNextSequence(rotamerData, rotamerCounter, sequences)
+                buildState.sequenceConformation = sequenceConf
+                ##sequences is needed for progress tracking.
+                sequences.append(sequenceConf)     
+                log.debug("sequence list length: " + str(len(sequences)))
+                structureInfo.buildStates.append(buildState)
+                
+            ##Useful logging for maintenance
+            log.debug("sequences: ")
+            for element in sequences:
+                log.debug("~")
+                for item in element:
+                    log.debug( str(item) )
 
-    ##Add the sequences to structureInfo
-    structureInfo = {
-        "sequences" : sequences
-    }
+            log.debug("sequenceCount: " + str(len(sequences)))
 
-    ##TODO: What else is needed for this? Solvent? Ions? Etc...
-
-    return structureInfo
+            return structureInfo
 
 
 def main():
-	log.info("main() was called.")
+    log.info("main() was called.")
 
 if __name__ == "__main__":
-	main()
+    main()
