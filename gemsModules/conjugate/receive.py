@@ -175,8 +175,20 @@ def writeGpInputFile(gemsProject, attachmentSites):
             file.write("Protein:\n")
             file.write(preprocessedPdbFileName + "\n\n")
             file.write("Protein Residue, Glycan Name:\n")
+            ##GP requires input to look like this: "A_83, Man9"
+            ##  There are two formats we allow in requests:
+            ##  glycan : "Man9"
+            ##  site : "A_83"
+            ##  OR
+            ##  glycan : "Man9"
+            ##  chain : "A"
+            ##  residue_number : "83"
             for attachment in attachmentSites:
-                file.write(attachment['site'] + "," + attachment['glycan'] + "\n")
+                if "site" in attachment.keys():
+                    file.write(attachment['site'] + "," + attachment['glycan'] + "\n")
+                else:
+                    file.write(attachment['chain'] + "_" + attachment['residue_number'] + "," + attachment['glycan'] + "\n")
+
             file.write("END")
             log.debug("Finished writing input.txt")
         return inputFileName

@@ -19,6 +19,7 @@ from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
 from gemsModules.common.loggingConfig import *
 from . import settings
+from . import structureInfo
 
 if loggers.get(__name__):
     pass
@@ -26,7 +27,7 @@ else:
     log = createLogger(__name__)
 
 
-##  @brief Evaluate a condensed sequence 
+##   @brief Evaluate a condensed sequence 
 #    @detail Evaluating a sequence requires a sequence string and a path to a prepfile.
 #    1) Checks sequence for validity,
 #    2) Starts a gemsProject.
@@ -366,7 +367,7 @@ def receive(thisTransaction : Transaction):
                         ##TODO: Need an equivalent to buildDefault3DStructure that:
                         ##          -Creates all needed directories
                         ##          -Interacts with gmml CarbohydrateBuilder
-                        ##          -Submits each sequence to slurm for building.
+                        ##          -Submits each sequence to slurm for minimizing.
                         ##      Then we need to register the build, which will involve updating the logic in
                         ##          registerBuild to allow for setting rotamers.
                         ##      Need to update responses with lists of sequence download dirs and data to show the user.
@@ -391,227 +392,6 @@ def receive(thisTransaction : Transaction):
     ## prepares the transaction for return to the requestor, success or fail.     
     thisTransaction.build_outgoing_string()
 
-##  @brief Object for tracking the parsing of rotamerData
-#   @param rotamerData is list of nested dict objects from the frontend that 
-#          represents user's rotamer selections.
-#   @TODO: Move this to a better file for this stuff.
-class RotamerCounter():
-    linkages = []
-    activeLevel = 0
-    rootHits = 0
-
-    def __init__(self, rotamerData):
-        for linkage in rotamerData:
-            label = linkage['linkageLabel']
-            for dihedral in linkage['dihedrals']:
-                name = dihedral['dihedralName']
-                count = len(dihedral['selectedRotamers'])
-                log.debug("count: " + str(count))
-                thisLinkageCountingObj = {
-                    'label' : label,
-                    'dihedral' : name,
-                    'count' : count,
-                    'currentIndex' : count - 1
-                }
-                self.linkages.append(thisLinkageCountingObj)
-
-        ## Instantiate to the index of the last element in the list.
-        self.activeLevel = len(self.linkages) - 1
-
-
-    def __str__(self):
-        result = "\nactiveLevel: " + str(self.activeLevel)
-        result = result + "\nlinkages: " 
-        for linkage in self.linkages:
-            result = result + "\n" + str(linkage)
-
-        return result
-
-
-##  @brief Parses user's selected rotamers (rotamerData) into a list of 
-#           structures to request.
-#   @detail With a limit of 64 structures to request at a time, users select
-#           each rotamer they want for each linkage. This code creates the 
-#           list of unique permutations possible for those selections.
-#   @param Transaction 
-#   @TODO: Move this to a better file for this stuff.
-def buildStructureInfo(thisTransaction : Transaction):
-    log.info("buildStructureInfo() was called.")
-    
-    #RotamerData is the list of dict objects describing each linkage
-    rotamerData = getRotamerDataFromTransaction(thisTransaction)
-    sequences = []
-    linkageCount = len(rotamerData)
-    log.debug("linkageCount: " + str(linkageCount))
-    log.debug("\nrotamerData:\n" + str(rotamerData))
-
-    ##Rotamer counter objects allow the logic to track the rotamer selection.
-    rotamerCounter = RotamerCounter(rotamerData)
-    log.debug("rotamerCounter: " + str(rotamerCounter.__dict__))
-
-    ##How many structures have been requested?
-    requestedStructureCount = getRequestedStructureCount(rotamerCounter)
-    log.debug("requestedStructureCount: " + str(requestedStructureCount))
-    
-    ##Define when to stop.
-    while len(sequences) < requestedStructureCount and len(sequences) <= 64:
-        ##Build the list
-        sequence = getNextSequence(rotamerData, rotamerCounter, sequences)
-        sequences.append(sequence)     
-        log.debug("sequence list length: " + str(len(sequences)))
-        
-    ##Useful logging for maintenance
-    log.debug("sequences: ")
-    for element in sequences:
-        log.debug("~")
-        for item in element:
-            log.debug( str(item) )
-
-    log.debug("sequenceCount: " + str(len(sequences)))
-
-    ##Add the sequences to structureInfo
-    structureInfo = {
-        "sequences" : sequences
-    }
-
-    ##TODO: What else is needed for this? Solvent? Ions? Etc...
-
-    return structureInfo
-
-
-##  @brief Uses the rotamerCounter to multiply the number of rotamer selections for each
-#       linkage-dihedral pair
-#   @param rotamerCounter
-#   @TODO: Move this to a better file for this stuff.
-def getRequestedStructureCount(rotamerCounter):
-    log.info("getRequestedStructureCount() was called.")
-    requestedStructureCount = 1
-    for linkage in rotamerCounter.linkages:
-        x = int(linkage['count'])
-        requestedStructureCount = requestedStructureCount * x
-
-    return requestedStructureCount
-
-
-##  @brief Grab the next sequence indicated by the rotamerCounter object. 
-#   @detail Handles things at the sequence level, grabbing conformer config dicts 
-#       and updating the rotamerCounter object so the next one will be the correct one.
-#   @TODO: Move this to a better file for this stuff.
-def getNextSequence(rotamerData, rotamerCounter, sequences):
-    log.debug("getNextSequence() was called.")
-    sequence = []
-
-    log.debug("\n\nrotamerCounter before building a sequence: \n" + str(rotamerCounter) + "\n")
-
-    ##Iterate through the rotamerCounter grabbing the keys for
-    #   grabbing the right rotamers from rotamer date
-    for i in range(len(rotamerCounter.linkages)) :
-        counterObj = rotamerCounter.linkages[i]
-        log.debug("Looking up this linkage at i: " + str(i) + ": " +  str(counterObj))
-
-        if len(sequences) == 0: 
-            log.debug("first sequence. Getting the first thing found for each label-dihedral pair.")
-            ##First sequence. Grab the first element found in each element.
-            addNextConformer(rotamerData, counterObj, sequence)
-            if i == len(rotamerCounter.linkages) - 1:
-                log.debug("decrementing counters for the first time.")
-                log.debug("\n\nrotamerCounter before: \n" + str(rotamerCounter))
-                decrementCounters(rotamerCounter)
-                log.debug("\n\nrotamerCounter after: \n" + str(rotamerCounter))
-        else:
-            log.debug("Sequences exist, need to check against those.")
-            ## The lastLeafConformer  is the conformer of the leaf of the previous sequence.
-            addNextConformer(rotamerData, counterObj, sequence)
-            if i == len(rotamerCounter.linkages) - 1:
-                log.debug("\n\nrotamerCounter before: \n" + str(rotamerCounter))
-                decrementCounters(rotamerCounter)
-                log.debug("\n\nrotamerCounter after: \n" + str(rotamerCounter))
-        
-    log.debug("\n\nreturning this sequence: \n " + str(sequence) + "\n")
-    return sequence
-
-##  @brief  Makes decisions about what rotamers the next sequence should use.
-#   @detail Behaves like an odometer: iteration needs to allow for rotamer reuse after
-#           a reset. Between resets, decrements are used.
-#   @param  rotamerCounter
-#   @TODO: Move this to a better file for this stuff.
-def decrementCounters(rotamerCounter):
-    log.info("decrementCounters() was called.")
-    leafNode = rotamerCounter.linkages[len(rotamerCounter.linkages) - 1]
-
-    if leafNode['currentIndex'] == 0:
-        updateCount = 1
-        thisIndex = len(rotamerCounter.linkages) - 1
-
-        #All decrementing work to be done above the active level.
-        while thisIndex > rotamerCounter.activeLevel:
-            rotamerCounter.linkages[thisIndex]['currentIndex'] = rotamerCounter.linkages[thisIndex]['count'] - 1
-            thisIndex = thisIndex - 1
-
-        ## The active linkage.
-        activeLinkage = rotamerCounter.linkages[rotamerCounter.activeLevel]
-        ## reset active linkage and increment its parent once.
-        activeLinkage['currentIndex'] = activeLinkage['count'] - 1
-
-        ## decrement the parent, when appropriate.
-        parentIndex = rotamerCounter.activeLevel - 1
-        parentLinkage = rotamerCounter.linkages[parentIndex]
-        if parentIndex > 0:
-            parentLinkage['currentIndex'] = parentLinkage['currentIndex'] - 1
-            rotamerCounter.activeLevel = parentIndex
-        elif parentIndex == 0:
-            if parentLinkage['currentIndex'] > 0:
-                parentLinkage['currentIndex'] = parentLinkage['currentIndex'] - 1
-                rotamerCounter.rootHits = rotamerCounter.rootHits + 1
-                rotamerCounter.activeLevel = len(rotamerCounter.linkages) - 1
-                resetCount = 1
-                while resetCount < len(rotamerCounter.linkages):
-                    rotamerCounter.linkages[resetCount]['currentIndex'] = rotamerCounter.linkages[resetCount]['count'] - 1
-                    resetCount = resetCount + 1
-            else:
-                log.debug("I think we are done with updating parent linkages?")
-
-        updateCount = updateCount + 1
-    else:
-        leafNode['currentIndex'] = leafNode['currentIndex'] - 1
-
-
-##  @brief  Updates the sequence with the next config object for a linkage based on the counterObj
-#   @detail Within a sequence, a conformer represents the state (rotamer) of a single label-dihedral pair.
-#           Just gets whatever rotamer is indicated in counterObj['currentIndex'], which puts all
-#           selection responsibility in the counter and decrementCounters(). Does not increment indices.
-#   @param  rotamerData
-#   @param  counterObj
-#   @param  sequence  Not the string, but a list of conformers currently being built.
-#   @TODO: Move this to a better file for this stuff.
-def addNextConformer(rotamerData, counterObj, sequence):
-    log.debug("addNextConformer() was called.")
-    myLabel = counterObj['label']
-    myDihedral = counterObj['dihedral']
-    myCount = counterObj['count']
-    myCurrentIndex = counterObj['currentIndex']
-
-    for linkageData in rotamerData:
-        linkageLabel = linkageData['linkageLabel'].strip()
-        log.debug("Looking for linkageLabel: " + linkageLabel)
-        if linkageLabel == myLabel:
-            log.debug("Found the linkage. Looking for the dihedral.")
-
-            for dihedral in linkageData['dihedrals']:
-                dihedralName = dihedral['dihedralName']
-                log.debug("Looking for dihedralName: " + dihedralName)  
-                if dihedralName == myDihedral:
-                    log.debug("Found the dihedral for this linkage.")
-                    log.debug("myCurrentIndex: " + str(myCurrentIndex))
-                    rotamer = dihedral['selectedRotamers'][myCurrentIndex]
-                    log.debug("rotamer: " + rotamer)
-                
-                    conformer = {
-                        'linkageLabel' : linkageLabel,
-                        'dihedralName' : dihedralName,
-                        'rotamer' : rotamer
-                    }
-                    sequence.append(conformer)
 
 ##  @brief  Finds rotamerData in the transaction
 #   @param  Transaction
@@ -678,6 +458,7 @@ def respondWithExistingDefaultStructure(thisTransaction: Transaction):
 #           reused via symlink.
 #   @detail Still being worked on, but works for default structures.
 #   ##TODO: Needs cleanup, documentation, and error handling.
+#   ##TODO: transition to using structureInfo object for registering and logging purposes.
 #   @param  Transaction
 def registerBuild(thisTransaction):
     log.info("registerBuild() was called.")
@@ -695,65 +476,76 @@ def registerBuild(thisTransaction):
     userDataDir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/"
     seqIDPath = userDataDir + seqID
     
+    log.debug("Checking to see if the seqIDPath already exists for this sequence: " + seqIDPath)
     if not os.path.exists(seqIDPath):
-        os.makedirs(seqIDPath)
-
-    projectDir = getProjectDir(thisTransaction)
-    try:
-        isDefault = checkIfDefaultStructureRequest(thisTransaction)
-        log.debug("isDefault: " + str(isDefault))
-        if isDefault:
-            link = seqIDPath + "/default"
-            projectDir = projectDir + "/default"
-        else:
-            link = buildRotamerDirName(thisTransaction)
-        
-        if os.path.exists(projectDir):
-            target = projectDir
-            ##What is being linked to is the projecDir or the 
-            log.debug("target: " + target)
-            ##This will be the symbolic link
-            log.debug("link: " + link)
-            os.symlink(target, link)
-        else:
-            log.error("Failed to find the target dir for the symbolic link.")
-            raise FileNotFoundError(projectDir)
-        
-    except Exception as error:
-        log.error("There was a problem creating the symbolic link.")
-        raise error
-    else:
-        ##TODO: Determine if the default structure was requested or not.
-        ## For now, assume the default structure was requested.
-        
-        solvationRequested = checkIfSolvationRequested(thisTransaction)
-        if solvationRequested == "Yes":
-            solvationShape = getSolvationShape(thisTransaction)
-        else:
-            solvationShape = ""
-        forceField = getForceFieldFromRequest(thisTransaction)
-
-        ##TODO: Update the json file for future reference.
-        structureMappingFilename = seqIDPath + "/structureMapping.json"
-        structureMap.update({
-            "isDefault": isDefault,
-            "solvationRequested": solvationRequested,
-            "solvationShape": solvationShape,
-            "forceField": forceField,
-        })
-        log.debug("Attempting to write the structure mapping data to file.")
-        log.debug("structureMap: " + str(structureMap))
+        log.debug("seqIDPath does not exist. Creating it now.")
         try:
-            if not os.path.exists(structureMappingFilename):
-                with open(structureMappingFilename, 'w', encoding='utf-8') as jsonFile:
-                    jsonString = json.dump(structureMap, jsonFile, ensure_ascii=False, indent=4)
-                    #jsonFile.write(jsonString)
-            else:
-                log.debug("The structureMapping.json file exists. Adding a new record.")
-                ##TODO: Write this logic.
+            os.makedirs(seqIDPath)
         except Exception as error:
-            log.error("There was a problem writing the structure mapping to file.")
+            log.error("There was a problem creating the seqIDPath: " + str(error))
             raise error
+        else:
+            projectDir = getProjectDir(thisTransaction)
+            try:
+                isDefault = checkIfDefaultStructureRequest(thisTransaction)
+                log.debug("isDefault: " + str(isDefault))
+                if isDefault:
+                    link = seqIDPath + "/default"
+                    projectDir = projectDir + "/default"
+                else:
+                    link = buildRotamerDirName(thisTransaction)
+                
+                if os.path.exists(projectDir):
+                    target = projectDir
+                    ##What is being linked to is the projecDir or the 
+                    log.debug("target: " + target)
+                    ##This will be the symbolic link
+                    log.debug("link: " + link)
+                    os.symlink(target, link)
+                else:
+                    log.error("Failed to find the target dir for the symbolic link.")
+                    raise FileNotFoundError(projectDir)
+                
+            except Exception as error:
+                log.error("There was a problem creating the symbolic link.")
+                raise error
+            else:
+                ##TODO: Determine if the default structure was requested or not.
+                ## For now, assume the default structure was requested.
+                
+                solvationRequested = checkIfSolvationRequested(thisTransaction)
+                if solvationRequested == "Yes":
+                    solvationShape = getSolvationShape(thisTransaction)
+                else:
+                    solvationShape = ""
+                forceField = getForceFieldFromRequest(thisTransaction)
+
+                ##Update the json file for future reference.
+                structureInfoFilename = seqIDPath + "/structureInfo.json"
+                structureMap.update({
+                    "isDefault": isDefault,
+                    "solvationRequested": solvationRequested,
+                    "solvationShape": solvationShape,
+                    "forceField": forceField,
+                })
+
+                log.debug("structureMap: " + str(structureMap))
+                log.debug("Updating or creating the log at:" + str(structureInfoFilename))
+                
+                if not os.path.exists(structureInfoFilename):
+                    log.debug("Creating a new structureInfo.json")
+                    try:
+                        with open(structureInfoFilename, 'w', encoding='utf-8') as jsonFile:
+                            jsonString = json.dump(structureMap, jsonFile, ensure_ascii=False, indent=4)
+                            log.debug("jsonString: " + jsonString)
+                            jsonFile.write(jsonString)
+                    except Exception as error:
+                        log.error("There was a problem writing the structure mapping to file: " + str(error))
+                        raise error
+                else:
+                    log.debug("The structureInfo.json file exists. Adding a new record.")
+                    ##TODO: Write this logic.
+                
 
 ##  @brief  Placeholder for now. Needs to be written.
 ##  @TODO: Write this logic when building structures with selectedRotamers exists.

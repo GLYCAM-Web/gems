@@ -27,9 +27,14 @@ if [ "$1" == "help" ]; then
 fi
 
 if [ "$1" == "" ]; then
-	echo "" > ./logs/git-ignore-me_gemsDebug.log
-	echo "" > ./logs/git-ignore-me_gemsInfo.log
-	echo "" > ./logs/git-ignore-me_gemsError.log
+	if [ -f "./logs/git-ignore-me_gemsDebug.log" ]; then
+		echo "" > ./logs/git-ignore-me_gemsDebug.log
+		echo "" > ./logs/git-ignore-me_gemsInfo.log
+		echo "" > ./logs/git-ignore-me_gemsError.log
+	else
+		echo Log files not found. Please run this script from programs/gems
+		
+	fi
 fi
 
 if [ "$1" == "debug" ]; then

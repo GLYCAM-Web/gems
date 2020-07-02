@@ -1,0 +1,68 @@
+{
+	"entity" :
+	{
+		"type": "Conjugate",
+		"services" :
+		[
+			{ "Build" :
+				{ "type" : "BuildGlycoprotein" }
+			}
+		],
+		"inputs" :
+		[
+			{ "pdb_ID" : "2V95" },
+			{ "attachments" : [
+					{
+						"glycan" : "Man9",
+						"chain" : "A",
+						"residue_number" : "66"
+					},
+					{
+						"glycan" : "Man9",
+						"chain" : "A",
+						"residue_number" : "194"
+					},
+					{
+						"glycan" : "Man9",
+						"chain" : "A",
+						"residue_number" : "230"
+					}
+				]
+			}
+		]
+	},
+	"options" :
+	{
+		"json_api_version" : "0.0.1"
+	}, 
+	"project" : 
+	{
+		"_state": "<django.db.models.base.ModelState object at 0x7fde746d9690>", 
+		"id": "1bf68039-340c-42bb-985c-fc9a42fbd554", 
+		"user_id": "None", 
+		"email": "", 
+		"title": "Untitled project", 
+		"comment": " ", 
+		"timestamp": "2020-06-29 15:20:14.002809+00:00", 
+		"project_type": "gp", 
+		"projID": " ", 
+		"requesting_agent": "json_api", 
+		"gems_version": "d875afcfdf213e3f625c0eb733b808b287c8da3d", 
+		"gems_branch": "gems-dev", 
+		"gmml_version": "7c4f0e2c9cea2d148c6eae67bbde84ce5a1ea7ce", 
+		"gmml_branch": "gmml-dev", 
+		"site_mode": "CONTAINERS", 
+		"site_host_name": "172.25.0.2", 
+		"force_field": "", 
+		"parameter_version": "", 
+		"amber_version": "", 
+		"json_api_version": "0.0.1", 
+		"userproject_ptr_id": "1bf68039-340c-42bb-985c-fc9a42fbd554", 
+		"uploaded_file_name": " ", 
+		"u_uuid": "c3411ff0-3c0f-4b68-9b93-c60224679046", 
+		"upload_path": "/website/uploads/tools/gp/git-ignore-me_userdata/c3411ff0-3c0f-4b68-9b93-c60224679046/", 
+		"pdb_id": "2V95", 
+		"gp_version": "0d9a55b51308446bdd76e8ac88aac064fddb3f08", 
+		"gp_git_branch": "stable"
+	}
+}

@@ -1,0 +1,31 @@
+Tue Jun 30 09:39:39 2020 >>> /programs/gems/gemsModules/query/run_query.py:104 >>> [INFO]: 
+{ "head": { "link": [], "vars": ["pdb", "oligo", "oligo_sequence"] },
+  "results": { "distinct": false, "ordered": true, "bindings": [ ] } }
+Tue Jun 30 09:39:53 2020 >>> /programs/gems/gemsModules/query/run_query.py:104 >>> [INFO]: 
+{ "head": { "link": [], "vars": ["pdb", "oligo", "oligo_sequence"] },
+  "results": { "distinct": false, "ordered": true, "bindings": [
+    { "pdb": { "type": "literal", "value": "110D" }	, "oligo": { "type": "uri", "value": "http://gmmo.uga.edu/#110d_oligo1" }	, "oligo_sequence": { "type": "literal", "value": "DM11-C21O8" }},
+    { "pdb": { "type": "literal", "value": "146D" }	, "oligo": { "type": "uri", "value": "http://gmmo.uga.edu/#146d_oligo4" }	, "oligo_sequence": { "type": "literal", "value": "DAltp[6H,2H,3<R1>]b1-3DTalp[6H,2H]b1-3DManp[6H,2H]b1-" }},
+    { "pdb": { "type": "literal", "value": "146D" }	, "oligo": { "type": "uri", "value": "http://gmmo.uga.edu/#146d_oligo6" }	, "oligo_sequence": { "type": "literal", "value": "DAltp[6H,2H,3<R1>]b1-3DTalp[6H,2H]b1-3DManp[6H,2H]b1-" }},
+    { "pdb": { "type": "literal", "value": "148L" }	, "oligo": { "type": "uri", "value": "http://gmmo.uga.edu/#148l_oligo1" }	, "oligo_sequence": { "type": "literal", "value": "DGlcpNAcb1-4DGlcpNAc[3<R1>]a1-GLU" }},
+    { "pdb": { "type": "literal", "value": "151D" }	, "oligo": { "type": "uri", "value": "http://gmmo.uga.edu/#151d_oligo1" }	, "oligo_sequence": { "type": "literal", "value": "DM21-C21O9" }},
+    { "pdb": { "type": "literal", "value": "152D" }	, "oligo": { "type": "uri", "value": "http://gmmo.uga.edu/#152d_oligo1" }	, "oligo_sequence": { "type": "literal", "value": "DM11-C21O8" }},
+    { "pdb": { "type": "literal", "value": "154L" }	, "oligo": { "type": "uri", "value": "http://gmmo.uga.edu/#154l_oligo1" }	, "oligo_sequence": { "type": "literal", "value": "DGlcpNAcb1-4DGlcpNAcb1-4DGlcpNAcb1-ROH" }},
+    { "pdb": { "type": "literal", "value": "215D" }	, "oligo": { "type": "uri", "value": "http://gmmo.uga.edu/#215d_oligo2" }	, "oligo_sequence": { "type": "literal", "value": "3-3[5-3]LGalp[6H,2H,3<R1>]a1-C21O9" }},
+    { "pdb": { "type": "literal", "value": "308D" }	, "oligo": { "type": "uri", "value": "http://gmmo.uga.edu/#308d_oligo5" }	, "oligo_sequence": { "type": "literal", "value": "DGlcpb1-" }},
+    { "pdb": { "type": "literal", "value": "308D" }	, "oligo": { "type": "uri", "value": "http://gmmo.uga.edu/#308d_oligo2" }	, "oligo_sequence": { "type": "literal", "value": "DM11-C21O8" }},
+    { "pdb": { "type": "literal", "value": "308D" }	, "oligo": { "type": "uri", "value": "http://gmmo.uga.edu/#308d_oligo6" }	, "oligo_sequence": { "type": "literal", "value": "DGlcpb1-" }},
+    { "pdb": { "type": "literal", "value": "308D" }	, "oligo": { "type": "uri", "value": "http://gmmo.uga.edu/#308d_oligo3" }	, "oligo_sequence": { "type": "literal", "value": "DM11-C21O8" }},
+    { "pdb": { "type": "literal", "value": "3A09" }	, "oligo": { "type": "uri", "value": "http://gmmo.uga.edu/#3a09_oligo1" }	, "oligo_sequence": { "type": "literal", "value": "MAW1-4DManpAb1-4DManpAa1-ROH" }},
+    { "pdb": { "type": "literal", "value": "427D" }	, "oligo": { "type": "uri", "value": "http://gmmo.uga.edu/#427d_oligo2" }	, "oligo_sequence": { "type": "literal", "value": "DM11-C21O8" }},
+    { "pdb": { "type": "literal", "value": "482D" }	, "oligo": { "type": "uri", "value": "http://gmmo.uga.edu/#482d_oligo1" }	, "oligo_sequence": { "type": "literal", "value": "LGalp[6H,2H,3<R1>]a1-C21O8" }},
+    { "pdb": { "type": "literal", "value": "4A05" }	, "oligo": { "type": "uri", "value": "http://gmmo.uga.edu/#4a05_oligo4" }	, "oligo_sequence": { "type": "literal", "value": "DGlcpNAcb1-4DGlcpNAcb1-ASN" }},
+    { "pdb": { "type": "literal", "value": "5A03" }	, "oligo": { "type": "uri", "value": "http://gmmo.uga.edu/#5a03_oligo19" }	, "oligo_sequence": { "type": "literal", "value": "DXylpb1-ROH" }},
+    { "pdb": { "type": "literal", "value": "5A03" }	, "oligo": { "type": "uri", "value": "http://gmmo.uga.edu/#5a03_oligo28" }	, "oligo_sequence": { "type": "literal", "value": "DXylpa1-ROH" }},
+    { "pdb": { "type": "literal", "value": "5A03" }	, "oligo": { "type": "uri", "value": "http://gmmo.uga.edu/#5a03_oligo20" }	, "oligo_sequence": { "type": "literal", "value": "DXylpb1-ROH" }},
+    { "pdb": { "type": "literal", "value": "5A03" }	, "oligo": { "type": "uri", "value": "http://gmmo.uga.edu/#5a03_oligo21" }	, "oligo_sequence": { "type": "literal", "value": "DXylpb1-ROH" }},
+    { "pdb": { "type": "literal", "value": "5A03" }	, "oligo": { "type": "uri", "value": "http://gmmo.uga.edu/#5a03_oligo22" }	, "oligo_sequence": { "type": "literal", "value": "DXylpb1-ROH" }},
+    { "pdb": { "type": "literal", "value": "5A03" }	, "oligo": { "type": "uri", "value": "http://gmmo.uga.edu/#5a03_oligo23" }	, "oligo_sequence": { "type": "literal", "value": "DXylpb1-ROH" }},
+    { "pdb": { "type": "literal", "value": "5A03" }	, "oligo": { "type": "uri", "value": "http://gmmo.uga.edu/#5a03_oligo24" }	, "oligo_sequence": { "type": "literal", "value": "DXylpb1-ROH" }},
+    { "pdb": { "type": "literal", "value": "5A03" }	, "oligo": { "type": "uri", "value": "http://gmmo.uga.edu/#5a03_oligo25" }	, "oligo_sequence": { "type": "literal", "value": "DXylpb1-ROH" }},
+    { "pdb": { "type": "literal", "value": "5A03" }	, "oligo": { "type": "uri", "value": "http://gmmo.uga.edu/#5a03_oligo26" }	, "oligo_sequence": { "type": "literal", "value": "DXylpb1-ROH" }} ] } }
