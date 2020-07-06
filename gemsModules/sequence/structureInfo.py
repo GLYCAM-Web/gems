@@ -16,12 +16,6 @@ else:
 
 ##    Enums
 
-##    @class SimpulationPhase(str, Enum)
-#    @brief The possible built types a structure can assume.
-class SimulationPhase(str, Enum):
-    gasPhase = "gas-phase"
-    solvent = "solvent"
-
 ##    @class JobStatusEnum(str, Enum)
 #    @brief    The possible statuses of a given job.
 class JobStatusEnum(str, Enum):
@@ -32,6 +26,7 @@ class JobStatusEnum(str, Enum):
     complete = "complete"
     failed = "failed"
     delayed = "delayed"
+
 
 
 ##    @class RotamerConformation
@@ -276,8 +271,48 @@ def getRotamerDataFromTransaction(thisTransaction: Transaction):
             raise AttributeError("geometryOptions")
 
 ##  @brief Pass in a sequence (list of rotamerConformations), get a terse label.
-def buildStructureLabel(sequenceConformation):
-    log.info("buildStructureLabel() was called.")
+#   @detail Translate the more verbose sequenceConf object into a terse string that is useful
+#           for naming directories and describing interesting geometry in a build.
+#   @param sequenceConf List[rotamerConformation]
+#   @return string structureLabel
+def buildStructureLabel(sequenceConf):
+    log.info("buildStructureLabel() was called.\n\n")
+    structureLabel = ""
+    log.debug("this sequenceConf: \n" + str(sequenceConf))
+
+    #Assess each rotamer conf obj
+    for rotamerConf in sequenceConf:
+        log.debug("this rotamerConf: \n" + str(rotamerConf))
+
+        ##Decide whether or not to add the label.
+        if structureLabel == "":
+            structureLabel = rotamerConf['linkageLabel']
+        elif rotamerConf['linkageLabel'] not in structureLabel:
+            structureLabel = structureLabel + "_"+ rotamerConf['linkageLabel']
+        else:
+            log.debug("adding to the same linkage.")
+            structureLabel = structureLabel + "_"
+
+        ##Decide which abbreviated dihedral is needed
+        dihedralAbbreviation = ""
+        if rotamerConf['dihedralName'] == "phi":
+            dihedralAbbreviation = "h"
+        elif rotamerConf['dihedralName'] == "psi":
+            dihedralAbbreviation = "s"
+        elif rotamerConf['dihedralName'] == "omega":
+            dihedralAbbreviation = "o"
+        elif rotamerConf['dihedralName'] == "chi":
+            dihedralAbbreviation = "c"
+        else:
+            log.debug("Unrecognized dihedralName: " + str(rotamerConf['dihedralName'])) 
+
+        structureLabel = structureLabel + dihedralAbbreviation
+
+        ##Add the rotamer value
+        structureLabel = structureLabel + rotamerConf['rotamer']
+
+
+    return structureLabel
 
 
 ##  @brief Parses user's selected rotamers (rotamerData) into a list of 
@@ -328,6 +363,26 @@ def buildStructureInfo(thisTransaction : Transaction):
                 ##Build the sequenceConformation
                 sequenceConf = getNextSequence(rotamerData, rotamerCounter, sequences)
                 buildState.sequenceConformation = sequenceConf
+                
+                ##Build the structureLabel
+                buildState.structureLabel = buildStructureLabel(sequenceConf)
+                log.debug("structureLabel: \n" + buildState.structureLabel)
+
+                ##Check if the user requested a specific simulationPhase
+                buildState.simulationPhase = checkForSimulationPhase(thisTransaction)
+                log.debug("simulationPhase: " + buildState.simulationPhase)
+
+                ##Set the initial status
+                buildState.status = JobStatusEnum.new
+                log.debug("status: " + buildState.status)
+
+                ##Set the date
+                buildState.date = datetime.now()
+                log.debug("date: " + str(buildState.date))
+
+                ## Check if the user requested to add ions
+                buildState.addIons = checkForAddIons(thisTransaction)
+
                 ##sequences is needed for progress tracking.
                 sequences.append(sequenceConf)     
                 log.debug("sequence list length: " + str(len(sequences)))
@@ -342,7 +397,48 @@ def buildStructureInfo(thisTransaction : Transaction):
 
             log.debug("sequenceCount: " + str(len(sequences)))
 
-            return structureInfo
+##  @brief Checks a transaction for user requests that specify adding ions.
+#   @detail Default value is "default" - which depends on other software's defauts.
+#   @param Transaction
+def checkForAddIons(thisTransaction: Transaction):
+    log.info("checkForAddIons() was called.")
+
+    result = "default"
+    request = thisTransaction.request_dict
+    if "project" in request.keys():
+        if "ion" in request['project'].keys():
+            result = request['project']['ion']
+    
+    ##If both a project and options exist, let the options override the
+    #   project.
+    if "options" in request.keys():
+        if "add_ions" in request['options'].keys():
+            result = request['options']['add_ions']
+
+    return result
+
+
+##  @brief Checks a transaction for user requests that specify simulation phase
+#   @detail Default value is gas_phase
+#   @param Transaction
+def checkForSimulationPhase(thisTransaction: Transaction):
+    log.info("checkForSimulationPhase() was called.")
+
+    simulationPhase = "gas_phase"
+    request = thisTransaction.request_dict
+    if "project" in request.keys():
+        if "solvation" in request['project'].keys():
+            if request['project']['solvation'] == "yes":
+                simulationPhase = "solvent"
+
+    ##If both a project and options exist, let the options override the
+    #   project.
+    if "options" in request.keys():
+        if "solvation" in request['options'].keys():
+            if request['options']['solvation'] == "yes":
+                simulationPhase = "solvent"
+
+    return "gas_phase"
 
 
 def main():
