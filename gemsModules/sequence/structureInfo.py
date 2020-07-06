@@ -16,9 +16,9 @@ else:
 
 ##    Enums
 
-##    @class BuildTypeEnum(str, Enum)
+##    @class SimpulationPhase(str, Enum)
 #    @brief The possible built types a structure can assume.
-class BuildTypeEnum(str, Enum):
+class SimulationPhase(str, Enum):
     gasPhase = "gas-phase"
     solvent = "solvent"
 
@@ -42,18 +42,19 @@ class RotamerConformation(BaseModel):
     dihedralName : str = ""
     rotamer : str = ""
 
-##     @class BuildState
+##   @class BuildState
 #    @brief An object that represents one requested build state.
+#    @TODO: Add more fields, ringPucker, protonationState, etc...
 class BuildState(BaseModel):
     ## Labels may be either "structure" if there is only one for this project.
     #    or, they may be a terse label,
     #    or they may be uuids if the terse label is > 32 char long.
-    label : str = ""
-    buildType : BuildTypeEnum = Field(
-        None,
+    structureLabel : str = ""
+    simulationPhase : SimulationPhaseEnum = Field(
+        "gas-phase",
         title = "Type",
         alias = "type",
-        description = "The possible built types a structure can assume."
+        description = "The possible simulation phases, example: gas-phase or solvent."
         ) ##Use an enum here. gas-phase, solvent
 
     status : JobStatusEnum = Field(
@@ -64,9 +65,9 @@ class BuildState(BaseModel):
         ) ##Use an enum here. new, building, ready, submitted, complete, failed, delayed
 
     date : datetime = None
-    ions : str = "No" ## Is there a benefit for this to be a String? Boolean?
-    energy : str = "" ## kcal/mol
-    forceField : str = "" ##
+    addIons : str = "default" ## Is there a benefit for this to be a String? Boolean?
+    energy : str = None ## kcal/mol
+    forceField : str = None ## TODO: This needs to be a class. Schedule design with Lachele.
     sequenceConformation : List[RotamerConformation] = None
 
 ##    @class StructureInfo
@@ -273,6 +274,10 @@ def getRotamerDataFromTransaction(thisTransaction: Transaction):
                 raise AttributeError("rotamerData")
         else:
             raise AttributeError("geometryOptions")
+
+##  @brief Pass in a sequence (list of rotamerConformations), get a terse label.
+def buildStructureLabel(sequenceConformation):
+    log.info("buildStructureLabel() was called.")
 
 
 ##  @brief Parses user's selected rotamers (rotamerData) into a list of 
