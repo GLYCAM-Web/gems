@@ -14,9 +14,11 @@ else:
     log = createLogger(__name__)
 
 
+
+
 ##    Enums
 
-##    @class JobStatusEnum(str, Enum)
+##   @class JobStatusEnum(str, Enum)
 #    @brief    The possible statuses of a given job.
 class JobStatusEnum(str, Enum):
     new = "new"
@@ -45,12 +47,9 @@ class BuildState(BaseModel):
     #    or, they may be a terse label,
     #    or they may be uuids if the terse label is > 32 char long.
     structureLabel : str = ""
-    simulationPhase : SimulationPhaseEnum = Field(
-        "gas-phase",
-        title = "Type",
-        alias = "type",
-        description = "The possible simulation phases, example: gas-phase or solvent."
-        ) ##Use an enum here. gas-phase, solvent
+    simulationPhase : str = "gas-phase"
+    ## Solvated requests might specify a shape.
+    solvationShape : str = None
 
     status : JobStatusEnum = Field(
         None,
@@ -65,19 +64,7 @@ class BuildState(BaseModel):
     forceField : str = None ## TODO: This needs to be a class. Schedule design with Lachele.
     sequenceConformation : List[RotamerConformation] = None
 
-##    @class StructureInfo
-#    @brief An object to represent the data previously held in the Structure_Mapping_Table.
-#    @detail This object holds the data that describes a series of ways that this single structure
-#            has been built. Each variation of a rotamer or from gas-phase to solvated, etc...
-#            represents a different build state, and each gets a record in this object.
-#            This object can be used to track a request, and a copy of it could be used to track 
-#            the progress of that requested series of jobs.
-class StructureInfo(BaseModel):
-    ## Useful to know what this all applies to.
-    sequence : str = ""
-    ## A build state is a descriptive object that can be used to request a pdb file 
-    #    of a sequence in a specific pose, with various other settings as well.
-    buildStates : List[BuildState] = None
+
 
 
 ##  @brief Object for tracking the parsing of rotamerData
@@ -115,6 +102,20 @@ class RotamerCounter():
             result = result + "\n" + str(linkage)
 
         return result
+
+##   @class StructureInfo
+#    @brief An object to represent the data previously held in the Structure_Mapping_Table.
+#    @detail This object holds the data that describes a series of ways that this single structure
+#            has been built. Each variation of a rotamer or from gas-phase to solvated, etc...
+#            represents a different build state, and each gets a record in this object.
+#            This object can be used to track a request, and a copy of it could be used to track 
+#            the progress of that requested series of jobs.
+class StructureInfo(BaseModel):
+    ## Useful to know what this all applies to.
+    sequence : str = ""
+    ## A build state is a descriptive object that can be used to request a pdb file 
+    #    of a sequence in a specific pose, with various other settings as well.
+    buildStates : List[BuildState] = None
 
 
 ##  @brief  Makes decisions about what rotamers the next sequence should use.
@@ -263,12 +264,14 @@ def getRotamerDataFromTransaction(thisTransaction: Transaction):
         if "geometryOptions" in request['options'].keys():
             if 'rotamerData' in request['options']['geometryOptions'].keys():
                 rotamerData = request['options']['geometryOptions']['rotamerData']
-                
+                log.debug("rotamerData: " + str(rotamerData))
                 return rotamerData
             else:
                 raise AttributeError("rotamerData")
         else:
             raise AttributeError("geometryOptions")
+    else:
+        log.debug("No options present in the request. Likely just a request for the default.")
 
 ##  @brief Pass in a sequence (list of rotamerConformations), get a terse label.
 #   @detail Translate the more verbose sequenceConf object into a terse string that is useful
@@ -315,6 +318,36 @@ def buildStructureLabel(sequenceConf):
     return structureLabel
 
 
+##  @brief  Gets the shape from the user request in transactions or returns default.
+#   @param Transaction
+#   @return String solvent_shape
+def getSolvationShape(thisTransaction):
+    log.info("getSolvationShape() was called.")
+    project = getFrontendProjectFromTransaction(thisTransaction)
+    if project is not None:
+        return project['solvation_shape']
+    else:
+        ##TODO: write logic for commandline users to specify solvent shapes other than the default.
+        return "REC"
+
+##  @brief Look at the transaction to see if a force field is specified
+#   @param Transaction thisTransaction
+#   @return String either "default" or the force field name.
+def getForceFieldFromRequest(thisTransaction):
+    log.info("getForceFieldFromRequest() was called.")
+    feProject = getFrontendProjectFromTransaction(thisTransaction)
+    if feProject is not None:
+        log.debug("feProject keys: " + str(feProject.keys()))
+        if feProject['force_field'] == "":
+            return "default"
+        else:
+            return project['force_field']
+
+    else:
+        ##TODO: write logic for commandline users to specify forcefields other than the default
+        ##Should it live in options?
+        return "default"
+
 ##  @brief Parses user's selected rotamers (rotamerData) into a list of 
 #           structures to request.
 #   @detail With a limit of 64 structures to request at a time, users select
@@ -345,57 +378,154 @@ def buildStructureInfo(thisTransaction : Transaction):
             raise error
         else:
             sequences = []
-            linkageCount = len(rotamerData)
-            log.debug("linkageCount: " + str(linkageCount))
-            log.debug("\nrotamerData:\n" + str(rotamerData))
 
-            ##Rotamer counter objects allow the logic to track the rotamer selection.
-            rotamerCounter = RotamerCounter(rotamerData)
-            log.debug("rotamerCounter: " + str(rotamerCounter.__dict__))
-
-            ##How many structures have been requested?
-            requestedStructureCount = getRequestedStructureCount(rotamerCounter)
-            log.debug("requestedStructureCount: " + str(requestedStructureCount))
-            
-            ##Define when to stop.
-            while len(sequences) < requestedStructureCount and len(sequences) <= 64:
+            ## Need to be able to handle the default, which has no rotamerData.
+            if rotamerData == None:
+                log.debug("Default request!")
                 buildState = BuildState()
-                ##Build the sequenceConformation
-                sequenceConf = getNextSequence(rotamerData, rotamerCounter, sequences)
-                buildState.sequenceConformation = sequenceConf
-                
-                ##Build the structureLabel
-                buildState.structureLabel = buildStructureLabel(sequenceConf)
-                log.debug("structureLabel: \n" + buildState.structureLabel)
-
-                ##Check if the user requested a specific simulationPhase
-                buildState.simulationPhase = checkForSimulationPhase(thisTransaction)
-                log.debug("simulationPhase: " + buildState.simulationPhase)
-
-                ##Set the initial status
+                buildState.structureLabel = "default"
                 buildState.status = JobStatusEnum.new
-                log.debug("status: " + buildState.status)
-
-                ##Set the date
                 buildState.date = datetime.now()
-                log.debug("date: " + str(buildState.date))
-
-                ## Check if the user requested to add ions
-                buildState.addIons = checkForAddIons(thisTransaction)
-
-                ##sequences is needed for progress tracking.
-                sequences.append(sequenceConf)     
-                log.debug("sequence list length: " + str(len(sequences)))
                 structureInfo.buildStates.append(buildState)
-                
-            ##Useful logging for maintenance
-            log.debug("sequences: ")
-            for element in sequences:
-                log.debug("~")
-                for item in element:
-                    log.debug( str(item) )
 
-            log.debug("sequenceCount: " + str(len(sequences)))
+            ## Presence of rotamerData indicates specific rotamer requests.
+            else:    
+                linkageCount = len(rotamerData)
+                log.debug("linkageCount: " + str(linkageCount))
+                log.debug("\nrotamerData:\n" + str(rotamerData))
+
+                ##Rotamer counter objects allow the logic to track the rotamer selection.
+                rotamerCounter = RotamerCounter(rotamerData)
+                log.debug("rotamerCounter: " + str(rotamerCounter.__dict__))
+
+                ##How many structures have been requested?
+                requestedStructureCount = getRequestedStructureCount(rotamerCounter)
+                log.debug("requestedStructureCount: " + str(requestedStructureCount))
+                
+                ##Define when to stop.
+                while len(sequences) < requestedStructureCount and len(sequences) <= 64:
+                    buildState = BuildState()
+                    ##Build the sequenceConformation
+                    sequenceConf = getNextSequence(rotamerData, rotamerCounter, sequences)
+                    buildState.sequenceConformation = sequenceConf
+                    
+                    ##Build the structureLabel
+                    buildState.structureLabel = buildStructureLabel(sequenceConf)
+                    log.debug("structureLabel: \n" + buildState.structureLabel)
+
+                    ##Check if the user requested a specific simulationPhase
+                    buildState.simulationPhase = checkForSimulationPhase(thisTransaction)
+                    log.debug("simulationPhase: " + buildState.simulationPhase)
+                    if buildState.simulationPhase == "solvent":
+                        buildState.solvationShape = getSolvationShape(thisTransaction)
+
+                    ##Set the initial status
+                    buildState.status = JobStatusEnum.new
+                    log.debug("status: " + buildState.status)
+
+                    ##Set the date
+                    buildState.date = datetime.now()
+                    log.debug("date: " + str(buildState.date))
+
+                    ## Check if the user requested to add ions
+                    buildState.addIons = checkForAddIons(thisTransaction)
+
+                    ##sequences is needed for progress tracking.
+                    sequences.append(sequenceConf)     
+                    log.debug("sequence list length: " + str(len(sequences)))
+                    structureInfo.buildStates.append(buildState)
+                    
+                ##Useful logging for maintenance
+                log.debug("sequences: ")
+                for element in sequences:
+                    log.debug("~")
+                    for item in element:
+                        log.debug( str(item) )
+
+                log.debug("sequenceCount: " + str(len(sequences)))
+
+    return structureInfo
+
+def saveRequestInfo(structureInfo, projectDir):
+    log.info("saveRequestInfo() was called.")
+    
+    ## convert the object to dict
+    try:
+        data = convertToDict(structureInfo)
+        log.debug("structureInfo as dict: \n\n")
+        prettyPrint(data)
+    except Exception as error:
+        log.error("There was a problem converting the structureInfo to dict: " + str(error))
+        raise error
+    else:
+        ## dump to request file
+        try:
+            fileName = projectDir + "structureInfo_request.json"
+            log.debug("Attempting to write: " + fileName)
+            with open(filename, 'w') as outFile:
+                json.dump(data, outFile)
+        except Exception as error:
+            log.error("There was a problem writing structureInfo_request.json to file: " + str(error))
+            raise error
+        else:
+             ## also dump to status file.
+            try:
+                statusFileName = projectDir + "structureInfo_status.json"
+                log.debug("Attempting to write: " + statusFileName)
+                with open(statusFileName, 'w') as statusFile:
+                    json.dump(data, statusFile)
+            except Exception as error:
+                log.error("There was a problem writing structureInfo_status.json: " + str(error))
+                raise error
+
+
+##  @brief Pass in structureInfo, get a dict in return.
+#   @detail Since structureInfo objects have lists of objects with lists of objects, 
+#   a bit of homework is saved by using this to convert to dict.
+def convertToDict(structureInfo):
+    log.info("convertToDict was called.")
+    data = {}
+    ## set the sequence.
+    try:
+        data['sequence'] = structureInfo.sequence
+        data['buildStates'] = []
+    except Exception as error:
+        log.error("There was a problem finding the sequence in structureInfo: " + str(error))
+        raise error
+    else:
+        try:
+            ##Process the build states.
+            for buildState in structureInfo.buildStates:
+                log.debug("buildState: " + repr(buildState))
+                state = {}
+                state['strucuterLabel'] = buildState.structureLabel
+                state['simulationPhase'] = buildState.simulationPhase
+                if buildState.simulationPhase == "solvent":
+                    state['solvationShape'] = buildState.solvationShape
+                state['status'] = buildState.status
+                state['date'] = str(buildState.date)
+                state['addIons']  = buildState.addIons
+                state['energy'] = buildState.energy
+                state['forceField']  = buildState.forceField
+                state['sequenceConformation'] = []
+                try:
+                    log.debug("sequenceConformation: " + repr(buildState.sequenceConformation))
+                    for rotamerConf in buildState.sequenceConformation:
+                        log.debug("rotamerConf: " + repr(rotamerConf))
+                        state['sequenceConformation'].append(rotamerConf.__dict__)
+                except Exception as error:
+                    log.error("There was a problem converting the sequence conformation to dict: " + str(error))
+                    raise error
+                else:
+                    data['buildStates'].append(state)
+        except Exception as error:
+            log.error("There was a problem building the states for this structureInfo: " + str(error))
+            raise error
+        else:
+            return data
+
+
+
 
 ##  @brief Checks a transaction for user requests that specify adding ions.
 #   @detail Default value is "default" - which depends on other software's defauts.

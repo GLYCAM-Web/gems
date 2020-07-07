@@ -170,10 +170,6 @@ def getLinkageOptionsFromBuilder(builder):
     log.debug("updatedLinkages: " + str(updatedLinkages))
     return updatedLinkages
 
-
-##TODO: Replace this with more generically useful: build3DStructure(transaction, service)
-##      Needs to work whether default structure or specific rotamers are requested.
-
 ##  @brief Creates a jobsubmission for Amber. Submits that. Updates the transaction to reflect this.
 #   @param Transaction thisTransaction
 #   @param Service service (optional)
@@ -202,7 +198,7 @@ def buildDefault3DStructure(thisTransaction : Transaction, thisService : Service
 
                 builder = getCbBuilderForSequence(sequence)
                 try:
-                    projectDir = getProjectSubdir(thisTransaction)
+                    projectDir = getProjectDirSubDir(thisTransaction)
                 except Exception as error:
                     log.error("There was a problem getting this build's subdir: " + str(error))
                     raise error
@@ -233,6 +229,24 @@ def buildDefault3DStructure(thisTransaction : Transaction, thisService : Service
                 ## everything up to here -- all the amber stuff --
                 ## is what needs to move
 
+def getProjectDirSubDir(thisTransaction: Transaction):
+    log.info("getProjectDirSubDir() was called.")
+    project_dir = thisTransaction.response_dict['gems_project']['project_dir']
+    log.debug("project_dir: " + project_dir)
+
+    ## If default structure, subdir name is 'default'
+    if checkIfDefaultStructureRequest(thisTransaction):
+        project_dir = project_dir + "default/"
+        if not os.path.exists(project_dir):
+            os.makedirs(project_dir)
+
+    else:
+        log.error("Still writing the logic to handle builds with selectedRotamers.")
+        ##TODO: provide the subdir based on this doc: 
+        ## http://128.192.9.183/eln/gwscratch/2020/01/10/succinct-rotamer-set-labeling-for-sequences/
+        raise AttributeError("rotamerSubdir")
+    return project_dir 
+
 
 ##  @brief Pass a sequence string, get a builder for that sequence.
 ##  @param String sequence - GLYCAM Condensed string sequence.
@@ -251,8 +265,7 @@ def getCbBuilderForSequence(sequence : str):
         log.error("Prepfile did not exist at: " + prepfile)
         raise FileNotFoundError
 
-##  @brief convenience method. pass transaction, get options dict.
-##  TODO: evaluate for deprecation. Not terribly useful.
+
 def getOptionsFromTransaction(thisTransaction: Transaction):
     log.info("getOptionsFromTransaction() was called.")
     if "options" in thisTransaction.request_dict.keys():
@@ -325,11 +338,45 @@ def receive(thisTransaction : Transaction):
             else:
                 if valid:
                     log.debug("Valid sequence.")
-                    try:
-                        manageSequenceRequest(thisTransaction)
-                    except Exception as error:
-                        log.error("There was a problem with manageSequenceRequest(): " + str(error))
-                        raise error
+
+                    ## Begin Structure generation logic. This chunk either builds or returns a pointer to a build
+                    #   of a collection of structures.
+                    if checkIfDefaultStructureRequest(thisTransaction):
+                        if checkIfDefaultStructureExists(thisTransaction):
+                            log.debug("Returning response with payload of existing build.")
+                            try:
+                                respondWithExistingDefaultStructure(thisTransaction)
+                            except Exception as error:
+                                log.error("There was a problem responding with an existing default structure: " + str(error))
+                                common.settings.appendCommonParserNotice(thisTransaction, 'InvalidInput', i)
+                        else:
+                            log.debug("Default structure does not exist yet.")
+                            try:
+                                buildDefault3DStructure(thisTransaction, None)
+                            except Exception as error:
+                                log.error("There was a problem building the default 3D structure: " + str(error))
+                                common.settings.appendCommonParserNotice(thisTransaction, 'InvalidInput', i)
+                            else:
+                                try:
+                                    registerBuild(thisTransaction)
+                                except Exception as error:
+                                    log.error("There was a problem regitstering this build: " + str(error))
+                                    common.settings.appendCommonParserNotice(thisTransaction, "unknown", i)
+                    else:
+                        log.debug("Received a request to build with selectedRotamers.")
+                        structureInfo = buildStructureInfo(thisTransaction)
+                        log.debug("\n\nstructureInfo:")
+                        prettyPrint(structureInfo.__dict__)
+
+                        ##TODO: Need an equivalent to buildDefault3DStructure that:
+                        ##          -Creates all needed directories
+                        ##          -Interacts with gmml CarbohydrateBuilder
+                        ##          -Submits each sequence to slurm for minimizing.
+                        ##      Then we need to register the build, which will involve updating the logic in
+                        ##          registerBuild to allow for setting rotamers.
+                        ##      Need to update responses with lists of sequence download dirs and data to show the user.
+                        ## End Structure generation logic.
+                    
                 else:
                     log.error("Invalid Sequence. Cannot build.")
                     common.settings.appendCommonParserNotice( thisTransaction,'InvalidInput',i)
@@ -349,43 +396,7 @@ def receive(thisTransaction : Transaction):
     ## prepares the transaction for return to the requestor, success or fail.     
     thisTransaction.build_outgoing_string()
 
-##  @brief Logs requests, makes decisions about what to build or reuse, builds a response.
-##  @detail This is a bit of a butler method, it looks over the process and calls only what
-#       is needed, depending on the request and whether an existing structure fits the request.
-def manageSequenceRequest(thisTransaction : Transaction):
-    log.info("manageSequenceRequest() was called.")
-    ##  Start a project
-    try:
-        startProject(thisTransaction)
-    except Exception as error:
-        log.error("There was a problem creating a project: " + str(error))
-        raise error
-    else:
-        ##  Build structureInfo object
-        try:
-            structureInfo = buildStructureInfo(thisTransaction)
 
-        except Exception as error:
-            log.error("There was a problem building structureInfo: " + str(error))
-            raise error
-        else:
-            ##  Save some copies of structureInfo for status tracking in projects.
-            try:
-                projectDir = getProjectDir(thisTransaction)
-                saveRequestInfo(structureInfo, projectDir)
-            except Exception as error:
-                log.error("There was a problem saving the request info: " + str(error))
-            else:
-                log.error("Still writing this code.")
-                ##  check if requested structures exitst, update structureInfo_status.json and project when exist
-                ##  build any needed structures, update structureInfo_status.json, and project
-                ##  create downloadUrl
-                ##  submit to amber for minimization, update structureInfo_status.json and project
-                ##  registerBuild
-                ##  append response to transaction
-
-
-##TODO Evaluate for deprecation.
 ##  @brief Call this if the default structure for a sequence already exists.
 #   @detail Builds a project and a response config object. Updates the transaction.
 #   @param Transaction
@@ -428,10 +439,6 @@ def respondWithExistingDefaultStructure(thisTransaction: Transaction):
                     }
                     appendResponse(thisTransaction, config)
 
-
-
-## TODO: Rewrite this to a smaller scope: symlinks, status updates, and folder creation 
-#       Remove structureInfo stuff completely.
 
 ##  @brief  Creates the directories and files needed to store a file that can be
 #           reused via symlink.
@@ -526,6 +533,60 @@ def registerBuild(thisTransaction):
                     ##TODO: Write this logic.
                 
 
+##  @brief  Placeholder for now. Needs to be written.
+##  @TODO: Write this logic when building structures with selectedRotamers exists.
+##  @TODO: Move this to a better file.
+def buildRotamerDirName(thisTransaction):
+    log.info("buildRotamerDirName() was called.")
+
+    log.error("buildRotamerDirName still needs to be written.")
+
+##  @brief  Gets the shape from the user request in transactions or returns default.
+#   @param Transaction
+#   @return String solvent_shape
+def getSolvationShape(thisTransaction):
+    log.info("getSolvationShape() was called.")
+    project = getFrontendProjectFromTransaction(thisTransaction)
+    if project is not None:
+        return project['solvation_shape']
+    else:
+        ##TODO: write logic for commandline users to specify solvent shapes other than the default.
+        return "REC"
+
+
+
+##  @brief Look at the transaction to see if a force field is specified
+#   @param Transaction thisTransaction
+#   @return String either "default" or the force field name.
+def getForceFieldFromRequest(thisTransaction):
+    log.info("getForceFieldFromRequest() was called.")
+    feProject = getFrontendProjectFromTransaction(thisTransaction)
+    if feProject is not None:
+        log.debug("feProject keys: " + str(feProject.keys()))
+        if feProject['force_field'] == "":
+            return "default"
+        else:
+            return project['force_field']
+
+    else:
+        ##TODO: write logic for commandline users to specify forcefields other than the default
+        return "default"
+
+## @brief Look at the transaction to see if solvation was requested.
+#  @param Transaction thisTransaction
+#  @return Boolean solvationRequested
+def checkIfSolvationRequested(thisTransaction):
+    log.info("checkIfSolvationRequested() was called.")
+    project = getFrontendProjectFromTransaction(thisTransaction)
+    if project is not None:
+        if project['solvation'] == "Yes":
+            return True
+        else:
+            return False
+    else:
+        log.error("This logic is still in development.")
+        ##TODO: figure out how one might specify a request for solvation if there is not a frontend project.
+        #           This applies to command line users that don't use the website or JSON API
 
 ##  @brief Looks at a transaction to determine if the user is requesting the default structure
 #   @param Transaction thisTransaction
