@@ -172,7 +172,7 @@ def getLinkageOptionsFromBuilder(builder):
 
 ##  @brief Creates a jobsubmission for Amber. Submits that. Updates the transaction to reflect this.
 #   @param Transaction thisTransaction
-#   @param Service service
+#   @param Service service (optional)
 def buildDefault3DStructure(thisTransaction : Transaction, thisService : Service = None):
     log.info("Sequence receive.py buildDefault3Dstructure() was called.\n")
     try:
@@ -422,6 +422,7 @@ def respondWithExistingDefaultStructure(thisTransaction: Transaction):
                 raise error
             else:
                 try:
+                    ##Grab the projectId from the gemsProject.
                     projID = getProjectpUUID(thisTransaction)
                 except Exception as error:
                     log.error("There was a problem getting the pUUID from the GemsProject: " + str(error))
