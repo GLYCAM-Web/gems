@@ -471,7 +471,7 @@ def convertToDict(structureInfo):
             for buildState in structureInfo.buildStates:
                 log.debug("buildState: " + repr(buildState))
                 state = {}
-                state['strucuterLabel'] = buildState.structureLabel
+                state['structureLabel'] = buildState.structureLabel
                 state['simulationPhase'] = buildState.simulationPhase
                 if buildState.simulationPhase == "solvent":
                     state['solvationShape'] = buildState.solvationShape

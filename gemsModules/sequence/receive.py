@@ -376,13 +376,61 @@ def manageSequenceRequest(thisTransaction : Transaction):
             except Exception as error:
                 log.error("There was a problem saving the request info: " + str(error))
             else:
-                log.error("Still writing this code.")
                 ##  check if requested structures exitst, update structureInfo_status.json and project when exist
+                try:
+                    if structureExists(structureInfo, thisTransaction):
                 ##  build any needed structures, update structureInfo_status.json, and project
                 ##  create downloadUrl
                 ##  submit to amber for minimization, update structureInfo_status.json and project
                 ##  registerBuild
                 ##  append response to transaction
+
+
+##  @brief Return true if this structure has been built previously, otherwise false.
+#   @oaram
+#   @return
+def structureExists(structureInfo : StructureInfo, thisTransaction : Transaction):
+    log.info("structureExists() was called.")
+    structureExists = False
+    try:
+        sequence = structureInfo.sequence
+        log.debug("Checking for previous builds of this sequence: \n" + sequence)
+    except Exception as error:
+        log.error("There was a problem getting the sequence from structureInfo: " + str(error))
+        raise error
+    else:
+        seqID = getSeqIDForSequence(sequence)
+        userDataDir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/"
+        log.debug("userDataDir: " + userDataDir)
+        options = getOptionsFromTransaction(thisTransaction)
+        try:
+            log.debug("Walking the userDataDir.")
+
+            for element in os.walk(userDataDir):
+                rootPath = element[0]
+                dirNames = element[1]
+                fileNames = element[2]
+
+                log.debug("rootPath: " + str(rootPath))
+                log.debug("dirNames: " + str(dirNames))
+                log.debug("fileNames: " + str(fileNames))
+                ##If seqID is an existing dirName, this sequence has existing builds.
+                for dirName in dirNames:
+                    log.debug("dirName: " + dirName)
+                    log.debug("seqID: " + seqID)
+                    if seqID == dirName:
+                        log.debug("\nFound the dir for this sequence. Checking rotamerSpecifications.")
+                        if checkIfDefaultStructureRequest(thisTransaction):
+                            log.debug("Default structure requested, checking if that exists:")
+                            
+
+                        
+        except Exception as error:
+            log.error("There was a problem checking if this structure exists.")
+            raise error
+        else:
+            return structureExists
+
 
 
 ##TODO Evaluate for deprecation.
