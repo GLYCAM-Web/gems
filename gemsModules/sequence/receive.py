@@ -177,61 +177,56 @@ def getLinkageOptionsFromBuilder(builder):
 ##  @brief Creates a jobsubmission for Amber. Submits that. Updates the transaction to reflect this.
 #   @param Transaction thisTransaction
 #   @param Service service (optional)
-def buildDefault3DStructure(thisTransaction : Transaction, thisService : Service = None):
+def build3DStructure(structureInfo : StructureInfo, thisTransaction : Transaction):
     log.info("Sequence receive.py buildDefault3Dstructure() was called.\n")
+
     try:
-        startProject(thisTransaction)
+        pUUID=getProjectpUUID(thisTransaction)
     except Exception as error:
-        log.error("There was a problem starting a GemsProject for this request: " + str(error))
+        log.error("There was a problem finding the project pUUID: " + str(error))
         raise error
     else:
         try:
-            pUUID=getProjectpUUID(thisTransaction)
+            sequence = getSequenceFromTransaction(thisTransaction)
         except Exception as error:
-            log.error("There was a problem finding the project pUUID: " + str(error))
-            raise error
+            log.error("There was a problem getting a sequence from the transaction: " + str(error))
         else:
+            gemsProject = thisTransaction.response_dict['gems_project']
+            responseConfig = build3dStructureResponseConfig(gemsProject)
+            appendResponse(thisTransaction, responseConfig)
+
+            builder = getCbBuilderForSequence(sequence)
             try:
-                sequence = getSequenceFromTransaction(thisTransaction)
+                projectDir = getProjectSubdir(thisTransaction)
             except Exception as error:
-                log.error("There was a problem getting a sequence from the transaction: " + str(error))
+                log.error("There was a problem getting this build's subdir: " + str(error))
+                raise error
             else:
-                gemsProject = thisTransaction.response_dict['gems_project']
-                responseConfig = build3dStructureResponseConfig(gemsProject)
-                appendResponse(thisTransaction, responseConfig)
+                destination = projectDir + 'structure'
+                log.debug("destination: " + destination)
+                builder.GenerateSingle3DStructure(destination)
 
-                builder = getCbBuilderForSequence(sequence)
-                try:
-                    projectDir = getProjectSubdir(thisTransaction)
-                except Exception as error:
-                    log.error("There was a problem getting this build's subdir: " + str(error))
-                    raise error
-                else:
-                    destination = projectDir + 'structure'
-                    log.debug("destination: " + destination)
-                    builder.GenerateSingle3DStructure(destination)
+                ## This needs to move - Sequence should not be deciding how 
+                ## minimization will happen.  That is the job of mmservice.
+                amberSubmissionJson='{"project" : \
+                    {\
+                    "id":"' + pUUID + '", \
+                    "workingDirectory":"' + projectDir + '", \
+                    "type":"minimization", \
+                    "system_phase":"gas", \
+                    "water_model":"none" \
+                    } \
+                }'
+                # TODO:  Make this resemble real code....
+                the_json_file = projectDir + "amber_submission.json"
+                min_json_in = open (the_json_file , 'w')
+                min_json_in.write(amberSubmissionJson)
+                min_json_in.close()
 
-                    ## This needs to move - Sequence should not be deciding how 
-                    ## minimization will happen.  That is the job of mmservice.
-                    amberSubmissionJson='{"project" : \
-                        {\
-                        "id":"' + pUUID + '", \
-                        "workingDirectory":"' + projectDir + '", \
-                        "type":"minimization", \
-                        "system_phase":"gas", \
-                        "water_model":"none" \
-                        } \
-                    }'
-                    # TODO:  Make this resemble real code....
-                    the_json_file = projectDir + "amber_submission.json"
-                    min_json_in = open (the_json_file , 'w')
-                    min_json_in.write(amberSubmissionJson)
-                    min_json_in.close()
-
-                    from gemsModules.mmservice.amber.amber import manageIncomingString
-                    manageIncomingString(amberSubmissionJson)
-                ## everything up to here -- all the amber stuff --
-                ## is what needs to move
+                from gemsModules.mmservice.amber.amber import manageIncomingString
+                manageIncomingString(amberSubmissionJson)
+            ## everything up to here -- all the amber stuff --
+            ## is what needs to move
 
 
 ##  @brief Pass a sequence string, get a builder for that sequence.
@@ -369,67 +364,74 @@ def manageSequenceRequest(thisTransaction : Transaction):
             log.error("There was a problem building structureInfo: " + str(error))
             raise error
         else:
-            ##  Save some copies of structureInfo for status tracking in projects.
+            ##  Save some copies of structureInfo for status tracking.
             try:
                 projectDir = getProjectDir(thisTransaction)
                 saveRequestInfo(structureInfo, projectDir)
             except Exception as error:
                 log.error("There was a problem saving the request info: " + str(error))
             else:
-                ##  check if requested structures exitst, update structureInfo_status.json and project when exist
-                try:
-                    if structureExists(structureInfo, thisTransaction):
-                ##  build any needed structures, update structureInfo_status.json, and project
-                ##  create downloadUrl
-                ##  submit to amber for minimization, update structureInfo_status.json and project
-                ##  registerBuild
-                ##  append response to transaction
+                ## Each buildState represents a single build request.
+                for buildState in structureInfo.buildStates:
+                    log.debug("Checking if a structure has been built in this buildState: ")
+                    prettyPrint(buildState)
+                    ##  check if requested structures exitst, update structureInfo_status.json and project when exist
+                    try:
+                        if structureExists(buildState, thisTransaction):
+                            log.debug("Found an existing structure.")
+                            log.error("Dan write logic to return existing structures.")
+                        else:
+
+                    except Exception as error:
+                        log.error("There was a problem checking if the structure exists: " + str(error))
+                        try:
+                            build3DStructure(structureInfo, thisTransaction)
+                            ##  build any needed structures, update structureInfo_status.json, and project
+                            ##  create downloadUrl
+                            ##  submit to amber for minimization, update structureInfo_status.json and project
+                            ##  registerBuild
+                            ##  append response to transaction
 
 
 ##  @brief Return true if this structure has been built previously, otherwise false.
 #   @oaram
 #   @return
-def structureExists(structureInfo : StructureInfo, thisTransaction : Transaction):
+def structureExists(buildState: BuildState, thisTransaction : Transaction):
     log.info("structureExists() was called.")
+
     structureExists = False
     try:
-        sequence = structureInfo.sequence
+        sequence = getSequenceFromTransaction(thisTransaction)
         log.debug("Checking for previous builds of this sequence: \n" + sequence)
     except Exception as error:
         log.error("There was a problem getting the sequence from structureInfo: " + str(error))
         raise error
     else:
-        seqID = getSeqIDForSequence(sequence)
+        ## Check if this sequence has been built before.
         userDataDir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/"
-        log.debug("userDataDir: " + userDataDir)
-        options = getOptionsFromTransaction(thisTransaction)
-        try:
-            log.debug("Walking the userDataDir.")
+        seqID = getSeqIDForSequence(sequence)
+        sequenceDir = userDataDir + seqID
 
-            for element in os.walk(userDataDir):
-                rootPath = element[0]
-                dirNames = element[1]
-                fileNames = element[2]
-
-                log.debug("rootPath: " + str(rootPath))
-                log.debug("dirNames: " + str(dirNames))
-                log.debug("fileNames: " + str(fileNames))
-                ##If seqID is an existing dirName, this sequence has existing builds.
-                for dirName in dirNames:
-                    log.debug("dirName: " + dirName)
-                    log.debug("seqID: " + seqID)
-                    if seqID == dirName:
-                        log.debug("\nFound the dir for this sequence. Checking rotamerSpecifications.")
-                        if checkIfDefaultStructureRequest(thisTransaction):
-                            log.debug("Default structure requested, checking if that exists:")
-                            
-
-                        
-        except Exception as error:
-            log.error("There was a problem checking if this structure exists.")
-            raise error
+        log.debug("sequenceDir: " + sequenceDir)
+        if os.path.isdir(sequenceDir):
+            log.debug("This sequence has previous builds.")
+            structureLabel = buildState.structureLabel
+            if structureLabel == "default":
+                ## Easy. Just check the path. If it exists, return true.
+                defaultBuildDir = sequenceDir + "/default/"
+                if os.path.isdir(defaultBuildDir):
+                    log.debug("default structure found.")
+                    return True
+                else:
+                    log.debug("default structure not found.")
+                    return False
+            else:
+                ## Need to write a buildStateExists() method that compares BuildStates that have
+                ##  been logged to file to requested BuildStates.
         else:
-            return structureExists
+            log.debug("No directory exists for this sequence, there cannot be any previous builds.")
+            return False
+
 
 
 
