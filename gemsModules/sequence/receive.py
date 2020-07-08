@@ -364,7 +364,7 @@ def manageSequenceRequest(thisTransaction : Transaction):
         ##  Build structureInfo object
         try:
             structureInfo = buildStructureInfo(thisTransaction)
-
+            log.debug("structureInfo: " + str(structureInfo))
         except Exception as error:
             log.error("There was a problem building structureInfo: " + str(error))
             raise error

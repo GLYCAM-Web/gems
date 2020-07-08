@@ -14,23 +14,6 @@ else:
     log = createLogger(__name__)
 
 
-
-
-##    Enums
-
-##   @class JobStatusEnum(str, Enum)
-#    @brief    The possible statuses of a given job.
-class JobStatusEnum(str, Enum):
-    new = "new"
-    building = "building"
-    ready = "ready"
-    submitted = "submitted"
-    complete = "complete"
-    failed = "failed"
-    delayed = "delayed"
-
-
-
 ##    @class RotamerConformation
 #    @brief    An object that represents a single requested pose for a single linkage
 class RotamerConformation(BaseModel):
@@ -51,12 +34,7 @@ class BuildState(BaseModel):
     ## Solvated requests might specify a shape.
     solvationShape : str = None
 
-    status : JobStatusEnum = Field(
-        None,
-        title = "status",
-        alias = "status",
-        description = "The possible statuses of a given job."
-        ) ##Use an enum here. new, building, ready, submitted, complete, failed, delayed
+    status : str = "new" ##Use an enum here. new, building, ready, submitted, complete, failed, delayed
 
     date : datetime = None
     addIons : str = "default" ## Is there a benefit for this to be a String? Boolean?
@@ -384,7 +362,6 @@ def buildStructureInfo(thisTransaction : Transaction):
                 log.debug("Default request!")
                 buildState = BuildState()
                 buildState.structureLabel = "default"
-                buildState.status = JobStatusEnum.new
                 buildState.date = datetime.now()
                 structureInfo.buildStates.append(buildState)
 
@@ -418,10 +395,6 @@ def buildStructureInfo(thisTransaction : Transaction):
                     log.debug("simulationPhase: " + buildState.simulationPhase)
                     if buildState.simulationPhase == "solvent":
                         buildState.solvationShape = getSolvationShape(thisTransaction)
-
-                    ##Set the initial status
-                    buildState.status = JobStatusEnum.new
-                    log.debug("status: " + buildState.status)
 
                     ##Set the date
                     buildState.date = datetime.now()
@@ -462,7 +435,7 @@ def saveRequestInfo(structureInfo, projectDir):
         try:
             fileName = projectDir + "structureInfo_request.json"
             log.debug("Attempting to write: " + fileName)
-            with open(filename, 'w') as outFile:
+            with open(fileName, 'w') as outFile:
                 json.dump(data, outFile)
         except Exception as error:
             log.error("There was a problem writing structureInfo_request.json to file: " + str(error))
@@ -509,10 +482,13 @@ def convertToDict(structureInfo):
                 state['forceField']  = buildState.forceField
                 state['sequenceConformation'] = []
                 try:
-                    log.debug("sequenceConformation: " + repr(buildState.sequenceConformation))
-                    for rotamerConf in buildState.sequenceConformation:
-                        log.debug("rotamerConf: " + repr(rotamerConf))
-                        state['sequenceConformation'].append(rotamerConf.__dict__)
+                    if buildState.sequenceConformation is not None:
+                        log.debug("sequenceConformation: " + repr(buildState.sequenceConformation))
+                        for rotamerConf in buildState.sequenceConformation:
+                            log.debug("rotamerConf: " + repr(rotamerConf))
+                            state['sequenceConformation'].append(rotamerConf.__dict__)
+                    else:
+                        log.debug("No sequence conformation. Must be a request for the default structure.")
                 except Exception as error:
                     log.error("There was a problem converting the sequence conformation to dict: " + str(error))
                     raise error
