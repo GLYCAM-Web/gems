@@ -243,12 +243,54 @@ def prettyPrint(myObj):
     log.debug("myObj objectType: " + str(type(myObj)))
     preparedObj = {}
     for field in myObj.keys():
-        if type(myObj[field] != str):
-            preparedObj[field] = str(myObj[field])
+        if type(field != str):
+            ## recursively convert object and all children to strings.
+            preparedObj[field] = processFieldForPrettyPrinting(myObj[field])
         else:
+
             preparedObj[field] = myObj[field]
 
     log.debug("myObj, pretty: \n" + json.dumps(preparedObj, indent=4, sort_keys=False))
+
+
+##  @brief Recursively convert object and all children to strings. 
+#   @detail Only intended for use with the prettyPrint method.
+#   @param field of unknown type
+#   @param field of type string
+def processFieldForPrettyPrinting(field):
+    #log.info("processFieldForPrettyPrinting() was called.")
+ 
+    #log.debug("fieldType: " + str(type(field)))
+    #log.debug(repr(field))
+    if type(field) != str:
+        if type(field) == list:
+            #log.debug("processing a list.")
+            newList = []
+            for subField in field:
+                newList.append(processFieldForPrettyPrinting(subField))
+            return newList
+        elif type(field) == dict:
+            #log.debug("processing a dict.\n" + repr(field))
+            newDict = {}
+            try:
+                #log.debug("keys: " + str(field.keys()))
+                for key in field.keys():
+                    #log.debug("key: " + key)
+                    newDict.update({
+                        key : processFieldForPrettyPrinting(field[key])
+                    }) 
+                return newDict
+            except Exception as error:
+                log.error("There was an error processing this dict: " + str(error))
+                log.error(repr(field))
+        else:
+            ## Convert non-strings to string.
+            #log.debug("converting field to string then returning it.")
+            return str(field)
+    else:
+        #log.debug("This field is already a string. Returning it.")
+        return field
+
 
 
 ##  Logic borrowed from https://realpython.com/python-rounding/
