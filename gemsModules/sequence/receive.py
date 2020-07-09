@@ -177,7 +177,7 @@ def getLinkageOptionsFromBuilder(builder):
 ##  @brief Creates a jobsubmission for Amber. Submits that. Updates the transaction to reflect this.
 #   @param Transaction thisTransaction
 #   @param Service service (optional)
-def build3DStructure(structureInfo : StructureInfo, thisTransaction : Transaction):
+def build3DStructure(buildState : BuildState, thisTransaction : Transaction):
     log.info("Sequence receive.py buildDefault3Dstructure() was called.\n")
 
     try:
@@ -204,29 +204,39 @@ def build3DStructure(structureInfo : StructureInfo, thisTransaction : Transactio
             else:
                 destination = projectDir + 'structure'
                 log.debug("destination: " + destination)
-                builder.GenerateSingle3DStructure(destination)
+                try:
+                    ## Check if this is the default build or if it has user options specified.
+                    if checkIfDefaultStructureRequest(thisTransaction):
+                        builder.GenerateSingle3DStructure(destination)
+                    else:
+                        ##TODO: Test this after GMML can accept user settings.
+                        builder.GenerateRotamers(destination, buildState)
+                except Exception as error:
+                    log.error("There was a problem generating this build: " + str(error))
+                    raise error
+                else:
 
-                ## This needs to move - Sequence should not be deciding how 
-                ## minimization will happen.  That is the job of mmservice.
-                amberSubmissionJson='{"project" : \
-                    {\
-                    "id":"' + pUUID + '", \
-                    "workingDirectory":"' + projectDir + '", \
-                    "type":"minimization", \
-                    "system_phase":"gas", \
-                    "water_model":"none" \
-                    } \
-                }'
-                # TODO:  Make this resemble real code....
-                the_json_file = projectDir + "amber_submission.json"
-                min_json_in = open (the_json_file , 'w')
-                min_json_in.write(amberSubmissionJson)
-                min_json_in.close()
+                    ##TODO This needs to move - Sequence should not be deciding how 
+                    ## minimization will happen.  That is the job of mmservice.
+                    amberSubmissionJson='{"project" : \
+                        {\
+                        "id":"' + pUUID + '", \
+                        "workingDirectory":"' + projectDir + '", \
+                        "type":"minimization", \
+                        "system_phase":"gas", \
+                        "water_model":"none" \
+                        } \
+                    }'
+                    # TODO:  Make this resemble real code....
+                    the_json_file = projectDir + "amber_submission.json"
+                    min_json_in = open (the_json_file , 'w')
+                    min_json_in.write(amberSubmissionJson)
+                    min_json_in.close()
 
-                from gemsModules.mmservice.amber.amber import manageIncomingString
-                manageIncomingString(amberSubmissionJson)
-            ## everything up to here -- all the amber stuff --
-            ## is what needs to move
+                    from gemsModules.mmservice.amber.amber import manageIncomingString
+                    manageIncomingString(amberSubmissionJson)
+                    ## everything up to here -- all the amber stuff --
+                    ## is what needs to move
 
 
 ##  @brief Pass a sequence string, get a builder for that sequence.
@@ -374,23 +384,37 @@ def manageSequenceRequest(thisTransaction : Transaction):
                 ## Each buildState represents a single build request.
                 for buildState in structureInfo.buildStates:
                     log.debug("Checking if a structure has been built in this buildState: ")
-                    prettyPrint(buildState)
+                    log.debug("buildState: " + repr(buildState))
                     ##  check if requested structures exitst, update structureInfo_status.json and project when exist
                     try:
                         if structureExists(buildState, thisTransaction):
                             log.debug("Found an existing structure.")
                             log.error("Dan write logic to return existing structures.")
                         else:
+                            log.debug("Need to build this structure.")
+                            try:
+                                ##  build any needed structures,
+                                buildStates = structureInfo.buildStates
+                                for buildState in buildStates:
 
+                                    build3DStructure(buildState, thisTransaction)
+                                    registerBuild(buildState, thisTransaction)
+                                    
+                                    ##      update structureInfo_status.json 
+                                    ##      Update project
+                                    ##  create downloadUrl
+                                    ##  submit to amber for minimization, 
+                                    ##      update structureInfo_status.json 
+                                    ##      update project
+                                    ##  registerBuild
+                                
+                                ##  append response to transaction
+                            except Exception as error:
+                                log.error("There was a problem building this structure: " + str(error))
+                                raise error
                     except Exception as error:
                         log.error("There was a problem checking if the structure exists: " + str(error))
-                        try:
-                            build3DStructure(structureInfo, thisTransaction)
-                            ##  build any needed structures, update structureInfo_status.json, and project
-                            ##  create downloadUrl
-                            ##  submit to amber for minimization, update structureInfo_status.json and project
-                            ##  registerBuild
-                            ##  append response to transaction
+                        raise error
 
 
 ##  @brief Return true if this structure has been built previously, otherwise false.
@@ -426,6 +450,7 @@ def structureExists(buildState: BuildState, thisTransaction : Transaction):
                     log.debug("default structure not found.")
                     return False
             else:
+                log.error("Need to write the logic that checks for existing builds that are not the defaults.")
                 ## Need to write a buildStateExists() method that compares BuildStates that have
                 ##  been logged to file to requested BuildStates.
         else:
@@ -480,26 +505,17 @@ def respondWithExistingDefaultStructure(thisTransaction: Transaction):
 
 
 
-## TODO: Rewrite this to a smaller scope: symlinks, status updates, and folder creation 
-#       Remove structureInfo stuff completely.
+## TODO: Rewrite this to a smaller scope: symlinks, and folder creation 
 
 ##  @brief  Creates the directories and files needed to store a file that can be
 #           reused via symlink.
 #   @detail Still being worked on, but works for default structures.
-#   ##TODO: Needs cleanup, documentation, and error handling.
-#   ##TODO: transition to using structureInfo object for registering and logging purposes.
 #   @param  Transaction
-def registerBuild(thisTransaction):
+def registerBuild(buildState : BuildState, thisTransaction : Transaction):
     log.info("registerBuild() was called.")
-    structureMap = {}
+
     sequence = getSequenceFromTransaction(thisTransaction)
     seqID = getSeqIDForSequence(sequence)
-    timestamp = str(datetime.now())
-    structureMap.update({
-        "sequence":sequence,
-        "seqID": seqID,
-        "timestamp": timestamp
-    })
 
     ## userDataDir is the top level dir that holds all projects, not a specific user's data.
     userDataDir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/"
@@ -522,7 +538,7 @@ def registerBuild(thisTransaction):
                     link = seqIDPath + "/default"
                     projectDir = projectDir + "/default"
                 else:
-                    link = buildRotamerDirName(thisTransaction)
+                    link = seqIDPath + "/" + buildState.structureLabel
                 
                 if os.path.exists(projectDir):
                     target = projectDir
@@ -598,6 +614,27 @@ def checkIfDefaultStructureRequest(thisTransaction):
         else:
             log.debug("No geometryOptions found, returning True.")
             return True
+
+
+##  @brief gets the path of the default dir for a project. 
+##  @TODO: Evaluate if this is necessary. Possibly deprecate this. 
+def getProjectSubdir(thisTransaction: Transaction):
+    log.info("getProjectSubdir() was called.")
+    project_dir = thisTransaction.response_dict['gems_project']['project_dir']
+    log.debug("project_dir: " + project_dir)
+
+    ## If default structure, subdir name is 'default'
+    if checkIfDefaultStructureRequest(thisTransaction):
+        project_dir = project_dir + "default/"
+        if not os.path.exists(project_dir):
+            os.makedirs(project_dir)
+
+    else:
+        log.error("Still writing the logic to handle builds with selectedRotamers.")
+        ##TODO: provide the subdir based on this doc: 
+        ## http://128.192.9.183/eln/gwscratch/2020/01/10/succinct-rotamer-set-labeling-for-sequences/
+        raise AttributeError("rotamerSubdir")
+    return project_dir 
 
 
 ##  @brief Looks up the sequence and generates an seqID, then checks for existing builds.

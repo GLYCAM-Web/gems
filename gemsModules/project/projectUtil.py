@@ -361,26 +361,6 @@ def updateTransaction(gems_project, thisTransaction):
     thisTransaction.response_dict['gems_project'] = gems_project.__dict__
     log.debug("thisTransaction: \n" + str(thisTransaction))
 
-##  @brief gets the path of the default dir for a project. 
-##  @TODO: Evaluate if this is necessary. Possibly deprecate this. 
-def getProjectSubdir(thisTransaction: Transaction):
-    log.info("getProjectSubdir() was called.")
-    project_dir = thisTransaction.response_dict['gems_project']['project_dir']
-    log.debug("project_dir: " + project_dir)
-
-    ## If default structure, subdir name is 'default'
-    if checkIfDefaultStructureRequest(thisTransaction):
-        project_dir = project_dir + "default/"
-        if not os.path.exists(project_dir):
-            os.makedirs(project_dir)
-
-    else:
-        log.error("Still writing the logic to handle builds with selectedRotamers.")
-        ##TODO: provide the subdir based on this doc: 
-        ## http://128.192.9.183/eln/gwscratch/2020/01/10/succinct-rotamer-set-labeling-for-sequences/
-        raise AttributeError("rotamerSubdir")
-    return project_dir 
-
 def main():
     if len(sys.argv) == 2:
         jsonObjectString = utils.JSON_From_Command_Line(sys.argv)
