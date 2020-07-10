@@ -34,7 +34,7 @@ class BuildState(BaseModel):
     ## Solvated requests might specify a shape.
     solvationShape : str = None
 
-    status : str = "new" ##Use an enum here. new, building, ready, submitted, complete, failed, delayed
+    status : str = "new" ## new, building, ready, submitted, complete, failed, delayed
 
     date : datetime = None
     addIons : str = "default" ## Is there a benefit for this to be a String? Boolean?
@@ -424,7 +424,7 @@ def saveRequestInfo(structureInfo, projectDir):
     
     ## convert the object to dict
     try:
-        data = convertToDict(structureInfo)
+        data = convertStructureInfoToDict(structureInfo)
         log.debug("structureInfo as dict: \n\n")
         prettyPrint(data)
     except Exception as error:
@@ -455,8 +455,8 @@ def saveRequestInfo(structureInfo, projectDir):
 ##  @brief Pass in structureInfo, get a dict in return.
 #   @detail Since structureInfo objects have lists of objects with lists of objects, 
 #   a bit of homework is saved by using this to convert to dict.
-def convertToDict(structureInfo):
-    log.info("convertToDict was called.")
+def convertStructureInfoToDict(structureInfo):
+    log.info("convertStructureInfoToDict was called.")
     data = {}
     ## set the sequence.
     try:

@@ -390,31 +390,83 @@ def manageSequenceRequest(thisTransaction : Transaction):
                         if structureExists(buildState, thisTransaction):
                             log.debug("Found an existing structure.")
                             log.error("Dan write logic to return existing structures.")
+                            ##TODO: Make this next method more generic, so it can handle rotamers too.
+                            respondWithExistingDefaultStructure(thisTransaction)
                         else:
                             log.debug("Need to build this structure.")
                             try:
                                 ##  build any needed structures,
                                 buildStates = structureInfo.buildStates
                                 for buildState in buildStates:
-
-                                    build3DStructure(buildState, thisTransaction)
-                                    registerBuild(buildState, thisTransaction)
-                                    
-                                    ##      update structureInfo_status.json 
-                                    ##      Update project
-                                    ##  create downloadUrl
-                                    ##  submit to amber for minimization, 
-                                    ##      update structureInfo_status.json 
-                                    ##      update project
-                                    ##  registerBuild
-                                
-                                ##  append response to transaction
+                                    try: 
+                                        build3DStructure(buildState, thisTransaction)
+                                    except Exception as error:
+                                        log.error("There was a problem building the 3D structure: " + str(error))
+                                        raise error
+                                    else:
+                                        try:
+                                            createSymLinks(buildState, thisTransaction)
+                                        except Exception as error:
+                                            log.error("There was a problem creating the symbolic links: " + str(error))
+                                            raise error
+                                        else:
+                                            try:
+                                                ##      update structureInfo_status.json 
+                                                ##      Update project
+                                                registerBuild(structureInfo, thisTransaction)
+                                            except Exception as error:
+                                                log.error("There was a problem registering this build: " + str(error))
+                                                raise error
+                                            
+                                            ##  create downloadUrl
+                                            ##  submit to amber for minimization, 
+                                            ##      update structureInfo_status.json 
+                                            ##      update project
+                                        
+                                        ##  append response to transaction
                             except Exception as error:
                                 log.error("There was a problem building this structure: " + str(error))
                                 raise error
                     except Exception as error:
                         log.error("There was a problem checking if the structure exists: " + str(error))
                         raise error
+
+
+def registerBuild(structureInfo : StructureInfo, thisTransaction : Transaction):
+    log.debug("registerBuild() was called.")
+    sequence = getSequenceFromTransaction(thisTransaction)
+    seqID = getSeqIDForSequence(sequence)
+    userDataDir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/"
+
+    seqIDPath = userDataDir + seqID
+    ##Update the json file for future reference.
+    structureInfoFilename = seqIDPath + "/structureInfo.json"
+    log.debug("Updating or creating the log at:" + str(structureInfoFilename))
+
+    ##  If we are registering this build the seqIDPath should already exist.
+    if os.path.isdir(seqIDPath):
+        log.debug("Found the seqIDPath")
+    else:
+        raise FileNotFoundError("seqIDPath: " + str(seqIDPath))
+
+    ## Create the structureInfo file if this is the first time.
+    if os.path.isfile(structureInfoFilename):
+        log.debug("Updating an existing structureInfo.json")
+        try:
+            parsed_json = json.load(structureInfoFilename)
+            log.debug("parsed_json: " + repr(parsed_json))
+        except Exception as error:
+            log.debug("There was a problem reading structureInfo.json: " + str(error))
+            raise error
+    else:
+        log.debug("Could not find structureInfo.json. Creating a new one.")
+
+        try:
+            with open(structureInfoFilename, 'w', encoding='utf-8') as jsonFile:
+                json.dump(convertStructureInfoToDict(structureInfo), jsonFile, ensure_ascii=False, indent=4)
+        except Exception as error:
+            log.error("There was a problem writing the structure mapping to file: " + str(error))
+            raise error
 
 
 ##  @brief Return true if this structure has been built previously, otherwise false.
@@ -460,48 +512,42 @@ def structureExists(buildState: BuildState, thisTransaction : Transaction):
 
 
 
-##TODO Evaluate for deprecation.
+##TODO Make this work for structures that are not the default.
 ##  @brief Call this if the default structure for a sequence already exists.
 #   @detail Builds a project and a response config object. Updates the transaction.
 #   @param Transaction
 def respondWithExistingDefaultStructure(thisTransaction: Transaction):
     log.info("respondWithExistingDefaultStructure() was called.")
-    ##  Even preexisting builds need projects.
+
     try:
-        startProject(thisTransaction)
+        sequence = getSequenceFromTransaction(thisTransaction)
     except Exception as error:
-        log.error("There was a problem starting a project for this request: " + str(error))
+        log.error("There was a problem getting the sequence from the request: " + str(error))
         raise error
     else:
         try:
-            sequence = getSequenceFromTransaction(thisTransaction)
+            seqID = getSeqIDForSequence(sequence)
         except Exception as error:
-            log.error("There was a problem getting the sequence from the request: " + str(error))
+            log.error("There was a problem getting the seqID for this sequence: " + str(error))
             raise error
         else:
             try:
-                seqID = getSeqIDForSequence(sequence)
+                ##Grab the projectId from the gemsProject.
+                projID = getProjectpUUID(thisTransaction)
             except Exception as error:
-                log.error("There was a problem getting the seqID for this sequence: " + str(error))
+                log.error("There was a problem getting the pUUID from the GemsProject: " + str(error))
                 raise error
             else:
-                try:
-                    ##Grab the projectId from the gemsProject.
-                    projID = getProjectpUUID(thisTransaction)
-                except Exception as error:
-                    log.error("There was a problem getting the pUUID from the GemsProject: " + str(error))
-                    raise error
-                else:
-                    config = {
-                        "entity":"Sequence",
-                        "respondingService":"Build3DStructure",
-                        "responses": [{
-                            'payload': projID,
-                            'download' : getDownloadUrl(seqID, "cb"),
-                            'seqID' : seqID
-                        }]
-                    }
-                    appendResponse(thisTransaction, config)
+                config = {
+                    "entity":"Sequence",
+                    "respondingService":"Build3DStructure",
+                    "responses": [{
+                        'payload': projID,
+                        'download' : getDownloadUrl(seqID, "cb"),
+                        'seqID' : seqID
+                    }]
+                }
+                appendResponse(thisTransaction, config)
 
 
 
@@ -511,8 +557,8 @@ def respondWithExistingDefaultStructure(thisTransaction: Transaction):
 #           reused via symlink.
 #   @detail Still being worked on, but works for default structures.
 #   @param  Transaction
-def registerBuild(buildState : BuildState, thisTransaction : Transaction):
-    log.info("registerBuild() was called.")
+def createSymLinks(buildState : BuildState, thisTransaction : Transaction):
+    log.info("createSymLinks() was called.")
 
     sequence = getSequenceFromTransaction(thisTransaction)
     seqID = getSeqIDForSequence(sequence)
@@ -536,7 +582,7 @@ def registerBuild(buildState : BuildState, thisTransaction : Transaction):
                 log.debug("isDefault: " + str(isDefault))
                 if isDefault:
                     link = seqIDPath + "/default"
-                    projectDir = projectDir + "/default"
+                    projectDir = projectDir + "default"
                 else:
                     link = seqIDPath + "/" + buildState.structureLabel
                 
@@ -554,43 +600,9 @@ def registerBuild(buildState : BuildState, thisTransaction : Transaction):
             except Exception as error:
                 log.error("There was a problem creating the symbolic link.")
                 raise error
-            else:
-                ##TODO: Determine if the default structure was requested or not.
-                ## For now, assume the default structure was requested.
+            
                 
-                solvationRequested = checkIfSolvationRequested(thisTransaction)
-                if solvationRequested == "Yes":
-                    solvationShape = getSolvationShape(thisTransaction)
-                else:
-                    solvationShape = ""
-                forceField = getForceFieldFromRequest(thisTransaction)
 
-                ##Update the json file for future reference.
-                structureInfoFilename = seqIDPath + "/structureInfo.json"
-                structureMap.update({
-                    "isDefault": isDefault,
-                    "solvationRequested": solvationRequested,
-                    "solvationShape": solvationShape,
-                    "forceField": forceField,
-                })
-
-                log.debug("structureMap: " + str(structureMap))
-                log.debug("Updating or creating the log at:" + str(structureInfoFilename))
-                
-                if not os.path.exists(structureInfoFilename):
-                    log.debug("Creating a new structureInfo.json")
-                    try:
-                        with open(structureInfoFilename, 'w', encoding='utf-8') as jsonFile:
-                            jsonString = json.dump(structureMap, jsonFile, ensure_ascii=False, indent=4)
-                            log.debug("jsonString: " + jsonString)
-                            jsonFile.write(jsonString)
-                    except Exception as error:
-                        log.error("There was a problem writing the structure mapping to file: " + str(error))
-                        raise error
-                else:
-                    log.debug("The structureInfo.json file exists. Adding a new record.")
-                    ##TODO: Write this logic.
-                
 
 
 ##  @brief Looks at a transaction to determine if the user is requesting the default structure
