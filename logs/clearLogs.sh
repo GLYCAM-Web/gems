@@ -42,7 +42,7 @@ if [ "$1" == "debug" ]; then
 fi
 
 if [ "$1" == "info" ]; then
-	echo "" > ./logs/git-ignore-me_gemsInfo.log
+	echo "" > ./lologsgs/git-ignore-me_gemsInfo.log
 fi
 
 if [ "$1" == "error" ]; then

@@ -392,81 +392,76 @@ def manageSequenceRequest(thisTransaction : Transaction):
                             log.error("Dan write logic to return existing structures.")
                             ##TODO: Make this next method more generic, so it can handle rotamers too.
                             respondWithExistingDefaultStructure(thisTransaction)
+                            ##TODO: Update the structureInfo_status.json
                         else:
                             log.debug("Need to build this structure.")
-                            try:
-                                ##  build any needed structures,
-                                buildStates = structureInfo.buildStates
-                                for buildState in buildStates:
-                                    try: 
-                                        build3DStructure(buildState, thisTransaction)
-                                    except Exception as error:
-                                        log.error("There was a problem building the 3D structure: " + str(error))
-                                        raise error
-                                    else:
-                                        try:
-                                            createSymLinks(buildState, thisTransaction)
-                                        except Exception as error:
-                                            log.error("There was a problem creating the symbolic links: " + str(error))
-                                            raise error
-                                        else:
-                                            try:
-                                                ##      update structureInfo_status.json 
-                                                ##      Update project
-                                                registerBuild(structureInfo, thisTransaction)
-                                            except Exception as error:
-                                                log.error("There was a problem registering this build: " + str(error))
-                                                raise error
-                                            
-                                            ##  create downloadUrl
-                                            ##  submit to amber for minimization, 
-                                            ##      update structureInfo_status.json 
-                                            ##      update project
-                                        
-                                        ##  append response to transaction
+                            try: 
+                                build3DStructure(buildState, thisTransaction)
                             except Exception as error:
-                                log.error("There was a problem building this structure: " + str(error))
+                                log.error("There was a problem building the 3D structure: " + str(error))
                                 raise error
+                            else:
+                                try:
+                                    createSymLinks(buildState, thisTransaction)
+                                except Exception as error:
+                                    log.error("There was a problem creating the symbolic links: " + str(error))
+                                    raise error
+                                else:
+                                    try:
+                                        #Updates the statuses in various files and the project
+                                        registerBuild(buildState, thisTransaction)
+                                    except Exception as error:
+                                        log.error("There was a problem registering this build: " + str(error))
+                                        raise error
+                                    
+                                    ##  create downloadUrl
+                                    ##  submit to amber for minimization, 
+                                    ##      update structureInfo_status.json again
+                                    ##      update project again
+                                
+                                ##  append response to transaction
+                            
                     except Exception as error:
                         log.error("There was a problem checking if the structure exists: " + str(error))
                         raise error
 
 
-def registerBuild(structureInfo : StructureInfo, thisTransaction : Transaction):
+
+def registerBuild(buildState : BuildState, thisTransaction : Transaction):
     log.debug("registerBuild() was called.")
-    sequence = getSequenceFromTransaction(thisTransaction)
-    seqID = getSeqIDForSequence(sequence)
-    userDataDir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/"
-
-    seqIDPath = userDataDir + seqID
-    ##Update the json file for future reference.
-    structureInfoFilename = seqIDPath + "/structureInfo.json"
-    log.debug("Updating or creating the log at:" + str(structureInfoFilename))
-
-    ##  If we are registering this build the seqIDPath should already exist.
-    if os.path.isdir(seqIDPath):
-        log.debug("Found the seqIDPath")
+    try:
+        ##TODO: get the path for structureInfo.json
+        structureInfoFilename = getStructureInfoFilename(thisTransaction)
+        log.debug("structureInfoFilename:" + str(structureInfoFilename))
+    except Exception as error:
+        log.error("There was a problem getting the path for structureInfo.json: " + str(error))
     else:
-        raise FileNotFoundError("seqIDPath: " + str(seqIDPath))
-
-    ## Create the structureInfo file if this is the first time.
-    if os.path.isfile(structureInfoFilename):
-        log.debug("Updating an existing structureInfo.json")
         try:
-            parsed_json = json.load(structureInfoFilename)
-            log.debug("parsed_json: " + repr(parsed_json))
+            ##TODO: get the path for structureInfo_status.json 
+            statusFilename = getStatusFilename(thisTransaction)
+            log.debug("statusFilename:" + str(statusFilename))
         except Exception as error:
-            log.debug("There was a problem reading structureInfo.json: " + str(error))
+            log.error("There was a problem getting the status filename: " + str(error))
             raise error
-    else:
-        log.debug("Could not find structureInfo.json. Creating a new one.")
+        else:
+            try:
+                updateSeqLog(structureInfoFilename, buildState, "submitted")
+            except Exception as error:
+                log.error("There was a problem updating the structureInfo.json: " + str(error))
+                raise error
+            else:
+                try:
+                    updateStatusFile(statusFilename, buildState, "submitted")
+                except Exception as error:
+                    log.error("There was a problem updating the status file: " + str(error))
+                    raise error
+                else:
+                    try:
+                        updateProjectStatus(thisTransaction)
+                    except Exception as error:
+                        log.error("There was a problem updating the project status")
+                        raise error
 
-        try:
-            with open(structureInfoFilename, 'w', encoding='utf-8') as jsonFile:
-                json.dump(convertStructureInfoToDict(structureInfo), jsonFile, ensure_ascii=False, indent=4)
-        except Exception as error:
-            log.error("There was a problem writing the structure mapping to file: " + str(error))
-            raise error
 
 
 ##  @brief Return true if this structure has been built previously, otherwise false.
@@ -576,30 +571,36 @@ def createSymLinks(buildState : BuildState, thisTransaction : Transaction):
             log.error("There was a problem creating the seqIDPath: " + str(error))
             raise error
         else:
-            projectDir = getProjectDir(thisTransaction)
             try:
-                isDefault = checkIfDefaultStructureRequest(thisTransaction)
-                log.debug("isDefault: " + str(isDefault))
-                if isDefault:
-                    link = seqIDPath + "/default"
-                    projectDir = projectDir + "default"
-                else:
-                    link = seqIDPath + "/" + buildState.structureLabel
-                
-                if os.path.exists(projectDir):
-                    target = projectDir
-                    ##What is being linked to is the projecDir or the 
-                    log.debug("target: " + target)
-                    ##This will be the symbolic link
-                    log.debug("link: " + link)
-                    os.symlink(target, link)
-                else:
-                    log.error("Failed to find the target dir for the symbolic link.")
-                    raise FileNotFoundError(projectDir)
-                
+                createSeqLog(sequence, seqIDPath)
             except Exception as error:
-                log.error("There was a problem creating the symbolic link.")
+                log.error("There was a problem creating the SeqLog: " + str(error))
                 raise error
+            else:
+                projectDir = getProjectDir(thisTransaction)
+                try:
+                    isDefault = checkIfDefaultStructureRequest(thisTransaction)
+                    log.debug("isDefault: " + str(isDefault))
+                    if isDefault:
+                        link = seqIDPath + "/default"
+                        projectDir = projectDir + "default"
+                    else:
+                        link = seqIDPath + "/" + buildState.structureLabel
+                    
+                    if os.path.exists(projectDir):
+                        target = projectDir
+                        ##What is being linked to is the projecDir or the 
+                        log.debug("target: " + target)
+                        ##This will be the symbolic link
+                        log.debug("link: " + link)
+                        os.symlink(target, link)
+                    else:
+                        log.error("Failed to find the target dir for the symbolic link.")
+                        raise FileNotFoundError(projectDir)
+                    
+                except Exception as error:
+                    log.error("There was a problem creating the symbolic link.")
+                    raise error
             
                 
 
