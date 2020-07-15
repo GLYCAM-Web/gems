@@ -445,13 +445,13 @@ def registerBuild(buildState : BuildState, thisTransaction : Transaction):
             raise error
         else:
             try:
-                updateSeqLog(structureInfoFilename, buildState, "submitted")
+                updateStructureInfo(structureInfoFilename, buildState, "submitted")
             except Exception as error:
                 log.error("There was a problem updating the structureInfo.json: " + str(error))
                 raise error
             else:
                 try:
-                    updateStatusFile(statusFilename, buildState, "submitted")
+                    updateStructureInfo(statusFilename, buildState, "submitted")
                 except Exception as error:
                     log.error("There was a problem updating the status file: " + str(error))
                     raise error

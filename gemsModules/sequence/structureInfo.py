@@ -551,31 +551,36 @@ def checkForSimulationPhase(thisTransaction: Transaction):
 
 
 ##  @brief Creates a record of a newly built structure in its seqID dir.
-#   @detail This holds the master record of all builds for a given sequence. 
+#   @detail structureInfo.json holds the master record of all builds for a given sequence. 
+#   @detail structureInfo_status.json holds the master record of all builds for a given project.
 #   @param structureInfoFilename String
-def updateSeqLog(structureInfoFilename : str, buildState : BuildState, status : str):
-    log.info("updateSeqLog() was called.")
+def updateBuildStatus(structureInfoFilename : str, buildState : BuildState, status : str):
+    log.info("updateStructureInfo() was called.")
     log.debug("structureInfoFilename: " + structureInfoFilename)
 
-    ## Throw errors if these files don't already exist.
-    seqDir = structureInfoFilename.replace("structureInfo.json", "")
-    log.debug("seqDir: " + seqDir)
-    if os.path.exists(seqDir):
-        log.debug("seqDir exists.")
+    if "status" in structureInfoFilename:
+        log.debug("Updating a project's  status file")
     else:
-        raise(FileNotFoundError(seqDir))
+        log.debug("Updating an seqDir's structureInfo.json")
+        ## Throw errors if the seqDir don't already exist.
+        seqDir = structureInfoFilename.replace("structureInfo.json", "")
+        log.debug("seqDir: " + seqDir)
+        if os.path.exists(seqDir):
+            log.debug("seqDir exists.")
+        else:
+            raise(FileNotFoundError(seqDir))
 
     if os.path.exists(structureInfoFilename):
-        log.debug("Found the structureInfo.json file.")
+        log.debug("Found the file.")
     else:
-        raise(FileNotFoundError(seqDir))
+        raise(FileNotFoundError(structureInfoFilename))
 
     try:
         ##Load the object from the file.
         with open(structureInfoFilename, 'r') as inFile:
             data = json.load(inFile)
     except Exception as error:
-        log.error("There was a problem reading the structureInfo.json: " + str(error))
+        log.error("There was a problem reading the file " + str(error))
         raise error
     else:
         try:
@@ -592,18 +597,26 @@ def updateSeqLog(structureInfoFilename : str, buildState : BuildState, status : 
             else:
                 log.debug("Builds exist. Checking if we are updating the status of an existing build.")
                 log.debug("buildState: " + str(data['buildStates']))
+                log.error("\n\n\n\n\nStill in dev \n\n\n\n")
                 ##TODO: Find the appropriate record for updating.
-            
+                for recordedState in data['buildStates']:
+                    log.debug("recordedState['structureLabel']: " + recordedState['structureLabel'])
+                    log.debug("buildState.structureLabel: " + buildState.structureLabel)
+                    if recordedState['structureLabel'] == buildState.structureLabel:
+                        log.debug("Found the record to update. recordedState['status']: " + recordedState['status'])
+                        recordedState['status'] = status
+                        log.debug("updated recordedState['status']: " + recordedState['status'])
+
         except Exception as error:
             log.error("There was a problem updating the object: " + str(error))
             raise error
         else:
             try:
-                log.debug("attempting to write the updated seqLog to file.")
+                log.debug("Attempting to write the updated structureInfo data to file.")
                 with open(structureInfoFilename, 'w') as outFile:
                     json.dump(data, outFile)
             except Exception as error:
-                log.error("There was a problem writing the seqLog to file: "  + str(error))
+                log.error("There was a problem writing the structureInfo data to file: "  + str(error))
                 raise error
 
 
