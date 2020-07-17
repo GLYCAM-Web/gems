@@ -354,14 +354,32 @@ def receive(thisTransaction : Transaction):
     ## prepares the transaction for return to the requestor, success or fail.     
     thisTransaction.build_outgoing_string()
 
+def projectExists(thisTransaction):
+    log.info("projectExists() was called.")
+    try:
+        projectDir = getProjectDir(thisTransaction)
+    except Exception as error:
+        log.error("There was a problem getting the projectDir: " + str(error))
+        raise error
+    else:
+        if os.path.exists(projectDir):
+            log.debug("Found an existing project dir.")
+            return True
+        else:
+            log.debug("No projectDir found.")
+            return False
+
 ##  @brief Logs requests, makes decisions about what to build or reuse, builds a response.
 ##  @detail This is a bit of a butler method, it looks over the process and calls only what
 #       is needed, depending on the request and whether an existing structure fits the request.
 def manageSequenceRequest(thisTransaction : Transaction):
     log.info("manageSequenceRequest() was called.")
-    ##  Start a project
+    ##  Start a project, if needed
     try:
-        startProject(thisTransaction)
+        if projectExists(thisTransaction):
+            log.debug("Existing project.")
+        else:
+            startProject(thisTransaction)
     except Exception as error:
         log.error("There was a problem creating a project: " + str(error))
         raise error
@@ -455,12 +473,6 @@ def registerBuild(buildState : BuildState, thisTransaction : Transaction):
                 except Exception as error:
                     log.error("There was a problem updating the status file: " + str(error))
                     raise error
-                else:
-                    try:
-                        updateProjectStatus(thisTransaction)
-                    except Exception as error:
-                        log.error("There was a problem updating the project status")
-                        raise error
 
 
 

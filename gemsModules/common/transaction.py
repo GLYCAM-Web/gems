@@ -399,18 +399,18 @@ class Transaction:
 #            if ('jsonObjectOutputFormat', 'Pretty') in self.transaction_in.options:
 #                isPretty = True
         log.info("build_outgoing_string() was called.")
-        log.debug("response_dict: \n" + str(self.response_dict))
+        #log.debug("response_dict: \n" + str(self.response_dict))
         for key in self.response_dict.keys():
-            log.debug("key: " + key)
-            log.debug("valueType: " + str(type(self.response_dict[key])))
+            #log.debug("key: " + key)
+            #log.debug("valueType: " + str(type(self.response_dict[key])))
             if key == 'gems_project':
-                log.debug("\ngems_project: \n")
+                #log.debug("\ngems_project: \n")
                 for element in self.response_dict['gems_project'].keys():
-                    log.debug("~ element: " + element)
+                    #log.debug("~ element: " + element)
                     if type(self.response_dict['gems_project'][element]) != str:
                         self.response_dict['gems_project'][element] = str(self.response_dict['gems_project'][element])
 
-                    log.debug("~ valueType: " + str(type(self.response_dict['gems_project'][element])))
+                    #log.debug("~ valueType: " + str(type(self.response_dict['gems_project'][element])))
         try:
             if isPretty:
                 self.outgoing_string=json.dumps(self.response_dict, indent=4)

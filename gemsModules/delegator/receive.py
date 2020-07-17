@@ -107,7 +107,8 @@ def delegate(jsonObjectString):
                             appendCommonParserNotice(thisTransaction, error_msg)
 
     # Return whatever outgoing string was made
-    log.debug("About to return whatever output I have at this point.")
+    log.debug("About to return whatever output I have at this point:")
+    prettyPrint(thisTransaction.response_dict)
     return thisTransaction.outgoing_string
 
 def setResponseSiteHost(thisTransaction):

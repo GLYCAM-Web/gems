@@ -37,9 +37,9 @@ class GemsProject(BaseModel):
     gmml_branch : str = ""
     site_mode : str = ""
     site_host_name : str = ""
-    force_field : str = ""
-    parameter_version : str = ""
-    amber_version : str = ""
+    force_field : str = "default"
+    parameter_version : str = "default"
+    amber_version : str = "default"
     json_api_version : str = ""
     
     
@@ -141,11 +141,14 @@ class CbProject(GemsProject):
         inputs = request_dict['entity']['inputs']
         sequence = ""
         for element in inputs:
-            if "Sequence" not in element.keys():
+            if "Sequence" in element.keys():
                 sequence = element['Sequence']['payload']
+
         if sequence is not "":
             self.sequence = sequence
             self.seqID = getSeqIDForSequence(sequence)
+        else:
+            raise AttributeError("Sequence")
         inputs = request_dict['entity']['inputs']
         requested_structure_count = 0
         for element in inputs:

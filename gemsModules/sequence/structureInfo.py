@@ -419,6 +419,9 @@ def buildStructureInfo(thisTransaction : Transaction):
 
     return structureInfo
 
+
+##  @brief creates the files needed to track a request for various builds of a sequence.
+#   @detail not for updating existing files. 
 def saveRequestInfo(structureInfo, projectDir):
     log.info("saveRequestInfo() was called.")
     
@@ -436,7 +439,9 @@ def saveRequestInfo(structureInfo, projectDir):
             fileName = projectDir + "logs/structureInfo_request.json"
             log.debug("Attempting to write: " + fileName)
             with open(fileName, 'w') as outFile:
-                json.dump(data, outFile)
+                jsonString = json.dumps(data, indent=4, sort_keys=False, default=str)
+                log.debug("jsonString: \n" + jsonString )
+                outFile.write(jsonString)
         except Exception as error:
             log.error("There was a problem writing structureInfo_request.json to file: " + str(error))
             raise error
@@ -446,7 +451,9 @@ def saveRequestInfo(structureInfo, projectDir):
                 statusFileName = projectDir + "logs/structureInfo_status.json"
                 log.debug("Attempting to write: " + statusFileName)
                 with open(statusFileName, 'w') as statusFile:
-                    json.dump(data, statusFile)
+                    jsonString = json.dumps(data, indent=4, sort_keys=False, default=str)
+                    log.debug("jsonString: \n" + jsonString )
+                    statusFile.write(jsonString)
             except Exception as error:
                 log.error("There was a problem writing structureInfo_status.json: " + str(error))
                 raise error
@@ -552,7 +559,8 @@ def checkForSimulationPhase(thisTransaction: Transaction):
 
 ##  @brief Creates a record of a newly built structure in its seqID dir.
 #   @detail structureInfo.json holds the master record of all builds for a given sequence. 
-#   @detail structureInfo_status.json holds the master record of all builds for a given project.
+#           structureInfo_status.json holds the master record of all builds for a given project.
+#           This method expects a file at a time to be passed in for updating.
 #   @param structureInfoFilename String
 def updateBuildStatus(structureInfoFilename : str, buildState : BuildState, status : str):
     log.info("updateStructureInfo() was called.")
@@ -614,7 +622,9 @@ def updateBuildStatus(structureInfoFilename : str, buildState : BuildState, stat
             try:
                 log.debug("Attempting to write the updated structureInfo data to file.")
                 with open(structureInfoFilename, 'w') as outFile:
-                    json.dump(data, outFile)
+                    jsonString = json.dumps(data, indent=4, sort_keys=False, default=str)
+                    log.debug("jsonString: \n" + jsonString )
+                    outFile.write(jsonString)
             except Exception as error:
                 log.error("There was a problem writing the structureInfo data to file: "  + str(error))
                 raise error
@@ -668,7 +678,9 @@ def createSeqLog(sequence : str, seqIDPath : str):
             fileName = seqIDPath + "/structureInfo.json"
             log.debug("Attempting to write: " + fileName)
             with open(fileName, 'w') as outFile:
-                json.dump(logObj, outFile)
+                jsonString = json.dumps(logObj, indent=4, sort_keys=False, default=str)
+                log.debug("jsonString: \n" + jsonString )
+                outFile.write(jsonString)
         except Exception as error:
             log.error("There was a problem writing structureInfo_request.json to file: " + str(error))
             raise error

@@ -60,7 +60,8 @@ def parseInput(thisTransaction):
 
     # Load the JSON string into the incoming dictionary
     thisTransaction.request_dict = json.loads(thisTransaction.incoming_string)
-    log.debug("thisTransaction.request_dict: " + str(thisTransaction.request_dict))
+    log.debug("thisTransaction.request_dict: \n\n")
+    prettyPrint(thisTransaction.request_dict)
 
     # Check to see if there are errors.  If there are, bail, but give a reason
     if thisTransaction.request_dict is None:
@@ -239,18 +240,16 @@ def appendResponse(thisTransaction, responseConfig):
 ##  @brief Convenience method for cleaning and speeding up log reading of dict objects.
 #   @detail Useful for assessing json objects.
 def prettyPrint(myObj):
-    log.info("prettyPrint() was called.")
-    log.debug("myObj objectType: " + str(type(myObj)))
+
     preparedObj = {}
     for field in myObj.keys():
         if type(field != str):
             ## recursively convert object and all children to strings.
             preparedObj[field] = processFieldForPrettyPrinting(myObj[field])
         else:
-
             preparedObj[field] = myObj[field]
 
-    log.debug("myObj, pretty: \n" + json.dumps(preparedObj, indent=4, sort_keys=False))
+    log.debug("\n" + json.dumps(preparedObj, indent=4, sort_keys=False))
 
 
 ##  @brief Recursively convert object and all children to strings. 

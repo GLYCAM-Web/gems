@@ -62,6 +62,7 @@ def startProject(thisTransaction : Transaction):
                 ### Find the projectDir.
                 try:
                     project_dir = getProjectDir(thisTransaction)
+                    logs_dir = setupProjectDirs(project_dir)
                 except Exception as error:
                     log.error("There was a problem getting the projectDir: " + str(error))
                     raise error
@@ -75,7 +76,6 @@ def startProject(thisTransaction : Transaction):
                             raise error
                     ### Write the logs to file.
                     try:
-                        logs_dir = setupProjectDirs(project_dir)
                         request = thisTransaction.request_dict
                         writeRequestToFile(request, logs_dir)
                         writeProjectLogFile(gems_project, logs_dir)
@@ -117,20 +117,23 @@ def getFrontendProjectFromTransaction(thisTransaction: Transaction):
 def getProjectDir(thisTransaction: Transaction):
     log.info("getProjectDir() was called.\n")
     try:
-        project_dir = thisTransaction.response_dict['gems_project']['project_dir']
-        log.debug("project_dir: " + project_dir)
+        if "gems_project" in thisTransaction.response_dict.keys():
+            if "project_dir" in thisTransaction.response_dict['gems_project']:
+                project_dir = thisTransaction.response_dict['gems_project']['project_dir']
+                log.debug("project_dir: " + project_dir)
+        elif "project" in thisTransaction.request_dict.keys():
+            if "projID" in thisTransaction.request_dict['project']:
+                projID = thisTransaction.request_dict['project']['projID']
+                projType = thisTransaction.request_dict['project']['project_type']
+                project_dir = projectSettings.output_data_dir + "tools/" +  projType  + "/git-ignore-me_userdata/" + projID + "/" 
+        else:
+            log.error("Insufficient information provided to find the projectDir.")
+            log.error("This transaction: \n\n " + str(thisTransaction.request))
+            raise AttributeError("projectDir")
     except Exception as error:
         log.error("There was a problem geting the project_dir from the response_dict." + str(error))
         raise error
     else:
-        log.debug("Checking to see if the project_dir exists.")
-        ##Check that the outpur_dir exists. Create it if not.
-        if not os.path.exists (project_dir):
-            log.debug("Creating a project_dir at: " + project_dir)
-            os.makedirs(project_dir)
-        else:
-            log.debug("project_dir already exists, no need to create it.")
-
         return project_dir
 
 ##  Creates dirs if needed in preparation for writing files.
@@ -184,7 +187,7 @@ def writeProjectLogFile(gems_project, logsDir):
     project_log_file = os.path.join(logsDir, logFileName)
     log.debug("project_log_file: " + project_log_file)
     with open(project_log_file, 'w', encoding='utf-8') as file:
-        jsonString = json.dumps(gems_project.__dict__, indent=4, sort_keys=True, default=str)
+        jsonString = json.dumps(gems_project.__dict__, indent=4, sort_keys=False, default=str)
         log.debug("jsonString: \n" + jsonString )
         file.write(jsonString)
 
