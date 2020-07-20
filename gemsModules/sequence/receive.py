@@ -354,10 +354,11 @@ def receive(thisTransaction : Transaction):
     ## prepares the transaction for return to the requestor, success or fail.     
     thisTransaction.build_outgoing_string()
 
-def projectExists(thisTransaction):
+def projectExists(thisTransaction : Transaction):
     log.info("projectExists() was called.")
     try:
         projectDir = getProjectDir(thisTransaction)
+        log.debug("projectDir: " + projectDir)
     except Exception as error:
         log.error("There was a problem getting the projectDir: " + str(error))
         raise error
@@ -394,8 +395,18 @@ def manageSequenceRequest(thisTransaction : Transaction):
         else:
             ##  Save some copies of structureInfo for status tracking.
             try:
+                ## Determine whether to save or update.
                 projectDir = getProjectDir(thisTransaction)
-                saveRequestInfo(structureInfo, projectDir)
+                filename = projectDir + "logs/structureInfo_request.json"
+                if os.path.exists(filename):
+                    log.debug("\n\nstructureInfo_request.json found. Updating both the request and the status file.\n\n")
+                    updateStructureInfotWithUserOptions(thisTransaction, structureInfo, filename)
+                    statusFile = projectDir + "logs/structureInfo_status.json"
+                    if os.path.exists(statusFile):
+                        updateStructureInfotWithUserOptions(thisTransaction, structureInfo, statusFile)
+                else:   
+                    ##Create new files for tracking this project.
+                    saveRequestInfo(structureInfo, projectDir)
             except Exception as error:
                 log.error("There was a problem saving the request info: " + str(error))
             else:

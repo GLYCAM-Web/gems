@@ -116,12 +116,15 @@ def getFrontendProjectFromTransaction(thisTransaction: Transaction):
 #   @return project_dir
 def getProjectDir(thisTransaction: Transaction):
     log.info("getProjectDir() was called.\n")
+    project_dir = ""
     try:
         if "gems_project" in thisTransaction.response_dict.keys():
+            log.debug("found a gems_project.")
             if "project_dir" in thisTransaction.response_dict['gems_project']:
                 project_dir = thisTransaction.response_dict['gems_project']['project_dir']
                 log.debug("project_dir: " + project_dir)
         elif "project" in thisTransaction.request_dict.keys():
+            log.debug("No gems_project found. Looking for a frontend project.")
             if "projID" in thisTransaction.request_dict['project']:
                 projID = thisTransaction.request_dict['project']['projID']
                 projType = thisTransaction.request_dict['project']['project_type']
@@ -134,6 +137,8 @@ def getProjectDir(thisTransaction: Transaction):
         log.error("There was a problem geting the project_dir from the response_dict." + str(error))
         raise error
     else:
+        if project_dir == "":
+            raise(FileNotFoundError("project_dir"))
         return project_dir
 
 ##  Creates dirs if needed in preparation for writing files.
@@ -190,6 +195,17 @@ def writeProjectLogFile(gems_project, logsDir):
         jsonString = json.dumps(gems_project.__dict__, indent=4, sort_keys=False, default=str)
         log.debug("jsonString: \n" + jsonString )
         file.write(jsonString)
+
+def updateCbProject(thisTransaction : Transaction, structureInfo):
+    log.info("updateCbProject was called")
+    log.debug("Requested service: " )
+    prettyPrint(thisTransaction.request_dict)
+    try:
+        projectDir = getProjectDir(thisTransaction)
+        log.debug("projectDir: " + projectDir)
+    except Exception as error:
+        log.error("There was a problem getting the projectDir: " + str(error))
+        raise error
 
 ##  Pass in a frontend project, and an project_dir, receive the name of the
 #   dir that uploaded input files should be copied to.

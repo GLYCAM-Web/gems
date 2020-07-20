@@ -421,15 +421,23 @@ def buildStructureInfo(thisTransaction : Transaction):
 
 
 ##  @brief creates the files needed to track a request for various builds of a sequence.
-#   @detail not for updating existing files. 
+#   @detail Updates existing files if they already exist.
+#   @param structureInfo
+#   @param projectDir
 def saveRequestInfo(structureInfo, projectDir):
     log.info("saveRequestInfo() was called.")
+    log.debug("projectDir: " + projectDir)
     
     ## convert the object to dict
     try:
-        data = convertStructureInfoToDict(structureInfo)
-        log.debug("structureInfo as dict: \n\n")
+        if "dict" == str(type(structureInfo)):
+            data = structureInfo
+        else:
+            data = convertStructureInfoToDict(structureInfo)
+            log.debug("structureInfo as dict: \n\n")
+        
         prettyPrint(data)
+
     except Exception as error:
         log.error("There was a problem converting the structureInfo to dict: " + str(error))
         raise error
@@ -477,7 +485,7 @@ def convertStructureInfoToDict(structureInfo):
             if structureInfo.buildStates is not None:
                 ##Process the build states.
                 for buildState in structureInfo.buildStates:
-                    log.debug("buildState: " + repr(buildState))
+                    log.debug("buildState: \n" + repr(buildState))
                     state = {}
                     state['structureLabel'] = buildState.structureLabel
                     state['simulationPhase'] = buildState.simulationPhase
@@ -491,10 +499,10 @@ def convertStructureInfoToDict(structureInfo):
                     state['sequenceConformation'] = []
                     try:
                         if buildState.sequenceConformation is not None:
-                            log.debug("sequenceConformation: " + repr(buildState.sequenceConformation))
+                            log.debug("sequenceConformation: \n" + repr(buildState.sequenceConformation))
                             for rotamerConf in buildState.sequenceConformation:
-                                log.debug("rotamerConf: " + repr(rotamerConf))
-                                state['sequenceConformation'].append(rotamerConf.__dict__)
+                                log.debug("rotamerConf: \n" + repr(rotamerConf))
+                                state['sequenceConformation'].append(rotamerConf)
                         else:
                             log.debug("No sequence conformation. Must be a request for the default structure.")
                     except Exception as error:
@@ -563,7 +571,7 @@ def checkForSimulationPhase(thisTransaction: Transaction):
 #           This method expects a file at a time to be passed in for updating.
 #   @param structureInfoFilename String
 def updateBuildStatus(structureInfoFilename : str, buildState : BuildState, status : str):
-    log.info("updateStructureInfo() was called.")
+    log.info("updateBuildStatus() was called.")
     log.debug("structureInfoFilename: " + structureInfoFilename)
 
     if "status" in structureInfoFilename:
@@ -605,8 +613,6 @@ def updateBuildStatus(structureInfoFilename : str, buildState : BuildState, stat
             else:
                 log.debug("Builds exist. Checking if we are updating the status of an existing build.")
                 log.debug("buildState: " + str(data['buildStates']))
-                log.error("\n\n\n\n\nStill in dev \n\n\n\n")
-                ##TODO: Find the appropriate record for updating.
                 for recordedState in data['buildStates']:
                     log.debug("recordedState['structureLabel']: " + recordedState['structureLabel'])
                     log.debug("buildState.structureLabel: " + buildState.structureLabel)
@@ -628,6 +634,35 @@ def updateBuildStatus(structureInfoFilename : str, buildState : BuildState, stat
             except Exception as error:
                 log.error("There was a problem writing the structureInfo data to file: "  + str(error))
                 raise error
+
+def updateStructureInfotWithUserOptions(thisTransaction : Transaction, structureInfo : StructureInfo, filename: str):
+    log.info("updateStructureInfotWithUserOptions() was called.")
+    try:
+        with open(filename, 'r') as inFile:
+            data =json.load(inFile)
+
+    except Exception as error:
+        log.error("There was a problem updating the structureInfo file: " + str(error))
+        raise error
+
+    else:
+        log.debug("old data: \n\n")
+        prettyPrint(data)
+        for newState in structureInfo.buildStates:
+            log.debug("New build state: " + str(newState))
+            data['buildStates'].append(newState.__dict__)
+
+        log.debug("updated data: \n\n")
+        prettyPrint(data)
+        try:
+            with open(filename, 'w') as outFile:
+                jsonString = json.dumps(data, indent=4, sort_keys=False, default=str)
+                log.debug("jsonString: \n" + jsonString)
+                outFile.write(jsonString)
+
+        except Exception as error:
+            log.error("There was a problem writing the updated data to the structureInfo file: " + str(error))
+            raise error
 
 
 ##  @brief Converts everything to string, creating and returning a new object for storage.
