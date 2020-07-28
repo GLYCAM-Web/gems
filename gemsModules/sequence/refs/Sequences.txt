@@ -15,6 +15,8 @@ Ordered by index:
 
 LIdopAa1-4[DNeupNAca2-8DNeupNAca2-8DNeupNAca2-5]LFrupa2-6DGalp[2Me]b1-3[DNeupNAca2-6DGlcp[2S]a1-4]DGlcpAa1-OME
 
+UUID:
+
 
 
 Ordered by longest chain:
@@ -23,7 +25,7 @@ DNeupNAca2-8DNeupNAca2-8DNeupNAca2-5[LIdopAa1-4]LFrupa2-6DGalp[2Me]b1-3[DNeupNAc
 
 
 
-Ordered another way:
+Ordered another way (a "user order"):
 
 DNeupNAca2-6DGlcp[2S]a1-4[DNeupNAca2-8DNeupNAca2-8DNeupNAca2-5[LIdopAa1-4]LFrupa2-6DGalp[2Me]b1-3]DGlcpAa1-OME
 
@@ -55,3 +57,10 @@ DNeupNAca2-&Label='9';8DNeupNAca2-&Label='8';8DNeupNAca2-&Label='7';5-LFrupa2-&L
 Ordered by index:
 
 LIdopAa&Label='11';1-4[DNeupNAca2-&Label='9';8DNeupNAca2-&Label='8';8DNeupNAca2-&Label='7';5]LFrupa2-&Label='6';6DGalp[2Me]b1-3[DNeupNAca2-&Label='3';6DGlcp[2S]a1-4]DGlcpAa1-OME
+
+
+
+Ordered another way (a "user order"):
+
+DNeupNAca2-&Label='Linkage A';6DGlcp[2S]a1-4[DNeupNAca2-&Label='Linkage E';8DNeupNAca2-&Label='Linkage D';8DNeupNAca2-&Label='Linkage C';5[LIdopAa1-4]LFrupa2-&Label='Linkage B'6DGalp[2Me]b1-3]DGlcpAa1-OME
+
