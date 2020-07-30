@@ -1,4 +1,28 @@
 #!/usr/bin/env python3
+#
+# ###############################################################
+# ##
+# ##  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# ##           R E A D   M E
+# ##  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# ##
+# ##  This file is being deprecated.  
+# ##  
+# ##  It will be split into two files:
+# ##
+# ##      delegator/io.py  
+# ##      common/io.py  
+# ##
+# ##  The file in delegator will handle the top-level parts of the
+# ##  Transaction class.
+# ##
+# ##  The file in common will handle all the definitions needed
+# ##  by the various Entities (service, notice, resource, etc.).
+# ##
+# ##  
+# ##  Please update those files rather than changing this one.
+# ##
+# ###############################################################
 from enum import Enum, auto
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 from typing import ForwardRef
@@ -13,16 +37,14 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__)
 
-# ####
-# ####  Enums
-# ####
-# ####  Keep values in some sort of logical order, please
-# ####  Alphabetical is good if there is no other obvious order.
-# ####
-
 # ##
 # ## Enums for Entity-specific Services
 # ##
+# ###############################################################
+# ##  This file is being deprecated.  
+# ##  Please do not make changes to it.
+# ###############################################################
+
 class BatchComputeServicesEnum(str, Enum):
     submit = 'Submit'
 
@@ -38,6 +60,10 @@ class ConjugateServicesEnum(str,Enum):
     evaluate = 'Evaluate'
     status = 'Status'
 
+# ###############################################################
+# ##  This file is being deprecated.  
+# ##  Please do not make changes to it.
+# ###############################################################
 class GlycoProteinServicesEnum(str,Enum):
     build3DStructure = 'Build3DStructure'
 
@@ -57,6 +83,10 @@ class StructureFileServicesEnum(str, Enum):
 # ##
 # ## Enums for environment variables
 # ##
+# ###############################################################
+# ##  This file is being deprecated.  
+# ##  Please do not make changes to it.
+# ###############################################################
 class SequenceServicesPathEnum(str,Enum):
     ## The entity itself
     sequenceentity   = 'GEMS_MODULES_SEQUENCE_PATH'
@@ -68,6 +98,10 @@ class SequenceServicesPathEnum(str,Enum):
 # ##
 # ## Enums relevant to all Entities & Services
 # ##
+# ###############################################################
+# ##  This file is being deprecated.  
+# ##  Please do not make changes to it.
+# ###############################################################
 class EntityTypeEnum(str, Enum):
     batchCompute = 'BatchCompute'
     commonServices = 'CommonServices'
@@ -82,6 +116,10 @@ class EntityTypeEnum(str, Enum):
     status = "Status"
 
 
+# ###############################################################
+# ##  This file is being deprecated.  
+# ##  Please do not make changes to it.
+# ###############################################################
 class CommonServicesEnum(str,Enum):
     """
     Services used by all Entities.
@@ -107,6 +145,10 @@ class CommonServicesEnum(str,Enum):
 # ##
 # ## Other general Enums
 # ##
+# ###############################################################
+# ##  This file is being deprecated.  
+# ##  Please do not make changes to it.
+# ###############################################################
 class ExternalFormatEnum(str, Enum):
     pdb = 'PDB'
     mmcif = 'MMCIF'
@@ -145,6 +187,10 @@ class ProjectTypeEnum(str,Enum):
 # ####
 # ####  The order will be guided mostly by dependency
 # ####
+# ###############################################################
+# ##  This file is being deprecated.  
+# ##  Please do not make changes to it.
+# ###############################################################
 class Tags(BaseModel):
     options : Dict[str,str] = Field(
             None,
@@ -172,6 +218,10 @@ class DelegatorServices(BaseModel):
             description = 'Services available to the Delegator Entity'
             )
 
+# ###############################################################
+# ##  This file is being deprecated.  
+# ##  Please do not make changes to it.
+# ###############################################################
 class GraphServices(BaseModel):
     graphServices : GraphServicesEnum = Field(
         'DrawGlycan',
@@ -207,6 +257,10 @@ class GlycoProteinServices(BaseModel):
             description = 'Services available to the GlycoProtein Entity'
             )
 
+# ###############################################################
+# ##  This file is being deprecated.  
+# ##  Please do not make changes to it.
+# ###############################################################
 class StatusServices(BaseModel):
     statusServices : StatusServicesEnum = Field(
         'GenerateReport',
@@ -248,6 +302,10 @@ class ResourceDescriptor(BaseModel):
     descriptor: Union[EmbeddedResource,ExternalResource]
 
  
+# ###############################################################
+# ##  This file is being deprecated.  
+# ##  Please do not make changes to it.
+# ###############################################################
 
 class Notice(BaseModel):
     """Description of a Notice."""
@@ -276,6 +334,10 @@ class Notice(BaseModel):
             )
     options : Tags = None
 
+# ###############################################################
+# ##  This file is being deprecated.  
+# ##  Please do not make changes to it.
+# ###############################################################
 class Resource(BaseModel):
     """Information describing a resource containing data."""
     metadata : ResourceDescriptor = Field(
@@ -295,6 +357,10 @@ class Resource(BaseModel):
         None
     ) 
 
+# ###############################################################
+# ##  This file is being deprecated.  
+# ##  Please do not make changes to it.
+# ###############################################################
 class Service(BaseModel):
     """Holds information about a requested Service."""
     typename : Union[CommonServices, ConjugateServices, DelegatorServices, GraphServices, MmServiceServices, SequenceServices, GlycoProteinServices, StatusServices, StructureFileServices ] = Field(
@@ -332,6 +398,10 @@ class Response(BaseModel):
 # ####
 # ####  Top-Level Objects
 # ####
+# ###############################################################
+# ##  This file is being deprecated.  
+# ##  Please do not make changes to it.
+# ###############################################################
 class Entity(BaseModel):
     """Holds information about the main object responsible for a service."""
     entityType: EntityTypeEnum = Field(
@@ -361,6 +431,10 @@ class Project(BaseModel):
     options : Tags = None
 
 
+# ###############################################################
+# ##  This file is being deprecated.  
+# ##  Please do not make changes to it.
+# ###############################################################
 class TransactionSchema(BaseModel):
     entity : Entity
     project : Project = None
@@ -371,6 +445,10 @@ class TransactionSchema(BaseModel):
 # ####
 # ####  Container for use in the modules
 # ####
+# ###############################################################
+# ##  This file is being deprecated.  
+# ##  Please do not make changes to it.
+# ###############################################################
 class Transaction:
     """Holds information relevant to a delegated transaction"""
     def __init__(self, incoming_string):
@@ -425,6 +503,10 @@ class Transaction:
         print("build_general_error_output was called. Still in development.")
 
 #top_level_schema = schema([Entity, Project], title='A GemsModules Transaction')
+# ###############################################################
+# ##  This file is being deprecated.  
+# ##  Please do not make changes to it.
+# ###############################################################
 def generateGemsModulesSchema():
     import json
     print(TransactionSchema.schema_json(indent=2))
