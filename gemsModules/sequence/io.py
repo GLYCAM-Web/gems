@@ -5,9 +5,8 @@ from typing import ForwardRef
 from pydantic import BaseModel, Field
 from pydantic.schema import schema
 from gemsModules.common.loggingConfig import *
-import common.io as commonio
-#from gemsModules.project import io as ProjectModels
-from gemsModules.project import dataio as ProjectModels
+from gemsModules.common import io as commonio
+from gemsModules.project import dataio as projectio
 import traceback
 
 if loggers.get(__name__):
@@ -15,8 +14,6 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__)
 
-
-# ##
 # ## Services
 # ##
 class Services(str,Enum):
@@ -25,7 +22,6 @@ class Services(str,Enum):
     evaluate = 'Evaluate'
     status = 'Status'
 
-# ##
 # ## Environment variables
 # ##
 class Environment(str,Enum):
@@ -36,14 +32,15 @@ class Environment(str,Enum):
     graph = 'GEMS_MODULES_SEQUENCE_GRAPH_PATH'
     evaluate         = 'GEMS_MODULES_SEQUENCE_STRUCTURE_PATH'
 
-# ##
 # ## Recognized input and output formats
 # ##
 class Formats(str,Enum):
-    glycamCondensed = 'GlycamCondensed'
+    """All Sequenes must be in GLYCAM Condensed notation"""
+    # the basic sequence as it might arrive, unspecified order, assumed condensed glycam
+    sequence = 'Sequence'  
 
 class Locations(str,Enum):
-    internal='internal'
+    internal='internal'  ##< All input at this time must be internal to the JSON object(s)
 
 class Resource(commonio.Resource):
     locationType : Locations = Field(
@@ -64,6 +61,29 @@ class Service(commonio.Service):
             )
     inputs : List[Resource] = None
     outputs : List[Resource] = None
+    project: projectio.GemsProject = None
+
+class Response(Service):
+    """Holds a response from a Service requested of the Sequence Entity."""
+    # the ordered condensed sequences
+    IndexOrder = 'IndexOrder'
+    LongestChainOrder = 'LongestChainOrder'
+    UserOrdered = 'UserOrdered'  
+    # other condensed sequences
+    MonospacedTextDiagram = 'MonospacedTextDiagram'
+    Suuid = 'Suuid'  
+    Smd5sum = 'Smd5sum'  
+    # the ordered condensed sequences, labeled
+    IndexOrderLabeled = 'IndexOrderLabeled'
+    LongestChainOrderLabeled = 'LongestChainOrderLabeled'
+    UserOrderedLabeled = 'UserOrderedLabeled'  
+    # other condensed sequences, labeled
+    MonospacedTextDiagramLabeled = 'MonospacedTextDiagramLabeled'
+    SuuidLabeled = 'SuuidLabeled'  
+    Smd5sumLabeled = 'Smd5sumLabeled'  
+    # entire JSON objects to be parsed
+    Definitions = 'Definitions'
+    BuildOptions = 'BuildOptions'
 
 
 

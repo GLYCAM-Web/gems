@@ -22,15 +22,14 @@
 # ##  Got a better accounting method?  Let's hear it!
 # ##
 # ###############################################################
+import traceback
 from enum import Enum, auto
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 from typing import ForwardRef
 from pydantic import BaseModel, Field
 from pydantic.schema import schema
-from common import io as commonio
-from project import io as projectio 
+from gemsModules.common import io as commonio
 from gemsModules.common.loggingConfig import *
-import traceback
 
 if loggers.get(__name__):
     pass
@@ -44,28 +43,24 @@ class Entities(str, Enum):
     project = 'Project'
     sequence = 'Sequence'
 
-class Entity(BaseModel):
+class Entity(commonio.Entity):
     """Holds information about the main module responsible for a service."""
     entityType : Entities = Field(
             ...,
             title='Type',
             alias='type'
             )
-    inputs     : List[commonio.Resource] = None
-    requestID  : str = Field(
-            None,
-            title = 'Request ID',
-            description = 'User-specified ID that will be echoed in responses.'
-            )
-    services   : List[commonio.Service] = None
-    responses  : List[commonio.Response] = None
-    options    : Tags = None
 
+##For the frontend project.
+class Project(BaseModel):
+    resources : List[commonio.Resource] = None
+    options : commonio.Tags = None
 
 class TransactionSchema(BaseModel):
+    timestamp : str = None
     entity  : Entity
-    project : projectio.Project = None
-    options : Tags = None
+    project : Project = None
+    options : commonio.Tags = None
 
 # ####
 # ####  Container for use in the modules

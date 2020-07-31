@@ -19,17 +19,17 @@
 # ##  Got a better accounting method?  Let's hear it!
 # ##
 # ###############################################################
+import traceback
 from enum import Enum, auto
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
-from typing import ForwardRef
 from pydantic import BaseModel, Field, Json
 from pydantic.schema import schema
 from gemsModules.common.loggingConfig import *
-##
-## This should probably not be needed after refactoring for this file
+# ##
+# ## This should probably not be needed after refactoring for this file
+# ## But, it might still be desired, depending
 # from gemsModules.project import dataio as ProjectModels
-##
-import traceback
+
 
 if loggers.get(__name__):
     pass
@@ -88,7 +88,7 @@ class Resource(BaseModel):
             title='Resource Format',
             description='Supported formats will varu with each Entity.',
             )
-    payload : str = Field(
+    payload : Json[str] = Field(
         None,
         description='The thing that is described by the location and format'
         )
@@ -122,25 +122,47 @@ class Service(BaseModel):
             title='A GEMS Project',
             description='This is generally assigned in the project module'
             )
+    subentities : Json = Field(
+            None,
+            title='Subentities',
+            description='List of Entities, and associated Services, needed by this Service'
+            )
 
-class Response(BaseModel):
+class Response(Service):
     """Holds information about a response to a service request."""
     typename : str = Field(
             None,
-            title='Type of Service.',
+            title='Responding Service.',
             alias='type',
-            description='The type service that this is in response to.'
+            description='The type service that produced this response.'
             )
+    subentities : Json = Field(
+            None,
+            title='Subentities',
+            description='List of Entities, and associated Services, needed by this Response'
+            )
+
+class Entity(BaseModel):
+    """Holds information about the main object responsible for a service."""
+    entityType : Json[str] = Field(
+            ...,
+            title='Type',
+            alias='type'
+            )
+    inputs : List[Resource] = None
     requestID : str = Field(
             None,
             title = 'Request ID',
-            description = 'User-specified ID from the service request.'
+            description = 'User-specified ID that will be echoed in responses.'
             )
+    services : List[Service] = None
+    responses : List[Response] = None
     options : Tags = None
 
 def generateSchema():
     import json
-    print(Service.schema_json(indent=2))
+    #print(Service.schema_json(indent=2))
+    print(Entity.schema_json(indent=2))
 
 if __name__ == "__main__":
   generateSchema()
