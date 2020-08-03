@@ -104,8 +104,8 @@ class Service(BaseModel):
             alias='type',
             description='The services available will vary by Entity.'
             )
-    inputs : List[Resource] = None
-    outputs : List[Resource] = None
+    inputs : Json = None
+    outputs : Json = None
     requestID : str = Field(
             None,
             title = 'Request ID',
@@ -117,7 +117,7 @@ class Service(BaseModel):
             title='Gems Project Information',
             description='See this doc somewhere for more information',
             )
-    project : Json[str] = Field(
+    project : Json = Field(
             None,
             title='A GEMS Project',
             description='This is generally assigned in the project module'
@@ -130,7 +130,7 @@ class Service(BaseModel):
 
 class Response(Service):
     """Holds information about a response to a service request."""
-    typename : str = Field(
+    typename : Json[str] = Field(
             None,
             title='Responding Service.',
             alias='type',
@@ -138,7 +138,7 @@ class Response(Service):
             )
     subentities : Json = Field(
             None,
-            title='Subentities',
+            title='Responding Subentities',
             description='List of Entities, and associated Services, needed by this Response'
             )
 
@@ -149,14 +149,14 @@ class Entity(BaseModel):
             title='Type',
             alias='type'
             )
-    inputs : List[Resource] = None
+    inputs : Json = None
     requestID : str = Field(
             None,
             title = 'Request ID',
             description = 'User-specified ID that will be echoed in responses.'
             )
-    services : List[Service] = None
-    responses : List[Response] = None
+    services : Json = None
+    responses : Json = None
     options : Tags = None
 
 def generateSchema():
