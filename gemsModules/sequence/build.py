@@ -6,10 +6,14 @@ import traceback
 import gemsModules.common.utils
 from gemsModules.project.projectUtil import *
 from gemsModules.project import settings as projectSettings
-from gemsModules.common.services import *
-from gemsModules.common.transaction import * # might need whole file...
+from gemsModules.common import io as commonio
+from gemsModules.common import logic as commonlogic
+from gemsModules.delegator import io as delegatorio
+#from gemsModules.common.services import *
+#from gemsModules.common.transaction import * # might need whole file...
 from gemsModules.common.loggingConfig import *
 
+from gemsModules.sequence import projects as sequenceProjects
 from . import settings as sequenceSettings
 from .structureInfo import *
 
@@ -76,7 +80,7 @@ def build3DStructure(buildState : BuildState, thisTransaction : Transaction):
     log.info("Sequence receive.py buildDefault3Dstructure() was called.\n")
 
     try:
-        pUUID=getProjectpUUID(thisTransaction)
+        pUUID=sequenceProjects.getProjectpUUID(thisTransaction)
     except Exception as error:
         log.error("There was a problem finding the project pUUID: " + str(error))
         raise error
@@ -93,7 +97,7 @@ def build3DStructure(buildState : BuildState, thisTransaction : Transaction):
             log.debug("About to getCbBuilderForSequence")
             builder = getCbBuilderForSequence(sequence)
             try:
-                projectDir = getProjectSubdir(thisTransaction)
+                projectDir = sequenceProjects.getProjectSubdir(thisTransaction)
             except Exception as error:
                 log.error("There was a problem getting this build's subdir: " + str(error))
                 raise error
@@ -103,7 +107,7 @@ def build3DStructure(buildState : BuildState, thisTransaction : Transaction):
 #####  START HERE
 #####
                     ## Check if this is the default build or if it has user options specified.
-                    if checkIfDefaultStructureRequest(thisTransaction):
+                    if sequenceProjects.checkIfDefaultStructureRequest(thisTransaction):
                         destination = projectDir 
                         #destination = projectDir + 'default'
                         log.debug("The request is for a single structure to be placed in: " + destination)

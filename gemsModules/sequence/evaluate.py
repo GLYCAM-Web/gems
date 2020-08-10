@@ -3,15 +3,16 @@ import json, sys, os, re, importlib.util, shutil, uuid
 import gemsModules
 import gmml
 import traceback
-#from datetime import datetime
 import gemsModules.common.utils
 from gemsModules.project.projectUtil import *
 from gemsModules.project import settings as projectSettings
-from gemsModules.common.services import *
-from gemsModules.common.transaction import * # might need whole file...
+from gemsModules.common import io as commonio
+from gemsModules.common import logic as commonlogic
+from gemsModules.delegator import io as delegatorio
+#from gemsModules.common.services import *
+#from gemsModules.common.transaction import * # might need whole file...
 from gemsModules.common.loggingConfig import *
 from . import settings as sequenceSettings
-from .structureInfo import *
 
 if loggers.get(__name__):
     pass

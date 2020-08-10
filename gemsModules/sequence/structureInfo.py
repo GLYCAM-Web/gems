@@ -4,8 +4,11 @@ from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 from datetime import datetime
 from pydantic import BaseModel, Field, ValidationError
 from pydantic.schema import schema
+from gemsModules.common import io as commonio
+from gemsModules.common import logic as commonlogic
+from gemsModules.delegator import io as delegatorio
 from gemsModules.common.loggingConfig import *
-from gemsModules.common.transaction import *
+#from gemsModules.common.transaction import *
 from gemsModules.project.projectUtil import *
 
 if loggers.get(__name__):
@@ -41,8 +44,6 @@ class BuildState(BaseModel):
     energy : str = None ## kcal/mol
     forceField : str = None ## TODO: This needs to be a class. Schedule design with Lachele.
     sequenceConformation : List[RotamerConformation] = None
-
-
 
 
 ##  @brief Object for tracking the parsing of rotamerData

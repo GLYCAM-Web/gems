@@ -6,12 +6,15 @@ import traceback
 import gemsModules.common.utils
 from gemsModules.project.projectUtil import *
 from gemsModules.project import settings as projectSettings
-from gemsModules.common.services import *
-from gemsModules.common.transaction import * # might need whole file...
+from gemsModules.common import io as commonio
+from gemsModules.common import logic as commonlogic
+from gemsModules.delegator import io as delegatorio
+#from gemsModules.common.services import *
+#from gemsModules.common.transaction import * # might need whole file...
 from gemsModules.common.loggingConfig import *
 from . import settings as sequenceSettings
-
-from .evaluate import *
+from gemsModules.sequence import projects as sequenceProjects
+from .structureInfo import *
 
 if loggers.get(__name__):
     pass
@@ -38,7 +41,7 @@ def manageSequenceRequest(thisTransaction : Transaction):
     log.info("manageSequenceRequest() was called.")
     ##  Start a project, if needed
     try:
-        if projectExists(thisTransaction):
+        if sequenceProjects.projectExists(thisTransaction):
             log.debug("Existing project.")
         else:
             startProject(thisTransaction)
@@ -77,29 +80,30 @@ def manageSequenceRequest(thisTransaction : Transaction):
                     log.debug("buildState: " + repr(buildState))
                     ##  check if requested structures exitst, update structureInfo_status.json and project when exist
                     try:
-                        if structureExists(buildState, thisTransaction):
+                        if sequenceProjects.structureExists(buildState, thisTransaction):
                             log.debug("Found an existing structure.")
                             log.error("Dan write logic to return existing structures.")
                             ##TODO: Make this next method more generic, so it can handle rotamers too.
-                            respondWithExistingDefaultStructure(thisTransaction)
+                            sequenceProjects.respondWithExistingDefaultStructure(thisTransaction)
                             ##TODO: Update the structureInfo_status.json
                         else:
                             log.debug("Need to build this structure.")
                             try: 
-                                build3DStructure(buildState, thisTransaction)
+                                from gemsModules.sequence import build
+                                build.build3DStructure(buildState, thisTransaction)
                             except Exception as error:
                                 log.error("There was a problem building the 3D structure: " + str(error))
                                 raise error
                             else:
                                 try:
-                                    createSymLinks(buildState, thisTransaction)
+                                    sequenceProjects.createSymLinks(buildState, thisTransaction)
                                 except Exception as error:
                                     log.error("There was a problem creating the symbolic links: " + str(error))
                                     raise error
                                 else:
                                     try:
                                         #Updates the statuses in various files and the project
-                                        registerBuild(buildState, thisTransaction)
+                                        sequenceProjects.registerBuild(buildState, thisTransaction)
                                     except Exception as error:
                                         log.error("There was a problem registering this build: " + str(error))
                                         raise error

@@ -6,8 +6,11 @@ import traceback
 import gemsModules.common.utils
 from gemsModules.project.projectUtil import *
 from gemsModules.project import settings as projectSettings
-from gemsModules.common.services import *
-from gemsModules.common.transaction import * # might need whole file...
+from gemsModules.common import io as commonio
+from gemsModules.common import logic as commonlogic
+from gemsModules.delegator import io as delegatorio
+#from gemsModules.common.services import *
+#from gemsModules.common.transaction import * # might need whole file...
 from gemsModules.common.loggingConfig import *
 from . import settings as sequenceSettings
 
@@ -226,7 +229,8 @@ def createSymLinks(buildState : BuildState, thisTransaction : Transaction):
 #   @return Boolean isDefault
 def checkIfDefaultStructureRequest(thisTransaction):
     log.info("checkIfDefaultStructureRequest was called().")
-    options  = getOptionsFromTransaction(thisTransaction)
+    from gemsModules.sequence import logic
+    options  = logic.getOptionsFromTransaction(thisTransaction)
     log.debug("options: " + str(options))
 
     if options == None:

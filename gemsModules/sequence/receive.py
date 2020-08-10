@@ -24,11 +24,12 @@ import gemsModules
 #import gemsModules.common.utils
 #from gemsModules.common.services import *
 #from gemsModules.common.transaction import * # might need whole file...
+#from gemsModules.sequence import evaluate 
+
 from gemsModules.common import io as commonio
 from gemsModules.common import logic as commonlogic
 from gemsModules.delegator import io as delegatorio
 from gemsModules.sequence import settings as sequenceSettings
-#from gemsModules.sequence import evaluate 
 
 from gemsModules.common.loggingConfig import *
 if loggers.get(__name__):
