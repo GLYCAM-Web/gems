@@ -9,8 +9,6 @@ from gemsModules.project import settings as projectSettings
 from gemsModules.common import io as commonio
 from gemsModules.common import logic as commonlogic
 from gemsModules.delegator import io as delegatorio
-#from gemsModules.common.services import *
-#from gemsModules.common.transaction import * # might need whole file...
 from gemsModules.common.loggingConfig import *
 from . import settings as sequenceSettings
 
@@ -18,14 +16,6 @@ if loggers.get(__name__):
     pass
 else:
     log = createLogger(__name__)
-
-## TODO Write this function
-def evaluateSequenceSanity(thisTransaction : Transaction):
-    pass
-def getSequenceGeometricOptions(thisTransaction : Transaction):
-    pass
-
-
 
 ##   @brief Evaluate a condensed sequence 
 #    @detail Evaluating a sequence requires a sequence string and a path to a prepfile.
@@ -37,7 +27,7 @@ def getSequenceGeometricOptions(thisTransaction : Transaction):
 #   @param Transaction thisTransaction
 #   @param Service service
 #   @return boolean valid
-def evaluateCondensedSequence(thisTransaction : Transaction, thisService : Service = None):
+def evaluateCondensedSequence(thisTransaction : Transaction, thisService : Service = None, validateOnly = False):
     log.info("evaluateCondensedSequence() was called.\n")
     sequence = getSequenceFromTransaction(thisTransaction)
     #Test that this exists.
@@ -46,34 +36,34 @@ def evaluateCondensedSequence(thisTransaction : Transaction, thisService : Servi
         raise AttributeError
     else:
         log.debug("sequence: " + sequence)
-    this_sequence = gmml.CondensedSequence(sequence)
-    valid = this_sequence.GetIsSequenceOkay()
+    valid = checkIsSequenceSane(sequence)
+    if validateOnly : 
+        responseConfig = buildEvaluationResponseConfig(valid, None, None)
+        appendResponse(thisTransaction, responseConfig)
+        log.debug("Returning early from evaluateCondensedSequence bc validate only.")
+        return valid
     if valid:
         log.debug("This is a valid sequence: " + sequence) 
-        from gemsModules.sequence import build
-        builder = build.getCbBuilderForSequence(sequence)
-        linkages = getLinkageOptionsFromBuilder(builder)
+        linkages = getLinkageOptionsFromBuilder(sequence)
+        sequences = getSequenceVariants(sequence)
     else: 
-        the_response=this_sequence.GetResponse() 
-        log.error("Seq is NOT valid.  The following is the response object:")
-        log.error(the_response)
-        linkages='Null'
-#        raise AttributeError
-#    builder = getCbBuilderForSequence(sequence)
-#    valid = builder.GetSequenceIsValid()
-#    linkages = getLinkageOptionsFromBuilder(builder)
-    responseConfig = buildEvaluationResponseConfig(valid, linkages)
+        log.debug("This is NOT a valid sequence: " + sequence) 
+        linkages=None
+        sequences=None
+    responseConfig = buildEvaluationResponseConfig(valid, linkages, sequences)
     appendResponse(thisTransaction, responseConfig)
     log.debug("Returning from evaluateCondensedSequence.")
     return valid
 
 
-##  @brief Pass in validation result and linkages, get a responseConfig.
+##  @brief Pass in validation result and linkages and sequences, get a responseConfig.
 #   @param boolean valid
 #   @param dict linkages
 #   @return dict config
-def buildEvaluationResponseConfig(valid, linkages):
+def buildEvaluationResponseConfig(valid, linkages, sequences):
     log.info("buildEvaluationResponseConfig() was called. \n")
+    # TODO:  Please someone make this less ugly
+#    if linkages is None:
     config = {
         "entity" : "Sequence",
         "respondingService" : "SequenceEvaluation",
@@ -84,6 +74,8 @@ def buildEvaluationResponseConfig(valid, linkages):
                     "SequenceIsValid" : valid
                 }
             },{
+                "SequenceVariants": sequences
+            },{
                 "BuildOptions": {
                     "geometricElements" : [
                         { "Linkages" : linkages }
@@ -93,15 +85,28 @@ def buildEvaluationResponseConfig(valid, linkages):
         }]
     }
 
+# ## The following might have once been a format for a validation response. 
+# ## Keeping it for historical sake.  Today is 2020-08-11.  If there
+# ## is no need for this by, say, 2021-08-11, this can go.
+# ##
+# ##    thisTransaction.response_dict['entity']['responses'].append({
+# ##    "condensedSequenceValidation" : {
+# ##    'sequence': sequence,
+# ##    'valid' : valid,
+# ##    }
+# ##    })
+
     return config
 
 
 
-##  @brief Pass a cb builder, get linkage options.
-#   @param  CarbohydrateBuilder builder - GMML class.
+##  @brief Pass a sequence, get linkage options.
+#   @param  str sequence 
 #   @return dict linkages
-def getLinkageOptionsFromBuilder(builder):
+def getLinkageOptionsFromBuilder(sequence):
     log.info("getLinkageOptionsFromBuilder() was called.\n")
+    from gemsModules.sequence import build
+    builder = build.getCbBuilderForSequence(sequence)
     userOptionsString = builder.GenerateUserOptionsJSON()
     userOptionsJSON = json.loads(userOptionsString)
     optionsResponses = userOptionsJSON['responses']
@@ -137,78 +142,75 @@ def getLinkageOptionsFromBuilder(builder):
     return updatedLinkages
 
 
-
-##  @brief Only validate a condensed sequence. Boolean result.
-#   @deprecated.
-def validateCondensedSequence(thisTransaction : Transaction, thisService : Service = None):
-    log.info("~~~ validateCondensedSequence was called.\n")
-    #Look in transaction for sequence
-    inputs = thisTransaction.request_dict['entity']['inputs']
-    log.debug("inputs: " + str(inputs))
-
-    for input in inputs:
-        log.debug("input.keys(): " + str(input.keys()))
-
-        keys = input.keys()
-
-        if 'Sequence' in keys:
-            payload = input['Sequence']['payload']
-            log.debug("payload: " + payload)
-            if payload == None:
-                log.error("Could not find Sequence in inputs.")
-                ##transaction, noticeBrief, blockId
-                common.settings.appendCommonParserNotice( thisTransaction, 'EmptyPayload', 'InvalidInputPayload')
-            else:
-                log.debug("validating input: " + str(input))
-                sequence = payload
-                log.debug("getting prepResidues.")
-                #Get prep residues
-                prepResidues = gmml.condensedsequence_glycam06_residue_tree()
-                log.debug("Instantiating an assembly.")
-                #Create an assembly
-                assembly = gmml.Assembly()
-
-                try:
-                    log.debug("Checking sequence sanity.")
-                    #Call assembly.CheckCondensed sequence sanity.
-                    valid = assembly.CheckCondensedSequenceSanity(sequence, prepResidues)
-                    log.debug("validation result: " + str(valid))
-
-                    ## Add valid to the transaction responses.
-                    if valid:
-                        thisTransaction.response_dict={}
-                        thisTransaction.response_dict['entity']={
-                                'type' : "sequence",
-                        }
-                        thisTransaction.response_dict['entity']['responses']=[]
-                        log.debug("Creating a response for this sequence.")
-                        thisTransaction.response_dict['entity']['responses'].append({
-                            "condensedSequenceValidation" : {
-                                'sequence': sequence,
-                                'valid' : valid,
-                            }
-                        })
-                    else:
-                        log.error("~~~\nCheckCondensedSequenceSanity returned false. Creating an error response.")
-                        log.error("thisTransaction: "  + str(thisTransaction))
-                        log.error(traceback.format_exc())
-                        ##appendCommonParserNotice(thisTransaction: Transaction,  noticeBrief: str, blockID: str = None)
-                        common.settings.appendCommonParserNotice( thisTransaction,  'InvalidInput', 'InvalidInputPayload')
-                except:
-                    log.error("Something went wrong while validating this sequence.")
-                    log.error("sequence: " + sequence)
-                    log.error(traceback.format_exc())
-                    common.settings.appendCommonParserNotice( thisTransaction, 'InvalidInput', 'InvalidInputPayload')
-        else:
-            ##Can be ok, inputs may be provided that are not sequences.
-            log.debug("no sequence found in this input, skipping.")
-            pass
+##  @brief Pass a sequence, get linkage options.
+#   @param  str sequence 
+#   @return dict sequences
+def getSequenceVariants(sequence):
+    log.info("getSequenceVariants() was called.\n")
+    this_sequence = gmml.CondensedSequence(sequence)
+    # ## 
+    # ##  This function assumes that the validity of the sequence was determined elsewhere
+    # ## 
+    # ##   So.... this is not needed....  :   if this_sequence.GetIsSequenceOkay()
+    Sequences = {}
+    Sequences['userSupplied']=sequence
+    Sequences['indexOrdered']= this_sequence.BuildLabeledCondensedSequence(
+                    this_sequence.Reordering_Approach_LOWEST_INDEX,
+                    this_sequence.Reordering_Approach_LOWEST_INDEX,
+                    False) 
+    Sequences['longestChainOrdered']= this_sequence.BuildLabeledCondensedSequence(
+                    this_sequence.Reordering_Approach_LONGEST_CHAIN,
+                    this_sequence.Reordering_Approach_LONGEST_CHAIN,
+                    False) 
+    Sequences['indexOrderedLabeled']= this_sequence.BuildLabeledCondensedSequence(
+                    this_sequence.Reordering_Approach_LOWEST_INDEX,
+                    this_sequence.Reordering_Approach_LOWEST_INDEX,
+                    True) 
+    log.debug("Here are the Sequences: " + str(Sequences))
+    return Sequences
 
 
 
 
-
-
+##  @brief Determine if a sequence is valid
+#   @param  sequence - a string
+#   @return boolean valid
+def checkIsSequenceSane(sequence):
+    log.info("~~~ checkIsSequenceSane was called.\n") 
+    # ## TODO:  This try-except is a total kluge. 
+    # ##  Without it, there is a problem in gmml/swig for bad sequences like:  DManpa1-6-DManpa1-OH
+    # ##  The std error:
+    # ##        Exception thrown in condensedSequence constructor. Look in the response object.
+    # ##  This also goes to std out: 
+    # ##        swig/python detected a memory leak of type 'InputOutput::Response *', no destructor found.
+    try: 
+        this_sequence = gmml.CondensedSequence(sequence) 
+        valid = this_sequence.GetIsSequenceOkay()
+    except:
+        the_response=this_sequence.GetResponse() 
+        log.error("Seq is NOT valid.  The following is the response object:")
+        log.error(the_response)
+        valid=False
+    if not valid:
+        return valid
+    log.debug("getting prepResidues.") 
+    #Get prep residues 
+    prepResidues = gmml.condensedsequence_glycam06_residue_tree() 
+    log.debug("Instantiating an assembly.") 
+    #Create an assembly
+    assembly = gmml.Assembly() 
+    try: 
+        log.debug("Checking sequence sanity.") 
+        #Call assembly.CheckCondensed sequence sanity.  
+        valid = assembly.CheckCondensedSequenceSanity(sequence, prepResidues) 
+        log.debug("validation result: " + str(valid)) 
+    except: 
+        log.error("Something went wrong while validating this sequence.") 
+        log.error("sequence: " + sequence) 
+        log.error(traceback.format_exc()) 
+        common.settings.appendCommonParserNotice( thisTransaction, 'GmmlError')
+        valid = False
+    return valid
 
 
 

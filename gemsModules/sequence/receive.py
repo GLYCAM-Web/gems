@@ -2,30 +2,6 @@
 import json, sys, os, re, importlib.util, shutil, uuid
 import traceback
 import gemsModules
-#import gmml
-
-## Get rid of these after the bad subprocess code is gone
-##
-## I think it is gone, so commenting these out
-#import subprocess,signal
-#from subprocess import *
-#from datetime import datetime
-## These can go, too, I think
-#from gemsModules import common
-#from gemsModules import sequence
-#from gemsModules.sequence.receive import *
-
-## I think this one should not be needed in receive
-#from .structureInfo import *
-
-#from gemsModules.project.projectUtil import *
-#from gemsModules.project import settings as projectSettings
-
-#import gemsModules.common.utils
-#from gemsModules.common.services import *
-#from gemsModules.common.transaction import * # might need whole file...
-#from gemsModules.sequence import evaluate 
-
 from gemsModules.common import io as commonio
 from gemsModules.common import logic as commonlogic
 from gemsModules.delegator import io as delegatorio
@@ -38,7 +14,7 @@ else:
     log = createLogger(__name__)
 
 ##  @brief Default service is marco polo. Should this be something else?
-#   @param Transaction this Transaction
+#   @param Transaction thisTransaction
 def doDefaultService(thisTransaction : delegatorio.Transaction):
     log.info("doDefaultService() was called.\n")
     # evaluate(thisTransaction : Transaction)
@@ -77,13 +53,13 @@ def receive(thisTransaction : delegatorio.Transaction):
         ## Only work on recognized services. Add an error and carry on checking other services if an unknown service is found.
         ##  TODO: Add a check for options like "On fail quit"
         ##  
-        ## TODO:  move most of this to 'sequence/logic.py'
         if i not in sequenceSettings.serviceModules.keys():
             if i not in common.settings.serviceModules.keys():
                 log.error("The requested service is not recognized. Try: " + str(sequenceSettings.serviceModules.keys()))
                 common.settings.appendCommonParserNotice( thisTransaction,'ServiceNotKnownToEntity',i)
             else:
                 pass
+        ## TODO:  move all the service call parts to 'sequence/logic.py'
         ## if it is known, try to do it
         elif i == "Evaluate":
             log.debug("Evaluate service requested from sequence entity.")
@@ -113,13 +89,11 @@ def receive(thisTransaction : delegatorio.Transaction):
                 else:
                     log.error("Invalid Sequence. Cannot build.")
                     common.settings.appendCommonParserNotice( thisTransaction,'InvalidInput',i)
-        ## Validate is rarely used, but useful for the json api user that would like to know if a list of 
-        #   sequences is valid or not, without the overhead of evaluation or building structures.
         elif i == "Validate":
             log.debug("Validate service requested from sequence entity.")
             from gemsModules.sequence import evaluate
             try:
-                evlauate.validateCondensedSequence(thisTransaction, None)
+                evaluate.evaluateCondensedSequence(thisTransaction,  None, True)
             except Exception as error:
                 log.error("There was a problem validating the condensed sequence: " + str(error)) 
                 common.settings.appendCommonParserNotice( thisTransaction, 'InvalidInput', 'InvalidInputPayload')

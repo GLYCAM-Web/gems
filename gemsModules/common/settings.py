@@ -91,7 +91,8 @@ ExitTypes = {
     'ServiceNotKnownToEntity':'error',
     'RequestedEntityNotFindable':'error',
     'EmptyPayload':'error',
-    'InvalidInput':'error'
+    'InvalidInput':'error',
+    'GmmlError':'error'
 }
 
 ExitBlockIDs = {
@@ -101,6 +102,9 @@ ExitBlockIDs = {
     'JsonParseEror':'Transaction',
     'ServiceNotKnownToEntity':'Service',
     'RequestedEntityNotFindable':'SystemError',
+    'EmptyPayload':'Transaction',
+    'InvalidInput':'Transaction',
+    'GmmlError':'SyatemError',
     'InvalidInputPayload':'Transaction',
     'NoInputPayloadDefined':'Transaction'
 }
@@ -112,6 +116,7 @@ ExitCodes = {
     'JsonParseEror':'304',
     'ServiceNotKnownToEntity':'305',
     'RequestedEntityNotFindable':'310',
+    'GmmlError':'315',
     'EmptyPayload':'400',
     'InvalidInput':'400'
 }
@@ -124,7 +129,8 @@ ExitMessages = {
     'ServiceNotKnownToEntity':'The requested Entity does not offer this Service.',
     'RequestedEntityNotFindable':'The requested Entity is known, but does not respond.',
     'EmptyPayload':'Missing or empty input payload.',
-    'InvalidInput':'error'
+    'InvalidInput':'error',
+    'GmmlError':'An interaction with GMML failed.'
 }
 
 ## TODO Make this sort of thing ultimately part of transaction.py (eg Notice class).
