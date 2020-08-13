@@ -8,7 +8,6 @@ from gemsModules.common import io as commonio
 from gemsModules.common import logic as commonlogic
 from gemsModules.delegator import io as delegatorio
 from gemsModules.common.loggingConfig import *
-#from gemsModules.common.transaction import *
 from gemsModules.project.projectUtil import *
 
 if loggers.get(__name__):
@@ -33,6 +32,7 @@ class BuildState(BaseModel):
     #    or, they may be a terse label,
     #    or they may be uuids if the terse label is > 32 char long.
     structureLabel : str = ""
+    structureDirectoryName : str = ""
     simulationPhase : str = "gas-phase"
     ## Solvated requests might specify a shape.
     solvationShape : str = None
@@ -362,7 +362,7 @@ def buildStructureInfo(thisTransaction : Transaction):
             if rotamerData == None:
                 log.debug("Default request!")
                 buildState = BuildState()
-                buildState.structureLabel = "default"
+                buildState.structureLabel = "structure"
                 buildState.date = datetime.now()
                 structureInfo.buildStates.append(buildState)
 
@@ -390,6 +390,14 @@ def buildStructureInfo(thisTransaction : Transaction):
                     ##Build the structureLabel
                     buildState.structureLabel = buildStructureLabel(sequenceConf)
                     log.debug("structureLabel: \n" + buildState.structureLabel)
+                    if len(buildState.structureLabel) > 32 :
+                        log.debug("structureLabel is long so building a UUID for structureDirectoryName")
+                        buildState.structureDirectoryName = getUuidForString(buildState.structureLabel)
+                        log.debug("The structureDirectoryName/UUID is : " + buildState.structureDirectoryName)
+                    else:
+                        log.debug("structureLabel is short so using it for structureDirectoryName")
+                        buildState.structureDirectoryName = buildState.structureLabel 
+                        log.debug("The structureDirectoryName is : " + buildState.structureDirectoryName)
 
                     ##Check if the user requested a specific simulationPhase
                     buildState.simulationPhase = checkForSimulationPhase(thisTransaction)

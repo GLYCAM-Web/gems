@@ -365,11 +365,23 @@ def getSequenceFromTransaction(thisTransaction: Transaction):
 #   Uses uuid5, which uses SHA-1 rather than Md5Sum
 #   @param sequence
 #   @return uuid seqID
+#   TODO: merge this into the more generic getUuidForString, below
 def getSeqIDForSequence(sequence):
     log.info("getSeqUUDIFor() was called. sequence: " + sequence)
-    seqID = str(uuid.uuid5(uuid.NAMESPACE_DNS, sequence))
+    seqID = str(uuid.uuid5(uuid.NAMESPACE_OID, sequence))
     log.debug("seqID: " + seqID)
     return seqID
+
+
+##  @brief Use a string to get a unique but repeatable UUID
+#   Uses uuid5, which uses SHA-1 rather than Md5Sum
+#   @param str string
+#   @return uuid seqID
+def getUuidForString(string):
+    log.info("getUuidForString() was called. string: " + string)
+    stringID = str(uuid.uuid5(uuid.NAMESPACE_OID, string))
+    log.debug("stringID: " + stringID)
+    return stringID
 
 
 def updateTransaction(gems_project, thisTransaction):

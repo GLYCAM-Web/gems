@@ -9,8 +9,6 @@ from gemsModules.project import settings as projectSettings
 from gemsModules.common import io as commonio
 from gemsModules.common import logic as commonlogic
 from gemsModules.delegator import io as delegatorio
-#from gemsModules.common.services import *
-#from gemsModules.common.transaction import * # might need whole file...
 from gemsModules.common.loggingConfig import *
 from . import settings as sequenceSettings
 
@@ -21,7 +19,6 @@ if loggers.get(__name__):
     pass
 else:
     log = createLogger(__name__)
-
 
 
 def projectExists(thisTransaction : Transaction):
@@ -39,12 +36,6 @@ def projectExists(thisTransaction : Transaction):
         else:
             log.debug("No projectDir found.")
             return False
-
-
-
-
-
-
 
 
 

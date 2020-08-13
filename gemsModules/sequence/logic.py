@@ -89,6 +89,7 @@ def manageSequenceRequest(thisTransaction : Transaction):
                         else:
                             log.debug("Need to build this structure.")
                             try: 
+                                sequenceProjects.createDirectoryStructure(buildState, thisTransaction)
                                 from gemsModules.sequence import build
                                 build.build3DStructure(buildState, thisTransaction)
                             except Exception as error:

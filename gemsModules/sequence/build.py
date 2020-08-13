@@ -148,6 +148,7 @@ def build3DStructure(buildState : BuildState, thisTransaction : Transaction):
                     ## is what needs to move
 
 
+
 ##  @brief Pass a sequence string, get a builder for that sequence.
 ##  @param String sequence - GLYCAM Condensed string sequence.
 #   @return CarbohydrateBuilder object from gmml.
@@ -164,14 +165,6 @@ def getCbBuilderForSequence(sequence : str):
     else:
         log.error("Prepfile did not exist at: " + prepfile)
         raise FileNotFoundError
-
-
-
-
-
-
-
-
 
 
 
