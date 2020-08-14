@@ -208,13 +208,13 @@ def appendResponse(thisTransaction, responseConfig):
                 log.debug("timestamp: " + timestamp)
                 thisTransaction.response_dict['timestamp'] = timestamp
 
-            if 'responses' not in thisTransaction.response_dict.keys():
-                thisTransaction.response_dict['responses'] = []
+            if 'responses' not in thisTransaction.response_dict['entity'].keys():
+                thisTransaction.response_dict['entity']['responses'] = []
 
             for response in responsesToWrite:
                 resource = {respondingService : response }
                 log.debug("Adding a resource to the response: " + str(resource))
-                thisTransaction.response_dict['responses'].append(resource)
+                thisTransaction.response_dict['entity']['responses'].append(resource)
             # if 'echoed_response' not in thisTransaction.response_dict.keys():
             #     thisTransaction.response_dict['echoed_response'] = {}
 

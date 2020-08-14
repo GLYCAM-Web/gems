@@ -2,12 +2,8 @@
 import json, math, os, sys,importlib.util
 from datetime import datetime
 import gemsModules
-
-#from gemsModules import common
 from gemsModules.common.settings import *
-#from gemsModules.common.utils import *
 from gemsModules.common.io import *
-
 from gemsModules.common.loggingConfig import *
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 from pydantic import BaseModel, Schema, ValidationError
@@ -166,6 +162,60 @@ def getGemsHome():
         raise AttributeError("GEMSHOME")
     return GEMSHOME
 
+
+def make_relative_symbolic_link(
+        path_down_to_source : str, 
+        path_down_to_dest_dir : str , 
+        dest_link_label : str, 
+        parent_directory : str
+        ):
+    #  path_down_to_source      Path, relative to parent_directory, to the source of the link
+    #  path_down_to_dest_dir    Path, relative to parent_directory, where the link will be placed
+    #                           If None, it will be the current working directory
+    #  dest_link_label          The lable to place in path_down_to_dest.
+    #                           That is, the sym link will be path_down_to_dest/dest_link_label
+    #                           If None - then the last part of the path_down_to_source will be used.
+    #                           That is, if path_down_to_source is path/down/to/source, then 
+    #                           the sym link will be path_down_to_dest/source
+    #  parent_directory         The parent where the two paths down exist.
+    #                           If None, it will use the current working directory
+    #                           Unless you know you are in a shell, you probably want to set this
+    log.info("common.logic.make_relative_symbolic_link() was called")
+    if parent_directory is not None:
+        owd=os.getcwd()
+        os.chdir(parent_directory)
+        log.debug("The original working directory was : " + owd)
+        log.debug("The current working directory is : " + os.getcwd())
+    if not os.path.exists(path_down_to_source):
+        log.error("Link source does not exist: " + path_down_to_source)
+        raise AttributeError(path_down_to_source)
+    if path_down_to_dest_dir is None:
+        if dest_link_label is None: 
+            path_down_to_dest_label=os.path.basename(path_down_to_source)
+        else:
+            path_down_to_dest_label=dest_link_label
+    else:
+        if not os.path.isdir(path_down_to_dest_dir): 
+            log.error("The path down to the link to be created is not a directory : " + path_down_to_dest_dir)
+            raise AttributeError(path_down_to_dest_dir)
+        if dest_link_label is None: 
+            path_down_to_dest_label=os.path.join(path_down_to_dest_dir, os.path.basename(path_down_to_source))
+        else:
+            path_down_to_dest_label=os.path.join(path_down_to_dest_dir, dest_link_label)
+    if path_down_to_source == path_down_to_dest_label:
+        log.error("Symbolic link source and destination cannot be the same thing : " + path_down_to_dest_label)
+        raise AttributeError("Source and destination for symbolic linking are the same: " + path_down_to_dest_label)
+    relative_path_to_source =  os.path.relpath(
+        path_down_to_source,
+        path_down_to_dest_dir
+        )
+    log.debug("About to link this source : " + relative_path_to_source)
+    log.debug(".... to this destination : " + path_down_to_dest_label)
+    os.symlink(relative_path_to_source,path_down_to_dest_label)
+    if parent_directory is not None:
+        os.chdir(owd)
+
+
 ##  Give a transaction, return its requested entity type
 #   @param  transaction
 def getEntityType(thisTransaction):
@@ -210,13 +260,13 @@ def appendResponse(thisTransaction, responseConfig):
                 log.debug("timestamp: " + timestamp)
                 thisTransaction.response_dict['timestamp'] = timestamp
 
-            if 'responses' not in thisTransaction.response_dict.keys():
-                thisTransaction.response_dict['responses'] = []
+            if 'responses' not in thisTransaction.response_dict['entity'].keys():
+                thisTransaction.response_dict['entity']['responses'] = []
 
             for response in responsesToWrite:
                 resource = {respondingService : response }
                 log.debug("Adding a resource to the response: " + str(resource))
-                thisTransaction.response_dict['responses'].append(resource)
+                thisTransaction.response_dict['entity']['responses'].append(resource)
             # if 'echoed_response' not in thisTransaction.response_dict.keys():
             #     thisTransaction.response_dict['echoed_response'] = {}
 

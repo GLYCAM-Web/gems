@@ -78,7 +78,7 @@ def structureExists(buildState: BuildState, thisTransaction : Transaction):
 
     structureExists = False
     try:
-        sequence = getSequenceFromTransaction(thisTransaction)
+        sequence = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
         log.debug("Checking for previous builds of this sequence: \n" + sequence)
     except Exception as error:
         log.error("There was a problem getting the sequence from structureInfo: " + str(error))
@@ -95,7 +95,7 @@ def structureExists(buildState: BuildState, thisTransaction : Transaction):
             structureLabel = buildState.structureLabel
             if structureLabel == "default":
                 ## Easy. Just check the path. If it exists, return true.
-                defaultBuildDir = sequenceDir + "/default/"
+                defaultBuildDir = sequenceDir + "/defaults/All_Builds/structure"
                 if os.path.isdir(defaultBuildDir):
                     log.debug("default structure found.")
                     return True
@@ -124,7 +124,7 @@ def respondWithExistingDefaultStructure(thisTransaction: Transaction):
     log.info("respondWithExistingDefaultStructure() was called.")
 
     try:
-        sequence = getSequenceFromTransaction(thisTransaction)
+        sequence = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
     except Exception as error:
         log.error("There was a problem getting the sequence from the request: " + str(error))
         raise error
@@ -153,6 +153,84 @@ def respondWithExistingDefaultStructure(thisTransaction: Transaction):
                 }
                 appendResponse(thisTransaction, config)
 
+## TODO: make all these directory/link/file making functions into one thing
+## that gets called by string only
+
+def createProjectDirectoryStructure(projectDir : str ):
+    # Ensure that the project directory is present and add some dirs
+    log.info("creatProjectDirectoryStructure() was called.")
+    if os.path.exists(projectDir):
+        log.debug("Found an existing project dir.")
+    else:
+        log.debug("No projectDir found.  Making one now at: " + projectDir)
+        try: 
+            os.makedirs(projectDir)
+        except Exception as error:
+            log.error("There was a problem making directory: " + projectDir)
+            raise error
+    try:
+        log.debug("Changing to the project diretctory for making more.")
+        os.chdir(projectDir)
+    except Exception as error:
+        log.error("Could not chdir to the project directory: " + projectDir)
+        raise error
+    try: 
+        ##  TODO:  write code to determine if there are multiple rotamers 
+        ##  possible and, if so, to make directories for them.
+        ##  For this moment, single-structure only
+        ##
+        ##  Also consider having it not create both New and Existing every time.
+        ##  Might be just as well to leave it.  But, do think about that.
+        if not os.path.exists('defaults/All_Builds') : 
+            os.makedirs('defaults/All_Builds')
+        if not os.path.exists('logs') : 
+            os.makedirs('logs')
+        if not os.path.exists('New_Builds/logs') : 
+            os.makedirs('New_Builds/logs')
+        if not os.path.exists('New_Builds/structure') : 
+            os.makedirs('New_Builds/structure')
+        if not os.path.exists('Existing_Builds/logs') : 
+            os.makedirs('Existing_Builds/logs')
+    except Exception as error:
+        log.error("There was a problem making directory: " + projectDir)
+        raise error
+
+
+def createProjectSymlinks(projectDir : str):
+    # Generate symbolic links within project directories
+    log.info("creatProjectSymlinks() was called.")
+    try:
+        log.debug("Changing to the project diretctory for making more.")
+        os.chdir(projectDir)
+    except Exception as error:
+        log.error("Could not chdir to the project directory: " + projectDir)
+        raise error
+    # TODO:  write in logic for:
+    #     evaluate.determineDefaultStructures()
+    if os.path.exists("New_Builds/structure/structure.pdb"):
+        default_unminimized="New_Builds/structure/structure.pdb"
+        default="New_Builds/structure/mol_min.pdb"
+        structure="New_Builds/structure"
+    elif os.path.exists("Existing_Builds/structure/structure.pdb"):
+        default_unminimized="Existing_Builds/structure/structure.pdb"
+        default="Existing_Builds/structure/mol_min.pdb"
+        structure="Existing_Builds/structure"
+    else:
+        log.error("Cannot find the default unminimized structure.")
+    try:
+#        make_relative_symbolic_link(
+#                path_down_to_source : str, 
+#                path_down_to_dest_dir : str , 
+#                dest_link_label : str, 
+#                parent_directory : str
+#                )
+        commonlogic.make_relative_symbolic_link( default_unminimized, 'defaults' , 'default_unminimized.pdb', None)
+        commonlogic.make_relative_symbolic_link( default, 'defaults' , 'default.pdb', None)
+        commonlogic.make_relative_symbolic_link( structure,'defaults/All_Builds' , 'structure', None)
+    except Exception as error:
+        log.error("Could not make one or mor symlinks in Create Project symlinks")
+        raise error
+ 
 
 
 ## TODO: Rewrite this to a smaller scope: symlinks, and folder creation 
@@ -161,15 +239,60 @@ def respondWithExistingDefaultStructure(thisTransaction: Transaction):
 #           reused via symlink.
 #   @detail Still being worked on, but works for default structures.
 #   @param  Transaction
-def createSymLinks(buildState : BuildState, thisTransaction : Transaction):
+def createSequenceSymLinks(sequenceID:str, projectID:str):
+    log.info("createSequenceSymLinks() was called.")
+    ## userDataDir is the top level dir that holds the repository of all sequences
+    sequencePath = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/Sequences/"
+    seqIDPath = sequencePath + sequenceID
+    projectPath = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/Builds/"
+    projIDPath = projectPath + projectID
+    parent_dir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/"
+    if not os.path.isdir(seqIDPath):
+        try:
+            os.makedirs(seqIDPath)
+        except Exception as error:
+            log.error("There was a problem creating the seqIDPath: " + str(error))
+            raise error
+    # TODO:  write evaluate.determineDefaultSequenecStructures which should be a lot like
+    #        evaluate.determineDefaultStructures()
+    # For now, just setting for a single structure
+    if not os.path.isdir(projIDPath + '/defaults/All_Builds'):
+        # TODO:  one day this might be annoying.  Feel free to change it
+        raise AttributeError("Cannot make sequence links for uninitialized project directory")
+    if not os.path.exists(projIDPath + '/defaults/Sequence_Repository'): 
+        path_down_to_source = 'Sequences/'+sequenceID
+        path_down_to_dest_dir = 'Builds/' + projectID + '/defaults/'
+#        make_relative_symbolic_link(
+#                path_down_to_source : str, 
+#                path_down_to_dest_dir : str , 
+#                dest_link_label : str, 
+#                parent_directory : str
+#                )
+        commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir , 'Sequence_Repository', parent_dir)
+    ## If this appears to be a new build for this sequence, have seqIDPath point into projIDPath
+    if os.path.isfile(projIDPath + 'New_Builds/structure/structure.off'):
+        # TODO : Make it possible for there to be other Build_Conditions....
+        path_down_to_source = 'Builds/' + projectID + '/New_Builds/structure/'
+        path_down_to_dest_dir = 'Sequences/'+sequenceID + '/Build_Conditions_1/All_Builds/'
+        commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir , None, parent_dir)
+        temp_parent_dir = 'Sequences/'+sequenceID + '/Build_Conditions_1/'
+        path_down_to_source = '/All_Builds/structure/mol_min.pdb'
+        commonlogic.make_relative_symbolic_link(path_down_to_source, 'default.pdb' , None, temp_parent_dir)
+        path_down_to_source = '/All_Builds/structure/strucure.pdb'
+        commonlogic.make_relative_symbolic_link(path_down_to_source, 'default_unminimized.pdb' , None, temp_parent_dir)
+    ## If this appears to be an old build for this sequence, ink have projIDPath point into seqIDPath
+    else:
+        path_down_to_source = 'Sequences/'+sequenceID + '/Build_Conditions_1/All_Builds/structure'
+        path_down_to_dest_dir = 'Builds/' + projectID + '/Existing_Builds/'
+        commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir , None, parent_dir)
+
+
+def createSymLinksOldAndCrufty(buildState : BuildState, thisTransaction : Transaction):
     log.info("createSymLinks() was called.")
 
-    sequence = getSequenceFromTransaction(thisTransaction)
+    sequence = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
     seqID = getSeqIDForSequence(sequence)
 
-    ## userDataDir is the top level dir that holds all projects, not a specific user's data.
-    userDataDir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/"
-    seqIDPath = userDataDir + seqID
     
     log.debug("Checking to see if the seqIDPath already exists for this sequence: " + seqIDPath)
     if not os.path.exists(seqIDPath):
@@ -246,11 +369,12 @@ def getProjectSubdir(thisTransaction: Transaction):
     project_dir = thisTransaction.response_dict['gems_project']['project_dir']
     log.debug("project_dir: " + project_dir)
 
-    ## If default structure, subdir name is 'default'
+    ## If default structure, subdir name is 'structure'
     if checkIfDefaultStructureRequest(thisTransaction):
-        project_dir = project_dir + "default/"
-        if not os.path.exists(project_dir):
-            os.makedirs(project_dir)
+        pass
+#        project_dir = project_dir + "structure/"
+#        if not os.path.exists(project_dir):
+#            os.makedirs(project_dir)
 
     else:
         log.error("Still writing the logic to handle builds with selectedRotamers.")
@@ -267,13 +391,13 @@ def checkIfDefaultStructureExists(thisTransaction):
     log.info("checkIfDefaultStructureExists() was called.")
     structureExists = False
     try:
-        sequence = getSequenceFromTransaction(thisTransaction)
+        sequence = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
     except Exception as error:
         log.error("There was a problem getting the sequence from the transaction: "  + str(error))
         raise error
     else:
         seqID = getSeqIDForSequence(sequence)
-        userDataDir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/"
+        userDataDir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/Sequences/"
         log.debug("userDataDir: " + userDataDir)
         options = getOptionsFromTransaction(thisTransaction)
         try:

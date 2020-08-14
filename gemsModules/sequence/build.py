@@ -108,7 +108,7 @@ def build3DStructure(buildState : BuildState, thisTransaction : Transaction):
 #####
                     ## Check if this is the default build or if it has user options specified.
                     if sequenceProjects.checkIfDefaultStructureRequest(thisTransaction):
-                        destination = projectDir 
+                        destination = projectDir + '/New_Builds/structure/'
                         #destination = projectDir + 'default'
                         log.debug("The request is for a single structure to be placed in: " + destination)
                         # ## Defaults for next build 
@@ -130,14 +130,14 @@ def build3DStructure(buildState : BuildState, thisTransaction : Transaction):
                     amberSubmissionJson='{"project" : \
                         {\
                         "id":"' + pUUID + '", \
-                        "workingDirectory":"' + projectDir + '", \
+                        "workingDirectory":"' + destination + '", \
                         "type":"minimization", \
                         "system_phase":"gas", \
                         "water_model":"none" \
                         } \
                     }'
                     # TODO:  Make this resemble real code....
-                    the_json_file = projectDir + "amber_submission.json"
+                    the_json_file = destination + "amber_submission.json"
                     min_json_in = open (the_json_file , 'w')
                     min_json_in.write(amberSubmissionJson)
                     min_json_in.close()

@@ -128,7 +128,10 @@ def getProjectDir(thisTransaction: Transaction):
             if "projID" in thisTransaction.request_dict['project']:
                 projID = thisTransaction.request_dict['project']['projID']
                 projType = thisTransaction.request_dict['project']['project_type']
-                project_dir = projectSettings.output_data_dir + "tools/" +  projType  + "/git-ignore-me_userdata/" + projID + "/" 
+                if projType == 'cb': 
+                    project_dir = projectSettings.output_data_dir + "tools/" +  projType  + "/git-ignore-me_userdata/Builds/" + projID + "/" 
+                else:
+                    project_dir = projectSettings.output_data_dir + "tools/" +  projType  + "/git-ignore-me_userdata/" + projID + "/" 
         else:
             log.error("Insufficient information provided to find the projectDir.")
             log.error("This transaction: \n\n " + str(thisTransaction.request))
@@ -346,20 +349,55 @@ def getSiteHostName(content):
 #           A new method would be required if/when the need to get a list of sequences arrives.
 #   @param Transaction thisTransaction
 #   @return String sequence
-def getSequenceFromTransaction(thisTransaction: Transaction):
+def getSequenceFromTransaction(thisTransaction: Transaction, sequenceType:str=None):
     log.info("getSequenceFromTransaction() was called.\n")
     inputs = thisTransaction.request_dict['entity']['inputs']
     sequence = ""
-    for element in inputs:
-        #log.debug("element: " + str(element))
-        if "Sequence" in element.keys():
-            sequence = element['Sequence']['payload']
+    if sequenceType is None:
+        for element in inputs:
+            #log.debug("element: " + str(element))
+            if "Sequence" in element.keys():
+                # TODO - make this not rely on 'sequence' being the key.
+                #    .... or change the schema....
+                sequence = element['Sequence']['payload']
+            else:
+                log.debug("Skipping")
+        if sequence == "":
+            raise AttributeError("Sequence")
         else:
-            log.debug("Skipping")
-    if sequence == "":
-        raise AttributeError("Sequence")
-    else:
-        return sequence
+            return sequence
+    else: 
+        for element in inputs:
+            ##  TODO: Write this to handle inputs nested inside the service
+            if "sequenceVariants" in element.keys():
+                if sequenceType in element['sequenceVariants'].keys():
+                    sequence = element['sequenceVariants'][sequenceType]
+                    return sequence
+    if thisTransaction.response_dict is not None:
+        if 'responses' in thisTransaction.response_dict['entity'].keys():
+            responses = thisTransaction.response_dict['entity']['responses']
+            log.debug("The responses. : ")
+            log.debug(str(responses))
+            for thingyOne in responses:
+                if 'SequenceEvaluation' in thingyOne.keys():
+                    theEvaluations = thingyOne['SequenceEvaluation']
+                    log.debug("The evaluations : ")
+                    log.debug(str(theEvaluations))
+                    if 'outputs' in theEvaluations:
+                            outputs = theEvaluations['outputs']
+                            log.debug("The second inputs. : ")
+                            log.debug(str(outputs))
+                            for element in outputs:
+                                if "SequenceVariants" in element.keys():
+                                    if sequenceType in element['SequenceVariants'].keys():
+                                        sequence = element['SequenceVariants'][sequenceType]
+                                        return sequence
+    log.debug("Still here?   Gosh...   Here is the transaction request: ")
+    log.debug(prettyPrint(thisTransaction.request_dict))
+    log.debug("...   And here is the transaction response: ")
+    log.debug(prettyPrint(thisTransaction.response_dict))
+    raise AttributeError("Cannot locate a sequence of type : " + sequenceType)
+
 
 ##  @brief Use a sequence to get a unique seqID.
 #   Uses uuid5, which uses SHA-1 rather than Md5Sum

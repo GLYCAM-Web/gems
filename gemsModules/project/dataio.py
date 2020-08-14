@@ -156,7 +156,7 @@ class CbProject(GemsProject):
                 requested_structure_count = requested_structure_count + 1
         structure_count = requested_structure_count
 
-        self.project_dir = project_settings.output_data_dir + "tools/" +  self.project_type  + "/git-ignore-me_userdata/" + self.pUUID + "/" 
+        self.project_dir = project_settings.output_data_dir + "tools/" +  self.project_type  + "/git-ignore-me_userdata/Builds/" + self.pUUID + "/" 
 
     def __str__(self):
         result = super().__str__()

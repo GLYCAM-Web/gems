@@ -89,7 +89,8 @@ def manageSequenceRequest(thisTransaction : Transaction):
                         else:
                             log.debug("Need to build this structure.")
                             try: 
-                                sequenceProjects.createDirectoryStructure(buildState, thisTransaction)
+                                # old:  sequenceProjects.createProjectDirectoryStructure(buildState, thisTransaction)
+                                sequenceProjects.createProjectDirectoryStructure(projectDir)
                                 from gemsModules.sequence import build
                                 build.build3DStructure(buildState, thisTransaction)
                             except Exception as error:
@@ -97,7 +98,9 @@ def manageSequenceRequest(thisTransaction : Transaction):
                                 raise error
                             else:
                                 try:
-                                    sequenceProjects.createSymLinks(buildState, thisTransaction)
+                                    this_pUUID = sequenceProjects.getProjectpUUID(thisTransaction)
+                                    sequenceProjects.createSequenceSymLinks(this_seqID, this_pUUID)
+                                    sequenceProjects.createProjectSymlinks(projectDir)
                                 except Exception as error:
                                     log.error("There was a problem creating the symbolic links: " + str(error))
                                     raise error
