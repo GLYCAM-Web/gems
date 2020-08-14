@@ -736,13 +736,13 @@ def createSeqLog(sequence : str, seqIDPath : str):
 def getStructureInfoFilename(thisTransaction : Transaction):
     log.info("getStructureInfoFilename() was called.")
     try:
-        sequence = getSequenceFromTransaction(thisTransaction)
+        sequence = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
     except Exception as error:
         log.error("There was a problem getting the sequence from the transaction: " + str(error))
         raise error
     else:
         seqID = getSeqIDForSequence(sequence)
-        userDataDir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/"
+        userDataDir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/Sequences/"
         seqIDPath = userDataDir + seqID
         ##Update the json file for future reference.
         return seqIDPath + "/structureInfo.json"

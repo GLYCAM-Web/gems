@@ -83,6 +83,12 @@ def manageSequenceRequest(thisTransaction : Transaction):
                         if sequenceProjects.structureExists(buildState, thisTransaction):
                             log.debug("Found an existing structure.")
                             log.error("Dan write logic to return existing structures.")
+                            this_pUUID = sequenceProjects.getProjectpUUID(thisTransaction)
+                            this_sequence = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
+                            this_seqID = getSeqIDForSequence(this_sequence)
+                            sequenceProjects.createProjectDirectoryStructure(projectDir)
+                            sequenceProjects.createSequenceSymLinks(this_seqID, this_pUUID)
+                            sequenceProjects.createProjectSymlinks(projectDir)
                             ##TODO: Make this next method more generic, so it can handle rotamers too.
                             sequenceProjects.respondWithExistingDefaultStructure(thisTransaction)
                             ##TODO: Update the structureInfo_status.json
@@ -99,6 +105,8 @@ def manageSequenceRequest(thisTransaction : Transaction):
                             else:
                                 try:
                                     this_pUUID = sequenceProjects.getProjectpUUID(thisTransaction)
+                                    this_sequence = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
+                                    this_seqID = getSeqIDForSequence(this_sequence)
                                     sequenceProjects.createSequenceSymLinks(this_seqID, this_pUUID)
                                     sequenceProjects.createProjectSymlinks(projectDir)
                                 except Exception as error:

@@ -55,18 +55,18 @@ def registerBuild(buildState : BuildState, thisTransaction : Transaction):
         except Exception as error:
             log.error("There was a problem getting the status filename: " + str(error))
             raise error
-        else:
-            try:
-                updateBuildStatus(structureInfoFilename, buildState, "submitted")
-            except Exception as error:
-                log.error("There was a problem updating the structureInfo.json: " + str(error))
-                raise error
-            else:
-                try:
-                    updateBuildStatus(statusFilename, buildState, "submitted")
-                except Exception as error:
-                    log.error("There was a problem updating the status file: " + str(error))
-                    raise error
+        #else:
+            #try:
+                #updateBuildStatus(structureInfoFilename, buildState, "submitted")
+            #except Exception as error:
+                #log.error("There was a problem updating the structureInfo.json: " + str(error))
+                #raise error
+            #else:
+                #try:
+                    #updateBuildStatus(statusFilename, buildState, "submitted")
+                #except Exception as error:
+                    #log.error("There was a problem updating the status file: " + str(error))
+                    #raise error
 
 
 
@@ -85,30 +85,31 @@ def structureExists(buildState: BuildState, thisTransaction : Transaction):
         raise error
     else:
         ## Check if this sequence has been built before.
-        userDataDir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/"
+        userDataDir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/Sequences/"
         seqID = getSeqIDForSequence(sequence)
         sequenceDir = userDataDir + seqID
 
         log.debug("sequenceDir: " + sequenceDir)
         if os.path.isdir(sequenceDir):
             log.debug("This sequence has previous builds.")
-            structureLabel = buildState.structureLabel
-            if structureLabel == "default":
-                ## Easy. Just check the path. If it exists, return true.
-                defaultBuildDir = sequenceDir + "/defaults/All_Builds/structure"
-                if os.path.isdir(defaultBuildDir):
-                    log.debug("default structure found.")
-                    return True
-                else:
-                    log.debug("default structure not found.")
-                    return False
-            else:
+            return True
+#            structureLabel = buildState.structureLabel
+#            if structureLabel == "default":
+#                ## Easy. Just check the path. If it exists, return true.
+#                defaultBuildDir = sequenceDir + "/defaults/All_Builds/structure"
+#                if os.path.isdir(defaultBuildDir):
+#                    log.debug("default structure found.")
+#                    return True
+#                else:
+#                    log.debug("default structure not found.")
+#                    return False
+#            else:
 ###
 ### START HERE -- add this logic
 ###
-                log.error("Need to write the logic that checks for existing builds that are not the defaults.")
-                ## Need to write a buildStateExists() method that compares BuildStates that have
-                ##  been logged to file to requested BuildStates.
+#                log.error("Need to write the logic that checks for existing builds that are not the defaults.")
+#                ## Need to write a buildStateExists() method that compares BuildStates that have
+#                ##  been logged to file to requested BuildStates.
         else:
             log.debug("No directory exists for this sequence, there cannot be any previous builds.")
             return False
@@ -247,12 +248,17 @@ def createSequenceSymLinks(sequenceID:str, projectID:str):
     projectPath = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/Builds/"
     projIDPath = projectPath + projectID
     parent_dir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/"
-    if not os.path.isdir(seqIDPath):
+    all_builds = seqIDPath + '/Build_Conditions_1/All_Builds/'
+    if not os.path.isdir(all_builds):
         try:
-            os.makedirs(seqIDPath)
+            os.makedirs(all_builds)
         except Exception as error:
             log.error("There was a problem creating the seqIDPath: " + str(error))
             raise error
+    # TODO : Make it possible for there to be other Build_Conditions....
+    if not os.path.isdir(seqIDPath + '/defaults'):
+        path_down_to_source = 'Build_Conditions_1/'
+        commonlogic.make_relative_symbolic_link(path_down_to_source, None , 'defaults', seqIDPath)
     # TODO:  write evaluate.determineDefaultSequenecStructures which should be a lot like
     #        evaluate.determineDefaultStructures()
     # For now, just setting for a single structure
@@ -270,18 +276,24 @@ def createSequenceSymLinks(sequenceID:str, projectID:str):
 #                )
         commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir , 'Sequence_Repository', parent_dir)
     ## If this appears to be a new build for this sequence, have seqIDPath point into projIDPath
-    if os.path.isfile(projIDPath + 'New_Builds/structure/structure.off'):
+    if os.path.isfile(projIDPath + '/New_Builds/structure/structure.off'):
         # TODO : Make it possible for there to be other Build_Conditions....
-        path_down_to_source = 'Builds/' + projectID + '/New_Builds/structure/'
+        log.debug("This appears to be a bew build.")
+        path_down_to_source = 'Builds/' + projectID + '/New_Builds/structure'
         path_down_to_dest_dir = 'Sequences/'+sequenceID + '/Build_Conditions_1/All_Builds/'
-        commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir , None, parent_dir)
-        temp_parent_dir = 'Sequences/'+sequenceID + '/Build_Conditions_1/'
-        path_down_to_source = '/All_Builds/structure/mol_min.pdb'
-        commonlogic.make_relative_symbolic_link(path_down_to_source, 'default.pdb' , None, temp_parent_dir)
-        path_down_to_source = '/All_Builds/structure/strucure.pdb'
-        commonlogic.make_relative_symbolic_link(path_down_to_source, 'default_unminimized.pdb' , None, temp_parent_dir)
+        if not os.path.exists(path_down_to_dest_dir + '/structure') : 
+            commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir , None, parent_dir)
+        temp_parent_dir = seqIDPath + '/Build_Conditions_1/'
+        path_down_to_source = 'All_Builds/structure/mol_min.pdb'
+        log.debug("The relevant paths are:  ")
+        log.debug("        temp_parent_dir : " + temp_parent_dir)
+        log.debug("        path_down_to_source  :  " + path_down_to_source)
+        commonlogic.make_relative_symbolic_link(path_down_to_source, None, 'default.pdb' ,  temp_parent_dir)
+        path_down_to_source = 'All_Builds/structure/structure.pdb'
+        commonlogic.make_relative_symbolic_link(path_down_to_source, None, 'default_unminimized.pdb' , temp_parent_dir)
     ## If this appears to be an old build for this sequence, ink have projIDPath point into seqIDPath
     else:
+        log.debug("New build failed, so we will assume it is an existing build.")
         path_down_to_source = 'Sequences/'+sequenceID + '/Build_Conditions_1/All_Builds/structure'
         path_down_to_dest_dir = 'Builds/' + projectID + '/Existing_Builds/'
         commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir , None, parent_dir)
