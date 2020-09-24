@@ -22,28 +22,6 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__)
 
-##  @brief Pass in a gemsProject and get a responseConfig.
-#   @param GemsProject gemsProject
-#   @return dict config
-def build3dStructureResponseConfig(gemsProject):
-    log.info("build3dStructureResponseConfig() was called.\n")
-    log.debug("gemsProject: " + str(gemsProject))
-    downloadUrl = getDownloadUrl(gemsProject['pUUID'], "cb")
-    sequence = gemsProject['sequence']
-    config = {
-        "entity" : "Sequence",
-        "respondingService" : "Build3DStructure",
-        "responses" : [{
-            'payload' : gemsProject['pUUID'],
-            'sequence' : gemsProject['sequence'],
-            'seqID' : getSeqIDForSequence(sequence),
-            'downloadUrl' : downloadUrl
-        }]
-    }
-
-    log.debug("returning 3dStructureResponseConfig: " + str(config))
-
-    return config
 
 
 ##  @brief Give a transaction and pUUID, and this method builds the json response and
@@ -90,8 +68,7 @@ def build3DStructure(buildState : BuildState, thisTransaction : Transaction):
         except Exception as error:
             log.error("There was a problem getting a sequence from the transaction: " + str(error))
         else:
-            gemsProject = thisTransaction.response_dict['gems_project']
-            responseConfig = build3dStructureResponseConfig(gemsProject)
+            responseConfig = sequenceProjects.build3dStructureResponseConfig(thisTransaction)
             appendResponse(thisTransaction, responseConfig)
 
             log.debug("About to getCbBuilderForSequence")

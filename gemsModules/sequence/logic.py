@@ -82,7 +82,6 @@ def manageSequenceRequest(thisTransaction : Transaction):
                     try:
                         if sequenceProjects.structureExists(buildState, thisTransaction):
                             log.debug("Found an existing structure.")
-                            log.error("Dan write logic to return existing structures.")
                             this_pUUID = sequenceProjects.getProjectpUUID(thisTransaction)
                             this_sequence = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
                             this_seqID = getSeqIDForSequence(this_sequence)

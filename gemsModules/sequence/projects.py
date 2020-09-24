@@ -115,44 +115,47 @@ def structureExists(buildState: BuildState, thisTransaction : Transaction):
             return False
 
 
-
-
-##TODO Make this work for structures that are not the default.
-##  @brief Call this if the default structure for a sequence already exists.
-#   @detail Builds a project and a response config object. Updates the transaction.
+##  @brief Build a structure response config oobject and append it to a transaction
 #   @param Transaction
 def respondWithExistingDefaultStructure(thisTransaction: Transaction):
     log.info("respondWithExistingDefaultStructure() was called.")
 
     try:
-        sequence = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
+        config = build3dStructureResponseConfig(thisTransaction)
+        appendResponse(thisTransaction, config)
     except Exception as error:
         log.error("There was a problem getting the sequence from the request: " + str(error))
         raise error
-    else:
-        try:
-            seqID = getSeqIDForSequence(sequence)
-        except Exception as error:
-            log.error("There was a problem getting the seqID for this sequence: " + str(error))
-            raise error
-        else:
-            try:
-                ##Grab the projectId from the gemsProject.
-                projID = getProjectpUUID(thisTransaction)
-            except Exception as error:
-                log.error("There was a problem getting the pUUID from the GemsProject: " + str(error))
-                raise error
-            else:
-                config = {
-                    "entity":"Sequence",
-                    "respondingService":"Build3DStructure",
-                    "responses": [{
-                        'payload': projID,
-                        'download' : getDownloadUrl(seqID, "cb"),
-                        'seqID' : seqID
-                    }]
-                }
-                appendResponse(thisTransaction, config)
+
+
+##  @brief Pass in a gemsProject and get a responseConfig.
+#   @param GemsProject gemsProject
+#   @return dict config
+def build3dStructureResponseConfig(thisTransaction : Transaction):
+    log.info("build3dStructureResponseConfig() was called.\n")
+    gemsProject = thisTransaction.response_dict['gems_project']
+    indexOrdered = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
+    seqID = getSeqIDForSequence(indexOrdered)
+
+    log.debug("seqID: " + str(seqID))
+    downloadUrl = getDownloadUrl(gemsProject['pUUID'], "cb")
+
+    sequence = gemsProject['sequence']
+    config = {
+        "entity" : "Sequence",
+        "respondingService" : "Build3DStructure",
+        "responses" : [{
+            'payload' : gemsProject['pUUID'],
+            'sequence' : gemsProject['sequence'],
+            'seqID' : seqID,
+            'downloadUrl' : downloadUrl
+        }]
+    }
+
+    log.debug("returning 3dStructureResponseConfig: " + str(config))
+
+    return config
+
 
 ## TODO: make all these directory/link/file making functions into one thing
 ## that gets called by string only
