@@ -49,7 +49,7 @@ def importEntity(requestedEntity):
             return importlib.import_module(requestedModule,package="gemsModules")
 
 def parseInput(thisTransaction):
-    log.info("parseInput() was called.\n")
+    log.info("common.logic.parseInput() was called.\n")
     import json
     from io import StringIO
     from pydantic import BaseModel, ValidationError
@@ -154,7 +154,7 @@ def getGemsHome():
 
         GEMSHOME environment variable is not set.
 
-        Set it using somthing like:
+        Set it using something like:
 
           BASH:  export GEMSHOME=/path/to/gems
           SH:    setenv GEMSHOME /path/to/gems
@@ -230,7 +230,7 @@ def getEntityType(thisTransaction):
 #   @param transaction
 #   @param responseConfig
 def appendResponse(thisTransaction, responseConfig):
-    log.info("appendResponse() was called.\n")
+    log.info("common_logic appendResponse() was called.\n")
     ## Check the responseConfig:
     if 'entity' in responseConfig.keys():
         entity = responseConfig['entity']
@@ -243,7 +243,7 @@ def appendResponse(thisTransaction, responseConfig):
         respondingService = responseConfig['respondingService']
         log.debug("respondingService: " + respondingService)
     else:
-        log.error("Please add a respondingService field to your responseConfig object.")
+        log.error("Please add a respond2342342ingService field to your responseConfig object.")
         appendCommonParserNotice(thisTransaction,'IncompleteResponseError')
 
     if 'responses' in responseConfig.keys():
@@ -289,6 +289,31 @@ def appendResponse(thisTransaction, responseConfig):
         log.error("Please add at a list of responses to your responseConfig object.")
         appendCommonParserNotice(thisTransaction,'IcompleteResponseError')
 
+def appendResponseOliver(thisTransaction, responseConfig):
+    log.info("common.logic appendResponse() was called.\n")
+    ## Check the responseConfig:
+    if 'entity' in responseConfig.keys():
+        responseEntity = responseConfig['entity']
+        log.debug("responseConfig entity: " + responseEntity)
+    else:
+        log.error("Please add the entity type to your responseConfig object.")
+        appendCommonParserNotice(thisTransaction, 'IncompleteResponseError')
+    # if thisTransaction.response_dict == None:
+    #     thisTransaction.response_dict = {}
+    # if 'timestamp' not in thisTransaction.response_dict.keys():
+    #     timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+    #     log.debug("timestamp: " + timestamp)
+    #     thisTransaction.response_dict['timestamp'] = timestamp
+    thisTransaction.response_dict['entity']['responses'] = []
+    # thisTransaction.response_dict['entity'] = {} // Handled elsewhere
+    # thisTransaction.response_dict['entity']['type'] = responseEntity
+    thisTransaction.response_dict['entity']['responses'].append(responseConfig)
+    try:
+        TransactionSchema(**thisTransaction.response_dict)
+        log.debug("Passes validation against schema.")
+    except ValidationError as e:
+        log.error("Validation Error: " + str(e))
+        appendCommonParserNotice(thisTransaction,'JsonParseEror')
 
 ##  @brief Convenience method for cleaning and speeding up log reading of dict objects.
 #   @detail Useful for assessing json objects.
