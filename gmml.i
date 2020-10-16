@@ -732,4 +732,14 @@ std::ostream & get_cout() { return std::cout; }
 //%template() std::pair<int, std::vector<Glycan::SugarName> >;
 //%template(sugar_name_closest_match_map) std::map<int, std::vector<Glycan::SugarName> >;
 
+///Carbohydrate Builder///
+//typedef std::vector<DihedralOptions> DihedralOptionsVector;
+%template(dihedral_options_vector) std::vector<CondensedSequenceSpace::DihedralOptions>;
+
+//typedef std::vector<LinkageOptions> LinkageOptionsVector;
+%template(linkage_options_vector) std::vector<CondensedSequenceSpace::LinkageOptions>;
+
+//typedef std::vector<MolecularModeling::Residue*> ResidueVector;
+%template(residue_vector) std::vector<MolecularModeling::Residue* >;
+
 //constexpr operator size_t() { return 0; }
