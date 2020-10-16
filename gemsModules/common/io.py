@@ -106,22 +106,22 @@ class Service(BaseModel):
             )
     inputs : Json = None
     outputs : Json = None
-    requestID : str = Field(
-            None,
-            title = 'Request ID',
-            description = 'User-specified ID that will be echoed in responses.'
-            )
-    options : Tags = None
-    project : Json = Field(
-            None,
-            title='Gems Project Information',
-            description='See this doc somewhere for more information',
-            )
-    project : Json = Field(
-            None,
-            title='A GEMS Project',
-            description='This is generally assigned in the project module'
-            )
+    # requestID : str = Field(
+    #         None,
+    #         title = 'Request ID',
+    #         description = 'User-specified ID that will be echoed in responses.'
+    #         )
+    # options : Tags = None
+    # project : Json = Field(
+    #         None,
+    #         title='Gems Project Information',
+    #         description='See this doc somewhere for more information',
+    #         )
+    # project : Json = Field(
+    #         None,
+    #         title='A GEMS Project',
+    #         description='This is generally assigned in the project module'
+    #         )
     subentities : Json = Field(
             None,
             title='Subentities',
@@ -136,11 +136,11 @@ class Response(Service):
             alias='type',
             description='The type service that produced this response.'
             )
-    subentities : Json = Field(
-            None,
-            title='Responding Subentities',
-            description='List of Entities, and associated Services, needed by this Response'
-            )
+    # subentities : Json = Field(
+    #         None,
+    #         title='Responding Subentities',
+    #         description='List of Entities, and associated Services, needed by this Response'
+    #         )
 
 class Entity(BaseModel):
     """Holds information about the main object responsible for a service."""
