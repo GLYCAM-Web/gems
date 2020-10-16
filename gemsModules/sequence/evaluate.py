@@ -27,8 +27,43 @@ else:
 #   @param Transaction thisTransaction
 #   @param Service service
 #   @return boolean valid
-def evaluateCondensedSequence(thisTransaction : Transaction, thisService : Service = None, validateOnly = False):
-    log.info("evaluateCondensedSequence() was called.\n")
+# def evaluateCondensedSequence(thisTransaction : Transaction, thisService : Service = None, validateOnly = False):
+#     log.info("evaluateCondensedSequence() was called.\n")
+#     sequence = getSequenceFromTransaction(thisTransaction)
+#     #Test that this exists.
+#     if sequence is None:
+#         log.error("No sequence found in the transaction.")
+#         raise AttributeError
+#     else:
+#         log.debug("sequence: " + sequence)
+#     valid = checkIsSequenceSane(sequence)
+#     if validateOnly : 
+#         responseConfig = buildEvaluationResponseConfig(valid, None, None)
+#         appendResponse(thisTransaction, responseConfig)
+#         log.debug("Returning early from evaluateCondensedSequence bc validate only.")
+#         return valid
+#     if valid:
+#         log.debug("This is a valid sequence: " + sequence) 
+#         #linkages1 = getLinkageOptionsFromGmmlcbBuilder(sequence)
+#         from gemsModules.sequence import io
+#         test = io.Service()
+#         test.InitializeClass(sequence)
+#         linkages = getLinkageOptionsFromBuilder(sequence)
+#         sequences = getSequenceVariants(sequence)
+#     else: 
+#         log.debug("This is NOT a valid sequence: " + sequence) 
+#         linkages=None
+#         sequences=None
+
+#     responseConfig = buildEvaluationResponseConfig(valid, linkages, sequences)
+#     appendResponse(thisTransaction, responseConfig)
+#     log.debug("Returning from evaluateCondensedSequence.")
+#     return valid
+
+def evaluateCondensedSequencePydantic(thisTransaction : Transaction, thisService : Service = None, validateOnly = False):
+    from gemsModules.sequence import io as sequence_io
+    from gemsModules.common import logic as common_logic
+    log.info("evaluateCondensedSequencePydantic() was called.\n")
     sequence = getSequenceFromTransaction(thisTransaction)
     #Test that this exists.
     if sequence is None:
@@ -36,54 +71,51 @@ def evaluateCondensedSequence(thisTransaction : Transaction, thisService : Servi
         raise AttributeError
     else:
         log.debug("sequence: " + sequence)
-    valid = checkIsSequenceSane(sequence)
-    if validateOnly : 
-        responseConfig = buildEvaluationResponseConfig(valid, None, None)
-        appendResponse(thisTransaction, responseConfig)
-        log.debug("Returning early from evaluateCondensedSequence bc validate only.")
-        return valid
-    if valid:
-        log.debug("This is a valid sequence: " + sequence) 
-        linkages = getLinkageOptionsFromBuilder(sequence)
-        sequences = getSequenceVariants(sequence)
-    else: 
-        log.debug("This is NOT a valid sequence: " + sequence) 
-        linkages=None
-        sequences=None
-    responseConfig = buildEvaluationResponseConfig(valid, linkages, sequences)
-    appendResponse(thisTransaction, responseConfig)
-    log.debug("Returning from evaluateCondensedSequence.")
-    return valid
-
+    response = sequence_io.Response()
+    response.InitializeClass(sequence, validateOnly)
+    # OG I'm putting this here cause I have no idea where it should go. 
+    # Initializing response_dict
+    if thisTransaction.response_dict == None:
+        thisTransaction.response_dict = {}
+    thisTransaction.response_dict['entity'] = thisTransaction.request_dict['entity']
+    if response.outputs.sequenceIsValid and not validateOnly:
+        responseConfig = response.dict()
+        #print(response.json())
+        common_logic.appendResponseOliver(thisTransaction, responseConfig)
+    return response.outputs.sequenceIsValid 
 
 ##  @brief Pass in validation result and linkages and sequences, get a responseConfig.
 #   @param boolean valid
 #   @param dict linkages
 #   @return dict config
-def buildEvaluationResponseConfig(valid, linkages, sequences):
-    log.info("buildEvaluationResponseConfig() was called. \n")
-    # TODO:  Please someone make this less ugly
-#    if linkages is None:
-    config = {
-        "entity" : "Sequence",
-        "respondingService" : "SequenceEvaluation",
-        "responses" : [{
-            "type": "Evaluate",
-            "outputs" : [{
-                "SequenceValidation" : {
-                    "SequenceIsValid" : valid
-                }
-            },{
-                "SequenceVariants": sequences
-            },{
-                "BuildOptions": {
-                    "geometricElements" : [
-                        { "Linkages" : linkages }
-                    ]
-                }
-            }]
-        }]
-    }
+# def buildEvaluationResponseConfig(valid, linkages, sequences):
+#     log.info("buildEvaluationResponseConfig() was called. \n")
+#     # TODO:  Please someone make this less ugly
+# #    if linkages is None:
+#     # from gemsModules.sequence import io
+#     # entity = io.Entity()
+#     # entity.InitializeClass()
+#     # print(entity.json())
+    # """ Old and ugly """
+    # config = {      
+    #     "responses" : [{
+    #         "entity" : "Sequence",
+    #         "type": "Evaluate",
+    #         "outputs" : [{
+    #             "SequenceValidation" : {
+    #                 "SequenceIsValid" : valid
+    #             }
+    #         },{
+    #             "SequenceVariants": sequences
+    #         },{
+    #             "BuildOptions": {
+    #                 "geometricElements" : [
+    #                     { "Linkages" : linkages }
+    #                 ]
+    #             }
+    #         }]
+    #     }]
+    # }
 
 # ## The following might have once been a format for a validation response. 
 # ## Keeping it for historical sake.  Today is 2020-08-11.  If there
@@ -96,50 +128,104 @@ def buildEvaluationResponseConfig(valid, linkages, sequences):
 # ##    }
 # ##    })
 
-    return config
+    # return config
 
+# class LinkageRotamerNames(str, Enum):
+#     phi = 'phi'
+#     psi = 'psi'
+#     omega = 'omega'
 
+# class LinkageRotamers(BaseModel): 
+#     indexOrderedLabel : str = None
+#     linkageName : str = None
+#     residue1Number : str = None
+#     residue2Number : str = None
+#     possibleRotamers : List[str,List[str]] =[]
+#     likelyRotamers :   List[Tuple[LinkageRotamerNames,List[str]]] =[]
+
+# I think if we got all the names to match, we could use parse_object_as instead of this. OG.
+# Probably it would fail on sub-classes though, but maybe.
+def getLinkageOptionsFromGmmlcbBuilder(sequence):
+    log.info("getLinkageOptionsFromGmmlcbBuilder() was called.\n")
+    from gemsModules.sequence import build
+    from gemsModules.sequence import io
+    cbBuilder = build.getCbBuilderForSequence(sequence)
+    gmmllinkageOptionsVector = cbBuilder.GenerateUserOptionsDataStruct()
+    gemsLinkageGeometryOptions = io.LinkageGeometryOptions()
+    gemsLinkageGeometryOptions.totalPossibleRotamers = cbBuilder.GetNumberOfShapes()
+    likelyOnly = True
+    gemsLinkageGeometryOptions.totalLikelyRotamers = cbBuilder.GetNumberOfShapes(likelyOnly)
+    for gmmlLinkageOptions in gmmllinkageOptionsVector:
+        gemsLinkageOptions = io.LinkageRotamers()
+        gemsLinkageOptions.indexOrderedLabel = gmmlLinkageOptions.indexOrderedLabel_
+        gemsLinkageOptions.linkageName = gmmlLinkageOptions.linkageName_
+        gemsLinkageOptions.firstResidueNumber = gmmlLinkageOptions.firstResidueNumber_
+        gemsLinkageOptions.secondResidueNumber = gmmlLinkageOptions.secondResidueNumber_
+        """ Likely Rotamers """
+        for dihedralOptions in gmmlLinkageOptions.likelyRotamers_:
+            gemsRotamers = io.DihedralRotamers() 
+            gemsRotamers.dihedralName = dihedralOptions.dihedralName_
+            for rotamer in dihedralOptions.rotamers_:
+                gemsRotamers.dihedralValues.extend([rotamer]);
+            gemsLinkageOptions.likelyRotamers.append(gemsRotamers)
+        """ Possible Rotamers """
+        for dihedralOptions in gmmlLinkageOptions.possibleRotamers_:
+            gemsRotamers = io.DihedralRotamers()
+            gemsRotamers.dihedralName = dihedralOptions.dihedralName_
+            for rotamer in dihedralOptions.rotamers_:
+                gemsRotamers.dihedralValues.extend([rotamer]);
+            gemsLinkageOptions.possibleRotamers.append((gemsRotamers))
+        gemsLinkageGeometryOptions.linkageRotamersList.append((gemsLinkageOptions))
+    return gemsLinkageGeometryOptions
+
+# class LinkageRotamers(BaseModel): 
+#     indexOrderedLabel : str = None
+#     linkageName : str = None
+#     residue1Number : str = None
+#     residue2Number : str = None
+#     possibleRotamers :  List[Tuple[LinkageRotamerNames,List[str]]] =[]
+#     likelyRotamers :   List[Tuple[LinkageRotamerNames,List[str]]] =[]
 
 ##  @brief Pass a sequence, get linkage options.
 #   @param  str sequence 
-#   @return dict linkages
-def getLinkageOptionsFromBuilder(sequence):
-    log.info("getLinkageOptionsFromBuilder() was called.\n")
-    from gemsModules.sequence import build
-    builder = build.getCbBuilderForSequence(sequence)
-    userOptionsString = builder.GenerateUserOptionsJSON()
-    userOptionsJSON = json.loads(userOptionsString)
-    optionsResponses = userOptionsJSON['responses']
-    for response in optionsResponses:
-        log.debug("response.keys: " + str(response.keys()))
-        if 'Evaluate' in response.keys():
-            if "glycosidicLinkages" in response['Evaluate'].keys():
-                linkages = response['Evaluate']['glycosidicLinkages']
-                if linkages != None:
-                    ## Creating a new dict that can hold a new, derived field.
-                    updatedLinkages = []
-                    for element in linkages:
-                        log.debug("element: " + str(element))
-                        if element == None:
-                            return None
-                        copy = {}
-                        for key in element.keys():
-                            log.debug("key: " + key)
-                            log.debug("element[" + key + "]: " + str(element[key]))
-                            copy[key] = {}
-                            for gmmlKey in element[key]:
-                                copy[key].update({
-                                    gmmlKey : element[key][gmmlKey],
-                                    'linkageSequence' : element[key]['linkageName']
-                                })
-                        updatedLinkages.append(copy)
-                else:
-                    return None
-            else: 
-                return None
+# #   @return dict linkages
+# def getLinkageOptionsFromBuilder(sequence):
+#     log.info("getLinkageOptionsFromBuilder() was called.\n")
+#     from gemsModules.sequence import build
+#     cbBuilder = build.getCbBuilderForSequence(sequence)
+#     userOptionsString = cbBuilder.GenerateUserOptionsJSON()
+#     userOptionsJSON = json.loads(userOptionsString)
+#     optionsResponses = userOptionsJSON['responses']
+#     for response in optionsResponses:
+#         log.debug("response.keys: " + str(response.keys()))
+#         if 'Evaluate' in response.keys():
+#             if "glycosidicLinkages" in response['Evaluate'].keys():
+#                 linkages = response['Evaluate']['glycosidicLinkages']
+#                 if linkages != None:
+#                     ## Creating a new dict that can hold a new, derived field.
+#                     updatedLinkages = []
+#                     for element in linkages:
+#                         log.debug("element: " + str(element))
+#                         if element == None:
+#                             return None
+#                         copy = {}
+#                         for key in element.keys():
+#                             log.debug("key: " + key)
+#                             log.debug("element[" + key + "]: " + str(element[key]))
+#                             copy[key] = {}
+#                             for gmmlKey in element[key]:
+#                                 copy[key].update({
+#                                     gmmlKey : element[key][gmmlKey],
+#                                     'linkageSequence' : element[key]['linkageName']
+#                                 })
+#                         updatedLinkages.append(copy)
+#                 else:
+#                     return None
+#             else: 
+#                 return None
 
-    log.debug("updatedLinkages: " + str(updatedLinkages))
-    return updatedLinkages
+#     log.debug("updatedLinkages: " + str(updatedLinkages))
+#     return updatedLinkages
 
 
 ##  @brief Pass a sequence, get linkage options.

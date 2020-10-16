@@ -92,23 +92,20 @@ class ResidueRingPucker(BaseModel):
 class LinkageRotamerNames(str, Enum):
     phi = 'phi'
     psi = 'psi'
+    omg = 'omg'
     omega = 'omega'
+
+class DihedralRotamers(BaseModel):
+    dihedralName : str = None # phi, psi etc. Use Enum above once anything works :(
+    dihedralValues : List[str] = [] # gg, -g, tg, etc
 
 class LinkageRotamers(BaseModel): 
     indexOrderedLabel : str = None
-    userDefinedLabel : str = None
-    linkageContext : str = None
-    possibleRotamers :  List[Tuple[LinkageRotamerNames,List[str]]] =[]
-    likelyRotamers :   List[Tuple[LinkageRotamerNames,List[str]]] =[]
-    selectedRotamers :   List[Tuple[LinkageRotamerNames,List[str]]] =[]
-
-class LinkageRotamerSet(BaseModel):
-    indexOrderedLabel : str = None
-    userDefinedLabel : str = None
-    linkageContext : str = None
-    possibleRotamerSets :  List[Tuple[str,List[str]]] =[]
-    likelyRotamerSets :   List[Tuple[str,List[str]]] =[]
-    selectedRotamerSets :   List[Tuple[str,List[str]]] =[]
+    linkageName : str = None
+    firstResidueNumber : str = None
+    secondResidueNumber : str = None
+    possibleRotamers : List[DihedralRotamers] = []
+    likelyRotamers : List[DihedralRotamers] = []
 
 class ResidueGeometryOptions(BaseModel):
     """Geometry options for residues"""
@@ -116,27 +113,40 @@ class ResidueGeometryOptions(BaseModel):
 
 class LinkageGeometryOptions(BaseModel):
     """Geometry options for linkages"""
-    rotamers : List[LinkageRotamers] = []
-    rotamerSets : List[LinkageRotamerSet] = []
+    linkageRotamersList : List[LinkageRotamers] = []
+    totalLikelyRotamers : int = 0
+    totalPossibleRotamers : int = 0
 
+# I can't figure out if I can pass gmml classes to functions here, so I just 
+# wrote getLinkageOptionsFromGmmlcbBuilder.
 class GeometryOptions(BaseModel):
-    Residues : ResidueGeometryOptions = None
-    Linkages : LinkageGeometryOptions = None
-
+    residues : ResidueGeometryOptions = None # Not yet handled.
+    linkages : LinkageGeometryOptions = None
+    def InitializeClass(self, validatedSequence : Sequence):
+        from gemsModules.sequence import evaluate
+        self.linkages = evaluate.getLinkageOptionsFromGmmlcbBuilder(validatedSequence)
+        #print(self.linkages.json())
 
 class BuildOptions(BaseModel):
     """Options for building 3D models"""
-    solvationOptions :  SystemSolvationOptions = None
-    geometryOptions :  GeometryOptions = None
+    solvationOptions : SystemSolvationOptions = None  # Not yet handled.
+    geometryOptions : GeometryOptions = None
+    def InitializeClass(self, validatedSequence : Sequence):
+        self.geometryOptions = GeometryOptions ()
+        self.geometryOptions.InitializeClass(validatedSequence)
+        #print(self.geometryOptions.json())
 
 class DrawOptions(BaseModel):
     """Options for drawing 2D models"""
     Labeled : str = "true"
 
-class SequenceInput(BaseModel):
-    other : List[Resource] = []
+# Oliver Oct2020 finds this unnecessary. Not sure what other is going to be.
+# class SequenceInput(BaseModel):
+#     other : List[Resource] = []
+    
+class SequenceOutput(BaseModel):
+    sequenceIsValid : str = "false"
     sequenceVariants: SequenceVariants = None
-#    Definitions : Definitions = None
     buildOptions : BuildOptions = Field(
             None,
             description="Options for building the 3D Structure of the sequence."
@@ -145,54 +155,67 @@ class SequenceInput(BaseModel):
             None,
             description="Options for drawing a 2D Structure of the sequence."
             )
-
-class SequenceOutput(SequenceInput):
-    sequenceIsValid : str = "false"
-
-
+    def InitializeClass(self, sequence : Sequence, validateOnly : bool):
+        from gemsModules.sequence import evaluate
+        self.sequenceIsValid = evaluate.checkIsSequenceSane(sequence)
+        if self.sequenceIsValid and not validateOnly:
+            self.sequenceVariants = evaluate.getSequenceVariants(sequence)
+            self.buildOptions = BuildOptions()
+            self.buildOptions.InitializeClass(sequence)
+            #drawOptions to be developed later.
+        return self.sequenceIsValid
+        
 class Service(commonio.Service):
     """Holds information about a Service requested of the Sequence Entity."""
     typename : Services = Field(
             'Build3DStructure',
-            alias='type',
+            alias = 'type',
             title = 'Requested Service',
             description = 'The service requested of the Sequence Entity'
             )
     project: projectio.GemsProject = None
-    inputs : SequenceInput = None
+    inputs : Sequence = None
     outputs : SequenceOutput = None
+    def InitializeClass(self, sequence : Sequence, validateOnly : bool):
+        self.inputs = sequence
+        self.outputs = SequenceOutput()
+        self.outputs.InitializeClass(sequence, validateOnly)
+        
 
 class Response(Service):
     """Holds a response from a Service requested of the Sequence Entity."""
+    entity : str = "Sequence"
     typename : Services = Field(
             'Build3DStructure',
             alias='type',
             title = 'Requested Service',
             description = 'The service that was requested of Sequence Entity'
             )
+    # This in herits from Service, so can all its InitialiseClass().
 
-class Entity(BaseModel):
-    """Holds information about the main object responsible for a service."""
-    entityType : str = Field(
-            'Sequence',
-            title='Type',
-            alias='type'
-            )
-#    inputs :  = None
-    requestID : str = Field(
-            None,
-            title = 'Request ID',
-            description = 'User-specified ID that will be echoed in responses.'
-            )
-    services : List[Service] = []
-    responses : List[Response] = []
-    inputs : SequenceInput = None
-    options : commonio.Tags = None
-
+# Drafted by Lachele, but probably not needed. Oliver Oct2020
+# class Entity(BaseModel):
+#     """Holds information about the main object responsible for a service."""
+    
+#     entityType : str = Field(
+#             'Sequence',
+#             title='Type',
+#             alias='type'
+#             )
+# #    inputs :  = None
+#     requestID : str = Field(
+#             None,
+#             title = 'Request ID',
+#             description = 'User-specified ID that will be echoed in responses.'
+#             )
+#     services : List[Service] = []
+#     responses : List[Response] = []
+#   #  inputs : SequenceInput = None # This is already in Service...
+#     options : commonio.Tags = None
 
 def generateSchema():
     import json
-    print(Entity.schema_json(indent=2))
+    print(Response.schema_json(indent=2))
 #    print(Response.schema_json(indent=2))
 
 if __name__ == "__main__":
