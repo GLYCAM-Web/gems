@@ -29,11 +29,13 @@ def delegate(jsonObjectString):
     log.debug("incoming jsonObjectString: " + jsonObjectString)
 
     # Make a new Transaction object for holding I/O information.
-    thisTransaction=Transaction(jsonObjectString)
+    from gemsModules.delegator.io import Transaction as ioTransaction
+    thisTransaction=ioTransaction(jsonObjectString)
 
     # If the incoming string was improperly formed, bail, but give a reason.
     ##TODO: Look at this more closely. Predates current error handling approach.
-    if parseInput(thisTransaction) != 0:
+    from gemsModules.common.logic import parseInput as logic_parseInput
+    if logic_parseInput(thisTransaction) != 0:
         log.error(" There was an error parsing the input!")
         thisTransaction.build_outgoing_string()
         return thisTransaction.outgoing_string
@@ -50,7 +52,8 @@ def delegate(jsonObjectString):
 
     ### See if it is possible to load a module for the requested Entity
     try:
-        theEntity = importEntity(entityType)
+        from gemsModules.common.logic import importEntity as logic_importEntity
+        theEntity = logic_importEntity(entityType)
         log.debug("theEntity: " + str(theEntity))
     except Exception as error:
         error_msg = "There was a problem importing the entity: " + str(error)
@@ -148,7 +151,7 @@ def doDefaultService(thisTransaction):
 
 ## TODO:  this reception code does not conform to the current JSON schema (is close...).
 def receive(thisTransaction):
-    log.info("receive() was called.\n")
+    log.info("delegator.receive() was called.\n")
     log.debug("request_dict: " + str(thisTransaction.request_dict))
 
     if 'services' not in thisTransaction.request_dict['entity'].keys():
