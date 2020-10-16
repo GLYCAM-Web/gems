@@ -31,7 +31,7 @@ def doDefaultService(thisTransaction : delegatorio.Transaction):
 ##  @brief The main way Delegator interacts with this module. Request handling.
 #   @param Transaction thisTransactrion
 def receive(thisTransaction : delegatorio.Transaction):
-    log.info("receive() was called:\n")
+    log.info("sequence.receive() was called:\n")
     import gemsModules.sequence
     ## First figure out the names of each of the requested services
     if not 'services' in thisTransaction.request_dict['entity'].keys():
@@ -65,7 +65,7 @@ def receive(thisTransaction : delegatorio.Transaction):
             log.debug("Evaluate service requested from sequence entity.")
             from gemsModules.sequence import evaluate
             try:
-                evaluate.evaluateCondensedSequence(thisTransaction,  None)
+                evaluate.evaluateCondensedSequencePydantic(thisTransaction)
             except Exception as error:
                 log.error("There was a problem evaluating the condensed sequence: " + str(error)) 
                 common.settings.appendCommonParserNotice( thisTransaction, 'InvalidInput', 'InvalidInputPayload')
@@ -74,7 +74,7 @@ def receive(thisTransaction : delegatorio.Transaction):
             try:
                 ##first evaluate the requested structure. Only build if valid.
                 from gemsModules.sequence import evaluate
-                valid = evaluate.evaluateCondensedSequence(thisTransaction, None)
+                valid = evaluate.evaluateCondensedSequencePydantic(thisTransaction)
             except Exception as error:
                 log.error("There was a problem evaluating the condensed sequence: " + str(error)) 
             else:
@@ -93,7 +93,7 @@ def receive(thisTransaction : delegatorio.Transaction):
             log.debug("Validate service requested from sequence entity.")
             from gemsModules.sequence import evaluate
             try:
-                evaluate.evaluateCondensedSequence(thisTransaction,  None, True)
+                evaluate.evaluateCondensedSequencePydantic(thisTransaction, True)
             except Exception as error:
                 log.error("There was a problem validating the condensed sequence: " + str(error)) 
                 common.settings.appendCommonParserNotice( thisTransaction, 'InvalidInput', 'InvalidInputPayload')
