@@ -45,20 +45,18 @@ if len(sys.argv) > 1:
     if sys.argv[1] in ( "-h", "--help") :
         sys.stderr.write(USAGE)
         sys.exit(1)
-else:
-    sys.stderr.write(USAGE)
-    sys.exit(1)
+
 
 if importlib.util.find_spec("gemsModules") is None:
-    this_dir, this_filename = os.path.split(__file__)
-    sys.path.append(this_dir + "/../gemsModules/")
-    if importlib.util.find_spec("common") is None:
-        sys.stderr.write("Unable to locate Common Services.  Exiting.\n")
-        sys.exit(129)
-    else:
-        from common import utils
+  this_dir, this_filename = os.path.split(__file__)
+  sys.path.append(this_dir + "/../gemsModules/")
+  if importlib.util.find_spec("common") is None:
+    sys.stderr.write("Unable to locate Common Services.  Exiting.\n")
+    sys.exit(129)
+  else:
+    from common import utils
 else:
-    from gemsModules.common import utils
+  from gemsModules.common import utils
 jsonObjectString=utils.JSON_From_Command_Line(sys.argv)
 
 
