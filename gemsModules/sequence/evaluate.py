@@ -72,14 +72,17 @@ def evaluateCondensedSequencePydantic(thisTransaction : Transaction, thisService
     else:
         log.debug("sequence: " + sequence)
     response = sequence_io.Response()
+    # This next line initializes response and sub-classes. These pydantic classes can output
+    # their contents as JSON.
     response.InitializeClass(sequence, validateOnly)
     # OG I'm putting this here cause I have no idea where it should go. 
+    # Seems like it should have been done elsewhere.
     # Initializing response_dict
     if thisTransaction.response_dict == None:
         thisTransaction.response_dict = {}
     thisTransaction.response_dict['entity'] = thisTransaction.request_dict['entity']
     if response.outputs.sequenceIsValid and not validateOnly:
-        responseConfig = response.dict()
+        responseConfig = response.dict(by_alias = True)
         #print(response.json())
         common_logic.appendResponseOliver(thisTransaction, responseConfig)
     return response.outputs.sequenceIsValid 
