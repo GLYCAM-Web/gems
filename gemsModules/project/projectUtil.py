@@ -378,20 +378,24 @@ def getSequenceFromTransaction(thisTransaction: Transaction, sequenceType:str=No
             responses = thisTransaction.response_dict['entity']['responses']
             log.debug("The responses. : ")
             log.debug(str(responses))
-            for thingyOne in responses:
-                if 'SequenceEvaluation' in thingyOne.keys():
-                    theEvaluations = thingyOne['SequenceEvaluation']
-                    log.debug("The evaluations : ")
-                    log.debug(str(theEvaluations))
-                    if 'outputs' in theEvaluations:
-                            outputs = theEvaluations['outputs']
-                            log.debug("The second inputs. : ")
-                            log.debug(str(outputs))
-                            for element in outputs:
-                                if "SequenceVariants" in element.keys():
-                                    if sequenceType in element['SequenceVariants'].keys():
-                                        sequence = element['SequenceVariants'][sequenceType]
-                                        return sequence
+            for response in responses:
+                if 'outputs' in response.keys():
+                    outputs = response['outputs']
+                    log.debug("The outputs: ")
+                    log.debug(str(outputs))
+                    if "sequenceVariants" in outputs.keys():
+                        if sequenceType in outputs['sequenceVariants'].keys():
+                            sequence = outputs['sequenceVariants'][sequenceType]
+                            return sequence
+                    # if 'outputs' in theEvaluations:
+                    #         outputs = theEvaluations['outputs']
+                    #         log.debug("The second inputs. : ")
+                    #         log.debug(str(outputs))
+                    #         for element in outputs:
+                    #             if "SequenceVariants" in element.keys():
+                    #                 if sequenceType in element['SequenceVariants'].keys():
+                    #                     sequence = element['SequenceVariants'][sequenceType]
+                    #                     return sequence
     log.debug("Still here?   Gosh...   Here is the transaction request: ")
     log.debug(prettyPrint(thisTransaction.request_dict))
     log.debug("...   And here is the transaction response: ")
