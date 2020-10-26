@@ -158,17 +158,19 @@ class SequenceOutput(BaseModel):
     def InitializeClass(self, sequence : Sequence, validateOnly : bool):
         from gemsModules.sequence import evaluate
         self.sequenceIsValid = evaluate.checkIsSequenceSane(sequence)
-        if self.sequenceIsValid and not validateOnly:
+        if self.sequenceIsValid:
             self.sequenceVariants = evaluate.getSequenceVariants(sequence)
+        if self.sequenceIsValid and not validateOnly:
             self.buildOptions = BuildOptions()
             self.buildOptions.InitializeClass(sequence)
+            # self.defaultStructure
             #drawOptions to be developed later.
-        return self.sequenceIsValid
+        return self.sequenceIsValid # is this ok?
         
 class Service(commonio.Service):
     """Holds information about a Service requested of the Sequence Entity."""
     typename : Services = Field(
-            'Build3DStructure',
+            'Evaluate',
             alias = 'type',
             title = 'Requested Service',
             description = 'The service requested of the Sequence Entity'
@@ -186,7 +188,7 @@ class Response(Service):
     """Holds a response from a Service requested of the Sequence Entity."""
     entity : str = "Sequence"
     typename : Services = Field(
-            'Build3DStructure',
+            'Evaluate',
             alias='type',
             title = 'Requested Service',
             description = 'The service that was requested of Sequence Entity'
