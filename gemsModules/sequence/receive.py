@@ -68,6 +68,7 @@ def receive(thisTransaction : delegatorio.Transaction):
                 evaluate.evaluateCondensedSequencePydantic(thisTransaction)
             except Exception as error:
                 log.error("There was a problem evaluating the condensed sequence: " + str(error)) 
+                log.error(traceback.format_exc())
                 common.settings.appendCommonParserNotice( thisTransaction, 'InvalidInput', 'InvalidInputPayload')
         elif i == 'Build3DStructure':
             log.debug("Build3DStructure service requested from sequence entity.")
@@ -77,6 +78,8 @@ def receive(thisTransaction : delegatorio.Transaction):
                 valid = evaluate.evaluateCondensedSequencePydantic(thisTransaction)
             except Exception as error:
                 log.error("There was a problem evaluating the condensed sequence: " + str(error)) 
+                log.error(traceback.format_exc())
+                common.settings.appendCommonParserNotice( thisTransaction, 'InvalidInput', 'InvalidInputPayload')
             else:
                 if valid:
                     log.debug("Valid sequence.")

@@ -145,7 +145,8 @@ class DrawOptions(BaseModel):
 #     other : List[Resource] = []
     
 class SequenceOutput(BaseModel):
-    sequenceIsValid : str = "false"
+    sequenceIsValid : bool = False
+    validateOnly : bool = False
     sequenceVariants: SequenceVariants = None
     buildOptions : BuildOptions = Field(
             None,
@@ -155,8 +156,16 @@ class SequenceOutput(BaseModel):
             None,
             description="Options for drawing a 2D Structure of the sequence."
             )
-    def InitializeClass(self, sequence : Sequence, validateOnly : bool):
+
+    def __init__(self, sequence:str, validateOnly:bool):
+        super().__init__()
+        log.info("Initializing SequenceOutput.")
+        log.debug("sequence: " + repr(sequence))
+        log.debug("validateOnly: " + repr(validateOnly))
+
         from gemsModules.sequence import evaluate
+
+        self.validateOnly = validateOnly
         self.sequenceIsValid = evaluate.checkIsSequenceSane(sequence)
         if self.sequenceIsValid:
             self.sequenceVariants = evaluate.getSequenceVariants(sequence)
@@ -165,7 +174,14 @@ class SequenceOutput(BaseModel):
             self.buildOptions.InitializeClass(sequence)
             # self.defaultStructure
             #drawOptions to be developed later.
-        return self.sequenceIsValid # is this ok?
+        
+
+
+class BuildOutput(BaseModel):
+    payload : str
+    sequence : str 
+    seqID : str
+    downloadUrl : str
         
 class Service(commonio.Service):
     """Holds information about a Service requested of the Sequence Entity."""
@@ -176,13 +192,28 @@ class Service(commonio.Service):
             description = 'The service requested of the Sequence Entity'
             )
     project: projectio.GemsProject = None
-    inputs : Sequence = None
-    outputs : SequenceOutput = None
-    def InitializeClass(self, sequence : Sequence, validateOnly : bool):
-        self.inputs = sequence
-        self.outputs = SequenceOutput()
-        self.outputs.InitializeClass(sequence, validateOnly)
-        
+    inputs : List[str] = None ##TODO: Make a CondensedSequence class.
+    outputs : List[Union[SequenceOutput, BuildOutput]] = None
+
+    def __init__(self, config : dict ):
+        super().__init__()
+
+        log.info("Initializing Service.")
+        log.debug("config: " + repr(config))
+
+        sequence = config['sequence']
+        validateOnly = config['validateOnly']
+        if self.inputs is None:
+            self.inputs = []
+        self.inputs.append(sequence)
+
+        if self.outputs == None:
+            self.outputs = []
+
+        output = SequenceOutput(sequence, validateOnly)
+
+        self.outputs.append(output)
+
 
 class Response(Service):
     """Holds a response from a Service requested of the Sequence Entity."""
