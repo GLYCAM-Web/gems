@@ -69,7 +69,9 @@ def build3DStructure(buildState : BuildState, thisTransaction : Transaction):
             log.error("There was a problem getting a sequence from the transaction: " + str(error))
         else:
             responseConfig = sequenceProjects.build3dStructureResponseConfig(thisTransaction)
-            appendResponse(thisTransaction, responseConfig)
+            response = sequence_io.Response(responseConfig)
+
+            appendResponse(thisTransaction, response)
 
             log.debug("About to getCbBuilderForSequence")
             builder = getCbBuilderForSequence(sequence)

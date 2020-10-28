@@ -157,10 +157,13 @@ class SequenceOutput(BaseModel):
             description="Options for drawing a 2D Structure of the sequence."
             )
 
-    def __init__(self, sequence:str, validateOnly:bool):
+    def __init__(self, config:dict):
         super().__init__()
         log.info("Initializing SequenceOutput.")
+        log.debug("config: " + repr(config))
+        sequence = config['sequence']
         log.debug("sequence: " + repr(sequence))
+        validateOnly = config['validateOnly']
         log.debug("validateOnly: " + repr(validateOnly))
 
         from gemsModules.sequence import evaluate
@@ -174,7 +177,6 @@ class SequenceOutput(BaseModel):
             self.buildOptions.InitializeClass(sequence)
             # self.defaultStructure
             #drawOptions to be developed later.
-        
 
 
 class BuildOutput(BaseModel):
@@ -182,7 +184,26 @@ class BuildOutput(BaseModel):
     sequence : str 
     seqID : str
     downloadUrl : str
-        
+
+    def __init__(self, config:dict):
+        super().__init__()
+        log.info("Initializing BuildOutput.")
+        log.debug("config: " + repr(config))
+        payload = config['payload']
+        log.debug("payload: " + payload)
+        sequence = config['payload']
+        log.debug("sequence: " + sequence)
+        seqID = config['seqID']
+        log.debug("seqID: " + seqID)
+        downloadUrl = config['downloadUrl']
+        log.debug("downloadUrl: " + downloadUrl)
+
+        self.payload = payload
+        self.sequence = sequence
+        self.seqID = seqID
+        self.downloadUrl = downloadUrl
+
+
 class Service(commonio.Service):
     """Holds information about a Service requested of the Sequence Entity."""
     typename : Services = Field(
@@ -201,18 +222,21 @@ class Service(commonio.Service):
         log.info("Initializing Service.")
         log.debug("config: " + repr(config))
 
-        sequence = config['sequence']
-        validateOnly = config['validateOnly']
         if self.inputs is None:
             self.inputs = []
-        self.inputs.append(sequence)
+        self.inputs.append(config['sequence'])
 
         if self.outputs == None:
             self.outputs = []
 
-        output = SequenceOutput(sequence, validateOnly)
-
-        self.outputs.append(output)
+        if config['outputType'] == "Evaluate":
+            output = SequenceOutput(config)
+            self.outputs.append(output)
+        elif config['outputType'] == "Build3DStructure":
+            output1 = SequenceOutput(config)
+            self.outputs.append(output1)
+            output2 = BuildOutput(config)
+            self.outputs.append(output2)
 
 
 class Response(Service):

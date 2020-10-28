@@ -64,20 +64,25 @@ def evaluateCondensedSequencePydantic(thisTransaction : Transaction, thisService
     from gemsModules.sequence import io as sequence_io
     from gemsModules.common import logic as common_logic
     log.info("evaluateCondensedSequencePydantic() was called.\n")
+    log.debug("thisService: " + str(thisService))
+    log.debug("validateOnly: " + str(validateOnly))
+
     sequence = getSequenceFromTransaction(thisTransaction)
     #Test that this exists.
     if sequence is None:
         log.error("No sequence found in the transaction.")
-        raise AttributeError
+        raise AttributeError("No sequence found in the transaction.")
     else:
         log.debug("sequence: " + sequence)
 
     config = {
         "sequence" : sequence,
-        "validateOnly" : validateOnly
+        "validateOnly" : validateOnly,
+        "outputType" : "Evaluate"
     }
 
     response = sequence_io.Response(config)
+    log.debug("response: " + repr(response))
 
     # OG I'm putting this here cause I have no idea where it should go. 
     # Seems like it should have been done elsewhere.
