@@ -87,9 +87,7 @@ def evaluateCondensedSequencePydantic(thisTransaction : Transaction, thisService
     # OG I'm putting this here cause I have no idea where it should go. 
     # Seems like it should have been done elsewhere.
     # Initializing response_dict
-    if thisTransaction.response_dict == None:
-        thisTransaction.response_dict = {}
-    thisTransaction.response_dict['entity'] = thisTransaction.request_dict['entity']
+    
 
     for output in response.outputs:
         log.debug("output type: " + str(type(output)))

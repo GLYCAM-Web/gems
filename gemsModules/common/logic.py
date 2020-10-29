@@ -289,25 +289,43 @@ def appendResponse(thisTransaction, responseConfig):
         log.error("Please add at a list of responses to your responseConfig object.")
         appendCommonParserNotice(thisTransaction,'IcompleteResponseError')
 
-def appendResponseOliver(thisTransaction, responseConfig):
+
+
+##  @brief Handles the construction of the response_dict portion of a transaction. 
+##  @details This creates the response bits that are common to all responses.
+##           Send one response at a time. Create the response using Pydantic-enabled classes in 
+##           your gemsModule's io.py.
+def appendResponseOliver(thisTransaction, serviceResponse):
     log.info("common.logic appendResponse() was called.\n")
-    ## Check the responseConfig:
-    if 'entity' in responseConfig.keys():
-        responseEntity = responseConfig['entity']
-        log.debug("responseConfig entity: " + responseEntity)
-    else:
-        log.error("Please add the entity type to your responseConfig object.")
-        appendCommonParserNotice(thisTransaction, 'IncompleteResponseError')
-    # if thisTransaction.response_dict == None:
-    #     thisTransaction.response_dict = {}
-    # if 'timestamp' not in thisTransaction.response_dict.keys():
-    #     timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-    #     log.debug("timestamp: " + timestamp)
-    #     thisTransaction.response_dict['timestamp'] = timestamp
-    thisTransaction.response_dict['entity']['responses'] = []
-    # thisTransaction.response_dict['entity'] = {} // Handled elsewhere
-    # thisTransaction.response_dict['entity']['type'] = responseEntity
-    thisTransaction.response_dict['entity']['responses'].append(responseConfig)
+
+    if thisTransaction.response_dict == None:
+        thisTransaction.response_dict = {}
+
+    ## Remember this could be called several times. Don't overwrite existing responses.
+    if thisTransaction.response_dict['entity'] == None:
+        thisTransaction.response_dict['entity'] = {}
+        try:
+            requestedEntity = thisTransaction.request_dict['entity']['type']
+        except Exception as error:
+            log.error("There was no entity type to be found in the transaction's request_dict.")
+            appendCommonParserNotice(thisTransaction, 'JsonParseError') 
+        else:
+            thisTransaction.response_dict['entity']['type'] = requestedEntity
+
+    log.debug("responding entity: " + thisTransaction.response_dict['entity']['type'])
+
+    if 'timestamp' not in thisTransaction.response_dict.keys():
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+        log.debug("timestamp: " + timestamp)
+        thisTransaction.response_dict['timestamp'] = timestamp
+
+     if thisTransaction.response_dict['entity']['responses'] == None:
+        thisTransaction.response_dict['entity']['responses'] = []
+
+
+
+    thisTransaction.response_dict['entity']['responses'].append(serviceResponse)
+
     try:
         TransactionSchema(**thisTransaction.response_dict)
         log.debug("Passes validation against schema.")
