@@ -144,7 +144,7 @@ class DrawOptions(BaseModel):
 # class SequenceInput(BaseModel):
 #     other : List[Resource] = []
     
-class SequenceOutput(BaseModel):
+class SequenceEvaluationOutput(BaseModel):
     sequenceIsValid : bool = False
     validateOnly : bool = False
     sequenceVariants: SequenceVariants = None
@@ -157,19 +157,19 @@ class SequenceOutput(BaseModel):
             description="Options for drawing a 2D Structure of the sequence."
             )
 
-    def __init__(self, config:dict):
+    def __init__(self, sequence:str, validateOnly):
         super().__init__()
         log.info("Initializing SequenceOutput.")
-        log.debug("config: " + repr(config))
-        sequence = config['sequence']
+
         log.debug("sequence: " + repr(sequence))
-        validateOnly = config['validateOnly']
         log.debug("validateOnly: " + repr(validateOnly))
 
         from gemsModules.sequence import evaluate
 
         self.validateOnly = validateOnly
         self.sequenceIsValid = evaluate.checkIsSequenceSane(sequence)
+        log.debug("self.sequenceIsValid: " + str(self.sequenceIsValid))
+
         if self.sequenceIsValid:
             self.sequenceVariants = evaluate.getSequenceVariants(sequence)
         if self.sequenceIsValid and not validateOnly:
@@ -179,23 +179,19 @@ class SequenceOutput(BaseModel):
             #drawOptions to be developed later.
 
 
-class BuildOutput(BaseModel):
+class Build3DStructureOutput(BaseModel):
     payload : str
     sequence : str 
     seqID : str
     downloadUrl : str
 
-    def __init__(self, config:dict):
+    def __init__(self, payload:str, sequence:str, seqID:str, downloadUrl:str):
         super().__init__()
         log.info("Initializing BuildOutput.")
-        log.debug("config: " + repr(config))
-        payload = config['payload']
+
         log.debug("payload: " + payload)
-        sequence = config['payload']
         log.debug("sequence: " + sequence)
-        seqID = config['seqID']
         log.debug("seqID: " + seqID)
-        downloadUrl = config['downloadUrl']
         log.debug("downloadUrl: " + downloadUrl)
 
         self.payload = payload
@@ -203,43 +199,7 @@ class BuildOutput(BaseModel):
         self.seqID = seqID
         self.downloadUrl = downloadUrl
 
-
-class Service(commonio.Service):
-    """Holds information about a Service requested of the Sequence Entity."""
-    typename : Services = Field(
-            'Evaluate',
-            alias = 'type',
-            title = 'Requested Service',
-            description = 'The service requested of the Sequence Entity'
-            )
-    project: projectio.GemsProject = None
-    inputs : List[str] = None ##TODO: Make a CondensedSequence class.
-    outputs : List[Union[SequenceOutput, BuildOutput]] = None
-
-    def __init__(self, config : dict ):
-        super().__init__()
-
-        log.info("Initializing Service.")
-        log.debug("config: " + repr(config))
-
-        if self.inputs is None:
-            self.inputs = []
-        self.inputs.append(config['sequence'])
-
-        if self.outputs == None:
-            self.outputs = []
-
-        if config['outputType'] == "Evaluate":
-            output = SequenceOutput(config)
-            self.outputs.append(output)
-        elif config['outputType'] == "Build3DStructure":
-            output1 = SequenceOutput(config)
-            self.outputs.append(output1)
-            output2 = BuildOutput(config)
-            self.outputs.append(output2)
-
-
-class Response(Service):
+class ServiceResponse(BaseModel):
     """Holds a response from a Service requested of the Sequence Entity."""
     entity : str = "Sequence"
     typename : Services = Field(
@@ -248,7 +208,71 @@ class Response(Service):
             title = 'Requested Service',
             description = 'The service that was requested of Sequence Entity'
             )
-    # This in herits from Service, so can all its InitialiseClass().
+    inputs : List[str] = None
+    outputs: List[Union[SequenceEvaluationOutput, Build3DStructureOutput]] = None
+
+    def __init__(self, serviceType: str, inputs= None, outputs = None):
+        super().__init__()
+        log.info("Instantiating a ServiceResponse")
+        log.debug("serviceType: " + serviceType)
+        self.typename = serviceType
+        if not inputs == None:
+            if self.inputs == None:
+                self.inputs = []
+            for input in inputs:
+                self.inputs.append(input)
+        if not outputs == None:
+            if self.outputs == None:
+                self.outputs = []
+            for output in outputs:
+                self.outputs.append(output)
+
+
+
+
+
+# class Service(commonio.Service):
+#     """Holds information about a Service requested of the Sequence Entity."""
+#     typename : Services = Field(
+#             'Evaluate',
+#             alias = 'type',
+#             title = 'Requested Service',
+#             description = 'The service requested of the Sequence Entity'
+#             )
+#     project: projectio.GemsProject = None
+#     inputs : List[str] = None ##TODO: Make a CondensedSequence class.
+#     outputs : List[Union[SequenceOutput, BuildOutput]] = None
+
+#     def __init__(self, config : dict ):
+#         super().__init__()
+
+#         log.info("Initializing Service.")
+#         log.debug("config: " + repr(config))
+
+#         if self.inputs is None:
+#             self.inputs = []
+#         self.inputs.append(config['sequence'])
+
+#         if self.outputs == None:
+#             self.outputs = []
+
+#         if config['outputType'] == "Evaluate":
+#             output = SequenceOutput(config)
+#             self.outputs.append(output)
+#         elif config['outputType'] == "Build3DStructure":
+#             output1 = SequenceOutput(config)
+#             self.outputs.append(output1)
+#             output2 = BuildOutput(config)
+#             self.outputs.append(output2)
+
+
+
+
+
+
+
+
+
 
 # Drafted by Lachele, but probably not needed. Oliver Oct2020
 # class Entity(BaseModel):

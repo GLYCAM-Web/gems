@@ -68,39 +68,36 @@ def evaluateCondensedSequencePydantic(thisTransaction : Transaction, thisService
     log.debug("validateOnly: " + str(validateOnly))
 
     sequence = getSequenceFromTransaction(thisTransaction)
+    inputs = []
+    inputs.append(sequence)
     #Test that this exists.
     if sequence is None:
-        log.error("No sequence found in the transaction.")
-        raise AttributeError("No sequence found in the transaction.")
+        errorMsg = "No sequence found in the transaction."
+        log.error(errorMsg)
+        raise AttributeError(errorMsg)
     else:
         log.debug("sequence: " + sequence)
 
-    config = {
-        "sequence" : sequence,
-        "validateOnly" : validateOnly,
-        "outputType" : "Evaluate"
-    }
+    ##Generate output first. sequence, validateOnly
+    evaluationOutput = sequence_io.SequenceEvaluationOutput(sequence, validateOnly)
+    sequenceIsValid = evaluationOutput.sequenceIsValid
+    log.debug("sequenceIsValid: " + str(sequenceIsValid))
+    outputs = []
+    outputs.append(evaluationOutput)
 
-    response = sequence_io.Response(config)
-    log.debug("response: " + repr(response))
+    ## serviceType, inputs, and outputs.
+    serviceResponse = sequence_io.ServiceResponse(thisService, inputs, outputs)
 
-    # OG I'm putting this here cause I have no idea where it should go. 
-    # Seems like it should have been done elsewhere.
-    # Initializing response_dict
-    
-
-    for output in response.outputs:
-        log.debug("output type: " + str(type(output)))
-        if gemsModules.sequence.io.SequenceOutput == type(output):
-            sequenceIsValid = output.sequenceIsValid
-            validateOnly = output.validateOnly
-            break
-
+    ##TODO: get sequenceIsValid and ValidateOnly.
     if sequenceIsValid and not validateOnly:
-        responseConfig = response.dict(by_alias = True)
-        #print(response.json())
-        common_logic.appendResponseOliver(thisTransaction, responseConfig)
-    return response.outputs.sequenceIsValid 
+        responseObj = serviceResponse.dict(by_alias = True)
+        log.debug("responseObj:\n")
+        prettyPrint(responseObj)
+        common_logic.appendResponseOliver(thisTransaction, responseObj)
+    else:
+        log.debug("validateOnly was true. Does evaluateCondensedSequence return a well-formed response?")
+
+    return sequenceIsValid
 
 ##  @brief Pass in validation result and linkages and sequences, get a responseConfig.
 #   @param boolean valid

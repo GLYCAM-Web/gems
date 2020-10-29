@@ -32,17 +32,20 @@ def importEntity(requestedEntity):
         log.debug("requestedModule: " + requestedModule)
     except Exception as error:
         log.error("There was a problem finding the requested entity. Does it exist? requestedEntity: " + requestedEntity)
+        log.error(traceback.format_exc())
         raise error
     else:
         try:
             module_spec = importlib.util.find_spec(requestedModule,package="gemsModules")
         except Exception as error:
             log.error("There was a problem importing the requested module.")
+            log.error(traceback.format_exc())
             raise error
         else:
 
             if module_spec is None:
                 log.error("The module spec returned None for rquestedEntity: " + requestedEntity)
+                log.error(traceback.format_exc())
                 raise FileNotFoundError(requestedEntity)
 
             log.debug("module_spec: " + str(module_spec))
@@ -141,6 +144,7 @@ def getCurrentStableJsonApiVersion():
         log.debug("json_api_version: " + version)
     except Exception as error:
         log.error("Failed to read the currentStableSchema file.")
+        log.error(traceback.format_exc())
         raise error
     else:
         return version
@@ -198,6 +202,7 @@ def make_relative_symbolic_link(
     else:
         if not os.path.isdir(path_down_to_dest_dir): 
             log.error("The path down to the link to be created is not a directory : " + path_down_to_dest_dir)
+            log.error(traceback.format_exc())
             raise AttributeError(path_down_to_dest_dir)
         if dest_link_label is None: 
             path_down_to_dest_label=os.path.join(path_down_to_dest_dir, os.path.basename(path_down_to_source))
@@ -281,6 +286,7 @@ def appendResponse(thisTransaction, responseConfig):
                 log.debug("Passes validation against schema.")
             except ValidationError as e:
                 log.error("Validation Error: " + str(e))
+                log.error(traceback.format_exc())
                 appendCommonParserNotice(thisTransaction,'JsonParseEror')
         else:
             log.Error("Incomplete responseConfig.")
@@ -302,35 +308,65 @@ def appendResponseOliver(thisTransaction, serviceResponse):
         thisTransaction.response_dict = {}
 
     ## Remember this could be called several times. Don't overwrite existing responses.
-    if thisTransaction.response_dict['entity'] == None:
+    # Entity contains type, services, inputs, and responses.
+    # Type already validated if we reach this point. Copy over from request.
+    if 'entity' not in thisTransaction.response_dict.keys():
         thisTransaction.response_dict['entity'] = {}
         try:
             requestedEntity = thisTransaction.request_dict['entity']['type']
         except Exception as error:
             log.error("There was no entity type to be found in the transaction's request_dict.")
-            appendCommonParserNotice(thisTransaction, 'JsonParseError') 
+            log.error(traceback.format_exc())
+            appendCommonParserNotice(thisTransaction,'InvalidInput', "entity['type']") 
         else:
             thisTransaction.response_dict['entity']['type'] = requestedEntity
 
+    ## services already validated if we reach this point. Copy over from request.
+    if 'services' not in thisTransaction.response_dict['entity'].keys():
+        thisTransaction.response_dict['entity']['services'] = []
+        try:
+            requestedService = serviceResponse['type']
+            log.debug("Adding service to json response object services list: " + requestedService)
+            thisTransaction.response_dict['entity']['services'].append(requestedService)
+        except Exception as error:
+            log.debug("There were no requested services. Default services will be described in the outputs.")
+
+
+    ## inputs already validated if we reach this point. Copy over from request.
+    if 'inputs' not in thisTransaction.response_dict['entity'].keys():
+        thisTransaction.response_dict['entity']['inputs'] = []
+        try:
+            requestInputs = thisTransaction.request_dict['entity']['inputs']
+            thisTransaction.response_dict['entity']['inputs']  = requestInputs
+        except Exception as error:
+            log.error("No inputs found in request.")
+            log.error(traceback.format_exc())
+            appendCommonParserNotice(thisTransaction,'InvalidInput', "entity['inputs']")
+
     log.debug("responding entity: " + thisTransaction.response_dict['entity']['type'])
 
-    if 'timestamp' not in thisTransaction.response_dict.keys():
-        timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-        log.debug("timestamp: " + timestamp)
-        thisTransaction.response_dict['timestamp'] = timestamp
+    ## Timestamp for the creation of this response. Overwrites if multiple responses
+    ##  are added. Represents the time of the addition of the final response.
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+    log.debug("response_timestamp: " + timestamp)
+    thisTransaction.response_dict['response_timestamp'] = timestamp
 
-     if thisTransaction.response_dict['entity']['responses'] == None:
+    if 'responses' not in thisTransaction.response_dict['entity'].keys():
         thisTransaction.response_dict['entity']['responses'] = []
-
-
 
     thisTransaction.response_dict['entity']['responses'].append(serviceResponse)
 
     try:
+        log.debug("response_dict obj type: " + str(type(thisTransaction.response_dict)))
+        log.debug("Response_dict before validation: ")
+
+        ##Breaking here. 
+        prettyPrint(thisTransaction.response_dict)
         TransactionSchema(**thisTransaction.response_dict)
         log.debug("Passes validation against schema.")
     except ValidationError as e:
-        log.error("Validation Error: " + str(e))
+        log.error("Validation Error while responding to: " + requestedEntity + e.json())
+        log.error(traceback.format_exc())
         appendCommonParserNotice(thisTransaction,'JsonParseEror')
 
 ##  @brief Convenience method for cleaning and speeding up log reading of dict objects.

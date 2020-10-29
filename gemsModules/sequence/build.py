@@ -29,7 +29,7 @@ else:
 #   @param Transaction thisTransaction
 #   @param String uUUID - Upload ID for user provided input.
 def appendBuild3DStructureResponse(thisTransaction : Transaction, pUUID : str):
-    log.info("appendBuild3DStructureResonse() was called.\n")
+    log.info("appendBuild3DStructureResonse() was called.")
     if thisTransaction.response_dict is None:
         thisTransaction.response_dict={}
     if not 'entity' in thisTransaction.response_dict:
@@ -55,7 +55,7 @@ def appendBuild3DStructureResponse(thisTransaction : Transaction, pUUID : str):
 #   @param Transaction thisTransaction
 #   @param Service service (optional)
 def build3DStructure(buildState : BuildState, thisTransaction : Transaction):
-    log.info("Sequence receive.py buildDefault3Dstructure() was called.\n")
+    log.info("buildDefault3Dstructure() was called.")
 
     try:
         pUUID=sequenceProjects.getProjectpUUID(thisTransaction)
@@ -68,13 +68,26 @@ def build3DStructure(buildState : BuildState, thisTransaction : Transaction):
         except Exception as error:
             log.error("There was a problem getting a sequence from the transaction: " + str(error))
         else:
-            responseConfig = sequenceProjects.build3dStructureResponseConfig(thisTransaction)
-            response = sequence_io.Response(responseConfig)
 
-            appendResponse(thisTransaction, response)
+            ## Generate output first
+            indexOrdered = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
+            seqID = getSeqIDForSequence(indexOrdered)
+            downloadUrl = getDownloadUrl(gemsProject['pUUID'], "cb")
+            ## By the time build3DStructure() is called, evaluation response exists.
+            ##  all we need to do is build the output and append it.
+            output = sequence_io.Build3DStructureOutput(pUUID, sequence, seqID, downloadUrl)
+            outputs = []
+            outputs.append(output)
+            inputs = []
+            inputs.append(sequence)
+            serviceResponse = sequence_io.ServiceResponse("Build3DStructure", inputs, outputs)
+            
+
+            ##TODO: figure out how to return this response now, and still continue this logic.
 
             log.debug("About to getCbBuilderForSequence")
             builder = getCbBuilderForSequence(sequence)
+
             try:
                 projectDir = sequenceProjects.getProjectSubdir(thisTransaction)
             except Exception as error:
