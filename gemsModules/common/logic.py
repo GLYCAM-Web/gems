@@ -301,7 +301,7 @@ def appendResponse(thisTransaction, responseConfig):
 ##  @details This creates the response bits that are common to all responses.
 ##           Send one response at a time. Create the response using Pydantic-enabled classes in 
 ##           your gemsModule's io.py.
-def appendResponseOliver(thisTransaction, serviceResponse):
+def updateResponse(thisTransaction, serviceResponse):
     log.info("common.logic appendResponse() was called.\n")
 
     log.debug("Service Response: ")

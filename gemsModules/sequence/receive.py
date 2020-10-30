@@ -75,7 +75,7 @@ def receive(thisTransaction : delegatorio.Transaction):
             try:
                 ##first evaluate the requested structure. Only build if valid.
                 from gemsModules.sequence import evaluate
-                valid = evaluate.evaluateCondensedSequencePydantic(thisTransaction, i)
+                valid = evaluate.evaluateCondensedSequencePydantic(thisTransaction, "Evaluate")
             except Exception as error:
                 log.error("There was a problem evaluating the condensed sequence: " + str(error)) 
                 log.error(traceback.format_exc())

@@ -100,6 +100,7 @@ def manageSequenceRequest(thisTransaction : Transaction):
                                 build.build3DStructure(buildState, thisTransaction)
                             except Exception as error:
                                 log.error("There was a problem building the 3D structure: " + str(error))
+                                log.error(traceback.format_exc())
                                 raise error
                             else:
                                 try:

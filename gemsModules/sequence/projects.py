@@ -123,10 +123,25 @@ def respondWithExistingDefaultStructure(thisTransaction: Transaction):
     log.info("respondWithExistingDefaultStructure() was called.")
 
     try:
-        config = build3dStructureResponseConfig(thisTransaction)
-        response = sequence_io.Response(config)
+        gemsProject = thisTransaction.response_dict['gems_project']
+        sequence = gemsProject['sequence']
+        pUUID = gemsProject['pUUID']
+
+        inputs = []
+        inputs.append(sequence)
         
-        appendResponse(thisTransaction, config)
+        indexOrdered = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
+        seqID = getSeqIDForSequence(indexOrdered)
+
+        downloadUrl = getDownloadUrl(gemsProject['pUUID'], "cb")
+        outputs = []
+
+        ouput = sequence_io.Build3DStructureOutput(pUUID, sequence, seqID, downloadUrl)
+        outputs.append(ouput)
+
+        serviceResponse = sequence_io.ServiceResponse("Build3DStructure", inputs, outputs)
+        responseObj = serviceResponse.dict(by_alias = True)
+        commonlogic.updateResponse(thisTransaction, responseObj)
     except Exception as error:
         log.error("There was a problem getting the sequence from the request: " + str(error))
         raise error

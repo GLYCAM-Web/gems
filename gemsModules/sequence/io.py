@@ -180,10 +180,10 @@ class SequenceEvaluationOutput(BaseModel):
 
 
 class Build3DStructureOutput(BaseModel):
-    payload : str
-    sequence : str 
-    seqID : str
-    downloadUrl : str
+    payload : str =  ""
+    sequence : str  = ""
+    seqID : str = ""
+    downloadUrl : str = ""
 
     def __init__(self, payload:str, sequence:str, seqID:str, downloadUrl:str):
         super().__init__()
@@ -198,6 +198,7 @@ class Build3DStructureOutput(BaseModel):
         self.sequence = sequence
         self.seqID = seqID
         self.downloadUrl = downloadUrl
+
 
 class ServiceResponse(BaseModel):
     """Holds a response from a Service requested of the Sequence Entity."""
