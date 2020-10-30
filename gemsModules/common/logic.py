@@ -362,7 +362,9 @@ def appendResponseOliver(thisTransaction, serviceResponse):
 
         ##Breaking here. 
         prettyPrint(thisTransaction.response_dict)
+
         TransactionSchema(**thisTransaction.response_dict)
+        
         log.debug("Passes validation against schema.")
     except ValidationError as e:
         log.error("Validation Error while responding to: " + requestedEntity + e.json())
