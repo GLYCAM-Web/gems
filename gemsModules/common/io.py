@@ -149,15 +149,16 @@ class Entity(BaseModel):
             title='Type',
             alias='type'
             )
-    inputs : Json = None
+    inputs : List[Json] = None
     requestID : str = Field(
             None,
             title = 'Request ID',
             description = 'User-specified ID that will be echoed in responses.'
             )
-    services : Json = None
-    responses : Json = None
+    services : List[Json] = None
+    responses : List[Json] = None
     options : Tags = None
+
 
 def generateSchema():
     import json

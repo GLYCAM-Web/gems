@@ -304,13 +304,21 @@ def appendResponse(thisTransaction, responseConfig):
 def appendResponseOliver(thisTransaction, serviceResponse):
     log.info("common.logic appendResponse() was called.\n")
 
+    log.debug("Service Response: ")
+    prettyPrint(serviceResponse)
+
     if thisTransaction.response_dict == None:
+        log.debug("No response_dict yet. Creating it now.")
         thisTransaction.response_dict = {}
+    else:
+        log.debug("Response dict already exists")
+
 
     ## Remember this could be called several times. Don't overwrite existing responses.
     # Entity contains type, services, inputs, and responses.
     # Type already validated if we reach this point. Copy over from request.
     if 'entity' not in thisTransaction.response_dict.keys():
+        log.debug("No entity in the response yet. Creating it now.")
         thisTransaction.response_dict['entity'] = {}
         try:
             requestedEntity = thisTransaction.request_dict['entity']['type']
@@ -320,16 +328,32 @@ def appendResponseOliver(thisTransaction, serviceResponse):
             appendCommonParserNotice(thisTransaction,'InvalidInput', "entity['type']") 
         else:
             thisTransaction.response_dict['entity']['type'] = requestedEntity
+    else:
+        log.debug("Entity already exists.")
 
     ## services already validated if we reach this point. Copy over from request.
     if 'services' not in thisTransaction.response_dict['entity'].keys():
         thisTransaction.response_dict['entity']['services'] = []
-        try:
-            requestedService = serviceResponse['type']
-            log.debug("Adding service to json response object services list: " + requestedService)
-            thisTransaction.response_dict['entity']['services'].append(requestedService)
-        except Exception as error:
-            log.debug("There were no requested services. Default services will be described in the outputs.")
+    else:
+        log.debug("Services object already exists.")
+
+    log.debug("serviceResponse['type']: " + serviceResponse['type'])
+
+    try:
+        serviceType = serviceResponse['type']
+
+        requestedService = { 
+            serviceType  :  {
+                "type" : serviceType
+            }
+        }
+
+        log.debug("Adding service to json response object services list: " + str(requestedService))
+        thisTransaction.response_dict['entity']['services'].append(requestedService)
+
+    except Exception as error:
+        log.debug("There was a problem adding the requested service: " + str(error))
+        log.error(traceback.format_exc())
 
 
     ## inputs already validated if we reach this point. Copy over from request.
@@ -343,6 +367,7 @@ def appendResponseOliver(thisTransaction, serviceResponse):
             log.error(traceback.format_exc())
             appendCommonParserNotice(thisTransaction,'InvalidInput', "entity['inputs']")
 
+
     log.debug("responding entity: " + thisTransaction.response_dict['entity']['type'])
 
     ## Timestamp for the creation of this response. Overwrites if multiple responses
@@ -350,6 +375,9 @@ def appendResponseOliver(thisTransaction, serviceResponse):
     timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
     log.debug("response_timestamp: " + timestamp)
     thisTransaction.response_dict['response_timestamp'] = timestamp
+
+
+    ####################################################################
 
     if 'responses' not in thisTransaction.response_dict['entity'].keys():
         thisTransaction.response_dict['entity']['responses'] = []
@@ -364,7 +392,7 @@ def appendResponseOliver(thisTransaction, serviceResponse):
         prettyPrint(thisTransaction.response_dict)
 
         TransactionSchema(**thisTransaction.response_dict)
-        
+
         log.debug("Passes validation against schema.")
     except ValidationError as e:
         log.error("Validation Error while responding to: " + requestedEntity + e.json())
