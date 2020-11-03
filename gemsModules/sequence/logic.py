@@ -85,9 +85,9 @@ def manageSequenceRequest(thisTransaction : Transaction):
                             this_pUUID = sequenceProjects.getProjectpUUID(thisTransaction)
                             this_sequence = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
                             this_seqID = getSeqIDForSequence(this_sequence)
-                            sequenceProjects.createProjectDirectoryStructure(projectDir)
+                            sequenceProjects.createSequenceProjectDirectoryStructure(projectDir)
                             sequenceProjects.createSequenceSymLinks(this_seqID, this_pUUID)
-                            sequenceProjects.createProjectSymlinks(projectDir)
+                            sequenceProjects.createSequenceProjectSymlinks(projectDir)
                             ##TODO: Make this next method more generic, so it can handle rotamers too.
                             sequenceProjects.respondWithExistingDefaultStructure(thisTransaction)
                             ##TODO: Update the structureInfo_status.json
@@ -95,7 +95,7 @@ def manageSequenceRequest(thisTransaction : Transaction):
                             log.debug("Need to build this structure.")
                             try: 
                                 # old:  sequenceProjects.createProjectDirectoryStructure(buildState, thisTransaction)
-                                sequenceProjects.createProjectDirectoryStructure(projectDir)
+                                sequenceProjects.createSequenceProjectDirectoryStructure(projectDir)
                                 from gemsModules.sequence import build
                                 build.build3DStructure(buildState, thisTransaction)
                             except Exception as error:
@@ -107,7 +107,7 @@ def manageSequenceRequest(thisTransaction : Transaction):
                                     this_sequence = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
                                     this_seqID = getSeqIDForSequence(this_sequence)
                                     sequenceProjects.createSequenceSymLinks(this_seqID, this_pUUID)
-                                    sequenceProjects.createProjectSymlinks(projectDir)
+                                    sequenceProjects.createSequenceProjectSymlinks(projectDir)
                                 except Exception as error:
                                     log.error("There was a problem creating the symbolic links: " + str(error))
                                     raise error
