@@ -7,8 +7,10 @@ import gemsModules.common.utils
 from gemsModules.project.projectUtil import *
 from gemsModules.project import settings as projectSettings
 from gemsModules.common import io as commonio
+from gemsModules.sequence import io as sequence_io
 from gemsModules.common import logic as commonlogic
 from gemsModules.delegator import io as delegatorio
+
 from gemsModules.common.loggingConfig import *
 from . import settings as sequenceSettings
 
@@ -121,8 +123,25 @@ def respondWithExistingDefaultStructure(thisTransaction: Transaction):
     log.info("respondWithExistingDefaultStructure() was called.")
 
     try:
-        config = build3dStructureResponseConfig(thisTransaction)
-        appendResponse(thisTransaction, config)
+        gemsProject = thisTransaction.response_dict['gems_project']
+        sequence = gemsProject['sequence']
+        pUUID = gemsProject['pUUID']
+
+        inputs = []
+        inputs.append(sequence)
+        
+        indexOrdered = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
+        seqID = getSeqIDForSequence(indexOrdered)
+
+        downloadUrl = getDownloadUrl(gemsProject['pUUID'], "cb")
+        outputs = []
+
+        ouput = sequence_io.Build3DStructureOutput(pUUID, sequence, seqID, downloadUrl)
+        outputs.append(ouput)
+
+        serviceResponse = sequence_io.ServiceResponse("Build3DStructure", inputs, outputs)
+        responseObj = serviceResponse.dict(by_alias = True)
+        commonlogic.updateResponse(thisTransaction, responseObj)
     except Exception as error:
         log.error("There was a problem getting the sequence from the request: " + str(error))
         raise error
@@ -136,21 +155,30 @@ def build3dStructureResponseConfig(thisTransaction : Transaction):
     gemsProject = thisTransaction.response_dict['gems_project']
     indexOrdered = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
     seqID = getSeqIDForSequence(indexOrdered)
-
-    log.debug("seqID: " + str(seqID))
     downloadUrl = getDownloadUrl(gemsProject['pUUID'], "cb")
-
     sequence = gemsProject['sequence']
     config = {
-        "entity" : "Sequence",
-        "respondingService" : "Build3DStructure",
-        "responses" : [{
-            'payload' : gemsProject['pUUID'],
-            'sequence' : gemsProject['sequence'],
-            'seqID' : seqID,
-            'downloadUrl' : downloadUrl
-        }]
+        "sequence" : sequence,
+        "validateOnly" : False,
+        "outputType" : "Build3DStructure",
+        "payload" : gemsProject['pUUID'],
+        "seqID" : seqID,
+        "downloadUrl" : downloadUrl
+
     }
+
+    
+
+    # config = {
+    #     "entity" : "Sequence",
+    #     "respondingService" : "Build3DStructure",
+    #     "responses" : [{
+    #         'payload' : gemsProject['pUUID'],
+    #         'sequence' : gemsProject['sequence'],
+    #         'seqID' : seqID,
+    #         'downloadUrl' : downloadUrl
+    #     }]
+    # }
 
     log.debug("returning 3dStructureResponseConfig: " + str(config))
 

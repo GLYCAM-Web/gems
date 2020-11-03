@@ -7,8 +7,9 @@ import gemsModules.common.utils
 from gemsModules.project.projectUtil import *
 from gemsModules.project import settings as projectSettings
 from gemsModules.common import io as commonio
-from gemsModules.common import logic as commonlogic
+from gemsModules.common import logic as commonLogic
 from gemsModules.delegator import io as delegatorio
+from gemsModules.sequence import io as sequenceIO
 #from gemsModules.common.services import *
 #from gemsModules.common.transaction import * # might need whole file...
 from gemsModules.common.loggingConfig import *
@@ -29,7 +30,7 @@ else:
 #   @param Transaction thisTransaction
 #   @param String uUUID - Upload ID for user provided input.
 def appendBuild3DStructureResponse(thisTransaction : Transaction, pUUID : str):
-    log.info("appendBuild3DStructureResonse() was called.\n")
+    log.info("appendBuild3DStructureResonse() was called.")
     if thisTransaction.response_dict is None:
         thisTransaction.response_dict={}
     if not 'entity' in thisTransaction.response_dict:
@@ -55,7 +56,7 @@ def appendBuild3DStructureResponse(thisTransaction : Transaction, pUUID : str):
 #   @param Transaction thisTransaction
 #   @param Service service (optional)
 def build3DStructure(buildState : BuildState, thisTransaction : Transaction):
-    log.info("Sequence receive.py buildDefault3Dstructure() was called.\n")
+    log.info("build3DStructure() was called.")
 
     try:
         pUUID=sequenceProjects.getProjectpUUID(thisTransaction)
@@ -68,11 +69,36 @@ def build3DStructure(buildState : BuildState, thisTransaction : Transaction):
         except Exception as error:
             log.error("There was a problem getting a sequence from the transaction: " + str(error))
         else:
-            responseConfig = sequenceProjects.build3dStructureResponseConfig(thisTransaction)
-            appendResponse(thisTransaction, responseConfig)
+            gemsProject = thisTransaction.response_dict['gems_project']
+            ## Generate output first
+            indexOrdered = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
+            seqID = getSeqIDForSequence(indexOrdered)
+            downloadUrl = getDownloadUrl(gemsProject['pUUID'], "cb")
+            ## By the time build3DStructure() is called, evaluation response exists.
+            ##  all we need to do is build the output and append it.
+            payload = pUUID
+            log.debug("payload: " + pUUID)
+            log.debug("sequence: " + sequence)
+            log.debug("seqID: " + seqID)
+            log.debug("downloadUrl: " + downloadUrl)
+
+            log.debug("Looky here.")
+
+            output = sequenceIO.Build3DStructureOutput(payload, sequence, seqID, downloadUrl)
+
+            log.debug("Build3DStructure output: " + repr(output))
+            outputs = []
+            outputs.append(output)
+            inputs = []
+            inputs.append(sequence)
+            serviceResponse = sequenceIO.ServiceResponse("Build3DStructure", inputs, outputs)
+            responseObj = serviceResponse.dict(by_alias=True)
+            commonLogic.updateResponse(thisTransaction, responseObj)
+            ##TODO: figure out how to return this response now, and still continue this logic.
 
             log.debug("About to getCbBuilderForSequence")
             builder = getCbBuilderForSequence(sequence)
+
             try:
                 projectDir = sequenceProjects.getProjectSubdir(thisTransaction)
             except Exception as error:

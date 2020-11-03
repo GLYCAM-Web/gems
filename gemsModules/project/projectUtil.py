@@ -351,9 +351,12 @@ def getSiteHostName(content):
 #   @return String sequence
 def getSequenceFromTransaction(thisTransaction: Transaction, sequenceType:str=None):
     log.info("getSequenceFromTransaction() was called.\n")
+    
     inputs = thisTransaction.request_dict['entity']['inputs']
     sequence = ""
+
     if sequenceType is None:
+        log.debug("No sequenceType requested. Grabbing the request payload.")
         for element in inputs:
             #log.debug("element: " + str(element))
             if "Sequence" in element.keys():
@@ -366,13 +369,29 @@ def getSequenceFromTransaction(thisTransaction: Transaction, sequenceType:str=No
             raise AttributeError("Sequence")
         else:
             return sequence
-    else: 
-        for element in inputs:
+    else:
+        log.debug("Looking for the sequenceType: " + str(sequenceType))
+        log.debug("response_dict: " )
+        prettyPrint(thisTransaction.response_dict)
+        responses = thisTransaction.response_dict['entity']['responses']
+        for response in responses:
+            if 'outputs' in response.keys():
+                outputs = response['outputs']
+                log.debug("found the outputs.")
+                break
+
+        if outputs == None:
+            raise AttributeError("Couldn't find any response outputs.")
+
+        for element in outputs:
+            log.debug("checking input element: " + repr(element))
             ##  TODO: Write this to handle inputs nested inside the service
             if "sequenceVariants" in element.keys():
                 if sequenceType in element['sequenceVariants'].keys():
                     sequence = element['sequenceVariants'][sequenceType]
                     return sequence
+
+
     if thisTransaction.response_dict is not None:
         if 'responses' in thisTransaction.response_dict['entity'].keys():
             responses = thisTransaction.response_dict['entity']['responses']

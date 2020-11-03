@@ -65,18 +65,21 @@ def receive(thisTransaction : delegatorio.Transaction):
             log.debug("Evaluate service requested from sequence entity.")
             from gemsModules.sequence import evaluate
             try:
-                evaluate.evaluateCondensedSequencePydantic(thisTransaction)
+                evaluate.evaluateCondensedSequencePydantic(thisTransaction, i)
             except Exception as error:
                 log.error("There was a problem evaluating the condensed sequence: " + str(error)) 
+                log.error(traceback.format_exc())
                 common.settings.appendCommonParserNotice( thisTransaction, 'InvalidInput', 'InvalidInputPayload')
         elif i == 'Build3DStructure':
             log.debug("Build3DStructure service requested from sequence entity.")
             try:
                 ##first evaluate the requested structure. Only build if valid.
                 from gemsModules.sequence import evaluate
-                valid = evaluate.evaluateCondensedSequencePydantic(thisTransaction)
+                valid = evaluate.evaluateCondensedSequencePydantic(thisTransaction, "Evaluate")
             except Exception as error:
                 log.error("There was a problem evaluating the condensed sequence: " + str(error)) 
+                log.error(traceback.format_exc())
+                common.settings.appendCommonParserNotice( thisTransaction, 'InvalidInput', 'InvalidInputPayload')
             else:
                 if valid:
                     log.debug("Valid sequence.")
