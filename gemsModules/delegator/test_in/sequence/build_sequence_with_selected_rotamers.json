@@ -31,7 +31,7 @@
                     ]
                 },
                 {
-                    "linkageLabel": " 25",
+                    "linkageLabel": "25",
                     "dihedrals": [
                         {
                             "dihedralName": "phi",
@@ -49,7 +49,7 @@
                     ]
                 },
                 {
-                    "linkageLabel": " 27",
+                    "linkageLabel": "27",
                     "dihedrals": [
                         {
                             "dihedralName": "phi",
@@ -67,7 +67,7 @@
                     ]
                 },
                 {
-                    "linkageLabel": " 29",
+                    "linkageLabel": "29",
                     "dihedrals": [
                         {
                             "dihedralName": "omega",
@@ -78,7 +78,7 @@
                     ]
                 },
                 {
-                    "linkageLabel": " 31",
+                    "linkageLabel": "31",
                     "dihedrals": [
                         {
                             "dihedralName": "phi",
@@ -97,7 +97,7 @@
                     ]
                 },
                 {
-                    "linkageLabel": " 33",
+                    "linkageLabel": "33",
                     "dihedrals": [
                         {
                             "dihedralName": "phi",
@@ -153,6 +153,6 @@
         "rotamer_list": "['21_omega_gg', '25_phi_t', '25_phi_-g', '25_omega_gg', '27_phi_t', '27_phi_-g', '27_omega_gg', '29_omega_gg', '31_phi_t', '31_phi_-g', '31_omega_gg', '31_omega_tg', '33_phi_t', '33_phi_-g', '33_omega_gg', '33_omega_tg']",
         "angle_info": "",
         "job_info": "",
-        "rotamer_data": "[{\"linkageLabel\": \"21\", \"dihedrals\": [{\"dihedralName\": \"omega\", \"selectedRotamers\": [\"gg\"]}]}, {\"linkageLabel\": \" 25\", \"dihedrals\": [{\"dihedralName\": \"phi\", \"selectedRotamers\": [\"t\", \"-g\"]}, {\"dihedralName\": \"omega\", \"selectedRotamers\": [\"gg\"]}]}, {\"linkageLabel\": \" 27\", \"dihedrals\": [{\"dihedralName\": \"phi\", \"selectedRotamers\": [\"t\", \"-g\"]}, {\"dihedralName\": \"omega\", \"selectedRotamers\": [\"gg\"]}]}, {\"linkageLabel\": \" 29\", \"dihedrals\": [{\"dihedralName\": \"omega\", \"selectedRotamers\": [\"gg\"]}]}, {\"linkageLabel\": \" 31\", \"dihedrals\": [{\"dihedralName\": \"phi\", \"selectedRotamers\": [\"t\", \"-g\"]}, {\"dihedralName\": \"omega\", \"selectedRotamers\": [\"gg\", \"tg\"]}]}, {\"linkageLabel\": \" 33\", \"dihedrals\": [{\"dihedralName\": \"phi\", \"selectedRotamers\": [\"t\", \"-g\"]}, {\"dihedralName\": \"omega\", \"selectedRotamers\": [\"gg\", \"tg\"]}]}]"
+        "rotamer_data": "[{\"linkageLabel\": \"21\", \"dihedrals\": [{\"dihedralName\": \"omega\", \"selectedRotamers\": [\"gg\"]}]}, {\"linkageLabel\": \"25\", \"dihedrals\": [{\"dihedralName\": \"phi\", \"selectedRotamers\": [\"t\", \"-g\"]}, {\"dihedralName\": \"omega\", \"selectedRotamers\": [\"gg\"]}]}, {\"linkageLabel\": \"27\", \"dihedrals\": [{\"dihedralName\": \"phi\", \"selectedRotamers\": [\"t\", \"-g\"]}, {\"dihedralName\": \"omega\", \"selectedRotamers\": [\"gg\"]}]}, {\"linkageLabel\": \"9\", \"dihedrals\": [{\"dihedralName\": \"omega\", \"selectedRotamers\": [\"gg\"]}]}, {\"linkageLabel\": \"1\", \"dihedrals\": [{\"dihedralName\": \"phi\", \"selectedRotamers\": [\"t\", \"-g\"]}, {\"dihedralName\": \"omega\", \"selectedRotamers\": [\"gg\", \"tg\"]}]}, {\"linkageLabel\": \"3\", \"dihedrals\": [{\"dihedralName\": \"phi\", \"selectedRotamers\": [\"t\", \"-g\"]}, {\"dihedralName\": \"omega\", \"selectedRotamers\": [\"gg\", \"tg\"]}]}]"
     }
 }
