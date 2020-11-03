@@ -160,9 +160,9 @@ def build3dStructureResponseConfig(thisTransaction : Transaction):
 ## TODO: make all these directory/link/file making functions into one thing
 ## that gets called by string only
 
-def createProjectDirectoryStructure(projectDir : str ):
+def createSequenceProjectDirectoryStructure(projectDir : str ):
     # Ensure that the project directory is present and add some dirs
-    log.info("creatProjectDirectoryStructure() was called.")
+    log.info("createSequenceProjectDirectoryStructure() was called.")
     if os.path.exists(projectDir):
         log.debug("Found an existing project dir.")
     else:
@@ -185,24 +185,32 @@ def createProjectDirectoryStructure(projectDir : str ):
         ##
         ##  Also consider having it not create both New and Existing every time.
         ##  Might be just as well to leave it.  But, do think about that.
-        if not os.path.exists('defaults/All_Builds') : 
-            os.makedirs('defaults/All_Builds')
-        if not os.path.exists('logs') : 
-            os.makedirs('logs')
-        if not os.path.exists('New_Builds/logs') : 
-            os.makedirs('New_Builds/logs')
-        if not os.path.exists('New_Builds/structure') : 
-            os.makedirs('New_Builds/structure')
-        if not os.path.exists('Existing_Builds/logs') : 
-            os.makedirs('Existing_Builds/logs')
+        ##  Note that makedirs makes everything in supplied path that doesn't exist.
+        ##  Exception should be raised when making projectID if it exists already.
+        os.makedirs('defaults/Requested_Builds',exist_ok = True)
+        os.makedirs('logs',exist_ok = True)
+        os.makedirs('New_Builds/logs',exist_ok = True)
+        os.makedirs('New_Builds/structure',exist_ok = True)
+        #Required if previous structures exist, but decision not made here?
+        #os.makedirs('Existing_Builds/logs',exist_ok = True)
+        # if not os.path.exists('defaults/Requested_Builds') : 
+        #     os.makedirs('defaults/Requested_Builds')
+        # if not os.path.exists('logs') : 
+        #     os.makedirs('logs')
+        # if not os.path.exists('New_Builds/logs') : 
+        #     os.makedirs('New_Builds/logs')
+        # if not os.path.exists('New_Builds/structure') : 
+        #     os.makedirs('New_Builds/structure')
+        # if not os.path.exists('Existing_Builds/logs') : 
+        #     os.makedirs('Existing_Builds/logs')
     except Exception as error:
         log.error("There was a problem making directory: " + projectDir)
         raise error
 
 
-def createProjectSymlinks(projectDir : str):
+def createSequenceProjectSymlinks(projectDir : str):
     # Generate symbolic links within project directories
-    log.info("creatProjectSymlinks() was called.")
+    log.info("createSequenceProjectSymlinks() was called.")
     try:
         log.debug("Changing to the project diretctory for making more.")
         os.chdir(projectDir)
@@ -230,7 +238,7 @@ def createProjectSymlinks(projectDir : str):
 #                )
         commonlogic.make_relative_symbolic_link( default_unminimized, 'defaults' , 'default_unminimized.pdb', None)
         commonlogic.make_relative_symbolic_link( default, 'defaults' , 'default.pdb', None)
-        commonlogic.make_relative_symbolic_link( structure,'defaults/All_Builds' , 'structure', None)
+        commonlogic.make_relative_symbolic_link( structure,'defaults/Requested_Builds' , 'structure', None)
     except Exception as error:
         log.error("Could not make one or mor symlinks in Create Project symlinks")
         raise error
@@ -246,11 +254,13 @@ def createProjectSymlinks(projectDir : str):
 def createSequenceSymLinks(sequenceID:str, projectID:str):
     log.info("createSequenceSymLinks() was called.")
     ## userDataDir is the top level dir that holds the repository of all sequences
+    print(projectSettings.output_data_dir)
     sequencePath = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/Sequences/"
     seqIDPath = sequencePath + sequenceID
     projectPath = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/Builds/"
     projIDPath = projectPath + projectID
     parent_dir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/"
+    # TODO: Hardcoded, but Build_Conditions_1 needs to become a BuildStrategyID
     all_builds = seqIDPath + '/Build_Conditions_1/All_Builds/'
     if not os.path.isdir(all_builds):
         try:
@@ -258,14 +268,13 @@ def createSequenceSymLinks(sequenceID:str, projectID:str):
         except Exception as error:
             log.error("There was a problem creating the seqIDPath: " + str(error))
             raise error
-    # TODO : Make it possible for there to be other Build_Conditions....
     if not os.path.isdir(seqIDPath + '/defaults'):
         path_down_to_source = 'Build_Conditions_1/'
         commonlogic.make_relative_symbolic_link(path_down_to_source, None , 'defaults', seqIDPath)
     # TODO:  write evaluate.determineDefaultSequenecStructures which should be a lot like
     #        evaluate.determineDefaultStructures()
     # For now, just setting for a single structure
-    if not os.path.isdir(projIDPath + '/defaults/All_Builds'):
+    if not os.path.isdir(projIDPath + '/defaults/Requested_Builds'):
         # TODO:  one day this might be annoying.  Feel free to change it
         raise AttributeError("Cannot make sequence links for uninitialized project directory")
     if not os.path.exists(projIDPath + '/defaults/Sequence_Repository'): 
