@@ -430,9 +430,8 @@ def updateTransaction(gems_project, thisTransaction):
     log.info("updateTransaction() was called.")
     if thisTransaction.response_dict == None:
         thisTransaction.response_dict = {}
-
     thisTransaction.response_dict['gems_project'] = gems_project.__dict__
-    log.debug("thisTransaction: \n" + str(thisTransaction))
+    log.debug("thisTransaction.response_dict['gems_project']: \n" + str(thisTransaction.response_dict['gems_project']))
 
 def main():
     if len(sys.argv) == 2:
