@@ -6,11 +6,23 @@ from gemsModules.common import settings
 ##TODO Create custom logging levels for critical errors to be able to specify
 ##  email recipient.
 
-##TO set the global logging verbosity, edit this var to one of the following:
-## logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL
-##  Note: this is overridden by the logLevel set in individual files.
-LOGGING_LEVEL = logging.DEBUG
+## Set the verbosity via the GEMS_LOGGING_LEVEL environment var.
+def getGemsLoggingLevel():
+    print("getGemsLoggingLevel() was called.")
+    loggingLevel = os.environ.get('GEMS_LOGGING_LEVEL')
+    if loggingLevel == None:
+        loggingLevel = logging.ERROR
+    elif loggingLevel == "error":
+        loggingLevel = logging.ERROR
+    elif loggingLevel == "info":
+        loggingLevel = logging.INFO
+    elif loggingLevel == "debug":
+        loggingLevel = logging.DEBUG
+    else:
+        print("The only valid values for GEMS_LOGGING_LEVEL are: error, info, or debug.")
+    return loggingLevel
 
+LOGGING_LEVEL = getGemsLoggingLevel()
 loggers = {}
 
 """
@@ -19,39 +31,45 @@ we want to write logs to file, send emails, etc...
 """
 def createLogger(name):
     #print("name: " + name + ", LOGGING_LEVEL: " + str(LOGGING_LEVEL))
-
     if(loggers.get(name)):
         log.debug("logger already exists with name: " + name)
     else:
         log = logging.getLogger(name)
         log.setLevel(LOGGING_LEVEL)
 
-        ##StreamHandler sends logs to std out.
-        # streamHandler = logging.StreamHandler()
-        # streamHandler.setLevel(LOGGING_LEVEL)
-        ##Logging to file.
+        ##File Handlers
         logsDir = getLogsDir()
-        debugFileHandler = logging.FileHandler(logsDir + "/git-ignore-me_gemsDebug.log")
-        debugFileHandler.setLevel(logging.DEBUG)
-        infoFileHandler = logging.FileHandler(logsDir + "/git-ignore-me_gemsInfo.log")
-        infoFileHandler.setLevel(logging.INFO)
         errorFileHandler = logging.FileHandler(logsDir + "git-ignore-me_gemsError.log")
         errorFileHandler.setLevel(logging.ERROR)
+        
+        if LOGGING_LEVEL > 10:
+            infoFileHandler = logging.FileHandler(logsDir + "/git-ignore-me_gemsInfo.log")
+            infoFileHandler.setLevel(logging.INFO)
+        elif LOGGING_LEVEL > 0:
+            debugFileHandler = logging.FileHandler(logsDir + "/git-ignore-me_gemsDebug.log")
+            debugFileHandler.setLevel(logging.DEBUG)
 
+
+        ##Formatters
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s',  datefmt='%Y-%m-%d %I:%M:%S %p')
-        #streamHandler.setFormatter(formatter)
-        debugFileHandler.setFormatter(formatter)
-        infoFileHandler.setFormatter(formatter)
         errorFileHandler.setFormatter(formatter)
+        
+        if LOGGING_LEVEL > 10:
+            infoFileHandler.setFormatter(formatter)
+        elif LOGGING_LEVEL > 0:
+            debugFileHandler.setFormatter(formatter)
 
         #log.addHandler(streamHandler)
-        log.addHandler(debugFileHandler)
-        log.addHandler(infoFileHandler)
         log.addHandler(errorFileHandler)
+        if LOGGING_LEVEL > 10:
+            log.addHandler(infoFileHandler)
+        elif LOGGING_LEVEL > 0:
+            log.addHandler(debugFileHandler)
 
         loggers[name] = log
         log.debug("created a new logger for: " + name + ", LOGGING_LEVEL: " + str(LOGGING_LEVEL))
     return log
+
 
 def getLogsDir():
     GEMSHOME = os.environ.get('GEMSHOME')
