@@ -53,38 +53,44 @@ class GemsProject(BaseModel):
         self.pUUID = str(uuid.uuid4()) 
         self.timestamp = datetime.now()
 
+        
         if 'project' in request_dict.keys():
             log.debug("found a project in the request_dict.")
-            fe_project = request_dict['project']
+            request = request_dict['project']
             
-            if 'title' in fe_project.keys():
-                self.title = fe_project['title']
-            if 'comment' in fe_project.keys():
-                self.comment = fe_project['comment']
-            if 'requesting_agent' in fe_project.keys():
-                self.requesting_agent = fe_project['requesting_agent']
-            if 'gems_version' in fe_project.keys():
-                self.gems_version = fe_project['gems_version']
-            if 'gems_branch' in fe_project.keys():
-                self.gems_branch = fe_project['gems_branch']
-            if 'gmml_version' in fe_project.keys():
-                self.gmml_version = fe_project['gmml_version']
-            if 'gmml_branch' in fe_project.keys():
-                self.gmml_branch = fe_project['gmml_branch']
-            if 'site_mode' in fe_project.keys():
-                self.site_mode = fe_project['site_mode']
-            if 'site_host_name' in fe_project.keys():
-                self.site_host_name = fe_project['site_host_name']
-            if 'force_field' in fe_project.keys():
-                self.force_field = fe_project['force_field']
-            if 'parameter_version' in fe_project.keys():
-                self.parameter_version =  fe_project['parameter_version']
-            if 'amber_version' in fe_project.keys():
-                self.amber_version = fe_project['amber_version']
-            if 'json_api_version' in fe_project.keys():
-                self.json_api_version = fe_project['json_api_version']
+            if 'title' in request.keys():
+                self.title = request['title']
+            if 'comment' in request.keys():
+                self.comment = request['comment']
+            if 'requesting_agent' in request.keys():
+                self.requesting_agent = request['requesting_agent']
+
+            ## Dependency version tracking needs to be read from VERSIONS file
+            ##  here, not in website.
+            if 'gems_version' in request.keys():
+                self.gems_version = request['gems_version']
+            if 'gems_branch' in request.keys():
+                self.gems_branch = request['gems_branch']
+            if 'gmml_version' in request.keys():
+                self.gmml_version = request['gmml_version']
+            if 'gmml_branch' in request.keys():
+                self.gmml_branch = request['gmml_branch']
+            if 'site_mode' in request.keys():
+                self.site_mode = request['site_mode']
+            if 'site_host_name' in request.keys():
+                self.site_host_name = request['site_host_name']
+            if 'force_field' in request.keys():
+                self.force_field = request['force_field']
+            if 'parameter_version' in request.keys():
+                self.parameter_version =  request['parameter_version']
+            if 'amber_version' in request.keys():
+                self.amber_version = request['amber_version']
+
+            ## Really the only version that needs to be in the request.
+            if 'json_api_version' in request.keys():
+                self.json_api_version = request['json_api_version']
         else:
-            ##  In a commandline request, a frontend project may not be included.
+            ##  For doing our best if the request doesn't include a project obj.
             #   This is where we give defaults for whatever is needed.
             self.requesting_agent = "command line"
             log.debug("request entity type: " + request_dict['entity']['type'])
@@ -101,8 +107,6 @@ class GemsProject(BaseModel):
                 self.project_type = "pdb"
                 self.has_input_files = True
 
-          
-            
     def __str__(self):
         result = "\ngems_project:"
         result = result + "\ncomment: " + self.comment
