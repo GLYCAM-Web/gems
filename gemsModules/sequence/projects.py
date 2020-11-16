@@ -29,8 +29,8 @@ def projectExists(thisTransaction : Transaction):
         projectDir = getProjectDir(thisTransaction)
         log.debug("projectDir: " + projectDir)
     except Exception as error:
-        log.error("There was a problem getting the projectDir: " + str(error))
-        raise error
+        log.debug("Didn't find a projectDir. Likely doesn't exist yet.")
+        return False
     else:
         if os.path.exists(projectDir):
             log.debug("Found an existing project dir.")
@@ -191,6 +191,7 @@ def build3dStructureResponseConfig(thisTransaction : Transaction):
 def createProjectDirectoryStructure(projectDir : str ):
     # Ensure that the project directory is present and add some dirs
     log.info("creatProjectDirectoryStructure() was called.")
+    log.debug("projectDir: " + projectDir)
     if os.path.exists(projectDir):
         log.debug("Found an existing project dir.")
     else:
@@ -201,7 +202,7 @@ def createProjectDirectoryStructure(projectDir : str ):
             log.error("There was a problem making directory: " + projectDir)
             raise error
     try:
-        log.debug("Changing to the project diretctory for making more.")
+        log.debug("Changing to the project directory for making more.")
         os.chdir(projectDir)
     except Exception as error:
         log.error("Could not chdir to the project directory: " + projectDir)

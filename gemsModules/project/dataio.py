@@ -18,7 +18,7 @@ else:
 
 ##  @brief The primary way of tracking data related to a project
 #   @detail This is the generic project object. See subtypes for more specific fields
-class GemsProject(BaseModel):
+class Project(BaseModel):
     ## The name of the output dir is the pUUID
     pUUID : str = ""
     title : str = ""
@@ -53,42 +53,40 @@ class GemsProject(BaseModel):
         self.pUUID = str(uuid.uuid4()) 
         self.timestamp = datetime.now()
 
-        
         if 'project' in request_dict.keys():
             log.debug("found a project in the request_dict.")
-            request = request_dict['project']
+            project = request_dict['project']
             
-            if 'title' in request.keys():
-                self.title = request['title']
-            if 'comment' in request.keys():
-                self.comment = request['comment']
-            if 'requesting_agent' in request.keys():
-                self.requesting_agent = request['requesting_agent']
+            if 'title' in project.keys():
+                self.title = project['title']
+            if 'comment' in project.keys():
+                self.comment = project['comment']
+            if 'requesting_agent' in project.keys():
+                self.requesting_agent = project['requesting_agent']
 
             ## Dependency version tracking needs to be read from VERSIONS file
             ##  here, not in website.
-            if 'gems_version' in request.keys():
-                self.gems_version = request['gems_version']
-            if 'gems_branch' in request.keys():
-                self.gems_branch = request['gems_branch']
-            if 'gmml_version' in request.keys():
-                self.gmml_version = request['gmml_version']
-            if 'gmml_branch' in request.keys():
-                self.gmml_branch = request['gmml_branch']
-            if 'site_mode' in request.keys():
-                self.site_mode = request['site_mode']
-            if 'site_host_name' in request.keys():
-                self.site_host_name = request['site_host_name']
-            if 'force_field' in request.keys():
-                self.force_field = request['force_field']
-            if 'parameter_version' in request.keys():
-                self.parameter_version =  request['parameter_version']
-            if 'amber_version' in request.keys():
-                self.amber_version = request['amber_version']
+            if 'gems_version' in project.keys():
+                self.gems_version = project['gems_version']
+            if 'gems_branch' in project.keys():
+                self.gems_branch = project['gems_branch']
+            if 'gmml_version' in project.keys():
+                self.gmml_version = project['gmml_version']
+            if 'gmml_branch' in project.keys():
+                self.gmml_branch = project['gmml_branch']
+            if 'site_mode' in project.keys():
+                self.site_mode = project['site_mode']
+            if 'site_host_name' in project.keys():
+                self.site_host_name = project['site_host_name']
+            if 'force_field' in project.keys():
+                self.force_field = project['force_field']
+            if 'parameter_version' in project.keys():
+                self.parameter_version =  project['parameter_version']
+            if 'amber_version' in project.keys():
+                self.amber_version = project['amber_version']
 
-            ## Really the only version that needs to be in the request.
-            if 'json_api_version' in request.keys():
-                self.json_api_version = request['json_api_version']
+            if 'json_api_version' in project.keys():
+                self.json_api_version = project['json_api_version']
         else:
             ##  For doing our best if the request doesn't include a project obj.
             #   This is where we give defaults for whatever is needed.
@@ -108,7 +106,7 @@ class GemsProject(BaseModel):
                 self.has_input_files = True
 
     def __str__(self):
-        result = "\ngems_project:"
+        result = "\nproject:"
         result = result + "\ncomment: " + self.comment
         result = result + "\ntimestamp: " + str(self.timestamp)
         result = result + "\nproject_type: " + self.project_type
@@ -125,13 +123,14 @@ class GemsProject(BaseModel):
         result = result + "\nparameter_version: "  + self.parameter_version
         result = result + "\namber_version: "  + self.amber_version
         result = result + "\njson_api_version: "  + self.json_api_version
+        result = result + "\nproject_dir: "  + self.project_dir
         return result
 
 
 
-## @brief cbProject is a typed project that inherits all the fields from gems_project and adds its own.
-#   
-class CbProject(GemsProject):
+## @brief cbProject is a typed project that inherits all the fields from project and adds 
+#   its own.
+class CbProject(Project):
     sequence : str = ""
     seqID : str = ""
     structure_count : int = 1
@@ -160,7 +159,13 @@ class CbProject(GemsProject):
                 requested_structure_count = requested_structure_count + 1
         structure_count = requested_structure_count
 
-        self.project_dir = project_settings.output_data_dir + "tools/" +  self.project_type  + "/git-ignore-me_userdata/Builds/" + self.pUUID + "/" 
+        ##User may provide a project_dir.
+        if 'project_dir' in request_dict['project'].keys():
+            project = request_dict['project']
+            self.project_dir = project['project_dir']
+        else:
+            ## Default, if none offered by the user.
+            self.project_dir = project_settings.output_data_dir + "tools/" +  self.project_type  + "/git-ignore-me_userdata/Builds/" + self.pUUID + "/" 
 
     def __str__(self):
         result = super().__str__()
@@ -171,7 +176,7 @@ class CbProject(GemsProject):
         #result = result + "\nstructure_mappings: " + str(self.structure_mappings)
         return result
 
-class PdbProject(GemsProject):
+class PdbProject(Project):
     uploadFileName : str = ""
     status : str = ""
 
@@ -184,7 +189,13 @@ class PdbProject(GemsProject):
         self.uploadFileName = getInput(request_dict)
         log.debug("uploadFileName: " + self.uploadFileName)
         self.status = "submitted"
-        self.project_dir = project_settings.output_data_dir + "tools/" +  self.project_type  + "/git-ignore-me_userdata/" + self.pUUID + "/" 
+        ##User may provide a project_dir.
+        if 'project_dir' in request_dict['project'].keys():
+            project = request_dict['project']
+            self.project_dir = project['project_dir']
+        else:
+            ## Default, if none offered by the user.
+            self.project_dir = project_settings.output_data_dir + "tools/" +  self.project_type  + "/git-ignore-me_userdata/Builds/" + self.pUUID + "/" 
 
     def __str__(self): 
         result = super().__str__()
@@ -194,7 +205,7 @@ class PdbProject(GemsProject):
         return result
 
 
-class GpProject(GemsProject):
+class GpProject(Project):
     pdbProjectID : str = ""
     uploadFileName : str = ""
     status : str = ""
@@ -209,8 +220,14 @@ class GpProject(GemsProject):
         self.project_type = "gp"
         self.has_input_files = True
         self.uploadFileName = pdbProject.uploadFileName
-        self.project_dir = project_settings.output_data_dir + "tools/" +  self.project_type  + "/git-ignore-me_userdata/" + self.pUUID + "/" 
- 
+        ##User may provide a project_dir.
+        if 'project_dir' in request_dict['project'].keys():
+            project = request_dict['project']
+            self.project_dir = project['project_dir']
+        else:
+            ## Default, if none offered by the user.
+            self.project_dir = project_settings.output_data_dir + "tools/" +  self.project_type  + "/git-ignore-me_userdata/Builds/" + self.pUUID + "/" 
+
 
     def __str__(self):
         result = super().__str__()
@@ -245,8 +262,8 @@ def getStructureFileProjectType(request_dict):
 
 ##TODO: pydantic homework when model has settled down.
 
-# def generategems_projectSchema():
-#     print(gems_project.schema_json(indent=2))
+# def generateProjectSchema():
+#     print(project.schema_json(indent=2))
 
 if __name__ == "__main__":
-    generategems_projectSchema()
+    generateProjectSchema()

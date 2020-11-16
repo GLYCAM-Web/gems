@@ -64,10 +64,10 @@ def manageSequenceRequest(thisTransaction : Transaction):
                 filename = projectDir + "logs/structureInfo_request.json"
                 if os.path.exists(filename):
                     log.debug("\n\nstructureInfo_request.json found. Updating both the request and the status file.\n\n")
-                    updateStructureInfotWithUserOptions(thisTransaction, structureInfo, filename)
+                    updateStructureInfoWithUserOptions(thisTransaction, structureInfo, filename)
                     statusFile = projectDir + "logs/structureInfo_status.json"
                     if os.path.exists(statusFile):
-                        updateStructureInfotWithUserOptions(thisTransaction, structureInfo, statusFile)
+                        updateStructureInfoWithUserOptions(thisTransaction, structureInfo, statusFile)
                 else:   
                     ##Create new files for tracking this project.
                     saveRequestInfo(structureInfo, projectDir)
