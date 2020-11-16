@@ -668,7 +668,6 @@ def getInput(request_dict : dict):
                 log.debug("uploadFileName: " + uploadFileName)
                 return uploadFileName
 
-
             elif "pdb_ID" in element.keys():
                 ### Look for a pdb ID to sideload.
                 log.debug("Side-loading pdb from rcsb.org.")

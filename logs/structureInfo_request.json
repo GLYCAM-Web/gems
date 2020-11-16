@@ -1,0 +1,15 @@
+{
+    "sequence": "DManpa1-OH",
+    "buildStates": [
+        {
+            "structureLabel": "structure",
+            "simulationPhase": "gas-phase",
+            "status": "new",
+            "date": "2020-11-16 15:47:39.589781",
+            "addIons": "default",
+            "energy": null,
+            "forceField": null,
+            "sequenceConformation": []
+        }
+    ]
+}

@@ -8,7 +8,6 @@ from gemsModules.common import settings
 
 ## Set the verbosity via the GEMS_LOGGING_LEVEL environment var.
 def getGemsLoggingLevel():
-    print("getGemsLoggingLevel() was called.")
     loggingLevel = os.environ.get('GEMS_LOGGING_LEVEL')
     if loggingLevel == None:
         loggingLevel = logging.ERROR
