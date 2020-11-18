@@ -55,37 +55,31 @@ def appendBuild3DStructureResponse(thisTransaction : Transaction, pUUID : str):
 ##  @brief Creates a jobsubmission for Amber. Submits that. Updates the transaction to reflect this.
 #   @param Transaction thisTransaction
 #   @param Service service (optional)
-def build3DStructure(buildState : BuildState, thisTransaction : Transaction):
+def build3DStructure(buildState : BuildState, thisTransaction : Transaction, outputDirPath : str):
     log.info("build3DStructure() was called.")
-
     try:
-        pUUID=sequenceProjects.getProjectpUUID(thisTransaction)
+        pUUID = sequenceProjects.getProjectpUUID(thisTransaction)
+        sequence = getSequenceFromTransaction(thisTransaction)
     except Exception as error:
-        log.error("There was a problem finding the project pUUID: " + str(error))
+        log.error("Incredibly, there was a problem finding the project pUUID, " )
+        log.error("or finding the sequence in the transaction: " + str(error))
         raise error
     else:
-        try:
-            sequence = getSequenceFromTransaction(thisTransaction)
-        except Exception as error:
-            log.error("There was a problem getting a sequence from the transaction: " + str(error))
-        else:
+        ## Check if this is the default build or if it has user options specified.
             gemsProject = thisTransaction.response_dict['gems_project']
             ## Generate output first
             indexOrdered = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
             seqID = getSeqIDForSequence(indexOrdered)
-            downloadUrl = getDownloadUrl(gemsProject['pUUID'], "cb")
+            downloadUrl = getDownloadUrl(gemsProject['pUUID'], "cb", outputDirPath)
             ## By the time build3DStructure() is called, evaluation response exists.
             ##  all we need to do is build the output and append it.
-            payload = pUUID
-            log.debug("payload: " + pUUID)
-            log.debug("sequence: " + sequence)
-            log.debug("seqID: " + seqID)
+            # All this should be done before building individual 3D structures.
+            #payload = pUUID
+            # log.debug("payload: " + pUUID)
+            # log.debug("sequence: " + sequence)
+            # log.debug("seqID: " + seqID)
             log.debug("downloadUrl: " + downloadUrl)
-
-            log.debug("Looky here.")
-
             output = sequenceIO.Build3DStructureOutput(payload, sequence, seqID, downloadUrl)
-
             log.debug("Build3DStructure output: " + repr(output))
             outputs = []
             outputs.append(output)
@@ -94,44 +88,34 @@ def build3DStructure(buildState : BuildState, thisTransaction : Transaction):
             serviceResponse = sequenceIO.ServiceResponse("Build3DStructure", inputs, outputs)
             responseObj = serviceResponse.dict(by_alias=True)
             commonLogic.updateResponse(thisTransaction, responseObj)
-            ##TODO: figure out how to return this response now, and still continue this logic.
+        if sequenceProjects.checkIfDefaultStructureRequest(thisTransaction):
 
+        ##TODO: figure out how to return this response now, and still continue this logic.
             log.debug("About to getCbBuilderForSequence")
             builder = getCbBuilderForSequence(sequence)
-
-            try:
-                projectDir = sequenceProjects.getProjectSubdir(thisTransaction)
+        try:
+            ## Check if this is the default build or if it has user options specified.
+                destination = projectDir + '/New_Builds/structure/'
+                    #destination = projectDir + 'default'
+                    log.debug("The request is for a single structure to be placed in: " + destination)
+                    # ## Defaults for next build 
+                    # ##     output directory: projectDir
+                    # ##     types of files to write:  'OFFFILE' -and- 'PDB'
+                    # ##     default filename prefix:  'structure'
+                    builder.GenerateSingle3DStructureDefaultFiles(destination)
+                else:
+                    ##TODO: Test this after GMML can accept user settings.
+                    log.debug("The request is for the a set of rotamers.")
+                    #void GenerateSpecific3DStructure(SingleRotamerInfoVector conformerInfo, std::string fileOutputDirectory = "unspecified");
+                    builder.GenerateSpecific3DStructure(conformerInfo, fileOutputDirectory)
             except Exception as error:
-                log.error("There was a problem getting this build's subdir: " + str(error))
+                log.error("There was a problem generating this build: " + str(error))
                 raise error
             else:
-                try:
-#####
-#####  START HERE
-#####
-                    ## Check if this is the default build or if it has user options specified.
-                    if sequenceProjects.checkIfDefaultStructureRequest(thisTransaction):
-                        destination = projectDir + '/New_Builds/structure/'
-                        #destination = projectDir + 'default'
-                        log.debug("The request is for a single structure to be placed in: " + destination)
-                        # ## Defaults for next build 
-                        # ##     output directory: projectDir
-                        # ##     types of files to write:  'OFFFILE' -and- 'PDB'
-                        # ##     default filename prefix:  'structure'
-                        builder.GenerateSingle3DStructureDefaultFiles(destination)
-                    else:
-                        ##TODO: Test this after GMML can accept user settings.
-                        log.debug("The request is for the a set of rotamers.")
-                        builder.GenerateRotamerDefaultFiles(destination, buildState)
-                except Exception as error:
-                    log.error("There was a problem generating this build: " + str(error))
-                    raise error
-                else:
-
-                    ##TODO This needs to move - Sequence should not be deciding how 
-                    ## minimization will happen.  That is the job of mmservice.
-                    amberSubmissionJson='{"project" : \
-                        {\
+                ##TODO This needs to move - Sequence should not be deciding how 
+                ## minimization will happen.  That is the job of mmservice.
+                amberSubmissionJson='{"project" : \
+                    {\
                         "id":"' + pUUID + '", \
                         "workingDirectory":"' + destination + '", \
                         "type":"minimization", \
@@ -139,16 +123,16 @@ def build3DStructure(buildState : BuildState, thisTransaction : Transaction):
                         "water_model":"none" \
                         } \
                     }'
-                    # TODO:  Make this resemble real code....
-                    the_json_file = destination + "amber_submission.json"
-                    min_json_in = open (the_json_file , 'w')
-                    min_json_in.write(amberSubmissionJson)
-                    min_json_in.close()
+                # TODO:  Make this resemble real code....
+                the_json_file = destination + "amber_submission.json"
+                min_json_in = open (the_json_file , 'w')
+                min_json_in.write(amberSubmissionJson)
+                min_json_in.close()
 
-                    from gemsModules.mmservice.amber.amber import manageIncomingString
-                    manageIncomingString(amberSubmissionJson)
-                    ## everything up to here -- all the amber stuff --
-                    ## is what needs to move
+                from gemsModules.mmservice.amber.amber import manageIncomingString
+                manageIncomingString(amberSubmissionJson)
+                ## everything up to here -- all the amber stuff --
+                ## is what needs to move
 
 
 

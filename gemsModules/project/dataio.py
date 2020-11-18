@@ -146,7 +146,7 @@ class CbProject(GemsProject):
 
         if sequence is not "":
             self.sequence = sequence
-            self.seqID = getSeqIDForSequence(sequence)
+            self.seqID = getSeqIDForSequence(sequence) # poorly named, not indexOrdered version!
         else:
             raise AttributeError("Sequence")
         inputs = request_dict['entity']['inputs']

@@ -150,8 +150,10 @@ def setupProjectDirs(projectDir):
     log.info("setupProjectDirs() was called.\n")
     try:
         if not os.path.exists(projectDir):
-            log.debug("creating the projectDir")
+            log.debug("creating the projectDir: " + projectDir)
             os.makedirs(projectDir)
+        else:
+            log.debug("project exists: " + projectDir)
     except:
         log.error("There was a problem with the projectDir.")
         raise error
@@ -309,7 +311,7 @@ def getProjectpUUID(thisTransaction : Transaction):
 #   appNames should look like frontend app abbreviations, cb, pdb, gp etc...
 #   @param  pUUID
 #   @param  appName
-def getDownloadUrl(pUUID : str, appName : str):
+def getDownloadUrl(pUUID : str, appName : str, optionalSubDir : str = ""):
     log.info("getDownloadUrl was called.\n")
     log.debug("pUUID: " + pUUID)
     log.debug("appName: " + appName)
@@ -318,7 +320,7 @@ def getDownloadUrl(pUUID : str, appName : str):
         with open(versionsFile) as file:
             content = file.read()
         siteHostName = getSiteHostName(content)
-        url = "http://" + siteHostName + "/json/download/" + appName +"/" + pUUID
+        url = "http://" + siteHostName + "/json/download/" + appName +"/" + pUUID + optionalSubDir
         log.debug("url : " + url )
         return url
     except AttributeError as error:
