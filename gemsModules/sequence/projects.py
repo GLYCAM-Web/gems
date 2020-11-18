@@ -39,7 +39,36 @@ def projectExists(thisTransaction : Transaction):
             log.debug("No projectDir found.")
             return False
 
+def addResponse(buildState : BuildState, thisTransaction : Transaction, outputDirPath : str):        
+    log.info("addResponse() was called.")
+    try:
+        pUUID = getProjectpUUID(thisTransaction)
+        sequence = getSequenceFromTransaction(thisTransaction)
+    except Exception as error:
+        log.error("Problem finding the project pUUID or sequence in the transaction: " + str(error))
+        raise error
 
+    gemsProject = thisTransaction.response_dict['gems_project']
+    indexOrdered = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
+    seqID = getSeqIDForSequence(indexOrdered)
+    ## No, they want a link to the symlink in Requested_Builds, which is yet to be generated
+    ## So this really needs to move. Which is good. Need a GenerateResponse function that does that.
+    downloadUrl = getDownloadUrl(gemsProject['pUUID'], "cb", outputDirPath)
+    # By the time build3DStructure() is called, evaluation response exists.
+    #  all we need to do is build the output and append it.
+    log.debug("payload: " + pUUID)
+    log.debug("sequence: " + sequence)
+    log.debug("seqID: " + seqID)
+    log.debug("downloadUrl: " + downloadUrl)
+    output = sequence_io.Build3DStructureOutput(pUUID, sequence, seqID, outputDirPath, downloadUrl)
+    log.debug("Build3DStructure output: " + repr(output))
+    outputs = []
+    outputs.append(output)
+    inputs = []
+    inputs.append(sequence)
+    serviceResponse = sequence_io.ServiceResponse("Build3DStructure", inputs, outputs)
+    responseObj = serviceResponse.dict(by_alias=True)
+    commonlogic.updateResponse(thisTransaction, responseObj)
 
 def registerBuild(buildState : BuildState, thisTransaction : Transaction):
     log.debug("registerBuild() was called.")
@@ -75,10 +104,42 @@ def registerBuild(buildState : BuildState, thisTransaction : Transaction):
 ##  @brief Return true if this structure has been built previously, otherwise false.
 #   @oaram
 #   @return
-def structureExists(buildState: BuildState, thisTransaction : Transaction):
+def structureExists(buildState: BuildState, thisTransaction : Transaction, buildStrategyID : str):
     log.info("structureExists() was called.")
+    if not sequenceExists(buildState, thisTransaction):
+        log.debug("Sequence has never been built before; a new sequence is born!")
+        return False
+    sequence = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
+    userDataDir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/Sequences/"
+    seqID = getSeqIDForSequence(sequence)
+    sequenceDir = userDataDir + seqID + "/" + buildStrategyID + "/" 
+    if buildState.structureLabel == "default":
+        defaultBuildDir = sequenceDir + "/All_Builds/default"
+        if os.path.isdir(defaultBuildDir):
+            log.debug("default structure found.")
+            return True
+        else:
+            log.debug("default structure not found.")
+            return False
+    else:
+        log.debug("structureDirectoryName: " + buildState.structureDirectoryName)
+        structureLinkInSequenceDir = sequenceDir + "/All_Builds/" + buildState.structureDirectoryName
+        if os.path.isdir(structureLinkInSequenceDir):
+            log.debug("The requested structure (" + buildState.structureDirectoryName + ") already exists.")
+            return True
+        else:
+            log.debug("The requested structure (" + buildState.structureDirectoryName + ") doesn't exist.")
+            return False
+            ## Need to write a buildStateExists() method that compares BuildStates that have
+            ##  been logged to file to requested BuildStates.
+            ## Oliver: Not sure what this comment wants exactly, or if what I have done covers it.
 
-    structureExists = False
+
+##  @brief Return true if this sequence has been built previously, otherwise false.
+#   @oaram
+#   @return
+def sequenceExists(buildState: BuildState, thisTransaction : Transaction):
+    log.info("sequenceExists() was called.")
     try:
         sequence = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
         log.debug("Checking for previous builds of this sequence: \n" + sequence)
@@ -87,31 +148,14 @@ def structureExists(buildState: BuildState, thisTransaction : Transaction):
         raise error
     else:
         ## Check if this sequence has been built before.
+        ## Can we assume that seqID has already been initialized and saved?
         userDataDir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/Sequences/"
         seqID = getSeqIDForSequence(sequence)
         sequenceDir = userDataDir + seqID
-
         log.debug("sequenceDir: " + sequenceDir)
         if os.path.isdir(sequenceDir):
             log.debug("This sequence has previous builds.")
             return True
-#            structureLabel = buildState.structureLabel
-#            if structureLabel == "default":
-#                ## Easy. Just check the path. If it exists, return true.
-#                defaultBuildDir = sequenceDir + "/defaults/All_Builds/structure"
-#                if os.path.isdir(defaultBuildDir):
-#                    log.debug("default structure found.")
-#                    return True
-#                else:
-#                    log.debug("default structure not found.")
-#                    return False
-#            else:
-###
-### START HERE -- add this logic
-###
-#                log.error("Need to write the logic that checks for existing builds that are not the defaults.")
-#                ## Need to write a buildStateExists() method that compares BuildStates that have
-#                ##  been logged to file to requested BuildStates.
         else:
             log.debug("No directory exists for this sequence, there cannot be any previous builds.")
             return False
@@ -188,208 +232,316 @@ def build3dStructureResponseConfig(thisTransaction : Transaction):
 ## TODO: make all these directory/link/file making functions into one thing
 ## that gets called by string only
 
-def createSequenceProjectDirectoryStructure(projectDir : str ):
-    # Ensure that the project directory is present and add some dirs
-    log.info("createSequenceProjectDirectoryStructure() was called.")
-    if os.path.exists(projectDir):
-        log.debug("Found an existing project dir.")
-    else:
-        log.debug("No projectDir found.  Making one now at: " + projectDir)
-        try: 
-            os.makedirs(projectDir)
-        except Exception as error:
-            log.error("There was a problem making directory: " + projectDir)
-            raise error
+## OG this is all being done elsewhere
+# def createSequenceProjectDirectoryStructure(projectDir : str ):
+#     # Ensure that the project directory is present and add some dirs
+#     log.info("createSequenceProjectDirectoryStructure() was called.")
+#     if os.path.exists(projectDir):
+#         log.debug("Found an existing project dir.")
+#     else:
+#         log.debug("No projectDir found.  Making one now at: " + projectDir)
+#         try: 
+#             os.makedirs(projectDir)
+#         except Exception as error:
+#             log.error("There was a problem making directory: " + projectDir)
+#             raise error
+#     try:
+#         log.debug("Changing to the project diretctory for making more.")
+#         os.chdir(projectDir)
+#     except Exception as error:
+#         log.error("Could not chdir to the project directory: " + projectDir)
+#         raise error
+#     try: 
+#         ##  TODO:  write code to determine if there are multiple rotamers 
+#         ##  possible and, if so, to make directories for them.
+#         ##  For this moment, single-structure only
+#         ##
+#         ##  Also consider having it not create both New and Existing every time.
+#         ##  Might be just as well to leave it.  But, do think about that.
+#         ##  Note that makedirs makes everything in supplied path that doesn't exist.
+#         ##  Exception should be raised when making projectID if it exists already.
+#         os.makedirs('defaults/Requested_Builds',exist_ok = True)
+#         os.makedirs('logs',exist_ok = True)
+#         os.makedirs('New_Builds/logs',exist_ok = True)
+#         os.makedirs('New_Builds/structure',exist_ok = True)
+#         #Required if previous structures exist, but decision should be elsewhere?
+#         os.makedirs('Existing_Builds/logs',exist_ok = True)
+#         # if not os.path.exists('defaults/Requested_Builds') : 
+#         #     os.makedirs('defaults/Requested_Builds')
+#         # if not os.path.exists('logs') : 
+#         #     os.makedirs('logs')
+#         # if not os.path.exists('New_Builds/logs') : 
+#         #     os.makedirs('New_Builds/logs')
+#         # if not os.path.exists('New_Builds/structure') : 
+#         #     os.makedirs('New_Builds/structure')
+#         # if not os.path.exists('Existing_Builds/logs') : 
+#         #     os.makedirs('Existing_Builds/logs')
+#     except Exception as error:
+#         log.error("There was a problem making directory: " + projectDir)
+#         raise error
+
+def createConformerDirectoryInBuildsDirectory(projectDir : str, conformerDirName : str):
+    log.info("createConformerDirectoryInBuildsDirectory() was called.")
+    conformerDirPath = (projectDir + "New_Builds/" + conformerDirName + '/')
     try:
-        log.debug("Changing to the project diretctory for making more.")
-        os.chdir(projectDir)
+        log.debug("Will attempt to create this folder: " + conformerDirPath)
+        os.makedirs(conformerDirPath)
     except Exception as error:
-        log.error("Could not chdir to the project directory: " + projectDir)
-        raise error
-    try: 
-        ##  TODO:  write code to determine if there are multiple rotamers 
-        ##  possible and, if so, to make directories for them.
-        ##  For this moment, single-structure only
-        ##
-        ##  Also consider having it not create both New and Existing every time.
-        ##  Might be just as well to leave it.  But, do think about that.
-        ##  Note that makedirs makes everything in supplied path that doesn't exist.
-        ##  Exception should be raised when making projectID if it exists already.
-        os.makedirs('defaults/Requested_Builds',exist_ok = True)
-        os.makedirs('logs',exist_ok = True)
-        os.makedirs('New_Builds/logs',exist_ok = True)
-        os.makedirs('New_Builds/structure',exist_ok = True)
-        #Required if previous structures exist, but decision not made here?
-        #os.makedirs('Existing_Builds/logs',exist_ok = True)
-        # if not os.path.exists('defaults/Requested_Builds') : 
-        #     os.makedirs('defaults/Requested_Builds')
-        # if not os.path.exists('logs') : 
-        #     os.makedirs('logs')
-        # if not os.path.exists('New_Builds/logs') : 
-        #     os.makedirs('New_Builds/logs')
-        # if not os.path.exists('New_Builds/structure') : 
-        #     os.makedirs('New_Builds/structure')
-        # if not os.path.exists('Existing_Builds/logs') : 
-        #     os.makedirs('Existing_Builds/logs')
-    except Exception as error:
-        log.error("There was a problem making directory: " + projectDir)
+        log.error("Could not create: " + conformerDirPath)
         raise error
 
+# Creates a symlink in Requested_Builds into either Existing_Builds or New_Builds
+def createSymLinkInRequestedStructures(projectDir : str, buildDir : str, conformerID : str):
+    log.info("createSymLinkInRequestedStructures() was called.")
+    try:
+        os.makedirs(projectDir + "Requested_Builds/", exist_ok = True)
+        path_down_to_source = buildDir + "/" + conformerID # Can be New_Builds/conformerID or Existing_Builds/conformerID
+        path_down_to_dest_dir = "Requested_Builds/" 
+        commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, conformerID, projectDir)
+    except Exception as error:
+        log.error("Could not create link in Builds/projectID/Requested_Builds/: " + str(error))
+        raise error
 
-def createSequenceProjectSymlinks(projectDir : str):
-    # Generate symbolic links within project directories
-    log.info("createSequenceProjectSymlinks() was called.")
+# Create default symlinks. Works for either existing/new conformer/default.
+# outputDir can be Existing_Builds/ or New_Builds/ followed by a conformerID or "default"
+# def createDefaultSymLinkBuildsDirectory(projectDir : str, outputDir : str):
+#     log.info("createDefaultSymLinkBuildsDirectory() was called")
+#     try:
+#         parent_dir = projectDir
+#         path_down_to_source = outputDir
+#         path_down_to_dest_dir = None
+#         commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, "defaultFolder", parent_dir)
+#         path_down_to_source = "defaultFolder/mol_min.pdb"
+#         commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, "default.pdb", parent_dir)
+#         path_down_to_source = "defaultFolder/structure.pdb"
+#         commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, "default_unminimized.pdb", parent_dir)
+#     except Exception as error:
+#         log.error("Cound not create default symlinks in Builds/" + str(error))
+#         raise error
+
+def createDefaultSymLinkSequencesDirectory(this_seqID : str, conformerID : str, buildStrategyID : str):
+    log.info("createDefaultSymLinkSequencesDirectory() was called")
     try:
-        log.debug("Changing to the project diretctory for making more.")
-        os.chdir(projectDir)
+        sequence_dir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/Sequences/"
+        parent_dir = sequence_dir + this_seqID + "/" + buildStrategyID + "/" 
+        path_down_to_source = "All_Builds/" + conformerID
+        path_down_to_dest_dir = None
+        commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, "defaultFolder", parent_dir)
+        path_down_to_source = "defaultFolder/mol_min.pdb"
+        commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, "default.pdb", parent_dir)
+        path_down_to_source = "defaultFolder/structure.pdb"
+        commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, "default_unminimized.pdb", parent_dir)
     except Exception as error:
-        log.error("Could not chdir to the project directory: " + projectDir)
+        log.error("Cound not create default symlinks in Sequences/" + str(error))
         raise error
-    # TODO:  write in logic for:
-    #     evaluate.determineDefaultStructures()
-    if os.path.exists("New_Builds/structure/structure.pdb"):
-        default_unminimized="New_Builds/structure/structure.pdb"
-        default="New_Builds/structure/mol_min.pdb"
-        structure="New_Builds/structure"
-    elif os.path.exists("Existing_Builds/structure/structure.pdb"):
-        default_unminimized="Existing_Builds/structure/structure.pdb"
-        default="Existing_Builds/structure/mol_min.pdb"
-        structure="Existing_Builds/structure"
-    else:
-        log.error("Cannot find the default unminimized structure.")
-    try:
-#        make_relative_symbolic_link(
-#                path_down_to_source : str, 
-#                path_down_to_dest_dir : str , 
-#                dest_link_label : str, 
-#                parent_directory : str
-#                )
-        commonlogic.make_relative_symbolic_link( default_unminimized, 'defaults' , 'default_unminimized.pdb', None)
-        commonlogic.make_relative_symbolic_link( default, 'defaults' , 'default.pdb', None)
-        commonlogic.make_relative_symbolic_link( structure,'defaults/Requested_Builds' , 'structure', None)
-    except Exception as error:
-        log.error("Could not make one or mor symlinks in Create Project symlinks")
-        raise error
+
+def addSequenceFolderSymLinkToNewBuild(sequenceID:str, buildStrategyID:str, projectID:str, conformerID:str):
+    log.info("addSequenceFolderSymLinkForConformer() was called.")
+    # Add a symlink from Sequences/sequenceID/buildStrategyID/All_Builds/conformerID
+    #                 to Builds/projectID/New_Builds/conformerID
+    # Don't want to call this function for Existing_Builds, as they should already be linked from All_Builds.
+    parent_dir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/"
+    # sequencePath = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/Sequences/"
+    # seqIDPath = sequencePath + sequenceID
+    path_down_to_source = 'Builds/' + projectID + "/New_Builds/"
+    path_down_to_dest_dir = 'Sequences/' + sequenceID + '/' + buildStrategyID + '/All_Builds/'
+    log.debug("Creating symlink with parentDir " + parent_dir + " called " + conformerID + " from " + path_down_to_dest_dir + " pointing to " + path_down_to_source)
+# make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, dest_link_label, parent_directory)
+    commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, conformerID, parent_dir)
+
+
+def addBuildFolderSymLinkToExistingConformer(sequenceID:str, buildStrategyID:str, projectID:str, conformerID:str):
+    log.info("addBuildFolderSymLinkForExistingConformer() was called.")
+    parent_dir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/"
+    path_down_to_dest_dir = 'Builds/' + projectID + '/Existing_Builds/'
+    path_down_to_source = 'Sequences/' + sequenceID + '/' + buildStrategyID + '/All_Builds/' + conformerID
+    log.debug("Creating symlink in " + parent_dir + " between " + path_down_to_dest_dir + " called " + conformerID + " to " + path_down_to_source)
+    commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, conformerID, parent_dir)
+
+
+## Oliver: Change this to be for default structures, or delete
+# def createSequenceProjectSymlinks(projectDir : str):
+#     # Generate symbolic links within project directories
+#     log.info("createSequenceProjectSymlinks() was called.")
+#     try:
+#         log.debug("Changing to the project diretctory for making more.")
+#         os.chdir(projectDir)
+#     except Exception as error:
+#         log.error("Could not chdir to the project directory: " + projectDir)
+#         raise error
+#     # TODO:  write in logic for:
+#     #     evaluate.determineDefaultStructures()
+#     if os.path.exists("New_Builds/structure/structure.pdb"):
+#         default_unminimized="New_Builds/structure/structure.pdb"
+#         default="New_Builds/structure/mol_min.pdb"
+#         structure="New_Builds/structure"
+#     elif os.path.exists("Existing_Builds/structure/structure.pdb"):
+#         default_unminimized="Existing_Builds/structure/structure.pdb"
+#         default="Existing_Builds/structure/mol_min.pdb"
+#         structure="Existing_Builds/structure"
+#     else:
+#         log.error("Cannot find the default unminimized structure.")
+#     try:
+# #        make_relative_symbolic_link(
+# #                path_down_to_source : str, 
+# #                path_down_to_dest_dir : str , 
+# #                dest_link_label : str, 
+# #                parent_directory : str
+# #                )
+#         commonlogic.make_relative_symbolic_link( default_unminimized, 'defaults' , 'default_unminimized.pdb', None)
+#         commonlogic.make_relative_symbolic_link( default, 'defaults' , 'default.pdb', None)
+#         commonlogic.make_relative_symbolic_link( structure,'defaults/Requested_Builds' , 'structure', None)
+#     except Exception as error:
+#         log.error("Could not make one or mor symlinks in Create Project symlinks")
+#         raise error
  
 
 
-## TODO: Rewrite this to a smaller scope: symlinks, and folder creation 
+
+
 
 ##  @brief  Creates the directories and files needed to store a file that can be
 #           reused via symlink.
 #   @detail Still being worked on, but works for default structures.
 #   @param  Transaction
-def createSequenceSymLinks(sequenceID:str, projectID:str):
-    log.info("createSequenceSymLinks() was called.")
+def setupInitialSequenceFolders(sequenceID:str, projectID:str, buildStrategyID:str):
+    log.info("setupInitialSequenceFolders() was called.")
+    ## Some of the folders in Sequence may already exist via a previous project, those in Builds should not.
     ## userDataDir is the top level dir that holds the repository of all sequences
     print(projectSettings.output_data_dir)
     sequencePath = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/Sequences/"
     seqIDPath = sequencePath + sequenceID
     projectPath = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/Builds/"
     projIDPath = projectPath + projectID
-    parent_dir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/"
-    # TODO: Hardcoded, but Build_Conditions_1 needs to become a BuildStrategyID
-    all_builds = seqIDPath + '/Build_Conditions_1/All_Builds/'
+    parent_dir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/"    
+    buildStrategyPath = seqIDPath + '/' + buildStrategyID + '/'
+    if not os.path.isdir(buildStrategyPath):
+        try:
+            os.makedirs(buildStrategyPath)
+            path_down_to_dest_dir = None # Same level as parent directory (seqIDPath)
+            commonlogic.make_relative_symbolic_link(buildStrategyPath, None, 'current', seqIDPath)
+        except Exception as error:
+            log.error("There was a problem creating buildStrategyPath: " + str(error))
+            raise error
+
+    all_builds = seqIDPath + '/' + buildStrategyID + '/All_Builds/'
     if not os.path.isdir(all_builds):
         try:
             os.makedirs(all_builds)
         except Exception as error:
-            log.error("There was a problem creating the seqIDPath: " + str(error))
+            log.error("There was a problem creating all_builds: " + str(error))
             raise error
-    if not os.path.isdir(seqIDPath + '/defaults'):
-        path_down_to_source = 'Build_Conditions_1/'
-        commonlogic.make_relative_symbolic_link(path_down_to_source, None , 'defaults', seqIDPath)
-    # TODO:  write evaluate.determineDefaultSequenecStructures which should be a lot like
-    #        evaluate.determineDefaultStructures()
-    # For now, just setting for a single structure
-    if not os.path.isdir(projIDPath + '/defaults/Requested_Builds'):
-        # TODO:  one day this might be annoying.  Feel free to change it
-        raise AttributeError("Cannot make sequence links for uninitialized project directory")
-    if not os.path.exists(projIDPath + '/defaults/Sequence_Repository'): 
-        path_down_to_source = 'Sequences/'+sequenceID
-        path_down_to_dest_dir = 'Builds/' + projectID + '/defaults/'
-#        make_relative_symbolic_link(
+    # Just make everything you might need here.
+    try:
+        os.makedirs(projIDPath + '/Requested_Builds')
+        os.makedirs(projIDPath + '/Existing_Builds')
+        os.makedirs(projIDPath + '/New_Builds')
+        os.makedirs(projIDPath + '/New_Builds/' + 'logs/', exist_ok = True)
+        os.makedirs(projIDPath + '/Existing_Builds/' + 'logs/', exist_ok = True)
+    except Exception as error:
+        log.error("There was a problem making folders or logs in Builds " + str(error))
+        raise error
+
+    # Assumes start_project was called before now, so project folder exists in Builds/
+    # OG not sure what the Sequence_Repository link be used for, but the plan requires it.
+    try:
+        path_down_to_source = 'Sequences/'+ sequenceID
+        path_down_to_dest_dir = 'Builds/' + projectID 
+        commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir , 'Sequence_Repository', parent_dir)
+    except Exception as error:
+        log.error("There was a problem making Sequence_Repository link " + str(error))
+        raise error    
+    
+
+
+    # logs folder handled by the generic startProject function
+
+#     # For now, just setting for a single structure
+#     if not os.path.isdir(projIDPath + '/defaults/Requested_Builds'):
+#         # TODO:  one day this might be annoying.  Feel free to change it
+#         raise AttributeError("Cannot make sequence links for uninitialized project directory")
+#     if not os.path.exists(projIDPath + '/defaults/Sequence_Repository'): 
+#         path_down_to_source = 'Sequences/'+ sequenceID
+#         path_down_to_dest_dir = 'Builds/' + projectID + '/defaults/'
+# #        make_relative_symbolic_link(
 #                path_down_to_source : str, 
 #                path_down_to_dest_dir : str , 
 #                dest_link_label : str, 
 #                parent_directory : str
 #                )
-        commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir , 'Sequence_Repository', parent_dir)
-    ## If this appears to be a new build for this sequence, have seqIDPath point into projIDPath
-    if os.path.isfile(projIDPath + '/New_Builds/structure/structure.off'):
-        # TODO : Make it possible for there to be other Build_Conditions....
-        log.debug("This appears to be a bew build.")
-        path_down_to_source = 'Builds/' + projectID + '/New_Builds/structure'
-        path_down_to_dest_dir = 'Sequences/'+sequenceID + '/Build_Conditions_1/All_Builds/'
-        if not os.path.exists(path_down_to_dest_dir + '/structure') : 
-            commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir , None, parent_dir)
-        temp_parent_dir = seqIDPath + '/Build_Conditions_1/'
-        path_down_to_source = 'All_Builds/structure/mol_min.pdb'
-        log.debug("The relevant paths are:  ")
-        log.debug("        temp_parent_dir : " + temp_parent_dir)
-        log.debug("        path_down_to_source  :  " + path_down_to_source)
-        commonlogic.make_relative_symbolic_link(path_down_to_source, None, 'default.pdb' ,  temp_parent_dir)
-        path_down_to_source = 'All_Builds/structure/structure.pdb'
-        commonlogic.make_relative_symbolic_link(path_down_to_source, None, 'default_unminimized.pdb' , temp_parent_dir)
-    ## If this appears to be an old build for this sequence, ink have projIDPath point into seqIDPath
-    else:
-        log.debug("New build failed, so we will assume it is an existing build.")
-        path_down_to_source = 'Sequences/'+sequenceID + '/Build_Conditions_1/All_Builds/structure'
-        path_down_to_dest_dir = 'Builds/' + projectID + '/Existing_Builds/'
-        commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir , None, parent_dir)
+        # commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir , 'Sequence_Repository', parent_dir)        
+ # ## OG removing this bit, it was specific for a default structure, will replace with something that handles both.
+#     ## If this appears to be a new build for this sequence, have seqIDPath point into projIDPath    
+#     if os.path.isfile(projIDPath + '/New_Builds/structure/structure.off'):
+#         # TODO : Make it possible for there to be other Build_Conditions....
+#         log.debug("This appears to be a bew build.")
+#         path_down_to_source = 'Builds/' + projectID + '/New_Builds/structure'
+#         path_down_to_dest_dir = 'Sequences/'+sequenceID + '/' + buildStrategyID + '/All_Builds/'
+#         if not os.path.exists(path_down_to_dest_dir + '/structure') : 
+#             commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir , None, parent_dir)
+#         temp_parent_dir = seqIDPath + '/' + buildStrategyID + '/'
+#         path_down_to_source = 'All_Builds/structure/mol_min.pdb'
+#         log.debug("The relevant paths are:  ")
+#         log.debug("        temp_parent_dir : " + temp_parent_dir)
+#         log.debug("        path_down_to_source  :  " + path_down_to_source)
+#         commonlogic.make_relative_symbolic_link(path_down_to_source, None, 'default.pdb' ,  temp_parent_dir)
+#         path_down_to_source = 'All_Builds/structure/structure.pdb'
+#         commonlogic.make_relative_symbolic_link(path_down_to_source, None, 'default_unminimized.pdb' , temp_parent_dir)
+#     ## If this appears to be an old build for this sequence, ink have projIDPath point into seqIDPath
+#     else:
+#         log.debug("New build failed, so we will assume it is an existing build.")
+#         path_down_to_source = 'Sequences/'+ sequenceID + '/' + buildStrategyID + '/All_Builds/structure'
+#         path_down_to_dest_dir = 'Builds/' + projectID + '/Existing_Builds/'
+#         commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir , None, parent_dir)
+## OG removing END
 
+# def createSymLinksOldAndCrufty(buildState : BuildState, thisTransaction : Transaction):
+#     log.info("createSymLinks() was called.")
 
-def createSymLinksOldAndCrufty(buildState : BuildState, thisTransaction : Transaction):
-    log.info("createSymLinks() was called.")
-
-    sequence = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
-    seqID = getSeqIDForSequence(sequence)
+#     sequence = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
+#     seqID = getSeqIDForSequence(sequence)
 
     
-    log.debug("Checking to see if the seqIDPath already exists for this sequence: " + seqIDPath)
-    if not os.path.exists(seqIDPath):
-        log.debug("seqIDPath does not exist. Creating it now.")
-        try:
-            os.makedirs(seqIDPath)
-        except Exception as error:
-            log.error("There was a problem creating the seqIDPath: " + str(error))
-            raise error
-        else:
-            try:
-                createSeqLog(sequence, seqIDPath)
-            except Exception as error:
-                log.error("There was a problem creating the SeqLog: " + str(error))
-                raise error
-            else:
-                projectDir = getProjectDir(thisTransaction)
-                try:
-                    isDefault = checkIfDefaultStructureRequest(thisTransaction)
-                    log.debug("isDefault: " + str(isDefault))
-                    if isDefault:
-                        link = seqIDPath + "/default"
-                        projectDir = projectDir + "default"
-                    else:
-                        link = seqIDPath + "/" + buildState.structureLabel
+#     log.debug("Checking to see if the seqIDPath already exists for this sequence: " + seqIDPath)
+#     if not os.path.exists(seqIDPath):
+#         log.debug("seqIDPath does not exist. Creating it now.")
+#         try:
+#             os.makedirs(seqIDPath)
+#         except Exception as error:
+#             log.error("There was a problem creating the seqIDPath: " + str(error))
+#             raise error
+#         else:
+#             try:
+#                 createSeqLog(sequence, seqIDPath)
+#             except Exception as error:
+#                 log.error("There was a problem creating the SeqLog: " + str(error))
+#                 raise error
+#             else:
+#                 projectDir = getProjectDir(thisTransaction)
+#                 try:
+#                     isDefault = checkIfDefaultStructureRequest(thisTransaction)
+#                     log.debug("isDefault: " + str(isDefault))
+#                     if isDefault:
+#                         link = seqIDPath + "/default"
+#                         projectDir = projectDir + "default"
+#                     else:
+#                         link = seqIDPath + "/" + buildState.structureLabel
                     
-                    if os.path.exists(projectDir):
-                        target = projectDir
-                        ##What is being linked to is the projecDir or the 
-                        log.debug("target: " + target)
-                        ##This will be the symbolic link
-                        log.debug("link: " + link)
-                        os.symlink(target, link)
-                    else:
-                        log.error("Failed to find the target dir for the symbolic link.")
-                        raise FileNotFoundError(projectDir)
+#                     if os.path.exists(projectDir):
+#                         target = projectDir
+#                         ##What is being linked to is the projecDir or the 
+#                         log.debug("target: " + target)
+#                         ##This will be the symbolic link
+#                         log.debug("link: " + link)
+#                         os.symlink(target, link)
+#                     else:
+#                         log.error("Failed to find the target dir for the symbolic link.")
+#                         raise FileNotFoundError(projectDir)
                     
-                except Exception as error:
-                    log.error("There was a problem creating the symbolic link.")
-                    raise error
+#                 except Exception as error:
+#                     log.error("There was a problem creating the symbolic link.")
+#                     raise error
             
-                
-
-
-
 ##  @brief Looks at a transaction to determine if the user is requesting the default structure
 #   @param Transaction thisTransaction
 #   @return Boolean isDefault
@@ -413,21 +565,16 @@ def checkIfDefaultStructureRequest(thisTransaction):
             log.debug("No geometryOptions found, returning True.")
             return True
 
-
 ##  @brief gets the path of the default dir for a project. 
 ##  @TODO: Evaluate if this is necessary. Possibly deprecate this. 
 def getProjectSubdir(thisTransaction: Transaction):
     log.info("getProjectSubdir() was called.")
     project_dir = thisTransaction.response_dict['gems_project']['project_dir']
-    log.debug("project_dir: " + project_dir)
+    log.debug("project_subdir: " + project_dir)
 
     ## If default structure, subdir name is 'structure'
     if checkIfDefaultStructureRequest(thisTransaction):
-        pass
-#        project_dir = project_dir + "structure/"
-#        if not os.path.exists(project_dir):
-#            os.makedirs(project_dir)
-
+        return project_dir 
     else:
         log.error("Still writing the logic to handle builds with selectedRotamers.")
         ##TODO: provide the subdir based on this doc: 
