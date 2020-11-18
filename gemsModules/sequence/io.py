@@ -183,20 +183,23 @@ class Build3DStructureOutput(BaseModel):
     payload : str =  ""
     sequence : str  = ""
     seqID : str = ""
+    subDirectory : str = ""
     downloadUrl : str = ""
 
-    def __init__(self, payload:str, sequence:str, seqID:str, downloadUrl:str):
+    def __init__(self, payload:str, sequence:str, seqID:str, subDirectory:str, downloadUrl:str):
         super().__init__()
         log.info("Initializing BuildOutput.")
 
         log.debug("payload: " + payload)
         log.debug("sequence: " + sequence)
         log.debug("seqID: " + seqID)
+        log.debug("subDirectory: " + subDirectory)
         log.debug("downloadUrl: " + downloadUrl)
 
         self.payload = payload
         self.sequence = sequence
         self.seqID = seqID
+        self.subDirectory = subDirectory
         self.downloadUrl = downloadUrl
 
 
