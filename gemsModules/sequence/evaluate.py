@@ -163,35 +163,54 @@ def evaluateCondensedSequencePydantic(thisTransaction : Transaction, thisService
 # Probably it would fail on sub-classes though, but maybe.
 def getLinkageOptionsFromGmmlcbBuilder(sequence):
     log.info("getLinkageOptionsFromGmmlcbBuilder() was called.\n")
+    log.debug("sequence: " + sequence)
     from gemsModules.sequence import build
     from gemsModules.sequence import io
     cbBuilder = build.getCbBuilderForSequence(sequence)
     gmmllinkageOptionsVector = cbBuilder.GenerateUserOptionsDataStruct()
+    log.debug("gmmllinkageOptionsVector: " + repr(gmmllinkageOptionsVector))
+
     gemsLinkageGeometryOptions = io.LinkageGeometryOptions()
     gemsLinkageGeometryOptions.totalPossibleRotamers = cbBuilder.GetNumberOfShapes()
     likelyOnly = True
     gemsLinkageGeometryOptions.totalLikelyRotamers = cbBuilder.GetNumberOfShapes(likelyOnly)
+
     for gmmlLinkageOptions in gmmllinkageOptionsVector:
+
         gemsLinkageOptions = io.LinkageRotamers()
+
         gemsLinkageOptions.indexOrderedLabel = gmmlLinkageOptions.indexOrderedLabel_
         gemsLinkageOptions.linkageName = gmmlLinkageOptions.linkageName_
         gemsLinkageOptions.firstResidueNumber = gmmlLinkageOptions.firstResidueNumber_
         gemsLinkageOptions.secondResidueNumber = gmmlLinkageOptions.secondResidueNumber_
+
         """ Likely Rotamers """
         for dihedralOptions in gmmlLinkageOptions.likelyRotamers_:
             gemsRotamers = io.DihedralRotamers() 
             gemsRotamers.dihedralName = dihedralOptions.dihedralName_
+            
             for rotamer in dihedralOptions.rotamers_:
                 gemsRotamers.dihedralValues.extend([rotamer]);
+            
             gemsLinkageOptions.likelyRotamers.append(gemsRotamers)
+
         """ Possible Rotamers """
         for dihedralOptions in gmmlLinkageOptions.possibleRotamers_:
             gemsRotamers = io.DihedralRotamers()
             gemsRotamers.dihedralName = dihedralOptions.dihedralName_
+
+
             for rotamer in dihedralOptions.rotamers_:
                 gemsRotamers.dihedralValues.extend([rotamer]);
-            gemsLinkageOptions.possibleRotamers.append((gemsRotamers))
-        gemsLinkageGeometryOptions.linkageRotamersList.append((gemsLinkageOptions))
+
+            gemsLinkageOptions.possibleRotamers.append(gemsRotamers)
+
+            ## dihedralsWithOptions Needed for the website
+            gemsLinkageOptions.dihedralsWithOptions.append(gemsRotamers.dihedralName)
+
+        gemsLinkageGeometryOptions.linkageRotamersList.append(gemsLinkageOptions)
+
+    log.debug("gemsLinkageGeometryOptions: " + repr(gemsLinkageGeometryOptions))
     return gemsLinkageGeometryOptions
 
 # class LinkageRotamers(BaseModel): 

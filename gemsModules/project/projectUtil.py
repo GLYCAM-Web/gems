@@ -17,11 +17,9 @@ else:
     log = createLogger(__name__)
 
 
-##  Pass in a transaction, if a frontend project is in the request,
-#   a gems_project is created with any relevant data, and the
-#   transaction is updated with the gems_project.
-#   If no frontend project is present, the gems_project is the only
-#   project.
+##  Pass in a transaction, if a project is in the request,
+#   a project is created with any relevant data, and the
+#   transaction is updated with the project.
 #   @param transaction
 def startProject(thisTransaction : Transaction):
     log.info("startProject() was called.\n")
@@ -30,55 +28,54 @@ def startProject(thisTransaction : Transaction):
     except Exception as error:
         log.error("There was a problem finding the entity in this transaction: " + str(error))
         raise error
-    else:
+    try:
+        ### Start a project
+        if entity == "Sequence":
+            log.debug("building a cb project.")
+            project = CbProject(thisTransaction.request_dict)
+
+        elif entity == "StructureFile":
+            log.debug("building a pdb project.")
+            project = PdbProject(thisTransaction.request_dict)
+
+        elif entity == "Conjugate":
+            log.debug("building a gp project.")
+            project = GpProject(thisTransaction.request_dict)
+
+        else:
+            log.error("Need to write code to instantiate projects for entity type: " + entity)
+            raise TypeError("entity: " + entity)
+    except Exception as error:
+        log.error("There was a problem starting the project: " + str(error))
+        raise error
+    try:
+        addProjectToResponse(project, thisTransaction)
+    except Exception as error:
+        log.error("There was a problem updating thisTransaction: " + str(error))
+        raise error
+    ### Find the projectDir.
+    try:
+        project_dir = project.project_dir
+        logs_dir = setupProjectDirs(project_dir)
+    except Exception as error:
+        log.error("There was a problem getting the projectDir: " + str(error))
+        raise error
+    ### Copy any upload files.
+    if project.has_input_files == True:
         try:
-            ### Start a gems_project
-            if entity == "Sequence":
-                log.debug("building a cb project.")
-                gems_project = CbProject(thisTransaction.request_dict)
-                log.debug("gems_project, after instantiation: \n" + str(gems_project))
-            elif entity == "StructureFile":
-                log.debug("building a pdb project.")
-                gems_project = PdbProject(thisTransaction.request_dict)
-                log.debug("gems_project, after instantiation: \n" + str(gems_project))
-            elif entity == "Conjugate":
-                log.debug("building a gp project.")
-                gems_project = GpProject(thisTransaction.request_dict)
-                log.debug("gems_project, after instantiation: \n" + str(gems_project))
-            else:
-                log.error("Need to write code to instantiate projects for entity type: " + entity)
-                raise TypeError("entity: " + entity)
+            copyUploadFilesToProject(thisTransaction, project)
         except Exception as error:
-            log.error("There was a problem starting the project: " + str(error))
+            log.error("There was a problem uploading the input: " + str(error))
             raise error
-        try:
-            updateTransaction(gems_project, thisTransaction)
-        except Exception as error:
-            log.error("There was a problem updating thisTransaction: " + str(error))
-            raise error
-        ### Find the projectDir.
-        try:
-            project_dir = getProjectDir(thisTransaction)
-            logs_dir = setupProjectDirs(project_dir)
-        except Exception as error:
-            log.error("There was a problem getting the projectDir: " + str(error))
-            raise error
-        ### Copy any upload files.
-        if gems_project.has_input_files:
-            try:
-                copyUploadFilesToProject(thisTransaction, gems_project)
-            except Exception as error:
-                log.error("There was a problem uploading the input: " + str(error))
-                raise error
-        ### Write the logs to file.
-        try:
-            request = thisTransaction.request_dict
-            writeRequestToFile(request, logs_dir)
-            writeProjectLogFile(gems_project, logs_dir)
-            return gems_project
-        except Exception as error:
-            log.error("There was a problem writing the project logs: " + str(error))
-            raise error
+    ### Write the logs to file.
+    try:
+        request = thisTransaction.request_dict
+        writeRequestToFile(request, logs_dir)
+        writeProjectLogFile(project, logs_dir)
+        return project
+    except Exception as error:
+        log.error("There was a problem writing the project logs: " + str(error))
+        raise error
 
 ## Pass in a transaction, figure out the requestingAgent. OK if it doesn't exist.
 #   Default is command line, replaced if a frontend project exists.
@@ -97,8 +94,8 @@ def getRequestingAgentFromTransaction(thisTransaction: Transaction):
 
 ##  Pass in a transaction, get the frontend project
 #   @param transaction
-def getFrontendProjectFromTransaction(thisTransaction: Transaction):
-    log.info("getFrontendProjectFromTransaction() was called.\n")
+def getProjectFromTransaction(thisTransaction: Transaction):
+    log.info("getProjectFromTransaction() was called.\n")
     if 'project' in thisTransaction.request_dict.keys():
         project = thisTransaction.request_dict['project']
         log.debug("Object type for frontend project: " + str(type(project)))
@@ -112,32 +109,18 @@ def getFrontendProjectFromTransaction(thisTransaction: Transaction):
 def getProjectDir(thisTransaction: Transaction):
     log.info("getProjectDir() was called.\n")
     project_dir = ""
-    try:
-        if "gems_project" in thisTransaction.response_dict.keys():
-            log.debug("found a gems_project.")
-            if "project_dir" in thisTransaction.response_dict['gems_project']:
-                project_dir = thisTransaction.response_dict['gems_project']['project_dir']
-                log.debug("project_dir: " + project_dir)
-        elif "project" in thisTransaction.request_dict.keys():
-            log.debug("No gems_project found. Looking for a frontend project.")
-            if "projID" in thisTransaction.request_dict['project']:
-                projID = thisTransaction.request_dict['project']['projID']
-                projType = thisTransaction.request_dict['project']['project_type']
-                if projType == 'cb': 
-                    project_dir = projectSettings.output_data_dir + "tools/" +  projType  + "/git-ignore-me_userdata/Builds/" + projID + "/" 
-                else:
-                    project_dir = projectSettings.output_data_dir + "tools/" +  projType  + "/git-ignore-me_userdata/" + projID + "/" 
+
+    if "project" in thisTransaction.request_dict.keys():
+        log.debug("Looking for a project.")
+        if"project_dir" in thisTransaction.request_dict['project'].keys():
+            project_dir = thisTransaction.request_dict['project']['project_dir']
         else:
-            log.error("Insufficient information provided to find the projectDir.")
-            log.error("This transaction: \n\n " + str(thisTransaction.request))
-            raise AttributeError("projectDir")
-    except Exception as error:
-        log.error("There was a problem geting the project_dir from the response_dict." + str(error))
-        raise error
-    else:
-        if project_dir == "":
-            raise(FileNotFoundError("project_dir"))
-        return project_dir
+            log.debug("Perhaps no project dir offered by the user. Checking response for the default.")
+            if "project" in thisTransaction.response_dict.keys():
+                if "project_dir" in thisTransaction.response_dict['project'].keys():
+                    project_dir = thisTransaction.response_dict['project']['project_dir']
+
+    return project_dir
 
 ##  Creates dirs if needed in preparation for writing files.
 #   @param projectDir
@@ -181,16 +164,16 @@ def writeRequestToFile(request, logsDir):
 
 
 
-## Writes the gems project to file in json format.
-#   @param gems_project
+## Writes the project to file in json format.
+#   @param project
 #   @param logsDir
-def writeProjectLogFile(gems_project, logsDir):
+def writeProjectLogFile(project, logsDir):
     log.info("writeProjectLogFile() was called.\n")
-    logFileName = gems_project.project_type + "ProjectLog.json"
+    logFileName = project.project_type + "ProjectLog.json"
     project_log_file = os.path.join(logsDir, logFileName)
     log.debug("project_log_file: " + project_log_file)
     with open(project_log_file, 'w', encoding='utf-8') as file:
-        jsonString = json.dumps(gems_project.__dict__, indent=4, sort_keys=False, default=str)
+        jsonString = json.dumps(project.__dict__, indent=4, sort_keys=False, default=str)
         log.debug("jsonString: \n" + jsonString )
         file.write(jsonString)
 
@@ -209,12 +192,11 @@ def updateCbProject(thisTransaction : Transaction, structureInfo):
 #   dir that uploaded input files should be copied to.
 #   @param project
 #   @param project_dir
-def getProjectUploadsDir(project, project_dir):
+def getProjectUploadsDir(project):
     log.info("getProjectUploadsDir() was called.\n")
-    log.debug("Object type for project: " + str(type(project)))
     log.debug("project.keys(): " + str(project.keys()))
     u_uuid = project['u_uuid']
-    project_uploads_dir = project_dir + "uploads/" + u_uuid + "/"
+    project_uploads_dir = project['upload_path']
     log.debug("project_uploads_dir: " + project_uploads_dir)
     if not os.path.exists(project_uploads_dir):
         #print("creating the uploads dir")
@@ -236,21 +218,14 @@ def getUploadsSourceDir(project):
 
 ##  Creates a copy of uploads from the frontend
 #   @param transaction
-def copyUploadFilesToProject(thisTransaction : Transaction, gems_project : GemsProject):
+def copyUploadFilesToProject(thisTransaction : Transaction, project : Project):
     log.info("copyUploadFilesToProject() was called.\n")
+    log.debug("project: " + repr(project))
     project_dir = getProjectDir(thisTransaction)
     log.debug("project_dir: " + project_dir)
-    try:
-        project = getFrontendProjectFromTransaction(thisTransaction)
-        log.debug("Object type for frontend project: " + str(type(project)))
-    except Exception as error:
-        log.error("There was a problem finding the frontend project.")
-        log.error("Error type: " + str(type(error)))
-        log.error(traceback.format_exc())
-        raise error
 
     try:
-        project_uploads_dir = getProjectUploadsDir(project, project_dir)
+        project_uploads_dir = getProjectUploadsDir(project)
     except Exception as error:
         log.error("There was a problem creating the destination for upload files.")
         log.error("Error type: " + str(type(error)))
@@ -282,15 +257,15 @@ def copyUploadFilesToProject(thisTransaction : Transaction, gems_project : GemsP
 
 
 
-##  Looks at the gems_project in a transaction to return the pUUID.
-#   @param thisTransaction Transaction object should contain a gems_project.Else returns none.
+##  Looks at the project in a transaction to return the pUUID.
+#   @param thisTransaction Transaction object should contain a project.Else returns none.
 def getProjectpUUID(thisTransaction : Transaction):
     log.info("getProjectpUUID() was called.\n")
     pUUID = ""
-    if 'gems_project' in thisTransaction.response_dict.keys():
-        pUUID = thisTransaction.response_dict['gems_project']['pUUID']
+    if 'project' in thisTransaction.response_dict.keys():
+        pUUID = thisTransaction.response_dict['project']['pUUID']
     else:
-        log.error("Cannot get pUUID from a transaction that has no gems_project.")
+        log.error("Cannot get pUUID from a transaction that has no project.")
         log.error("thisTransaction's keys: \n" + str(thisTransaction.response_dict.keys()))
         raise AttributeError
     log.debug("pUUID: " + str(pUUID))
@@ -439,13 +414,16 @@ def getUuidForString(string):
     log.debug("stringID: " + stringID)
     return stringID
 
-
-def updateTransaction(gems_project, thisTransaction):
-    log.info("updateTransaction() was called.")
+def addProjectToResponse(project, thisTransaction):
+    log.info("addProjectToResponse() was called.")
     if thisTransaction.response_dict == None:
         thisTransaction.response_dict = {}
-    thisTransaction.response_dict['gems_project'] = gems_project.__dict__
-    log.debug("thisTransaction.response_dict['gems_project']: \n" + str(thisTransaction.response_dict['gems_project']))
+    preparedCopy = project.__dict__
+    keys = preparedCopy.keys()
+    for key in keys:
+        preparedCopy[key] = str(preparedCopy[key])
+    thisTransaction.response_dict['project'] = preparedCopy
+    log.debug("thisTransaction: \n" + str(thisTransaction))
 
 def main():
     if len(sys.argv) == 2:

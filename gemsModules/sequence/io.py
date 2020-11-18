@@ -104,6 +104,7 @@ class LinkageRotamers(BaseModel):
     linkageName : str = None
     firstResidueNumber : str = None
     secondResidueNumber : str = None
+    dihedralsWithOptions : List[str] = []
     possibleRotamers : List[DihedralRotamers] = []
     likelyRotamers : List[DihedralRotamers] = []
 
@@ -122,7 +123,8 @@ class LinkageGeometryOptions(BaseModel):
 class GeometryOptions(BaseModel):
     residues : ResidueGeometryOptions = None # Not yet handled.
     linkages : LinkageGeometryOptions = None
-    def InitializeClass(self, validatedSequence : Sequence):
+    def __init__(self, validatedSequence : Sequence):
+        super().__init__()
         from gemsModules.sequence import evaluate
         self.linkages = evaluate.getLinkageOptionsFromGmmlcbBuilder(validatedSequence)
         #print(self.linkages.json())
@@ -131,10 +133,13 @@ class BuildOptions(BaseModel):
     """Options for building 3D models"""
     solvationOptions : SystemSolvationOptions = None  # Not yet handled.
     geometryOptions : GeometryOptions = None
-    def InitializeClass(self, validatedSequence : Sequence):
-        self.geometryOptions = GeometryOptions ()
-        self.geometryOptions.InitializeClass(validatedSequence)
-        #print(self.geometryOptions.json())
+
+    def __init__(self, validatedSequence : Sequence):
+        super().__init__()
+        log.info("Initializing BuildOptions")
+        log.debug("validatedSequence: " + validatedSequence)
+        self.geometryOptions = GeometryOptions(validatedSequence)
+
 
 class DrawOptions(BaseModel):
     """Options for drawing 2D models"""
@@ -173,8 +178,8 @@ class SequenceEvaluationOutput(BaseModel):
         if self.sequenceIsValid:
             self.sequenceVariants = evaluate.getSequenceVariants(sequence)
         if self.sequenceIsValid and not validateOnly:
-            self.buildOptions = BuildOptions()
-            self.buildOptions.InitializeClass(sequence)
+            self.buildOptions = BuildOptions(sequence)
+            
             # self.defaultStructure
             #drawOptions to be developed later.
 

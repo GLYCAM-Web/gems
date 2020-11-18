@@ -177,7 +177,7 @@ class ResourceStringFormatEnum(str, Enum):
 
 ## Update me when adding new project types.
 class ProjectTypeEnum(str,Enum):
-    gemsProject = 'GemsProject'
+    project = 'Project'
     cbProject = 'CbProject'
     pdbProject = 'PdbProject'
     gpProject = 'GpProject'
@@ -377,7 +377,7 @@ class Service(BaseModel):
             description = 'User-specified ID that will be echoed in responses.'
             )
     options : Tags = None
-    project : ProjectModels.GemsProject = None
+    project : ProjectModels.Project = None
 
 class Response(BaseModel):
     """Holds information about a response to a service request."""
@@ -484,14 +484,14 @@ class Transaction:
             for key in self.response_dict.keys():
                 #log.debug("key: " + key)
                 #log.debug("valueType: " + str(type(self.response_dict[key])))
-                if key == 'gems_project':
+                if key == 'project':
                     #log.debug("\ngems_project: \n")
-                    for element in self.response_dict['gems_project'].keys():
+                    for element in self.response_dict['project'].keys():
                         #log.debug("~ element: " + element)
-                        if type(self.response_dict['gems_project'][element]) != str:
-                            self.response_dict['gems_project'][element] = str(self.response_dict['gems_project'][element])
+                        if type(self.response_dict['project'][element]) != str:
+                            self.response_dict['project'][element] = str(self.response_dict['project'][element])
 
-                        #log.debug("~ valueType: " + str(type(self.response_dict['gems_project'][element])))
+                        #log.debug("~ valueType: " + str(type(self.response_dict['project'][element])))
             try:
                 if isPretty:
                     self.outgoing_string=json.dumps(self.response_dict, indent=4)

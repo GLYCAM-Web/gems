@@ -27,17 +27,15 @@ USAGE:
     We recommend doing this only for debugging purposes.
 
     Verbosity values:
-        -1        (default) Print only the JSON object.  This will return the 
-                  first fatal error (if any) in a JSON object.
-         0-2      These will all exit on fatal errors.
-         0        Print very important messages only.
-         1        Print a little more information.
-         2        Print lots of detail.
+        error       Only Fatal errors are logged. (Default)
+        info        Log statements that track what methods are called, plus errors.
+        debug       Log lots of detail. For detailed debugging.
+        none        No logging.
 
-    To set the verbosity, set GEMS_DEBUG_VERBOSITY to one of the values above.  
+    To set the verbosity, set GEMS_LOGGING_LEVEL to one of the values above.  
     For example:
-        (bash)  export GEMS_DEBUG_VERBOSITY=1
-        (csh)   setenv GEMS_DEBUG_VERBOSITY 1
+        (bash)  export GEMS_LOGGING_LEVEL=debug
+        (csh)   setenv GEMS_LOGGING_LEVEL debug
 
 \n"""
 

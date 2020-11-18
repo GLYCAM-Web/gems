@@ -369,7 +369,7 @@ def convertDihedralNameToCode(dihedralName : str):
 #   @return String solvent_shape
 def getSolvationShape(thisTransaction):
     log.info("getSolvationShape() was called.")
-    project = getFrontendProjectFromTransaction(thisTransaction)
+    project = getProjectFromTransaction(thisTransaction)
     if project is not None:
         return project['solvation_shape']
     else:
@@ -381,10 +381,10 @@ def getSolvationShape(thisTransaction):
 #   @return String either "default" or the force field name.
 def getForceFieldFromRequest(thisTransaction):
     log.info("getForceFieldFromRequest() was called.")
-    feProject = getFrontendProjectFromTransaction(thisTransaction)
-    if feProject is not None:
-        log.debug("feProject keys: " + str(feProject.keys()))
-        if feProject['force_field'] == "":
+    project = getProjectFromTransaction(thisTransaction)
+    if project is not None:
+        log.debug("project keys: " + str(project.keys()))
+        if project['force_field'] == "":
             return "default"
         else:
             return project['force_field']
@@ -806,7 +806,7 @@ def updateBuildStatus(structureInfoFilename : str, buildState : BuildState, stat
                 log.error("There was a problem writing the structureInfo data to file: "  + str(error))
                 raise error
 
-def updateStructureInfotWithUserOptions(thisTransaction : Transaction, structureInfo : StructureInfo, filename: str):
+def updateStructureInfoWithUserOptions(thisTransaction : Transaction, structureInfo : StructureInfo, filename: str):
     log.info("updateStructureInfotWithUserOptions() was called.")
     try:
         with open(filename, 'r') as inFile:

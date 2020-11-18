@@ -29,8 +29,8 @@ def projectExists(thisTransaction : Transaction):
         projectDir = getProjectDir(thisTransaction)
         log.debug("projectDir: " + projectDir)
     except Exception as error:
-        log.error("There was a problem getting the projectDir: " + str(error))
-        raise error
+        log.debug("Didn't find a projectDir. Likely doesn't exist yet.")
+        return False
     else:
         if os.path.exists(projectDir):
             log.debug("Found an existing project dir.")
@@ -48,7 +48,7 @@ def addResponse(buildState : BuildState, thisTransaction : Transaction, outputDi
         log.error("Problem finding the project pUUID or sequence in the transaction: " + str(error))
         raise error
 
-    gemsProject = thisTransaction.response_dict['gems_project']
+    gemsProject = thisTransaction.response_dict['project']
     indexOrdered = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
     seqID = getSeqIDForSequence(indexOrdered)
     ## No, they want a link to the symlink in Requested_Builds, which is yet to be generated
