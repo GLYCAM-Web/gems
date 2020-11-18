@@ -192,8 +192,8 @@ def make_relative_symbolic_link(
         log.debug("The current working directory is : " + os.getcwd())
     if not os.path.exists(path_down_to_source):
         log.debug("Link source does not exist: " + path_down_to_source)
-        log.debug("Allowing anyway.")
-#        raise AttributeError(path_down_to_source)
+        log.debug("Allowing anyway.") # Oliver: Seems odd that this would work.
+        #raise AttributeError(path_down_to_source)
     if path_down_to_dest_dir is None:
         if dest_link_label is None: 
             path_down_to_dest_label=os.path.basename(path_down_to_source)
@@ -217,7 +217,9 @@ def make_relative_symbolic_link(
         )
     log.debug("About to link this source : " + relative_path_to_source)
     log.debug(".... to this destination : " + path_down_to_dest_label)
-    os.symlink(relative_path_to_source,path_down_to_dest_label)
+    if os.path.islink(dest_link_label): # Oliver addition to allow overwrites
+        os.remove(dest_link_label)
+    os.symlink(relative_path_to_source, path_down_to_dest_label)
     if parent_directory is not None:
         os.chdir(owd)
 
