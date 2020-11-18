@@ -739,6 +739,9 @@ std::ostream & get_cout() { return std::cout; }
 //typedef std::vector<LinkageOptions> LinkageOptionsVector;
 %template(linkage_options_vector) std::vector<CondensedSequenceSpace::LinkageOptions>;
 
+//typedef std::vector<SingleRotamerInfo> SingleRotamerInfoVector;
+%template(single_rotamer_info_vector) std::vector<CondensedSequenceSpace::SingleRotamerInfo>;
+
 //typedef std::vector<MolecularModeling::Residue*> ResidueVector;
 %template(residue_vector) std::vector<MolecularModeling::Residue* >;
 
