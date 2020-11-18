@@ -51,39 +51,34 @@ def startProject(thisTransaction : Transaction):
         except Exception as error:
             log.error("There was a problem starting the project: " + str(error))
             raise error
-        else:
-
+        try:
+            updateTransaction(gems_project, thisTransaction)
+        except Exception as error:
+            log.error("There was a problem updating thisTransaction: " + str(error))
+            raise error
+        ### Find the projectDir.
+        try:
+            project_dir = getProjectDir(thisTransaction)
+            logs_dir = setupProjectDirs(project_dir)
+        except Exception as error:
+            log.error("There was a problem getting the projectDir: " + str(error))
+            raise error
+        ### Copy any upload files.
+        if gems_project.has_input_files:
             try:
-                updateTransaction(gems_project, thisTransaction)
+                copyUploadFilesToProject(thisTransaction, gems_project)
             except Exception as error:
-                log.error("There was a problem updating thisTransaction: " + str(error))
+                log.error("There was a problem uploading the input: " + str(error))
                 raise error
-            else:
-                ### Find the projectDir.
-                try:
-                    project_dir = getProjectDir(thisTransaction)
-                    logs_dir = setupProjectDirs(project_dir)
-                except Exception as error:
-                    log.error("There was a problem getting the projectDir: " + str(error))
-                    raise error
-                else:
-                    ### Copy any upload files.
-                    if gems_project.has_input_files:
-                        try:
-                            copyUploadFilesToProject(thisTransaction, gems_project)
-                        except Exception as error:
-                            log.error("There was a problem uploading the input: " + str(error))
-                            raise error
-                    ### Write the logs to file.
-                    try:
-                        request = thisTransaction.request_dict
-                        writeRequestToFile(request, logs_dir)
-                        writeProjectLogFile(gems_project, logs_dir)
-                        return gems_project
-                    except Exception as error:
-                        log.error("There was a problem writing the project logs: " + str(error))
-                        raise error
-
+        ### Write the logs to file.
+        try:
+            request = thisTransaction.request_dict
+            writeRequestToFile(request, logs_dir)
+            writeProjectLogFile(gems_project, logs_dir)
+            return gems_project
+        except Exception as error:
+            log.error("There was a problem writing the project logs: " + str(error))
+            raise error
 
 ## Pass in a transaction, figure out the requestingAgent. OK if it doesn't exist.
 #   Default is command line, replaced if a frontend project exists.
@@ -157,19 +152,17 @@ def setupProjectDirs(projectDir):
     except:
         log.error("There was a problem with the projectDir.")
         raise error
-    else:
-        #Start a log file for the project and put it in uUUID dir
-        logs_dir = projectDir + "logs/"
-        try:
-            if not os.path.exists(logs_dir):
-                log.debug("creating the logs dir in project")
-                os.makedirs(logs_dir)
-
-            log.debug("logs_dir: " + logs_dir)
-            return logs_dir
-        except Exception as error:
-            log.error("There was a problem with the logs dir.")
-            raise error
+    #Start a log file for the project and put it in uUUID dir
+    logs_dir = projectDir + "logs/"
+    try:
+        if not os.path.exists(logs_dir):
+            log.debug("creating the logs dir in project")
+            os.makedirs(logs_dir)
+        log.debug("logs_dir: " + logs_dir)
+        return logs_dir
+    except Exception as error:
+        log.error("There was a problem with the logs dir.")
+        raise error
 
 
 ## Write the original request to file.
