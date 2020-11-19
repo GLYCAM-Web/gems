@@ -39,7 +39,7 @@ def projectExists(thisTransaction : Transaction):
             log.debug("No projectDir found.")
             return False
 
-def addResponse(buildState : BuildState, thisTransaction : Transaction, outputDirPath : str):        
+def addResponse(buildState : BuildState, thisTransaction : Transaction, conformerID : str):        
     log.info("addResponse() was called.")
     try:
         pUUID = getProjectpUUID(thisTransaction)
@@ -47,20 +47,20 @@ def addResponse(buildState : BuildState, thisTransaction : Transaction, outputDi
     except Exception as error:
         log.error("Problem finding the project pUUID or sequence in the transaction: " + str(error))
         raise error
+# "payload": "97b8338e-bdf5-4120-bb7e-609e4097af33",
+# "sequence": "DNeu5Aca2-6DGalpb1-4DGlcpNAcb1-6[DNeu5Aca2-6DGalpb1-4DGlcpNAcb1-2]DManpa1-6[DNeu5Aca2-6DGalpb1-4DGlcpNAcb1-2[DNeu5Aca2-6DGalpb1-4DGlcpNAcb1-4]DManpa1-3]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH",
+# "seqID": "b0f05178-eeb3-536c-8937-bfb1b797c2a8",
+# "conformerID" : "44a25e2c-c7b5-5683-bc63-717ca66f23b5",         
+# "conformerPath": "ProjectID/Requested_Structures/conformerID/",
+# "fullDirectory": "/website/userdata/tools/cb/git-ignore-me_userdata/Builds/97b8338e-bdf5-4120-bb7e-609e4097af33/Requested_Structures/44a25e2c-c7b5-5683-bc63-717ca66f23b5",
+# "downloadUrl": "http://172.25.0.2/json/download/cb/97b8338e-bdf5-4120-bb7e-609e4097af33/website/userdata/tools/cb/git-ignore-me_userdata/Builds/97b8338e-bdf5-4120-bb7e-609e4097af33/Requested_Structures/44a25e2c-c7b5-5683-bc63-717ca66f23b5"
 
     gemsProject = thisTransaction.response_dict['project']
     indexOrdered = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
     seqID = getSeqIDForSequence(indexOrdered)
-    ## No, they want a link to the symlink in Requested_Builds, which is yet to be generated
-    ## So this really needs to move. Which is good. Need a GenerateResponse function that does that.
-    downloadUrl = getDownloadUrl(gemsProject['pUUID'], "cb", outputDirPath)
     # By the time build3DStructure() is called, evaluation response exists.
     #  all we need to do is build the output and append it.
-    log.debug("payload: " + pUUID)
-    log.debug("sequence: " + sequence)
-    log.debug("seqID: " + seqID)
-    log.debug("downloadUrl: " + downloadUrl)
-    output = sequence_io.Build3DStructureOutput(pUUID, sequence, seqID, outputDirPath, downloadUrl)
+    output = sequence_io.Build3DStructureOutput(pUUID, sequence, seqID, conformerID)
     log.debug("Build3DStructure output: " + repr(output))
     outputs = []
     outputs.append(output)
@@ -304,27 +304,11 @@ def createSymLinkInRequestedStructures(projectDir : str, buildDir : str, conform
 
 # Create default symlinks. Works for either existing/new conformer/default.
 # outputDir can be Existing_Builds/ or New_Builds/ followed by a conformerID or "default"
-# def createDefaultSymLinkBuildsDirectory(projectDir : str, outputDir : str):
-#     log.info("createDefaultSymLinkBuildsDirectory() was called")
-#     try:
-#         parent_dir = projectDir
-#         path_down_to_source = outputDir
-#         path_down_to_dest_dir = None
-#         commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, "defaultFolder", parent_dir)
-#         path_down_to_source = "defaultFolder/mol_min.pdb"
-#         commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, "default.pdb", parent_dir)
-#         path_down_to_source = "defaultFolder/structure.pdb"
-#         commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, "default_unminimized.pdb", parent_dir)
-#     except Exception as error:
-#         log.error("Cound not create default symlinks in Builds/" + str(error))
-#         raise error
-
-def createDefaultSymLinkSequencesDirectory(this_seqID : str, conformerID : str, buildStrategyID : str):
-    log.info("createDefaultSymLinkSequencesDirectory() was called")
+def createDefaultSymLinkBuildsDirectory(projectDir : str, outputDir : str):
+    log.info("createDefaultSymLinkBuildsDirectory() was called")
     try:
-        sequence_dir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/Sequences/"
-        parent_dir = sequence_dir + this_seqID + "/" + buildStrategyID + "/" 
-        path_down_to_source = "All_Builds/" + conformerID
+        parent_dir = projectDir
+        path_down_to_source = outputDir
         path_down_to_dest_dir = None
         commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, "defaultFolder", parent_dir)
         path_down_to_source = "defaultFolder/mol_min.pdb"
@@ -332,8 +316,24 @@ def createDefaultSymLinkSequencesDirectory(this_seqID : str, conformerID : str, 
         path_down_to_source = "defaultFolder/structure.pdb"
         commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, "default_unminimized.pdb", parent_dir)
     except Exception as error:
-        log.error("Cound not create default symlinks in Sequences/" + str(error))
+        log.error("Cound not create default symlinks in Builds/" + str(error))
         raise error
+
+# def createDefaultSymLinkSequencesDirectory(this_seqID : str, conformerID : str, buildStrategyID : str):
+#     log.info("createDefaultSymLinkSequencesDirectory() was called")
+#     try:
+#         sequence_dir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/Sequences/"
+#         parent_dir = sequence_dir + this_seqID + "/" + buildStrategyID + "/" 
+#         path_down_to_source = "All_Builds/" + conformerID
+#         path_down_to_dest_dir = None
+#         commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, "defaultFolder", parent_dir)
+#         path_down_to_source = "defaultFolder/mol_min.pdb"
+#         commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, "default.pdb", parent_dir)
+#         path_down_to_source = "defaultFolder/structure.pdb"
+#         commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, "default_unminimized.pdb", parent_dir)
+#     except Exception as error:
+#         log.error("Cound not create default symlinks in Sequences/" + str(error))
+#         raise error
 
 def addSequenceFolderSymLinkToNewBuild(sequenceID:str, buildStrategyID:str, projectID:str, conformerID:str):
     log.info("addSequenceFolderSymLinkForConformer() was called.")
@@ -343,7 +343,7 @@ def addSequenceFolderSymLinkToNewBuild(sequenceID:str, buildStrategyID:str, proj
     parent_dir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/"
     # sequencePath = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/Sequences/"
     # seqIDPath = sequencePath + sequenceID
-    path_down_to_source = 'Builds/' + projectID + "/New_Builds/"
+    path_down_to_source = 'Builds/' + projectID + "/New_Builds/" + conformerID
     path_down_to_dest_dir = 'Sequences/' + sequenceID + '/' + buildStrategyID + '/All_Builds/'
     log.debug("Creating symlink with parentDir " + parent_dir + " called " + conformerID + " from " + path_down_to_dest_dir + " pointing to " + path_down_to_source)
 # make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, dest_link_label, parent_directory)

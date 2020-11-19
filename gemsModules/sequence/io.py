@@ -7,6 +7,7 @@ from pydantic.schema import schema
 from gemsModules.common.loggingConfig import *
 from gemsModules.common import io as commonio
 from gemsModules.project import dataio as projectio
+from gemsModules.project import projectUtil as projectUtil
 import traceback
 
 if loggers.get(__name__):
@@ -188,25 +189,27 @@ class Build3DStructureOutput(BaseModel):
     payload : str =  ""
     sequence : str  = ""
     seqID : str = ""
+    conformerID : str = ""
     subDirectory : str = ""
     downloadUrl : str = ""
 
-    def __init__(self, payload:str, sequence:str, seqID:str, subDirectory:str, downloadUrl:str):
+    def __init__(self, payload:str, sequence:str, seqID:str, conformerID:str):
         super().__init__()
         log.info("Initializing BuildOutput.")
-
-        log.debug("payload: " + payload)
-        log.debug("sequence: " + sequence)
-        log.debug("seqID: " + seqID)
-        log.debug("subDirectory: " + subDirectory)
-        log.debug("downloadUrl: " + downloadUrl)
-
         self.payload = payload
         self.sequence = sequence
         self.seqID = seqID
-        self.subDirectory = subDirectory
-        self.downloadUrl = downloadUrl
+        self.conformerID = conformerID
+        self.subDirectory = '/Requested_Builds/' + conformerID + '/'
+        #self.downloadUrl = downloadUrl
+        self.downloadUrl = projectUtil.getDownloadUrl(payload, "cb", self.subDirectory)
 
+        log.debug("payload(projectID): " + self.payload)
+        log.debug("sequence: " + self.sequence)
+        log.debug("seqID: " + self.seqID)
+        log.debug("conformerID: " + self.conformerID)
+        log.debug("subDirectory: " + self.subDirectory)
+        log.debug("downloadUrl: " + self.downloadUrl)
 
 class ServiceResponse(BaseModel):
     """Holds a response from a Service requested of the Sequence Entity."""
