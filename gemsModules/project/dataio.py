@@ -162,7 +162,7 @@ class CbProject(Project):
             ##User may provide a project_dir.
             if 'project_dir' in request_dict['project'].keys():
                 project = request_dict['project']
-                self.project_dir = project['project_dir']
+                self.project_dir = project['project_dir'] + self.pUUID
             else:
                 ## Default, if none offered by the user.
                 self.project_dir =  buildDefaultProjectDir(self.project_type , self.pUUID)
