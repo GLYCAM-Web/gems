@@ -20,7 +20,18 @@
         "geometryOptions": {
             "rotamerData": [
                 {
-                    "linkageLabel": "6",
+                    "linkageLabel": "21",
+                    "dihedrals": [
+                        {
+                            "dihedralName": "omega",
+                            "selectedRotamers": [
+                                "gg"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "linkageLabel": "25",
                     "dihedrals": [
                         {
                             "dihedralName": "phi",
@@ -30,7 +41,7 @@
                             ]
                         },
                         {
-                            "dihedralName": "omg",
+                            "dihedralName": "omega",
                             "selectedRotamers": [
                                 "gg"
                             ]
@@ -38,7 +49,7 @@
                     ]
                 },
                 {
-                    "linkageLabel": "9",
+                    "linkageLabel": "27",
                     "dihedrals": [
                         {
                             "dihedralName": "phi",
@@ -48,7 +59,7 @@
                             ]
                         },
                         {
-                            "dihedralName": "omg",
+                            "dihedralName": "omega",
                             "selectedRotamers": [
                                 "gg"
                             ]
@@ -56,10 +67,10 @@
                     ]
                 },
                 {
-                    "linkageLabel": "10",
+                    "linkageLabel": "29",
                     "dihedrals": [
                         {
-                            "dihedralName": "omg",
+                            "dihedralName": "omega",
                             "selectedRotamers": [
                                 "gg"
                             ]
@@ -67,7 +78,7 @@
                     ]
                 },
                 {
-                    "linkageLabel": "13",
+                    "linkageLabel": "31",
                     "dihedrals": [
                         {
                             "dihedralName": "phi",
@@ -77,18 +88,7 @@
                             ]
                         },
                         {
-                            "dihedralName": "omg",
-                            "selectedRotamers": [
-                                "gg"
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "linkageLabel": "14",
-                    "dihedrals": [
-                        {
-                            "dihedralName": "omg",
+                            "dihedralName": "omega",
                             "selectedRotamers": [
                                 "gg",
                                 "tg"
@@ -97,7 +97,7 @@
                     ]
                 },
                 {
-                    "linkageLabel": "16",
+                    "linkageLabel": "33",
                     "dihedrals": [
                         {
                             "dihedralName": "phi",
@@ -107,7 +107,7 @@
                             ]
                         },
                         {
-                            "dihedralName": "omg",
+                            "dihedralName": "omega",
                             "selectedRotamers": [
                                 "gg",
                                 "tg"
@@ -119,41 +119,40 @@
         }
     },
     "project": {
-        "_state": "<django.db.models.base.ModelState object at 0x7f1412c20a90>",
-        "id": "ff2dfc06-8db3-45ae-a4b4-71202618ea52",
+        "_state": "<django.db.models.base.ModelState object at 0x7fb3df3dbc50>",
+        "id": "6d8e0a70-664b-4432-855f-d0f929e35ec1",
         "user_id": "None",
         "email": "",
         "title": "",
         "comment": "",
-        "timestamp": "2020-11-05 18:02:09.061796+00:00",
+        "timestamp": "2020-05-28 19:58:46.574178+00:00",
         "project_type": "cb",
-        "projID": "ee8a2836-77d9-4a69-9414-6ae46ed3e55e",
+        "projID": " ",
         "requesting_agent": "website",
-        "gems_version": "64c9837519a45a52e175adcb83e1b638ccfd8147",
-        "gems_branch": "gems-dev",
-        "gmml_version": "935488f4f7224e807e9fac728b1d3388b0cb358d",
+        "gems_version": "07405afc61db9c3d566f337d219572ac276509f1",
+        "gems_branch": "structureTracking",
+        "gmml_version": "82afc57666c0758614e12cdbfbf615f6459e4f32",
         "gmml_branch": "gmml-dev",
         "site_mode": "CONTAINERS",
-        "site_host_name": "172.25.0.2",
+        "site_host_name": "192.168.16.2",
         "force_field": "",
         "parameter_version": "",
         "amber_version": "",
         "json_api_version": "0.0.1",
-        "userproject_ptr_id": "ff2dfc06-8db3-45ae-a4b4-71202618ea52",
+        "userproject_ptr_id": "6d8e0a70-664b-4432-855f-d0f929e35ec1",
         "sequence": "DNeu5Aca2-6DGalpb1-4DGlcpNAcb1-6[DNeu5Aca2-6DGalpb1-4DGlcpNAcb1-2]DManpa1-6[DNeu5Aca2-6DGalpb1-4DGlcpNAcb1-2[DNeu5Aca2-6DGalpb1-4DGlcpNAcb1-4]DManpa1-3]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH",
-        "seqID": "b0f05178-eeb3-536c-8937-bfb1b797c2a8",
-        "gemsProject": "ee8a2836-77d9-4a69-9414-6ae46ed3e55e",
+        "seqID": "None",
         "ion": "No",
-        "solvation": "Yes",
+        "solvation": "no",
         "solvation_size": "8",
         "solvation_distance": "2",
         "solvation_shape": "REC",
         "num_structures": "1",
         "linkage_info": "",
         "rotamer_info": "",
-        "rotamer_list": "['6_phi_t', '6_phi_-g', '6_omg_gg', '9_phi_t', '9_phi_-g', '9_omg_gg', '10_omg_gg', '13_phi_t', '13_phi_-g', '13_omg_gg', '14_omg_gg', '14_omg_tg', '16_phi_t', '16_phi_-g', '16_omg_gg', '16_omg_tg']",
+        "rotamer_list": "['21_omega_gg', '25_phi_t', '25_phi_-g', '25_omega_gg', '27_phi_t', '27_phi_-g', '27_omega_gg', '29_omega_gg', '31_phi_t', '31_phi_-g', '31_omega_gg', '31_omega_tg', '33_phi_t', '33_phi_-g', '33_omega_gg', '33_omega_tg']",
         "angle_info": "",
         "job_info": "",
-        "rotamer_data": "[{\"linkageLabel\": \"6\", \"dihedrals\": [{\"dihedralName\": \"phi\", \"selectedRotamers\": [\"t\", \"-g\"]}, {\"dihedralName\": \"omg\", \"selectedRotamers\": [\"gg\"]}]}, {\"linkageLabel\": \"9\", \"dihedrals\": [{\"dihedralName\": \"phi\", \"selectedRotamers\": [\"t\", \"-g\"]}, {\"dihedralName\": \"omg\", \"selectedRotamers\": [\"gg\"]}]}, {\"linkageLabel\": \"10\", \"dihedrals\": [{\"dihedralName\": \"omg\", \"selectedRotamers\": [\"gg\"]}]}, {\"linkageLabel\": \"13\", \"dihedrals\": [{\"dihedralName\": \"phi\", \"selectedRotamers\": [\"t\", \"-g\"]}, {\"dihedralName\": \"omg\", \"selectedRotamers\": [\"gg\"]}]}, {\"linkageLabel\": \"14\", \"dihedrals\": [{\"dihedralName\": \"omg\", \"selectedRotamers\": [\"gg\", \"tg\"]}]}, {\"linkageLabel\": \"16\", \"dihedrals\": [{\"dihedralName\": \"phi\", \"selectedRotamers\": [\"t\", \"-g\"]}, {\"dihedralName\": \"omg\", \"selectedRotamers\": [\"gg\", \"tg\"]}]}]"
+        "rotamer_data": "[{\"linkageLabel\": \"21\", \"dihedrals\": [{\"dihedralName\": \"omega\", \"selectedRotamers\": [\"gg\"]}]}, {\"linkageLabel\": \"25\", \"dihedrals\": [{\"dihedralName\": \"phi\", \"selectedRotamers\": [\"t\", \"-g\"]}, {\"dihedralName\": \"omega\", \"selectedRotamers\": [\"gg\"]}]}, {\"linkageLabel\": \"27\", \"dihedrals\": [{\"dihedralName\": \"phi\", \"selectedRotamers\": [\"t\", \"-g\"]}, {\"dihedralName\": \"omega\", \"selectedRotamers\": [\"gg\"]}]}, {\"linkageLabel\": \"9\", \"dihedrals\": [{\"dihedralName\": \"omega\", \"selectedRotamers\": [\"gg\"]}]}, {\"linkageLabel\": \"1\", \"dihedrals\": [{\"dihedralName\": \"phi\", \"selectedRotamers\": [\"t\", \"-g\"]}, {\"dihedralName\": \"omega\", \"selectedRotamers\": [\"gg\", \"tg\"]}]}, {\"linkageLabel\": \"3\", \"dihedrals\": [{\"dihedralName\": \"phi\", \"selectedRotamers\": [\"t\", \"-g\"]}, {\"dihedralName\": \"omega\", \"selectedRotamers\": [\"gg\", \"tg\"]}]}]"
     }
 }

@@ -45,7 +45,6 @@ def importEntity(requestedEntity):
 
             if module_spec is None:
                 log.error("The module spec returned None for rquestedEntity: " + requestedEntity)
-                log.error(traceback.format_exc())
                 raise FileNotFoundError(requestedEntity)
 
             log.debug("module_spec: " + str(module_spec))
@@ -67,6 +66,7 @@ def parseInput(thisTransaction):
     # Check to see if there are errors.  If there are, bail, but give a reason
     if thisTransaction.request_dict is None:
         appendCommonParserNotice(thisTransaction,'JsonParseError')
+        log.error(traceback.format_exc())
         raise AttributeError("request_dict")
     try:
         TransactionSchema(**thisTransaction.request_dict)
@@ -163,6 +163,7 @@ def getGemsHome():
           BASH:  export GEMSHOME=/path/to/gems
           SH:    setenv GEMSHOME /path/to/gems
         """)
+
         raise AttributeError("GEMSHOME")
     return GEMSHOME
 
@@ -192,8 +193,8 @@ def make_relative_symbolic_link(
         log.debug("The current working directory is : " + os.getcwd())
     if not os.path.exists(path_down_to_source):
         log.debug("Link source does not exist: " + path_down_to_source)
-        log.debug("Allowing anyway.")
-#        raise AttributeError(path_down_to_source)
+        log.debug("Allowing anyway.") # Oliver: Seems odd that this would work.
+        #raise AttributeError(path_down_to_source)
     if path_down_to_dest_dir is None:
         if dest_link_label is None: 
             path_down_to_dest_label=os.path.basename(path_down_to_source)
@@ -202,7 +203,6 @@ def make_relative_symbolic_link(
     else:
         if not os.path.isdir(path_down_to_dest_dir): 
             log.error("The path down to the link to be created is not a directory : " + path_down_to_dest_dir)
-            log.error(traceback.format_exc())
             raise AttributeError(path_down_to_dest_dir)
         if dest_link_label is None: 
             path_down_to_dest_label=os.path.join(path_down_to_dest_dir, os.path.basename(path_down_to_source))
@@ -217,7 +217,9 @@ def make_relative_symbolic_link(
         )
     log.debug("About to link this source : " + relative_path_to_source)
     log.debug(".... to this destination : " + path_down_to_dest_label)
-    os.symlink(relative_path_to_source,path_down_to_dest_label)
+    if os.path.islink(dest_link_label): # Oliver addition to allow overwrites
+        os.remove(dest_link_label)
+    os.symlink(relative_path_to_source, path_down_to_dest_label)
     if parent_directory is not None:
         os.chdir(owd)
 

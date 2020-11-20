@@ -55,102 +55,100 @@ def appendBuild3DStructureResponse(thisTransaction : Transaction, pUUID : str):
 ##  @brief Creates a jobsubmission for Amber. Submits that. Updates the transaction to reflect this.
 #   @param Transaction thisTransaction
 #   @param Service service (optional)
-def build3DStructure(buildState : BuildState, thisTransaction : Transaction):
+def build3DStructure(buildState : BuildState, thisTransaction : Transaction, outputDirPath : str):
     log.info("build3DStructure() was called.")
-
     try:
-        pUUID=sequenceProjects.getProjectpUUID(thisTransaction)
+        pUUID = sequenceProjects.getProjectpUUID(thisTransaction)
+        sequence = getSequenceFromTransaction(thisTransaction)
     except Exception as error:
-        log.error("There was a problem finding the project pUUID: " + str(error))
+        log.error("Problem finding the project pUUID or sequence in the transaction: " + str(error))
         raise error
-    else:
-        try:
-            sequence = getSequenceFromTransaction(thisTransaction)
-        except Exception as error:
-            log.error("There was a problem getting a sequence from the transaction: " + str(error))
+    
+    ##TODO: figure out how to return this response now, and still continue this logic.
+    log.debug("About to getCbBuilderForSequence")
+    builder = getCbBuilderForSequence(sequence)
+    try:
+        ## If this is default, set the output path, otherwise use what was passed in.
+        if buildState.isDefaultStructure:
+            log.debug("Generating default in: " + outputDirPath)
+            builder.GenerateSingle3DStructureDefaultFiles(outputDirPath)
         else:
-            gemsProject = thisTransaction.response_dict['gems_project']
-            ## Generate output first
-            indexOrdered = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
-            seqID = getSeqIDForSequence(indexOrdered)
-            downloadUrl = getDownloadUrl(gemsProject['pUUID'], "cb")
-            ## By the time build3DStructure() is called, evaluation response exists.
-            ##  all we need to do is build the output and append it.
-            payload = pUUID
-            log.debug("payload: " + pUUID)
-            log.debug("sequence: " + sequence)
-            log.debug("seqID: " + seqID)
-            log.debug("downloadUrl: " + downloadUrl)
+            log.debug("The request is for a conformer with outputDirPath: " + outputDirPath)
+                ## Need to put the info into the GMML struct: SingleRotamerInfoVector
+            gmmlConformerInfo = populateGMMLConformerInfoStruct(buildState)
+            builder.GenerateSpecific3DStructure(gmmlConformerInfo, outputDirPath)
+    except Exception as error:
+        log.error("There was a problem generating this build: " + str(error))
+        raise error
+    ##TODO This needs to move - Sequence should not be deciding how 
+    ## minimization will happen.  That is the job of mmservice.
+    amberSubmissionJson='{"project" : \
+    {\
+    "id":"' + pUUID + '", \
+    "workingDirectory":"' + outputDirPath + '", \
+    "type":"minimization", \
+    "system_phase":"gas", \
+    "water_model":"none" \
+    } \
+    }'
+    # TODO:  Make this resemble real code....
+    the_json_file = outputDirPath + "amber_submission.json"
+    min_json_in = open (the_json_file , 'w')
+    min_json_in.write(amberSubmissionJson)
+    min_json_in.close()
 
-            log.debug("Looky here.")
+    from gemsModules.mmservice.amber.amber import manageIncomingString
+    manageIncomingString(amberSubmissionJson)
+    ## everything up to here -- all the amber stuff --
+    ## is what needs to move
 
-            output = sequenceIO.Build3DStructureOutput(payload, sequence, seqID, downloadUrl)
+##  @brief Pass a BuildState, get a gmml level struct with conformer information.
+##  @param BuildState. Information to generate a specific, single 3D shape.
+#   @return SingleRotamerInfoVector object from gmml.
+# def populateGMMLConformerInfoStruct(buildState : BuildState):
+#     log.info("populateGMMLConformerInfoStruct() was called.")
+#     try:
+#         gmmlConformerInfo = gmml.single_rotamer_info_vector()
+#         for conf in buildState.sequenceConformation:
+#             singleRotamerInfo = gmml.SingleRotamerInfo()
+#             singleRotamerInfo.linkageIndex = conf['linkageLabel'] # This is a bad gems name. Notes in RotamerConformation class.
+#             singleRotamerInfo.linkageName = conf['linkageLabel'] # This is a better match, but GMML probably doesn't need to know user labels.
+#             singleRotamerInfo.dihedralName = conf['dihedralName']
+#             singleRotamerInfo.selectedRotamer = conf['rotamer']
+#             gmmlConformerInfo.push_back(singleRotamerInfo)
+#             #singleRotamerInfo.numericValue = conf['numericValue'] # Not supported at GMML or gems level yet.
+#             #log.debug("LinkageLabel: " + conf['linkageLabel'] + ", dihedralName: " + conf['dihedralName'] + ", rotamer: " + conf['rotamer'])
+#             #print(conf)
+#     except Exception as error:
+#         log.error("Could not populateGMMLConformerInfoStruct: " + str(error) )
+#         raise error
+#     else:
+#         return gmmlConformerInfo
 
-            log.debug("Build3DStructure output: " + repr(output))
-            outputs = []
-            outputs.append(output)
-            inputs = []
-            inputs.append(sequence)
-            serviceResponse = sequenceIO.ServiceResponse("Build3DStructure", inputs, outputs)
-            responseObj = serviceResponse.dict(by_alias=True)
-            commonLogic.updateResponse(thisTransaction, responseObj)
-            ##TODO: figure out how to return this response now, and still continue this logic.
+# This poor code is a result of how the combinations are generated in 
+# structureinfo.generateCombinationsFromRotamerData().
+def populateGMMLConformerInfoStruct(buildState : BuildState):
+    log.info("populateGMMLConformerInfoStruct() was called.")
+# example buildState.sequenceConformation:
+# ('6', 'h', '-g', '6', 'o', 'gg', '9', 'h', '-g', '9', 'o', 'gg', '10', 'o', 'gg', '13', 'h', '-g', '13', 'o', 'gg', '14', 'o', 'tg', '16', 'h', '-g', '16', 'o', 'tg')
+    try:
+        gmmlConformerInfo = gmml.single_rotamer_info_vector()
+        for rotList in divideListIntoChunks(buildState.sequenceConformation, 3):
+            singleRotamerInfo = gmml.SingleRotamerInfo()
+            singleRotamerInfo.linkageIndex = rotList[0]
+            singleRotamerInfo.dihedralName = rotList[1]
+            singleRotamerInfo.selectedRotamer = rotList[2]
+            gmmlConformerInfo.push_back(singleRotamerInfo)
+            #singleRotamerInfo.numericValue = conf['numericValue'] # Not supported at GMML or gems level yet.
+            log.debug("LinkageLabel: " + rotList[0] + ", dihedralName: " + rotList[1] + ", rotamer: " + rotList[2])
+    except Exception as error:
+        log.error("Could not populateGMMLConformerInfoStruct: " + str(error) )
+        raise error
+    return gmmlConformerInfo
 
-            log.debug("About to getCbBuilderForSequence")
-            builder = getCbBuilderForSequence(sequence)
-
-            try:
-                projectDir = sequenceProjects.getProjectSubdir(thisTransaction)
-            except Exception as error:
-                log.error("There was a problem getting this build's subdir: " + str(error))
-                raise error
-            else:
-                try:
-#####
-#####  START HERE
-#####
-                    ## Check if this is the default build or if it has user options specified.
-                    if sequenceProjects.checkIfDefaultStructureRequest(thisTransaction):
-                        destination = projectDir + '/New_Builds/structure/'
-                        #destination = projectDir + 'default'
-                        log.debug("The request is for a single structure to be placed in: " + destination)
-                        # ## Defaults for next build 
-                        # ##     output directory: projectDir
-                        # ##     types of files to write:  'OFFFILE' -and- 'PDB'
-                        # ##     default filename prefix:  'structure'
-                        builder.GenerateSingle3DStructureDefaultFiles(destination)
-                    else:
-                        ##TODO: Test this after GMML can accept user settings.
-                        log.debug("The request is for the a set of rotamers.")
-                        builder.GenerateRotamerDefaultFiles(destination, buildState)
-                except Exception as error:
-                    log.error("There was a problem generating this build: " + str(error))
-                    raise error
-                else:
-
-                    ##TODO This needs to move - Sequence should not be deciding how 
-                    ## minimization will happen.  That is the job of mmservice.
-                    amberSubmissionJson='{"project" : \
-                        {\
-                        "id":"' + pUUID + '", \
-                        "workingDirectory":"' + destination + '", \
-                        "type":"minimization", \
-                        "system_phase":"gas", \
-                        "water_model":"none" \
-                        } \
-                    }'
-                    # TODO:  Make this resemble real code....
-                    the_json_file = destination + "amber_submission.json"
-                    min_json_in = open (the_json_file , 'w')
-                    min_json_in.write(amberSubmissionJson)
-                    min_json_in.close()
-
-                    from gemsModules.mmservice.amber.amber import manageIncomingString
-                    manageIncomingString(amberSubmissionJson)
-                    ## everything up to here -- all the amber stuff --
-                    ## is what needs to move
-
-
+def divideListIntoChunks(l, n):
+    for i in range(0, len(l), n):
+        yield l[i:i + n]
 
 ##  @brief Pass a sequence string, get a builder for that sequence.
 ##  @param String sequence - GLYCAM Condensed string sequence.

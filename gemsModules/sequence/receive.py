@@ -42,35 +42,35 @@ def receive(thisTransaction : delegatorio.Transaction):
     input_services = thisTransaction.request_dict['entity']['services']
     theServices=commonlogic.getTypesFromList(input_services)
     ## for each requested service:
-    for i in theServices:
-        log.debug("service, i: " + i)
+    for currentService in theServices:
+        log.debug("service, currentService: " + currentService)
         #####  the automated module loading doesn't work, and I can't figure out how to make it work,
               # that is:
-              #  requestedModule='.'+settings.serviceModules[i]
+              #  requestedModule='.'+settings.serviceModules[currentService]
               #  the_spec = importlib.util.find_spec('.sequence.entity.evaluate',gemsModules)
               # .... and many variants thereof
         #####  so, writing something ugly for now
         ## Only work on recognized services. Add an error and carry on checking other services if an unknown service is found.
         ##  TODO: Add a check for options like "On fail quit"
         ##  
-        if i not in sequenceSettings.serviceModules.keys():
-            if i not in common.settings.serviceModules.keys():
+        if currentService not in sequenceSettings.serviceModules.keys():
+            if currentService not in common.settings.serviceModules.keys():
                 log.error("The requested service is not recognized. Try: " + str(sequenceSettings.serviceModules.keys()))
-                common.settings.appendCommonParserNotice( thisTransaction,'ServiceNotKnownToEntity',i)
+                common.settings.appendCommonParserNotice( thisTransaction,'ServiceNotKnownToEntity',currentService)
             else:
                 pass
         ## TODO:  move all the service call parts to 'sequence/logic.py'
         ## if it is known, try to do it
-        elif i == "Evaluate":
+        elif currentService == "Evaluate":
             log.debug("Evaluate service requested from sequence entity.")
             from gemsModules.sequence import evaluate
             try:
-                evaluate.evaluateCondensedSequencePydantic(thisTransaction, i)
+                evaluate.evaluateCondensedSequencePydantic(thisTransaction, currentService)
             except Exception as error:
                 log.error("There was a problem evaluating the condensed sequence: " + str(error)) 
                 log.error(traceback.format_exc())
                 common.settings.appendCommonParserNotice( thisTransaction, 'InvalidInput', 'InvalidInputPayload')
-        elif i == 'Build3DStructure':
+        elif currentService == 'Build3DStructure':
             log.debug("Build3DStructure service requested from sequence entity.")
             try:
                 ##first evaluate the requested structure. Only build if valid.
@@ -91,8 +91,8 @@ def receive(thisTransaction : delegatorio.Transaction):
                         raise error
                 else:
                     log.error("Invalid Sequence. Cannot build.")
-                    common.settings.appendCommonParserNotice( thisTransaction,'InvalidInput',i)
-        elif i == "Validate":
+                    common.settings.appendCommonParserNotice( thisTransaction,'InvalidInput',currentService)
+        elif currentService == "Validate":
             log.debug("Validate service requested from sequence entity.")
             from gemsModules.sequence import evaluate
             try:
@@ -102,7 +102,7 @@ def receive(thisTransaction : delegatorio.Transaction):
                 common.settings.appendCommonParserNotice( thisTransaction, 'InvalidInput', 'InvalidInputPayload')
         else:
             log.error("got to the else, so something is wrong")
-            common.settings.appendCommonParserNotice( thisTransaction,'ServiceNotKnownToEntity',i)
+            common.settings.appendCommonParserNotice( thisTransaction,'ServiceNotKnownToEntity',currentService)
 
     ## prepares the transaction for return to the requestor, success or fail.     
     thisTransaction.build_outgoing_string()

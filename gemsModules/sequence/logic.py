@@ -39,99 +39,98 @@ def getOptionsFromTransaction(thisTransaction: Transaction):
 #       is needed, depending on the request and whether an existing structure fits the request.
 def manageSequenceRequest(thisTransaction : Transaction):
     log.info("manageSequenceRequest() was called.")
+    from gemsModules.sequence import build as sequenceBuild
     ##  Start a project, if needed
     try:
         if sequenceProjects.projectExists(thisTransaction):
             log.debug("Existing project.")
         else:
+            log.debug("Starting a new project.")
             startProject(thisTransaction)
     except Exception as error:
         log.error("There was a problem creating a project: " + str(error))
+        log.error(traceback.format_exc())
         raise error
-    else:
-        ##  Build structureInfo object
-        try:
-            structureInfo = buildStructureInfo(thisTransaction)
-            log.debug("structureInfo: " + str(structureInfo))
-        except Exception as error:
-            log.error("There was a problem building structureInfo: " + str(error))
-            raise error
-        else:
-            ##  Save some copies of structureInfo for status tracking.
-            try:
-                ## Determine whether to save or update.
-                projectDir = getProjectDir(thisTransaction)
-                filename = projectDir + "logs/structureInfo_request.json"
-                if os.path.exists(filename):
-                    log.debug("\n\nstructureInfo_request.json found. Updating both the request and the status file.\n\n")
-                    updateStructureInfoWithUserOptions(thisTransaction, structureInfo, filename)
-                    statusFile = projectDir + "logs/structureInfo_status.json"
-                    if os.path.exists(statusFile):
-                        updateStructureInfoWithUserOptions(thisTransaction, structureInfo, statusFile)
-                else:   
-                    ##Create new files for tracking this project.
-                    saveRequestInfo(structureInfo, projectDir)
-            except Exception as error:
-                log.error("There was a problem saving the request info: " + str(error))
-            else:
-                ## Each buildState represents a single build request.
-                for buildState in structureInfo.buildStates:
-                    log.debug("Checking if a structure has been built in this buildState: ")
-                    log.debug("buildState: " + repr(buildState))
-                    ##  check if requested structures exitst, update structureInfo_status.json and project when exist
-                    try:
-                        if sequenceProjects.structureExists(buildState, thisTransaction):
-                            log.debug("Found an existing structure.")
-                            this_pUUID = sequenceProjects.getProjectpUUID(thisTransaction)
-                            this_sequence = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
-                            this_seqID = getSeqIDForSequence(this_sequence)
-                            sequenceProjects.createProjectDirectoryStructure(projectDir)
-                            sequenceProjects.createSequenceSymLinks(this_seqID, this_pUUID)
-                            sequenceProjects.createProjectSymlinks(projectDir)
-                            ##TODO: Make this next method more generic, so it can handle rotamers too.
-                            sequenceProjects.respondWithExistingDefaultStructure(thisTransaction)
-                            ##TODO: Update the structureInfo_status.json
-                        else:
-                            log.debug("Need to build this structure.")
-                            try: 
-                                # old:  sequenceProjects.createProjectDirectoryStructure(buildState, thisTransaction)
-                                sequenceProjects.createProjectDirectoryStructure(projectDir)
-                                from gemsModules.sequence import build
-                                build.build3DStructure(buildState, thisTransaction)
-                            except Exception as error:
-                                log.error("There was a problem building the 3D structure: " + str(error))
-                                log.error(traceback.format_exc())
-                                raise error
-                            else:
-                                try:
-                                    this_pUUID = sequenceProjects.getProjectpUUID(thisTransaction)
-                                    this_sequence = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
-                                    this_seqID = getSeqIDForSequence(this_sequence)
-                                    sequenceProjects.createSequenceSymLinks(this_seqID, this_pUUID)
-                                    sequenceProjects.createProjectSymlinks(projectDir)
-                                except Exception as error:
-                                    log.error("There was a problem creating the symbolic links: " + str(error))
-                                    raise error
-                                else:
-                                    try:
-                                        #Updates the statuses in various files and the project
-                                        sequenceProjects.registerBuild(buildState, thisTransaction)
-                                    except Exception as error:
-                                        log.error("There was a problem registering this build: " + str(error))
-                                        raise error
-                                    
-                                    ##  create downloadUrl
-                                    ##  submit to amber for minimization, 
-                                    ##      update structureInfo_status.json again
-                                    ##      update project again
-                                
-                                ##  append response to transaction
-                            
-                    except Exception as error:
-                        log.error("There was a problem checking if the structure exists: " + str(error))
-                        raise error
+
+    ##  Build structureInfo object
+    try:
+        structureInfo = buildStructureInfoOliver(thisTransaction)
+        log.debug("structureInfo: " + str(structureInfo))
+    except Exception as error:
+        log.error("There was a problem building structureInfo: " + str(error))
+        log.error(traceback.format_exc())
+        raise error
+    ##  Save some copies of structureInfo for status tracking.
+    try:
+        ## Determine whether to save or update.
+        projectDir = getProjectDir(thisTransaction)
+        filename = projectDir + "logs/structureInfo_request.json"
+        if os.path.exists(filename):
+            log.debug("\n\nstructureInfo_request.json found. Updating both the request and the status file.\n\n")
+            updateStructureInfoWithUserOptions(thisTransaction, structureInfo, filename)
+            statusFile = projectDir + "logs/structureInfo_status.json"
+            if os.path.exists(statusFile):
+                updateStructureInfoWithUserOptions(thisTransaction, structureInfo, statusFile)
+            else:   
+                ##Create new files for tracking this project.
+                saveRequestInfo(structureInfo, projectDir)
+    except Exception as error:
+        log.error("There was a problem saving the request info: " + str(error))
+        log.error(traceback.format_exc())
+        raise error
+    try:
+        ## Here we need to setup project folder, create some symLinks etc, before we get into each buildState
+        ## Not happy with the organization of this logic. Too much state being passed around and similar code!
+        ## Smells like it should be a class and this stuff goes in the initializer. 
+        this_pUUID = sequenceProjects.getProjectpUUID(thisTransaction)
+        this_sequence = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
+        this_seqID = getSeqIDForSequence(this_sequence)
+        buildStrategyID = "buildStrategyID1" # TODO implement getCurrentBuildStrategyID().
+        sequenceProjects.setupInitialSequenceFolders(this_seqID, this_pUUID, buildStrategyID)
+
+        ## Regardless if requesting default or not, I think I need to generate a default. Otherwise I get into madness
+        ## with figuring out exist status and which conformerID to use in place of default. Then when a default 
+        ## request does come, should it overwrite previous default for old projects?
+        ## A default request is always first, this is now implemented in buildStructureInfo
+        for buildState in structureInfo.buildStates:
+            log.debug("Checking if a structure has been built in this buildState: ")
+            log.debug("buildState: " + repr(buildState))
+            conformerID = buildState.structureDirectoryName # May return "default" or a conformerID
+            ##  check if requested structures exitst, update structureInfo_status.json and project when exist
+            if sequenceProjects.structureExists(buildState, thisTransaction, buildStrategyID):
+                ## Nothing in Sequence/ needs to change. In Builds/ProjectID/
+                ## add symLink in Existing to Sequences/SequenceID/defaults/All_builds/conformerID.
+                log.debug("Found an existing structure.")
+                buildDir = "Existing_Builds/"
+                sequenceProjects.addBuildFolderSymLinkToExistingConformer(this_seqID, buildStrategyID, this_pUUID, conformerID)
+            else: # Doesn't already exist.
+                log.debug("Need to build this structure.")
+                buildDir = "New_Builds/"
+                sequenceProjects.createConformerDirectoryInBuildsDirectory(projectDir, conformerID)
+                sequenceBuild.build3DStructure(buildState, thisTransaction, projectDir + buildDir + conformerID)
+                sequenceProjects.addSequenceFolderSymLinkToNewBuild(this_seqID, buildStrategyID, this_pUUID, conformerID)
+                if conformerID == "default": # And doesn't already exist.
+                    #sequenceProjects.createDefaultSymLinkSequencesDirectory(this_seqID, conformerID, buildStrategyID)
+                    sequenceProjects.createDefaultSymLinkBuildsDirectory(projectDir, buildDir + conformerID)
+
+            # buildDir is either New_Builds/ or Existing_Builds/
+            sequenceProjects.createSymLinkInRequestedStructures(projectDir, buildDir, conformerID)
+            # Needs to be Requested_Structres/. Need to add conformerID separately.
+            sequenceProjects.addResponse(buildState, thisTransaction, conformerID)
+            # This probably needs work    
+            sequenceProjects.registerBuild(buildState, thisTransaction)
 
 
+        #sequenceProjects.createDefaultSymLinkBuildsDirectory(projectDir, buildDir + conformerID)
+            ##  create downloadUrl
+            ##  submit to amber for minimization, 
+            ##      update structureInfo_status.json again
+            ##      update project again                    
+            ##  append response to transaction           
+    except Exception as error:
+        log.error("There was a problem managing this sequence request: " + str(error))
+        log.error(traceback.format_exc())
+        raise error
 
 
 def main():

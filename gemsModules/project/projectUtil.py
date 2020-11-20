@@ -28,59 +28,55 @@ def startProject(thisTransaction : Transaction):
     except Exception as error:
         log.error("There was a problem finding the entity in this transaction: " + str(error))
         raise error
-    else:
-        try:
-            ### Start a project
-            if entity == "Sequence":
-                log.debug("building a cb project.")
-                project = CbProject(thisTransaction.request_dict)
-                
-            elif entity == "StructureFile":
-                log.debug("building a pdb project.")
-                project = PdbProject(thisTransaction.request_dict)
-                
-            elif entity == "Conjugate":
-                log.debug("building a gp project.")
-                project = GpProject(thisTransaction.request_dict)
-                
-            else:
-                log.error("Need to write code to instantiate projects for entity type: " + entity)
-                raise TypeError("entity: " + entity)
-        except Exception as error:
-            log.error("There was a problem starting the project: " + str(error))
-            raise error
-        else:
+    try:
+        ### Start a project
+        if entity == "Sequence":
+            log.debug("building a cb project.")
+            project = CbProject(thisTransaction.request_dict)
 
-            try:
-                addProjectToResponse(project, thisTransaction)
-            except Exception as error:
-                log.error("There was a problem updating thisTransaction: " + str(error))
-                raise error
-            else:
-                ### Find the projectDir.
-                try:
-                    project_dir = project.project_dir
-                    logs_dir = setupProjectDirs(project_dir)
-                except Exception as error:
-                    log.error("There was a problem getting the projectDir: " + str(error))
-                    raise error
-                else:
-                    ### Copy any upload files.
-                    if project.has_input_files == True:
-                        try:
-                            copyUploadFilesToProject(thisTransaction, project)
-                        except Exception as error:
-                            log.error("There was a problem uploading the input: " + str(error))
-                            raise error
-                    ### Write the logs to file.
-                    try:
-                        request = thisTransaction.request_dict
-                        writeRequestToFile(request, logs_dir)
-                        writeProjectLogFile(project, logs_dir)
-                        return project
-                    except Exception as error:
-                        log.error("There was a problem writing the project logs: " + str(error))
-                        raise error
+        elif entity == "StructureFile":
+            log.debug("building a pdb project.")
+            project = PdbProject(thisTransaction.request_dict)
+
+        elif entity == "Conjugate":
+            log.debug("building a gp project.")
+            project = GpProject(thisTransaction.request_dict)
+
+        else:
+            log.error("Need to write code to instantiate projects for entity type: " + entity)
+            raise TypeError("entity: " + entity)
+    except Exception as error:
+        log.error("There was a problem starting the project: " + str(error))
+        raise error
+    try:
+        addProjectToResponse(project, thisTransaction)
+    except Exception as error:
+        log.error("There was a problem updating thisTransaction: " + str(error))
+        raise error
+    ### Find the projectDir.
+    try:
+        project_dir = project.project_dir
+        logs_dir = setupProjectDirs(project_dir)
+    except Exception as error:
+        log.error("There was a problem getting the projectDir: " + str(error))
+        raise error
+    ### Copy any upload files.
+    if project.has_input_files == True:
+        try:
+            copyUploadFilesToProject(thisTransaction, project)
+        except Exception as error:
+            log.error("There was a problem uploading the input: " + str(error))
+            raise error
+
+    ### Write the logs to file.
+    try:
+        request = thisTransaction.request_dict
+        writeRequestToFile(request, logs_dir)
+        writeProjectLogFile(project, logs_dir)
+        return project
+    except Exception as error:
+        log.error("There was a problem writing the project logs: " + str(error))
+        raise error
 
 
 ## Pass in a transaction, figure out the requestingAgent. OK if it doesn't exist.
@@ -115,16 +111,14 @@ def getProjectFromTransaction(thisTransaction: Transaction):
 def getProjectDir(thisTransaction: Transaction):
     log.info("getProjectDir() was called.\n")
     project_dir = ""
-
-    if "project" in thisTransaction.request_dict.keys():
-        log.debug("Looking for a project.")
-        if"project_dir" in thisTransaction.request_dict['project'].keys():
-            project_dir = thisTransaction.request_dict['project']['project_dir']
-        else:
-            log.debug("Perhaps no project dir offered by the user. Checking response for the default.")
-            if "project" in thisTransaction.response_dict.keys:
-                if "project_dir" in thisTransaction.response_dict['project'].keys():
-                    project_dir = thisTransaction.response_dict['project']['project_dir']
+    log.debug("Looking for a project in the request.")
+    if thisTransaction.response_dict:
+        log.debug("found a response_dict.")
+        if "project" in thisTransaction.response_dict.keys():
+            project_dir = thisTransaction.response_dict['project']['project_dir']
+    else:
+        log.debug("No response_dict found. Looking in the request_dict")
+        project_dir = thisTransaction.request_dict['project']['project_dir']
 
     return project_dir
 
@@ -134,24 +128,24 @@ def setupProjectDirs(projectDir):
     log.info("setupProjectDirs() was called.\n")
     try:
         if not os.path.exists(projectDir):
-            log.debug("creating the projectDir")
+            log.debug("creating the projectDir: " + projectDir)
             os.makedirs(projectDir)
+        else:
+            log.debug("project exists: " + projectDir)
     except:
         log.error("There was a problem with the projectDir.")
         raise error
-    else:
-        #Start a log file for the project and put it in uUUID dir
-        logs_dir = projectDir + "logs/"
-        try:
-            if not os.path.exists(logs_dir):
-                log.debug("creating the logs dir in project")
-                os.makedirs(logs_dir)
-
-            log.debug("logs_dir: " + logs_dir)
-            return logs_dir
-        except Exception as error:
-            log.error("There was a problem with the logs dir.")
-            raise error
+    #Start a log file for the project and put it in uUUID dir
+    logs_dir = projectDir + "logs/"
+    try:
+        if not os.path.exists(logs_dir):
+            log.debug("creating the logs dir in project")
+            os.makedirs(logs_dir)
+        log.debug("logs_dir: " + logs_dir)
+        return logs_dir
+    except Exception as error:
+        log.error("There was a problem with the logs dir.")
+        raise error
 
 
 ## Write the original request to file.
@@ -285,7 +279,7 @@ def getProjectpUUID(thisTransaction : Transaction):
 #   appNames should look like frontend app abbreviations, cb, pdb, gp etc...
 #   @param  pUUID
 #   @param  appName
-def getDownloadUrl(pUUID : str, appName : str):
+def getDownloadUrl(pUUID : str, appName : str, optionalSubDir : str = ""):
     log.info("getDownloadUrl was called.\n")
     log.debug("pUUID: " + pUUID)
     log.debug("appName: " + appName)
@@ -294,7 +288,7 @@ def getDownloadUrl(pUUID : str, appName : str):
         with open(versionsFile) as file:
             content = file.read()
         siteHostName = getSiteHostName(content)
-        url = "http://" + siteHostName + "/json/download/" + appName +"/" + pUUID
+        url = "http://" + siteHostName + "/json/download/" + appName +"/" + pUUID + optionalSubDir
         log.debug("url : " + url )
         return url
     except AttributeError as error:
@@ -346,21 +340,21 @@ def getSequenceFromTransaction(thisTransaction: Transaction, sequenceType:str=No
         else:
             return sequence
     else:
-        log.debug("Looking for the sequenceType: " + str(sequenceType))
-        log.debug("response_dict: " )
-        prettyPrint(thisTransaction.response_dict)
+        #log.debug("Looking for the sequenceType: " + str(sequenceType))
+        #log.debug("response_dict: " )
+        #prettyPrint(thisTransaction.response_dict)
         responses = thisTransaction.response_dict['entity']['responses']
         for response in responses:
             if 'outputs' in response.keys():
                 outputs = response['outputs']
-                log.debug("found the outputs.")
+                #log.debug("found the outputs.")
                 break
 
         if outputs == None:
             raise AttributeError("Couldn't find any response outputs.")
 
         for element in outputs:
-            log.debug("checking input element: " + repr(element))
+            #log.debug("checking input element: " + repr(element))
             ##  TODO: Write this to handle inputs nested inside the service
             if "sequenceVariants" in element.keys():
                 if sequenceType in element['sequenceVariants'].keys():
@@ -371,13 +365,13 @@ def getSequenceFromTransaction(thisTransaction: Transaction, sequenceType:str=No
     if thisTransaction.response_dict is not None:
         if 'responses' in thisTransaction.response_dict['entity'].keys():
             responses = thisTransaction.response_dict['entity']['responses']
-            log.debug("The responses. : ")
-            log.debug(str(responses))
+            #log.debug("The responses. : ")
+            #log.debug(str(responses))
             for response in responses:
                 if 'outputs' in response.keys():
                     outputs = response['outputs']
-                    log.debug("The outputs: ")
-                    log.debug(str(outputs))
+                    # log.debug("The outputs: ")
+                    # log.debug(str(outputs))
                     if "sequenceVariants" in outputs.keys():
                         if sequenceType in outputs['sequenceVariants'].keys():
                             sequence = outputs['sequenceVariants'][sequenceType]
@@ -430,7 +424,8 @@ def addProjectToResponse(project, thisTransaction):
     for key in keys:
         preparedCopy[key] = str(preparedCopy[key])
     thisTransaction.response_dict['project'] = preparedCopy
-    log.debug("thisTransaction: \n" + str(thisTransaction))
+    log.debug("thisTransaction.response_dict: \n" )
+    prettyPrint(thisTransaction.response_dict)
 
 def main():
     if len(sys.argv) == 2:

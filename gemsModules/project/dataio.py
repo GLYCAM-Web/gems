@@ -126,7 +126,11 @@ class Project(BaseModel):
         result = result + "\nproject_dir: "  + self.project_dir
         return result
 
-
+def buildDefaultProjectDir(tool, pUUID):
+    log.info("buildDefaultProjecDir() was called.")
+    log.debug("tool: " + tool)
+    log.debug("pUUID: " + pUUID)
+    return project_settings.output_data_dir + "tools/" +  tool  + "/git-ignore-me_userdata/Builds/" + pUUID + "/" 
 
 ## @brief cbProject is a typed project that inherits all the fields from project and adds 
 #   its own.
@@ -149,22 +153,23 @@ class CbProject(Project):
 
         if sequence is not "":
             self.sequence = sequence
-            self.seqID = getSeqIDForSequence(sequence)
+            self.seqID = getSeqIDForSequence(sequence) # poorly named, not indexOrdered version!
         else:
             raise AttributeError("Sequence")
         inputs = request_dict['entity']['inputs']
 
-        if 'project' in request_dict.keys() and 'project_dir' in request_dict['project'].keys():
+        if'project' in request_dict.keys():
             ##User may provide a project_dir.
-            project = request_dict['project']
-            self.project_dir = project['project_dir'] + self.pUUID
-
+            if 'project_dir' in request_dict['project'].keys():
+                project = request_dict['project']
+                self.project_dir = project['project_dir']
+            else:
+                ## Default, if none offered by the user.
+                self.project_dir =  buildDefaultProjectDir(self.project_type , self.pUUID)
         else:
             ## Default, if none offered by the user.
-            self.project_dir = project_settings.output_data_dir + "tools/" +  self.project_type  + "/git-ignore-me_userdata/Builds/" + self.pUUID + "/" 
-    
-        if 'project' in request_dict.keys() and 'structure_count' in request_dict['project'].keys():
-            self.structure_count = request_dict['project']['structureCount']
+                self.project_dir =  buildDefaultProjectDir(self.project_type , self.pUUID)
+
 
     def __str__(self):
         result = super().__str__()
@@ -188,13 +193,18 @@ class PdbProject(Project):
         self.uploadFileName = getInput(request_dict)
         log.debug("uploadFileName: " + self.uploadFileName)
         self.status = "submitted"
+
         ##User may provide a project_dir.
-        if 'project_dir' in request_dict['project'].keys():
-            project = request_dict['project']
-            self.project_dir = project['project_dir']
+        if'project' in request_dict.keys():
+            if 'project_dir' in request_dict['project'].keys():
+                project = request_dict['project']
+                self.project_dir = project['project_dir']
+            else:
+                ## Default, if none offered by the user.
+                self.project_dir =  buildDefaultProjectDir(self.project_type , self.pUUID)
         else:
             ## Default, if none offered by the user.
-            self.project_dir = project_settings.output_data_dir + "tools/" +  self.project_type  + "/git-ignore-me_userdata/Builds/" + self.pUUID + "/" 
+                self.project_dir =  buildDefaultProjectDir(self.project_type , self.pUUID)
 
     def __str__(self): 
         result = super().__str__()
@@ -220,12 +230,17 @@ class GpProject(Project):
         self.has_input_files = True
         self.uploadFileName = pdbProject.uploadFileName
         ##User may provide a project_dir.
-        if 'project_dir' in request_dict['project'].keys():
-            project = request_dict['project']
-            self.project_dir = project['project_dir']
+        if'project' in request_dict.keys():
+            
+            if 'project_dir' in request_dict['project'].keys():
+                project = request_dict['project']
+                self.project_dir = project['project_dir']
+            else:
+                ## Default, if none offered by the user.
+                self.project_dir =  buildDefaultProjectDir(self.project_type , self.pUUID)
         else:
             ## Default, if none offered by the user.
-            self.project_dir = project_settings.output_data_dir + "tools/" +  self.project_type  + "/git-ignore-me_userdata/Builds/" + self.pUUID + "/" 
+                self.project_dir =  buildDefaultProjectDir(self.project_type , self.pUUID)
 
 
     def __str__(self):
