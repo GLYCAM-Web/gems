@@ -292,7 +292,7 @@ def createConformerDirectoryInBuildsDirectory(projectDir : str, conformerDirName
     log.info("createConformerDirectoryInBuildsDirectory() was called.")
     log.debug("projectDir: " + projectDir)
     log.debug("conformerDirName: " + conformerDirName)
-    conformerDirPath = (projectDir + "New_Builds/" + conformerDirName + '/')
+    conformerDirPath = (projectDir + "/New_Builds/" + conformerDirName + '/')
     try:
         log.debug("Will attempt to create this folder: " + conformerDirPath)
         os.makedirs(conformerDirPath)

@@ -126,11 +126,11 @@ class Project(BaseModel):
         result = result + "\nproject_dir: "  + self.project_dir
         return result
 
-def buildDefaultProjectDir(tool, pUUID):
+def buildProjectDir(tool, pUUID):
     log.info("buildDefaultProjecDir() was called.")
     log.debug("tool: " + tool)
     log.debug("pUUID: " + pUUID)
-    return project_settings.output_data_dir + "tools/" +  tool  + "/git-ignore-me_userdata/Builds/" + pUUID + "/" 
+    return project_settings.output_data_dir + "tools/" +  tool  + "/git-ignore-me_userdata/Builds/" + pUUID 
 
 ## @brief cbProject is a typed project that inherits all the fields from project and adds 
 #   its own.
@@ -165,10 +165,10 @@ class CbProject(Project):
                 self.project_dir = project['project_dir'] + self.pUUID
             else:
                 ## Default, if none offered by the user.
-                self.project_dir =  buildDefaultProjectDir(self.project_type , self.pUUID)
+                self.project_dir =  buildProjectDir(self.project_type , self.pUUID)
         else:
             ## Default, if none offered by the user.
-                self.project_dir =  buildDefaultProjectDir(self.project_type , self.pUUID)
+                self.project_dir =  buildProjectDir(self.project_type , self.pUUID)
 
 
     def __str__(self):
@@ -201,10 +201,10 @@ class PdbProject(Project):
                 self.project_dir = project['project_dir']
             else:
                 ## Default, if none offered by the user.
-                self.project_dir =  buildDefaultProjectDir(self.project_type , self.pUUID)
+                self.project_dir =  buildProjectDir(self.project_type , self.pUUID)
         else:
             ## Default, if none offered by the user.
-                self.project_dir =  buildDefaultProjectDir(self.project_type , self.pUUID)
+                self.project_dir =  buildProjectDir(self.project_type , self.pUUID)
 
     def __str__(self): 
         result = super().__str__()
@@ -237,10 +237,10 @@ class GpProject(Project):
                 self.project_dir = project['project_dir']
             else:
                 ## Default, if none offered by the user.
-                self.project_dir =  buildDefaultProjectDir(self.project_type , self.pUUID)
+                self.project_dir =  buildProjectDir(self.project_type , self.pUUID)
         else:
             ## Default, if none offered by the user.
-                self.project_dir =  buildDefaultProjectDir(self.project_type , self.pUUID)
+                self.project_dir =  buildProjectDir(self.project_type , self.pUUID)
 
 
     def __str__(self):

@@ -106,9 +106,13 @@ def manageSequenceRequest(thisTransaction : Transaction):
             else: # Doesn't already exist.
                 log.debug("Need to build this structure.")
                 buildDir = "New_Builds/"
+
                 sequenceProjects.createConformerDirectoryInBuildsDirectory(projectDir, conformerID)
-                sequenceBuild.build3DStructure(buildState, thisTransaction, projectDir + buildDir + conformerID)
+                outputDirPath = projectDir + "/" + buildDir + conformerID
+                log.debug("outputDirPath: " + outputDirPath)
+                sequenceBuild.build3DStructure(buildState, thisTransaction, outputDirPath)
                 sequenceProjects.addSequenceFolderSymLinkToNewBuild(this_seqID, buildStrategyID, this_pUUID, conformerID)
+                
                 if conformerID == "default": # And doesn't already exist.
                     #sequenceProjects.createDefaultSymLinkSequencesDirectory(this_seqID, conformerID, buildStrategyID)
                     sequenceProjects.createDefaultSymLinkBuildsDirectory(projectDir, buildDir + conformerID)
