@@ -294,10 +294,10 @@ def createConformerDirectoryInBuildsDirectory(projectDir : str, conformerDirName
     log.debug("conformerDirName: " + conformerDirName)
     conformerDirPath = (projectDir + "/New_Builds/" + conformerDirName + '/')
     try:
-        log.debug("Will attempt to create this folder: " + conformerDirPath)
+        log.debug("Trying to create conformerDirPath: " + conformerDirPath)
         os.makedirs(conformerDirPath)
     except Exception as error:
-        log.error("Could not create: " + conformerDirPath)
+        log.error("Could not create conformerDirPath: " + conformerDirPath)
         log.error(traceback.format_exc())
         raise error
 
@@ -305,7 +305,7 @@ def createConformerDirectoryInBuildsDirectory(projectDir : str, conformerDirName
 def createSymLinkInRequestedStructures(projectDir : str, buildDir : str, conformerID : str):
     log.info("createSymLinkInRequestedStructures() was called.")
     try:
-        os.makedirs(projectDir + "Requested_Builds/", exist_ok = True)
+        os.makedirs(projectDir + "/Requested_Builds/", exist_ok = True)
         path_down_to_source = buildDir + "/" + conformerID # Can be New_Builds/conformerID or Existing_Builds/conformerID
         path_down_to_dest_dir = "Requested_Builds/" 
         commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, conformerID, projectDir)
@@ -319,9 +319,12 @@ def createSymLinkInRequestedStructures(projectDir : str, buildDir : str, conform
 def createDefaultSymLinkBuildsDirectory(projectDir : str, outputDir : str):
     log.info("createDefaultSymLinkBuildsDirectory() was called")
     try:
+        log.debug("projectDir: " + projectDir)
+        log.debug("outputDir: " + outputDir)
         parent_dir = projectDir
         path_down_to_source = outputDir
         path_down_to_dest_dir = None
+
         commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, "defaultFolder", parent_dir)
         path_down_to_source = "defaultFolder/mol_min.pdb"
         commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, "default.pdb", parent_dir)

@@ -186,6 +186,11 @@ def make_relative_symbolic_link(
     #                           If None, it will use the current working directory
     #                           Unless you know you are in a shell, you probably want to set this
     log.info("common.logic.make_relative_symbolic_link() was called")
+    log.debug("path_down_to_source: " + path_down_to_source)
+    log.debug("path_down_to_dest_dir: " + str(path_down_to_dest_dir))
+    log.debug("dest_link_label: " + dest_link_label)
+    log.debug("parent_directory: " + parent_directory)
+
     if parent_directory is not None:
         owd=os.getcwd()
         os.chdir(parent_directory)

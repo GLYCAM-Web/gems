@@ -136,7 +136,7 @@ def setupProjectDirs(projectDir):
         log.error("There was a problem with the projectDir.")
         raise error
     #Start a log file for the project and put it in uUUID dir
-    logs_dir = projectDir + "logs/"
+    logs_dir = projectDir + "/logs/"
     try:
         if not os.path.exists(logs_dir):
             log.debug("creating the logs dir in project")
