@@ -202,7 +202,7 @@ class Build3DStructureOutput(BaseModel):
         self.conformerID = conformerID
         self.subDirectory = '/Requested_Builds/' + conformerID + '/'
         #self.downloadUrl = downloadUrl
-        self.downloadUrl = projectUtil.getDownloadUrl(payload, "cb", self.subDirectory)
+        self.downloadUrl = projectUtil.getDownloadUrl(payload, "cb", self.conformerID)
 
         log.debug("payload(projectID): " + self.payload)
         log.debug("sequence: " + self.sequence)

@@ -283,13 +283,14 @@ def getDownloadUrl(pUUID : str, appName : str, optionalSubDir : str = ""):
     log.info("getDownloadUrl was called.\n")
     log.debug("pUUID: " + pUUID)
     log.debug("appName: " + appName)
+    log.debug("optionalSubDir: " + optionalSubDir)
     try:
         versionsFile = "/website/userdata/VERSIONS.sh"
         with open(versionsFile) as file:
             content = file.read()
         siteHostName = getSiteHostName(content)
-        url = "http://" + siteHostName + "/json/download/" + appName +"/" + pUUID + optionalSubDir
-        log.debug("url : " + url )
+        url = "http://" + siteHostName + "/json/download/" + appName +"/" + pUUID + "/" + optionalSubDir
+        log.debug("downloadUrl : " + url )
         return url
     except AttributeError as error:
         log.error("Something went wrong building the downloadUrl.")

@@ -424,7 +424,7 @@ def setupInitialSequenceFolders(sequenceID:str, projectID:str, buildStrategyID:s
     log.info("setupInitialSequenceFolders() was called.")
     ## Some of the folders in Sequence may already exist via a previous project, those in Builds should not.
     ## userDataDir is the top level dir that holds the repository of all sequences
-    print(projectSettings.output_data_dir)
+    log.debug(projectSettings.output_data_dir)
     sequencePath = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/Sequences/"
     seqIDPath = sequencePath + sequenceID
     projectPath = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/Builds/"
