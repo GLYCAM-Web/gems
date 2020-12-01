@@ -130,7 +130,7 @@ def buildProjectDir(tool, pUUID):
     log.info("buildDefaultProjecDir() was called.")
     log.debug("tool: " + tool)
     log.debug("pUUID: " + pUUID)
-    return project_settings.output_data_dir + "tools/" +  tool  + "/git-ignore-me_userdata/Builds/" + pUUID 
+    return os.path.join(project_settings.output_data_dir,  "tools",  tool, "git-ignore-me_userdata/Builds", pUUID )
 
 ## @brief cbProject is a typed project that inherits all the fields from project and adds 
 #   its own.
@@ -162,7 +162,13 @@ class CbProject(Project):
             ##User may provide a project_dir.
             if 'project_dir' in request_dict['project'].keys():
                 project = request_dict['project']
-                self.project_dir = project['project_dir'] + self.pUUID
+                ## 
+                if self.pUUID not in project['project_dir']:
+                    log.debug("Adding pUUID to the project_dir: " + project['project_dir'])
+                    self.project_dir = buildProjectDir(self.project_type , self.pUUID)
+                else:
+                    log.debug("pUUID already added to the project_dir: " + project['project_dir'])
+                    self.project_dir = project['project_dir']
             else:
                 ## Default, if none offered by the user.
                 self.project_dir =  buildProjectDir(self.project_type , self.pUUID)

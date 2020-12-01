@@ -108,7 +108,10 @@ def manageSequenceRequest(thisTransaction : Transaction):
                 buildDir = "New_Builds/"
 
                 sequenceProjects.createConformerDirectoryInBuildsDirectory(projectDir, conformerID)
-                outputDirPath = projectDir + "/" + buildDir + conformerID
+
+                #outputDirPath = projectDir + "/" + buildDir + conformerID 
+                outputDirPath = os.path.join(projectDir, buildDir, conformerID)
+
                 log.debug("outputDirPath: " + outputDirPath)
                 sequenceBuild.build3DStructure(buildState, thisTransaction, outputDirPath)
                 sequenceProjects.addSequenceFolderSymLinkToNewBuild(this_seqID, buildStrategyID, this_pUUID, conformerID)

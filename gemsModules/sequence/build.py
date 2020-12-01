@@ -57,6 +57,7 @@ def appendBuild3DStructureResponse(thisTransaction : Transaction, pUUID : str):
 #   @param Service service (optional)
 def build3DStructure(buildState : BuildState, thisTransaction : Transaction, outputDirPath : str):
     log.info("build3DStructure() was called.")
+    log.debug("outputDirPath: " + outputDirPath)
     try:
         pUUID = sequenceProjects.getProjectpUUID(thisTransaction)
         sequence = getSequenceFromTransaction(thisTransaction)
@@ -92,7 +93,7 @@ def build3DStructure(buildState : BuildState, thisTransaction : Transaction, out
     } \
     }'
     # TODO:  Make this resemble real code....
-    the_json_file = outputDirPath + "amber_submission.json"
+    the_json_file = outputDirPath + "/amber_submission.json"
     min_json_in = open (the_json_file , 'w')
     min_json_in.write(amberSubmissionJson)
     min_json_in.close()

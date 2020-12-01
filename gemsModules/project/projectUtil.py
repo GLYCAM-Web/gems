@@ -33,7 +33,7 @@ def startProject(thisTransaction : Transaction):
         if entity == "Sequence":
             log.debug("building a cb project.")
             project = CbProject(thisTransaction.request_dict)
-
+            log.debug("project.project_dir, after instantiation: " + project.project_dir)
         elif entity == "StructureFile":
             log.debug("building a pdb project.")
             project = PdbProject(thisTransaction.request_dict)
@@ -126,6 +126,7 @@ def getProjectDir(thisTransaction: Transaction):
 #   @param projectDir
 def setupProjectDirs(projectDir):
     log.info("setupProjectDirs() was called.\n")
+    log.debug("projectDir: " + projectDir)
     try:
         if not os.path.exists(projectDir):
             log.debug("creating the projectDir: " + projectDir)
