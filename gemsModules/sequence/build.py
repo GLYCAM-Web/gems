@@ -4,6 +4,7 @@ import gemsModules
 import gmml
 import traceback
 import gemsModules.common.utils
+from multiprocessing import Process
 from gemsModules.project.projectUtil import *
 from gemsModules.project import settings as projectSettings
 from gemsModules.common import io as commonio
@@ -17,7 +18,6 @@ from gemsModules.common.loggingConfig import *
 from gemsModules.sequence import projects as sequenceProjects
 from . import settings as sequenceSettings
 from .structureInfo import *
-
 if loggers.get(__name__):
     pass
 else:
@@ -55,28 +55,32 @@ def appendBuild3DStructureResponse(thisTransaction : Transaction, pUUID : str):
 ##  @brief Creates a jobsubmission for Amber. Submits that. Updates the transaction to reflect this.
 #   @param Transaction thisTransaction
 #   @param Service service (optional)
-def build3DStructure(buildState : BuildState, thisTransaction : Transaction, outputDirPath : str):
+def build3DStructure(buildState : BuildState, thisTransaction : Transaction, outputDirPath : str, builder):
     log.info("build3DStructure() was called.")
     try:
         pUUID = sequenceProjects.getProjectpUUID(thisTransaction)
-        sequence = getSequenceFromTransaction(thisTransaction)
+        ##sequence = getSequenceFromTransaction(thisTransaction)
     except Exception as error:
-        log.error("Problem finding the project pUUID or sequence in the transaction: " + str(error))
+        log.error("Problem finding the project pUUID in the transaction: " + str(error))
         raise error
     
     ##TODO: figure out how to return this response now, and still continue this logic.
-    log.debug("About to getCbBuilderForSequence")
-    builder = getCbBuilderForSequence(sequence)
+    # log.debug("About to getCbBuilderForSequence")
+    # builder = getCbBuilderForSequence(sequence)
     try:
         ## If this is default, set the output path, otherwise use what was passed in.
         if buildState.isDefaultStructure:
             log.debug("Generating default in: " + outputDirPath)
-            builder.GenerateSingle3DStructureDefaultFiles(outputDirPath)
+            p = Process(target=builder.GenerateSingle3DStructureDefaultFiles, args=(outputDirPath,))
+            ##builder.GenerateSingle3DStructureDefaultFiles(outputDirPath)
+            p.start()
         else:
             log.debug("The request is for a conformer with outputDirPath: " + outputDirPath)
                 ## Need to put the info into the GMML struct: SingleRotamerInfoVector
             gmmlConformerInfo = populateGMMLConformerInfoStruct(buildState)
-            builder.GenerateSpecific3DStructure(gmmlConformerInfo, outputDirPath)
+            p = Process(target=builder.GenerateSpecific3DStructure, args=(gmmlConformerInfo, outputDirPath,))
+            p.start()
+            ##builder.GenerateSpecific3DStructure(gmmlConformerInfo, outputDirPath)
     except Exception as error:
         log.error("There was a problem generating this build: " + str(error))
         raise error
