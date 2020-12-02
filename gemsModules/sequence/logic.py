@@ -87,11 +87,11 @@ def manageSequenceRequest(thisTransaction : Transaction):
         this_seqID = getSeqIDForSequence(this_sequence)
         buildStrategyID = "buildStrategyID1" # TODO implement getCurrentBuildStrategyID().
         sequenceProjects.setupInitialSequenceFolders(this_seqID, this_pUUID, buildStrategyID)
-
         ## Regardless if requesting default or not, I think I need to generate a default. Otherwise I get into madness
         ## with figuring out exist status and which conformerID to use in place of default. Then when a default 
         ## request does come, should it overwrite previous default for old projects?
         ## A default request is always first, this is now implemented in buildStructureInfo
+        needToInstantiateCarbohydrateBuilder = True
         for buildState in structureInfo.buildStates:
             log.debug("Checking if a structure has been built in this buildState: ")
             log.debug("buildState: " + repr(buildState))
@@ -105,15 +105,19 @@ def manageSequenceRequest(thisTransaction : Transaction):
                 sequenceProjects.addBuildFolderSymLinkToExistingConformer(this_seqID, buildStrategyID, this_pUUID, conformerID)
             else: # Doesn't already exist.
                 log.debug("Need to build this structure.")
+                if needToInstantiateCarbohydrateBuilder:
+                    needToInstantiateCarbohydrateBuilder = False # Only ever do this once.
+                    log.debug("About to getCbBuilderForSequence")
+                    inputSequence = getSequenceFromTransaction(thisTransaction)
+                    builder = sequenceBuild.getCbBuilderForSequence(inputSequence)
                 buildDir = "New_Builds/"
-
                 sequenceProjects.createConformerDirectoryInBuildsDirectory(projectDir, conformerID)
 
                 #outputDirPath = projectDir + "/" + buildDir + conformerID 
                 outputDirPath = os.path.join(projectDir, buildDir, conformerID)
 
                 log.debug("outputDirPath: " + outputDirPath)
-                sequenceBuild.build3DStructure(buildState, thisTransaction, outputDirPath)
+                sequenceBuild.build3DStructure(buildState, thisTransaction, outputDirPath, builder)
                 sequenceProjects.addSequenceFolderSymLinkToNewBuild(this_seqID, buildStrategyID, this_pUUID, conformerID)
                 
                 if conformerID == "default": # And doesn't already exist.
