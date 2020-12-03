@@ -72,16 +72,17 @@ def build3DStructure(buildState : BuildState, thisTransaction : Transaction, out
         ## If this is default, set the output path, otherwise use what was passed in.
         if buildState.isDefaultStructure:
             log.debug("Generating default in: " + outputDirPath)
-            p = Process(target=builder.GenerateSingle3DStructureDefaultFiles, args=(outputDirPath,))
-            ##builder.GenerateSingle3DStructureDefaultFiles(outputDirPath)
-            p.start()
+            ## Using multiprocessing for this function call.
+            builder.GenerateSingle3DStructureDefaultFiles(outputDirPath)
+            #p = Process(target=builder.GenerateSingle3DStructureDefaultFiles, args=(outputDirPath,))
+            #p.start()
         else:
             log.debug("The request is for a conformer with outputDirPath: " + outputDirPath)
                 ## Need to put the info into the GMML struct: SingleRotamerInfoVector
             gmmlConformerInfo = populateGMMLConformerInfoStruct(buildState)
-            p = Process(target=builder.GenerateSpecific3DStructure, args=(gmmlConformerInfo, outputDirPath,))
-            p.start()
-            ##builder.GenerateSpecific3DStructure(gmmlConformerInfo, outputDirPath)
+            builder.GenerateSpecific3DStructure(gmmlConformerInfo, outputDirPath)
+            #p = Process(target=builder.GenerateSpecific3DStructure, args=(gmmlConformerInfo, outputDirPath,))
+            #p.start()
     except Exception as error:
         log.error("There was a problem generating this build: " + str(error))
         raise error
@@ -103,7 +104,10 @@ def build3DStructure(buildState : BuildState, thisTransaction : Transaction, out
     min_json_in.close()
 
     from gemsModules.mmservice.amber.amber import manageIncomingString
-    manageIncomingString(amberSubmissionJson)
+    ## Using multiprocessing for this function call.
+    #manageIncomingString(amberSubmissionJson)
+    p = Process(target=manageIncomingString, args=(amberSubmissionJson,))
+    p.start()
     ## everything up to here -- all the amber stuff --
     ## is what needs to move
 
