@@ -197,7 +197,7 @@ class Amber_MD_Run_Control:
         run_script.write("  -inf  " + self.MININFO + " \\\n\n")
         run_script.write("if grep -q \'" + self.MD_DONE_TEXT + "\' " + self.MINOUT + " ; then\n")
         run_script.write("    echo \"Minimization of webid ${RUN_ID} appears to be complete on $(date).\" >> ${LOGFILE}\n")
-        run_script.write("    ambpdb -p " + self.PARMTOP + " -c " + self.INPCRD + " > " + self.MINPDB + " 2> " + self.MINPDB + ".stderr\n")
+        run_script.write("    ambpdb -p " + self.PARMTOP + " -c " + self.INPCRD + " > " + self.MINPDB + " 2> " + "ambpdb" + ".stderr\n")
         run_script.write("else\n")
         run_script.write("    echo \"Minimization of webid ${RUN_ID} appears to have failed on $(date).Check " + self.MINOUT + "\" >> ${LOGFILE}\n")
         run_script.write("    exit 1\n")
