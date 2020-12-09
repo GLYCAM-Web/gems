@@ -123,7 +123,7 @@ def manageSequenceRequest(thisTransaction : Transaction):
             # buildDir is either New_Builds/ or Existing_Builds/
             sequenceProjects.createSymLinkInRequestedStructures(projectDir, buildDir, conformerID)
             # Needs to be Requested_Structres/. Need to add conformerID separately.
-            sequenceProjects.addResponse(buildState, thisTransaction, conformerID, buildState.structureLabel)
+            sequenceProjects.addResponse(buildState, thisTransaction, conformerID, buildState.conformerLabel)
             # This probably needs work    
             sequenceProjects.registerBuild(buildState, thisTransaction)
 

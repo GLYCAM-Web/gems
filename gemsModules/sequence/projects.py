@@ -38,7 +38,7 @@ def projectExists(thisTransaction : Transaction):
         log.debug("No projectDir found.")
         return False
 
-def addResponse(buildState : BuildState, thisTransaction : Transaction, conformerID : str, structureLabel : str):        
+def addResponse(buildState : BuildState, thisTransaction : Transaction, conformerID : str, conformerLabel : str):        
     log.info("addResponse() was called.")
     try:
         pUUID = getProjectpUUID(thisTransaction)
@@ -60,7 +60,7 @@ def addResponse(buildState : BuildState, thisTransaction : Transaction, conforme
     seqID = getSeqIDForSequence(indexOrdered)
     # By the time build3DStructure() is called, evaluation response exists.
     #  all we need to do is build the output and append it.
-    output = sequence_io.Build3DStructureOutput(pUUID, sequence, seqID, conformerID, structureLabel)
+    output = sequence_io.Build3DStructureOutput(pUUID, sequence, seqID, conformerID, conformerLabel)
     log.debug("Build3DStructure output: " + repr(output))
     outputs = []
     outputs.append(output)
@@ -116,7 +116,7 @@ def structureExists(buildState: BuildState, thisTransaction : Transaction, build
     sequenceDir = userDataDir + seqID + "/" + buildStrategyID + "/" 
     log.debug("sequenceDir: " + sequenceDir)
 
-    if buildState.structureLabel == "default":
+    if buildState.conformerLabel == "default":
         defaultBuildDir = sequenceDir + "All_Builds/default"
         log.debug("defaultBuildDir: " + defaultBuildDir)
         if os.path.isdir(defaultBuildDir):
@@ -545,7 +545,7 @@ def setupInitialSequenceFolders(sequenceID:str, projectID:str, buildStrategyID:s
 #                         link = seqIDPath + "/default"
 #                         projectDir = projectDir + "default"
 #                     else:
-#                         link = seqIDPath + "/" + buildState.structureLabel
+#                         link = seqIDPath + "/" + buildState.conformerLabel
                     
 #                     if os.path.exists(projectDir):
 #                         target = projectDir

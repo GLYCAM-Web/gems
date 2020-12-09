@@ -38,7 +38,7 @@ class BuildState(BaseModel):
     ## Labels may be either "structure" if there is only one for this project.
     #    or, they may be a terse label,
     #    or they may be uuids if the terse label is > 32 char long.
-    structureLabel : str = ""
+    conformerLabel : str = ""
     structureDirectoryName : str = ""
     simulationPhase : str = "gas-phase"
     ## Solvated requests might specify a shape.
@@ -267,74 +267,26 @@ def getRotamerDataFromTransaction(thisTransaction: Transaction):
 #   @detail Translate the more verbose sequenceConf object into a terse string that is useful
 #           for naming directories and describing interesting geometry in a build.
 #   @param sequenceConf List[rotamerConformation]
-#   @return string structureLabel
-# def buildStructureLabel(sequenceConf):
-#     log.info("buildStructureLabel() was called.\n\n")
-#     structureLabel = ""
-#     log.debug("this sequenceConf: \n" + str(sequenceConf))
-
-#     #Assess each rotamer conf obj
-#     for rotamerConf in sequenceConf:
-#         log.debug("this rotamerConf: \n" + str(rotamerConf))
-
-#         ##Decide whether or not to add the label.
-#         if structureLabel == "":
-#             structureLabel = rotamerConf['linkageLabel']
-#         elif rotamerConf['linkageLabel'] not in structureLabel:
-#             structureLabel = structureLabel + "_"+ rotamerConf['linkageLabel']
-#         else:
-#             log.debug("adding to the same linkage.")
-#             structureLabel = structureLabel + "_"
-
-#         ##Decide which abbreviated dihedral is needed
-#         dihedralAbbreviation = ""
-#         if rotamerConf['dihedralName'] == "phi":
-#             dihedralAbbreviation = "h"
-#         elif rotamerConf['dihedralName'] == "psi":
-#             dihedralAbbreviation = "s"
-#         elif rotamerConf['dihedralName'] == "omg":
-#             dihedralAbbreviation = "o"
-#         elif rotamerConf['dihedralName'] == "omega":
-#             dihedralAbbreviation = "o"
-#         elif rotamerConf['dihedralName'] == "chi1":
-#             dihedralAbbreviation = "c1"
-#         elif rotamerConf['dihedralName'] == "chi2":
-#             dihedralAbbreviation = "c2"
-#         else:
-#             log.debug("Unrecognized dihedralName: " + str(rotamerConf['dihedralName'])) 
-
-#         structureLabel = structureLabel + dihedralAbbreviation
-
-#         ##Add the rotamer value
-#         structureLabel = structureLabel + rotamerConf['rotamer']
-
-
-#     return structureLabel
-
-##  @brief Pass in a sequence (list of rotamerConformations), get a terse label.
-#   @detail Translate the more verbose sequenceConf object into a terse string that is useful
-#           for naming directories and describing interesting geometry in a build.
-#   @param sequenceConf List[rotamerConformation]
-#   @return string structureLabel
-def buildStructureLabelOliver(rotamerCombo):
-    log.info("buildStructureLabel() was called.\n\n")
-    structureLabel = ""
+#   @return string conformerLabel
+def buildConformerLabel(rotamerCombo): ## Added by Oliver 
+    log.info("buildConformerLabel() was called.\n\n")
+    conformerLabel = ""
     currentLinkage = ""
     #log.debug("this sequenceConf: \n" + str(sequenceConf))
 
     for item in rotamerCombo:
         ## Decide whether or not to add the label.
-        if structureLabel == "": # first loop
+        if conformerLabel == "": # first loop
             currentLinkage = item
-            structureLabel += item
+            conformerLabel += item
         elif item.isdigit(): ## Assumes only linkages are ints, and not negative.
-            structureLabel += "_"
+            conformerLabel += "_"
             if item != currentLinkage: # new linkage
-                structureLabel += item 
+                conformerLabel += item 
                 currentLinkage = item
         else:
-            structureLabel += item
-    return structureLabel
+            conformerLabel += item
+    return conformerLabel
 
 
 class RotamerConformation(BaseModel):
@@ -395,104 +347,6 @@ def getForceFieldFromRequest(thisTransaction):
         ##Should it live in options?
         return "default"
 
-##  @brief Parses user's selected rotamers (rotamerData) into a list of 
-#           structures to request.
-#   @detail With a limit of 64 structures to request at a time, users select
-#           each rotamer they want for each linkage. This code creates the 
-#           list of unique permutations possible for those selections.
-#   @param Transaction 
-#   @TODO: Move this to a better file for this stuff.
-# def buildStructureInfo(thisTransaction : Transaction):
-#     log.info("buildStructureInfo() was called.")
-
-#     structureInfo = StructureInfo()
-#     structureInfo.buildStates = []
-#     try:
-#         sequence = getSequenceFromTransaction(thisTransaction)
-#         log.debug("sequence: " + str(sequence))
-#         structureInfo.sequence = sequence
-#         ##TODO: Also grab the following from the request, or set defaults:
-#         ##    buildType, ions, forceField, date.
-#     except Exception as error:
-#         log.error("There was a problem getting the sequence from the transaction: " + str(error))
-#         raise error
-#     try:
-#         #RotamerData is the list of dict objects describing each linkage
-#         rotamerData = getRotamerDataFromTransaction(thisTransaction)
-#     except Exception as error:
-#         log.error("There was a problem getting rotamerData from the transaction: " + str(error))
-#         raise error
-#     sequences = []
-#     ## Need to be able to handle the default, which has no rotamerData.
-#     if rotamerData == None:
-#         log.debug("Default request!")
-#         buildState = BuildState()
-#         buildState.structureLabel = "structure"
-#         buildState.date = datetime.now()
-#         structureInfo.buildStates.append(buildState)
-
-#     ## Presence of rotamerData indicates specific rotamer requests.
-#     else:    
-#         linkageCount = len(rotamerData)
-#         log.debug("linkageCount: " + str(linkageCount))
-#         log.debug("\nrotamerData:\n" + str(rotamerData))
-
-#         ##Rotamer counter objects allow the logic to track the rotamer selection.
-#         rotamerCounter = RotamerCounter(rotamerData)
-#         log.debug("rotamerCounter: " + str(rotamerCounter.__dict__))
-
-#         ##How many structures have been requested?
-#         requestedStructureCount = getRequestedStructureCount(rotamerCounter)
-#         log.debug("requestedStructureCount: " + str(requestedStructureCount))
-                
-#         ##Define when to stop.
-#         while len(sequences) < requestedStructureCount and len(sequences) <= 64:
-#             buildState = BuildState()
-#             ##Build the sequenceConformation
-#             sequenceConf = getNextSequence(rotamerData, rotamerCounter, sequences)
-#             buildState.sequenceConformation = sequenceConf
-                    
-#             ##Build the structureLabel
-#             buildState.structureLabel = buildStructureLabel(sequenceConf)
-#             log.debug("structureLabel: \n" + buildState.structureLabel)
-#             if len(buildState.structureLabel) > 32 :
-#                 log.debug("structureLabel is long so building a UUID for structureDirectoryName")
-#                 buildState.structureDirectoryName = getUuidForString(buildState.structureLabel)
-#                 log.debug("The structureDirectoryName/UUID is : " + buildState.structureDirectoryName)
-#             else:
-#                 log.debug("structureLabel is short so using it for structureDirectoryName")
-#                 buildState.structureDirectoryName = buildState.structureLabel 
-#                 log.debug("The structureDirectoryName is : " + buildState.structureDirectoryName)
-
-#             ##Check if the user requested a specific simulationPhase
-#             buildState.simulationPhase = checkForSimulationPhase(thisTransaction)
-#             log.debug("simulationPhase: " + buildState.simulationPhase)
-#             if buildState.simulationPhase == "solvent":
-#                         buildState.solvationShape = getSolvationShape(thisTransaction)
-
-#             ##Set the date
-#             buildState.date = datetime.now()
-#             log.debug("date: " + str(buildState.date))
-
-#             ## Check if the user requested to add ions
-#             buildState.addIons = checkForAddIons(thisTransaction)
-
-#             ##sequences is needed for progress tracking.
-#             sequences.append(sequenceConf)     
-#             log.debug("sequence list length: " + str(len(sequences)))
-#             structureInfo.buildStates.append(buildState)
-                    
-#         ##Useful logging for maintenance
-#         log.debug("sequences: ")
-#         for element in sequences:
-#             log.debug("~")
-#             for item in element:
-#                 log.debug( str(item) )
-
-#         log.debug("sequenceCount: " + str(len(sequences)))
-
-#     return structureInfo
-
 def countNumberOfShapesUpToLimit(rotamerData : []):
     hardLimit = 64
     count = 1
@@ -537,7 +391,7 @@ def buildStructureInfoOliver(thisTransaction : Transaction):
     ## Need to be able to handle the default, which has no rotamerData.
     ## Oliver has decided to always request a default for symlinking ease.
     buildState = BuildState()
-    buildState.structureLabel = "default"
+    buildState.conformerLabel = "default"
     buildState.structureDirectoryName = "default"
     buildState.isDefaultStructure = True
     buildState.date = datetime.now()
@@ -561,15 +415,15 @@ def buildStructureInfoOliver(thisTransaction : Transaction):
         for rotamerCombo in sequenceRotamerCombos:
             buildState = BuildState()
             buildState.sequenceConformation = rotamerCombo
-            buildState.structureLabel = buildStructureLabelOliver(rotamerCombo)
-            log.debug("label is :" + buildState.structureLabel)
-            if len(buildState.structureLabel) > 32 :
-                log.debug("structureLabel is long so building a UUID for structureDirectoryName")
-                buildState.structureDirectoryName = getUuidForString(buildState.structureLabel)
+            buildState.conformerLabel = buildConformerLabel(rotamerCombo)
+            log.debug("label is :" + buildState.conformerLabel)
+            if len(buildState.conformerLabel) > 32 :
+                log.debug("conformerLabel is long so building a UUID for structureDirectoryName")
+                buildState.structureDirectoryName = getUuidForString(buildState.conformerLabel)
                 log.debug("The structureDirectoryName/UUID is : " + buildState.structureDirectoryName)
             else:
-                log.debug("structureLabel is short so using it for structureDirectoryName")
-                buildState.structureDirectoryName = buildState.structureLabel 
+                log.debug("conformerLabel is short so using it for structureDirectoryName")
+                buildState.structureDirectoryName = buildState.conformerLabel 
                 log.debug("The structureDirectoryName is : " + buildState.structureDirectoryName)
             buildState.simulationPhase = simulationPhase
             if solvationShape != None:
@@ -666,7 +520,7 @@ def convertStructureInfoToDict(structureInfo):
                 for buildState in structureInfo.buildStates:
                     log.debug("buildState: \n" + repr(buildState))
                     state = {}
-                    state['structureLabel'] = buildState.structureLabel
+                    state['conformerLabel'] = buildState.conformerLabel
                     state['simulationPhase'] = buildState.simulationPhase
                     if buildState.simulationPhase == "solvent":
                         state['solvationShape'] = buildState.solvationShape
@@ -796,9 +650,9 @@ def updateBuildStatus(structureInfoFilename : str, buildState : BuildState, stat
                 log.debug("Builds exist. Checking if we are updating the status of an existing build.")
                 log.debug("buildState: " + str(data['buildStates']))
                 for recordedState in data['buildStates']:
-                    log.debug("recordedState['structureLabel']: " + recordedState['structureLabel'])
-                    log.debug("buildState.structureLabel: " + buildState.structureLabel)
-                    if recordedState['structureLabel'] == buildState.structureLabel:
+                    log.debug("recordedState['conformerLabel']: " + recordedState['conformerLabel'])
+                    log.debug("buildState.conformerLabel: " + buildState.conformerLabel)
+                    if recordedState['conformerLabel'] == buildState.conformerLabel:
                         log.debug("Found the record to update. recordedState['status']: " + recordedState['status'])
                         recordedState['status'] = status
                         log.debug("updated recordedState['status']: " + recordedState['status'])
@@ -859,7 +713,7 @@ def prepareBuildRecord(buildState : BuildState):
     log.info("prepareBuildRecord() was called.")
     log.debug("buildState: " + repr(buildState))
     state = {}
-    state['structureLabel'] = buildState.structureLabel
+    state['conformerLabel'] = buildState.conformerLabel
     state['simulationPhase'] = buildState.simulationPhase
     if buildState.simulationPhase == "solvent":
         state['solvationShape'] = buildState.solvationShape
