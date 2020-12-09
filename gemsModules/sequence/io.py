@@ -190,16 +190,18 @@ class Build3DStructureOutput(BaseModel):
     sequence : str  = ""
     seqID : str = ""
     conformerID : str = ""
+    structureLabel : str = ""
     subDirectory : str = ""
     downloadUrl : str = ""
 
-    def __init__(self, payload:str, sequence:str, seqID:str, conformerID:str):
+    def __init__(self, payload:str, sequence:str, seqID:str, conformerID:str, structureLabel:str):
         super().__init__()
         log.info("Initializing BuildOutput.")
         self.payload = payload
         self.sequence = sequence
         self.seqID = seqID
         self.conformerID = conformerID
+        self.structureLabel = structureLabel
         self.subDirectory = '/Requested_Builds/' + conformerID + '/'
         #self.downloadUrl = downloadUrl
         self.downloadUrl = projectUtil.getDownloadUrl(payload, "cb", self.conformerID)
@@ -208,6 +210,7 @@ class Build3DStructureOutput(BaseModel):
         log.debug("sequence: " + self.sequence)
         log.debug("seqID: " + self.seqID)
         log.debug("conformerID: " + self.conformerID)
+        log.debug("structureLabel: " + self.conformerID)
         log.debug("subDirectory: " + self.subDirectory)
         log.debug("downloadUrl: " + self.downloadUrl)
 

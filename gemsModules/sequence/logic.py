@@ -112,14 +112,10 @@ def manageSequenceRequest(thisTransaction : Transaction):
                     builder = sequenceBuild.getCbBuilderForSequence(inputSequence)
                 buildDir = "New_Builds/"
                 sequenceProjects.createConformerDirectoryInBuildsDirectory(projectDir, conformerID)
-
-                #outputDirPath = projectDir + "/" + buildDir + conformerID 
                 outputDirPath = os.path.join(projectDir, buildDir, conformerID)
-
                 log.debug("outputDirPath: " + outputDirPath)
                 sequenceBuild.build3DStructure(buildState, thisTransaction, outputDirPath, builder)
-                sequenceProjects.addSequenceFolderSymLinkToNewBuild(this_seqID, buildStrategyID, this_pUUID, conformerID)
-                
+                sequenceProjects.addSequenceFolderSymLinkToNewBuild(this_seqID, buildStrategyID, this_pUUID, conformerID)        
                 if conformerID == "default": # And doesn't already exist.
                     #sequenceProjects.createDefaultSymLinkSequencesDirectory(this_seqID, conformerID, buildStrategyID)
                     sequenceProjects.createDefaultSymLinkBuildsDirectory(projectDir, buildDir + conformerID)
@@ -127,7 +123,7 @@ def manageSequenceRequest(thisTransaction : Transaction):
             # buildDir is either New_Builds/ or Existing_Builds/
             sequenceProjects.createSymLinkInRequestedStructures(projectDir, buildDir, conformerID)
             # Needs to be Requested_Structres/. Need to add conformerID separately.
-            sequenceProjects.addResponse(buildState, thisTransaction, conformerID)
+            sequenceProjects.addResponse(buildState, thisTransaction, conformerID, buildState.structureLabel)
             # This probably needs work    
             sequenceProjects.registerBuild(buildState, thisTransaction)
 

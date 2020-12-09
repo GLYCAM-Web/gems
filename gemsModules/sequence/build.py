@@ -73,16 +73,16 @@ def build3DStructure(buildState : BuildState, thisTransaction : Transaction, out
         if buildState.isDefaultStructure:
             log.debug("Generating default in: " + outputDirPath)
             ## Using multiprocessing for this function call.
-            builder.GenerateSingle3DStructureDefaultFiles(outputDirPath)
-            #p = Process(target=builder.GenerateSingle3DStructureDefaultFiles, args=(outputDirPath,))
-            #p.start()
+            #builder.GenerateSingle3DStructureDefaultFiles(outputDirPath)
+            p = Process(target=builder.GenerateSingle3DStructureDefaultFiles, args=(outputDirPath,))
+            p.start()
         else:
             log.debug("The request is for a conformer with outputDirPath: " + outputDirPath)
                 ## Need to put the info into the GMML struct: SingleRotamerInfoVector
             gmmlConformerInfo = populateGMMLConformerInfoStruct(buildState)
-            builder.GenerateSpecific3DStructure(gmmlConformerInfo, outputDirPath)
-            #p = Process(target=builder.GenerateSpecific3DStructure, args=(gmmlConformerInfo, outputDirPath,))
-            #p.start()
+            #builder.GenerateSpecific3DStructure(gmmlConformerInfo, outputDirPath)
+            p = Process(target=builder.GenerateSpecific3DStructure, args=(gmmlConformerInfo, outputDirPath,))
+            p.start()
     except Exception as error:
         log.error("There was a problem generating this build: " + str(error))
         raise error

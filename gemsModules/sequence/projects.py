@@ -38,7 +38,7 @@ def projectExists(thisTransaction : Transaction):
         log.debug("No projectDir found.")
         return False
 
-def addResponse(buildState : BuildState, thisTransaction : Transaction, conformerID : str):        
+def addResponse(buildState : BuildState, thisTransaction : Transaction, conformerID : str, structureLabel : str):        
     log.info("addResponse() was called.")
     try:
         pUUID = getProjectpUUID(thisTransaction)
@@ -60,7 +60,7 @@ def addResponse(buildState : BuildState, thisTransaction : Transaction, conforme
     seqID = getSeqIDForSequence(indexOrdered)
     # By the time build3DStructure() is called, evaluation response exists.
     #  all we need to do is build the output and append it.
-    output = sequence_io.Build3DStructureOutput(pUUID, sequence, seqID, conformerID)
+    output = sequence_io.Build3DStructureOutput(pUUID, sequence, seqID, conformerID, structureLabel)
     log.debug("Build3DStructure output: " + repr(output))
     outputs = []
     outputs.append(output)
@@ -169,33 +169,33 @@ def sequenceExists(buildState: BuildState, thisTransaction : Transaction):
 
 ##  @brief Build a structure response config oobject and append it to a transaction
 #   @param Transaction
-def respondWithExistingDefaultStructure(thisTransaction: Transaction):
-    log.info("respondWithExistingDefaultStructure() was called.")
+# def respondWithExistingDefaultStructure(thisTransaction: Transaction):
+#     log.info("respondWithExistingDefaultStructure() was called.")
 
-    try:
-        gemsProject = thisTransaction.response_dict['gems_project']
-        sequence = gemsProject['sequence']
-        pUUID = gemsProject['pUUID']
+#     try:
+#         gemsProject = thisTransaction.response_dict['gems_project']
+#         sequence = gemsProject['sequence']
+#         pUUID = gemsProject['pUUID']
 
-        inputs = []
-        inputs.append(sequence)
+#         inputs = []
+#         inputs.append(sequence)
         
-        indexOrdered = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
-        seqID = getSeqIDForSequence(indexOrdered)
+#         indexOrdered = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
+#         seqID = getSeqIDForSequence(indexOrdered)
 
-        downloadUrl = getDownloadUrl(gemsProject['pUUID'], "cb")
-        outputs = []
+#         downloadUrl = getDownloadUrl(gemsProject['pUUID'], "cb")
+#         outputs = []
 
-        ouput = sequence_io.Build3DStructureOutput(pUUID, sequence, seqID, downloadUrl)
-        outputs.append(ouput)
+#         ouput = sequence_io.Build3DStructureOutput(pUUID, sequence, seqID, downloadUrl)
+#         outputs.append(ouput)
 
-        serviceResponse = sequence_io.ServiceResponse("Build3DStructure", inputs, outputs)
-        responseObj = serviceResponse.dict(by_alias = True)
-        commonlogic.updateResponse(thisTransaction, responseObj)
-    except Exception as error:
-        log.error("There was a problem getting the sequence from the request: " + str(error))
-        log.error(traceback.format_exc())
-        raise error
+#         serviceResponse = sequence_io.ServiceResponse("Build3DStructure", inputs, outputs)
+#         responseObj = serviceResponse.dict(by_alias = True)
+#         commonlogic.updateResponse(thisTransaction, responseObj)
+#     except Exception as error:
+#         log.error("There was a problem getting the sequence from the request: " + str(error))
+#         log.error(traceback.format_exc())
+#         raise error
 
 
 ##  @brief Pass in a gemsProject and get a responseConfig.
