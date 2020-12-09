@@ -7,6 +7,7 @@ prefSTRUCTURE='mol'  # default prefix for a structure file
 extPDB='pdb'  # all varieties of PDB-style file
 extOFF='off'  # OFF files
 extMMCIF='mmcif'  # mm-cif files
+extMOL2='mol2' # mol2 files.
 extTEXT='txt'  # A plain-text file, usually ASCII
 extRUNLOG='runlog'  # log for the GLYCAM-Web process
 
@@ -20,6 +21,7 @@ extMDCRD='mdcrd'  # AMBER coordinate trajectory
 extMDVEL='mdvel'  # AMBER velocity trajectory
 extMDCRDBOX='crdbox'  # AMBER coordinate trajectory with periodic boundary
 
+extCPPTRAJIN='cpptrajin'
 extLEAPIN='leapin'
 extMININ='minin'
 extHEATIN='heatin'

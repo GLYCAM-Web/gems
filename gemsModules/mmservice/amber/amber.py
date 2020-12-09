@@ -25,10 +25,15 @@ class Amber_Job:
 #        self.PARMTOP = str (json_dict["project"]["prmtop_file_name"])
 #        self.INPCRD = str (json_dict["project"]["inpcrd_file_name"])
         self.PARMTOP =  self.RUN_PREF + '.' +  conf.File_Naming.extPARM
+        self.PARMT3P =  self.RUN_PREF + '_min_t3p.' +  conf.File_Naming.extPARM
+        self.PARMT5P =  self.RUN_PREF + '_min_t5p.' +  conf.File_Naming.extPARM
         self.INPCRD =  self.RUN_PREF + '.' +  conf.File_Naming.extINPCRD
         log.debug ("self PARMTOP is " + self.PARMTOP )
         log.debug ("self INPCRD is " + self.INPCRD )
         #input file names
+        self.CPPTRAJIN = self.RUN_PREF + '.' + conf.File_Naming.extCPPTRAJIN
+        self.LEAPSOLVT3PIN = self.RUN_PREF + '_T3P.' + conf.File_Naming.extLEAPIN
+        self.LEAPSOLVT5PIN = self.RUN_PREF + '_T5P.' + conf.File_Naming.extLEAPIN
         self.LEAPIN = self.RUN_PREF + '.' + conf.File_Naming.extLEAPIN
         self.MININ = self.RUN_PREF + '.' + conf.File_Naming.extMININ
         self.HEATIN = self.RUN_PREF + '.' + conf.File_Naming.extHEATIN
@@ -45,6 +50,8 @@ class Amber_Job:
         self.EQUIRST = self.RUN_PREF + '_equi.' + conf.File_Naming.extMDRST # single frame coordinate file
         self.MDRST = self.RUN_PREF + '_md.' + conf.File_Naming.extMDRST # single frame coordinate file
         #trajectory file_names
+        self.INPCRDT3P = self.RUN_PREF + '_min_t3p.' + conf.File_Naming.extMDRST
+        self.INPCRDT5P = self.RUN_PREF + '_min_t5p.' + conf.File_Naming.extMDRST
         self.MINCRD = self.RUN_PREF + '.' + conf.File_Naming.extMINCRD
         self.HEATCRD = self.RUN_PREF + '.' + conf.File_Naming.extHEATCRD
         self.EQUICRD = self.RUN_PREF + '.' + conf.File_Naming.extEQUICRD
@@ -54,8 +61,11 @@ class Amber_Job:
         self.HEATINFO = self.RUN_PREF + '.' + conf.File_Naming.extHEATINFO
         self.EQUIINFO = self.RUN_PREF + '.' + conf.File_Naming.extEQUIINFO
         self.MDINFO = self.RUN_PREF + '.' + conf.File_Naming.extMDINFO
-        #PDB file names
-        self.MINPDB = self.RUN_PREF + '_min.' + conf.File_Naming.extPDB 
+        #other structure file names
+        self.MINPDB = self.RUN_PREF + '_min.' + conf.File_Naming.extPDB
+        self.MINMOL2 = self.RUN_PREF + '_min.' + conf.File_Naming.extMOL2
+        self.PDBT3P = self.RUN_PREF + '_min_t3p.' + conf.File_Naming.extPDB
+        self.PDBT5P = self.RUN_PREF + '_min_t5p.' + conf.File_Naming.extPDB
         #logfile names
         self.MINLOG = self.RUN_PREF + '.' + conf.File_Naming.extMINLOG
         self.HEATLOG = self.RUN_PREF + '.' + conf.File_Naming.extHEATLOG
@@ -67,12 +77,18 @@ class Amber_Job:
         if json_dict["project"]["type"] == "minimization":
             self.minimization_only = True;
             self.CreateTLeapInputFile()
+            self.CreateCpptrajInputFile()
             self.CreateMinimizationInputFile()
+            self.CreateTLeapSolvT3PInputFile()
+            self.CreateTLeapSolvT5PInputFile()
             self.CreateSubmissionScript(json_dict)
         else:
             self.minimization_only = False;
             self.CreateTLeapInputFile()
+            self.CreateCpptrajInputFile()
             self.CreateMinimizationInputFile()
+            self.CreateTLeapSolvT3PInputFile()
+            self.CreateTLeapSolvT5PInputFile()
             self.CreateHeatingInputFile()
             self.CreateEquilibrationInputFile()
             self.CreateProductionInputFile()
@@ -100,7 +116,49 @@ class Amber_Job:
         min_in.write('  ntb = 0, cut = 20.0, ntmin = 1, nscm = 100, dielc = 1 ,\n')
         min_in.write('  ntxo = 1, ntwr = 1,\n')
         min_in.write(' &end \n')
+## Plan: After minimization convert the min structure to a mol2 file with cpptraj
+## cpptraj.in
+## parm mol.parm7
+## trajin mol_min.rst7
+## trajout mol_min.mol2
+## Then load this mol2 file into tleap for ionization. Then solvate with tip3p and tip5p water models. 
+    def CreateCpptrajInputFile(self):
+        cpptraj_in = open (self.WorkDir + '/' + self.CPPTRAJIN, 'w')
+        log.debug("Attempting to open this file as cpptraj.in >>>" + self.WorkDir + '/' + self.CPPTRAJIN + "<<<")
+        cpptraj_in.write('parm ' + self.PARMTOP + '\n')
+        cpptraj_in.write('trajin ' + self.MINRST + '\n')
+        cpptraj_in.write('trajout ' + self.MINMOL2 + '\n')
 
+    def CreateTLeapSolvT3PInputFile(self): #Creates a tLeap input file that creates minimization PARMTOP and RST7 files.
+        tleap_in = open (self.WorkDir + '/' + self.LEAPSOLVT3PIN, 'w')
+        log.debug("Attempting to open this file as tleap input >>>" + self.WorkDir + '/' + self.LEAPSOLVT3PIN + "<<<")
+        tleap_in.write('verbosity 0\n')
+        tleap_in.write('logfile leapIons.log\n')
+        tleap_in.write('source leaprc.GLYCAM_06j-1 \n')
+        tleap_in.write('loadamberparams frcmod.ionsjc_tip3p\n')
+        tleap_in.write('mol=loadmol2 ' + self.MINMOL2 + '\n')
+        tleap_in.write('addIons mol Na+ 0\n')
+        tleap_in.write('addIons mol Cl- 0\n')
+        tleap_in.write('solvateOct mol TIP3PBOX 8.0 iso\n')
+        tleap_in.write('saveamberparm mol ' + self.PARMT3P + ' ' + self.INPCRDT3P + '\n')
+        tleap_in.write('savepdb mol ' + self.PDBT3P + '\n')
+        tleap_in.write('quit\n')
+
+    def CreateTLeapSolvT5PInputFile(self): #Creates a tLeap input file that creates minimization PARMTOP and RST7 files.
+        tleap_in = open (self.WorkDir + '/' + self.LEAPSOLVT5PIN, 'w')
+        log.debug("Attempting to open this file as tleap input >>>" + self.WorkDir + '/' + self.LEAPSOLVT5PIN + "<<<")
+        tleap_in.write('verbosity 0\n')
+        tleap_in.write('logfile leapIons.log\n')
+        tleap_in.write('source leaprc.GLYCAM_06j-1 \n')
+        tleap_in.write('loadamberparams frcmod.tip5p\n')
+        tleap_in.write('mol=loadmol2 ' + self.MINMOL2 + '\n')
+        tleap_in.write('addIons mol Na+ 0\n')
+        tleap_in.write('addIons mol Cl- 0\n')
+        tleap_in.write('solvateOct mol TIP5PBOX 8.0 iso\n')
+        tleap_in.write('saveamberparm mol ' + self.PARMT5P + ' ' + self.INPCRDT5P + '\n')
+        tleap_in.write('savepdb mol ' + self.PDBT5P + '\n')
+        tleap_in.write('quit\n')
+        
     def CreateHeatingInputFile(self):
         heat_in = open (self.WorkDir + '/' + self.HEATIN, 'w')
         heat_in.write('Dynamic Simulation with Constant Volume\n')
@@ -198,7 +256,11 @@ class Amber_Job:
         run_script.write("    echo \"Minimization of webid ${RUN_ID} appears to have failed on $(date).Check " + self.MINOUT + "\" >> ${LOGFILE}\n")
         run_script.write("    exit 1\n")
         run_script.write("fi\n")
-
+        run_script.write("echo \"Running cpptraj...\" >> ${LOGFILE}" + "\n")
+        run_script.write("cpptraj -i " +  self.CPPTRAJIN + "\n")
+        run_script.write("echo \"Running tleap twice more...\" >> ${LOGFILE}" + "\n")
+        run_script.write("tleap -f " + self.LEAPSOLVT3PIN + "\n")
+        run_script.write("tleap -f " + self.LEAPSOLVT5PIN + "\n")
 
         if self.minimization_only != True:
             run_script.write("${MD_COMMAND} \\\n")
