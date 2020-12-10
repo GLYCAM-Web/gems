@@ -11,7 +11,7 @@
         "inputs": [
             {
                 "Sequence": {
-                    "payload": "DNeup5Aca2-6DGalpb1-4DGlcpNAcb1-6[DNeup5Aca2-6DGalpb1-4DGlcpNAcb1-2]DManpa1-6[DNeup5Aca2-6DGalpb1-4DGlcpNAcb1-2[DNeup5Aca2-6DGalpb1-4DGlcpNAcb1-4]DManpa1-3]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH"
+                    "payload": "DGlcpNAcb1-2DManpa1-6[DGlcpNAcb1-2DManpa1-3]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH"
                 }
             }
         ]
@@ -22,89 +22,6 @@
                 {
                     "dihedrals": [
                         {
-                            "dihedralName": "phi",
-                            "selectedRotamers": [
-                                "t"
-                            ]
-                        },
-                        {
-                            "dihedralName": "omg",
-                            "selectedRotamers": [
-                                "gt",
-                                "tg"
-                            ]
-                        }
-                    ],
-                    "linkageLabel": "6"
-                },
-                {
-                    "dihedrals": [
-                        {
-                            "dihedralName": "phi",
-                            "selectedRotamers": [
-                                "t"
-                            ]
-                        },
-                        {
-                            "dihedralName": "omg",
-                            "selectedRotamers": [
-                                "gt",
-                                "tg"
-                            ]
-                        }
-                    ],
-                    "linkageLabel": "9"
-                },
-                {
-                    "dihedrals": [
-                        {
-                            "dihedralName": "omg",
-                            "selectedRotamers": [
-                                "gt"
-                            ]
-                        }
-                    ],
-                    "linkageLabel": "10"
-                },
-                {
-                    "dihedrals": [
-                        {
-                            "dihedralName": "phi",
-                            "selectedRotamers": [
-                                "t"
-                            ]
-                        },
-                        {
-                            "dihedralName": "omg",
-                            "selectedRotamers": [
-                                "gt",
-                                "tg"
-                            ]
-                        }
-                    ],
-                    "linkageLabel": "13"
-                },
-                {
-                    "dihedrals": [
-                        {
-                            "dihedralName": "omg",
-                            "selectedRotamers": [
-                                "gg",
-                                "gt"
-                            ]
-                        }
-                    ],
-                    "linkageLabel": "14"
-                },
-                {
-                    "dihedrals": [
-                        {
-                            "dihedralName": "phi",
-                            "selectedRotamers": [
-                                "t"
-                            ]
-                        },
-                        {
                             "dihedralName": "omg",
                             "selectedRotamers": [
                                 "gg",
@@ -113,22 +30,22 @@
                             ]
                         }
                     ],
-                    "linkageLabel": "16"
+                    "linkageLabel": "5"
                 }
             ]
         }
     },
     "project": {
-        "_state": "<django.db.models.base.ModelState object at 0x7fca906a6a50>",
-        "id": "0ba4faaa-d613-497d-a01f-f9ba4f67ec44",
+        "_state": "<django.db.models.base.ModelState object at 0x7fe1c60710d0>",
+        "id": "919c7c4e-bb4c-4ce4-8326-fc872da19fd2",
         "user_id": "None",
         "email": "",
-        "pUUID": "f9935785-d4b5-4939-837a-02c90b6ce40b",
+        "pUUID": "437464fd-6324-4615-99cd-14db4ef61f94",
         "title": "Untitled project",
         "comment": " ",
-        "timestamp": "2020-12-01 19:51:23.610752+00:00",
+        "timestamp": "2020-12-10 21:21:48.154888+00:00",
         "project_type": "cb",
-        "project_dir": "/website/userdata/tools/cb/git-ignore-me_userdata/Builds/f9935785-d4b5-4939-837a-02c90b6ce40b",
+        "project_dir": "/website/userdata/tools/cb/git-ignore-me_userdata/Builds/437464fd-6324-4615-99cd-14db4ef61f94",
         "requesting_agent": "website",
         "gems_version": "",
         "gems_branch": "",
@@ -140,13 +57,13 @@
         "parameter_version": "default",
         "amber_version": "default",
         "json_api_version": "0.0.1",
-        "project_ptr_id": "0ba4faaa-d613-497d-a01f-f9ba4f67ec44",
-        "sequence": "DNeup5Aca2-6DGalpb1-4DGlcpNAcb1-6[DNeup5Aca2-6DGalpb1-4DGlcpNAcb1-2]DManpa1-6[DNeup5Aca2-6DGalpb1-4DGlcpNAcb1-2[DNeup5Aca2-6DGalpb1-4DGlcpNAcb1-4]DManpa1-3]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH",
-        "seqID": "7abc4ab5-ae05-52cb-9a5b-a8a0c3d8957a",
+        "project_ptr_id": "919c7c4e-bb4c-4ce4-8326-fc872da19fd2",
+        "sequence": "DGlcpNAcb1-2DManpa1-6[DGlcpNAcb1-2DManpa1-3]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH",
+        "seqID": "f6b26e06-feaf-5b05-91e9-7d293ea1bdb3",
         "structure_count": "1",
         "linkage_info": "",
         "rotamer_info": "",
-        "rotamer_list": "['6_phi_t', '6_omg_gt', '6_omg_tg', '9_phi_t', '9_omg_gt', '9_omg_tg', '10_omg_gt', '13_phi_t', '13_omg_gt', '13_omg_tg', '14_omg_gg', '14_omg_gt', '16_phi_t', '16_omg_gg', '16_omg_gt', '16_omg_tg']",
+        "rotamer_list": "['5_omg_gg', '5_omg_gt', '5_omg_tg']",
         "angle_info": "",
         "job_info": "",
         "rotamer_data": ""

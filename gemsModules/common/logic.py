@@ -224,7 +224,11 @@ def make_relative_symbolic_link(
     log.debug(".... to this destination : " + path_down_to_dest_label)
     if os.path.islink(dest_link_label): # Oliver addition to allow overwrites
         os.remove(dest_link_label)
-    os.symlink(relative_path_to_source, path_down_to_dest_label)
+    try:
+        os.symlink(relative_path_to_source, path_down_to_dest_label)
+    except Exception as error:
+        log.debug("Simlink already exists. No need to create a new one. Here is the error, just in case: " + str(error))
+
     if parent_directory is not None:
         os.chdir(owd)
 

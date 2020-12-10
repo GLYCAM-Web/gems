@@ -451,9 +451,10 @@ def setupInitialSequenceFolders(sequenceID:str, projectID:str, buildStrategyID:s
             raise error
     # Just make everything you might need here.
     try:
-        os.makedirs(projIDPath + '/Requested_Builds')
-        os.makedirs(projIDPath + '/Existing_Builds')
-        os.makedirs(projIDPath + '/New_Builds')
+
+        os.makedirs(projIDPath + '/Requested_Builds', exist_ok = True)
+        os.makedirs(projIDPath + '/Existing_Builds',  exist_ok = True)
+        os.makedirs(projIDPath + '/New_Builds', exist_ok = True)
         os.makedirs(projIDPath + '/New_Builds/' + 'logs/', exist_ok = True)
         os.makedirs(projIDPath + '/Existing_Builds/' + 'logs/', exist_ok = True)
     except Exception as error:
