@@ -120,6 +120,8 @@ def getProjectDir(thisTransaction: Transaction):
         log.debug("No response_dict found. Looking in the request_dict")
         project_dir = thisTransaction.request_dict['project']['project_dir']
 
+    log.debug("returning projectDir: " + project_dir)
+
     return project_dir
 
 ##  Creates dirs if needed in preparation for writing files.
@@ -262,6 +264,14 @@ def copyUploadFilesToProject(thisTransaction : Transaction, project : Project):
 #   @param thisTransaction Transaction object should contain a project.Else returns none.
 def getProjectpUUID(thisTransaction : Transaction):
     log.info("getProjectpUUID() was called.\n")
+    log.debug("Request dict: \n")
+    prettyPrint(thisTransaction.request_dict)
+    if thisTransaction.response_dict is not None:
+        log.debug("Response dict: \n")
+        prettyPrint(thisTransaction.response_dict)
+    else:
+        log.debug("No response_exists.")
+
     pUUID = ""
     if 'project' in thisTransaction.response_dict.keys():
         pUUID = thisTransaction.response_dict['project']['pUUID']
@@ -342,7 +352,7 @@ def getSequenceFromTransaction(thisTransaction: Transaction, sequenceType:str=No
         else:
             return sequence
     else:
-        #log.debug("Looking for the sequenceType: " + str(sequenceType))
+        log.debug("Looking for the sequenceType: " + str(sequenceType))
         #log.debug("response_dict: " )
         #prettyPrint(thisTransaction.response_dict)
         responses = thisTransaction.response_dict['entity']['responses']

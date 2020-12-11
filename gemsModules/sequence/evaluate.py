@@ -62,6 +62,7 @@ else:
 
 def evaluateCondensedSequencePydantic(thisTransaction : Transaction, thisService : Service = None, validateOnly = False):
     from gemsModules.sequence import io as sequence_io
+    from gemsModules.sequence import logic as sequence_logic
     from gemsModules.common import logic as commonLogic
     log.info("evaluateCondensedSequencePydantic() was called.\n")
     log.debug("thisService: " + str(thisService))
@@ -90,11 +91,15 @@ def evaluateCondensedSequencePydantic(thisTransaction : Transaction, thisService
     serviceResponse = sequence_io.ServiceResponse(thisService, inputs, outputs)
 
     ##TODO: get sequenceIsValid and ValidateOnly.
-    if sequenceIsValid and not validateOnly:
+    if sequenceIsValid and not validateOnly: 
         responseObj = serviceResponse.dict(by_alias = True)
         log.debug("responseObj:\n")
         prettyPrint(responseObj)
         commonLogic.updateResponse(thisTransaction, responseObj)
+        ##Build the Default structure.
+        ##If not validate only, build the default structure. 
+        log.debug("Evaluation request is not validateOnly. Requesting the default structure.")
+        sequence_logic.manageSequenceRequest(thisTransaction)
     else:
         log.debug("validateOnly was true. Does evaluateCondensedSequence return a well-formed response?")
 
