@@ -47,6 +47,8 @@ def createLogger(name):
         elif LOGGING_LEVEL > 0:
             debugFileHandler = logging.FileHandler(logsDir + "/git-ignore-me_gemsDebug.log")
             debugFileHandler.setLevel(logging.DEBUG)
+            infoFileHandler = logging.FileHandler(logsDir + "/git-ignore-me_gemsInfo.log")
+            infoFileHandler.setLevel(logging.INFO)
 
 
         ##Formatters
@@ -57,6 +59,7 @@ def createLogger(name):
             infoFileHandler.setFormatter(formatter)
         elif LOGGING_LEVEL > 0:
             debugFileHandler.setFormatter(formatter)
+            infoFileHandler.setFormatter(formatter)
 
         #log.addHandler(streamHandler)
         log.addHandler(errorFileHandler)
@@ -64,6 +67,7 @@ def createLogger(name):
             log.addHandler(infoFileHandler)
         elif LOGGING_LEVEL > 0:
             log.addHandler(debugFileHandler)
+            log.addHandler(infoFileHandler)
 
         loggers[name] = log
         log.debug("created a new logger for: " + name + ", LOGGING_LEVEL: " + str(LOGGING_LEVEL))

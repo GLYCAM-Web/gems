@@ -350,11 +350,12 @@ def getSequenceFromTransaction(thisTransaction: Transaction, sequenceType:str=No
         if sequence == "":
             raise AttributeError("Sequence")
         else:
+            log.debug("returning sequence: " + sequence)
             return sequence
     else:
         log.debug("Looking for the sequenceType: " + str(sequenceType))
-        #log.debug("response_dict: " )
-        #prettyPrint(thisTransaction.response_dict)
+        log.debug("response_dict: " )
+        prettyPrint(thisTransaction.response_dict)
         responses = thisTransaction.response_dict['entity']['responses']
         for response in responses:
             if 'outputs' in response.keys():
@@ -371,6 +372,7 @@ def getSequenceFromTransaction(thisTransaction: Transaction, sequenceType:str=No
             if "sequenceVariants" in element.keys():
                 if sequenceType in element['sequenceVariants'].keys():
                     sequence = element['sequenceVariants'][sequenceType]
+                    log.debug("returning sequence: " + sequence)
                     return sequence
 
 
@@ -387,6 +389,7 @@ def getSequenceFromTransaction(thisTransaction: Transaction, sequenceType:str=No
                     if "sequenceVariants" in outputs.keys():
                         if sequenceType in outputs['sequenceVariants'].keys():
                             sequence = outputs['sequenceVariants'][sequenceType]
+                            log.debug("returning sequence: " + sequence)
                             return sequence
                     # if 'outputs' in theEvaluations:
                     #         outputs = theEvaluations['outputs']

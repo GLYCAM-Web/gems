@@ -66,6 +66,8 @@ def receive(thisTransaction : delegatorio.Transaction):
             from gemsModules.sequence import evaluate
             try:
                 evaluate.evaluateCondensedSequencePydantic(thisTransaction, currentService)
+                ##Build the Default structure.
+                manageSequenceRequest(thisTransaction)
             except Exception as error:
                 log.error("There was a problem evaluating the condensed sequence: " + str(error)) 
                 log.error(traceback.format_exc())
@@ -76,6 +78,8 @@ def receive(thisTransaction : delegatorio.Transaction):
                 ##first evaluate the requested structure. Only build if valid.
                 from gemsModules.sequence import evaluate
                 valid = evaluate.evaluateCondensedSequencePydantic(thisTransaction, "Evaluate")
+                
+                
             except Exception as error:
                 log.error("There was a problem evaluating the condensed sequence: " + str(error)) 
                 log.error(traceback.format_exc())
@@ -86,6 +90,8 @@ def receive(thisTransaction : delegatorio.Transaction):
                     try:
                         from gemsModules.sequence import logic
                         logic.manageSequenceRequest(thisTransaction)
+                        
+                        
                     except Exception as error:
                         log.error("There was a problem with manageSequenceRequest(): " + str(error))
                         raise error
