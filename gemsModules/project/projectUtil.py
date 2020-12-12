@@ -266,24 +266,35 @@ def getProjectpUUID(thisTransaction : Transaction):
     log.info("getProjectpUUID() was called.\n")
     log.debug("Request dict: \n")
     prettyPrint(thisTransaction.request_dict)
-    if thisTransaction.response_dict is not None:
+    if thisTransaction.response_dict.keys() is not None:
         log.debug("Response dict: \n")
         prettyPrint(thisTransaction.response_dict)
+        pUUID = ""
+        if 'project' in thisTransaction.response_dict.keys():
+            pUUID = thisTransaction.response_dict['project']['pUUID']
+        else:
+            log.error("Cannot get pUUID from a transaction that has no project.")
+            log.error("thisTransaction's keys: \n" + str(thisTransaction.response_dict.keys()))
+            raise AttributeError
+        log.debug("pUUID: " + str(pUUID))
+        if pUUID == "":
+            raise AttributeError("pUUID")
+        else:
+            return pUUID
     else:
-        log.debug("No response_exists.")
-
-    pUUID = ""
-    if 'project' in thisTransaction.response_dict.keys():
-        pUUID = thisTransaction.response_dict['project']['pUUID']
-    else:
-        log.error("Cannot get pUUID from a transaction that has no project.")
-        log.error("thisTransaction's keys: \n" + str(thisTransaction.response_dict.keys()))
-        raise AttributeError
-    log.debug("pUUID: " + str(pUUID))
-    if pUUID == "":
-        raise AttributeError("pUUID")
-    else:
-        return pUUID
+        log.debug("No response_exists. Checking the request.")
+        pUUID = ""
+        if 'project' in thisTransaction.request_dict.keys():
+            pUUID = thisTransaction.request_dict['project']['pUUID']
+        else:
+            log.error("Cannot get pUUID from a transaction that has no project.")
+            log.error("thisTransaction's keys: \n" + str(thisTransaction.request_dict.keys()))
+            raise AttributeError
+        log.debug("pUUID: " + str(pUUID))
+        if pUUID == "":
+            raise AttributeError("pUUID")
+        else:
+            return pUUID
 
 
 ## Pass a pUUID and an appName, get a download url.
