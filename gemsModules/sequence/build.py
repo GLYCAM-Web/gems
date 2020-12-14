@@ -52,7 +52,6 @@ def appendBuild3DStructureResponse(thisTransaction : Transaction, pUUID : str):
 
 def buildEach3DStructureInStructureInfo(structureInfo : StructureInfo, buildStrategyID : str, thisTransaction : Transaction, this_seqID : str, this_pUUID : str, projectDir : str):
     needToInstantiateCarbohydrateBuilder = True
-    import time
     from multiprocessing import Process
     for buildState in structureInfo.buildStates:
         log.debug("Checking if a structure has been built in this buildState: ")
@@ -71,27 +70,20 @@ def buildEach3DStructureInStructureInfo(structureInfo : StructureInfo, buildStra
                 needToInstantiateCarbohydrateBuilder = False # Only ever do this once.
                 log.debug("About to getCbBuilderForSequence")
                 inputSequence = getSequenceFromTransaction(thisTransaction)          
-                start = time.time()
                 builder = getCbBuilderForSequence(inputSequence)
-                end = time.time()
-                print("Time consumed in Instantiating carbohydrateBuilder: ",end - start)
             buildDir = "New_Builds/"
             sequenceProjects.createConformerDirectoryInBuildsDirectory(projectDir, conformerID)
             outputDirPath = os.path.join(projectDir, buildDir, conformerID)
             log.debug("outputDirPath: " + outputDirPath)
-            start = time.time()
             #from multiprocessing import set_start_method
             #set_start_method("spawn")
             #d = Process(target=build3DStructure, args=(buildState, thisTransaction, outputDirPath, builder))
            # d.start()
             build3DStructure(buildState, thisTransaction, outputDirPath, builder)
-            end = time.time()
-            print("Time consumed in build3DStructure : ",end - start)
             sequenceProjects.addSequenceFolderSymLinkToNewBuild(this_seqID, buildStrategyID, this_pUUID, conformerID)        
             if conformerID == "default": # And doesn't already exist.
                 #sequenceProjects.createDefaultSymLinkSequencesDirectory(this_seqID, conformerID, buildStrategyID)
                 sequenceProjects.createDefaultSymLinkBuildsDirectory(projectDir, buildDir + conformerID)
-
         # buildDir is either New_Builds/ or Existing_Builds/
         sequenceProjects.createSymLinkInRequestedStructures(projectDir, buildDir, conformerID)
         # Needs to be Requested_Structres/. Need to add conformerID separately.
