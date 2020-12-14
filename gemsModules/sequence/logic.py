@@ -4,6 +4,7 @@ import gemsModules
 import gmml
 import traceback
 import gemsModules.common.utils
+from multiprocessing import Process
 from gemsModules.project.projectUtil import *
 from gemsModules.project import settings as projectSettings
 from gemsModules.common import io as commonio
@@ -33,6 +34,12 @@ def getOptionsFromTransaction(thisTransaction: Transaction):
         log.debug("No options found.")
         return None
 
+class EverLastingProcess(Process):
+    def join(self, *args, **kwargs):
+        pass # Overwrites join so that it doesn't block. Otherwise parent waits.
+
+    def __del__(self):
+        pass
 
 ##  @brief Logs requests, makes decisions about what to build or reuse, builds a response.
 ##  @detail This is a bit of a butler method, it looks over the process and calls only what
@@ -83,56 +90,23 @@ def manageSequenceRequest(thisTransaction : Transaction):
         ## Not happy with the organization of this logic. Too much state being passed around and similar code!
         ## Smells like it should be a class and this stuff goes in the initializer. 
         this_pUUID = sequenceProjects.getProjectpUUID(thisTransaction)
-
-
         this_sequence = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
         this_seqID = getSeqIDForSequence(this_sequence)
         buildStrategyID = "buildStrategyID1" # TODO implement getCurrentBuildStrategyID().
         sequenceProjects.setupInitialSequenceFolders(this_seqID, this_pUUID, buildStrategyID)
+        #Can generate the response already:
+        for buildState in structureInfo.buildStates:
+            conformerID = buildState.structureDirectoryName
+            sequenceProjects.addResponse(buildState, thisTransaction, conformerID, buildState.conformerLabel)
+        log.debug("response_dict, after evaluation: ")
+        prettyPrint(thisTransaction.response_dict)
         ## Regardless if requesting default or not, I think I need to generate a default. Otherwise I get into madness
         ## with figuring out exist status and which conformerID to use in place of default. Then when a default 
         ## request does come, should it overwrite previous default for old projects?
         ## A default request is always first, this is now implemented in buildStructureInfo
-        needToInstantiateCarbohydrateBuilder = True
-        for buildState in structureInfo.buildStates:
-            log.debug("Checking if a structure has been built in this buildState: ")
-            log.debug("buildState: " + repr(buildState))
-            conformerID = buildState.structureDirectoryName # May return "default" or a conformerID
-            ##  check if requested structures exitst, update structureInfo_status.json and project when exist
-            if sequenceProjects.structureExists(buildState, thisTransaction, buildStrategyID):
-                ## Nothing in Sequence/ needs to change. In Builds/ProjectID/
-                ## add symLink in Existing to Sequences/SequenceID/defaults/All_builds/conformerID.
-                log.debug("Found an existing structure.")
-                buildDir = "Existing_Builds/"
-                sequenceProjects.addBuildFolderSymLinkToExistingConformer(this_seqID, buildStrategyID, this_pUUID, conformerID)
-            else: # Doesn't already exist.
-                log.debug("Need to build this structure.")
-                if needToInstantiateCarbohydrateBuilder:
-                    needToInstantiateCarbohydrateBuilder = False # Only ever do this once.
-                    log.debug("About to getCbBuilderForSequence")
-                    inputSequence = getSequenceFromTransaction(thisTransaction)
-                    builder = sequenceBuild.getCbBuilderForSequence(inputSequence)
-                buildDir = "New_Builds/"
-                sequenceProjects.createConformerDirectoryInBuildsDirectory(projectDir, conformerID)
-                outputDirPath = os.path.join(projectDir, buildDir, conformerID)
-                log.debug("outputDirPath: " + outputDirPath)
-                sequenceBuild.build3DStructure(buildState, thisTransaction, outputDirPath, builder)
-                sequenceProjects.addSequenceFolderSymLinkToNewBuild(this_seqID, buildStrategyID, this_pUUID, conformerID)        
-                if conformerID == "default": # And doesn't already exist.
-                    #sequenceProjects.createDefaultSymLinkSequencesDirectory(this_seqID, conformerID, buildStrategyID)
-                    sequenceProjects.createDefaultSymLinkBuildsDirectory(projectDir, buildDir + conformerID)
-
-            # buildDir is either New_Builds/ or Existing_Builds/
-            sequenceProjects.createSymLinkInRequestedStructures(projectDir, buildDir, conformerID)
-            # Needs to be Requested_Structres/. Need to add conformerID separately.
-            sequenceProjects.addResponse(buildState, thisTransaction, conformerID, buildState.conformerLabel)
-            # This probably needs work    
-            sequenceProjects.registerBuild(buildState, thisTransaction)
-
-            log.debug("response_dict, after evaluation: ")
-            prettyPrint(thisTransaction.response_dict)
-
-
+        #sequenceBuild.buildEach3DStructureInStructureInfo(structureInfo, buildStrategyID, thisTransaction, this_seqID, this_pUUID, projectDir)
+        p = EverLastingProcess(target=sequenceBuild.buildEach3DStructureInStructureInfo, args=(structureInfo, buildStrategyID, thisTransaction, this_seqID, this_pUUID, projectDir,), daemon=False)
+        p.start()
         #sequenceProjects.createDefaultSymLinkBuildsDirectory(projectDir, buildDir + conformerID)
             ##  create downloadUrl
             ##  submit to amber for minimization, 

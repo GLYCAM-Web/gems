@@ -16,6 +16,7 @@ from gemsModules.sequence import io as sequenceIO
 from gemsModules.common.loggingConfig import *
 
 from gemsModules.sequence import projects as sequenceProjects
+
 from . import settings as sequenceSettings
 from .structureInfo import *
 if loggers.get(__name__):
@@ -48,6 +49,55 @@ def appendBuild3DStructureResponse(thisTransaction : Transaction, pUUID : str):
         }
     })
 
+
+def buildEach3DStructureInStructureInfo(structureInfo : StructureInfo, buildStrategyID : str, thisTransaction : Transaction, this_seqID : str, this_pUUID : str, projectDir : str):
+    needToInstantiateCarbohydrateBuilder = True
+    import time
+    from multiprocessing import Process
+    for buildState in structureInfo.buildStates:
+        log.debug("Checking if a structure has been built in this buildState: ")
+        log.debug("buildState: " + repr(buildState))
+        conformerID = buildState.structureDirectoryName # May return "default" or a conformerID
+        ##  check if requested structures exitst, update structureInfo_status.json and project when exist
+        if sequenceProjects.structureExists(buildState, thisTransaction, buildStrategyID):
+            ## Nothing in Sequence/ needs to change. In Builds/ProjectID/
+            ## add symLink in Existing to Sequences/SequenceID/defaults/All_builds/conformerID.
+            log.debug("Found an existing structure for " + conformerID)
+            buildDir = "Existing_Builds/"
+            sequenceProjects.addBuildFolderSymLinkToExistingConformer(this_seqID, buildStrategyID, this_pUUID, conformerID)
+        else: # Doesn't already exist.
+            log.debug("Need to build this structure: " + conformerID )
+            if needToInstantiateCarbohydrateBuilder:
+                needToInstantiateCarbohydrateBuilder = False # Only ever do this once.
+                log.debug("About to getCbBuilderForSequence")
+                inputSequence = getSequenceFromTransaction(thisTransaction)          
+                start = time.time()
+                builder = getCbBuilderForSequence(inputSequence)
+                end = time.time()
+                print("Time consumed in Instantiating carbohydrateBuilder: ",end - start)
+            buildDir = "New_Builds/"
+            sequenceProjects.createConformerDirectoryInBuildsDirectory(projectDir, conformerID)
+            outputDirPath = os.path.join(projectDir, buildDir, conformerID)
+            log.debug("outputDirPath: " + outputDirPath)
+            start = time.time()
+            #from multiprocessing import set_start_method
+            #set_start_method("spawn")
+            #d = Process(target=build3DStructure, args=(buildState, thisTransaction, outputDirPath, builder))
+           # d.start()
+            build3DStructure(buildState, thisTransaction, outputDirPath, builder)
+            end = time.time()
+            print("Time consumed in build3DStructure : ",end - start)
+            sequenceProjects.addSequenceFolderSymLinkToNewBuild(this_seqID, buildStrategyID, this_pUUID, conformerID)        
+            if conformerID == "default": # And doesn't already exist.
+                #sequenceProjects.createDefaultSymLinkSequencesDirectory(this_seqID, conformerID, buildStrategyID)
+                sequenceProjects.createDefaultSymLinkBuildsDirectory(projectDir, buildDir + conformerID)
+
+        # buildDir is either New_Builds/ or Existing_Builds/
+        sequenceProjects.createSymLinkInRequestedStructures(projectDir, buildDir, conformerID)
+        # Needs to be Requested_Structres/. Need to add conformerID separately.
+        # sequenceProjects.addResponse(buildState, thisTransaction, conformerID, buildState.conformerLabel)
+        # This probably needs work    
+        sequenceProjects.registerBuild(buildState, thisTransaction)
 
 ##TODO: Replace this with more generically useful: build3DStructure(transaction, service)
 ##      Needs to work whether default structure or specific rotamers are requested.
@@ -105,9 +155,9 @@ def build3DStructure(buildState : BuildState, thisTransaction : Transaction, out
 
     from gemsModules.mmservice.amber.amber import manageIncomingString
     ## Using multiprocessing for this function call.
-    #manageIncomingString(amberSubmissionJson)
-    p = Process(target=manageIncomingString, args=(amberSubmissionJson,))
-    p.start()
+    manageIncomingString(amberSubmissionJson)
+    #p = Process(target=manageIncomingString, args=(amberSubmissionJson,))
+    #p.start()
     ## everything up to here -- all the amber stuff --
     ## is what needs to move
 
