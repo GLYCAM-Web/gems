@@ -83,6 +83,8 @@ def manageSequenceRequest(thisTransaction : Transaction):
         ## Not happy with the organization of this logic. Too much state being passed around and similar code!
         ## Smells like it should be a class and this stuff goes in the initializer. 
         this_pUUID = sequenceProjects.getProjectpUUID(thisTransaction)
+
+
         this_sequence = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
         this_seqID = getSeqIDForSequence(this_sequence)
         buildStrategyID = "buildStrategyID1" # TODO implement getCurrentBuildStrategyID().
@@ -126,6 +128,9 @@ def manageSequenceRequest(thisTransaction : Transaction):
             sequenceProjects.addResponse(buildState, thisTransaction, conformerID, buildState.conformerLabel)
             # This probably needs work    
             sequenceProjects.registerBuild(buildState, thisTransaction)
+
+            log.debug("response_dict, after evaluation: ")
+            prettyPrint(thisTransaction.response_dict)
 
 
         #sequenceProjects.createDefaultSymLinkBuildsDirectory(projectDir, buildDir + conformerID)

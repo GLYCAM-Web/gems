@@ -96,13 +96,12 @@ def evaluateCondensedSequencePydantic(thisTransaction : Transaction, thisService
         log.debug("responseObj:\n")
         prettyPrint(responseObj)
         commonLogic.updateResponse(thisTransaction, responseObj)
-        ##Build the Default structure.
-        ##If not validate only, build the default structure. 
-        log.debug("Evaluation request is not validateOnly. Requesting the default structure.")
-        sequence_logic.manageSequenceRequest(thisTransaction)
+        log.debug("finished building default structure")
     else:
         log.debug("validateOnly was true. Does evaluateCondensedSequence return a well-formed response?")
 
+    log.debug("response_dict, after evaluation: ")
+    prettyPrint(thisTransaction.response_dict)
     return sequenceIsValid
 
 ##  @brief Pass in validation result and linkages and sequences, get a responseConfig.

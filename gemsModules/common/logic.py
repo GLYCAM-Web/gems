@@ -352,18 +352,27 @@ def updateResponse(thisTransaction, serviceResponse):
 
     try:
         serviceType = serviceResponse['type']
-
-        requestedService = { 
-            serviceType  :  {
-                "type" : serviceType
+        responseServices = thisTransaction.response_dict['entity']['services']
+        serviceListed = False
+        log.debug("responseServices: " + repr(responseServices))
+        #[{'Evaluate': {'type': 'Evaluate'}}, {'Build3DStructure': {'type': 'Build3DStructure'}}]
+        for service in responseServices:
+            log.debug("service keys: " + str(service.keys()))
+            if serviceType in service.keys():
+                serviceListed = True
+        if serviceListed == False:
+            requestedService = { 
+                serviceType  :  {
+                    "type" : serviceType
+                }
             }
-        }
-
-        log.debug("Adding service to json response object services list: " + str(requestedService))
-        thisTransaction.response_dict['entity']['services'].append(requestedService)
+            log.debug("Adding service to json response object services list: " + str(requestedService))
+            thisTransaction.response_dict['entity']['services'].append(requestedService)
+        else:
+            log.debug("Service already listed. Skipping.")
 
     except Exception as error:
-        log.debug("There was a problem adding the requested service: " + str(error))
+        log.error("There was a problem adding the requested service: " + str(error))
         log.error(traceback.format_exc())
 
 
