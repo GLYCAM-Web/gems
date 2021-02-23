@@ -100,7 +100,7 @@ def getProjectFromTransaction(thisTransaction: Transaction):
     log.info("getProjectFromTransaction() was called.\n")
     if 'project' in thisTransaction.request_dict.keys():
         project = thisTransaction.request_dict['project']
-        log.debug("Object type for frontend project: " + str(type(project)))
+        log.debug("Object type for project: " + str(type(project)))
         return project
     else:
         return None

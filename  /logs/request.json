@@ -1,0 +1,52 @@
+{
+    "entity": {
+        "type": "StructureFile",
+        "services": [
+            {
+                "Preprocess": {
+                    "type": "PreprocessPdbForAmber"
+                }
+            }
+        ],
+        "inputs": [
+            {
+                "pdb_file_name": "2V95.pdb"
+            }
+        ]
+    },
+    "options": {
+        "preprocessor_options": {
+            "targetModule": "amber"
+        }
+    },
+    "project": {
+        "_state": "<django.db.models.base.ModelState object at 0x7f2b4dd04cd0>",
+        "id": "fbde2060-6317-4a41-b840-e4a85be0a265",
+        "user_id": "None",
+        "email": "",
+        "pUUID": "None",
+        "title": "",
+        "comment": "",
+        "timestamp": "2021-02-17 20:31:31.734356+00:00",
+        "project_type": " ",
+        "project_dir": " ",
+        "requesting_agent": "website",
+        "gems_version": "9215a3d7827fce3d45d1d63472b04a0c065f1099",
+        "gems_branch": "pdbPreprocessor",
+        "gmml_version": "762992fcaf3d767c2741a03e8f8f21b1e79bd68f",
+        "gmml_branch": "gmml-dev",
+        "site_mode": "CONTAINERS",
+        "site_host_name": "172.23.0.2",
+        "force_field": "",
+        "parameter_version": "",
+        "amber_version": "",
+        "json_api_version": "0.0.1",
+        "project_ptr_id": "fbde2060-6317-4a41-b840-e4a85be0a265",
+        "uploaded_file_name": "2V95.pdb",
+        "u_uuid": "92d02799-000a-4adc-8812-770aac6c4d90",
+        "upload_path": "/website/TESTS/pdb/test_in/",
+        "pdb_id": " ",
+        "type": "pdb",
+        "_django_version": "2.2.2"
+    }
+}

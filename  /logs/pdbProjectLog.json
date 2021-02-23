@@ -1,0 +1,22 @@
+{
+    "pUUID": "d79f186f-c887-4621-af26-217becfa2300",
+    "title": "",
+    "comment": "",
+    "timestamp": "2021-02-22 15:18:44.762390",
+    "project_type": "pdb",
+    "project_dir": " ",
+    "requesting_agent": "website",
+    "has_input_files": "True",
+    "gems_version": "9215a3d7827fce3d45d1d63472b04a0c065f1099",
+    "gems_branch": "pdbPreprocessor",
+    "gmml_version": "762992fcaf3d767c2741a03e8f8f21b1e79bd68f",
+    "gmml_branch": "gmml-dev",
+    "site_mode": "CONTAINERS",
+    "site_host_name": "172.23.0.2",
+    "force_field": "",
+    "parameter_version": "",
+    "amber_version": "",
+    "json_api_version": "0.0.1",
+    "uploadFileName": "2V95.pdb",
+    "status": "submitted"
+}

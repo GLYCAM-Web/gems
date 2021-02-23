@@ -26,19 +26,20 @@ def preprocessPdbForAmber(thisTransaction):
         ### Some projects will already have been created. 
         #   However, these two conditions need new projects.
         if thisTransaction.response_dict == None: 
-            gemsProject = startProject(thisTransaction)
-        elif 'gems_project' not in thisTransaction.response_dict.keys():
-            gemsProject = startProject(thisTransaction)
+            project = startProject(thisTransaction)
+        elif 'project' not in thisTransaction.response_dict.keys():
+            project = startProject(thisTransaction)
         else:
-            log.debug("response_dict or gems_project already exists, not starting a project.")
+            log.debug("response_dict or project already exists, not starting a project.")
 
         prettyPrint(thisTransaction.request_dict)
 
     except Exception as error:
-        log.error("There was a problem starting a pdb gemsProject.")
+        log.error("There was a problem starting a pdb project." + str(error))
         raise error
     else:
-        uploadFileName = thisTransaction.response_dict['gems_project']['uploadFileName']
+        log.debug("\n\nthisTransaction.response_dict: " + str(thisTransaction.response_dict))
+        uploadFileName = thisTransaction.response_dict['project']['uploadFileName']
         log.debug("completed uploadFileName: " + uploadFileName)
         ### generate the processed pdb's content
         try:
@@ -53,7 +54,7 @@ def preprocessPdbForAmber(thisTransaction):
             try:
                 writePdbOutput(thisTransaction, pdbFile)
             except Exception as error:
-                log.error("There was a problem writing the pdb output.")
+                log.error("There was a problem writing the pdb output." + str(error))
                 raise error
 
 
@@ -80,7 +81,7 @@ def generatePdbOutput(thisTransaction):
 
 
         ### Get the fileName from the transaction.
-        project = getFrontendProjectFromTransaction(thisTransaction)
+        project = getProjectFromTransaction(thisTransaction)
         log.debug("Object type for frontend project: " + str(type(project)))
         try:
             projectDir = getProjectDir(thisTransaction)
@@ -89,7 +90,7 @@ def generatePdbOutput(thisTransaction):
             log.error(traceback.format_exc())
             raise error
         else:
-            projectUploadDir  = getProjectUploadsDir(project, projectDir)
+            projectUploadDir  = getProjectUploadsDir(project)
             uploadedFileName = project['uploaded_file_name']
             log.debug("uploadedFileName: " + uploadedFileName)
             uploadedPDB = projectUploadDir + uploadedFileName
@@ -739,15 +740,15 @@ def writePdb(pdbFile, projectDir):
 
 def buildPdbResponseConfig(thisTransaction : Transaction):
     log.info("buildPdbResponseConfig() was called.\n")
-    gemsProject = thisTransaction.response_dict['gems_project']
-    downloadUrl = getDownloadUrl(gemsProject['pUUID'], "pdb")
+    project = thisTransaction.response_dict['project']
+    downloadUrl = getDownloadUrl(project['pUUID'], "pdb")
     config = {
         "entity" : "StructureFile",
         "respondingService" : "PreprocessPdbForAmber",
         "responses" : [
             {
-                "project_status" : gemsProject['status'],
-                'payload' : gemsProject['pUUID'],
+                "project_status" : project['status'],
+                'payload' : project['pUUID'],
                 'downloadUrl' : downloadUrl
             }
         ]
@@ -862,15 +863,5 @@ def getUploadFileName(project):
 
     
 
-##Starts the project, and updates the transaction.
-def startPdbGemsProject(thisTransaction):
-    log.info("startPdbGemsProject() was called.\n")
-    try:
-        ##Start a gemsProject        
-        gemsProject = startProject(thisTransaction)
-        return gemsProject
-    except Exception as error:
-        log.error("There was a problem starting the gemsProject.")
-        raise error
         
     

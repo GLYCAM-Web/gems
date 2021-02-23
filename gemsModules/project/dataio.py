@@ -127,7 +127,7 @@ class Project(BaseModel):
         return result
 
 def buildProjectDir(tool, pUUID):
-    log.info("buildDefaultProjecDir() was called.")
+    log.info("buildProjecDir() was called.")
     log.debug("tool: " + tool)
     log.debug("pUUID: " + pUUID)
     return os.path.join(project_settings.output_data_dir,  "tools",  tool, "git-ignore-me_userdata/Builds", pUUID )
@@ -202,15 +202,26 @@ class PdbProject(Project):
 
         ##User may provide a project_dir.
         if'project' in request_dict.keys():
+            log.debug("Found a project in the request.")
             if 'project_dir' in request_dict['project'].keys():
-                project = request_dict['project']
-                self.project_dir = project['project_dir']
+                log.info("Found a project_dir in the request.")
+                if request_dict['project']['project_dir'] != " ":
+                    project = request_dict['project']
+                    self.project_dir = project['project_dir']
+                else:
+                    log.debug("No project_dir found in the project. Using default.")
+                    ## Default, if none offered by the user.
+                    self.project_dir =  buildProjectDir(self.project_type , self.pUUID)
             else:
+                log.debug("No project_dir found in the project. Using default.")
                 ## Default, if none offered by the user.
                 self.project_dir =  buildProjectDir(self.project_type , self.pUUID)
         else:
-            ## Default, if none offered by the user.
-                self.project_dir =  buildProjectDir(self.project_type , self.pUUID)
+            ## Default, if no project offered by the user.
+            log.debug("No project found. Using default project dir.")
+            self.project_dir =  buildProjectDir(self.project_type , self.pUUID)
+
+        log.debug("project_dir: " + self.project_dir)
 
     def __str__(self): 
         result = super().__str__()
