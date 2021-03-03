@@ -610,6 +610,7 @@ def buildHistidineProtonationsDict(thisTransaction, preprocessor):
 #   @param pdbFile
 def writePdbOutput(thisTransaction, pdbFile):
     log.info("writePdbOutput() was called.\n")
+
     ### Give the output file the same path as the uploaded file, but replace the name.
     try:
         projectDir = getProjectDir(thisTransaction)
@@ -617,23 +618,22 @@ def writePdbOutput(thisTransaction, pdbFile):
     except Exception as error:
         log.error("There was a problem getting the output dir from the transaction.")
         raise error
-    else:
 
-        ### Write the file
-        try:   
-            writePdb(pdbFile, projectDir)
-        except Exception as error:
-            log.error("There was an error writing the pdb file.")
-            raise error        
-        else:
+    ### Write the file
+    try:   
+        writePdb(pdbFile, projectDir)
+    except Exception as error:
+        log.error("There was an error writing the pdb file.")
+        raise error        
 
-            ### Build a response
-            try:
-                responseConfig = buildPdbResponseConfig(thisTransaction)
-                appendResponse(thisTransaction, responseConfig)
-            except Exception as error:
-                log.error("There was a problem building the pdbResponse.")
-                raise error
+
+    ### Build a response
+    try:
+        responseConfig = buildPdbResponseConfig(thisTransaction)
+        appendResponse(thisTransaction, responseConfig)
+    except Exception as error:
+        log.error("There was a problem building the pdbResponse.")
+        raise error
                            
 
 
@@ -732,7 +732,7 @@ def writePdb(pdbFile, projectDir):
     if os.path.exists(projectDir):
         log.debug("Writing the preprocessed pdb to 'updated_pdb.pdb'")
         destinationFile = 'updated_pdb.pdb'
-        updatedPdbFileName = projectDir + destinationFile
+        updatedPdbFileName = projectDir + "/" + destinationFile
         log.debug("updatedPdbFileName: " + updatedPdbFileName)
         pdbFile.WriteWithTheGivenModelNumber(updatedPdbFileName)
     else:
