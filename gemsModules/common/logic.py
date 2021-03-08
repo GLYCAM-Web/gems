@@ -25,7 +25,7 @@ verbosity=common.utils.gems_environment_verbosity()
 def importEntity(requestedEntity):
     log.info("importEntity() was called.\n")
     log.debug("requestedEntity: " + requestedEntity)
-    log.debug("Entities known to Common Services: " + str(subEntities))
+    #log.debug("Entities known to Common Services: " + str(subEntities))
 
     try:
         requestedModule = '.' + subEntities[requestedEntity]
@@ -47,7 +47,7 @@ def importEntity(requestedEntity):
                 log.error("The module spec returned None for rquestedEntity: " + requestedEntity)
                 raise FileNotFoundError(requestedEntity)
 
-            log.debug("module_spec: " + str(module_spec))
+            #log.debug("module_spec: " + str(module_spec))
             return importlib.import_module(requestedModule,package="gemsModules")
 
 def parseInput(thisTransaction):
@@ -60,8 +60,8 @@ def parseInput(thisTransaction):
 
     # Load the JSON string into the incoming dictionary
     thisTransaction.request_dict = json.loads(thisTransaction.incoming_string)
-    log.debug("thisTransaction.request_dict: \n\n")
-    prettyPrint(thisTransaction.request_dict)
+    #log.debug("thisTransaction.request_dict: \n\n")
+    #prettyPrint(thisTransaction.request_dict)
 
     # Check to see if there are errors.  If there are, bail, but give a reason
     if thisTransaction.request_dict is None:
@@ -78,7 +78,7 @@ def parseInput(thisTransaction):
     else:
         # If still here, load the data into a Transaction object and return success
         thisTransaction.transaction_in = jsonpickle.decode(thisTransaction.incoming_string)
-        log.debug("thisTransaction.transaction_in: " + str(thisTransaction.transaction_in))
+        #log.debug("thisTransaction.transaction_in: " + str(thisTransaction.transaction_in))
         return 0
 
 def marco(requestedEntity):

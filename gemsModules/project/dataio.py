@@ -24,6 +24,7 @@ class Project(BaseModel):
     title : str = ""
     comment : str = ""
     timestamp : datetime = None
+    gems_timestamp : datetime = None
     project_type : str = ""
 
     ## The project path. Used to be output dir, but now that is reserved for subdirs.
@@ -41,17 +42,18 @@ class Project(BaseModel):
     parameter_version : str = "default"
     amber_version : str = "default"
     json_api_version : str = ""
-    
+    _django_version : str = ""
+    django_project_id : str = ""
     
 
     def __init__(self, request_dict : dict):
         super().__init__()
         log.info("GemsProject.__init__() was called.")
-        log.debug("request_dict: " + str(request_dict))
+        #log.debug("request_dict: " + str(request_dict))
 
         ## Random uuid for the project uuid.
         self.pUUID = str(uuid.uuid4()) 
-        self.timestamp = datetime.now()
+        self.gems_timestamp = datetime.now()
 
         if 'project' in request_dict.keys():
             log.debug("found a project in the request_dict.")
@@ -61,6 +63,8 @@ class Project(BaseModel):
                 self.title = project['title']
             if 'comment' in project.keys():
                 self.comment = project['comment']
+            if 'timestamp' in project.keys():
+                self.timestamp = project['timestamp']
             if 'requesting_agent' in project.keys():
                 self.requesting_agent = project['requesting_agent']
 
@@ -87,6 +91,9 @@ class Project(BaseModel):
 
             if 'json_api_version' in project.keys():
                 self.json_api_version = project['json_api_version']
+            if 'django_project_id' in project.keys():
+                self.django_project_id = project['django_project_id']
+
         else:
             ##  For doing our best if the request doesn't include a project obj.
             #   This is where we give defaults for whatever is needed.
@@ -94,21 +101,20 @@ class Project(BaseModel):
             log.debug("request entity type: " + request_dict['entity']['type'])
             if request_dict['entity']['type'] == "Sequence":
                 self.project_type = "cb"
-                self.has_input_files = False
             elif request_dict['entity']['type'] == "MmService":
                 self.project_type = "md"
                 self.has_input_files = True
             elif request_dict['entity']['type'] == "Conjugate":
                 self.project_type = "gp"
-                self.has_input_files = True
             elif request_dict['entity']['type'] == "StructureFile":
                 self.project_type = "pdb"
-                self.has_input_files = True
+                
 
     def __str__(self):
         result = "\nproject:"
         result = result + "\ncomment: " + self.comment
         result = result + "\ntimestamp: " + str(self.timestamp)
+        result = result + "\ngems_timestamp: " + str(self.gems_timestamp)
         result = result + "\nproject_type: " + self.project_type
         result = result + "\npUUID: " + self.pUUID
         result = result + "\nrequesting_agent: " + self.requesting_agent
@@ -123,6 +129,7 @@ class Project(BaseModel):
         result = result + "\nparameter_version: "  + self.parameter_version
         result = result + "\namber_version: "  + self.amber_version
         result = result + "\njson_api_version: "  + self.json_api_version
+        result = result + "\ndjango_project_id: "  + self.django_project_id
         result = result + "\nproject_dir: "  + self.project_dir
         return result
 
@@ -145,6 +152,7 @@ class CbProject(Project):
         log.info("CbProject.__init__() was called.")
         from gemsModules.project.projectUtil import getSequenceFromTransaction, getSeqIDForSequence
         self.project_type = "cb"
+        self.has_input_files = False
         inputs = request_dict['entity']['inputs']
         sequence = ""
         for element in inputs:
@@ -187,26 +195,40 @@ class CbProject(Project):
         return result
 
 class PdbProject(Project):
-    uploadFileName : str = ""
+    uploaded_file_name : str = ""
     status : str = ""
+    u_uuid : str = ""
+    upload_path : str = ""
+    pdb_id : str = ""
+    input_source : str = ""
 
     def __init__(self, request_dict: dict):
         super().__init__(request_dict)
-        from gemsModules.structureFile.amber.receive import getInput
+        from gemsModules.structureFile.amber.receive import getPdbRequestInput
         log.info("PdbProject.__init__() was called.")
         self.project_type = "pdb"
         self.has_input_files = True
-        self.uploadFileName = getInput(request_dict)
-        log.debug("uploadFileName: " + self.uploadFileName)
+        self.uploaded_file_name = getPdbRequestInput(request_dict)
+        log.debug("uploaded_file_name: " + self.uploaded_file_name)
         self.status = "submitted"
 
         ##User may provide a project_dir.
         if'project' in request_dict.keys():
             log.debug("Found a project in the request.")
-            if 'project_dir' in request_dict['project'].keys():
+            project = request_dict['project']
+            if "u_uuid" in project.keys():
+                self.u_uuid = project['u_uuid']
+            if "upload_path" in project.keys():
+                self.upload_path = project['upload_path']
+            if "pdb_id" in project.keys():
+                self.pdb_id = project['pdb_id']
+            if "input_source" in project.keys():
+                self.input_source = project['input_source']
+
+            if 'project_dir' in project.keys():
                 log.info("Found a project_dir in the request.")
                 if request_dict['project']['project_dir'] != " ":
-                    project = request_dict['project']
+                    
                     self.project_dir = project['project_dir']
                 else:
                     log.debug("No project_dir found in the project. Using default.")
@@ -226,8 +248,13 @@ class PdbProject(Project):
     def __str__(self): 
         result = super().__str__()
         result = result + "\nproject_type: " + self.project_type
-        result = result + "\nuploadFileName: " + self.uploadFileName
+        result = result + "\nuploaded_file_name: " + self.uploaded_file_name
         result = result + "\nstatus: " + self.status
+        result = result + "\nu_uuid: " + self.u_uuid
+        result = result + "\nupload_path: " + self.upload_path
+        result = result + "\npdb_id: " + self.pdb_id
+        result = result + "\ninput_source: " + self.input_source
+
         return result
 
 

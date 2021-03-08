@@ -7,7 +7,7 @@
             }
         }],
         "inputs": [{
-            "pdb_file_name": "test_1buy.pdb"
+            "pdb_file_name": "1buy.pdb"
         }]
     },
     "options": {
@@ -19,7 +19,7 @@
         "_state": "<django.db.models.base.ModelState object at 0x7effd3db2150>",
         "id": "0dd24a03-bfc4-4c51-bb67-51638481ae78",
         "user_id": "None",
-        "email": "nobdy@home.com",
+        "email": "nobody@home.com",
         "pUUID": "None",
         "title": "Dan's Project",
         "comment": "commentyness",
@@ -39,9 +39,9 @@
         "amber_version": "",
         "json_api_version": "0.0.1",
         "project_ptr_id": "0dd24a03-bfc4-4c51-bb67-51638481ae78",
-        "uploaded_file_name": "test_1buy.pdb",
+        "uploaded_file_name": "1buy.pdb",
         "u_uuid": "4c82fce4-b413-49ff-b420-23a6dbd33eb7",
-        "upload_path": "/website/uploads/tools/pdb/git-ignore-me_userdata/4c82fce4-b413-49ff-b420-23a6dbd33eb7/",
+        "upload_path": "/website/TESTS/pdb/test_in/",
         "pdb_id": " ",
         "status": "requested",
         "input_source": "upload"
