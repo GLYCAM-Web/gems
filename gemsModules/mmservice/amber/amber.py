@@ -35,37 +35,48 @@ class Amber_Job:
         self.LEAPSOLVT3PIN = self.RUN_PREF + '_T3P.' + conf.File_Naming.extLEAPIN
         self.LEAPSOLVT5PIN = self.RUN_PREF + '_T5P.' + conf.File_Naming.extLEAPIN
         self.LEAPIN = self.RUN_PREF + '.' + conf.File_Naming.extLEAPIN
-        self.MININ = self.RUN_PREF + '.' + conf.File_Naming.extMININ
+        self.GASMININ = self.RUN_PREF + '_gas.' + conf.File_Naming.extMININ
+        self.SOLMININ = self.RUN_PREF + '_sol.' + conf.File_Naming.extMININ
         self.HEATIN = self.RUN_PREF + '.' + conf.File_Naming.extHEATIN
         self.EQUIIN = self.RUN_PREF + '.' + conf.File_Naming.extEQUIIN
         self.MDIN = self.RUN_PREF + '.' + conf.File_Naming.extMDIN
         #output file names
         self.MINOUT = self.RUN_PREF + '.' + conf.File_Naming.extMINOUT
+        self.MINT3POUT = self.RUN_PREF + '_t3p.' + conf.File_Naming.extMINOUT
+        self.MINT5POUT = self.RUN_PREF + '_t5p.' + conf.File_Naming.extMINOUT
         self.HEATOUT = self.RUN_PREF + '.' + conf.File_Naming.extHEATOUT
         self.EQUIOUT = self.RUN_PREF + '.' + conf.File_Naming.extEQUIOUT
         self.MDOUT = self.RUN_PREF + '.' + conf.File_Naming.extMDOUT
         #coordinate file names
         self.MINRST = self.RUN_PREF + '_min.' + conf.File_Naming.extMDRST # single frame coordinate file
+        self.MINT3PRST = self.RUN_PREF + '_min_t3p.' + conf.File_Naming.extMDRST # single frame coordinate file
+        self.MINT5PRST = self.RUN_PREF + '_min_t5p.' + conf.File_Naming.extMDRST # single frame coordinate file
         self.HEATRST = self.RUN_PREF + '_heat.' + conf.File_Naming.extMDRST # single frame coordinate file
         self.EQUIRST = self.RUN_PREF + '_equi.' + conf.File_Naming.extMDRST # single frame coordinate file
         self.MDRST = self.RUN_PREF + '_md.' + conf.File_Naming.extMDRST # single frame coordinate file
         #trajectory file_names
-        self.INPCRDT3P = self.RUN_PREF + '_min_t3p.' + conf.File_Naming.extMDRST
-        self.INPCRDT5P = self.RUN_PREF + '_min_t5p.' + conf.File_Naming.extMDRST
+        self.INPCRDT3P = self.RUN_PREF + '_t3p.' + conf.File_Naming.extMDRST
+        self.INPCRDT5P = self.RUN_PREF + '_t5p.' + conf.File_Naming.extMDRST
         self.MINCRD = self.RUN_PREF + '.' + conf.File_Naming.extMINCRD
+        self.MINT3PCRD = self.RUN_PREF + 'min_t3p.' + conf.File_Naming.extMINCRD
+        self.MINT5PCRD = self.RUN_PREF + 'min_t5p.' + conf.File_Naming.extMINCRD
         self.HEATCRD = self.RUN_PREF + '.' + conf.File_Naming.extHEATCRD
         self.EQUICRD = self.RUN_PREF + '.' + conf.File_Naming.extEQUICRD
         self.MDCRD = self.RUN_PREF + '.' + conf.File_Naming.extMDCRD # MD production run trajectory file in MDCRD format. How about .nc?
         #info file names
         self.MININFO = self.RUN_PREF + '.' + conf.File_Naming.extMININFO
+        self.MINT3PINFO = self.RUN_PREF + 'min_t3p.' + conf.File_Naming.extMININFO
+        self.MINT5PINFO = self.RUN_PREF + 'min_t5p.' + conf.File_Naming.extMININFO
         self.HEATINFO = self.RUN_PREF + '.' + conf.File_Naming.extHEATINFO
         self.EQUIINFO = self.RUN_PREF + '.' + conf.File_Naming.extEQUIINFO
         self.MDINFO = self.RUN_PREF + '.' + conf.File_Naming.extMDINFO
         #other structure file names
         self.MINPDB = self.RUN_PREF + '_min.' + conf.File_Naming.extPDB
+        self.MINPDBT5P = self.RUN_PREF + '_min_t3p.' + conf.File_Naming.extPDB
+        self.MINPDBT3P = self.RUN_PREF + '_min_t5p.' + conf.File_Naming.extPDB
         self.MINMOL2 = self.RUN_PREF + '_min.' + conf.File_Naming.extMOL2
-        self.PDBT3P = self.RUN_PREF + '_min_t3p.' + conf.File_Naming.extPDB
-        self.PDBT5P = self.RUN_PREF + '_min_t5p.' + conf.File_Naming.extPDB
+        self.PDBT3P = self.RUN_PREF + '_t3p.' + conf.File_Naming.extPDB
+        self.PDBT5P = self.RUN_PREF + '_t5p.' + conf.File_Naming.extPDB
         #logfile names
         self.MINLOG = self.RUN_PREF + '.' + conf.File_Naming.extMINLOG
         self.HEATLOG = self.RUN_PREF + '.' + conf.File_Naming.extHEATLOG
@@ -78,7 +89,8 @@ class Amber_Job:
             self.minimization_only = True;
             self.CreateTLeapInputFile()
             self.CreateCpptrajInputFile()
-            self.CreateMinimizationInputFile()
+            self.CreateGasMinimizationInputFile()
+            self.CreateSolvatedMinimizationInputFile()
             self.CreateTLeapSolvT3PInputFile()
             self.CreateTLeapSolvT5PInputFile()
             self.CreateSubmissionScript(json_dict)
@@ -86,7 +98,8 @@ class Amber_Job:
             self.minimization_only = False;
             self.CreateTLeapInputFile()
             self.CreateCpptrajInputFile()
-            self.CreateMinimizationInputFile()
+            self.CreateGasMinimizationInputFile()
+            self.CreateSolvatedMinimizationInputFile()
             self.CreateTLeapSolvT3PInputFile()
             self.CreateTLeapSolvT5PInputFile()
             self.CreateHeatingInputFile()
@@ -108,14 +121,27 @@ class Amber_Job:
         tleap_in.write('saveamberparm CONDENSEDSEQUENCE ' + self.PARMTOP + ' ' + self.INPCRD + '\n')
         tleap_in.write('quit\n')
 
-    def CreateMinimizationInputFile(self):
-        min_in = open (self.WorkDir + '/' + self.MININ, 'w')
+    def CreateGasMinimizationInputFile(self):
+        min_in = open (self.WorkDir + '/' + self.GASMININ, 'w')
         min_in.write('Gas Phase Minimization\n')
         min_in.write(' &cntrl\n')
-        min_in.write('  imin = 1, maxcyc = 10000, ncyc = 5000, dt = 0.001 ,\n')
-        min_in.write('  ntb = 0, cut = 20.0, ntmin = 1, nscm = 100, dielc = 1 ,\n')
-        min_in.write('  ntxo = 1, ntwr = 1,\n')
+        min_in.write('  imin = 1, maxcyc = 10000, ncyc = 5000,\n')
+        min_in.write('  ntb = 0, cut = 20.0,\n')
+        min_in.write('  ntxo = 1, ntwr = 10,\n')
         min_in.write(' &end \n')
+
+    def CreateSolvatedMinimizationInputFile(self):
+        min_in = open (self.WorkDir + '/' + self.SOLMININ, 'w')
+        min_in.write('Constant Volume Minimization\n')
+        min_in.write(' &cntrl\n')
+        min_in.write('  imin = 1, maxcyc = 20000, ncyc = 10000,\n')
+        min_in.write('  cut = 8.0,\n')
+        min_in.write('  ntxo = 1, ntwr = 10,\n')
+        min_in.write('  ntr = 1,\n')
+        min_in.write('  restraintmask = \'!:WAT= & !@H=\',\n')
+        min_in.write('  restraint_wt = 5.0,\n')
+        min_in.write(' &end \n')
+
 ## Plan: After minimization convert the min structure to a mol2 file with cpptraj
 ## cpptraj.in
 ## parm mol.parm7
@@ -224,8 +250,6 @@ class Amber_Job:
         #For now don't call tleap to make Prmtop and rst7, they are provided by the user. The create tleap input file function is currently empty
         run_script.write("echo \"Running tleap...\" >> ${LOGFILE}" + "\n")
         run_script.write("tleap -f " + self.LEAPIN + "\n")
-
-
         run_script.write("echo \"Running sander...\" >> ${LOGFILE}" + "\n")
         run_script.write("\n")
         run_script.write("cd " + self.WorkDir + "\n")
@@ -244,7 +268,7 @@ class Amber_Job:
         run_script.write("${MD_COMMAND} \\\n")
         run_script.write("  -p    " + self.PARMTOP + " \\\n")
         run_script.write("  -c    " + self.INPCRD + " \\\n")
-        run_script.write("  -i    " + self.MININ + " \\\n")
+        run_script.write("  -i    " + self.GASMININ + " \\\n")
         run_script.write("  -o    " + self.MINOUT +  " \\\n")
         run_script.write("  -r    " + self.MINRST + " \\\n")
         run_script.write("  -x    " + self.MINCRD + " \\\n")
@@ -258,9 +282,53 @@ class Amber_Job:
         run_script.write("fi\n")
         run_script.write("echo \"Running cpptraj...\" >> ${LOGFILE}" + "\n")
         run_script.write("cpptraj -i " +  self.CPPTRAJIN + "\n")
-        run_script.write("echo \"Running tleap twice more...\" >> ${LOGFILE}" + "\n")
+
+        #Oliver: Repeating the above for now, I forget Python and I'm not sure this class is what it should be.
+        run_script.write("echo \"Running tleap for Tip3P solvated structures...\" >> ${LOGFILE}" + "\n")
         run_script.write("tleap -f " + self.LEAPSOLVT3PIN + "\n")
+        run_script.write("echo \"Running sander...\" >> ${LOGFILE}" + "\n")
+        run_script.write("\n")
+        run_script.write("# Do the minimization\n")
+        run_script.write("\n")
+        run_script.write("${MD_COMMAND} \\\n") 
+        run_script.write("  -p    " + self.PARMT3P + " \\\n")
+        run_script.write("  -c    " + self.INPCRDT3P + " \\\n")
+        run_script.write("  -i    " + self.SOLMININ + " \\\n")
+        run_script.write("  -o    " + self.MINT3POUT +  " \\\n")
+        run_script.write("  -r    " + self.MINT3PRST + " \\\n")
+        run_script.write("  -x    " + self.MINT3PCRD + " \\\n")
+        run_script.write("  -ref  " + self.INPCRDT3P + " \\\n\n")
+        run_script.write("  -inf  " + self.MINT3PINFO + " \\\n\n")
+        run_script.write("if grep -q \'" + self.MD_DONE_TEXT + "\' " + self.MINT3POUT + " ; then\n")
+        run_script.write("    echo \"Minimization of webid ${RUN_ID} appears to be complete on $(date).\" >> ${LOGFILE}\n")
+        run_script.write("    ambpdb -p " + self.PARMT3P + " -c " + self.INPCRDT3P + " > " + self.MINPDBT3P + " 2> " + self.MINPDBT3P + ".stderr\n")
+        run_script.write("else\n")
+        run_script.write("    echo \"Minimization of webid ${RUN_ID} appears to have failed on $(date).Check " + self.MINT3POUT + "\" >> ${LOGFILE}\n")
+        run_script.write("    exit 1\n")
+        run_script.write("fi\n")
+        #Oliver: Tip5p
+        run_script.write("echo \"Running tleap for Tip5P solvated structures...\" >> ${LOGFILE}" + "\n")
         run_script.write("tleap -f " + self.LEAPSOLVT5PIN + "\n")
+        run_script.write("echo \"Running sander...\" >> ${LOGFILE}" + "\n")
+        run_script.write("\n")
+        run_script.write("# Do the minimization\n")
+        run_script.write("\n")
+        run_script.write("${MD_COMMAND} \\\n") 
+        run_script.write("  -p    " + self.PARMT5P + " \\\n")
+        run_script.write("  -c    " + self.INPCRDT5P + " \\\n")
+        run_script.write("  -i    " + self.SOLMININ + " \\\n")
+        run_script.write("  -o    " + self.MINT5POUT +  " \\\n")
+        run_script.write("  -r    " + self.MINT5PRST + " \\\n")
+        run_script.write("  -x    " + self.MINT5PCRD + " \\\n")
+        run_script.write("  -ref  " + self.INPCRDT5P + " \\\n\n")
+        run_script.write("  -inf  " + self.MINT5PINFO + " \\\n\n")
+        run_script.write("if grep -q \'" + self.MD_DONE_TEXT + "\' " + self.MINT5POUT + " ; then\n")
+        run_script.write("    echo \"Minimization of webid ${RUN_ID} appears to be complete on $(date).\" >> ${LOGFILE}\n")
+        run_script.write("    ambpdb -p " + self.PARMT5P + " -c " + self.INPCRDT5P + " > " + self.MINPDBT5P + " 2> " + self.MINPDBT5P + ".stderr\n")
+        run_script.write("else\n")
+        run_script.write("    echo \"Minimization of webid ${RUN_ID} appears to have failed on $(date).Check " + self.MINT5POUT + "\" >> ${LOGFILE}\n")
+        run_script.write("    exit 1\n")
+        run_script.write("fi\n")
 
         if self.minimization_only != True:
             run_script.write("${MD_COMMAND} \\\n")
@@ -321,7 +389,7 @@ class Amber_Job:
 #            log.debug ("Test:" + self.WorkDir + "/" + self.INPCRD)
 #            input_file_missing = True
 #            log.debug('Inpcrd file missing in sub directory %s'%(os.path.abspath(self.WorkDir)))
-        if os.path.isfile(self.WorkDir + "/" + self.MININ) == False:
+        if os.path.isfile(self.WorkDir + "/" + self.GASMININ) == False:
             input_file_missing = True
             log.debug('MININ file missing in sub directory %s'%(os.path.abspath(self.WorkDir)))
 
