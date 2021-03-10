@@ -48,6 +48,7 @@ def startProject(thisTransaction : Transaction):
     except Exception as error:
         log.error("There was a problem starting the project: " + str(error))
         raise error
+
     try:
         addProjectToResponse(project, thisTransaction)
     except Exception as error:
@@ -61,7 +62,8 @@ def startProject(thisTransaction : Transaction):
         log.error("There was a problem getting the projectDir: " + str(error))
         raise error
     ### Copy any upload files.
-    if project.has_input_files == True:
+    log.debug("project.has_input_files: " + project.has_input_files)
+    if project.has_input_files == "True":
         try:
             copyUploadFilesToProject(thisTransaction, project)
         except Exception as error:
@@ -111,13 +113,13 @@ def getProjectFromTransaction(thisTransaction: Transaction):
 def getProjectDir(thisTransaction: Transaction):
     log.info("getProjectDir() was called.\n")
     project_dir = ""
-    log.debug("Looking for a project in the request.")
+    #log.debug("Looking for a project in the request.")
     if thisTransaction.response_dict:
-        log.debug("found a response_dict.")
+        #log.debug("found a response_dict.")
         if "project" in thisTransaction.response_dict.keys():
             project_dir = thisTransaction.response_dict['project']['project_dir']
     else:
-        log.debug("No response_dict found. Looking in the request_dict")
+        #log.debug("No response_dict found. Looking in the request_dict")
         project_dir = thisTransaction.request_dict['project']['project_dir']
 
     log.debug("returning projectDir: " + project_dir)
@@ -128,13 +130,13 @@ def getProjectDir(thisTransaction: Transaction):
 #   @param projectDir
 def setupProjectDirs(projectDir):
     log.info("setupProjectDirs() was called.\n")
-    log.debug("projectDir: " + projectDir)
+    
     try:
         if not os.path.exists(projectDir):
-            log.debug("creating the projectDir: " + projectDir)
+            #log.debug("creating the projectDir: " + projectDir)
             os.makedirs(projectDir)
         else:
-            log.debug("project exists: " + projectDir)
+            log.debug("projectDir exists.")
     except:
         log.error("There was a problem with the projectDir.")
         raise error
@@ -142,8 +144,10 @@ def setupProjectDirs(projectDir):
     logs_dir = projectDir + "/logs/"
     try:
         if not os.path.exists(logs_dir):
-            log.debug("creating the logs dir in project")
+            #log.debug("creating the logs dir in project")
             os.makedirs(logs_dir)
+
+        log.debug("projectDir: " + projectDir)
         log.debug("logs_dir: " + logs_dir)
         return logs_dir
     except Exception as error:
@@ -191,20 +195,30 @@ def updateCbProject(thisTransaction : Transaction, structureInfo):
         log.error("There was a problem getting the projectDir: " + str(error))
         raise error
 
-##  Pass in a frontend project, and an project_dir, receive the name of the
+##  Pass in a project, and receive the name of the
 #   dir that uploaded input files should be copied to.
 #   @param project
 #   @param project_dir
-def getProjectUploadsDir(project):
+def getProjectUploadsDir(thisTransaction):
     log.info("getProjectUploadsDir() was called.\n")
-    log.debug("project.keys(): " + str(project.keys()))
-    u_uuid = project['u_uuid']
-    project_uploads_dir = project['upload_path']
-    log.debug("project_uploads_dir: " + project_uploads_dir)
-    if not os.path.exists(project_uploads_dir):
-        #print("creating the uploads dir")
-        os.makedirs(project_uploads_dir)
-    return project_uploads_dir
+    project = getProjectFromTransaction(thisTransaction)
+    
+    if str(type(project)) == "<class 'gemsModules.project.dataio.PdbProject'>":
+        project = project.__dict__
+
+    try:
+        projectDir = getProjectDir(thisTransaction)
+    except Exception as error:
+        log.error("There was a problem getting the projectDir.")
+        log.error(traceback.format_exc())
+        raise error
+
+    projectUploadsDir = projectDir + "/uploads/"
+    log.debug("projectUploadsDir: " + projectUploadsDir)
+    if not os.path.exists(projectUploadsDir):
+        log.debug("creating the uploads dir")
+        os.makedirs(projectUploadsDir)
+    return projectUploadsDir
 
 
 ##  Pass a frontend project and get the upload path or an error if
@@ -212,6 +226,12 @@ def getProjectUploadsDir(project):
 #   @param  project
 def getUploadsSourceDir(project):
     log.info("getUploadsSourceDir() was called.\n")
+    if str(type(project)) == "<class 'gemsModules.project.dataio.PdbProject'>":
+        project = project.__dict__
+
+    log.debug("project obj type: " + str(type(project)))
+    log.debug("project.keys(): " + str(project.keys()))
+
     uploads_source_dir = project['upload_path']
     if not os.path.exists(uploads_source_dir):
         raise FileNotFoundError(uploads_source_dir)
@@ -223,17 +243,18 @@ def getUploadsSourceDir(project):
 #   @param transaction
 def copyUploadFilesToProject(thisTransaction : Transaction, project : Project):
     log.info("copyUploadFilesToProject() was called.\n")
-    log.debug("project: " + repr(project))
     project_dir = getProjectDir(thisTransaction)
     log.debug("project_dir: " + project_dir)
 
+    ## Find the destination dir
     try:
-        project_uploads_dir = getProjectUploadsDir(project)
+        destination_uploads_dir = getProjectUploadsDir(thisTransaction)
     except Exception as error:
         log.error("There was a problem creating the destination for upload files.")
         log.error("Error type: " + str(type(error)))
         log.error(traceback.format_exc())
         raise error
+    # Find the source dir
     try:
         uploads_source_dir = getUploadsSourceDir(project)
         log.debug("uploads_source_dir: " + uploads_source_dir)
@@ -242,16 +263,30 @@ def copyUploadFilesToProject(thisTransaction : Transaction, project : Project):
         log.error("Error type: " + str(type(error)))
         log.error(traceback.format_exc())
         raise error
+
+    # Find the file name
     try:
+        target_upload_file = getUploadFileName(project)
+    except Exception as error:
+        log.error("There was a problem finding the upload file name: " + str(error))
+        log.error(traceback.format_exc())
+        raise error
+    try:
+        log.debug("hi")
         uploads_dir = os.fsencode(uploads_source_dir)
+
         for upload_file in os.listdir(uploads_dir):
             filename = os.fsdecode(upload_file)
-            log.debug("filename: " + filename)
-            source_file = os.path.join(uploads_source_dir, filename)
-            log.debug("file source: " + source_file)
-            destination_file = os.path.join(project_uploads_dir, filename)
-            log.debug("file destination: " + destination_file)
-            copyfile(source_file, destination_file)
+            if filename == target_upload_file:
+                log.debug("filename: " + filename)
+                source_file = os.path.join(uploads_source_dir, filename)
+                log.debug("file source: " + source_file)
+                destination_file = os.path.join(destination_uploads_dir, filename)
+                log.debug("file destination: " + destination_file)
+                copyfile(source_file, destination_file)
+                break
+            else:
+                log.debug("Not copying this file: " + filename)
     except Exception as error:
         log.error("There was a problem copying the upload files into the project's project_dir.")
         log.error("Error type: " + str(type(error)))
@@ -259,6 +294,21 @@ def copyUploadFilesToProject(thisTransaction : Transaction, project : Project):
         raise error
 
 
+## Only gets the file name. Not the path.
+#   @aparam project
+def getUploadFileName(project):
+    log.info("getUploadFileName() was called.\n")
+    if str(type(project)) == "<class 'gemsModules.project.dataio.PdbProject'>":
+        project = project.__dict__
+    
+    uploaded_file_name = ""
+    if "uploaded_file_name" in project.keys():
+        uploaded_file_name = project['uploaded_file_name']
+        log.debug("uploaded_file_name: " + uploaded_file_name)
+        return uploaded_file_name
+    else:
+        log.error("No uploaded_file_name found in project.")
+        raise AttributeError("uploaded_file_name")
 
 ##  Looks at the project in a transaction to return the pUUID.
 #   @param thisTransaction Transaction object should contain a project.Else returns none.

@@ -54,7 +54,7 @@ def delegate(jsonObjectString):
     try:
         from gemsModules.common.logic import importEntity as logic_importEntity
         theEntity = logic_importEntity(entityType)
-        log.debug("theEntity: " + str(theEntity))
+        #log.debug("theEntity: " + str(theEntity))
     except Exception as error:
         error_msg = "There was a problem importing the entity: " + str(error)
         log.error(error_msg)
