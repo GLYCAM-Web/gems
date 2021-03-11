@@ -259,7 +259,7 @@ def appendResponse(thisTransaction, responseConfig):
         respondingService = responseConfig['respondingService']
         log.debug("respondingService: " + respondingService)
     else:
-        log.error("Please add a respond2342342ingService field to your responseConfig object.")
+        log.error("Please add a respondingService field to your responseConfig object.")
         appendCommonParserNotice(thisTransaction,'IncompleteResponseError')
 
     if 'responses' in responseConfig.keys():
