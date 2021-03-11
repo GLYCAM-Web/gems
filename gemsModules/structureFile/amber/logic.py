@@ -13,13 +13,16 @@ else:
 #   @param preprocessor
 def updateTransactionWithPreprocessorOptions(thisTransaction, preprocessor):
     log.info("updateTransactionWithPreprocessorOptions() was called.\n")
+
     if thisTransaction.response_dict == None:
         thisTransaction.response_dict = {}
+
     if 'entity' not in thisTransaction.response_dict.keys():
         thisTransaction.response_dict['entity'] = {}
         thisTransaction.response_dict['entity']['type'] = "StructureFile"
     if 'responses' not in thisTransaction.response_dict.keys():
         thisTransaction.response_dict['responses'] = []
+
     response = {}
     response["PreprocessingOptions"] = {}
     tableMetaData ={}
@@ -161,55 +164,13 @@ def updateTransactionWithPreprocessorOptions(thisTransaction, preprocessor):
 
 
 
-
+##  REFACTORING - This needs to move into io.py, as part of preprocessPDBForAmber service.
 ##  Pass in an transaction and get a new, preprocessed pdbFile object, 
 #       ready to be written to file.
 #   @param transaction
 def generatePdbFile(thisTransaction):
     log.info("generatePdbFile() was called.\n")
-    try:
-        gemsHome = getGemsHome()
-        log.debug("gemsHome: " + gemsHome)
-    except Exception as error:
-        log.error("There was a problem getting GEMSHOME.")
-        raise error
 
-    ##TODO: Check if user has provided optional prepFile and libraries.
-    aminoLibs = getDefaultAminoLibs(gemsHome)
-    prepFile = getDefaultPrepFile(gemsHome)
-    glycamLibs = gmml.string_vector()
-    otherLibs = gmml.string_vector()
-    preprocessor = gmml.PdbPreprocessor()
-
-    ### Get the fileName from the transaction.
-    project = getProjectFromTransaction(thisTransaction)
-    log.debug("Object type for frontend project: " + str(type(project)))
-    
-
-    projectUploadDir  = getProjectUploadsDir(thisTransaction)
-    uploadedFileName = project['uploaded_file_name']
-    log.debug("uploadedFileName: " + uploadedFileName)
-    uploadedPDB = projectUploadDir + uploadedFileName
-    #PDB file object:
-    log.debug("uploadedPDB: " + uploadedPDB)
-    try:
-        log.debug("working dir: " + os.getcwd())
-        pdbFile = gmml.PdbFile(uploadedPDB)
-        log.debug("pdbFile: " + str(pdbFile))
-    except Exception as error:
-        log.error("There was a problem creating the pdbFile object from the uploaded pdb file.")
-        log.error(traceback.format_exc)
-        raise error
-    
-    try:
-        ### Preprocess
-        preprocessor.Preprocess(pdbFile, aminoLibs, glycamLibs, otherLibs, prepFile)
-        updateTransactionWithPreprocessorOptions(thisTransaction, preprocessor)
-        
-    except Exception as error:
-        log.error("There was a problem preprocessing with gmml.")
-        log.error(traceback.format_exc())
-        raise error
     
     try:
         ### Apply preprocessing
@@ -690,8 +651,16 @@ def writePdb(pdbFile, projectDir):
 ## A method for providing default Amino libs
 ##TODO:  Update these paths to those in programs/Amber
 #   @param gemsHome
-def getDefaultAminoLibs(gemsHome):
+def getDefaultAminoLibs():
     log.info("getDefaultAminoLibs() was called.\n")
+
+    try:
+        gemsHome = getGemsHome()
+        log.debug("gemsHome: " + gemsHome)
+    except Exception as error:
+        log.error("There was a problem getting GEMSHOME.")
+        raise error
+
     amino_libs = gmml.string_vector()
     amino_libs.push_back(gemsHome + "/gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/amino12.lib")
     amino_libs.push_back(gemsHome + "/gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminont12.lib")
@@ -704,6 +673,14 @@ def getDefaultAminoLibs(gemsHome):
 ##Prep file
 def getDefaultPrepFile(gemsHome):
     log.info("getDefaultPrepFile() was called.\n")
+
+    try:
+        gemsHome = getGemsHome()
+        log.debug("gemsHome: " + gemsHome)
+    except Exception as error:
+        log.error("There was a problem getting GEMSHOME.")
+        raise error
+    
     prepFile = gmml.string_vector()
     prepFile.push_back(gemsHome + "/gmml/dat/CurrentParams/leaprc_GLYCAM_06j-1_2014-03-14/GLYCAM_06j-1.prep")
     for item in prepFile:

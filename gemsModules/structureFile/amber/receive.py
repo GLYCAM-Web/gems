@@ -8,9 +8,11 @@ import traceback
 from collections import defaultdict
 from collections import OrderedDict
 
-from gemsModules.common.transaction import *
-from gemsModules.common.logic import appendResponse
 from gemsModules.project.projectUtil import *
+from gemsModules.common.logic import appendResponse, prettyPrint
+from gemsModules.common.transaction import *
+import gemsModules.structureFile.amber.io as amberIO
+
 from gemsModules.common.loggingConfig import *
 import gemsModules.structureFile.amber.settings as amberStructureSettings
 
@@ -40,10 +42,24 @@ def evaluatePdb(thisTransaction):
         raise error
     else:
         log.debug("\n\nthisTransaction.response_dict: " + str(thisTransaction.response_dict))
-        uploaded_file_name = thisTransaction.response_dict['project']['uploaded_file_name']
-        log.debug("completed uploaded_file_name: " + uploaded_file_name)
+        uploadedFileName = thisTransaction.response_dict['project']['uploaded_file_name']
+        log.debug("uploadedFileName: " + uploadedFileName)
+
+        projectDir = thisTransaction.response_dict['project']['project_dir']
+        uploadFile = projectDir + "upload/" + uploadedFileName
+        log.debug("uploadFile: " + uploadFile)
+
 
         ### generate the processed pdb's content
+        output = amberIO.EvaluationOutput(uploadFile)
+        
+
+        ## Add the output to the response.
+
+        ## If needed, write stuff to file.
+
+        ## Keep this stuff for a reference, but replace it with better stuff. 
+        ##VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
         
         # try:
         #     pdbFile = generatePdbFile(thisTransaction)
@@ -60,11 +76,12 @@ def evaluatePdb(thisTransaction):
         #         log.error("There was a problem writing the pdb output." + str(error))
         #         raise error
 
-
+        ##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 def preprocessPdbForAmber(thisTransaction):
     log.info("preprocessPdbForAmber() was called. Still in Development!!!!!!!!" 
+    output = amberIO.PreprocessPdbForAmberOutput()
     
 
         
