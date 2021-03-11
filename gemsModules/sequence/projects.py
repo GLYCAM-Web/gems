@@ -47,15 +47,7 @@ def addResponse(buildState : BuildState, thisTransaction : Transaction, conforme
         log.error("Problem finding the project pUUID or sequence in the transaction: " + str(error))
         log.error(traceback.format_exc())
         raise error
-# "payload": "97b8338e-bdf5-4120-bb7e-609e4097af33",
-# "sequence": "DNeu5Aca2-6DGalpb1-4DGlcpNAcb1-6[DNeu5Aca2-6DGalpb1-4DGlcpNAcb1-2]DManpa1-6[DNeu5Aca2-6DGalpb1-4DGlcpNAcb1-2[DNeu5Aca2-6DGalpb1-4DGlcpNAcb1-4]DManpa1-3]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH",
-# "seqID": "b0f05178-eeb3-536c-8937-bfb1b797c2a8",
-# "conformerID" : "44a25e2c-c7b5-5683-bc63-717ca66f23b5",         
-# "conformerPath": "ProjectID/Requested_Structures/conformerID/",
-# "fullDirectory": "/website/userdata/tools/cb/git-ignore-me_userdata/Builds/97b8338e-bdf5-4120-bb7e-609e4097af33/Requested_Structures/44a25e2c-c7b5-5683-bc63-717ca66f23b5",
-# "downloadUrl": "http://172.25.0.2/json/download/cb/97b8338e-bdf5-4120-bb7e-609e4097af33/website/userdata/tools/cb/git-ignore-me_userdata/Builds/97b8338e-bdf5-4120-bb7e-609e4097af33/Requested_Structures/44a25e2c-c7b5-5683-bc63-717ca66f23b5"
 
-    gemsProject = thisTransaction.response_dict['project']
     indexOrdered = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
     seqID = getSeqIDForSequence(indexOrdered)
     # By the time build3DStructure() is called, evaluation response exists.
