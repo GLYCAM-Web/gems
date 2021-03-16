@@ -1,167 +1,12 @@
+import gmml
 from gemsModules.common.loggingConfig import *
-
+from gemsModules.common.transaction import *
+from gemsModules.project.projectUtil import *
 
 if loggers.get(__name__):
     pass
 else:
     log = createLogger(__name__)
-
-
-##TODO: REFACTOR THIS TO USE PYDANTIC
-##  Adds any options data to the transaction's response. Used for options tables by the frontend.
-#   @param thisTransaction
-#   @param preprocessor
-def updateTransactionWithPreprocessorOptions(thisTransaction, preprocessor):
-    log.info("updateTransactionWithPreprocessorOptions() was called.\n")
-
-    if thisTransaction.response_dict == None:
-        thisTransaction.response_dict = {}
-
-    if 'entity' not in thisTransaction.response_dict.keys():
-        thisTransaction.response_dict['entity'] = {}
-        thisTransaction.response_dict['entity']['type'] = "StructureFile"
-    if 'responses' not in thisTransaction.response_dict.keys():
-        thisTransaction.response_dict['responses'] = []
-
-    response = {}
-    response["PreprocessingOptions"] = {}
-    tableMetaData ={}
-
-    ### Update the Histidine Protonation data, HIS
-    hisData = buildHistidineProtonationsDict(thisTransaction, preprocessor)
-    if len(hisData) != 0:
-        response['PreprocessingOptions']['histidineProtonation'] = {}
-        response['PreprocessingOptions']['histidineProtonation'] = hisData
-
-        tableMetaData.update({
-            "histidineProtonation" : { 
-                "tableLabel" : "Histidine Protonation",  
-                "interactionRequirement" : "optional",
-                "urgency" : "info",
-                "count" : str(len(hisData)),
-                "description" : amberStructureSettings.descriptions['histidineProtonation']
-            }
-        })
-    else:
-        log.debug("length of hisData: " + str(len(hisData)))
-
-    ### Update the Disulfide Bond data, CYS 
-    cysData = buildDisulfideBondsDict(thisTransaction, preprocessor)
-    if len(cysData) != 0:
-        response['PreprocessingOptions']['disulfideBonds'] = {}
-        response['PreprocessingOptions']['disulfideBonds'] = cysData
-
-        ### a value of "warning" indicates optional action can be taken, but is not needed.
-        tableMetaData.update({
-            'disulfideBonds' : { 
-                "tableLabel" : "Disulfide Bonds", 
-                "interactionRequirement" : "optional",
-                "urgency" : "info",
-                "count" : str(len(cysData)),
-                "description" : amberStructureSettings.descriptions['disulfideBonds']
-            }
-        })
-    else:
-        log.debug("length of cysData: " + str(len(cysData)))
-
-    ### Update the Unrecognized Residue data, UNRES
-    unresData = buildUnrecognizedResiduesDict(thisTransaction, preprocessor)
-    if len(unresData) != 0:
-        response['PreprocessingOptions']['unrecognizedResidues'] = {}
-        response['PreprocessingOptions']['unrecognizedResidues'] = unresData
-        urgencyLevel = getUrgencyLevelForUnrecognizedResidues(unresData)
-
-         ### Any mid-chain unrecognized residues cause error level urgency,
-         #  terminals just get warnings.
-        tableMetaData.update({
-            'unrecognizedResidues' : { 
-                "tableLabel" : "Unrecognized Residues", 
-                "interactionRequirement" : "none",
-                "urgency" : urgencyLevel,
-                "count" : str(len(unresData)),
-                "description" : amberStructureSettings.descriptions['unrecognizedResidues']
-            }
-        })
-    else:
-        log.debug("length of unresData: " + str(len(unresData)))
-
-    ### Update the Chain Termination data, TER
-    terData = buildChainTerminationsDict(thisTransaction, preprocessor)
-    if len(terData) != 0: 
-        response['PreprocessingOptions']['chainTerminations'] = {}
-        response['PreprocessingOptions']['chainTerminations'] = terData
-
-        tableMetaData.update({
-            'chainTerminations' : {
-                "tableLabel" : "Chain Terminations", 
-                "interactionRequirement" : "optional",
-                "urgency" : "info",
-                "count" : str(len(terData)),
-                "description" : amberStructureSettings.descriptions['chainTerminations']
-            }
-        })
-    else:
-        log.debug("length of terData: " + str(len(terData)))
-
-    ### Update the Replaced Hydrogen data, HYD
-    hydData = buildReplacedHydrogensDict(thisTransaction, preprocessor)
-    if len(hydData) != 0:
-        response['PreprocessingOptions']['replacedHydrogens'] = {}
-        response['PreprocessingOptions']['replacedHydrogens'] = hydData
-
-        tableMetaData.update({
-            'replacedHydrogens' : {
-                "tableLabel" : "Replaced Hydrogens", 
-                "interactionRequirement" : "none",
-                "urgency" : "info",
-                "count" : str(len(hydData)),
-                "description" : amberStructureSettings.descriptions['replacedHydrogens']
-            }
-        })
-    else:
-        log.debug("length of hydData: " + str(len(hydData)))
-
-    ### Update the Unrecognized Heavy Atoms data, HVY
-    hvyData = buildUnrecognizedHeavyAtomsDict(thisTransaction, preprocessor)
-    if len(hvyData) != 0:
-        response['PreprocessingOptions']['unrecognizedHeavyAtoms'] = {}
-        response['PreprocessingOptions']['unrecognizedHeavyAtoms'] = hvyData
-
-        ### If any of these exist, we've got nothing. No can do.
-        tableMetaData.update({
-            'unrecognizedHeavyAtoms' : {
-                "tableLabel" : "Unrecognized Heavy Atoms", 
-                "interactionRequirement": "none",
-                "urgency": "error",
-                "count" : str(len(hvyData)),
-                "description" : amberStructureSettings.descriptions['unrecognizedHeavyAtoms']
-            }
-        } )
-    else:
-        log.debug("length of hvyData: " + str(len(hvyData)))
-
-    ### Update the Missing Residues data, MIS
-    misData = buildMissingResiduesDict(thisTransaction, preprocessor)
-    if len(misData) != 0:
-        response['PreprocessingOptions']['missingResidues'] = {}
-        response['PreprocessingOptions']['missingResidues'] = misData
-
-        tableMetaData.update({
-            'missingResidues' : {
-                "tableLabel" : "Missing Residues", 
-                "interactionRequirement": "optional",
-                "urgency": "warning",
-                "count" : str(len(misData)),
-                "description" : amberStructureSettings.descriptions['missingResidues']
-            }
-        })
-    else:
-        log.debug("length of misData: " + str(len(misData)))
-
-    ## Add the tableMetaData to the response.
-    response.update({"tableMetaData" : tableMetaData})
-    thisTransaction.response_dict['responses'].append(response)
-
 
 
 ##  REFACTORING - This needs to move into io.py, as part of preprocessPDBForAmber service.
@@ -171,7 +16,6 @@ def updateTransactionWithPreprocessorOptions(thisTransaction, preprocessor):
 def generatePdbFile(thisTransaction):
     log.info("generatePdbFile() was called.\n")
 
-    
     try:
         ### Apply preprocessing
         preprocessor.ApplyPreprocessingWithTheGivenModelNumber(pdbFile, aminoLibs, glycamLibs, prepFile)
@@ -189,327 +33,6 @@ def generatePdbFile(thisTransaction):
     
     return pdbFile
 
-
-
-##  If all midChain values are false, this is warning level. 
-#   Any midChain value of true makes this an error level.
-#   @param unresData
-def getUrgencyLevelForUnrecognizedResidues(unresData):
-    log.info("getUrgencyLevelForUnrecognizedResidues() was called.\n")
-    urgencyLevel = "warning"
-
-    for item in unresData:
-        if item['isMidChain'] == "True":
-            urgencyLevel = "error"
-
-    log.debug("urgencyLevel: " + urgencyLevel)
-    return urgencyLevel
-
-##  Give a transaction and a preprocessor object, get a dict with Missing Residue data from a pdb
-#   @param thisTransaction
-#   @param preprocessor
-def buildMissingResiduesDict(thisTransaction, preprocessor):
-    log.info("buildMissingResiduesDict() was called.\n")
-    
-    misData = []
-    missingResidues = preprocessor.GetMissingResidues()
-    log.info("length of missingResidues: " + str(len(missingResidues)))
-
-    for item in missingResidues: 
-        mapping = {}
-        chainID = item.GetResidueChainId()
-        mapping['chainID'] = chainID
-        log.debug("chainID: " + chainID)
-
-        ### If an insertion code is found, just append it to the sequence number.
-        startSequenceNumber = str(item.GetStartingResidueSequenceNumber())
-        startInsertionCode = item.GetStartingResidueInsertionCode()
-        if "?" not in startInsertionCode:
-            startSequenceNumber = startSequenceNumber + startInsertionCode
-        mapping['startSequenceNumber'] = startSequenceNumber
-        log.debug("startSequenceNumber: " + startSequenceNumber)
-
-        ### If an insertion code is found, just append it to the sequence number.
-        endSequenceNumber = str(item.GetEndingResidueSequenceNumber())
-        endInsertionCode = item.GetEndingResidueInsertionCode()
-        if "?" not in endInsertionCode:
-            endSequenceNumber = endSequenceNumber + endInsertionCode
-        mapping['endSequenceNumber'] = endSequenceNumber
-        log.debug("endSequenceNumber: " + endSequenceNumber)
-
-        residueBeforeGap = str(item.GetResidueBeforeGap())
-        mapping['residueBeforeGap'] = residueBeforeGap
-        log.debug("residueBeforeGap: " + residueBeforeGap)
-
-        residueAfterGap = str(item.GetResidueAfterGap())
-        mapping['residueAfterGap'] = residueAfterGap
-        log.debug("residueAfterGap: " + residueAfterGap)
-
-        misData.append(mapping)
-
-    return misData
-
-
-##  Give a transaction and a preprocessor object, get a dict with Unrecognized Heavy Atom data from a pdb
-#   @param thisTransaction
-#   @param preprocessor
-def buildUnrecognizedHeavyAtomsDict(thisTransaction, preprocessor):
-    log.info("buildUnrecognizedHeavyAtomsDict() was called.\n")
-
-    hvyData = []
-    hvyAtoms = preprocessor.GetUnrecognizedHeavyAtoms()
-    log.info("length of hvyAtoms: " + str(len(hvyAtoms)))
-
-    for item in hvyAtoms:
-        mapping = {}
-        index = str(item.GetAtomSerialNumber())
-        mapping['index'] = index
-        log.debug("index: " + index)
-
-        atomName = item.GetAtomName()
-        mapping['atomName'] = atomName
-        log.debug("atomName: " + atomName)
-
-        residueName = item.GetResidueName()
-        mapping['residueName'] = residueName
-        log.debug("residueName: " + residueName)
-
-        chainID = item.GetResidueChainId()
-        mapping['chainID'] = chainID
-        log.debug("chainID: " + chainID)
-
-        ### If an insertion code is found, just append it to the sequence number.
-        residueNumber = str(item.GetResidueSequenceNumber())
-        insertionCode = str(item.GetResidueInsertionCode())
-        if "?" not in insertionCode:
-            residueNumber = residueNumber + insertionCode
-        mapping['residueNumber'] = residueNumber
-        log.debug("residueNumber: " + residueNumber)
-
-
-        hvyData.append(mapping)
-
-    return hvyData
-
-
-##  Give a transaction and a preprocessor object, get a dict with Replaced Hydrogen data from a pdb
-#   @param thisTransaction
-#   @param preprocessor
-def buildReplacedHydrogensDict(thisTransaction, preprocessor):
-    log.info("buildReplacedHydrogensDict() was called.\n")
-
-    hydData = []
-    replacedHydrogens = preprocessor.GetReplacedHydrogens()
-    log.info("length of replacedHydrogens: " + str(len(replacedHydrogens)))
-
-    for item in replacedHydrogens:
-        mapping = {}
-        index = str(item.GetAtomSerialNumber())
-        mapping['index'] = index
-        log.debug("index: " + index)
-
-        atomName = item.GetAtomName()
-        mapping['atomName'] = atomName
-        log.debug("atomName: " + atomName)
-
-        residueName = item.GetResidueName()
-        mapping['residueName'] = residueName
-        log.debug("residueName: " + residueName)
-
-        chainID = item.GetResidueChainId()
-        mapping['chainID'] = chainID
-        log.debug("chainID: " + chainID)
-
-        ### If an insertion code is found, just append it to the sequence number.
-        residueNumber = str(item.GetResidueSequenceNumber())
-        insertionCode = item.GetResidueInsertionCode()
-        if "?" not in insertionCode:
-            residueNumber = residueNumber + insertionCode
-
-        mapping['residueNumber'] = residueNumber
-        log.debug("residueNumber: " + residueNumber)
-
-
-        hydData.append(mapping)
-
-    return hydData
-
-
-##  Give a transaction and a preprocessor object, get a dict with Chain Termination data from a pdb
-#   @param thisTransaction
-#   @param preprocessor
-def buildChainTerminationsDict(thisTransaction, preprocessor):
-    log.info("buildChainTerminationsDict() was called.\n")
-
-    terData = []
-    chainTerminations = preprocessor.GetChainTerminations()
-    log.debug("length of chainTerminations: " + str(len(chainTerminations)))
-
-    for item in chainTerminations:
-        mapping = {}
-        chainID = item.GetResidueChainId()
-        mapping['chainID'] = chainID
-        log.debug("chainID: " + chainID)
-
-        ### If an insertion code is found, just append it to the start index.
-        startIndex = str(item.GetStartingResidueSequenceNumber())
-        startInsertion = str(item.GetStartingResidueInsertionCode())
-        if "?" not in startInsertion:
-            startIndex = startIndex + startInsertion
-
-        mapping['startIndex'] = startIndex
-        log.debug("startIndex: " + startIndex)
-
-        ### If an insertion code is found, just append it to the end index.
-        endIndex = str(item.GetEndingResidueSequenceNumber())
-        endInsertion = str(item.GetEndingResidueInsertionCode())
-        if "?" not in endInsertion:
-            endIndex = endIndex + endInsertion
-        mapping['endIndex'] = endIndex
-        log.debug("endIndex: " + endIndex)
-
-        terData.append(mapping)
-
-    return terData       
-
-
-
-##  Give a transaction and a preprocessor object, get a dict with Unrecognized Residue data from a pdb
-#   @param thisTransaction
-#   @param preprocessor
-def buildUnrecognizedResiduesDict(thisTransaction, preprocessor):
-    log.info("buildUnrecognizedResiduesDict() was called.\n")
-
-    unresData = []
-    unrecognizedResidues = preprocessor.GetUnrecognizedResidues()
-    log.debug("length of unrecognizedResidues: " + str(len(unrecognizedResidues)))
-
-    for item in unrecognizedResidues:
-        mapping = {}
-        chainID = item.GetResidueChainId()
-        mapping['chainID'] = chainID
-        log.debug("chainID: " + chainID)
-
-        ### If an insertion code is found, just append it to the index.
-        index = str(item.GetResidueSequenceNumber())
-        insertionCode = item.GetResidueInsertionCode()
-        if "?" not in insertionCode: 
-            index = index + insertionCode
-        mapping['index'] = index
-        log.debug("index: " + index)
-
-        name = item.GetResidueName()
-        mapping['name'] = name
-        log.debug("name: " + name)
-
-        isMidChain = str(item.GetMiddleOfChain())
-        mapping['isMidChain'] = isMidChain
-        log.debug("isMidChain: " + isMidChain)
-
-        unresData.append(mapping)
-
-    return unresData
-
-
-##  Give a transaction and a preprocessor object, get a dict with Disulfide Bonding data from a pdb
-#   @param thisTransaction
-#   @param preprocessor
-def buildDisulfideBondsDict(thisTransaction, preprocessor):
-    log.info("buildDisulfideBondsDict() was called.\n")
-
-    cysData = []
-    disulfideBonds = preprocessor.GetDisulfideBonds()
-    log.debug("length of disulfideBonds: " + str(len(disulfideBonds)))
-
-    for item in disulfideBonds:
-        mapping = {}
-
-        ### TODO:Dummy method. Replace with GMML logic
-        amberResidueName = getAmberResidueName(item)
-
-        ### Residue 1
-        residue1ChainId = item.GetResidueChainId1()
-        mapping['residue1ChainId'] = residue1ChainId
-        log.debug("residue1ChainId: " + residue1ChainId)
-
-        residue1Number = str(item.GetResidueSequenceNumber1())
-        mapping['residue1Number'] = residue1Number
-        log.debug("residue1Number: " + residue1Number)
-
-        mapping['residue1AmberResidueName'] = amberResidueName
-        log.debug("residue1AmberResidueName: " + amberResidueName)
-
-        ### Residue2
-        residue2ChainId = item.GetResidueChainId2()
-        mapping['residue2ChainId'] = residue2ChainId
-        log.debug("residue2ChainId: " + residue2ChainId)
-
-        residue2Number = str(item.GetResidueSequenceNumber2())
-        mapping['residue2Number'] = residue2Number
-        log.debug("residue2Number: " + residue2Number)
-
-        mapping['residue2AmberResidueName'] = amberResidueName
-        log.debug("residue2AmberResidueName: " + amberResidueName)
-        
-        ### Distance
-        distance = str(roundHalfUp(item.GetDistance(), 4))
-        mapping['distance'] = distance
-        log.debug("distance: " + distance)
-
-        ### Bonded
-        bonded = str(item.GetIsBonded())
-        mapping['bonded'] = bonded
-        log.debug("bonded: " + bonded)
-
-        cysData.append(mapping)
-
-    return cysData
-
-
-def getAmberResidueName(item):
-    log.info("getAmberResidueName() was called.")
-    ### TODO: Replace this dummy gems method with gmml logic.
-    amberResidueName = ""
-    if item.GetIsBonded():
-        amberResidueName = "CYX"
-    else:
-        amberResidueName = "CYS"
-
-    return amberResidueName
-
-
-##  Give a transaction and a preprocessor object, get a dict with Histidine mapping data from a pdb
-#   @param thisTransaction
-#   @param preprocessor
-def buildHistidineProtonationsDict(thisTransaction, preprocessor):
-    log.info("buildHistidineProtonationsDict() was called.\n")
-
-    histidineMappings = preprocessor.GetHistidineMappings()
-    log.debug("length of histidineMappings: " + str(len(histidineMappings)))
-    hisData = []
-    for item in histidineMappings:
-        mapping = {}
-        chainID = item.GetResidueChainId()
-        mapping['chainID'] = chainID
-        log.debug("chainID: " + chainID)
-
-        ### if an insertionCode is found, just append that to the residueNumber.
-        residueNumber = str(item.GetResidueSequenceNumber())
-        insertionCode = item.GetResidueInsertionCode()
-        if "?" not in insertionCode:
-            residueNumber = residueNumber + insertionCode
-
-        mapping['residueNumber'] = residueNumber
-        log.debug("residueNumber: " + residueNumber)
-        
-
-        mappingFormat = item.GetStringFormatOfSelectedMapping()
-        mapping['mappingFormat'] = mappingFormat
-        log.debug("mappingFormat: " + mappingFormat)
-
-        hisData.append(mapping)
-
-    return hisData
 
 
 ## Wrapper for file writing homework
@@ -671,7 +194,7 @@ def getDefaultAminoLibs():
     return amino_libs
 
 ##Prep file
-def getDefaultPrepFile(gemsHome):
+def getDefaultPrepFile():
     log.info("getDefaultPrepFile() was called.\n")
 
     try:
@@ -756,10 +279,463 @@ def sideloadPdbFromRcsb(pdbID, uploadDir):
         else:
             return pdbFileName
 
-def addResponse(thisTransaction : Transaction):
-    log.info("addResponse() was called.")
-    project = thisTransaction.response_dict['project']
 
-    ##Gather args needed for PreprocessPdbForAmber
-    ##Instantiate a service response.
-    ##Instantiate 
+
+
+#########################################
+#References below VVVVVVVVVVVVVVVVVVVVVVV
+
+
+# ##  Give a transaction and a preprocessor object, get a dict with Missing Residue data from a pdb
+# #   @param thisTransaction
+# #   @param preprocessor
+# def buildMissingResiduesDict(thisTransaction, preprocessor):
+#     log.info("buildMissingResiduesDict() was called.\n")
+    
+#     misData = []
+#     missingResidues = preprocessor.GetMissingResidues()
+#     log.info("length of missingResidues: " + str(len(missingResidues)))
+
+#     for item in missingResidues: 
+#         mapping = {}
+#         chainID = item.GetResidueChainId()
+#         mapping['chainID'] = chainID
+#         log.debug("chainID: " + chainID)
+
+#         ### If an insertion code is found, just append it to the sequence number.
+#         startSequenceNumber = str(item.GetStartingResidueSequenceNumber())
+#         startInsertionCode = item.GetStartingResidueInsertionCode()
+#         if "?" not in startInsertionCode:
+#             startSequenceNumber = startSequenceNumber + startInsertionCode
+#         mapping['startSequenceNumber'] = startSequenceNumber
+#         log.debug("startSequenceNumber: " + startSequenceNumber)
+
+#         ### If an insertion code is found, just append it to the sequence number.
+#         endSequenceNumber = str(item.GetEndingResidueSequenceNumber())
+#         endInsertionCode = item.GetEndingResidueInsertionCode()
+#         if "?" not in endInsertionCode:
+#             endSequenceNumber = endSequenceNumber + endInsertionCode
+#         mapping['endSequenceNumber'] = endSequenceNumber
+#         log.debug("endSequenceNumber: " + endSequenceNumber)
+
+#         residueBeforeGap = str(item.GetResidueBeforeGap())
+#         mapping['residueBeforeGap'] = residueBeforeGap
+#         log.debug("residueBeforeGap: " + residueBeforeGap)
+
+#         residueAfterGap = str(item.GetResidueAfterGap())
+#         mapping['residueAfterGap'] = residueAfterGap
+#         log.debug("residueAfterGap: " + residueAfterGap)
+
+#         misData.append(mapping)
+
+#     return misData
+
+
+# ##  Give a transaction and a preprocessor object, get a dict with Unrecognized Heavy Atom data from a pdb
+# #   @param thisTransaction
+# #   @param preprocessor
+# def buildUnrecognizedHeavyAtomsDict(thisTransaction, preprocessor):
+#     log.info("buildUnrecognizedHeavyAtomsDict() was called.\n")
+
+#     hvyData = []
+#     hvyAtoms = preprocessor.GetUnrecognizedHeavyAtoms()
+#     log.info("length of hvyAtoms: " + str(len(hvyAtoms)))
+
+#     for item in hvyAtoms:
+#         mapping = {}
+#         index = str(item.GetAtomSerialNumber())
+#         mapping['index'] = index
+#         log.debug("index: " + index)
+
+#         atomName = item.GetAtomName()
+#         mapping['atomName'] = atomName
+#         log.debug("atomName: " + atomName)
+
+#         residueName = item.GetResidueName()
+#         mapping['residueName'] = residueName
+#         log.debug("residueName: " + residueName)
+
+#         chainID = item.GetResidueChainId()
+#         mapping['chainID'] = chainID
+#         log.debug("chainID: " + chainID)
+
+#         ### If an insertion code is found, just append it to the sequence number.
+#         residueNumber = str(item.GetResidueSequenceNumber())
+#         insertionCode = str(item.GetResidueInsertionCode())
+#         if "?" not in insertionCode:
+#             residueNumber = residueNumber + insertionCode
+#         mapping['residueNumber'] = residueNumber
+#         log.debug("residueNumber: " + residueNumber)
+
+
+#         hvyData.append(mapping)
+
+#     return hvyData
+
+
+# ##  Give a transaction and a preprocessor object, get a dict with Replaced Hydrogen data from a pdb
+# #   @param thisTransaction
+# #   @param preprocessor
+# def buildReplacedHydrogensDict(thisTransaction, preprocessor):
+#     log.info("buildReplacedHydrogensDict() was called.\n")
+
+#     hydData = []
+#     replacedHydrogens = preprocessor.GetReplacedHydrogens()
+#     log.info("length of replacedHydrogens: " + str(len(replacedHydrogens)))
+
+#     for item in replacedHydrogens:
+#         mapping = {}
+#         index = str(item.GetAtomSerialNumber())
+#         mapping['index'] = index
+#         log.debug("index: " + index)
+
+#         atomName = item.GetAtomName()
+#         mapping['atomName'] = atomName
+#         log.debug("atomName: " + atomName)
+
+#         residueName = item.GetResidueName()
+#         mapping['residueName'] = residueName
+#         log.debug("residueName: " + residueName)
+
+#         chainID = item.GetResidueChainId()
+#         mapping['chainID'] = chainID
+#         log.debug("chainID: " + chainID)
+
+#         ### If an insertion code is found, just append it to the sequence number.
+#         residueNumber = str(item.GetResidueSequenceNumber())
+#         insertionCode = item.GetResidueInsertionCode()
+#         if "?" not in insertionCode:
+#             residueNumber = residueNumber + insertionCode
+
+#         mapping['residueNumber'] = residueNumber
+#         log.debug("residueNumber: " + residueNumber)
+
+
+#         hydData.append(mapping)
+
+#     return hydData
+
+
+# ##  Give a transaction and a preprocessor object, get a dict with Chain Termination data from a pdb
+# #   @param thisTransaction
+# #   @param preprocessor
+# def buildChainTerminationsDict(thisTransaction, preprocessor):
+#     log.info("buildChainTerminationsDict() was called.\n")
+
+#     terData = []
+#     chainTerminations = preprocessor.GetChainTerminations()
+#     log.debug("length of chainTerminations: " + str(len(chainTerminations)))
+
+#     for item in chainTerminations:
+#         mapping = {}
+#         chainID = item.GetResidueChainId()
+#         mapping['chainID'] = chainID
+#         log.debug("chainID: " + chainID)
+
+#         ### If an insertion code is found, just append it to the start index.
+#         startIndex = str(item.GetStartingResidueSequenceNumber())
+#         startInsertion = str(item.GetStartingResidueInsertionCode())
+#         if "?" not in startInsertion:
+#             startIndex = startIndex + startInsertion
+
+#         mapping['startIndex'] = startIndex
+#         log.debug("startIndex: " + startIndex)
+
+#         ### If an insertion code is found, just append it to the end index.
+#         endIndex = str(item.GetEndingResidueSequenceNumber())
+#         endInsertion = str(item.GetEndingResidueInsertionCode())
+#         if "?" not in endInsertion:
+#             endIndex = endIndex + endInsertion
+#         mapping['endIndex'] = endIndex
+#         log.debug("endIndex: " + endIndex)
+
+#         terData.append(mapping)
+
+#     return terData       
+
+
+
+# ##  Give a transaction and a preprocessor object, get a dict with Unrecognized Residue data from a pdb
+# #   @param thisTransaction
+# #   @param preprocessor
+# def buildUnrecognizedResiduesDict(thisTransaction, preprocessor):
+#     log.info("buildUnrecognizedResiduesDict() was called.\n")
+
+#     unresData = []
+#     unrecognizedResidues = preprocessor.GetUnrecognizedResidues()
+#     log.debug("length of unrecognizedResidues: " + str(len(unrecognizedResidues)))
+
+#     for item in unrecognizedResidues:
+#         mapping = {}
+#         chainID = item.GetResidueChainId()
+#         mapping['chainID'] = chainID
+#         log.debug("chainID: " + chainID)
+
+#         ### If an insertion code is found, just append it to the index.
+#         index = str(item.GetResidueSequenceNumber())
+#         insertionCode = item.GetResidueInsertionCode()
+#         if "?" not in insertionCode: 
+#             index = index + insertionCode
+#         mapping['index'] = index
+#         log.debug("index: " + index)
+
+#         name = item.GetResidueName()
+#         mapping['name'] = name
+#         log.debug("name: " + name)
+
+#         isMidChain = str(item.GetMiddleOfChain())
+#         mapping['isMidChain'] = isMidChain
+#         log.debug("isMidChain: " + isMidChain)
+
+#         unresData.append(mapping)
+
+#     return unresData
+
+
+# ##  Give a transaction and a preprocessor object, get a dict with Disulfide Bonding data from a pdb
+# #   @param thisTransaction
+# #   @param preprocessor
+# def buildDisulfideBondsDict(thisTransaction, preprocessor):
+#     log.info("buildDisulfideBondsDict() was called.\n")
+
+#     cysData = []
+#     disulfideBonds = preprocessor.GetDisulfideBonds()
+#     log.debug("length of disulfideBonds: " + str(len(disulfideBonds)))
+
+#     for item in disulfideBonds:
+#         mapping = {}
+
+#         ### TODO:Dummy method. Replace with GMML logic
+#         amberResidueName = getAmberResidueName(item)
+
+#         ### Residue 1
+#         residue1ChainId = item.GetResidueChainId1()
+#         mapping['residue1ChainId'] = residue1ChainId
+#         log.debug("residue1ChainId: " + residue1ChainId)
+
+#         residue1Number = str(item.GetResidueSequenceNumber1())
+#         mapping['residue1Number'] = residue1Number
+#         log.debug("residue1Number: " + residue1Number)
+
+#         mapping['residue1AmberResidueName'] = amberResidueName
+#         log.debug("residue1AmberResidueName: " + amberResidueName)
+
+#         ### Residue2
+#         residue2ChainId = item.GetResidueChainId2()
+#         mapping['residue2ChainId'] = residue2ChainId
+#         log.debug("residue2ChainId: " + residue2ChainId)
+
+#         residue2Number = str(item.GetResidueSequenceNumber2())
+#         mapping['residue2Number'] = residue2Number
+#         log.debug("residue2Number: " + residue2Number)
+
+#         mapping['residue2AmberResidueName'] = amberResidueName
+#         log.debug("residue2AmberResidueName: " + amberResidueName)
+        
+#         ### Distance
+#         distance = str(roundHalfUp(item.GetDistance(), 4))
+#         mapping['distance'] = distance
+#         log.debug("distance: " + distance)
+
+#         ### Bonded
+#         bonded = str(item.GetIsBonded())
+#         mapping['bonded'] = bonded
+#         log.debug("bonded: " + bonded)
+
+#         cysData.append(mapping)
+
+#     return cysData
+
+
+
+
+# ##  Give a transaction and a preprocessor object, get a dict with Histidine mapping data from a pdb
+# #   @param thisTransaction
+# #   @param preprocessor
+# def buildHistidineProtonationsDict(thisTransaction, preprocessor):
+#     log.info("buildHistidineProtonationsDict() was called.\n")
+
+#     histidineMappings = preprocessor.GetHistidineMappings()
+#     log.debug("length of histidineMappings: " + str(len(histidineMappings)))
+#     hisData = []
+#     for item in histidineMappings:
+#         mapping = {}
+#         chainID = item.GetResidueChainId()
+#         mapping['chainID'] = chainID
+#         log.debug("chainID: " + chainID)
+
+#         ### if an insertionCode is found, just append that to the residueNumber.
+#         residueNumber = str(item.GetResidueSequenceNumber())
+#         insertionCode = item.GetResidueInsertionCode()
+#         if "?" not in insertionCode:
+#             residueNumber = residueNumber + insertionCode
+
+#         mapping['residueNumber'] = residueNumber
+#         log.debug("residueNumber: " + residueNumber)
+        
+
+#         mappingFormat = item.GetStringFormatOfSelectedMapping()
+#         mapping['mappingFormat'] = mappingFormat
+#         log.debug("mappingFormat: " + mappingFormat)
+
+#         hisData.append(mapping)
+
+#     return hisData
+
+
+
+# ##TODO: REFACTOR THIS TO USE PYDANTIC
+# ##  Adds any options data to the transaction's response. Used for options tables by the frontend.
+# #   @param thisTransaction
+# #   @param preprocessor
+# def updateTransactionWithPreprocessorOptions(thisTransaction, preprocessor):
+#     log.info("updateTransactionWithPreprocessorOptions() was called.\n")
+
+#     if thisTransaction.response_dict == None:
+#         thisTransaction.response_dict = {}
+
+#     if 'entity' not in thisTransaction.response_dict.keys():
+#         thisTransaction.response_dict['entity'] = {}
+#         thisTransaction.response_dict['entity']['type'] = "StructureFile"
+#     if 'responses' not in thisTransaction.response_dict.keys():
+#         thisTransaction.response_dict['responses'] = []
+
+#     response = {}
+#     response["PreprocessingOptions"] = {}
+#     tableMetaData ={}
+
+#     ### Update the Histidine Protonation data, HIS
+#     hisData = buildHistidineProtonationsDict(thisTransaction, preprocessor)
+#     if len(hisData) != 0:
+#         response['PreprocessingOptions']['histidineProtonation'] = {}
+#         response['PreprocessingOptions']['histidineProtonation'] = hisData
+
+#         tableMetaData.update({
+#             "histidineProtonation" : { 
+#                 "tableLabel" : "Histidine Protonation",  
+#                 "interactionRequirement" : "optional",
+#                 "urgency" : "info",
+#                 "count" : str(len(hisData)),
+#                 "description" : amberStructureSettings.descriptions['histidineProtonation']
+#             }
+#         })
+#     else:
+#         log.debug("length of hisData: " + str(len(hisData)))
+
+#     ### Update the Disulfide Bond data, CYS 
+#     cysData = buildDisulfideBondsDict(thisTransaction, preprocessor)
+#     if len(cysData) != 0:
+#         response['PreprocessingOptions']['disulfideBonds'] = {}
+#         response['PreprocessingOptions']['disulfideBonds'] = cysData
+
+#         ### a value of "warning" indicates optional action can be taken, but is not needed.
+#         tableMetaData.update({
+#             'disulfideBonds' : { 
+#                 "tableLabel" : "Disulfide Bonds", 
+#                 "interactionRequirement" : "optional",
+#                 "urgency" : "info",
+#                 "count" : str(len(cysData)),
+#                 "description" : amberStructureSettings.descriptions['disulfideBonds']
+#             }
+#         })
+#     else:
+#         log.debug("length of cysData: " + str(len(cysData)))
+
+#     ### Update the Unrecognized Residue data, UNRES
+#     unresData = buildUnrecognizedResiduesDict(thisTransaction, preprocessor)
+#     if len(unresData) != 0:
+#         response['PreprocessingOptions']['unrecognizedResidues'] = {}
+#         response['PreprocessingOptions']['unrecognizedResidues'] = unresData
+#         urgencyLevel = getUrgencyLevelForUnrecognizedResidues(unresData)
+
+#          ### Any mid-chain unrecognized residues cause error level urgency,
+#          #  terminals just get warnings.
+#         tableMetaData.update({
+#             'unrecognizedResidues' : { 
+#                 "tableLabel" : "Unrecognized Residues", 
+#                 "interactionRequirement" : "none",
+#                 "urgency" : urgencyLevel,
+#                 "count" : str(len(unresData)),
+#                 "description" : amberStructureSettings.descriptions['unrecognizedResidues']
+#             }
+#         })
+#     else:
+#         log.debug("length of unresData: " + str(len(unresData)))
+
+#     ### Update the Chain Termination data, TER
+#     terData = buildChainTerminationsDict(thisTransaction, preprocessor)
+#     if len(terData) != 0: 
+#         response['PreprocessingOptions']['chainTerminations'] = {}
+#         response['PreprocessingOptions']['chainTerminations'] = terData
+
+#         tableMetaData.update({
+#             'chainTerminations' : {
+#                 "tableLabel" : "Chain Terminations", 
+#                 "interactionRequirement" : "optional",
+#                 "urgency" : "info",
+#                 "count" : str(len(terData)),
+#                 "description" : amberStructureSettings.descriptions['chainTerminations']
+#             }
+#         })
+#     else:
+#         log.debug("length of terData: " + str(len(terData)))
+
+#     ### Update the Replaced Hydrogen data, HYD
+#     hydData = buildReplacedHydrogensDict(thisTransaction, preprocessor)
+#     if len(hydData) != 0:
+#         response['PreprocessingOptions']['replacedHydrogens'] = {}
+#         response['PreprocessingOptions']['replacedHydrogens'] = hydData
+
+#         tableMetaData.update({
+#             'replacedHydrogens' : {
+#                 "tableLabel" : "Replaced Hydrogens", 
+#                 "interactionRequirement" : "none",
+#                 "urgency" : "info",
+#                 "count" : str(len(hydData)),
+#                 "description" : amberStructureSettings.descriptions['replacedHydrogens']
+#             }
+#         })
+#     else:
+#         log.debug("length of hydData: " + str(len(hydData)))
+
+#     ### Update the Unrecognized Heavy Atoms data, HVY
+#     hvyData = buildUnrecognizedHeavyAtomsDict(thisTransaction, preprocessor)
+#     if len(hvyData) != 0:
+#         response['PreprocessingOptions']['unrecognizedHeavyAtoms'] = {}
+#         response['PreprocessingOptions']['unrecognizedHeavyAtoms'] = hvyData
+
+#         ### If any of these exist, we've got nothing. No can do.
+#         tableMetaData.update({
+#             'unrecognizedHeavyAtoms' : {
+#                 "tableLabel" : "Unrecognized Heavy Atoms", 
+#                 "interactionRequirement": "none",
+#                 "urgency": "error",
+#                 "count" : str(len(hvyData)),
+#                 "description" : amberStructureSettings.descriptions['unrecognizedHeavyAtoms']
+#             }
+#         } )
+#     else:
+#         log.debug("length of hvyData: " + str(len(hvyData)))
+
+#     ### Update the Missing Residues data, MIS
+#     misData = buildMissingResiduesDict(thisTransaction, preprocessor)
+#     if len(misData) != 0:
+#         response['PreprocessingOptions']['missingResidues'] = {}
+#         response['PreprocessingOptions']['missingResidues'] = misData
+
+#         tableMetaData.update({
+#             'missingResidues' : {
+#                 "tableLabel" : "Missing Residues", 
+#                 "interactionRequirement": "optional",
+#                 "urgency": "warning",
+#                 "count" : str(len(misData)),
+#                 "description" : amberStructureSettings.descriptions['missingResidues']
+#             }
+#         })
+#     else:
+#         log.debug("length of misData: " + str(len(misData)))
+
+#     ## Add the tableMetaData to the response.
+#     response.update({"tableMetaData" : tableMetaData})
+#     thisTransaction.response_dict['responses'].append(response)
+

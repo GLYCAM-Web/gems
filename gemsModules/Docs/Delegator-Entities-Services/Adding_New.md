@@ -37,7 +37,7 @@ existing directories for format and content information.
 * helpme.py - A file containing various types of help in simple text format.
 	* Note that the names of the types of help are standard, so be sure to
 		stick to the naming convention.
-* settings.py - A file mapping JSON requests to classes, funcitons and modules.
+* settings.py - A file mapping JSON requests to classes, functions and modules.
 	* We do this because we don't want anything coming in over the web to
 		directly cause the execution of any code.  So, we make sure that the code
 		on the back-end always performs actions _on behalf of_ a request rather

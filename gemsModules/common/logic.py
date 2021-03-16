@@ -313,17 +313,15 @@ def appendResponse(thisTransaction, responseConfig):
 ##           Send one response at a time. Create the response using Pydantic-enabled classes in 
 ##           your gemsModule's io.py.
 def updateResponse(thisTransaction, serviceResponse):
-    log.info("common.logic appendResponse() was called.\n")
-
-    log.debug("Service Response: ")
-    prettyPrint(serviceResponse)
+    log.info("common.logic updateResponse() was called.\n")
+    log.debug("type of serviceResponse obj: " + str(type(serviceResponse)))
+    log.debug("serviceResponse.keys: " + str(serviceResponse.keys()))
 
     if thisTransaction.response_dict == None:
         log.debug("No response_dict yet. Creating it now.")
         thisTransaction.response_dict = {}
     else:
         log.debug("Response dict already exists")
-
 
     ## Remember this could be called several times. Don't overwrite existing responses.
     # Entity contains type, services, inputs, and responses.

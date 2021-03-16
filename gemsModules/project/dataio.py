@@ -211,7 +211,7 @@ class PdbProject(Project):
 
     def __init__(self, request_dict: dict):
         super().__init__(request_dict)
-        from gemsModules.structureFile.amber.receive import getPdbRequestInput
+        from gemsModules.structureFile.amber.logic import getPdbRequestInput
         log.info("PdbProject.__init__() was called.")
         self.project_type = "pdb"
         self.has_input_files = True

@@ -1,7 +1,7 @@
 import os, sys, importlib.util
 import gemsModules
 from gemsModules.common.services import *
-from gemsModules.common.transaction import *
+from gemsModules.delegator import io as delegatorio
 from gemsModules.project.projectUtil import *
 from gemsModules.common.loggingConfig import *
 from gemsModules.structureFile.amber.receive import preprocessPdbForAmber, evaluatePdb
@@ -14,7 +14,7 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__)
 
-def receive(thisTransaction):
+def receive(thisTransaction : delegatorio.Transaction):
     log.info("receive() was called.\n")
     #log.debug("thisTransaction: " + str(thisTransaction.__dict__))
 
@@ -42,8 +42,6 @@ def receive(thisTransaction):
                     log.error("There was a problem preprocessing the PDB for amber: " + str(error))
                     log.error(traceback.format_exc())
                     raise error
-                
-                thisTransaction.build_outgoing_string()
 
             elif requestedService == "Evaluate":
                 try:
@@ -53,7 +51,9 @@ def receive(thisTransaction):
                     log.error(traceback.format_exc())
                     raise error
 
-def doDefaultService(thisTransaction):
+            
+
+def doDefaultService(thisTransaction : delegatorio.Transaction):
     log.info("doDefaultService() was called.\n")
     ##Preprocess PDB will be the default. Given a request to the StructureFile entity,
     ##  with no services or options defined, look for a pdb file and preprocess it for Amber.
@@ -62,8 +62,8 @@ def doDefaultService(thisTransaction):
     except Exception as error:
         log.error("There was a problem doing the default service in the structureFile module.")
         raise error
-    else:
-        thisTransaction.build_outgoing_string()
+    
+    thisTransaction.build_outgoing_string()
 
 
 def main():
@@ -77,7 +77,7 @@ def main():
     with open(inputFile, 'r') as file:
         jsonObjectString = file.read().replace('\n', '')
 
-    thisTransaction = Transaction(jsonObjectString)
+    thisTransaction = delegatorio.Transaction(jsonObjectString)
 
     try:
         parseInput(thisTransaction)
