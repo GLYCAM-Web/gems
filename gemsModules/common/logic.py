@@ -6,7 +6,7 @@ from gemsModules.common.settings import *
 from gemsModules.common.io import *
 from gemsModules.common.loggingConfig import *
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
-from pydantic import BaseModel, Schema, ValidationError
+from pydantic import BaseModel, ValidationError
 from pydantic.schema import schema
 import traceback
 

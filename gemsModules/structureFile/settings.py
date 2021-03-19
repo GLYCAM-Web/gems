@@ -2,8 +2,7 @@
 from gemsModules import common
 from gemsModules.common.transaction import *
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
-from pydantic import BaseModel, Schema
-
+from pydantic import BaseModel
 ## Who I am
 WhoIAm='StructureFile'
 
