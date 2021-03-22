@@ -25,6 +25,7 @@ class Services(str, Enum):
 ## Used to be unrecognizedHeavyAtoms
 class UnrecognizedAtomsTableMetadata(BaseModel):
     tableLabel : str = "Unrecognized Atoms"
+    tableKey : str = "unrecognizedAtoms"
     interactionRequirement : str = "none"
     urgency : str = "error"
     count : int = 0
@@ -38,6 +39,7 @@ class UnrecognizedAtomsTableMetadata(BaseModel):
     def __str__(self):
         result = super().__str__()
         result = result + "\ntableLabel: " + self.tableLabel
+        result = result + "\ntableKey: " + self.tableKey
         result = result + "\ninteractionRequirement: " + self.interactionRequirement
         result = result + "\nurgency: " + self.urgency
         result = result + "\ncount: " + str(self.count)
@@ -74,8 +76,10 @@ class UnrecognizedAtom(BaseModel):
 
 
 ## Data for the table, offers summary
+##  Used to be unrecognizedResidues
 class UnrecognizedMoleculesTableMetadata(BaseModel):
     tableLabel : str = "Unrecognized Molecules"
+    tableKey : str = "unrecognizedMolecules"
     interactionRequirement : str = "none"
     urgency : str = "warning"
     count : int = 0
@@ -90,6 +94,7 @@ class UnrecognizedMoleculesTableMetadata(BaseModel):
     def __str__(self):
         result = super().__str__()
         result = result + "\ntableLabel: " + self.tableLabel
+        result = result + "\ntableKey: " + self.tableKey
         result = result + "\ninteractionRequirement: " + self.interactionRequirement
         result = result + "\nurgency: " + self.urgency
         result = result + "\ncount: " + str(self.count)
@@ -132,6 +137,7 @@ class UnrecognizedMolecule(BaseModel):
 ## Data for the table, offers summary
 class MissingResiduesTableMetadata(BaseModel):
     tableLabel : str = "Missing Residues"
+    tableKey : str = "missingResidues"
     interactionRequirement : str = "optional"
     urgency : str = "warning"
     count : int = 0
@@ -145,6 +151,7 @@ class MissingResiduesTableMetadata(BaseModel):
     def __str__(self):
         result = super().__str__()
         result = result + "\ntableLabel: " + self.tableLabel
+        result = result + "\ntableKey: " + self.tableKey
         result = result + "\ninteractionRequirement: " + self.interactionRequirement
         result = result + "\nurgency: " + self.urgency
         result = result + "\ncount: " + str(self.count)
@@ -188,7 +195,8 @@ class MissingResidue(BaseModel):
 
 ## Data for the table, offers summary
 class HistidineProtonationsTableMetadata(BaseModel):
-    tableLabel : str = "Histidine Protonation"
+    tableLabel : str = "Histidine Protonations"
+    tableKey : str = "histidineProtonations"
     interactionRequirement : str = "optional"
     urgency : str = "info"
     count : int = 0
@@ -202,6 +210,7 @@ class HistidineProtonationsTableMetadata(BaseModel):
     def __str__(self):
         result = super().__str__()
         result = result + "\ntableLabel: " + self.tableLabel
+        result = result + "\ntableKey: " + self.tableKey
         result = result + "\ninteractionRequirement: " + self.interactionRequirement
         result = result + "\nurgency: " + self.urgency
         result = result + "\ncount: " + str(self.count)
@@ -235,6 +244,7 @@ class HistidineProtonation(BaseModel):
 ## Data for the table, offers summary
 class DisulfideBondsTableMetadata(BaseModel):
     tableLabel : str = "Disulfide Bonds"
+    tableKey : str = "disulfideBonds"
     interactionRequirement : str = "optional"
     urgency : str = "info"
     count : int = 0
@@ -248,6 +258,7 @@ class DisulfideBondsTableMetadata(BaseModel):
     def __str__(self):
         result = super().__str__()
         result = result + "\ntableLabel: " + self.tableLabel
+        result = result + "\ntableKey: " + self.tableKey
         result = result + "\ninteractionRequirement: " + self.interactionRequirement
         result = result + "\nurgency: " + self.urgency
         result = result + "\ncount: " + str(self.count)
@@ -306,6 +317,7 @@ def getAmberResidueName(item):
 ## Data for the table, offers summary
 class ChainTerminationsTableMetadata(BaseModel):
     tableLabel : str = "Chain Terminations"
+    tableKey : str = "chainTerminations"
     interactionRequirement : str = "optional"
     urgency : str = "info"
     count : int = 0
@@ -319,6 +331,7 @@ class ChainTerminationsTableMetadata(BaseModel):
     def __str__(self):
         result = super().__str__()
         result = result + "\ntableLabel: " + self.tableLabel
+        result = result + "\ntableKey: " + self.tableKey
         result = result + "\ninteractionRequirement: " + self.interactionRequirement
         result = result + "\nurgency: " + self.urgency
         result = result + "\ncount: " + str(self.count)
@@ -355,6 +368,7 @@ class ChainTermination(BaseModel):
 ## Data for the table, offers summary
 class ReplacedHydrogensTableMetadata(BaseModel):
     tableLabel : str = "Replaced Hydrogens"
+    tableKey : str = "replacedHydrogens"
     interactionRequirement : str = "none"
     urgency : str = "info"
     count : int = 0
@@ -368,6 +382,7 @@ class ReplacedHydrogensTableMetadata(BaseModel):
     def __str__(self):
         result = super().__str__()
         result = result + "\ntableLabel: " + self.tableLabel
+        result = result + "\ntableKey: " + self.tableKey
         result = result + "\ninteractionRequirement: " + self.interactionRequirement
         result = result + "\nurgency: " + self.urgency
         result = result + "\ncount: " + str(self.count)
@@ -459,14 +474,17 @@ class EvaluationOutput(BaseModel):
         ##UnrecognizedAtoms
         try: 
             atoms = preprocessor.GetUnrecognizedHeavyAtoms()
-            log.debug("atoms: " + str(len(atoms)))
             if len(atoms) > 0:
                 metadata = UnrecognizedAtomsTableMetadata(len(atoms))
                 log.debug("metadata: " + str(type(metadata)))
                 self.tableMetadata.append(metadata)
+                unrecognizedAtoms = []
+
                 for atom in atoms:
                     unrecognizedAtomObj = UnrecognizedAtom(atom)
-                    self.preprocessingOptions.append(unrecognizedAtomObj)
+                    unrecognizedAtoms.append(unrecognizedAtomObj)
+                
+                self.preprocessingOptions.append({"unrecognizedAtoms": unrecognizedAtoms})
 
         except Exception as error:
             log.error("There was a problem evaluating unrecognized atoms: " + str(error))
@@ -474,17 +492,21 @@ class EvaluationOutput(BaseModel):
             raise error
 
         ##UnrecognizedMolecules
+        ##  Used to be unrecognizedResidues
         try: 
             modlecules = preprocessor.GetUnrecognizedResidues()
             if len(modlecules) > 0:
                 urgencyLevel = "warning"
+                unrecognizedMolecules = []
                 for molecule in modlecules:
                     unrecognizedMoleculeObj = UnrecognizedMolecule(molecule)
-                    self.preprocessingOptions.append(unrecognizedMoleculeObj)
+                    unrecognizedMolecules.append(unrecognizedMoleculeObj)
                     if unrecognizedMoleculeObj.isMidChain:
                         urgencyLevel = "error"
 
-                self.tableMetadata.append(UnrecognizedMoleculesTableMetadata(len(modlecules), urgencyLevel))
+                self.preprocessingOptions.append({"unrecognizedMolecules" : unrecognizedMolecules})
+                metadata = UnrecognizedMoleculesTableMetadata(len(modlecules), urgencyLevel)
+                self.tableMetadata.append(metadata)
             
         except Exception as error:
             log.error("There was a problem creating the pdbFile object from the uploaded pdb file: " + str(error))
@@ -496,9 +518,12 @@ class EvaluationOutput(BaseModel):
             residues = preprocessor.GetMissingResidues()
             if len(residues) > 0:
                 self.tableMetadata.append(MissingResiduesTableMetadata(len(residues)))
+                missingResidues = []
                 for residue in residues:
                     missingResidueObj = MissingResidue(residue)
-                    self.preprocessingOptions.append(missingResidueObj)
+                    missingResidues.append(missingResidueObj)
+
+                self.preprocessingOptions.append({"missingResidues" : missingResidues})
             
         except Exception as error:
             log.error("There was a problem creating the pdbFile object from the uploaded pdb file: " + str(error))
@@ -509,10 +534,13 @@ class EvaluationOutput(BaseModel):
         try: 
             histidineMappings = preprocessor.GetHistidineMappings()
             if len(histidineMappings) > 0:
-                self.tableMetadata.append(HistidineProtonationsTableMetadata(len(histidineMappings)))
+                self.tableMetadata.append( HistidineProtonationsTableMetadata(len(histidineMappings)))
+                histidineProtonations = []
                 for mapping in histidineMappings:
                     mappingObj = HistidineProtonation(mapping)
-                    self.preprocessingOptions.append(mappingObj)
+                    histidineProtonations.append(mappingObj)
+                
+                self.preprocessingOptions.append({"histidineProtonations" : histidineProtonations})
 
         except Exception as error:
             log.error("There was a problem creating the pdbFile object from the uploaded pdb file: " + str(error))
@@ -524,9 +552,12 @@ class EvaluationOutput(BaseModel):
             disulfideBonds = preprocessor.GetDisulfideBonds()
             if len(disulfideBonds) > 0:
                 self.tableMetadata.append(DisulfideBondsTableMetadata(len(disulfideBonds)))
+                disulfides = []
                 for bond in disulfideBonds:
                     disulfideBondObj = DisulfideBond(bond)
-                    self.preprocessingOptions.append(disulfideBondObj)
+                    disulfides.append(disulfideBondObj)
+
+                self.preprocessingOptions.append({"disulfideBonds" : disulfides})
 
         except Exception as error:
             log.error("There was a problem creating the pdbFile object from the uploaded pdb file: " + str(error))
@@ -537,9 +568,12 @@ class EvaluationOutput(BaseModel):
             chainTerminations = preprocessor.GetChainTerminations()
             if len(chainTerminations) > 0:
                 self.tableMetadata.append(ChainTerminationsTableMetadata(len(chainTerminations)))
+                terminations = []
                 for terminal in chainTerminations:
                     terminalObj = ChainTermination(terminal)
-                    self.preprocessingOptions.append(terminalObj)
+                    terminations.append(terminalObj)
+
+                self.preprocessingOptions.append({"chainTerminations" : terminations})
 
         except Exception as error:
             log.error("There was a problem creating the pdbFile object from the uploaded pdb file: " + str(error))
@@ -550,9 +584,12 @@ class EvaluationOutput(BaseModel):
             replacedHydrogens = preprocessor.GetReplacedHydrogens()
             if len(replacedHydrogens) > 0:
                 self.tableMetadata.append(ReplacedHydrogensTableMetadata(len(replacedHydrogens)))
+                hydrogens = []
                 for hydrogen in replacedHydrogens:
                     hydrogenObj = ReplacedHydrogen(hydrogen)
-                    self.preprocessingOptions.append(hydrogenObj)
+                    hydrogens.append(hydrogenObj)
+
+                self.preprocessingOptions.append({"replacedHydrogens" : hydrogens})
             
         except Exception as error:
             log.error("There was a problem creating the pdbFile object from the uploaded pdb file: " + str(error))
