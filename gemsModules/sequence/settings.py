@@ -2,14 +2,14 @@
 from gemsModules import common
 from gemsModules.common.transaction import *
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
-from pydantic import BaseModel, Schema
+from pydantic import BaseModel
 
 ## Who I am
 WhoIAm='Sequence'
 
 ##Status Report
 status = "Stable"
-moduleStatusDetail = "Module framework in place. Can build default structures that are not minimized. Currently working on condensed sequence validation."
+moduleStatusDetail = "Nearing ready for v1 release. Needs tests and documentation."
 
 servicesStatus = [
     {
@@ -25,7 +25,7 @@ servicesStatus = [
     {
         "service" : "Build3DStructure",
         "status" : "Stable.",
-        "statusDetail" : "Can build a default structure that has not been minimized. No option setting possible yet."
+        "statusDetail" : "Ready for tests and documentation."
     }
 ]
 

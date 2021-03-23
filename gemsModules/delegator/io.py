@@ -94,7 +94,10 @@ class Transaction:
 #                isPretty = True
         log.info("build_outgoing_string() was called.")
         if self.response_dict is None:
-            self.build_general_error_output()
+            msg = "Transaction has no response_dict! request_dict: " + str(self.request_dict)
+            #print("transaction.response_dict: " + str(self.response_dict))
+            #print("transaction: " + str(self.__dict__))
+            self.build_general_error_output(msg)
         else:
             #log.debug("response_dict: \n" + str(self.response_dict))
             for key in self.response_dict.keys():
@@ -118,8 +121,11 @@ class Transaction:
                 raise error
 
 
-    def build_general_error_output(self):
-        self.outgoing_string="{'entity':{'type':'commonServicer','responses':{'notice':'fix me there was an error'}}}"
+    def build_general_error_output(self, msg=None):
+        if msg == None:
+            msg = 'fix me there was an error'
+
+        self.outgoing_string="{'entity':{'type':'commonServicer','responses':{'notice': " + msg + "}}}"
        # print("build_general_error_output was called. Still in development.")
 
 #top_level_schema = schema([Entity, Project], title='A GemsModules Transaction')

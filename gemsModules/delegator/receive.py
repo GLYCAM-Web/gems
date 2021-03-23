@@ -112,6 +112,9 @@ def delegate(jsonObjectString):
     # Return whatever outgoing string was made
     log.debug("About to return whatever output I have at this point:")
     prettyPrint(thisTransaction.response_dict)
+
+    log.debug("thisTransaction.outgoing_string obj type: " + str(type(thisTransaction.outgoing_string)))
+    log.debug("thisTransaction.outgoing_string: " + thisTransaction.outgoing_string)
     return thisTransaction.outgoing_string
 
 def setResponseSiteHost(thisTransaction):

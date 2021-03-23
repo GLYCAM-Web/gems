@@ -91,8 +91,15 @@ class Project(BaseModel):
 
             if 'json_api_version' in project.keys():
                 self.json_api_version = project['json_api_version']
-            if 'django_project_id' in project.keys():
-                self.django_project_id = project['django_project_id']
+
+            log.debug("Checking for the django_project_id.")
+            if 'id' in project.keys():
+                self.django_project_id = project['id']
+                log.debug("self.django_project_id: " + self.django_project_id)
+            else:
+                log.error("Failed to find the django_project_id!")
+                log.error("project.keys(): "  + str(project.keys()))
+
 
         else:
             ##  For doing our best if the request doesn't include a project obj.
@@ -204,7 +211,7 @@ class PdbProject(Project):
 
     def __init__(self, request_dict: dict):
         super().__init__(request_dict)
-        from gemsModules.structureFile.amber.receive import getPdbRequestInput
+        from gemsModules.structureFile.amber.logic import getPdbRequestInput
         log.info("PdbProject.__init__() was called.")
         self.project_type = "pdb"
         self.has_input_files = True
