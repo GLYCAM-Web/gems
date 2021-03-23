@@ -105,6 +105,38 @@ check_gmmldir() {
     fi
 }
 
+check_pull_mdutils() {
+    theDir="$GEMSHOME/External/MD_Utils"
+    if [ ! -d "${theDir}" ]; then
+	    mkdir -p ${theDir}
+    fi
+    if [ ! -d "${theDir}/.git" ]; then
+        echo ""
+        echo "MD_Utils repo does not exist. Attempting to clone."
+	git clone https://github.com/GLYCAM-Web/MD_Utils.git ${theDir}
+    	if [ ! -d "${theDir}/.git" ]; then
+        	echo ""
+        	echo "Error:  Unable to clone MD_Utils.  Some functions will be unavailable."
+        	echo "You can try again on your own using the following command."
+        	echo "You will not need to remake GEMS or GMML after cloning."
+        	echo ""
+		echo "git clone https://github.com/GLYCAM-Web/MD_Utils.git ${theDir}"
+	fi
+    else
+	echo "Updating MD_Utils"
+	( cd ${theDir} && git pull )
+	returnValue=$?
+	if [ "${returnValue}" != 0 ] ; then
+		echo ""
+		echo "Unable to update MD_Utils.  Some functions may be unavailable."
+        	echo "You can try again on your own using the following command."
+        	echo "You will not need to remake GEMS or GMML after pulling."
+        	echo ""
+		echo "cd ${theDir} && git pull"
+	fi
+    fi
+}
+
 ################################################################
 #########                CHECK SETTINGS                #########
 ################################################################
@@ -114,6 +146,7 @@ echo "Starting installation of GEMS at `date`".
 gemshome=`pwd`
 check_gemshome $gemshome
 check_gmmldir $GEMSHOME/gmml
+check_pull_mdutils
 get_numprocs
 
 ################################################################

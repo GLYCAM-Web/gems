@@ -15,6 +15,7 @@ def batch_compute_delegation (incoming_json_dict):
     minimal_json_dict = incoming_json_dict
     output_str = json.dumps(minimal_json_dict)
     slurm_receive.manageIncomingString(output_str)
+#    slurm_receive.manageIncomingString(json.dumps(incoming_json_dict))
 
     
 if (__name__ == '__main__'):

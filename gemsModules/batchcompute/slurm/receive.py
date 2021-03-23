@@ -32,7 +32,7 @@ def submit(thisSlurmJobInfo):
     try:
         log.debug ("In func submit(), incoming dict sbatchArg is: " + thisSlurmJobInfo.incoming_dict['sbatchArgument'] + "\n")
         p = subprocess.Popen( [ 'sbatch', thisSlurmJobInfo.incoming_dict["slurm_runscript_name"] ] ,
-                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (outputhere,errorshere) = p.communicate()
         if p.returncode != 0 :
             return "SLURM submit got non-zero exit upon attempt to submit."
@@ -67,10 +67,10 @@ def writeSlurmSubmissionScript(path, thisSlurmJobInfo):
     script.write("#SBATCH --nodes=1" + "\n")
     script.write("#SBATCH --output=slurm_%x-%A.out" + "\n")
     script.write("#SBATCH --partition=" + incoming_dict["partition"] + "\n")
-    script.write("#SBATCH --tasks-per-node=1" + "\n")
+    script.write("#SBATCH --tasks-per-node=4" + "\n")
     script.write("#SBATCH --uid=" + incoming_dict["user"] + "\n")
     script.write("\n")
-    script.write("bash " + incoming_dict["sbatchArgument"] + "\n")
+    script.write(incoming_dict["sbatchArgument"] + "\n")
 
 def manageIncomingString(jsonObjectString):
     """

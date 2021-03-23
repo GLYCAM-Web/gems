@@ -73,6 +73,7 @@ def buildEach3DStructureInStructureInfo(structureInfo : StructureInfo, buildStra
                 builder = getCbBuilderForSequence(inputSequence)
             buildDir = "New_Builds/"
             sequenceProjects.createConformerDirectoryInBuildsDirectory(projectDir, conformerID)
+            ## TODO - one day, the path on a compute node might differ from the website path
             outputDirPath = os.path.join(projectDir, buildDir, conformerID)
             log.debug("outputDirPath: " + outputDirPath)
             #from multiprocessing import set_start_method
@@ -128,22 +129,22 @@ def build3DStructure(buildState : BuildState, thisTransaction : Transaction, out
     except Exception as error:
         log.error("There was a problem generating this build: " + str(error))
         raise error
-    ##TODO This needs to move - Sequence should not be deciding how 
-    ## minimization will happen.  That is the job of mmservice.
-    amberSubmissionJson='{"project" : \
-    {\
-    "id":"' + pUUID + '", \
-    "workingDirectory":"' + outputDirPath + '", \
-    "type":"minimization", \
-    "system_phase":"gas", \
-    "water_model":"none" \
-    } \
+    ## Generate JSOn to tell mmservice/amber that there is a job to do
+    ## TODO  make filling this in use a class in amber/io.py 
+    amberSubmissionJson='{ \
+    "molecularSystemType":"Glycan", \
+    "molecularModelingJobType":"Prep_and_Minimization", \
+    "jobID":"' + pUUID + '", \
+    "localWorkingDirectory":"' + outputDirPath + '", \
+    "comment":"initiated by gemsModules/sequence"\
     }'
-    # TODO:  Make this resemble real code....
-    the_json_file = outputDirPath + "/amber_submission.json"
-    min_json_in = open (the_json_file , 'w')
-    min_json_in.write(amberSubmissionJson)
-    min_json_in.close()
+    log.debug(amberSubmissionJson)
+#    # TODO:  Make this resemble real code....
+#    ##  Moving this to mmservice/amber/amber.py
+#    the_json_file = outputDirPath + "/amber_submission.json"
+#    min_json_in = open (the_json_file , 'w')
+#    min_json_in.write(amberSubmissionJson)
+#    min_json_in.close()
 
     from gemsModules.mmservice.amber.amber import manageIncomingString
     ## Using multiprocessing for this function call.
