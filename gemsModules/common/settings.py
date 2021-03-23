@@ -4,7 +4,7 @@ from gemsModules.common.transaction import *
 from gemsModules.common.loggingConfig import *
 
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
-from pydantic import BaseModel, Schema
+from pydantic import BaseModel
 
 ## TODO: put some of this data into an in-memory sqlite db
 

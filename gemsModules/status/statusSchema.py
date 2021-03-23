@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from pydantic import BaseModel, Schema
+from pydantic import BaseModel, Field
 from pydantic.schema import schema
 
 
@@ -12,7 +12,7 @@ class StatusServicesEnum(str,Enum):
     generateReport = 'GenerateReport'
 
 class StatusServices(BaseModel):
-    statusServices : StatusServicesEnum = Schema(
+    statusServices : StatusServicesEnum = Field(
         'GenerateReport',
         title = 'Status Reporting Services',
         description = 'Reporting services for gemsModules.'

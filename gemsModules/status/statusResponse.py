@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from typing import Dict, List
-from pydantic import BaseModel, Schema
+from pydantic import BaseModel
 from pydantic.schema import schema
 
 """Whole class is experimental"""

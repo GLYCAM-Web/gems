@@ -3,7 +3,7 @@
         "type": "StructureFile",
         "services": [{
             "Preprocess": {
-                "type": "PreprocessPdbForAmber"
+                "type": "Evaluate"
             }
         }],
         "inputs": [{
