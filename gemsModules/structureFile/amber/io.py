@@ -29,7 +29,7 @@ class UnrecognizedAtomsTableMetadata(BaseModel):
     interactionRequirement : str = "none"
     urgency : str = "error"
     count : int = 0
-    description: str = "Here is the description for the purpose behind the Unrecognized Atoms data."
+    description: str = "The following atoms were not recognized."
 
     def __init__(self, atomCount):
         super().__init__()
@@ -83,7 +83,7 @@ class UnrecognizedMoleculesTableMetadata(BaseModel):
     interactionRequirement : str = "none"
     urgency : str = "warning"
     count : int = 0
-    description : str = "Here is the description for the purpose behind the Unrecognized Residue data"
+    description : str = "The following unrecognized residues were found. They must be deleted (for you to use this site). If Mid-Chain is False, no further action is required. Otherwise, pleaseinspect the missing residues (see Missing Residues table) to choose how we should handle the new chain termini that are created by removing these residues."
 
     def __init__(self, moleculeCount, urgencyLevel):
         super().__init__()
@@ -141,7 +141,7 @@ class MissingResiduesTableMetadata(BaseModel):
     interactionRequirement : str = "optional"
     urgency : str = "warning"
     count : int = 0
-    description : str = "Here is the description for the purpose behind the Missing Residues data"
+    description : str = "Gaps were detected."
 
     def __init__(self, moleculeCount):
         super().__init__()
@@ -200,7 +200,7 @@ class HistidineProtonationsTableMetadata(BaseModel):
     interactionRequirement : str = "optional"
     urgency : str = "info"
     count : int = 0
-    description : str = "Here is the description for the purpose behind the Histidine Protonation data"
+    description : str = "Choose HIS mappings."
 
     def __init__(self, mappingCount):
         super().__init__()
@@ -248,7 +248,7 @@ class DisulfideBondsTableMetadata(BaseModel):
     interactionRequirement : str = "optional"
     urgency : str = "info"
     count : int = 0
-    description : str = "Here is the description for the purpose behind the Disulfide Bonds data"
+    description : str = "Select disulfide bonds."
 
     def __init__(self, bondCount):
         super().__init__()
@@ -321,7 +321,7 @@ class ChainTerminationsTableMetadata(BaseModel):
     interactionRequirement : str = "optional"
     urgency : str = "info"
     count : int = 0
-    description : str = "Here is the description for the purpose behind the Chain Terminations data"
+    description : str = "Select terminal residues."
 
     def __init__(self, terminalCount):
         super().__init__()
@@ -372,7 +372,7 @@ class ReplacedHydrogensTableMetadata(BaseModel):
     interactionRequirement : str = "none"
     urgency : str = "info"
     count : int = 0
-    description : str = "Here is the description for the purpose behind the Replaced Hydrogens data"
+    description : str = "The following atoms were removed..."
 
     def __init__(self, hydrogenCount):
         super().__init__()
