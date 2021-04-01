@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from enum import Enum, auto
-from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
+from typing import Dict, List, Optional, Sequence, Set, Tuple, Union, Any
 from typing import ForwardRef
 from pydantic import BaseModel, Field, ValidationError, validator
 from pydantic.schema import schema
@@ -134,6 +134,10 @@ class BuildOptions(BaseModel):
     """Options for building 3D models"""
     solvationOptions : SystemSolvationOptions = None  # Not yet handled.
     geometryOptions : GeometryOptions = None
+    mdMinimize : bool = Field(
+            True,
+            title = 'Minimize structure using MD',
+            )
 
     def __init__(self, validatedSequence : Sequence):
         super().__init__()
@@ -144,7 +148,7 @@ class BuildOptions(BaseModel):
 
 class DrawOptions(BaseModel):
     """Options for drawing 2D models"""
-    Labeled : str = "true"
+    Labeled : str = "true"  ## Lachele Mar 2020 - should this be a bool?
 
 # Oliver Oct2020 finds this unnecessary. Not sure what other is going to be.
 # class SequenceInput(BaseModel):
@@ -243,71 +247,64 @@ class ServiceResponse(BaseModel):
                 self.outputs.append(output)
 
 
+ class Service(commonio.Service):
+     """Holds information about a Service requested of the Sequence Entity."""
+     typename : Services = Field(
+             'Evaluate',
+             alias = 'type',
+             title = 'Requested Service',
+             description = 'The service requested of the Sequence Entity'
+             )
+     project: projectio.GemsProject = None
+     inputs : List[str] = None ##TODO: Make a CondensedSequence class.
+     outputs : List[Union[SequenceOutput, BuildOutput]] = None
+
+     def __init__(self, config : dict ):
+         super().__init__()
+
+         log.info("Initializing Service.")
+         log.debug("config: " + repr(config))
+
+         if self.inputs is None:
+             self.inputs = []
+         self.inputs.append(config['sequence'])
+
+         if self.outputs == None:
+             self.outputs = []
+
+         if config['outputType'] == "Evaluate":
+             output = SequenceOutput(config)
+             self.outputs.append(output)
+         elif config['outputType'] == "Build3DStructure":
+             output1 = SequenceOutput(config)
+             self.outputs.append(output1)
+             output2 = BuildOutput(config)
+             self.outputs.append(output2)
 
 
 
-# class Service(commonio.Service):
-#     """Holds information about a Service requested of the Sequence Entity."""
-#     typename : Services = Field(
-#             'Evaluate',
-#             alias = 'type',
-#             title = 'Requested Service',
-#             description = 'The service requested of the Sequence Entity'
-#             )
-#     project: projectio.GemsProject = None
-#     inputs : List[str] = None ##TODO: Make a CondensedSequence class.
-#     outputs : List[Union[SequenceOutput, BuildOutput]] = None
-
-#     def __init__(self, config : dict ):
-#         super().__init__()
-
-#         log.info("Initializing Service.")
-#         log.debug("config: " + repr(config))
-
-#         if self.inputs is None:
-#             self.inputs = []
-#         self.inputs.append(config['sequence'])
-
-#         if self.outputs == None:
-#             self.outputs = []
-
-#         if config['outputType'] == "Evaluate":
-#             output = SequenceOutput(config)
-#             self.outputs.append(output)
-#         elif config['outputType'] == "Build3DStructure":
-#             output1 = SequenceOutput(config)
-#             self.outputs.append(output1)
-#             output2 = BuildOutput(config)
-#             self.outputs.append(output2)
-
-
-
-
-
-
-
-
-
-
-# Drafted by Lachele, but probably not needed. Oliver Oct2020
-# class Entity(BaseModel):
-#     """Holds information about the main object responsible for a service."""
+ class Entity(commonio.Entity):
+     """Holds information about the main object responsible for a service."""
     
-#     entityType : str = Field(
-#             'Sequence',
-#             title='Type',
-#             alias='type'
-#             )
-# #    inputs :  = None
-#     requestID : str = Field(
-#             None,
-#             title = 'Request ID',
-#             description = 'User-specified ID that will be echoed in responses.'
-#             )
-#     services : List[Service] = []
-#     responses : List[Response] = []
-#   #  inputs : SequenceInput = None # This is already in Service...
-#     options : commonio.Tags = None
+     entityType : str = Field(
+             'Sequence',
+             title='Type',
+             alias='type'
+             )
+#     inputs :  = None
+     requestID : str = Field(
+             None,
+             title = 'Request ID',
+             description = 'User-specified ID that will be echoed in responses.'
+             )
+     services : List[Service] = []
+     responses : List[Response] = []
+   #  inputs : SequenceInput = None # This is already in Service...
+     options : commonio.Tags = None
+
+     def __init__(self, **data: Any):
+        super().__init__(**data)
+
 
 def generateSchema():
     import json

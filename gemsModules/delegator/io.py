@@ -24,11 +24,12 @@
 # ###############################################################
 import traceback
 from enum import Enum, auto
-from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
+from typing import Dict, List, Optional, Sequence, Set, Tuple, Union, Any
 from typing import ForwardRef
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, Json
 from pydantic.schema import schema
 from gemsModules.common import io as commonio
+from gemsModules.project import io as projectio
 from gemsModules.common.loggingConfig import *
 
 if loggers.get(__name__):
@@ -43,31 +44,28 @@ class Entities(str, Enum):
     project = 'Project'
     sequence = 'Sequence'
 
-class Entity(commonio.Entity):
-    """Holds information about the main module responsible for a service."""
-    entityType : Entities = Field(
-            ...,
-            title='Type',
-            alias='type'
-            )
-
-##For the frontend project.
-class Project(BaseModel):
-    resources : List[commonio.Resource] = None
-    options : commonio.Tags = None
 
 class TransactionSchema(BaseModel):
     timestamp : str = None
-    entity  : Entity
-    project : Project = None
-    options : commonio.Tags = None
+    entity  : Entity = None
+    project : projectio.Project = None
+    options : Json[str] = None
+#    project : Project = None
+#    options : commonio.Tags = None
 
 # ####
 # ####  Container for use in the modules
 # ####
 class Transaction:
     """Holds information relevant to a delegated transaction"""
-    def __init__(self, incoming_string):
+    incoming_string :str = None
+    request_dict : {}  = None
+    transaction_in : TransactionSchema = None
+    transaction_out: TransactionSchema = None
+    response_dict : {} = None
+    outgoing_string : str = None
+
+    def __init__(self, in_string):
         """
         Storage for the input and output relevant to the transaction.
 
@@ -76,12 +74,22 @@ class Transaction:
         the response dictionary is built up.  From that the outgoing string
         is generated.
         """
-        self.incoming_string = incoming_string
-        self.request_dict : {} = None
-        self.transaction_in : TransactionSchema = None
-        self.transaction_out : TransactionSchema = None
-        self.response_dict : {} = None
-        self.outgoing_string : str = None
+        import json
+        print("The in_string is: " + in_string)
+
+        self.incoming_string = in_string
+        print("The incoming_string is: " )
+        print(self.incoming_string)
+
+        self.request_dict = json.loads(self.incoming_string)
+        print("The request_dict is: " )
+        print(self.request_dict)
+
+    def populate_transaction(self)
+
+        self.transaction_in = TransactionSchema(**self.request_dict)
+        print("The transaction_in is: " )
+        print(self.transaction_in.json(indent=2))
 
     def build_outgoing_string(self):
         import json
@@ -112,7 +120,7 @@ class Transaction:
 
                         #log.debug("~ valueType: " + str(type(self.response_dict['gems_project'][element])))
             try:
-                if isPretty:
+                if isPretty is True:
                     self.outgoing_string=json.dumps(self.response_dict, indent=4)
                 else:
                     self.outgoing_string=json.dumps(self.response_dict)

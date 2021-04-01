@@ -136,11 +136,6 @@ class Response(Service):
             alias='type',
             description='The type service that produced this response.'
             )
-    # subentities : Json = Field(
-    #         None,
-    #         title='Responding Subentities',
-    #         description='List of Entities, and associated Services, needed by this Response'
-    #         )
 
 class Entity(BaseModel):
     """Holds information about the main object responsible for a service."""
@@ -149,15 +144,19 @@ class Entity(BaseModel):
             title='Type',
             alias='type'
             )
-    inputs : List[Json] = None
+#    inputs : List[Resource] = None
+#    inputs : List[Json] = None
+    inputs : Json[str] = None
     requestID : str = Field(
             None,
             title = 'Request ID',
             description = 'User-specified ID that will be echoed in responses.'
             )
-    services : List[Json] = None
-    responses : List[Json] = None
-    options : Tags = None
+    services : Json[str] = None
+    responses : Json[str] = None
+#    services : List[Service] = None
+#    responses : List[Response] = None
+    options : Json[str] = None
 
 
 def generateSchema():

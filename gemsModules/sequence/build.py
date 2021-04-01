@@ -24,8 +24,6 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__)
 
-
-
 ##  @brief Give a transaction and pUUID, and this method builds the json response and
 #   appends that to the transaction.
 #   @param Transaction thisTransaction
@@ -48,7 +46,6 @@ def appendBuild3DStructureResponse(thisTransaction : Transaction, pUUID : str):
             'downloadUrl': downloadUrl
         }
     })
-
 
 def buildEach3DStructureInStructureInfo(structureInfo : StructureInfo, buildStrategyID : str, thisTransaction : Transaction, this_seqID : str, this_pUUID : str, projectDir : str):
     needToInstantiateCarbohydrateBuilder = True
@@ -109,6 +106,7 @@ def build3DStructure(buildState : BuildState, thisTransaction : Transaction, out
         raise error
     
     ##TODO: figure out how to return this response now, and still continue this logic.
+    #  ...use 'yield'...
     # log.debug("About to getCbBuilderForSequence")
     # builder = getCbBuilderForSequence(sequence)
     try:
@@ -129,6 +127,10 @@ def build3DStructure(buildState : BuildState, thisTransaction : Transaction, out
     except Exception as error:
         log.error("There was a problem generating this build: " + str(error))
         raise error
+    if "mdMinimize" in thisTransaction.transaction_in.["entity"].["options"] :
+        if thisTransaction.transaction_in.options.mdMinimize is False :
+            return
+
     ## Generate JSOn to tell mmservice/amber that there is a job to do
     ## TODO  make filling this in use a class in amber/io.py 
     amberSubmissionJson='{ \
@@ -139,13 +141,6 @@ def build3DStructure(buildState : BuildState, thisTransaction : Transaction, out
     "comment":"initiated by gemsModules/sequence"\
     }'
     log.debug(amberSubmissionJson)
-#    # TODO:  Make this resemble real code....
-#    ##  Moving this to mmservice/amber/amber.py
-#    the_json_file = outputDirPath + "/amber_submission.json"
-#    min_json_in = open (the_json_file , 'w')
-#    min_json_in.write(amberSubmissionJson)
-#    min_json_in.close()
-
     from gemsModules.mmservice.amber.amber import manageIncomingString
     ## Using multiprocessing for this function call.
     manageIncomingString(amberSubmissionJson)
@@ -218,8 +213,6 @@ def getCbBuilderForSequence(sequence : str):
     else:
         log.error("Prepfile did not exist at: " + prepfile)
         raise FileNotFoundError
-
-
 
 
 
