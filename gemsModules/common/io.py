@@ -21,9 +21,10 @@
 # ###############################################################
 import traceback
 from enum import Enum, auto
-from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
+from typing import Dict, List, Optional, Sequence, Set, Tuple, Union, Any
 from pydantic import BaseModel, Field, Json
 from pydantic.schema import schema
+from gemsModules.project import dataio as projectio
 from gemsModules.common.loggingConfig import *
 # ##
 # ## This should probably not be needed after refactoring for this file
@@ -36,18 +37,17 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__)
 
-
 class NoticeTypes(str, Enum):
     note = 'Note'
     warning = 'Warning'
     error = 'Error'
     exit = 'Exit'
 
-class Tags(BaseModel):
-    options : Dict[str,str] = Field(
-            None,
-            description='Key-value pairs that are specific to each entity, service, etc'
-            )
+#class Tags(BaseModel):
+    #options : Dict[str,str] = Field(
+            #None,
+            #description='Key-value pairs that are specific to each entity, service, etc'
+            #)
 
 class Notice(BaseModel):
     """Description of a Notice."""
@@ -74,7 +74,10 @@ class Notice(BaseModel):
             alias='message',
             description='A more detailed message for this notice.'
             )
-    options : Tags = None
+    options : Dict[str,str] = Field(
+            None,
+            description='Key-value pairs that are specific to each entity, service, etc'
+            )
 
 class Resource(BaseModel):
     """Information describing a resource containing data."""
@@ -92,12 +95,17 @@ class Resource(BaseModel):
         None,
         description='The thing that is described by the location and format'
         )
-    tags : Tags = None
-    options : Tags = None
-    notice : Notice = None
+    notices : List[Notice] = None
+    options : Dict[str,str] = Field(
+            None,
+            description='Key-value pairs that are specific to each entity, service, etc'
+            )
 
 class Service(BaseModel):
-    """Holds information about a requested Service."""
+    """
+    Holds information about a requested Service.
+    This object will have different forms in each Entity.
+    """
     typename : Json[str]  = Field(
             None,
             title='Type of Service.',
@@ -105,37 +113,24 @@ class Service(BaseModel):
             description='The services available will vary by Entity.'
             )
     inputs : Json = None
-    outputs : Json = None
-    # requestID : str = Field(
-    #         None,
-    #         title = 'Request ID',
-    #         description = 'User-specified ID that will be echoed in responses.'
-    #         )
-    # options : Tags = None
-    # project : Json = Field(
-    #         None,
-    #         title='Gems Project Information',
-    #         description='See this doc somewhere for more information',
-    #         )
-    # project : Json = Field(
-    #         None,
-    #         title='A GEMS Project',
-    #         description='This is generally assigned in the project module'
-    #         )
-    subentities : Json = Field(
+    options : Dict[str,str] = Field(
             None,
-            title='Subentities',
-            description='List of Entities, and associated Services, needed by this Service'
+            description='Key-value pairs that are specific to each entity, service, etc'
             )
 
 class Response(Service):
-    """Holds information about a response to a service request."""
+    """
+    Holds information about a response to a service request.
+    This object will have different forms in each Entity.
+    """
     typename : Json[str] = Field(
             None,
             title='Responding Service.',
             alias='type',
             description='The type service that produced this response.'
             )
+    outputs : Json = None
+    notices : List[Notice] = None
 
 class Entity(BaseModel):
     """Holds information about the main object responsible for a service."""
@@ -144,25 +139,120 @@ class Entity(BaseModel):
             title='Type',
             alias='type'
             )
-#    inputs : List[Resource] = None
-#    inputs : List[Json] = None
-    inputs : Json[str] = None
     requestID : str = Field(
             None,
             title = 'Request ID',
             description = 'User-specified ID that will be echoed in responses.'
             )
-    services : Json[str] = None
-    responses : Json[str] = None
-#    services : List[Service] = None
-#    responses : List[Response] = None
-    options : Json[str] = None
+    services : List[Service] = None
+    inputs : List[Resource] = None
+    responses : List[Response] = None
+    notices : List[Notice] = None
+    options : Dict[str,str] = Field(
+            None,
+            description='Key-value pairs that are specific to each entity, service, etc'
+            )
+
+class TransactionSchema(BaseModel):
+    timestamp : str = None
+    entity  : Entity = None
+    project : projectio.Project = None
+    options : Dict[str,str] = Field(
+            None,
+            description='Key-value pairs that are specific to each entity, service, etc'
+            )
+    notices : List[Notice] = None
+    class Config:
+        title = 'gemsModulesTransaction'
+
+# ####
+# ####  Container for use in the modules
+# ####
+class Transaction:
+    """Holds information relevant to a delegated transaction"""
+    incoming_string :str = None
+    request_dict : {}  = None
+    transaction_in : TransactionSchema = None
+    transaction_out: TransactionSchema = None
+    response_dict : {} = None
+    outgoing_string : str = None
+
+    def __init__(self, in_string):
+        """
+        Storage for the input and output relevant to the transaction.
+
+        A copy of the incoming string is stored.  That string is parsed
+        into a request dictionary.  As the entities perform their services,
+        the response dictionary is built up.  From that the outgoing string
+        is generated.
+        """
+        import json
+        log.debug("The in_string is: " + in_string)
+
+        self.incoming_string = in_string
+        log.debug("The incoming_string is: " )
+        log.debug(self.incoming_string)
+
+        self.request_dict = json.loads(self.incoming_string)
+        log.debug("The request_dict is: " )
+        log.debug(self.request_dict)
+
+    def populate_transaction_in(self):
+
+        self.transaction_in = TransactionSchema(**self.request_dict)
+        log.debug("The transaction_in is: " )
+        log.debug(self.transaction_in.json(indent=2))
+
+    def build_outgoing_string(self):
+        import json
+        isPretty=False
+
+#        ## TODO: read in whether the output should be pretty
+#        # this might work:
+#        if self.transaction_in.options is not None:
+#            if ('jsonObjectOutputFormat', 'prettyOutput') in self.transaction_in.options:
+#                isPretty = True
+        log.info("build_outgoing_string() was called.")
+        if self.response_dict is None:
+            msg = "Transaction has no response_dict! request_dict: " + str(self.request_dict)
+            #print("transaction.response_dict: " + str(self.response_dict))
+            #print("transaction: " + str(self.__dict__))
+            self.build_general_error_output(msg)
+        else:
+            #log.debug("response_dict: \n" + str(self.response_dict))
+            for key in self.response_dict.keys():
+                #log.debug("key: " + key)
+                #log.debug("valueType: " + str(type(self.response_dict[key])))
+                if key == 'gems_project':
+                    #log.debug("\ngems_project: \n")
+                    for element in self.response_dict['gems_project'].keys():
+                        #log.debug("~ element: " + element)
+                        if type(self.response_dict['gems_project'][element]) != str:
+                            self.response_dict['gems_project'][element] = str(self.response_dict['gems_project'][element])
+
+                        #log.debug("~ valueType: " + str(type(self.response_dict['gems_project'][element])))
+            try:
+                if isPretty is True:
+                    self.outgoing_string=json.dumps(self.response_dict, indent=4)
+                else:
+                    self.outgoing_string=json.dumps(self.response_dict)
+            except Exception as error:
+                log.error("There was a problem dumping the response_dict to string.")
+                raise error
+
+
+    def build_general_error_output(self, msg=None):
+        if msg == None:
+            msg = 'fix me there was an error'
+
+        self.outgoing_string="{'entity':{'type':'commonServicer','responses':{'notice': " + msg + "}}}"
+       # print("build_general_error_output was called. Still in development.")
 
 
 def generateSchema():
     import json
     #print(Service.schema_json(indent=2))
-    print(Entity.schema_json(indent=2))
+    print(TransactionSchema.schema_json(indent=2))
 
 if __name__ == "__main__":
   generateSchema()

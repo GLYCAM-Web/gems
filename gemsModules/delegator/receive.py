@@ -29,7 +29,7 @@ def delegate(jsonObjectString):
     log.debug("incoming jsonObjectString: " + jsonObjectString)
 
     # Make a new Transaction object for holding I/O information.
-    from gemsModules.delegator.io import Transaction as ioTransaction
+    from gemsModules.common.io import Transaction as ioTransaction
     thisTransaction=ioTransaction(jsonObjectString)
 
     # If the incoming string was improperly formed, bail, but give a reason.

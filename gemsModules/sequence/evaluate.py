@@ -8,7 +8,6 @@ from gemsModules.project.projectUtil import *
 from gemsModules.project import settings as projectSettings
 from gemsModules.common import io as commonio
 from gemsModules.common import logic as commonlogic
-from gemsModules.delegator import io as delegatorio
 from gemsModules.common.loggingConfig import *
 from . import settings as sequenceSettings
 

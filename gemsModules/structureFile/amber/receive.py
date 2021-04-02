@@ -10,7 +10,7 @@ from collections import OrderedDict
 
 from gemsModules.project.projectUtil import *
 from gemsModules.common.logic import appendResponse, prettyPrint, updateResponse
-from gemsModules.delegator import io as delegatorio
+from gemsModules.common import io as commonio
 import gemsModules.structureFile.amber.io as amberIO
 
 from gemsModules.common.loggingConfig import *
@@ -23,7 +23,7 @@ else:
 
 ##  Evaluate a pdb for use with Amber.
 #   @param thisTransaction A request containing either the path to an uploaded pdb, or a pdbID for sideloading.
-def evaluatePdb(thisTransaction : delegatorio.Transaction):
+def evaluatePdb(thisTransaction : commonio.Transaction):
     log.info("evaluatePdb() was called.\n")
     try:
         ### Some projects will already have been created. 
@@ -90,7 +90,7 @@ def evaluatePdb(thisTransaction : delegatorio.Transaction):
         
 
 
-def preprocessPdbForAmber(thisTransaction : delegatorio.Transaction):
+def preprocessPdbForAmber(thisTransaction : commonio.Transaction):
     log.info("preprocessPdbForAmber() was called. Still in Development!!!!!!!!")
     output = amberIO.PreprocessPdbForAmberOutput()
 

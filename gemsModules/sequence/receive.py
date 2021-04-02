@@ -4,7 +4,6 @@ import traceback
 import gemsModules
 from gemsModules.common import io as commonio
 from gemsModules.common import logic as commonlogic
-from gemsModules.delegator import io as delegatorio
 from gemsModules.sequence import settings as sequenceSettings
 
 from gemsModules.common.loggingConfig import *
@@ -15,7 +14,7 @@ else:
 
 ##  @brief Default service is marco polo. Should this be something else?
 #   @param Transaction thisTransaction
-def doDefaultService(thisTransaction : delegatorio.Transaction):
+def doDefaultService(thisTransaction : commonio.Transaction):
     log.info("doDefaultService() was called.\n")
     # evaluate(thisTransaction : Transaction)
     # build3DStructure(thisTransaction : Transaction)
@@ -30,7 +29,7 @@ def doDefaultService(thisTransaction : delegatorio.Transaction):
 
 ##  @brief The main way Delegator interacts with this module. Request handling.
 #   @param Transaction thisTransactrion
-def receive(thisTransaction : delegatorio.Transaction):
+def receive(thisTransaction : commonio.Transaction):
     log.info("sequence.receive() was called:\n")
     import gemsModules.sequence
     ## First figure out the names of each of the requested services

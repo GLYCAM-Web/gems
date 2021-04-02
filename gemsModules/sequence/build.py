@@ -9,7 +9,6 @@ from gemsModules.project.projectUtil import *
 from gemsModules.project import settings as projectSettings
 from gemsModules.common import io as commonio
 from gemsModules.common import logic as commonLogic
-from gemsModules.delegator import io as delegatorio
 from gemsModules.sequence import io as sequenceIO
 #from gemsModules.common.services import *
 #from gemsModules.common.transaction import * # might need whole file...

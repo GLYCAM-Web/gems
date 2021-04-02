@@ -1,7 +1,7 @@
 import os, sys, importlib.util
 import gemsModules
 from gemsModules.common.services import *
-from gemsModules.delegator import io as delegatorio
+from gemsModules.common import io as commonio
 from gemsModules.project.projectUtil import *
 from gemsModules.common.loggingConfig import *
 from gemsModules.structureFile.amber.receive import preprocessPdbForAmber, evaluatePdb
@@ -14,7 +14,7 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__)
 
-def receive(thisTransaction : delegatorio.Transaction):
+def receive(thisTransaction : commonio.Transaction):
     log.info("receive() was called.\n")
     #log.debug("thisTransaction: " + str(thisTransaction.__dict__))
 
@@ -53,7 +53,7 @@ def receive(thisTransaction : delegatorio.Transaction):
 
             
 
-def doDefaultService(thisTransaction : delegatorio.Transaction):
+def doDefaultService(thisTransaction : commonio.Transaction):
     log.info("doDefaultService() was called.\n")
     ##Preprocess PDB will be the default. Given a request to the StructureFile entity,
     ##  with no services or options defined, look for a pdb file and preprocess it for Amber.
@@ -77,7 +77,7 @@ def main():
     with open(inputFile, 'r') as file:
         jsonObjectString = file.read().replace('\n', '')
 
-    thisTransaction = delegatorio.Transaction(jsonObjectString)
+    thisTransaction = commonio.Transaction(jsonObjectString)
 
     try:
         parseInput(thisTransaction)

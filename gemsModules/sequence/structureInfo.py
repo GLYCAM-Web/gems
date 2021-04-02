@@ -6,7 +6,6 @@ from pydantic import BaseModel, Field, ValidationError
 from pydantic.schema import schema
 from gemsModules.common import io as commonio
 from gemsModules.common import logic as commonlogic
-from gemsModules.delegator import io as delegatorio
 from gemsModules.common.loggingConfig import *
 from gemsModules.project.projectUtil import *
 import gmml
