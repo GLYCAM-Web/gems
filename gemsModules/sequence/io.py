@@ -6,8 +6,9 @@ from pydantic import BaseModel, Field, ValidationError, validator
 from pydantic.schema import schema
 from gemsModules.common.loggingConfig import *
 from gemsModules.common import io as commonio
-from gemsModules.project import dataio as projectio
+from gemsModules.project import io as projectio
 from gemsModules.project import projectUtil as projectUtil
+from gemsModules.sequence import settings
 import traceback
 
 if loggers.get(__name__):
@@ -15,46 +16,27 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__)
 
-# ## Services
-# ##
-class Services(str,Enum):
-    build3dStructure = 'Build3dStructure'
-    drawGlycan = 'drawGlycan'
-    evaluate = 'Evaluate'
-    status = 'Status'
-
-# ## Environment variables
-# ##
-class Environment(str,Enum):
-    ## The entity itself
-    sequenceentity   = 'GEMS_MODULES_SEQUENCE_PATH'
-    ## Services for this entity, in alphabetical order
-    build3DStructure = 'GEMS_MODULES_SEQUENCE_STRUCTURE_PATH'
-    graph = 'GEMS_MODULES_SEQUENCE_GRAPH_PATH'
-    evaluate         = 'GEMS_MODULES_SEQUENCE_STRUCTURE_PATH'
-
-# ## Recognized input and output formats
-# ##
-class Formats(str,Enum):
-    """All Sequenes must be in GLYCAM Condensed notation"""
-    # the basic sequence as it might arrive, unspecified order, assumed condensed glycam
-    sequence = 'Sequence'  
-
-class Locations(str,Enum):
-    internal='internal'  ##< All input at this time must be internal to the JSON object(s)
-
 class Resource(commonio.Resource):
-    Sequence : str = None
-    locationType : Locations = Field(
+    locationType : settings.Locations = Field(
             'internal',
             description='Supported input locations for the Service Entity.'
             )
-    resourceFormat : Formats = Field(
+    resourceFormat : settings.Formats = Field(
             'GlycamCondensed',
             description='Supported input formats for the Service Entity.'
             )
 
-class SequenceVariants(BaseModel):
+class TheSequence(BaseModel) :
+    payload : str = ''
+    sequenceFormat : str = Field(
+            'GlycamCondensed',
+            alias='format',
+            description =  'The format of the sequence in the payload'
+            )
+    class Config:
+        title = 'Sequence'
+
+class TheSequenceVariants(BaseModel):
     """Different representations of the sequence."""
     # condensed sequence types
     IndexOrder : str = None
@@ -74,7 +56,7 @@ class Definitions(BaseModel):
     """TODO:  write this. """
     pass
 
-class SystemSolvationOptions(BaseModel):
+class TheSystemSolvationOptions(BaseModel):
     solvationStatus : str = Field(
             'Unsolvated',
             description="Unsolvated, To be solvated, Solvated, Not applicable"
@@ -84,92 +66,90 @@ class SystemSolvationOptions(BaseModel):
             description="No ions, Add ions, Contains ions."
             )
 
-class ResidueRingPucker(BaseModel):
+class TheResidueRingPucker(BaseModel):
     puckerClassificationSystem : str = Field(
             'BFMP',
             description="The system used to identify the ring pucker (shape)."
             )
 
-class LinkageRotamerNames(str, Enum):
-    phi = 'phi'
-    psi = 'psi'
-    omg = 'omg'
-    omega = 'omega'
-
-class DihedralRotamers(BaseModel):
+class TheDihedralRotamers(BaseModel):
     dihedralName : str = None # phi, psi etc. Use Enum above once anything works :(
     dihedralValues : List[str] = [] # gg, -g, tg, etc
 
-class LinkageRotamers(BaseModel): 
+class TheLinkageRotamers(BaseModel): 
     indexOrderedLabel : str = None
     linkageName : str = None
     firstResidueNumber : str = None
     secondResidueNumber : str = None
     dihedralsWithOptions : List[str] = []
-    possibleRotamers : List[DihedralRotamers] = []
-    likelyRotamers : List[DihedralRotamers] = []
+    possibleRotamers : List[TheDihedralRotamers] = []
+    likelyRotamers : List[TheDihedralRotamers] = []
 
-class ResidueGeometryOptions(BaseModel):
+class TheResidueGeometryOptions(BaseModel):
     """Geometry options for residues"""
-    ringPuckers : List[ResidueRingPucker] = []
+    ringPuckers : List[TheResidueRingPucker] = []
 
-class LinkageGeometryOptions(BaseModel):
+class TheLinkageGeometryOptions(BaseModel):
     """Geometry options for linkages"""
-    linkageRotamersList : List[LinkageRotamers] = []
+    linkageRotamersList : List[TheLinkageRotamers] = []
     totalLikelyRotamers : int = 0
     totalPossibleRotamers : int = 0
 
 # I can't figure out if I can pass gmml classes to functions here, so I just 
 # wrote getLinkageOptionsFromGmmlcbBuilder.
-class GeometryOptions(BaseModel):
-    residues : ResidueGeometryOptions = None # Not yet handled.
-    linkages : LinkageGeometryOptions = None
-    def __init__(self, validatedSequence : Sequence):
-        super().__init__()
+class TheGeometryOptions(BaseModel):
+    residues : TheResidueGeometryOptions = None # Not yet handled.
+    linkages : TheLinkageGeometryOptions = None
+
+    def __init__(self, **data : Any):
+        super().__init__(**data)
+
+    def setLinkages(self, validatedSequence : Sequence):
         from gemsModules.sequence import evaluate
         self.linkages = evaluate.getLinkageOptionsFromGmmlcbBuilder(validatedSequence)
-        #print(self.linkages.json())
+        log.debug(self.linkages.json())
 
-class BuildOptions(BaseModel):
+class TheBuildOptions(BaseModel):
     """Options for building 3D models"""
-    solvationOptions : SystemSolvationOptions = None  # Not yet handled.
-    geometryOptions : GeometryOptions = None
+    solvationOptions : TheSystemSolvationOptions = None  # Not yet handled.
+    geometryOptions : TheGeometryOptions = None
     mdMinimize : bool = Field(
             True,
             title = 'Minimize structure using MD',
             )
 
-    def __init__(self, validatedSequence : Sequence):
-        super().__init__()
-        log.info("Initializing BuildOptions")
+    def __init__(self, **data : Any):
+        super().__init__(**data)
+
+    def setGeometryOptions(self, validatedSequence : Sequence):
+        log.info("Setting geometryOptions in BuildOptions")
         log.debug("validatedSequence: " + validatedSequence)
-        self.geometryOptions = GeometryOptions(validatedSequence)
+        self.geometryOptions = GeometryOptions.setLinkage(validatedSequence)
 
 
-class DrawOptions(BaseModel):
+class TheDrawOptions(BaseModel):
     """Options for drawing 2D models"""
     Labeled : str = "true"  ## Lachele Mar 2020 - should this be a bool?
 
-# Oliver Oct2020 finds this unnecessary. Not sure what other is going to be.
-# class SequenceInput(BaseModel):
-#     other : List[Resource] = []
-    
+
 class SequenceEvaluationOutput(BaseModel):
     sequenceIsValid : bool = False
     validateOnly : bool = False
-    sequenceVariants: SequenceVariants = None
-    buildOptions : BuildOptions = Field(
+    sequenceVariants: TheSequenceVariants = None
+    buildOptions : TheBuildOptions = Field(
             None,
             description="Options for building the 3D Structure of the sequence."
             )
-    drawOptions : DrawOptions = Field(
+    drawOptions : TheDrawOptions = Field(
             None,
             description="Options for drawing a 2D Structure of the sequence."
             )
 
-    def __init__(self, sequence:str, validateOnly):
-        super().__init__()
-        log.info("Initializing SequenceOutput.")
+    def __init__(self, **data : Any):
+        super().__init__(**data)
+
+    def getEvaluation(self, sequence:str, validateOnly):
+        log.info("Getting the Evaluation for SequenceEvaluationOutput.")
 
         log.debug("sequence: " + repr(sequence))
         log.debug("validateOnly: " + repr(validateOnly))
@@ -183,10 +163,10 @@ class SequenceEvaluationOutput(BaseModel):
         if self.sequenceIsValid:
             self.sequenceVariants = evaluate.getSequenceVariants(sequence)
         if self.sequenceIsValid and not validateOnly:
-            self.buildOptions = BuildOptions(sequence)
+            self.buildOptions = BuildOptions.setGeometryOptions(sequence)
             
-            # self.defaultStructure
-            #drawOptions to be developed later.
+       # self.defaultStructure
+        #drawOptions to be developed later.
 
 
 class Build3DStructureOutput(BaseModel):
@@ -198,18 +178,10 @@ class Build3DStructureOutput(BaseModel):
     subDirectory : str = ""
     downloadUrl : str = ""
 
-    def __init__(self, payload:str, sequence:str, seqID:str, conformerID:str, conformerLabel:str):
-        super().__init__()
-        log.info("Initializing BuildOutput.")
-        self.payload = payload
-        self.sequence = sequence
-        self.seqID = seqID
-        self.conformerID = conformerID
-        self.conformerLabel = conformerLabel
-        self.subDirectory = '/Requested_Builds/' + conformerID + '/'
-        #self.downloadUrl = downloadUrl
-        self.downloadUrl = projectUtil.getDownloadUrl(payload, "cb", self.conformerID)
+    def __init__(self, **data : Any):
+        super().__init__(**data)
 
+        log.debug("These are the values at initialization of Build3DStructureOutput")
         log.debug("payload(projectID): " + self.payload)
         log.debug("sequence: " + self.sequence)
         log.debug("seqID: " + self.seqID)
@@ -218,109 +190,144 @@ class Build3DStructureOutput(BaseModel):
         log.debug("subDirectory: " + self.subDirectory)
         log.debug("downloadUrl: " + self.downloadUrl)
 
+#    def getTheOutput(self, payload:str, sequence:str, seqID:str, conformerID:str, conformerLabel:str):
 
-class Service(commonio.Service):
+    def setSubDirectory() :
+        self.subDirectory = '/Requested_Builds/' + conformerID + '/'
+    def setDownloadUrl() :
+        self.downloadUrl = projectUtil.getDownloadUrl(payload, "cb", self.conformerID)
+
+
+# ## These do not need to be named with 'sequence, e.g., 'sequenceService'.  
+# ## Doing that just makes me feel more comfortable about referencing things.
+# ## 
+# ## Regarding capitalization, my current ad-hoc convention:
+# ##    - initial is lower case = this is a child class of something else and
+# ##      the first word is the modifier.  
+# ##          example:  sequenceService is a child of Service, modified by sequence
+# ##    - initial is upper case = this is not a child, except of BaseModel.
+# ##          example:  SequenceInputs is not a child of another class.
+# $$ (Lachele)
+class sequenceService(commonio.Service):
     """Holds information about a Service requested of the Sequence Entity."""
-    typename : Services = Field( 
+    typename : settings.Services = Field( 
         'Evaluate', 
         alias = 'type', 
         title = 'Requested Service', 
         description = 'The service requested of the Sequence Entity'
         )
-    project: projectio.Project = None
-    inputs : List[str] = None ##TODO: Make a CondensedSequence class.
-    outputs : List[Union[SequenceEvaluationOutput, Build3DStructureOutput]] = None
 
-    def __init__(self, config : dict ):
-        super().__init__()
-
+    def __init__(self, **data : Any):
+        super().__init__(**data)
         log.info("Initializing Service.")
-        log.debug("config: " + repr(config))
+        log.debug("the data " + repr(self))
+        log.debug("Init for the Services in sequence was called.")
 
-        if self.inputs is None:
-            self.inputs = []
-        self.inputs.append(config['sequence'])
-
-        if self.outputs == None:
-            self.outputs = []
-
-        if config['outputType'] == "Evaluate":
-            output = SequenceOutput(config)
-            self.outputs.append(output)
-        elif config['outputType'] == "Build3DStructure":
-            output1 = SequenceOutput(config)
-            self.outputs.append(output1)
-            output2 = BuildOutput(config)
-            self.outputs.append(output2)
 
 ## This is a Response and should be called that, and based on Service (Lachele)
-class Response(Service):
+class sequenceResponse(sequenceService) : 
     """Holds a response from a Service requested of the Sequence Entity."""
-    entity : str = "Sequence"
-    typename : Services = Field(
-            'Evaluate',
-            alias='type',
-            title = 'Requested Service',
-            description = 'The service that was requested of Sequence Entity'
-            )
-    inputs : List[str] = None
-    outputs: List[Union[SequenceEvaluationOutput, Build3DStructureOutput]] = None
-
-    def __init__(self, serviceType: str, inputs= None, outputs = None):
-        super().__init__()
-        log.info("Instantiating a ServiceResponse")
-        log.debug("serviceType: " + serviceType)
-        self.typename = serviceType
-        if not inputs == None:
-            if self.inputs == None:
-                self.inputs = []
-            for input in inputs:
-                self.inputs.append(input)
-        if not outputs == None:
-            if self.outputs == None:
-                self.outputs = []
-            for output in outputs:
-                self.outputs.append(output)
-
-
-
-class Entity(commonio.Entity):
-    """Holds information about the main object responsible for a service."""
-   
-    entityType : str = Field(
-            'Sequence',
-            title='Type',
-            alias='type'
-            )
-    services : List[Service] = []
-    responses : List[Response] = []
+    respondingEntity : str = settings.WhoIAm
+    outputs : List[Union[SequenceEvaluationOutput, Build3DStructureOutput, Resource]] = []
 
     def __init__(self, **data: Any):
         super().__init__(**data)
+        log.info("Instantiating a sequenceResponse")
+        log.debug("respondingEntity: " + self.respondingEntity)
 
-#    @validator('entityType')
-#    def must_be_sequence(cls,v):
-#        if v is not 'sequence':
-#            pass
-#        ## but really call common servicer to whine and exit
-#        ## .... what abou sub-entities?  
+class SequenceInputs(BaseModel) :
+    Sequence : TheSequence = None
+    SequenceVariants : TheSequenceVariants = None
+    SystemSolvationOptions : TheSystemSolvationOptions = None 
+    ResidueRingPucker : TheResidueRingPucker = None 
+    DihedralRotamers : TheDihedralRotamers = None 
+    LinkageRotamers : TheLinkageRotamers = None 
+    ResidueGeometryOptions : TheResidueGeometryOptions = None 
+    LinkageGeometryOptions : TheLinkageGeometryOptions = None 
+    GeometryOptions : TheGeometryOptions = None 
+    BuildOptions : TheBuildOptions = None 
+    DrawOptions : TheDrawOptions = None
 
 
-class TransactionSchema(commonio.TransactionSchema):
+class sequenceEntity(commonio.Entity):
+    """Holds information about the main object responsible for a service."""
+    entityType : str = Field(
+            settings.WhoIAm,
+            title='Type',
+            alias='type'
+            )
+    services : List[Dict[str,sequenceService]] = []
+    responses : List[Dict[str,sequenceResponse]] = []
+    inputs : List[Union[SequenceInputs,Resource]] =  None
+
+    def __init__(self, **data: Any):
+        super().__init__(**data)
+        log.info("Instantiating a sequenceEntity")
+        log.debug("entityType: " + self.entityType)
+
+    def initialize_responses_from_services(self) :
+        self.responses(**self.services)
+
+    def append_input_resource(self, theResource : Resource) :
+        self.inputs.append(theResource)
+
+    def append_output_resource(self, theResource : Resource) :
+        self.outputs.append(theResource)
+
+class sequenceTransactionSchema(commonio.TransactionSchema):
     """
     Holds info about the Transaction JSON object used in the Sequence entity.
     """
-    entity : Entity = ...
+    entity : sequenceEntity = ...
+    project : projectio.CbProject = None
+
+    def __init__(self, **data : Any):
+        super().__init__(**data)
+
     class Config:
         title = 'gensModulesSequenceTransaction'
 
+class Transaction(commonio.Transaction):
+    transaction_in : sequenceTransactionSchema 
+    transaction_out: sequenceTransactionSchema 
+    
+    def populate_transaction_in(self) :
+
+        self.transaction_in = sequenceTransactionSchema(**self.request_dict)
+        log.debug("The transaction_in is: " )
+        log.debug(self.transaction_in.json(indent=2))
+
+    # ## I'm certain there is a better way to do this.  - Lachele
+    def getInputSequencePayload(self) :
+        if self.transaction_in is None :
+            return None
+        if self.transaction_in.entity is None :
+            return None
+        if self.transaction_in.entity.inputs is None :
+            return None
+        for i in self.transaction_in.entity.inputs : 
+            if i.Sequence is not None :
+                if i.Sequence.payload is not None :
+                    if i.Sequence.payload is not "" :
+                        return i.Sequence.payload
+        return None
 
 
 def generateSchema():
     import json
  #   print(Entity.schema_json(indent=2))
-    print(TransactionSchema.schema_json(indent=2))
+    print(sequenceTransactionSchema.schema_json(indent=2))
+
+inputJSON='{ "entity": { "type": "Sequence", "services": [ { "Build": { "type": "Build3DStructure" } } ], "inputs": [ { "Sequence": { "payload": "DManpa1-OH" } } ] } }'
+
+def troubleshoot():
+    thisTransaction=Transaction(inputJSON)
+    print(thisTransaction.incoming_string)
+    print(thisTransaction.request_dict)
+    thisTransaction.populate_transaction_in()
+    print(thisTransaction.transaction_in)
 
 if __name__ == "__main__":
   generateSchema()
+  troubleshoot()
 

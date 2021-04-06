@@ -32,13 +32,13 @@ def delegate(jsonObjectString):
     from gemsModules.common.io import Transaction as ioTransaction
     thisTransaction=ioTransaction(jsonObjectString)
 
-    # If the incoming string was improperly formed, bail, but give a reason.
-    ##TODO: Look at this more closely. Predates current error handling approach.
-    from gemsModules.common.logic import parseInput as logic_parseInput
-    if logic_parseInput(thisTransaction) != 0:
-        log.error(" There was an error parsing the input!")
-        thisTransaction.build_outgoing_string()
-        return thisTransaction.outgoing_string
+#    # If the incoming string was improperly formed, bail, but give a reason.
+#    ##TODO: Look at this more closely. Predates current error handling approach.
+#    from gemsModules.common.logic import parseInput as logic_parseInput
+#    if logic_parseInput(thisTransaction) != 0:
+#        log.error(" There was an error parsing the input!")
+#        thisTransaction.build_outgoing_string()
+#        return thisTransaction.outgoing_string
 
     # Grab the entity type
     entityType = thisTransaction.request_dict['entity']['type']
@@ -67,6 +67,7 @@ def delegate(jsonObjectString):
             appendCommonParserNotice(thisTransaction,'NoEntityDefined')
         elif not 'services' in thisTransaction.request_dict['entity'].keys():
             ## If no service is requested in the json object, do the default service.
+            ## This logic could possibly move down to the Entity level.  Is ok here. (Lachele)
             log.debug("No service defined in the request. Calling the default service")
             theEntity.receive.doDefaultService(thisTransaction)
         else:
@@ -79,7 +80,6 @@ def delegate(jsonObjectString):
                 log.error(traceback.format_exc())
                 appendCommonParserNotice(thisTransaction, error_msg)
             else:
-
                 ##Set the json_api_version in the response_dict.
                 try:
                     setResponseApiVersion(thisTransaction)

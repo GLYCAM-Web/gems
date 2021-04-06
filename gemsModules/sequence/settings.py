@@ -49,3 +49,47 @@ serviceModules = {
     'Build3DStructure' : 'build3Dstructure'
 }
 
+
+# ## from Lachele, 2021-04-01:  
+# ##    I'm moving these here from io.py.  They don't
+# ##    have to stay here.  I was hoping to make io.py
+# ##    a little sipler.  I also have my eye on making
+# ##    a lot of the io classes be generic so that they
+# ##    need a lot less redefinition in the child classes.
+#
+# ##
+# ## Services
+# ##
+class Services(str,Enum):
+    build3dStructure = 'Build3DStructure'
+    drawGlycan = 'DrawGlycan'
+    evaluate = 'Evaluate'
+    status = 'Status'
+
+# ## Environment variables
+# ##
+class Environment(str,Enum):
+    ## The entity itself
+    sequenceentity   = 'GEMS_MODULES_SEQUENCE_PATH'
+    ## Services for this entity, in alphabetical order
+    build3DStructure = 'GEMS_MODULES_SEQUENCE_STRUCTURE_PATH'
+    graph = 'GEMS_MODULES_SEQUENCE_GRAPH_PATH'
+    evaluate         = 'GEMS_MODULES_SEQUENCE_STRUCTURE_PATH'
+
+# ## Recognized input and output formats
+# ##
+class Formats(str,Enum):
+    """All Sequenes must be in GLYCAM Condensed notation"""
+    # the basic sequence as it might arrive, unspecified order, assumed condensed glycam
+    sequence = 'Sequence'  
+
+class Locations(str,Enum):
+    internal='internal'  ##< All input at this time must be internal to the JSON object(s)
+
+### This does not appear to be used anywhere.   (Lachele 2021-04-01)
+class LinkageRotamerNames(str, Enum):
+    phi = 'phi'
+    psi = 'psi'
+    omg = 'omg'
+    omega = 'omega'
+

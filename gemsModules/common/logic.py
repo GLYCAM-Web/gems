@@ -50,6 +50,8 @@ def importEntity(requestedEntity):
             #log.debug("module_spec: " + str(module_spec))
             return importlib.import_module(requestedModule,package="gemsModules")
 
+# ###  This now is part of the Transaction Class
+# ###  It is deprecated and should go away.   Lachele 2021-04-02
 def parseInput(thisTransaction):
     log.info("common.logic.parseInput() was called.\n")
     import json
@@ -301,10 +303,10 @@ def appendResponse(thisTransaction, responseConfig):
                 appendCommonParserNotice(thisTransaction,'JsonParseEror')
         else:
             log.Error("Incomplete responseConfig.")
-            appendCommonParserNotice(thisTransaction,'IcompleteResponseError')
+            appendCommonParserNotice(thisTransaction,'IncompleteResponseError')
     else:
         log.error("Please add at a list of responses to your responseConfig object.")
-        appendCommonParserNotice(thisTransaction,'IcompleteResponseError')
+        appendCommonParserNotice(thisTransaction,'IncompleteResponseError')
 
 
 

@@ -25,12 +25,8 @@ from typing import Dict, List, Optional, Sequence, Set, Tuple, Union, Any
 from pydantic import BaseModel, Field, Json
 from pydantic.schema import schema
 from gemsModules.project import dataio as projectio
+from gemsModules.common import settings
 from gemsModules.common.loggingConfig import *
-# ##
-# ## This should probably not be needed after refactoring for this file
-# ## But, it might still be desired, depending
-# from gemsModules.project import dataio as ProjectModels
-
 
 if loggers.get(__name__):
     pass
@@ -100,30 +96,42 @@ class Resource(BaseModel):
             None,
             description='Key-value pairs that are specific to each entity, service, etc'
             )
+# ## Services
+# ##
+class Services(str,Enum):
+    errorNotification = 'ErrorNotification'
+    status = 'Status'
 
 class Service(BaseModel):
     """
     Holds information about a requested Service.
     This object will have different forms in each Entity.
     """
-    typename : Json[str]  = Field(
-            None,
-            title='Type of Service.',
-            alias='type',
-            description='The services available will vary by Entity.'
-            )
+    typename : Services = Field(
+        'Status',
+        alias = 'type',
+        title = 'Common Services',
+        description = 'The service requested of the Common Servicer'
+        )
+#    typename : str  = Field(
+#            None,
+#            title='Type of Service.',
+#            alias='type',
+#            description='The services available will vary by Entity.'
+#            )
     inputs : Json = None
     options : Dict[str,str] = Field(
             None,
             description='Key-value pairs that are specific to each entity, service, etc'
             )
 
+# ## TODO - consider putting Response inside of Service - Lachele
 class Response(Service):
     """
     Holds information about a response to a service request.
     This object will have different forms in each Entity.
     """
-    typename : Json[str] = Field(
+    typename : str = Field(
             None,
             title='Responding Service.',
             alias='type',
@@ -134,8 +142,8 @@ class Response(Service):
 
 class Entity(BaseModel):
     """Holds information about the main object responsible for a service."""
-    entityType : Json[str] = Field(
-            ...,
+    entityType : str = Field(
+            settings.WhoIAm,
             title='Type',
             alias='type'
             )
@@ -163,7 +171,7 @@ class TransactionSchema(BaseModel):
             )
     notices : List[Notice] = None
     class Config:
-        title = 'gemsModulesTransaction'
+        title = 'gemsModulesCommonTransaction'
 
 # ####
 # ####  Container for use in the modules
@@ -172,8 +180,8 @@ class Transaction:
     """Holds information relevant to a delegated transaction"""
     incoming_string :str = None
     request_dict : {}  = None
-    transaction_in : TransactionSchema = None
-    transaction_out: TransactionSchema = None
+    transaction_in : TransactionSchema
+    transaction_out: TransactionSchema 
     response_dict : {} = None
     outgoing_string : str = None
 
@@ -187,15 +195,28 @@ class Transaction:
         is generated.
         """
         import json
-        log.debug("The in_string is: " + in_string)
+        # ## I think it is wrong to have Transaction call something from 
+        # ## some other place to modify itself, but I don't have time to
+        # ## refactor this all to make it right.  Lachele 2021-04-02
+        from gemsModules.common import services as commonServices
+        from gemsModules.common import settings as commonSettings
+        from gemsModules.common import io as commonio
 
+        log.debug("The in_string is: " + in_string)
         self.incoming_string = in_string
         log.debug("The incoming_string is: " )
         log.debug(self.incoming_string)
+        if self.incoming_string is None :
+            commonSettings.appendCommonParserNotice(self, 'InvalidInput', commonSettings.WhoIAm)
+            return
+        else : 
+            self.request_dict = json.loads(self.incoming_string) 
+            log.debug("The request_dict is: " ) 
+            log.debug(self.request_dict)
 
-        self.request_dict = json.loads(self.incoming_string)
-        log.debug("The request_dict is: " )
-        log.debug(self.request_dict)
+        if self.incoming_string is None :
+            commonSettings.appendCommonParserNotice(self, 'InvalidInput', commonSettings.WhoIAm)
+            return
 
     def populate_transaction_in(self):
 

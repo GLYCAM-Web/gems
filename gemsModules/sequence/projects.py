@@ -39,19 +39,23 @@ def projectExists(thisTransaction : Transaction):
 
 def addResponse(buildState : BuildState, thisTransaction : Transaction, conformerID : str, conformerLabel : str):        
     log.info("addResponse() was called.")
+    # By the time build3DStructure() is called, evaluation response exists.
+    #  all we need to do is build the output and append it.
+    output = sequence_io.Build3DStructureOutput()
+    output.conformerID=conformerID
+    output.conformerLabel=conformerLabel
     try:
-        pUUID = getProjectpUUID(thisTransaction)
-        sequence = getSequenceFromTransaction(thisTransaction)
+        output.payload = getProjectpUUID(thisTransaction)
+        output.sequence = getSequenceFromTransaction(thisTransaction)
     except Exception as error:
         log.error("Problem finding the project pUUID or sequence in the transaction: " + str(error))
         log.error(traceback.format_exc())
         raise error
 
     indexOrdered = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
-    seqID = getSeqIDForSequence(indexOrdered)
-    # By the time build3DStructure() is called, evaluation response exists.
-    #  all we need to do is build the output and append it.
-    output = sequence_io.Build3DStructureOutput(pUUID, sequence, seqID, conformerID, conformerLabel)
+    output.seqID = getSeqIDForSequence(indexOrdered)
+    
+#    output = sequence_io.Build3DStructureOutput(pUUID, sequence, seqID, conformerID, conformerLabel)
     log.debug("Build3DStructure output: " + repr(output))
     outputs = []
     outputs.append(output)

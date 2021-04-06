@@ -92,7 +92,10 @@ ExitTypes = {
     'RequestedEntityNotFindable':'error',
     'EmptyPayload':'error',
     'InvalidInput':'error',
-    'GmmlError':'error'
+    'GmmlError':'error',
+    'GemsError':'error',
+    'InvalidInputPayload':'error',
+    'NoInputPayloadDefined':'error'
 }
 
 ExitBlockIDs = {
@@ -105,6 +108,7 @@ ExitBlockIDs = {
     'EmptyPayload':'Transaction',
     'InvalidInput':'Transaction',
     'GmmlError':'SyatemError',
+    'GemsError':'SystemError',
     'InvalidInputPayload':'Transaction',
     'NoInputPayloadDefined':'Transaction'
 }
@@ -118,7 +122,10 @@ ExitCodes = {
     'RequestedEntityNotFindable':'310',
     'GmmlError':'315',
     'EmptyPayload':'400',
-    'InvalidInput':'400'
+    'InvalidInput':'400',
+    'GemsError':'315',
+    'InvalidInputPayload':'400',
+    'NoInputPayloadDefined':'400'
 }
 
 ExitMessages = {
@@ -130,7 +137,10 @@ ExitMessages = {
     'RequestedEntityNotFindable':'The requested Entity is known, but does not respond.',
     'EmptyPayload':'Missing or empty input payload.',
     'InvalidInput':'error',
-    'GmmlError':'An interaction with GMML failed.'
+    'GmmlError':'An interaction with GMML failed.',
+    'GemsError':'There was an error in GEMS',
+    'InvalidInputPayload':'An invalid payload was detected.',
+    'NoInputPayloadDefined':'No payload could be found.'
 }
 
 ## TODO Make this sort of thing ultimately part of transaction.py (eg Notice class).

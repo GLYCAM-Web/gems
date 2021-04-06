@@ -231,10 +231,10 @@ def appendResponse(thisTransaction, responseConfig):
                 appendCommonParserNotice(thisTransaction,'JsonParseEror')
         else:
             log.Error("Incomplete responseConfig.")
-            appendCommonParserNotice(thisTransaction,'IcompleteResponseError')
+            appendCommonParserNotice(thisTransaction,'IncompleteResponseError')
     else:
         log.error("Please add at a list of responses to your responseConfig object.")
-        appendCommonParserNotice(thisTransaction,'IcompleteResponseError')
+        appendCommonParserNotice(thisTransaction,'IncompleteResponseError')
 
 
 ##  @brief Convenience method for cleaning and speeding up log reading of dict objects.

@@ -10,76 +10,31 @@ from gemsModules.common import io as commonio
 from gemsModules.common import logic as commonlogic
 from gemsModules.common.loggingConfig import *
 from . import settings as sequenceSettings
+from . import io as sequenceio
+from . import io as sequencelogic
 
 if loggers.get(__name__):
     pass
 else:
     log = createLogger(__name__)
 
-##   @brief Evaluate a condensed sequence 
-#    @detail Evaluating a sequence requires a sequence string and a path to a prepfile.
-#    1) Checks sequence for validity,
-#    2) Starts a gemsProject.
-#    3) builds a default structure, moving it to the output dir
-#    3) appends options to transaction
-#    4) returns boolan valid
-#   @param Transaction thisTransaction
-#   @param Service service
-#   @return boolean valid
-# def evaluateCondensedSequence(thisTransaction : Transaction, thisService : Service = None, validateOnly = False):
-#     log.info("evaluateCondensedSequence() was called.\n")
-#     sequence = getSequenceFromTransaction(thisTransaction)
-#     #Test that this exists.
-#     if sequence is None:
-#         log.error("No sequence found in the transaction.")
-#         raise AttributeError
-#     else:
-#         log.debug("sequence: " + sequence)
-#     valid = checkIsSequenceSane(sequence)
-#     if validateOnly : 
-#         responseConfig = buildEvaluationResponseConfig(valid, None, None)
-#         appendResponse(thisTransaction, responseConfig)
-#         log.debug("Returning early from evaluateCondensedSequence bc validate only.")
-#         return valid
-#     if valid:
-#         log.debug("This is a valid sequence: " + sequence) 
-#         #linkages1 = getLinkageOptionsFromGmmlcbBuilder(sequence)
-#         from gemsModules.sequence import io
-#         test = io.Service()
-#         test.InitializeClass(sequence)
-#         linkages = getLinkageOptionsFromBuilder(sequence)
-#         sequences = getSequenceVariants(sequence)
-#     else: 
-#         log.debug("This is NOT a valid sequence: " + sequence) 
-#         linkages=None
-#         sequences=None
-
-#     responseConfig = buildEvaluationResponseConfig(valid, linkages, sequences)
-#     appendResponse(thisTransaction, responseConfig)
-#     log.debug("Returning from evaluateCondensedSequence.")
-#     return valid
-
-def evaluateCondensedSequencePydantic(thisTransaction : Transaction, thisService : Service = None, validateOnly = False):
-    from gemsModules.sequence import io as sequence_io
-    from gemsModules.sequence import logic as sequence_logic
-    from gemsModules.common import logic as commonLogic
+def evaluateCondensedSequencePydantic(thisTransaction : sequenceio.Transaction, thisService : sequenceio.sequenceService = None, validateOnly = False):
     log.info("evaluateCondensedSequencePydantic() was called.\n")
     log.debug("thisService: " + str(thisService))
     log.debug("validateOnly: " + str(validateOnly))
 
-    sequence = getSequenceFromTransaction(thisTransaction)
-    inputs = []
-    inputs.append(sequence)
+    sequence = thisTransaction.getInputSequencePayload()
     #Test that this exists.
     if sequence is None:
         errorMsg = "No sequence found in the transaction."
         log.error(errorMsg)
         raise AttributeError(errorMsg)
     else:
-        log.debug("sequence: " + sequence)
+        log.debug("YAY!  Found a sequence: " + sequence)
 
     ##Generate output first. sequence, validateOnly
-    evaluationOutput = sequence_io.SequenceEvaluationOutput(sequence, validateOnly)
+    evaluationOutput = sequenceio.SequenceEvaluationOutput()
+    evaluationOutput.getEvaluation(sequence, validateOnly)
     log.debug("Evaluation output: " + repr(evaluationOutput))
     sequenceIsValid = evaluationOutput.sequenceIsValid
     log.debug("sequenceIsValid: " + str(sequenceIsValid))
@@ -87,14 +42,14 @@ def evaluateCondensedSequencePydantic(thisTransaction : Transaction, thisService
     outputs.append(evaluationOutput)
 
     ## serviceType, inputs, and outputs.
-    serviceResponse = sequence_io.ServiceResponse(thisService, inputs, outputs)
+    serviceResponse = sequenceio.ServiceResponse(thisService, inputs, outputs)
 
     ##TODO: get sequenceIsValid and ValidateOnly.
     if sequenceIsValid and not validateOnly: 
         responseObj = serviceResponse.dict(by_alias = True)
         log.debug("responseObj:\n")
         prettyPrint(responseObj)
-        commonLogic.updateResponse(thisTransaction, responseObj)
+        commonlogic.updateResponse(thisTransaction, responseObj)
         log.debug("finished building default structure")
     else:
         log.debug("validateOnly was true. Does evaluateCondensedSequence return a well-formed response?")
@@ -147,20 +102,6 @@ def evaluateCondensedSequencePydantic(thisTransaction : Transaction, thisService
 # ##    }
 # ##    })
 
-    # return config
-
-# class LinkageRotamerNames(str, Enum):
-#     phi = 'phi'
-#     psi = 'psi'
-#     omega = 'omega'
-
-# class LinkageRotamers(BaseModel): 
-#     indexOrderedLabel : str = None
-#     linkageName : str = None
-#     residue1Number : str = None
-#     residue2Number : str = None
-#     possibleRotamers : List[str,List[str]] =[]
-#     likelyRotamers :   List[Tuple[LinkageRotamerNames,List[str]]] =[]
 
 # I think if we got all the names to match, we could use parse_object_as instead of this. OG.
 # Probably it would fail on sub-classes though, but maybe.
@@ -216,14 +157,7 @@ def getLinkageOptionsFromGmmlcbBuilder(sequence):
     log.debug("gemsLinkageGeometryOptions: " + repr(gemsLinkageGeometryOptions))
     return gemsLinkageGeometryOptions
 
-# class LinkageRotamers(BaseModel): 
-#     indexOrderedLabel : str = None
-#     linkageName : str = None
-#     residue1Number : str = None
-#     residue2Number : str = None
-#     possibleRotamers :  List[Tuple[LinkageRotamerNames,List[str]]] =[]
-#     likelyRotamers :   List[Tuple[LinkageRotamerNames,List[str]]] =[]
-
+#### REMOVE after 2021-08-01 if not needed before then
 ##  @brief Pass a sequence, get linkage options.
 #   @param  str sequence 
 # #   @return dict linkages
