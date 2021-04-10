@@ -55,13 +55,13 @@ Do you want to:
   2.  Proceed without deleting the files?  Type 'Keep'
   3.  Delete the files and proceed?  Type 'Delete'
 "
-	read -p "You must type the entire word: " KeepDelete
+	read -p "You must type the entire word: " answer
 	
-	if [ "${KeepDelete}" == "Exit" ] ; then
+	if [ "${answer}" = "Exit" ] ; then
 		exit 1
-	elif [ "${KeepDelete}" == "Keep" ] ; then
+	elif [ "${answer}" = "Keep" ] ; then
 		OK2Delete=No
-	elif [ "${KeepDelete}" == "Delete" ] ; then
+	elif [ "${answer}" = "Delete" ] ; then
 		OK2Delete=Yes
 	else
 		echo "Unrecognized option.  Exiting."

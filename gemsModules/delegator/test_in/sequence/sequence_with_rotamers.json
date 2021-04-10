@@ -1,35 +1,35 @@
 {
 	"entity": {
 		"type": "Sequence",
-		"services": [{
-			"Build": {
+		"services": {
+			"build": {
 				"type": "Build3DStructure"
 			}
-		}],
-		"inputs": [{
-			"Sequence": {
+		},
+		"inputs": {
+			"sequence": {
 				"payload": "DManpa1-3DManpa1-6[DGlcpNAcb1-4][DNeu5Aca2-6DGalpb1-4DGlcpNAcb1-2DManpa1-3]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH"
+			},
+			"geometryOptions": {
+				"linkages" : {
+					"rotamerData": [{
+						"linkageLabel": "15",
+						"dihedrals": [{
+							"dihedralName": "omega",
+							"selectedRotamers": ["gg", "gt"]
+						}]
+					}, {
+						"linkageLabel": "18",
+						"dihedrals": [{
+							"dihedralName": "phi",
+							"selectedRotamers": ["t", "-g"]
+						}, {
+							"dihedralName": "omega",
+							"selectedRotamers": ["gg", "gt", "tg"]
+						}]
+					}]
+				}
 			}
-		}]
-	},
-	"options": {
-		"geometryOptions": {
-			"rotamerData": [{
-				"linkageLabel": "15",
-				"dihedrals": [{
-					"dihedralName": "omega",
-					"selectedRotamers": ["gg", "gt"]
-				}]
-			}, {
-				"linkageLabel": "18",
-				"dihedrals": [{
-					"dihedralName": "phi",
-					"selectedRotamers": ["t", "-g"]
-				}, {
-					"dihedralName": "omega",
-					"selectedRotamers": ["gg", "gt", "tg"]
-				}]
-			}]
 		}
 	},
 	"project": {
@@ -56,7 +56,7 @@
 		"userproject_ptr_id": "8a978306-7014-4dbd-9579-b8df748e857f",
 		"sequence": "DManpa1-3DManpa1-6[DGlcpNAcb1-4][DNeu5Aca2-6DGalpb1-4DGlcpNAcb1-2DManpa1-3]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH",
 		"seqID": "None",
-		"ion": "No",
+		"ion": "Ns",
 		"solvation": "no",
 		"solvation_size": "8",
 		"solvation_distance": "2",
@@ -68,5 +68,7 @@
 		"angle_info": "",
 		"job_info": "",
 		"rotamer_data": [{"linkageLabel": "15", "dihedrals": [{"dihedralName": "omega", "selectedRotamers": ["gg", "gt"]}]}, {"linkageLabel": "18", "dihedrals": [{"dihedralName": "phi", "selectedRotamers": ["t", "-g"]}, {"dihedralName": "omega", "selectedRotamers": ["gg", "gt", "tg"]}]}]
-	}
+	},
+	"prettyPrint" : true,
+	"mdMinimize" : false
 }
