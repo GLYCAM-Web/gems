@@ -3,13 +3,19 @@ import  os, sys
 import json
 import uuid
 from datetime import datetime
-from gemsModules.common.services import *
+from gemsModules.common import services as commonservices
 from gemsModules.project import settings as project_settings
 from pydantic import BaseModel, Field, ValidationError
 from pydantic.schema import schema
 from typing import Any
 from gemsModules.common.loggingConfig import *
 import traceback
+
+# ## TODO - a lot of this info really belongs elsewhere.  It's not really
+#    project information.  For example, 'seqID' only applies to the sequence
+#    entity.  In the GP builder, there might be many sequences, but still 
+#    only one overall project.  So, one day, clean this up.
+
 
 if loggers.get(__name__):
     pass
@@ -116,58 +122,51 @@ def buildProjectDir(tool, pUUID):
 ## @brief cbProject is a typed project that inherits all the fields from project and adds 
 #   its own.
 class CbProject(Project):
-    sequence : str = ""
-    seqID : str = ""
-    structure_count : int = 1
+# Taking these out of Project because they cause confusion.
+#    sequence : str = ""
+#    seqID : str = ""
+#    payloadHash : str = ""
+#    structure_count : int = 1
     #structure_mappings : []
 
     def __init__(self, **data : Any):
         super().__init__(**data)
         log.info("CbProject.__init__() was called.")
-        from gemsModules.project.projectUtil import getSequenceFromTransaction, getSeqIDForSequence
-
-#    def __init__(self, request_dict: dict):
-#        super().__init__(request_dict)
         self.project_type = "cb"
-#        self.has_input_files = False
-#        inputs = request_dict['entity']['inputs']
-#        sequence = ""
-#        for element in inputs:
-#            if "Sequence" in element.keys():
-#                sequence = element['Sequence']['payload']
-#
-#        if sequence is not "":
-#            self.sequence = sequence
-#            self.seqID = getSeqIDForSequence(sequence) # poorly named, not indexOrdered version!
-#        else:
+
+
+    def startMeUp(self, thisTransaction) :
+        from gemsModules.project.projectUtil import getSequenceFromTransaction, getSeqIDForSequence
+        self.has_input_files = False
+
+        transIn = thisTransaction.transaction_in
+
+#        self.sequence = thisTransaction.getInputSequencePayload()
+#        if self.sequence is None :
 #            raise AttributeError("Sequence")
-#        inputs = request_dict['entity']['inputs']
-#
-#        if'project' in request_dict.keys():
-#            ##User may provide a project_dir.
-#            if 'project_dir' in request_dict['project'].keys():
-#                project = request_dict['project']
-#                ## 
-#                if self.pUUID not in project['project_dir']:
-#                    log.debug("Adding pUUID to the project_dir: " + project['project_dir'])
-#                    self.project_dir = buildProjectDir(self.project_type , self.pUUID)
-#                else:
-#                    log.debug("pUUID already added to the project_dir: " + project['project_dir'])
-#                    self.project_dir = project['project_dir']
-#            else:
-#                ## Default, if none offered by the user.
-#                self.project_dir =  buildProjectDir(self.project_type , self.pUUID)
-#        else:
-#            ## Default, if none offered by the user.
-#                self.project_dir =  buildProjectDir(self.project_type , self.pUUID)
+
+#        self.seqID = getSeqIDForSequence(self.sequence) # poorly named, not indexOrdered version!
+#        log.debug("self.seqID in CbProject.startMeUp is : >>>" + self.seqID + "<<<")
+        log.debug("self.project_type in CbProject.startMeUp is : >>>" + self.project_type + "<<<")
+#        log.debug("self.sequence in CbProject.startMeUp is : >>>" + self.sequence + "<<<")
+
+        if transIn.project is not None :
+            if transIn.project.project_dir is not None  :
+                if transIn.project.project_dir is not "" :
+                    self.project_dir = transIn.project.project_dir
+        if self.project_dir is None :
+            self.project_dir =  buildProjectDir(self.project_type , self.pUUID)
+        if self.project_dir is  "" :
+            self.project_dir =  buildProjectDir(self.project_type , self.pUUID)
+        log.debug("self.project_dir in CbProject.startMeUp is : >>>" + self.project_dir + "<<<")
 
 
     def __str__(self):
         result = super().__str__()
         result = result + "\nproject_type: " + self.project_type
-        result = result + "\nsequence: " + self.sequence
-        result = result + "\nseqID: " + self.seqID
-        result = result + "\nstructure_count: " + str(self.structure_count)
+#        result = result + "\nsequence: " + self.sequence
+#        result = result + "\nseqID: " + self.seqID
+#        result = result + "\nstructure_count: " + str(self.structure_count)
         #result = result + "\nstructure_mappings: " + str(self.structure_mappings)
         return result
 

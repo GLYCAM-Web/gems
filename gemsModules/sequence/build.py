@@ -5,13 +5,13 @@ import gmml
 import traceback
 import gemsModules.common.utils
 from multiprocessing import Process
-from gemsModules.project.projectUtil import *
+from gemsModules.project import projectUtilPydantic as projectUtils
 from gemsModules.project import settings as projectSettings
+from gemsModules.sequence import io as sequenceio
 from gemsModules.common import io as commonio
 from gemsModules.common import logic as commonLogic
+from gemsModules.common import services as commonservices
 from gemsModules.sequence import io as sequenceIO
-#from gemsModules.common.services import *
-#from gemsModules.common.transaction import * # might need whole file...
 from gemsModules.common.loggingConfig import *
 
 from gemsModules.sequence import projects as sequenceProjects
@@ -27,66 +27,130 @@ else:
 #   appends that to the transaction.
 #   @param Transaction thisTransaction
 #   @param String uUUID - Upload ID for user provided input.
-def appendBuild3DStructureResponse(thisTransaction : Transaction, pUUID : str):
-    log.info("appendBuild3DStructureResonse() was called.")
-    if thisTransaction.response_dict is None:
-        thisTransaction.response_dict={}
-    if not 'entity' in thisTransaction.response_dict:
-        thisTransaction.response_dict['entity']={}
-    if not 'type' in thisTransaction.response_dict['entity']:
-        thisTransaction.response_dict['entity']['type']='Sequence'
-    if not 'responses' in thisTransaction.response_dict:
-        thisTransaction.response_dict['responses']=[]
+#def appendBuild3DStructureResponse(thisTransaction : sequenceio.Transaction, pUUID : str):
+#    log.info("appendBuild3DStructureResonse() was called.")
+#    if thisTransaction.response_dict is None:
+#        thisTransaction.response_dict={}
+#    if not 'entity' in thisTransaction.response_dict:
+#        thisTransaction.response_dict['entity']={}
+#    if not 'type' in thisTransaction.response_dict['entity']:
+#        thisTransaction.response_dict['entity']['type']='Sequence'
+#    if not 'responses' in thisTransaction.response_dict:
+#        thisTransaction.response_dict['responses']=[]
+#
+#    downloadUrl = getDownloadUrl(pUUID, "cb")
+#    thisTransaction.response_dict['responses'].append({
+#        'Build3DStructure': {
+#            'payload': pUUID ,
+#            'downloadUrl': downloadUrl
+#        }
+#    })
 
-    downloadUrl = getDownloadUrl(pUUID, "cb")
-    thisTransaction.response_dict['responses'].append({
-        'Build3DStructure': {
-            'payload': pUUID ,
-            'downloadUrl': downloadUrl
-        }
-    })
-
-def buildEach3DStructureInStructureInfo(structureInfo : StructureInfo, buildStrategyID : str, thisTransaction : Transaction, this_seqID : str, this_pUUID : str, projectDir : str):
+#def buildEach3DStructureInStructureInfo(structureInfo : sequenceio.StructureInfo, buildStrategyID : str, thisTransaction : sequenceio.Transaction, this_seqID : str, this_pUUID : str, projectDir : str):
+def buildEach3DStructureInStructureInfo(thisTransaction : sequenceio.Transaction):
     needToInstantiateCarbohydrateBuilder = True
     from multiprocessing import Process
-    for buildState in structureInfo.buildStates:
+#    print(structureInfo.json(indent=2))
+#    print(buildStrategyID)
+#    print(thisTransaction)
+#    print("thisTransaction.transaction_out is :")
+#    print(thisTransaction.transaction_out)
+#    print("thisTransaction.transaction_out.json is :")
+#    print(thisTransaction.transaction_out.json(indent=2))
+#    sys.exit(1)
+
+    # get info from the transaction and check sanity
+    log.debug("About to get build informaion from the transaction")
+    log.debug("Working on the Build States now.")
+    buildStatesOK = True
+    theseBuildStates = thisTransaction.getIndividualBuildDetailsOut()
+    if theseBuildStates is None :
+        buildStatesOK = False
+    if theseBuildStates is [] :
+        buildStatesOK = False
+    if buildStatesOK is False :
+        log.error("Got all the way to buildEach3DStructureInStructureInfo without any buildStates")
+        thisTransaction.generateCommonParserNotice(
+                noticeBrief='GemsError', 
+                additionalInfo={"hint":"No buildStates accessible from structureBuildDetails"})
+        return
+   
+    log.debug("Working on getting other data now.")
+    try :
+        theStructureBuildInfo = thisTransaction.getStructureBuildInfoOut()
+        if theStructureBuildInfo.indexOrderedSequence is "" :
+            theStructureBuildInfo.setSequence(thisTransaction.getSequenceVariantOut('IndexOrdered'))
+            theStructureBuildInfo.setSeqID(theStructureBuildInfo.indexOrderedSequence)
+        thisBuildStrategyID   = theStructureBuildInfo.getBuildStrategyID()
+        thisSeqID             = thisTransaction.getSeqIDOut()
+        if thisSeqID != theStructureBuildInfo.getSeqID() :
+            error="Seq IDs do not match in project and build details."
+            log.error("error")
+            log.error("     project  : " + str(thisSeqID))
+            log.error("     build details  : " + str(theStructureBuildInfo.getSeqID()))
+            return
+        thisPuuID             = thisTransaction.getPuuIDOut()
+        thisProjectDir        = thisTransaction.getProjectDirOut()
+    except Exception as error :
+        log.error("Something went wrong getting the other data.  The following is from Python.")
+        log.error(error)
+        raise error
+
+    for buildState in theseBuildStates :
         log.debug("Checking if a structure has been built in this buildState: ")
         log.debug("buildState: " + repr(buildState))
         conformerID = buildState.structureDirectoryName # May return "default" or a conformerID
+#        print("1")
         ##  check if requested structures exitst, update structureInfo_status.json and project when exist
-        if sequenceProjects.structureExists(buildState, thisTransaction, buildStrategyID):
+#        print(repr(sequenceProjects.structureExists(buildState, thisTransaction, buildStrategyID)))
+        if sequenceProjects.structureExists(buildState, thisTransaction, thisBuildStrategyID):
+#            print("1.1.0")
             ## Nothing in Sequence/ needs to change. In Builds/ProjectID/
             ## add symLink in Existing to Sequences/SequenceID/defaults/All_builds/conformerID.
             log.debug("Found an existing structure for " + conformerID)
+#            print("1.1.1")
             buildDir = "Existing_Builds/"
-            sequenceProjects.addBuildFolderSymLinkToExistingConformer(this_seqID, buildStrategyID, this_pUUID, conformerID)
+#            print("1.1.2")
+            sequenceProjects.addBuildFolderSymLinkToExistingConformer(thisSeqID, thisBuildStrategyID, thisPuuID, conformerID)
         else: # Doesn't already exist.
+#            print("1.2.0")
             log.debug("Need to build this structure: " + conformerID )
             if needToInstantiateCarbohydrateBuilder:
+#                print("1.2.0.1")
                 needToInstantiateCarbohydrateBuilder = False # Only ever do this once.
-                log.debug("About to getCbBuilderForSequence")
-                inputSequence = getSequenceFromTransaction(thisTransaction)          
+                # ## the following should probably use the indexOrdered sequence, but that doesn't work...
+                inputSequence = thisTransaction.getSequenceVariantOut('userSupplied')          
+                log.debug("About to getCbBuilderForSequence: " + inputSequence)
                 builder = getCbBuilderForSequence(inputSequence)
+#            print("1.2.1")
             buildDir = "New_Builds/"
-            sequenceProjects.createConformerDirectoryInBuildsDirectory(projectDir, conformerID)
+#            print("1.2.2")
+            sequenceProjects.createConformerDirectoryInBuildsDirectory(thisProjectDir, conformerID)
             ## TODO - one day, the path on a compute node might differ from the website path
-            outputDirPath = os.path.join(projectDir, buildDir, conformerID)
+#            print("1.2.3")
+            outputDirPath = os.path.join(thisProjectDir, buildDir, conformerID)
+#            print("1.2.4")
             log.debug("outputDirPath: " + outputDirPath)
             #from multiprocessing import set_start_method
             #set_start_method("spawn")
             #d = Process(target=build3DStructure, args=(buildState, thisTransaction, outputDirPath, builder))
            # d.start()
+#            print("1.2.5")
             build3DStructure(buildState, thisTransaction, outputDirPath, builder)
-            sequenceProjects.addSequenceFolderSymLinkToNewBuild(this_seqID, buildStrategyID, this_pUUID, conformerID)        
+#            print("1.2.6")
+            sequenceProjects.addSequenceFolderSymLinkToNewBuild(thisSeqID, thisBuildStrategyID, thisPuuID, conformerID)        
             if conformerID == "default": # And doesn't already exist.
                 #sequenceProjects.createDefaultSymLinkSequencesDirectory(this_seqID, conformerID, buildStrategyID)
-                sequenceProjects.createDefaultSymLinkBuildsDirectory(projectDir, buildDir + conformerID)
+                sequenceProjects.createDefaultSymLinkBuildsDirectory(thisProjectDir, buildDir + conformerID)
         # buildDir is either New_Builds/ or Existing_Builds/
-        sequenceProjects.createSymLinkInRequestedStructures(projectDir, buildDir, conformerID)
+#        print("2")
+        sequenceProjects.createSymLinkInRequestedStructures(thisProjectDir, buildDir, conformerID)
         # Needs to be Requested_Structres/. Need to add conformerID separately.
         # sequenceProjects.addResponse(buildState, thisTransaction, conformerID, buildState.conformerLabel)
         # This probably needs work    
+#        print("3")
         sequenceProjects.registerBuild(buildState, thisTransaction)
+#        print("4")
 
 ##TODO: Replace this with more generically useful: build3DStructure(transaction, service)
 ##      Needs to work whether default structure or specific rotamers are requested.
@@ -94,11 +158,13 @@ def buildEach3DStructureInStructureInfo(structureInfo : StructureInfo, buildStra
 ##  @brief Creates a jobsubmission for Amber. Submits that. Updates the transaction to reflect this.
 #   @param Transaction thisTransaction
 #   @param Service service (optional)
-def build3DStructure(buildState : BuildState, thisTransaction : Transaction, outputDirPath : str, builder):
+def build3DStructure(buildState : sequenceio.Single3DStructureBuildDetails, thisTransaction : sequenceio.Transaction, outputDirPath : str, builder):
     log.info("build3DStructure() was called.")
     log.debug("outputDirPath: " + outputDirPath)
+    log.debug("the build state is: ")
+    log.debug(buildState)
     try:
-        pUUID = sequenceProjects.getProjectpUUID(thisTransaction)
+        pUUID = projectUtils.getProjectpUUID(thisTransaction.transaction_out.project)
         ##sequence = getSequenceFromTransaction(thisTransaction)
     except Exception as error:
         log.error("Problem finding the project pUUID in the transaction: " + str(error))
@@ -108,10 +174,15 @@ def build3DStructure(buildState : BuildState, thisTransaction : Transaction, out
     #  ...use 'yield'...
     # log.debug("About to getCbBuilderForSequence")
     # builder = getCbBuilderForSequence(sequence)
+    thisEvaluation=thisTransaction.transaction_out.entity.outputs.sequenceEvaluationOutput
+    thisBuildOptions=thisEvaluation.buildOptions
+    if thisBuildOptions is None:
+        thisBuildOptions=sequenceio.TheBuildOptions()
+    gmmlConformerInfo = populateGMMLConformerInfoStruct(buildState)
     try:
         ## If this is default, set the output path, otherwise use what was passed in.
         if buildState.isDefaultStructure:
-            log.debug("Generating default in: " + outputDirPath)
+            log.debug("Generating default structure in: " + outputDirPath)
             ## Using multiprocessing for this function call.
             builder.GenerateSingle3DStructureDefaultFiles(outputDirPath)
             #p = Process(target=builder.GenerateSingle3DStructureDefaultFiles, args=(outputDirPath,))
@@ -119,16 +190,17 @@ def build3DStructure(buildState : BuildState, thisTransaction : Transaction, out
         else:
             log.debug("The request is for a conformer with outputDirPath: " + outputDirPath)
                 ## Need to put the info into the GMML struct: SingleRotamerInfoVector
-            gmmlConformerInfo = populateGMMLConformerInfoStruct(buildState)
+#            gmmlConformerInfo = populateGMMLConformerInfoStruct(buildState)
             builder.GenerateSpecific3DStructure(gmmlConformerInfo, outputDirPath)
             #p = Process(target=builder.GenerateSpecific3DStructure, args=(gmmlConformerInfo, outputDirPath,))
             #p.start()
     except Exception as error:
         log.error("There was a problem generating this build: " + str(error))
         raise error
-    if "mdMinimize" in thisTransaction.transaction_in.["entity"].["options"] :
-        if thisTransaction.transaction_in.options.mdMinimize is False :
-            return
+    if thisBuildOptions.mdMinimize is False :
+        log.debug("mdMinimize is false and this is the gmmlConformerInfo : " )
+        log.debug(gmmlConformerInfo)
+        return gmmlConformerInfo
 
     ## Generate JSOn to tell mmservice/amber that there is a job to do
     ## TODO  make filling this in use a class in amber/io.py 
@@ -143,42 +215,18 @@ def build3DStructure(buildState : BuildState, thisTransaction : Transaction, out
     from gemsModules.mmservice.amber.amber import manageIncomingString
     ## Using multiprocessing for this function call.
     manageIncomingString(amberSubmissionJson)
-    #p = Process(target=manageIncomingString, args=(amberSubmissionJson,))
-    #p.start()
-    ## everything up to here -- all the amber stuff --
-    ## is what needs to move
-
-##  @brief Pass a BuildState, get a gmml level struct with conformer information.
-##  @param BuildState. Information to generate a specific, single 3D shape.
-#   @return SingleRotamerInfoVector object from gmml.
-# def populateGMMLConformerInfoStruct(buildState : BuildState):
-#     log.info("populateGMMLConformerInfoStruct() was called.")
-#     try:
-#         gmmlConformerInfo = gmml.single_rotamer_info_vector()
-#         for conf in buildState.sequenceConformation:
-#             singleRotamerInfo = gmml.SingleRotamerInfo()
-#             singleRotamerInfo.linkageIndex = conf['linkageLabel'] # This is a bad gems name. Notes in RotamerConformation class.
-#             singleRotamerInfo.linkageName = conf['linkageLabel'] # This is a better match, but GMML probably doesn't need to know user labels.
-#             singleRotamerInfo.dihedralName = conf['dihedralName']
-#             singleRotamerInfo.selectedRotamer = conf['rotamer']
-#             gmmlConformerInfo.push_back(singleRotamerInfo)
-#             #singleRotamerInfo.numericValue = conf['numericValue'] # Not supported at GMML or gems level yet.
-#             #log.debug("LinkageLabel: " + conf['linkageLabel'] + ", dihedralName: " + conf['dihedralName'] + ", rotamer: " + conf['rotamer'])
-#             #print(conf)
-#     except Exception as error:
-#         log.error("Could not populateGMMLConformerInfoStruct: " + str(error) )
-#         raise error
-#     else:
-#         return gmmlConformerInfo
+    return gmmlConformerInfo
 
 # This poor code is a result of how the combinations are generated in 
 # structureinfo.generateCombinationsFromRotamerData().
-def populateGMMLConformerInfoStruct(buildState : BuildState):
+def populateGMMLConformerInfoStruct(buildState : sequenceio.Single3DStructureBuildDetails):
     log.info("populateGMMLConformerInfoStruct() was called.")
 # example buildState.sequenceConformation:
 # ('6', 'h', '-g', '6', 'o', 'gg', '9', 'h', '-g', '9', 'o', 'gg', '10', 'o', 'gg', '13', 'h', '-g', '13', 'o', 'gg', '14', 'o', 'tg', '16', 'h', '-g', '16', 'o', 'tg')
     try:
         gmmlConformerInfo = gmml.single_rotamer_info_vector()
+        log.debug("buildState.sequenceConformation, is : ")
+        log.debug(buildState.sequenceConformation)
         for rotList in divideListIntoChunks(buildState.sequenceConformation, 3):
             singleRotamerInfo = gmml.SingleRotamerInfo()
             singleRotamerInfo.linkageIndex = rotList[0]
@@ -190,9 +238,14 @@ def populateGMMLConformerInfoStruct(buildState : BuildState):
     except Exception as error:
         log.error("Could not populateGMMLConformerInfoStruct: " + str(error) )
         raise error
+    log.debug("About to return a gmmlConformerInfo and it is :  >>>" + str(gmmlConformerInfo) + "<<<")
     return gmmlConformerInfo
 
 def divideListIntoChunks(l, n):
+    log.debug("l is this thing:  " + repr(l))
+    log.debug("l is this content : " + str(l))
+    log.debug("n is this thing:  " + repr(n))
+    log.debug("n is this content : " + str(n))
     for i in range(0, len(l), n):
         yield l[i:i + n]
 
@@ -201,7 +254,7 @@ def divideListIntoChunks(l, n):
 #   @return CarbohydrateBuilder object from gmml.
 def getCbBuilderForSequence(sequence : str):
     log.info("getCbBuilderForSequence() was called.\n")
-    GemsPath = getGemsHome()
+    GemsPath = commonservices.getGemsHome()
     log.debug("GemsPath: " + GemsPath )
 
     prepfile = GemsPath + "/gemsModules/sequence/GLYCAM_06j-1.prep"

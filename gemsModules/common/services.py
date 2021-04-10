@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import json, math, os, sys,importlib.util
+import json, math, os, sys,importlib.util, pprint
 from datetime import datetime
 import gemsModules
 from gemsModules import common
@@ -22,6 +22,19 @@ else:
 
 verbosity=common.utils.gems_environment_verbosity()
 
+def prettyString( incomingDict: Dict ) :
+    pp = pprint.PrettyPrinter(indent=2)
+    return pp.pprint(incomingDict)
+
+def directoryExists(directory : str) :
+    log.info("directoryExists() was called.")
+    log.debug("The directory to check : " + directory)
+    if os.path.exists(directory):
+        log.debug("Found the directory.")
+        return True
+    else:
+        log.debug("Directory not found.")
+        return False
 
 ##  Pass in the name of an entity, receive a module or an error.
 def importEntity(requestedEntity):
@@ -61,11 +74,12 @@ def parseInput(thisTransaction):
     # Load the JSON string into the incoming dictionary
     thisTransaction.request_dict = json.loads(thisTransaction.incoming_string)
     log.debug("thisTransaction.request_dict: \n\n")
-    prettyPrint(thisTransaction.request_dict)
+    prettyString(thisTransaction.request_dict)
+    #prettyPrint(thisTransaction.request_dict)
 
     # Check to see if there are errors.  If there are, bail, but give a reason
     if thisTransaction.request_dict is None:
-        appendCommonParserNotice(thisTransaction,'JsonParseError')
+        thisTransaction.generateCommonParserNotice(noticeBrief = 'JsonParseError')
         raise AttributeError("request_dict")
     try:
         TransactionSchema(**thisTransaction.request_dict)
@@ -184,14 +198,14 @@ def appendResponse(thisTransaction, responseConfig):
         log.debug("entity: " + entity)
     else:
         log.error("Please add the entity type to your responseConfig object.")
-        appendCommonParserNotice(thisTransaction, 'IncompleteResponseError')
+        thisTransaction.generateCommonParserNotice(noticeBrief =  'IncompleteResponseError')
 
     if 'respondingService' in responseConfig.keys():
         respondingService = responseConfig['respondingService']
         log.debug("respondingService: " + respondingService)
     else:
         log.error("Please add a respondingService field to your responseConfig object.")
-        appendCommonParserNotice(thisTransaction,'IncompleteResponseError')
+        thisTransaction.generateCommonParserNotice(noticeBrief = 'IncompleteResponseError')
 
     if 'responses' in responseConfig.keys():
         responsesToWrite = responseConfig['responses']
@@ -228,13 +242,13 @@ def appendResponse(thisTransaction, responseConfig):
                 log.debug("Passes validation against schema.")
             except ValidationError as e:
                 log.error("Validation Error: " + str(e))
-                appendCommonParserNotice(thisTransaction,'JsonParseEror')
+                thisTransaction.generateCommonParserNotice(noticeBrief = 'JsonParseEror')
         else:
             log.Error("Incomplete responseConfig.")
-            appendCommonParserNotice(thisTransaction,'IncompleteResponseError')
+            thisTransaction.generateCommonParserNotice(noticeBrief = 'IncompleteResponseError')
     else:
         log.error("Please add at a list of responses to your responseConfig object.")
-        appendCommonParserNotice(thisTransaction,'IncompleteResponseError')
+        thisTransaction.generateCommonParserNotice(noticeBrief = 'IncompleteResponseError')
 
 
 ##  @brief Convenience method for cleaning and speeding up log reading of dict objects.

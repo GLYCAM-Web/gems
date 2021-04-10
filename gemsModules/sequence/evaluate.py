@@ -4,13 +4,14 @@ import gemsModules
 import gmml
 import traceback
 import gemsModules.common.utils
-from gemsModules.project.projectUtil import *
+from gemsModules.project import projectUtilPydantic as projectUtils
 from gemsModules.project import settings as projectSettings
+from gemsModules.sequence import io as sequenceio
 from gemsModules.common import io as commonio
 from gemsModules.common import logic as commonlogic
+from gemsModules.common import services as commonservices
 from gemsModules.common.loggingConfig import *
 from . import settings as sequenceSettings
-from . import io as sequenceio
 from . import io as sequencelogic
 
 if loggers.get(__name__):
@@ -18,110 +19,24 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__)
 
-def evaluateCondensedSequencePydantic(thisTransaction : sequenceio.Transaction, thisService : sequenceio.sequenceService = None, validateOnly = False):
-    log.info("evaluateCondensedSequencePydantic() was called.\n")
-    log.debug("thisService: " + str(thisService))
-    log.debug("validateOnly: " + str(validateOnly))
-
-    sequence = thisTransaction.getInputSequencePayload()
-    #Test that this exists.
-    if sequence is None:
-        errorMsg = "No sequence found in the transaction."
-        log.error(errorMsg)
-        raise AttributeError(errorMsg)
-    else:
-        log.debug("YAY!  Found a sequence: " + sequence)
-
-    ##Generate output first. sequence, validateOnly
-    evaluationOutput = sequenceio.SequenceEvaluationOutput()
-    evaluationOutput.getEvaluation(sequence, validateOnly)
-    log.debug("Evaluation output: " + repr(evaluationOutput))
-    sequenceIsValid = evaluationOutput.sequenceIsValid
-    log.debug("sequenceIsValid: " + str(sequenceIsValid))
-    outputs = []
-    outputs.append(evaluationOutput)
-
-    ## serviceType, inputs, and outputs.
-    serviceResponse = sequenceio.ServiceResponse(thisService, inputs, outputs)
-
-    ##TODO: get sequenceIsValid and ValidateOnly.
-    if sequenceIsValid and not validateOnly: 
-        responseObj = serviceResponse.dict(by_alias = True)
-        log.debug("responseObj:\n")
-        prettyPrint(responseObj)
-        commonlogic.updateResponse(thisTransaction, responseObj)
-        log.debug("finished building default structure")
-    else:
-        log.debug("validateOnly was true. Does evaluateCondensedSequence return a well-formed response?")
-
-    log.debug("response_dict, after evaluation: ")
-    prettyPrint(thisTransaction.response_dict)
-    return sequenceIsValid
-
-##  @brief Pass in validation result and linkages and sequences, get a responseConfig.
-#   @param boolean valid
-#   @param dict linkages
-#   @return dict config
-# def buildEvaluationResponseConfig(valid, linkages, sequences):
-#     log.info("buildEvaluationResponseConfig() was called. \n")
-#     # TODO:  Please someone make this less ugly
-# #    if linkages is None:
-#     # from gemsModules.sequence import io
-#     # entity = io.Entity()
-#     # entity.InitializeClass()
-#     # print(entity.json())
-    # """ Old and ugly """
-    # config = {      
-    #     "responses" : [{
-    #         "entity" : "Sequence",
-    #         "type": "Evaluate",
-    #         "outputs" : [{
-    #             "SequenceValidation" : {
-    #                 "SequenceIsValid" : valid
-    #             }
-    #         },{
-    #             "SequenceVariants": sequences
-    #         },{
-    #             "BuildOptions": {
-    #                 "geometricElements" : [
-    #                     { "Linkages" : linkages }
-    #                 ]
-    #             }
-    #         }]
-    #     }]
-    # }
-
-# ## The following might have once been a format for a validation response. 
-# ## Keeping it for historical sake.  Today is 2020-08-11.  If there
-# ## is no need for this by, say, 2021-08-11, this can go.
-# ##
-# ##    thisTransaction.response_dict['entity']['responses'].append({
-# ##    "condensedSequenceValidation" : {
-# ##    'sequence': sequence,
-# ##    'valid' : valid,
-# ##    }
-# ##    })
-
-
 # I think if we got all the names to match, we could use parse_object_as instead of this. OG.
 # Probably it would fail on sub-classes though, but maybe.
 def getLinkageOptionsFromGmmlcbBuilder(sequence):
     log.info("getLinkageOptionsFromGmmlcbBuilder() was called.\n")
     log.debug("sequence: " + sequence)
     from gemsModules.sequence import build
-    from gemsModules.sequence import io
     cbBuilder = build.getCbBuilderForSequence(sequence)
     gmmllinkageOptionsVector = cbBuilder.GenerateUserOptionsDataStruct()
     log.debug("gmmllinkageOptionsVector: " + repr(gmmllinkageOptionsVector))
 
-    gemsLinkageGeometryOptions = io.LinkageGeometryOptions()
+    gemsLinkageGeometryOptions = sequenceio.AllLinkageRotamerData()
     gemsLinkageGeometryOptions.totalPossibleRotamers = cbBuilder.GetNumberOfShapes()
     likelyOnly = True
     gemsLinkageGeometryOptions.totalLikelyRotamers = cbBuilder.GetNumberOfShapes(likelyOnly)
 
     for gmmlLinkageOptions in gmmllinkageOptionsVector:
 
-        gemsLinkageOptions = io.LinkageRotamers()
+        gemsLinkageOptions = sequenceio.TheLinkageRotamerData()
 
         gemsLinkageOptions.indexOrderedLabel = gmmlLinkageOptions.indexOrderedLabel_
         gemsLinkageOptions.linkageName = gmmlLinkageOptions.linkageName_
@@ -130,7 +45,7 @@ def getLinkageOptionsFromGmmlcbBuilder(sequence):
 
         """ Likely Rotamers """
         for dihedralOptions in gmmlLinkageOptions.likelyRotamers_:
-            gemsRotamers = io.DihedralRotamers() 
+            gemsRotamers = sequenceio.TheRotamerDihedralInfo() 
             gemsRotamers.dihedralName = dihedralOptions.dihedralName_
             
             for rotamer in dihedralOptions.rotamers_:
@@ -140,7 +55,7 @@ def getLinkageOptionsFromGmmlcbBuilder(sequence):
 
         """ Possible Rotamers """
         for dihedralOptions in gmmlLinkageOptions.possibleRotamers_:
-            gemsRotamers = io.DihedralRotamers()
+            gemsRotamers = sequenceio.TheRotamerDihedralInfo()
             gemsRotamers.dihedralName = dihedralOptions.dihedralName_
 
 
@@ -152,7 +67,7 @@ def getLinkageOptionsFromGmmlcbBuilder(sequence):
             ## dihedralsWithOptions Needed for the website
             gemsLinkageOptions.dihedralsWithOptions.append(gemsRotamers.dihedralName)
 
-        gemsLinkageGeometryOptions.linkageRotamersList.append(gemsLinkageOptions)
+        gemsLinkageGeometryOptions.linkageRotamerData.append(gemsLinkageOptions)
 
     log.debug("gemsLinkageGeometryOptions: " + repr(gemsLinkageGeometryOptions))
     return gemsLinkageGeometryOptions
@@ -266,7 +181,7 @@ def checkIsSequenceSane(sequence):
         log.error("Something went wrong while validating this sequence.") 
         log.error("sequence: " + sequence) 
         log.error(traceback.format_exc()) 
-        common.settings.appendCommonParserNotice( thisTransaction, 'GmmlError')
+        common.settings.generateCommonParserNotice(noticeBrief='GmmlError')
         valid = False
     return valid
 

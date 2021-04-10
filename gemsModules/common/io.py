@@ -21,6 +21,7 @@
 # ###############################################################
 import traceback
 from enum import Enum, auto
+from uuid import UUID
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union, Any
 from pydantic import BaseModel, Field, Json
 from pydantic.schema import schema
@@ -56,7 +57,7 @@ class Notice(BaseModel):
             None,
             title='Code',
             alias='code',
-            description='Code associated with this notice.'
+            description='Numeric code associated with this notice, for users who like this sort of thing.'
             )
     noticeBrief: str = Field(
             None,
@@ -70,7 +71,18 @@ class Notice(BaseModel):
             alias='message',
             description='A more detailed message for this notice.'
             )
-    options : Dict[str,str] = Field(
+    noticeScope : str = Field(
+            None,
+            title='Context of notice',
+            alias='scope',
+            description='The scope at which the error occured.'
+            )
+    messagingEntity : str = Field(
+            None,
+            title='Messaging Entity',
+            description='The Entity that raised the notice, if known.'
+            )
+    additionalInfo : Dict[str,str] = Field(
             None,
             description='Key-value pairs that are specific to each entity, service, etc'
             )
@@ -96,6 +108,10 @@ class Resource(BaseModel):
             None,
             description='Key-value pairs that are specific to each entity, service, etc'
             )
+
+    def generateCommonParserNotice(self, *args, **kwargs) :
+        self.notices.append(settings.generateCommonParserNotice(*args, **kwargs))
+
 # ## Services
 # ##
 class Services(str,Enum):
@@ -113,19 +129,23 @@ class Service(BaseModel):
         title = 'Common Services',
         description = 'The service requested of the Common Servicer'
         )
-#    typename : str  = Field(
-#            None,
-#            title='Type of Service.',
-#            alias='type',
-#            description='The services available will vary by Entity.'
-#            )
+    givenName : str = Field(
+            None,
+            title = 'The name given this object in the transaction'
+            )
+    myUuid : UUID = Field(
+            None,
+            title = 'My UUID',
+            description = 'ID to allow correlations between services and responses.'
+            )
     inputs : Json = None
     options : Dict[str,str] = Field(
             None,
             description='Key-value pairs that are specific to each entity, service, etc'
             )
 
-# ## TODO - consider putting Response inside of Service - Lachele
+# ## TODO - consider putting Response inside of Service
+# ##        I keep changing my mind.   - Lachele
 class Response(Service):
     """
     Holds information about a response to a service request.
@@ -140,6 +160,9 @@ class Response(Service):
     outputs : Json = None
     notices : List[Notice] = None
 
+    def generateCommonParserNotice(self, *args, **kwargs) :
+        self.notices.append(settings.generateCommonParserNotice(*args, **kwargs))
+
 class Entity(BaseModel):
     """Holds information about the main object responsible for a service."""
     entityType : str = Field(
@@ -152,26 +175,34 @@ class Entity(BaseModel):
             title = 'Request ID',
             description = 'User-specified ID that will be echoed in responses.'
             )
-    services : List[Service] = None
-    inputs : List[Resource] = None
-    responses : List[Response] = None
+    services : Dict[str,Service] = None
+    responses : Dict[str,Response] = None
+    resources : List[Resource] = None
     notices : List[Notice] = None
     options : Dict[str,str] = Field(
             None,
             description='Key-value pairs that are specific to each entity, service, etc'
             )
 
+    def generateCommonParserNotice(self, *args, **kwargs) :
+        self.notices.append(settings.generateCommonParserNotice(*args, **kwargs))
+
 class TransactionSchema(BaseModel):
     timestamp : str = None
     entity  : Entity = None
     project : projectio.Project = None
+    prettyPrint : bool = False
+    mdMinimize : bool = True
     options : Dict[str,str] = Field(
             None,
             description='Key-value pairs that are specific to each entity, service, etc'
             )
-    notices : List[Notice] = None
+    notices : List[Notice] = []
     class Config:
         title = 'gemsModulesCommonTransaction'
+
+    def generateCommonParserNotice(self, *args, **kwargs) :
+        self.notices.append(settings.generateCommonParserNotice(*args, **kwargs))
 
 # ####
 # ####  Container for use in the modules
@@ -184,6 +215,7 @@ class Transaction:
     transaction_out: TransactionSchema 
     response_dict : {} = None
     outgoing_string : str = None
+
 
     def __init__(self, in_string):
         """
@@ -207,7 +239,7 @@ class Transaction:
         log.debug("The incoming_string is: " )
         log.debug(self.incoming_string)
         if self.incoming_string is None :
-            commonSettings.appendCommonParserNotice(self, 'InvalidInput', commonSettings.WhoIAm)
+            commonSettings.generateCommonParserNotice(noticeBrief='InvalidInput', messagingEntity=commonSettings.WhoIAm)
             return
         else : 
             self.request_dict = json.loads(self.incoming_string) 
@@ -215,8 +247,13 @@ class Transaction:
             log.debug(self.request_dict)
 
         if self.incoming_string is None :
-            commonSettings.appendCommonParserNotice(self, 'InvalidInput', commonSettings.WhoIAm)
+            commonSettings.generateCommonParserNotice(noticeBrief='InvalidInput', messagingEntity=commonSettings.WhoIAm)
             return
+
+    def generateCommonParserNotice(self, *args, **kwargs) :
+        if self.transaction_out is None : 
+            self.transaction_out = TransactionSchema()
+        self.transaction_out.generateCommonParserNotice(*args, **kwargs)
 
     def populate_transaction_in(self):
 
@@ -236,8 +273,6 @@ class Transaction:
         log.info("build_outgoing_string() was called.")
         if self.response_dict is None:
             msg = "Transaction has no response_dict! request_dict: " + str(self.request_dict)
-            #print("transaction.response_dict: " + str(self.response_dict))
-            #print("transaction: " + str(self.__dict__))
             self.build_general_error_output(msg)
         else:
             #log.debug("response_dict: \n" + str(self.response_dict))
@@ -267,7 +302,6 @@ class Transaction:
             msg = 'fix me there was an error'
 
         self.outgoing_string="{'entity':{'type':'commonServicer','responses':{'notice': " + msg + "}}}"
-       # print("build_general_error_output was called. Still in development.")
 
 
 def generateSchema():

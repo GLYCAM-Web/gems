@@ -32,7 +32,7 @@ def receive(thisTransaction : commonio.Transaction):
             if requestedService not in structureFileSettings.serviceModules.keys():
                 log.error("The requested service is not recognized.")
                 log.error("services: " + str(structureFileSettings.serviceModules.keys()))
-                appendCommonParserNotice(thisTransaction,'ServiceNotKnownToEntity', requestedService)
+                thisTransaction.generateCommonParserNotice(noticeBrief='ServiceNotKnownToEntity')
                 raise AttributeError(requestedService)
             elif requestedService == "PreprocessPdbForAmber":
                 try:

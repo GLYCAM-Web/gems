@@ -51,7 +51,7 @@ def receive(thisTransaction):
             if requestedService not in mmSettings.serviceModules.keys():
                 log.error("The requested service is not recognized.")
                 log.error("services: " + str(mmSettings.serviceModules.keys()))
-                common.settings.appendCommonParserNotice(thisTransaction,'ServiceNotKnownToEntity', requestedService)
+                thisTransaction.generateCommonParserNotice(noticeBrief='ServiceNotKnownToEntity')
             elif requestedService == "Amber":
                 log.debug("Amber service requested.")
 

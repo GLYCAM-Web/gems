@@ -27,13 +27,15 @@ def receive(thisTransaction : Transaction):
             if requestedService not in settings.serviceModules.keys():
                 if requestedService not in common.settings.serviceModules.keys():
                     log.error("The requested service is not recognized.")
-                    common.settings.appendCommonParserNotice( thisTransaction, 'ServiceNotKnownToEntity', requestedService)
+                    thisTransaction.generateCommonParserNotice(noticeBrief = 'ServiceNotKnownToEntity')
+                    #common.settings.appendCommonParserNotice( thisTransaction, 'ServiceNotKnownToEntity', requestedService)
             elif requestedService == "GenerateReport":
                 generateReport(thisTransaction)
                 thisTransaction.build_outgoing_string()
             else:
                 log.error("Perhaps a service was added to status/settings.py, but not defined in receive.py? Likely this service is still in development.")
-                common.settings.appendCommonParserNotice( thisTransaction, 'ServiceNotKnownToEntity', requestedService)
+                thisTransaction.generateCommonParserNotice(noticeBrief = 'ServiceNotKnownToEntity')
+                #common.settings.appendCommonParserNotice( thisTransaction, 'ServiceNotKnownToEntity', requestedService)
 
 
 def doDefaultService(thisTransaction : Transaction):

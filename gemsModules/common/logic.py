@@ -67,7 +67,7 @@ def parseInput(thisTransaction):
 
     # Check to see if there are errors.  If there are, bail, but give a reason
     if thisTransaction.request_dict is None:
-        appendCommonParserNotice(thisTransaction,'JsonParseError')
+        thisTransaction.generateCommonParserNotice(noticeBrief = 'JsonParseError')
         log.error(traceback.format_exc())
         raise AttributeError("request_dict")
     try:
@@ -255,14 +255,14 @@ def appendResponse(thisTransaction, responseConfig):
         log.debug("entity: " + entity)
     else:
         log.error("Please add the entity type to your responseConfig object.")
-        appendCommonParserNotice(thisTransaction, 'IncompleteResponseError')
+        thisTransaction.generateCommonParserNotice(noticeBrief =  'IncompleteResponseError')
 
     if 'respondingService' in responseConfig.keys():
         respondingService = responseConfig['respondingService']
         log.debug("respondingService: " + respondingService)
     else:
         log.error("Please add a respondingService field to your responseConfig object.")
-        appendCommonParserNotice(thisTransaction,'IncompleteResponseError')
+        thisTransaction.generateCommonParserNotice(noticeBrief = 'IncompleteResponseError')
 
     if 'responses' in responseConfig.keys():
         responsesToWrite = responseConfig['responses']
@@ -300,13 +300,13 @@ def appendResponse(thisTransaction, responseConfig):
             except ValidationError as e:
                 log.error("Validation Error: " + str(e))
                 log.error(traceback.format_exc())
-                appendCommonParserNotice(thisTransaction,'JsonParseEror')
+                thisTransaction.generateCommonParserNotice(noticeBrief = 'JsonParseEror')
         else:
             log.Error("Incomplete responseConfig.")
-            appendCommonParserNotice(thisTransaction,'IncompleteResponseError')
+            thisTransaction.generateCommonParserNotice(noticeBrief = 'IncompleteResponseError')
     else:
         log.error("Please add at a list of responses to your responseConfig object.")
-        appendCommonParserNotice(thisTransaction,'IncompleteResponseError')
+        thisTransaction.generateCommonParserNotice(noticeBrief = 'IncompleteResponseError')
 
 
 
@@ -336,7 +336,7 @@ def updateResponse(thisTransaction, serviceResponse):
         except Exception as error:
             log.error("There was no entity type to be found in the transaction's request_dict.")
             log.error(traceback.format_exc())
-            appendCommonParserNotice(thisTransaction,'InvalidInput', "entity['type']") 
+            thisTransaction.generateCommonParserNotice(noticeBrief = 'InvalidInput') 
         else:
             thisTransaction.response_dict['entity']['type'] = requestedEntity
     else:
@@ -385,7 +385,7 @@ def updateResponse(thisTransaction, serviceResponse):
         except Exception as error:
             log.error("No inputs found in request.")
             log.error(traceback.format_exc())
-            appendCommonParserNotice(thisTransaction,'InvalidInput', "entity['inputs']")
+            thisTransaction.generateCommonParserNotice(noticeBrief = 'InvalidInput')
 
 
     log.debug("responding entity: " + thisTransaction.response_dict['entity']['type'])
@@ -417,7 +417,7 @@ def updateResponse(thisTransaction, serviceResponse):
     except ValidationError as e:
         log.error("Validation Error while responding to: " + requestedEntity + e.json())
         log.error(traceback.format_exc())
-        appendCommonParserNotice(thisTransaction,'JsonParseEror')
+        thisTransaction.generateCommonParserNotice(noticeBrief = 'JsonParseEror')
 
 ##  @brief Convenience method for cleaning and speeding up log reading of dict objects.
 #   @detail Useful for assessing json objects.

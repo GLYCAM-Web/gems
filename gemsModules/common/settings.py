@@ -95,10 +95,11 @@ ExitTypes = {
     'GmmlError':'error',
     'GemsError':'error',
     'InvalidInputPayload':'error',
-    'NoInputPayloadDefined':'error'
+    'NoInputPayloadDefined':'error',
+    'UnknownError':'error'
 }
 
-ExitBlockIDs = {
+ExitScopes = {
     'NoEntityDefined':'Transaction',
     'EntityNotKnown':'Entity',
     'NoTypeForEntity':'Entity',
@@ -110,7 +111,8 @@ ExitBlockIDs = {
     'GmmlError':'SyatemError',
     'GemsError':'SystemError',
     'InvalidInputPayload':'Transaction',
-    'NoInputPayloadDefined':'Transaction'
+    'NoInputPayloadDefined':'Transaction',
+    'UnknownError':'Unknown'
 }
 
 ExitCodes = {
@@ -125,7 +127,8 @@ ExitCodes = {
     'InvalidInput':'400',
     'GemsError':'315',
     'InvalidInputPayload':'400',
-    'NoInputPayloadDefined':'400'
+    'NoInputPayloadDefined':'400',
+    'UnknownError':'500'
 }
 
 ExitMessages = {
@@ -140,41 +143,75 @@ ExitMessages = {
     'GmmlError':'An interaction with GMML failed.',
     'GemsError':'There was an error in GEMS',
     'InvalidInputPayload':'An invalid payload was detected.',
-    'NoInputPayloadDefined':'No payload could be found.'
+    'NoInputPayloadDefined':'No payload could be found.',
+    'UnknownError':'We really have no idea what went wrong.'
 }
 
 ## TODO Make this sort of thing ultimately part of transaction.py (eg Notice class).
-def appendCommonParserNotice(thisTransaction: Transaction,  noticeBrief: str, blockID: str = None):
-    log.info("appendCommonParserNotice() was called.\n")
-    # Build the notice
-    if thisTransaction.response_dict is None:
-        thisTransaction.response_dict={}
-        thisTransaction.response_dict['entity']={}
+def appendCommonParserNotice(theTransaction )  :
+    # Build the notice for older code
+        if theTransaction.response_dict is None:
+            theTransaction.response_dict={}
+            theTransaction.response_dict['entity']={}
+    
+        if theTransaction.response_dict['entity'] is None:
+            theTransaction.response_dict['entity']={}
+    
+        if not 'type' in theTransaction.response_dict['entity']:
+            theTransaction.response_dict['entity']['type'] = 'CommonServicer'
+    
+    
+        if not 'responses' in theTransaction.response_dict['entity']:
+            theTransaction.response_dict['entity']['responses']=[]
+    
+        theTransaction.response_dict['entity']['responses'].append({
+                'CommonServicerNotice' : {
+                'type' : ExitTypes[noticeBrief],
+                'notice' : {
+                    'code' : ExitCodes[noticeBrief],
+                    'brief' : noticeBrief,
+                    'blockID' : scope,
+                    'message' : ExitMessages[noticeBrief],
+                    }
+                }})
+    
 
-    if thisTransaction.response_dict['entity'] is None:
-        thisTransaction.response_dict['entity']={}
+def generateCommonParserNotice(
+        noticeBrief : str = 'UnknownError' , 
+        scope : str = None,
+        messagingEntity : str = None ,
+        exitType : str = None,
+        exitCode : str = None,
+        exitMessage : str = None,
+        additionalInfo : Dict = None
+        ):
+    log.info("generateCommonParserNotice() was called.\n")
 
-    if not 'type' in thisTransaction.response_dict['entity']:
-        thisTransaction.response_dict['entity']['type'] = 'CommonServicer'
+    if ExitTypes[noticeBrief] is None :
+        log.info("Unknown noticeBrief, '" + noticeBrief + "', sent to appendCommonParserNotice() \n")
+        noticeBrief = 'UnknownError'
 
+    if messagingEntity is None :
+        messagingEntity='CommonServicer'
 
-    if not 'responses' in thisTransaction.response_dict['entity']:
-        thisTransaction.response_dict['entity']['responses']=[]
+    if scope is None :
+        scope : str = ExitScopes[noticeBrief]
+    if exitType is None :
+        exitType = ExitTypes[noticeBrief],
+    if exitCode is None :
+        exitCode = ExitCodes[noticeBrief],
+    if exitMessage is None :
+        exitMessage = ExitMessages[noticeBrief],
 
-    if blockID is None:
-        if noticeBrief in ExitBlockIDs:
-            blockID = ExitBlockIDs[noticeBrief]
-        else:
-            blockID = 'unknown'
+    # Build the notice for newer code
+    thisNotice = common.io.Notice()
+    thisNotice.noticeType=exitType
+    thisNotice.noticeCode=exitCode
+    thisNotice.noticeBrief=noticeBrief
+    thisNotice.noticeScope=scope
+    thisNotice.noticeMessage=exitMessage
+    thisNotice.messagingEntity=messagingEntity
+    if additionalInfo is not None : 
+        thisNotice.additionalInfo=additionalInfo
 
-    thisTransaction.response_dict['entity']['responses'].append({
-            'CommonServicerNotice' : {
-            'type' : ExitTypes[noticeBrief],
-            'notice' : {
-                'code' : ExitCodes[noticeBrief],
-                'brief' : noticeBrief,
-                'blockID' : blockID,
-                'message' : ExitMessages[noticeBrief],
-                }
-            }})
-
+    return thisNotice

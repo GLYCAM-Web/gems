@@ -50,7 +50,7 @@ def receive(thisTransaction):
             if requestedService not in conjugateSettings.serviceModules.keys():
                 log.error("The requested service is not recognized.")
                 log.error("services: " + str(conjugateSettings.serviceModules.keys()))
-                appendCommonParserNotice(thisTransaction,'ServiceNotKnownToEntity', requestedService)
+                thisTransaction.generateCommonParserNotice(noticeBrief='ServiceNotKnownToEntity')
             elif requestedService == "BuildGlycoprotein":
                 buildGlycoprotein(thisTransaction)
             else:
@@ -71,7 +71,7 @@ def buildGlycoprotein(thisTransaction):
     ##For now, require attachmentSites.
     if len(attachmentSites) == 0:
         log.error("BuildGlycoprotein requests require 'attachmentSites'.")
-        appendCommonParserNotice(thisTransaction, 'InvalidInput' )
+        thisTransaction.generateCommonParserNotice(noticeBrief= 'InvalidInput' )
     else:
         log.debug("attachmentSites present.")
         if "gems_project" not in thisTransaction.response_dict.keys():

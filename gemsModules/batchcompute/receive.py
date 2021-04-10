@@ -53,7 +53,7 @@ def receive(thisTransaction):
             if requestedService not in batchcomputeSettings.serviceModules.keys():
                 log.error("The requested service is not recognized.")
                 log.error("services: " + str(conjugateSettings.serviceModules.keys()))
-                appendCommonParserNotice(thisTransaction,'ServiceNotKnownToEntity', requestedService)
+                thisTransaction.generateCommonParserNotice(noticeBrief='ServiceNotKnownToEntity')
             elif requestedService == "BuildGlycoprotein":
                 log.debug("received a request to BuildGlycoprotein.")
             else:
@@ -77,7 +77,7 @@ def submitGpScriptToSlurm(thisTransaction, gemsProject, sbatchArg):
         log.debug("outputDir" + outputDir)
     else:
         log.error("Gems project not found.")
-        appendCommonParserNotice(thisTransaction, "InvalidInput")
+        thisTransaction.generateCommonParserNotice(noticeBrief="InvalidInput")
 
     log.debug("Found the script.")
     jobInfoObject = {}

@@ -59,26 +59,32 @@ def delegate(jsonObjectString):
         error_msg = "There was a problem importing the entity: " + str(error)
         log.error(error_msg)
         log.error(traceback.format_exc())
-        appendCommonParserNotice(thisTransaction, error_msg)
+        thisTransaction.generateCommonParserNotice(messagingEntity='delegator', additionalInfo={"errorMessage":error_msg})
     else:
         ##Figure out what service to do.
         if theEntity is None:
             log.error("there was no entity to call.  bailing")
-            appendCommonParserNotice(thisTransaction,'NoEntityDefined')
+            thisTransaction.generateCommonParserNotice(noticeBrief='NoEntityDefined')
         elif not 'services' in thisTransaction.request_dict['entity'].keys():
             ## If no service is requested in the json object, do the default service.
             ## This logic could possibly move down to the Entity level.  Is ok here. (Lachele)
             log.debug("No service defined in the request. Calling the default service")
-            theEntity.receive.doDefaultService(thisTransaction)
+            returnedTransaction = theEntity.receive.doDefaultService(thisTransaction)
+            if returnedTransaction is not None :
+                # ## !!!!! This might not work as planned....
+                thisTransaction = returnedTransaction
         else:
             try:
                 ## This is where specific requested services are called.
-                theEntity.receive.receive(thisTransaction)
+                returnedTransaction = theEntity.receive.receive(thisTransaction)
+                if returnedTransaction is not None :
+                    # ## !!!!! This might not work as planned....
+                    thisTransaction = returnedTransaction
             except Exception as error:
                 error_msg = str(error)
                 log.error("There was a problem providing the requested service: " + str(error))
                 log.error(traceback.format_exc())
-                appendCommonParserNotice(thisTransaction, error_msg)
+                thisTransaction.generateCommonParserNotice(messagingEntity='delegator', additionalInfo={"errorMessage":error_msg})
             else:
                 ##Set the json_api_version in the response_dict.
                 try:
@@ -87,7 +93,7 @@ def delegate(jsonObjectString):
                     error_msg  = "There was a problem setting the response JSON API version: " + str(error)
                     log.error(error_msg)
                     log.error(traceback.format_exc())
-                    appendCommonParserNotice(thisTransaction, error_msg)
+                    thisTransaction.generateCommonParserNotice(messagingEntity='delegator', additionalInfo={"errorMessage":error_msg})
                 else:
                     ##Set the response timestamp.
                     setResponseTimestamp(thisTransaction)
@@ -107,7 +113,7 @@ def delegate(jsonObjectString):
                             error_msg = "There was a problem building the outgoing string: " + str(error)
                             log.error(error_msg)
                             log.error("Error type: " + str(type(error)))
-                            appendCommonParserNotice(thisTransaction, error_msg)
+                            thisTransaction.generateCommonParserNotice(messagingEntity='delegator', additionalInfo={"errorMessage":error_msg})
 
     # Return whatever outgoing string was made
     log.debug("About to return whatever output I have at this point:")
