@@ -339,6 +339,7 @@ class TheSequenceEvaluationOutput(BaseModel):
     def __init__(self, **data : Any):
         super().__init__(**data)
 
+
     def getEvaluation(self, sequence:str, validateOnly):
         log.info("Getting the Evaluation for SequenceEvaluationOutput.")
 
@@ -356,6 +357,17 @@ class TheSequenceEvaluationOutput(BaseModel):
             self.sequenceVariants = evaluate.getSequenceVariants(sequence)
             log.debug("Just got sequence variants.  They are:")
             log.debug(str(self.sequenceVariants))
+            log.debug("indexOrdered: " + str(self.sequenceVariants['indexOrdered']))
+            reducingSuffix = self.sequenceVariants['indexOrdered'][-7:]
+            log.debug("reducingSuffix: " + reducingSuffix)
+            log.debug("# of '-': " + str(reducingSuffix.count('-')))
+            if 2 == reducingSuffix.count('-'):
+                lastIndex = self.sequenceVariants['indexOrdered'].rfind('-')
+                log.debug("lastIndex of '-': " + str(lastIndex))
+                self.sequenceVariants['indexOrdered'] = self.sequenceVariants['indexOrdered'][:lastIndex - 2] + self.sequenceVariants['indexOrdered'][lastIndex:]
+                log.debug("indexOrdered: " + self.sequenceVariants['indexOrdered'])
+            ##DGlcpNAcb1-1-OH
+
         if self.sequenceIsValid and not self.validateOnly :
             self.buildOptions = TheBuildOptions()
             self.buildOptions.setGeometryOptions(sequence)
