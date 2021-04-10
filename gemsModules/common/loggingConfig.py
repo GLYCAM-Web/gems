@@ -8,18 +8,22 @@ from gemsModules.common import settings
 
 ## Set the verbosity via the GEMS_LOGGING_LEVEL environment var.
 def getGemsLoggingLevel():
-    loggingLevel = os.environ.get('GEMS_LOGGING_LEVEL')
-    if loggingLevel == None:
-        loggingLevel = logging.ERROR
-    elif loggingLevel == "error":
-        loggingLevel = logging.ERROR
-    elif loggingLevel == "info":
-        loggingLevel = logging.INFO
-    elif loggingLevel == "debug":
-        loggingLevel = logging.DEBUG
-    else:
-        print("The only valid values for GEMS_LOGGING_LEVEL are: error, info, or debug.")
-    return loggingLevel
+    try:
+        loggingLevel = os.environ.get('GEMS_LOGGING_LEVEL')
+        
+        if loggingLevel == None:
+            loggingLevel = logging.ERROR
+        elif loggingLevel == "error":
+            loggingLevel = logging.ERROR
+        elif loggingLevel == "info":
+            loggingLevel = logging.INFO
+        elif loggingLevel == "debug":
+            loggingLevel = logging.DEBUG
+        else:
+            print("The only valid values for GEMS_LOGGING_LEVEL are: error, info, or debug: " + str(loggingLevel))
+        return loggingLevel
+    except Exception as error:
+        return logging.ERROR
 
 LOGGING_LEVEL = getGemsLoggingLevel()
 loggers = {}
@@ -34,6 +38,7 @@ def createLogger(name):
         log.debug("logger already exists with name: " + name)
     else:
         log = logging.getLogger(name)
+
         log.setLevel(LOGGING_LEVEL)
 
         ##File Handlers
