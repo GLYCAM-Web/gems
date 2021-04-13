@@ -41,15 +41,18 @@ def buildQueryString(thisTransaction : Transaction):
     #
     try:
         virtLocation = os.getenv('VIRTUOSO_DB') + ":" + str(8890) + "/sparql"
-    except:
-        log.error("Unable to find the Virtuoso Database.  Quitting.")
-        sys.exit(1)
+    except Exception as error:
+        log.error("Unable to find the Virtuoso Database.  Quitting. " + str(error))
+        log.error(traceback.format_exc())
+        raise error
     try:
         GemsPath = os.environ.get('GEMSHOME')
-    except:
-        sys.exit(1)
+    except Exception as error:
+        log.error("Unable to find GEMSHOME " + str(error))
+        log.error(traceback.format_exc())
+        raise error
     debugFileLocation = GemsPath + "/DebugOutput.txt"
-    theseOptions = thisTransaction.transaction_in['services'][0]['formQueryString']['options']
+    theseOptions = thisTransaction.request_dict['services'][0]['formQueryString']['options']
     if theseOptions['queryType'] == "Initial":
         log.debug(theseOptions)
         log.debug("Printing the aglycon part:")

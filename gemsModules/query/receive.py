@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import gemsModules
+import gemsModules, traceback
 from gemsModules import common
 from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
@@ -20,6 +20,7 @@ def doDefaultService(thisTransaction):
     # thisTransaction.response_dict['responses']=[]
     # thisTransaction.response_dict['responses'].append({'payload':marco('Query')})
     # thisTransaction.build_outgoing_string()
+    log.debug("About to run query")
     run_query.buildQueryString(thisTransaction)
 
 def receive(thisTransaction):
