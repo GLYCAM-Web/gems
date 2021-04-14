@@ -140,10 +140,10 @@ def manageSequenceRequest(self) :
         #
         # Do the building of the structures
         #   using a blocking method:
-        build.buildEach3DStructureInStructureInfo(self)
+        #build.buildEach3DStructureInStructureInfo(self)
         #   using a non-blocking method:
-        #p = logic.EverLastingProcess(target=build.buildEach3DStructureInStructureInfo, args=(self,), daemon=False)
-        #p.start()
+        p = logic.EverLastingProcess(target=build.buildEach3DStructureInStructureInfo, args=(self,), daemon=False)
+        p.start()
         #
         #sequenceProjects.createDefaultSymLinkBuildsDirectory(projectDir, buildDir + conformerID)
             ##  create downloadUrl
