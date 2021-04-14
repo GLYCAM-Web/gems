@@ -58,18 +58,6 @@ def registerBuild(buildState : sequenceio.Single3DStructureBuildDetails, thisTra
             log.error("There was a problem getting the status filename: " + str(error))
             log.error(traceback.format_exc())
             raise error
-        #else:
-            #try:
-                #updateBuildStatus(structureInfoFilename, buildState, "submitted")
-            #except Exception as error:
-                #log.error("There was a problem updating the structureInfo.json: " + str(error))
-                #raise error
-            #else:
-                #try:
-                    #updateBuildStatus(statusFilename, buildState, "submitted")
-                #except Exception as error:
-                    #log.error("There was a problem updating the status file: " + str(error))
-                    #raise error
 
 
 
@@ -137,69 +125,29 @@ def sequenceExists(buildState: sequenceio.Single3DStructureBuildDetails, thisTra
         return False
 
 
-##  @brief Build a structure response config oobject and append it to a transaction
-#   @param Transaction
-# def respondWithExistingDefaultStructure(thisTransaction: Transaction):
-#     log.info("respondWithExistingDefaultStructure() was called.")
 
-#     try:
-#         gemsProject = thisTransaction.response_dict['gems_project']
-#         sequence = gemsProject['sequence']
-#         pUUID = gemsProject['pUUID']
-
-#         inputs = []
-#         inputs.append(sequence)
-        
-#         indexOrdered = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
-#         seqID = getSeqIDForSequence(indexOrdered)
-
-#         downloadUrl = getDownloadUrl(gemsProject['pUUID'], "cb")
-#         outputs = []
-
-#         ouput = sequenceio.Build3DStructureOutput(pUUID, sequence, seqID, downloadUrl)
-#         outputs.append(ouput)
-
-#         serviceResponse = sequenceio.ServiceResponse("Build3DStructure", inputs, outputs)
-#         responseObj = serviceResponse.dict(by_alias = True)
-#         commonlogic.updateResponse(thisTransaction, responseObj)
-#     except Exception as error:
-#         log.error("There was a problem getting the sequence from the request: " + str(error))
-#         log.error(traceback.format_exc())
-#         raise error
-
-
-##  @brief Pass in a gemsProject and get a responseConfig.
-#   @param GemsProject gemsProject
-#   @return dict config
-def build3dStructureResponseConfig(thisTransaction : sequenceio.Transaction):
-    log.info("build3dStructureResponseConfig() was called.\n")
-    gemsProject = thisTransaction.response_dict['gems_project']
-    indexOrdered = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
-    seqID = getSeqIDForSequence(indexOrdered)
-    downloadUrl = getDownloadUrl(gemsProject['pUUID'], "cb")
-    sequence = gemsProject['sequence']
-    config = {
-        "sequence" : sequence,
-        "validateOnly" : False,
-        "outputType" : "Build3DStructure",
-        "payload" : gemsProject['pUUID'],
-        "seqID" : seqID,
-        "downloadUrl" : downloadUrl
-
-    }
-
+# ##  I believe the following is no longer used - Lachele
+# ##  @ brief Pass in a gemsProject and get a responseConfig.
+# #   @ param GemsProject gemsProject
+# #   @ return dict config
+# def build3dStructureResponseConfig(thisTransaction : sequenceio.Transaction):
+    #log.info("build3dStructureResponseConfig() was called.\n")
+    #gemsProject = thisTransaction.response_dict['gems_project']
+    #indexOrdered = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
+    #seqID = getSeqIDForSequence(indexOrdered)
+    #downloadUrl = getDownloadUrl(gemsProject['pUUID'], "cb")
+    #sequence = gemsProject['sequence']
+    #config = {
+        #"sequence" : sequence,
+        #"validateOnly" : False,
+        #"outputType" : "Build3DStructure",
+        #"payload" : gemsProject['pUUID'],
+        #"seqID" : seqID,
+        #"downloadUrl" : downloadUrl
+#
+    #}
+#
     
-
-    # config = {
-    #     "entity" : "Sequence",
-    #     "respondingService" : "Build3DStructure",
-    #     "responses" : [{
-    #         'payload' : gemsProject['pUUID'],
-    #         'sequence' : gemsProject['sequence'],
-    #         'seqID' : seqID,
-    #         'downloadUrl' : downloadUrl
-    #     }]
-    # }
 
     log.debug("returning 3dStructureResponseConfig: " + str(config))
 
@@ -280,46 +228,6 @@ def addBuildFolderSymLinkToExistingConformer(sequenceID:str, buildStrategyID:str
     path_down_to_source = 'Sequences/' + sequenceID + '/' + buildStrategyID + '/All_Builds/' + conformerID
     log.debug("Creating symlink in " + parent_dir + " between " + path_down_to_dest_dir + " called " + conformerID + " to " + path_down_to_source)
     commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, conformerID, parent_dir)
-
-
-## Oliver: Change this to be for default structures, or delete
-# def createSequenceProjectSymlinks(projectDir : str):
-#     # Generate symbolic links within project directories
-#     log.info("createSequenceProjectSymlinks() was called.")
-#     try:
-#         log.debug("Changing to the project diretctory for making more.")
-#         os.chdir(projectDir)
-#     except Exception as error:
-#         log.error("Could not chdir to the project directory: " + projectDir)
-#         raise error
-#     # TODO:  write in logic for:
-#     #     evaluate.determineDefaultStructures()
-#     if os.path.exists("New_Builds/structure/structure.pdb"):
-#         default_unminimized="New_Builds/structure/structure.pdb"
-#         default="New_Builds/structure/mol_min.pdb"
-#         structure="New_Builds/structure"
-#     elif os.path.exists("Existing_Builds/structure/structure.pdb"):
-#         default_unminimized="Existing_Builds/structure/structure.pdb"
-#         default="Existing_Builds/structure/mol_min.pdb"
-#         structure="Existing_Builds/structure"
-#     else:
-#         log.error("Cannot find the default unminimized structure.")
-#     try:
-# #        make_relative_symbolic_link(
-# #                path_down_to_source : str, 
-# #                path_down_to_dest_dir : str , 
-# #                dest_link_label : str, 
-# #                parent_directory : str
-# #                )
-#         commonlogic.make_relative_symbolic_link( default_unminimized, 'defaults' , 'default_unminimized.pdb', None)
-#         commonlogic.make_relative_symbolic_link( default, 'defaults' , 'default.pdb', None)
-#         commonlogic.make_relative_symbolic_link( structure,'defaults/Requested_Builds' , 'structure', None)
-#     except Exception as error:
-#         log.error("Could not make one or mor symlinks in Create Project symlinks")
-#         raise error
- 
-
-
 
 
 

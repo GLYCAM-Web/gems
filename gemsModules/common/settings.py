@@ -82,6 +82,12 @@ helpDict = {
     'ReturnSchema'      : 'schemaLocation'
 }
 
+##
+##
+## Notices Generator Data
+##
+## The key in the following dictionaries is called noticeBrief 
+##
 ## Information about error messages this entity/module might return.
 ExitTypes = {
     'NoEntityDefined':'error',
@@ -147,48 +153,51 @@ ExitMessages = {
     'UnknownError':'We really have no idea what went wrong.'
 }
 
-## TODO Make this sort of thing ultimately part of transaction.py (eg Notice class).
-def appendCommonParserNotice(theTransaction )  :
-    # Build the notice for older code
-        if theTransaction.response_dict is None:
-            theTransaction.response_dict={}
-            theTransaction.response_dict['entity']={}
-    
-        if theTransaction.response_dict['entity'] is None:
-            theTransaction.response_dict['entity']={}
-    
-        if not 'type' in theTransaction.response_dict['entity']:
-            theTransaction.response_dict['entity']['type'] = 'CommonServicer'
-    
-    
-        if not 'responses' in theTransaction.response_dict['entity']:
-            theTransaction.response_dict['entity']['responses']=[]
-    
-        theTransaction.response_dict['entity']['responses'].append({
-                'CommonServicerNotice' : {
-                'type' : ExitTypes[noticeBrief],
-                'notice' : {
-                    'code' : ExitCodes[noticeBrief],
-                    'brief' : noticeBrief,
-                    'blockID' : scope,
-                    'message' : ExitMessages[noticeBrief],
-                    }
-                }})
-    
+##
+## This can probably go very soon
+##
+#def appendCommonParserNotice(theTransaction )  :
+#    # Build the notice for older code
+#        if theTransaction.response_dict is None:
+#            theTransaction.response_dict={}
+#            theTransaction.response_dict['entity']={}
+#    
+#        if theTransaction.response_dict['entity'] is None:
+#            theTransaction.response_dict['entity']={}
+#    
+#        if not 'type' in theTransaction.response_dict['entity']:
+#            theTransaction.response_dict['entity']['type'] = 'CommonServicer'
+#    
+#    
+#        if not 'responses' in theTransaction.response_dict['entity']:
+#            theTransaction.response_dict['entity']['responses']=[]
+#    
+#        theTransaction.response_dict['entity']['responses'].append({
+#                'CommonServicerNotice' : {
+#                'type' : ExitTypes[noticeBrief],
+#                'notice' : {
+#                    'code' : ExitCodes[noticeBrief],
+#                    'brief' : noticeBrief,
+#                    'blockID' : scope,
+#                    'message' : ExitMessages[noticeBrief],
+#                    }
+#                }})
+#    
 
+# ## See above for definition of noticeBrief
 def generateCommonParserNotice(
-        noticeBrief : str = 'UnknownError' , 
-        scope : str = None,
-        messagingEntity : str = None ,
-        exitType : str = None,
-        exitCode : str = None,
-        exitMessage : str = None,
-        additionalInfo : Dict = None
+        noticeBrief     : str  = 'UnknownError' ,  # Lookup keyword for the error
+        scope           : str  = None,             # Is this from entity? service? transaction?
+        messagingEntity : str  = None,             # Which entity sends this message?
+        exitType        : str  = None,             # Error, Warning, Info
+        exitCode        : str  = None,             # Numeric code because those can be useful
+        exitMessage     : str  = None,             # Human-readable brief description
+        additionalInfo  : Dict = None              # Free-form dictionary of data to return 
         ):
     log.info("generateCommonParserNotice() was called.\n")
 
     if ExitTypes[noticeBrief] is None :
-        log.info("Unknown noticeBrief, '" + noticeBrief + "', sent to appendCommonParserNotice() \n")
+        log.info("Unknown noticeBrief, '" + noticeBrief + "', sent to generateCommonParserNotice() \n")
         noticeBrief = 'UnknownError'
 
     if messagingEntity is None :

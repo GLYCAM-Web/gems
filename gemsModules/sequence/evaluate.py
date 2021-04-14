@@ -72,48 +72,6 @@ def getLinkageOptionsFromGmmlcbBuilder(sequence):
     log.debug("gemsLinkageGeometryOptions: " + repr(gemsLinkageGeometryOptions))
     return gemsLinkageGeometryOptions
 
-#### REMOVE after 2021-08-01 if not needed before then
-##  @brief Pass a sequence, get linkage options.
-#   @param  str sequence 
-# #   @return dict linkages
-# def getLinkageOptionsFromBuilder(sequence):
-#     log.info("getLinkageOptionsFromBuilder() was called.\n")
-#     from gemsModules.sequence import build
-#     cbBuilder = build.getCbBuilderForSequence(sequence)
-#     userOptionsString = cbBuilder.GenerateUserOptionsJSON()
-#     userOptionsJSON = json.loads(userOptionsString)
-#     optionsResponses = userOptionsJSON['responses']
-#     for response in optionsResponses:
-#         log.debug("response.keys: " + str(response.keys()))
-#         if 'Evaluate' in response.keys():
-#             if "glycosidicLinkages" in response['Evaluate'].keys():
-#                 linkages = response['Evaluate']['glycosidicLinkages']
-#                 if linkages != None:
-#                     ## Creating a new dict that can hold a new, derived field.
-#                     updatedLinkages = []
-#                     for element in linkages:
-#                         log.debug("element: " + str(element))
-#                         if element == None:
-#                             return None
-#                         copy = {}
-#                         for key in element.keys():
-#                             log.debug("key: " + key)
-#                             log.debug("element[" + key + "]: " + str(element[key]))
-#                             copy[key] = {}
-#                             for gmmlKey in element[key]:
-#                                 copy[key].update({
-#                                     gmmlKey : element[key][gmmlKey],
-#                                     'linkageSequence' : element[key]['linkageName']
-#                                 })
-#                         updatedLinkages.append(copy)
-#                 else:
-#                     return None
-#             else: 
-#                 return None
-
-#     log.debug("updatedLinkages: " + str(updatedLinkages))
-#     return updatedLinkages
-
 
 ##  @brief Pass a sequence, get linkage options.
 #   @param  str sequence 

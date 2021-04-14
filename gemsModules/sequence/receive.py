@@ -90,9 +90,11 @@ def receive(receivedTransaction : sequenceio.Transaction):
             from gemsModules.sequence import evaluate
             try:
                 thisTransaction.evaluateCondensedSequence()
-                ##Build the Default structure.
-                from gemsModules.sequence import logic
-                thisTransaction.manageSequenceRequest()
+                if thisTransaction.entity.inputs.evaluationOptions is not None :
+                    if thisTransaction.entity.inputs.evaluationOptions.noBuild is False : 
+                        ##Build the Default structure.  
+                        from gemsModules.sequence import logic 
+                        thisTransaction.manageSequenceRequest(defaultOnly=True)
             except Exception as error:
                 log.error("There was a problem evaluating the condensed sequence: " + str(error)) 
                 log.error(traceback.format_exc())

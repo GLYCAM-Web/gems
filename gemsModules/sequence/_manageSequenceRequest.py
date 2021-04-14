@@ -7,7 +7,7 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__)
 
-def manageSequenceRequest(self) :
+def manageSequenceRequest(self, defaultOnly : bool = False) :
     log.info("manageSequenceRequest was called ")
     from typing import List
     from gemsModules.sequence import structureInfo, projects, logic, build
@@ -138,12 +138,14 @@ def manageSequenceRequest(self) :
                 self.transaction_out.entity.outputs.sequenceEvaluationOutput.buildOptions = sequenceio.TheBuildOptions()
             self.transaction_out.entity.outputs.sequenceEvaluationOutput.buildOptions.mdMinimize = False
         #
+Make a switch for this that is settable somewhere...
         # Do the building of the structures
+        # ## TODO:  Make it possible to easily switch between these without needing to comment/uncomment
         #   using a blocking method:
-        build.buildEach3DStructureInStructureInfo(self)
+        # build.buildEach3DStructureInStructureInfo(self)
         #   using a non-blocking method:
-        #p = logic.EverLastingProcess(target=build.buildEach3DStructureInStructureInfo, args=(self,), daemon=False)
-        #p.start()
+        p = logic.EverLastingProcess(target=build.buildEach3DStructureInStructureInfo, args=(self,), daemon=False)
+        p.start()
         #
         #sequenceProjects.createDefaultSymLinkBuildsDirectory(projectDir, buildDir + conformerID)
             ##  create downloadUrl

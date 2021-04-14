@@ -111,14 +111,14 @@ class AllLinkageRotamerData(BaseModel):
     totalPossibleRotamers : int = 0
 
 class TheLinkageGeometryOptions(BaseModel) :
-    linkageRotamersList : AllLinkageRotamerData = []
+    allLinkageRotamersData : AllLinkageRotamerData = None 
     
     def getRotamerData(self) :
         log.info("LinkageGeometryOptions.getRotamerDataIn was called")
-        if self.linkageRotamersList is None :
+        if self.allLinkageRotamersData is None :
             return None
         else :
-            return self.linkageRotamersList
+            return self.allLinkageRotamersData
 
 
 ##   @class Single3DStructureBuildDetails
@@ -308,6 +308,8 @@ class TheBuildOptions(BaseModel):
             True,
             title = 'Minimize structure using MD',
             )
+    numberStructuresHardLimit : int = 64  ## Website or API calls will enforce this
+                                          ## Set to -1 to get all of them (BEWARE!)
 
     def __init__(self, **data : Any):
         super().__init__(**data)
@@ -317,17 +319,34 @@ class TheBuildOptions(BaseModel):
         log.debug("validatedSequence: " + validatedSequence)
         self.geometryOptions = TheGeometryOptions()
         self.geometryOptions.setLinkages(validatedSequence)
+    
+    def getRotamerData(self) :
+        log.info("buildOptions.getRotamerDataOut was called")
+        if self.geometryOptions is None :
+            return None
+        else :
+            return self.geometryOptions.getRotamerData()
+
 
 class TheDrawOptions(BaseModel):
     """Options for drawing 2D models"""
     Labeled : bool = True 
 
 
+class TheEvaluationOptions(BaseModel):
+    """Options for sequence evaluations"""
+    validateOnly     : bool = False  # Stop after setting sequenceIsValid and return answer
+    evaluateForBuild : bool = False  # Is this an evaluation as part of an explicit build request?
+    noBuild          : bool = False  # Just do a full evaluation ; don't do the default example build
+
 class TheSequenceEvaluationOutput(BaseModel):
-    sequenceIsValid : bool = False
-    validateOnly : bool = False
-    sequenceVariants: TheSequenceVariants = None
-    buildOptions : TheBuildOptions = Field(
+    sequenceIsValid   : bool = False  # Determine if the sequence has proper syntax, etc.
+    sequenceVariants  : TheSequenceVariants  = None
+    evaluationOptions : TheEvaluationOptions = Field(
+            None,
+            description="Options for evaluating the sequence."
+            )
+    buildOptions      : TheBuildOptions      = Field(
             None,
             description="Options for building the 3D Structure of the sequence."
             )
@@ -339,6 +358,13 @@ class TheSequenceEvaluationOutput(BaseModel):
     def __init__(self, **data : Any):
         super().__init__(**data)
 
+    def getRotamerData(self) :
+        log.info("sequenceEvaluationOutput.getRotamerDataOut was called")
+        if self.buildOptions is None :
+            return None
+        else :
+            return self.buildOptions.getRotamerData()
+
     def getEvaluation(self, sequence:str, validateOnly):
         log.info("Getting the Evaluation for SequenceEvaluationOutput.")
 
@@ -347,7 +373,10 @@ class TheSequenceEvaluationOutput(BaseModel):
 
         from gemsModules.sequence import evaluate
 
-        self.validateOnly = validateOnly
+        if self.evaluationOptions is None :
+            self.evaluationOptions = TheEvaluationOptions()
+
+        self.evaluationOptions.validateOnly = validateOnly
         self.sequenceIsValid = evaluate.checkIsSequenceSane(sequence)
         log.debug("self.sequenceIsValid: " + str(self.sequenceIsValid))
 
@@ -356,7 +385,7 @@ class TheSequenceEvaluationOutput(BaseModel):
             self.sequenceVariants = evaluate.getSequenceVariants(sequence)
             log.debug("Just got sequence variants.  They are:")
             log.debug(str(self.sequenceVariants))
-        if self.sequenceIsValid and not self.validateOnly :
+        if self.sequenceIsValid and not self.evaluationOptions.validateOnly :
             self.buildOptions = TheBuildOptions()
             self.buildOptions.setGeometryOptions(sequence)
             
@@ -372,47 +401,6 @@ class TheSequenceEvaluationOutput(BaseModel):
         else :
             return self.sequenceVariants[variant]
 
-
-#class OLD_DEPRECATED_TheBuild3DStructureOutput(BaseModel):
-#    payload : str =  ""
-#    sequence : str  = ""
-#    seqID : str = ""
-#    conformerID : str = ""
-#    conformerLabel : str = ""
-#    subDirectory : str = ""
-#    downloadUrl : str = ""
-#
-#    def __init__(self, **data : Any):
-#        super().__init__(**data)
-#
-#        log.debug("These are the values at initialization of Build3DStructureOutput")
-#        log.debug("payload(projectID): " + self.payload)
-#        log.debug("sequence: " + self.sequence)
-#        log.debug("seqID: " + self.seqID)
-#        log.debug("conformerID: " + self.conformerID)
-#        log.debug("conformerLabel: " + self.conformerID)
-#        log.debug("subDirectory: " + self.subDirectory)
-#        log.debug("downloadUrl: " + self.downloadUrl)
-#
-##    def getTheOutput(self, payload:str, sequence:str, seqID:str, conformerID:str, conformerLabel:str):
-#
-#    def setSubDirectory(self) :
-#        self.subDirectory = '/Requested_Builds/' + conformerID + '/'
-#    def setDownloadUrl(self) :
-#        self.downloadUrl = projectUtils.getDownloadUrl(payload, "cb", self.conformerID)
-#    def setSeqID(self) :
-#        if self.sequence is "" :
-#            error = "Cannot derive a seqID from an empty sequence string"
-#            log.error(error)
-#            raise error
-#        self.seqID = projectUtils.getSeqIDForSequence(self.sequence)
-#    
-#    def getSubDirectory(self) :
-#        return self.subDirectory 
-#    def getDownloadUrl(self) :
-#        return self.downloadUrl
-#    def getSeqID(self) :
-#        return self.seqID
 
 # ## These do not need to be named with 'sequence, e.g., 'sequenceService'.  
 # ## Doing that just makes me feel more comfortable about referencing things.
@@ -466,13 +454,21 @@ class SequenceOutputs(BaseModel) :
         else : 
             return self.structureBuildInfo.getSequence()
 
+    def getRotamerData(self) :
+        log.info("evaluate.getRotamerData was called")
+        if self.sequenceEvaluationOutput is None :
+            return None
+        else :
+            return self.sequenceEvaluationOutput.getRotamerData()
+
 class SequenceInputs(BaseModel) :
-    sequence : TheSequence = None
-    sequenceVariants : TheSequenceVariants = None
+    sequence               : TheSequence               = None
+    sequenceVariants       : TheSequenceVariants       = None
     systemSolvationOptions : TheSystemSolvationOptions = None 
-    geometryOptions : TheGeometryOptions = None 
-    buildOptions : TheBuildOptions = None 
-    drawOptions : TheDrawOptions = None
+    geometryOptions        : TheGeometryOptions        = None 
+    buildOptions           : TheBuildOptions           = None 
+    evaluationOptions      : TheEvaluationOptions      = None
+    drawOptions            : TheDrawOptions            = None
 
 class sequenceEntity(commonio.Entity):
     """Holds information about the main object responsible for a service."""
@@ -523,6 +519,15 @@ class sequenceEntity(commonio.Entity):
         else :
             return self.inputs.geometryOptions.getRotamerData()
 
+    def getRotamerDataOut(self) :
+        log.info("Entity.getRotamerDataOut was called")
+        if self.outputs is None :
+            return None
+        elif self.outputs.geometryOptions is None :
+            return None
+        else :
+            return self.outputs.geometryOptions.getRotamerData()
+
     # ## I'm certain there is a better way to do this.  - Lachele
     def getSequenceVariantIn(self, variant) :
         log.info("sequenceEntity.getSequenceVariantIn was called")
@@ -557,7 +562,7 @@ class sequenceEntity(commonio.Entity):
                     scope='SequenceEntity',
                     additionalInfo=thisAdditionalInfo
                     )
-            raise error
+            raise 
         if self.inputs.sequence is None :
             thisAdditionalInfo={'hint':'The entity has inputs but cannot find Sequence Payload.'}
             self.generateCommonParserNotice(
@@ -565,7 +570,7 @@ class sequenceEntity(commonio.Entity):
                     scope='SequenceEntityInputs',
                     additionalInfo=thisAdditionalInfo
                     )
-            raise error
+            raise 
         sequence=self.inputs.sequence.payload
         if sequence is None or "" :
             thisAdditionalInfo={'hint':'The entity a Sequence but cannot find Sequence Payload.'}
@@ -574,7 +579,7 @@ class sequenceEntity(commonio.Entity):
                     scope='SequenceEntityInputSequence',
                     additionalInfo=thisAdditionalInfo
                     )
-            raise error
+            raise 
         if self.outputs is None :
             self.outputs = SequenceOutputs()
         if self.outputs.sequenceEvaluationOutput is None :
@@ -609,6 +614,13 @@ class sequenceTransactionSchema(commonio.TransactionSchema):
             return None
         else :
             return self.entity.getRotamerDataIn()
+
+    def getRotamerDataOut(self) :
+        log.info("Transaction.getRotamerDataOut was called")
+        if self.entity is None :
+            return None
+        else :
+            return self.entity.getRotamerDataOut()
 
     def getBuildStrategyIDOut(self) :
         if self.entity is None : 
@@ -677,6 +689,13 @@ class Transaction(commonio.Transaction):
             return None
         else :
             return self.transaction_in.getRotamerDataIn()
+
+    def getRotamerDataOut(self) :
+        log.info("Transaction-Wrapper.getRotamerDataOut was called")
+        if self.transaction_out is None :
+            return None
+        else :
+            return self.transaction_out.getRotamerDataOut()
 
     # ## I'm certain there is a better way to do this.  - Lachele
     def getInputSequencePayload(self) :
@@ -789,7 +808,7 @@ class Transaction(commonio.Transaction):
         self.transaction_out.evaluateCondensedSequence() 
 
 # In file _manageSequenceRequest.py: 
-#    def manageSequenceRequest(self) 
+#    def manageSequenceRequest(self, defaultOnly : bool = False) 
     from gemsModules.sequence._manageSequenceRequest import manageSequenceRequest
 
 
