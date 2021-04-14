@@ -197,8 +197,8 @@ class Single3DStructureBuildDetails(BaseModel):
 
     def setSubDirectory(self) :
         self.subDirectory = '/Requested_Builds/' + conformerID + '/'
-    def setDownloadUrl(self) :
-        self.downloadUrl = projectUtils.getDownloadUrl(payload, "cb", self.conformerID)
+    def setDownloadUrl(self, pUUID) :
+        self.downloadUrl = projectUtils.getDownloadUrl(pUUID, "cb", self.conformerLabel)
     def setSeqID(self) :
         if self.sequence is "" :
             error = "Cannot derive a seqID from an empty sequence string"
@@ -385,6 +385,20 @@ class TheSequenceEvaluationOutput(BaseModel):
             self.sequenceVariants = evaluate.getSequenceVariants(sequence)
             log.debug("Just got sequence variants.  They are:")
             log.debug(str(self.sequenceVariants))
+###
+###   Fix these....
+### 
+            log.debug("indexOrdered: " + str(self.sequenceVariants['indexOrdered']))
+            reducingSuffix = self.sequenceVariants['indexOrdered'][-7:]
+            log.debug("reducingSuffix: " + reducingSuffix)
+            log.debug("# of '-': " + str(reducingSuffix.count('-')))
+            if 2 == reducingSuffix.count('-'):
+                lastIndex = self.sequenceVariants['indexOrdered'].rfind('-')
+                log.debug("lastIndex of '-': " + str(lastIndex))
+                self.sequenceVariants['indexOrdered'] = self.sequenceVariants['indexOrdered'][:lastIndex - 2] + self.sequenceVariants['indexOrdered'][lastIndex:]
+                log.debug("indexOrdered: " + self.sequenceVariants['indexOrdered'])
+            ##DGlcpNAcb1-1-OH
+
         if self.sequenceIsValid and not self.evaluationOptions.validateOnly :
             self.buildOptions = TheBuildOptions()
             self.buildOptions.setGeometryOptions(sequence)

@@ -101,7 +101,7 @@ def countNumberOfShapesUpToLimit(rotamerData : [], hardLimit = 1):
 #           list of unique permutations possible for those selections.
 #   @param Transaction 
 #   @TODO: Move this to a better file for this stuff.
-def buildStructureInfoOliver(thisTransaction : sequenceio.Transaction):
+def buildStructureInfoOliver(thisTransaction : sequenceio.Transaction, pUUID : str):
     log.info("buildStructureInfo() was called.")
 
     structureInfo = sequenceio.StructureBuildInfo()
@@ -227,6 +227,9 @@ def buildStructureInfoOliver(thisTransaction : sequenceio.Transaction):
                 buildState.solventShape = solventShape
             buildState.date = date
             buildState.addIons = addIons
+            buildState.setDownloadUrl(pUUID)
+
+
             structureInfo.individualBuildDetails.append(buildState)    
     return structureInfo
 

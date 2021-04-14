@@ -61,7 +61,7 @@ def manageSequenceRequest(self, defaultOnly : bool = False) :
     if self.transaction_out.entity.outputs.structureBuildInfo is None :
         self.transaction_out.entity.outputs.structureBuildInfo=sequenceio.StructureBuildInfo()
     try:
-        thisStructureInfo = structureInfo.buildStructureInfoOliver(self)
+        thisStructureInfo = structureInfo.buildStructureInfoOliver(self, self.transaction_out.project.pUUID)
         self.transaction_out.entity.outputs.structureBuildInfo= thisStructureInfo
         #thisStructureInfo.buildStates[0].energy=8.8888  # to test change-making
         log.debug("structureInfo: " + thisStructureInfo.json(indent=2))
@@ -90,6 +90,8 @@ def manageSequenceRequest(self, defaultOnly : bool = False) :
         log.error("There was a problem saving the request info: " + str(error))
         log.error(traceback.format_exc())
         raise error
+
+
     try:
         ## Here we need to setup project folder, create some symLinks etc, before we get into each buildState
         ## Not happy with the organization of this logic. Too much state being passed around and similar code!
@@ -142,7 +144,7 @@ Make a switch for this that is settable somewhere...
         # Do the building of the structures
         # ## TODO:  Make it possible to easily switch between these without needing to comment/uncomment
         #   using a blocking method:
-        # build.buildEach3DStructureInStructureInfo(self)
+        #build.buildEach3DStructureInStructureInfo(self)
         #   using a non-blocking method:
         p = logic.EverLastingProcess(target=build.buildEach3DStructureInStructureInfo, args=(self,), daemon=False)
         p.start()
