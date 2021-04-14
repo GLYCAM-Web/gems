@@ -197,8 +197,8 @@ class Single3DStructureBuildDetails(BaseModel):
 
     def setSubDirectory(self) :
         self.subDirectory = '/Requested_Builds/' + conformerID + '/'
-    def setDownloadUrl(self) :
-        self.downloadUrl = projectUtils.getDownloadUrl(payload, "cb", self.conformerID)
+    def setDownloadUrl(self, pUUID) :
+        self.downloadUrl = projectUtils.getDownloadUrl(pUUID, "cb", self.conformerLabel)
     def setSeqID(self) :
         if self.sequence is "" :
             error = "Cannot derive a seqID from an empty sequence string"
