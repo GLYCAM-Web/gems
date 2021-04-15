@@ -13,39 +13,37 @@
 		       	"geometryOptions": { 
 				"linkages": { 
 					"linkageRotamerInfo":{
-					       "singleLinkageRotamerDataList" : [ 
-						{ 
-							"indexOrderedLabel": "6", 
-							"linkageLabel": "6", 
-							"selectedRotamers": [ 
-								{ 
-									"dihedralName": "omg", 
-									"dihedralValues": [ 
-										"gg", "gt", "tg" ] 
-								}, 
-								{ 
-									"dihedralName": "phi", 
-									"dihedralValues": [ 
-										"t", "-g" ] 
-								} 
-							] 
-						} ,
-						{ 
-							"indexOrderedLabel": "8", 
-							"linkageLabel": "8", 
-							"selectedRotamers": [ 
-								{ 
-									"dihedralName": "omg", 
-									"dihedralValues": [ 
-										"gg", "gt" ] 
-								} 
-							] 
-						} 
-						],
-					"totalLikelyRotamers": 12, 
-					"totalPossibleRotamers": 18 
+				       "singleLinkageRotamerDataList" : [ 
+							{ 
+								"indexOrderedLabel": "6", 
+								"linkageLabel": "6", 
+								"selectedRotamers": [ 
+									{ 
+										"dihedralName": "omg", 
+										"dihedralValues": [ 
+											"gg", "gt", "tg" ] 
+									}, 
+									{ 
+										"dihedralName": "phi", 
+										"dihedralValues": [ 
+											"t", "-g" ] 
+									} 
+								] 
+							} ,
+							{ 
+								"indexOrderedLabel": "8", 
+								"linkageLabel": "8", 
+								"selectedRotamers": [ 
+									{ 
+										"dihedralName": "omg", 
+										"dihedralValues": [ 
+											"gg", "gt" ] 
+									} 
+								] 
+							} 
+						]
 					} 
-			    	} 
+			    } 
 			}
 		}
 	},
