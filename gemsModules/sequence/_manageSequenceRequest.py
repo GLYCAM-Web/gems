@@ -60,6 +60,7 @@ def manageSequenceRequest(self, defaultOnly : bool = False) :
         self.transaction_out.entity.outputs=sequenceio.SequenceOutputs()
     if self.transaction_out.entity.outputs.structureBuildInfo is None :
         self.transaction_out.entity.outputs.structureBuildInfo=sequenceio.StructureBuildInfo()
+        log.debug("structureBuildInfo: " + str(self.transaction_out.entity.outputs.structureBuildInfo))
     try:
         thisStructureInfo = structureInfo.buildStructureInfoOliver(self, self.transaction_out.project.pUUID)
         self.transaction_out.entity.outputs.structureBuildInfo= thisStructureInfo
