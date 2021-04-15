@@ -106,6 +106,7 @@ def receive(receivedTransaction : sequenceio.Transaction):
                 from gemsModules.sequence import evaluate
                 thisTransaction.evaluateCondensedSequence()
                 valid = thisTransaction.transaction_out.entity.outputs.sequenceEvaluationOutput.sequenceIsValid
+                thisTransaction.setIsEvaluationForBuild(True)
             except Exception as error:
                 log.error("There was a problem evaluating the condensed sequence: " + str(error)) 
                 log.error(traceback.format_exc())

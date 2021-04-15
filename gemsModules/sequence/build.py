@@ -79,7 +79,7 @@ def buildEach3DStructureInStructureInfo(thisTransaction : sequenceio.Transaction
     try :
         theStructureBuildInfo = thisTransaction.getStructureBuildInfoOut()
         if theStructureBuildInfo.indexOrderedSequence is "" :
-            theStructureBuildInfo.setSequence(thisTransaction.getSequenceVariantOut('IndexOrdered'))
+            theStructureBuildInfo.setSequence(thisTransaction.getSequenceVariantOut('indexOrdered'))
             theStructureBuildInfo.setSeqID(theStructureBuildInfo.indexOrderedSequence)
         thisBuildStrategyID   = theStructureBuildInfo.getBuildStrategyID()
         thisSeqID             = thisTransaction.getSeqIDOut()
@@ -119,7 +119,7 @@ def buildEach3DStructureInStructureInfo(thisTransaction : sequenceio.Transaction
 #                print("1.2.0.1")
                 needToInstantiateCarbohydrateBuilder = False # Only ever do this once.
                 # ## the following should probably use the indexOrdered sequence, but that doesn't work...
-                inputSequence = thisTransaction.getSequenceVariantOut('userSupplied')          
+                inputSequence = thisTransaction.getSequenceVariantOut('indexOrdered')          
                 log.debug("About to getCbBuilderForSequence: " + inputSequence)
                 builder = getCbBuilderForSequence(inputSequence)
 #            print("1.2.1")

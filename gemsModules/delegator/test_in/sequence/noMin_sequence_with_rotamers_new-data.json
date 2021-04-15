@@ -49,5 +49,6 @@
 			}
 		}
 	},
-	"prettyPrint" : true
+	"prettyPrint" : true,
+	"mdMinimize" : false
 }

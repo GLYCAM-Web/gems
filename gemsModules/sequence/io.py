@@ -42,27 +42,24 @@ class TheSequence(BaseModel) :
 class TheSequenceVariants(BaseModel):
     """Different representations of the sequence."""
     # condensed sequence types
-    IndexOrder : str = None # key is 'indexOrdered' ???
-    LongestChainOrder : str = None
-    UserOrdered : str = None
-    MonospacedTextDiagram : str = None
+    indexOrdered : str = None # key is 'indexOrdered' ???
+    longestChainOrdered : str = None
+    userOrdered : str = None
+    monospacedTextDiagram : str = None
     # ... labeled
-    IndexOrderLabeled : str = None
-    LongestChainOrderLabeled : str = None
-    UserOrderedLabeled : str = None
-    MonospacedTextDiagramLabeled : str = None
+    indexOrderedLabeled : str = None
+    longestChainOrderedLabeled : str = None
+    userOrderedLabeled : str = None
+    monospacedTextDiagramLabeled : str = None
     # other condensed sequence representations
-    Suuid : str = None
-    Smd5sum : str = None
+    suuid : str = None
+    smd5sum : str = None
 
     # ## I'm certain there is a better way to do this.  - Lachele
     def getSequenceVariant(self, variant) :
         log.info("TheSequenceVariants.getSequenceVariant was called")
-        theVariant=self.dict()[variant].get()
-        if theVariant is None :
-            return None
-        else :
-            return theVariant
+        theVariant = getattr(self, variant)
+        return theVariant
 
 
 class Definitions(BaseModel):
@@ -89,7 +86,7 @@ class TheRotamerDihedralInfo(BaseModel):
     dihedralName : str = None # phi, psi etc. Use Enum above once anything works :(
     dihedralValues : List[str] = [] # gg, -g, tg, etc
 
-class TheLinkageRotamerData(BaseModel): 
+class SingleLinkageRotamerData(BaseModel): 
     indexOrderedLabel : str = None
     linkageLabel : str = None
     linkageName : str = None
@@ -104,22 +101,19 @@ class TheResidueGeometryOptions(BaseModel):
     """Geometry options for residues"""
     ringPuckers : List[TheResidueRingPucker] = []
 
-class AllLinkageRotamerData(BaseModel):
+class AllLinkageRotamerInfo(BaseModel):
     """Geometry options for linkages"""
-    linkageRotamerData : List[TheLinkageRotamerData] = []
+    singleLinkageRotamerDataList : List[SingleLinkageRotamerData] = []
     totalLikelyRotamers : int = 0
     totalPossibleRotamers : int = 0
+    totalSelectedRotamers : int = 0
 
-class TheLinkageGeometryOptions(BaseModel) :
-    allLinkageRotamersData : AllLinkageRotamerData = None 
-    
-    def getRotamerData(self) :
-        log.info("LinkageGeometryOptions.getRotamerDataIn was called")
-        if self.allLinkageRotamersData is None :
-            return None
-        else :
-            return self.allLinkageRotamersData
+    def __init__(self, **data : Any):
+        super().__init__(**data)
 
+        if self.singleLinkageRotamerDataList != [] :
+            if self.totalPossibleRotamers == 0 :
+                self.totalPossibleRotamers = structureInfo.countNumberOfShapes(self)
 
 ##   @class Single3DStructureBuildDetails
 #    @brief An object that represents one requested build state and its outputs
@@ -278,26 +272,46 @@ class StructureBuildInfo(BaseModel):
     def getSeqID(self) :
         return self.seqID
 
+class TheLinkageGeometryOptions(BaseModel) :
+    linkageRotamerInfo : AllLinkageRotamerInfo = None
+
+    def getRotamerData(self) :
+        log.info("Linkage GeometryOptions.getRotamerData was called")
+        if self.linkageRotamerInfo is None :
+            return None
+        else :
+            return self.linkageRotamerInfo
+
+    def setLinkageRotamerInfo(self, validatedSequence : str):
+        from gemsModules.sequence import evaluate
+        self.linkageRotamerInfo = evaluate.getLinkageOptionsFromGmmlcbBuilder(validatedSequence)
+        log.debug(self.linkageRotamerInfo.json())
+
 # I can't figure out if I can pass gmml classes to functions here, so I just 
 # wrote getLinkageOptionsFromGmmlcbBuilder.
 class TheGeometryOptions(BaseModel):
     residues : TheResidueGeometryOptions = None # Not yet handled.
-    linkages : TheLinkageGeometryOptions = None
+    linkages : TheLinkageGeometryOptions = None 
 
     def __init__(self, **data : Any):
         super().__init__(**data)
 
     def getRotamerData(self) :
-        log.info("GeometryOptions.getRotamerDataIn was called")
+        log.info("GeometryOptions.getRotamerData was called")
         if self.linkages is None :
             return None
+        elif self.linkages.linkageRotamerInfo is None :
+            return None
         else :
-            return self.linkages.getRotamerData()
+            return self.linkages.linkageRotamerInfo
 
-    def setLinkages(self, validatedSequence : str):
-        from gemsModules.sequence import evaluate
-        self.linkages = evaluate.getLinkageOptionsFromGmmlcbBuilder(validatedSequence)
-        log.debug(self.linkages.json())
+    def setLinkageRotamerInfo(self, validatedSequence : str):
+        if self.linkages is None :
+            self.linkages = TheLinkageGeometryOptions()
+        self.linkages.setLinkageRotamerInfo(validatedSequence)
+#        from gemsModules.sequence import evaluate
+#        self.linkages = evaluate.getLinkageOptionsFromGmmlcbBuilder(validatedSequence)
+#        log.debug(self.linkages.json())
 
 class TheBuildOptions(BaseModel):
     """Options for building 3D models"""
@@ -308,8 +322,8 @@ class TheBuildOptions(BaseModel):
             True,
             title = 'Minimize structure using MD',
             )
-    numberStructuresHardLimit : int = 64  ## Website or API calls will enforce this
-                                          ## Set to -1 to get all of them (BEWARE!)
+    numberStructuresHardLimit : int = None  ## Website or API calls will enforce 64
+                                            ## Set to -1 to get all of them (BEWARE!)
 
     def __init__(self, **data : Any):
         super().__init__(**data)
@@ -318,7 +332,7 @@ class TheBuildOptions(BaseModel):
         log.info("Setting geometryOptions in BuildOptions")
         log.debug("validatedSequence: " + validatedSequence)
         self.geometryOptions = TheGeometryOptions()
-        self.geometryOptions.setLinkages(validatedSequence)
+        self.geometryOptions.setLinkageRotamerInfo(validatedSequence)
     
     def getRotamerData(self) :
         log.info("buildOptions.getRotamerDataOut was called")
@@ -359,7 +373,7 @@ class TheSequenceEvaluationOutput(BaseModel):
         super().__init__(**data)
 
     def getRotamerData(self) :
-        log.info("sequenceEvaluationOutput.getRotamerDataOut was called")
+        log.info("sequenceEvaluationOutput.getRotamerData was called")
         if self.buildOptions is None :
             return None
         else :
@@ -386,17 +400,19 @@ class TheSequenceEvaluationOutput(BaseModel):
             log.debug("Just got sequence variants.  They are:")
             log.debug(str(self.sequenceVariants))
 ###
-###   Fix these....
+###   I think these are no longer needed.
 ### 
-            log.debug("indexOrdered: " + str(self.sequenceVariants['indexOrdered']))
-            reducingSuffix = self.sequenceVariants['indexOrdered'][-7:]
+            #log.debug("indexOrdered: " + str(self.sequenceVariants['indexOrdered']))
+            #reducingSuffix = self.sequenceVariants['indexOrdered'][-7:]
+            log.debug("indexOrdered: " + str(self.sequenceVariants.indexOrdered))
+            reducingSuffix = self.sequenceVariants.indexOrdered[-7:]
             log.debug("reducingSuffix: " + reducingSuffix)
             log.debug("# of '-': " + str(reducingSuffix.count('-')))
-            if 2 == reducingSuffix.count('-'):
-                lastIndex = self.sequenceVariants['indexOrdered'].rfind('-')
-                log.debug("lastIndex of '-': " + str(lastIndex))
-                self.sequenceVariants['indexOrdered'] = self.sequenceVariants['indexOrdered'][:lastIndex - 2] + self.sequenceVariants['indexOrdered'][lastIndex:]
-                log.debug("indexOrdered: " + self.sequenceVariants['indexOrdered'])
+#            if 2 == reducingSuffix.count('-'):
+#                lastIndex = self.sequenceVariants['indexOrdered'].rfind('-')
+#                log.debug("lastIndex of '-': " + str(lastIndex))
+#                self.sequenceVariants['indexOrdered'] = self.sequenceVariants['indexOrdered'][:lastIndex - 2] + self.sequenceVariants['indexOrdered'][lastIndex:]
+#                log.debug("indexOrdered: " + self.sequenceVariants['indexOrdered'])
             ##DGlcpNAcb1-1-OH
 
         if self.sequenceIsValid and not self.evaluationOptions.validateOnly :
@@ -413,7 +429,8 @@ class TheSequenceEvaluationOutput(BaseModel):
         if self.sequenceVariants is None :
             return None
         else :
-            return self.sequenceVariants[variant]
+            theVariant = getattr(self.sequenceVariants, variant)
+            return theVariant
 
 
 # ## These do not need to be named with 'sequence, e.g., 'sequenceService'.  
@@ -424,8 +441,9 @@ class TheSequenceEvaluationOutput(BaseModel):
 # ##      the first word is the modifier.  
 # ##          example:  sequenceService is a child of Service, modified by sequence
 # ##    - initial is upper case = this is not a child, except of BaseModel.
-# ##          example:  SequenceInputs is not a child of another classBuildDetails
-# $$ (Lachele)
+# ##          example:  SequenceInputs is not a child of another class
+# ## Feel free to change the naming conventions
+# ## (Lachele)
 class sequenceService(commonio.Service):
     """Holds information about a Service requested of the Sequence Entity."""
     typename : settings.Services = Field( 
@@ -445,9 +463,6 @@ class sequenceService(commonio.Service):
 ## This is a Response and should be called that
 class SequenceOutputs(BaseModel) : 
     sequenceEvaluationOutput : TheSequenceEvaluationOutput = None
-# ##  DEPRECATED    
-# ##          build3DStructureOutputs : List[TheBuild3DStructureOutput] = None
-# ##  Moved into structureBuildDetails.
     structureBuildInfo : StructureBuildInfo = None
 
     def getStructureBuildInfo(self) :
@@ -474,6 +489,7 @@ class SequenceOutputs(BaseModel) :
             return None
         else :
             return self.sequenceEvaluationOutput.getRotamerData()
+
 
 class SequenceInputs(BaseModel) :
     sequence               : TheSequence               = None
@@ -537,10 +553,8 @@ class sequenceEntity(commonio.Entity):
         log.info("Entity.getRotamerDataOut was called")
         if self.outputs is None :
             return None
-        elif self.outputs.geometryOptions is None :
-            return None
         else :
-            return self.outputs.geometryOptions.getRotamerData()
+            return self.outputs.getRotamerData()
 
     # ## I'm certain there is a better way to do this.  - Lachele
     def getSequenceVariantIn(self, variant) :
@@ -740,6 +754,79 @@ class Transaction(commonio.Transaction):
             return self.transaction_out.project.project_dir
 
 
+    def getIsEvaluationSetNoBuild(self) :
+        if all(v is not None for v in [
+            self.transaction_out, 
+            self.transaction_out.entity, 
+            self.transaction_out.entity.outputs, 
+            self.transaction_out.entity.outputs.sequenceEvaluationOutput,
+            self.transaction_out.entity.outputs.sequenceEvaluationOutput.evaluationOptions
+            ]):
+            return self.transaction_out.entity.outputs.evaluationOptions.noBuild
+        else :
+            return False  # the default value if not set otherwise
+    def setIsEvaluationSetNoBuild(self, value) :
+        if all(v is not None for v in [
+            self.transaction_out, 
+            self.transaction_out.entity, 
+            self.transaction_out.entity.outputs, 
+            self.transaction_out.entity.outputs.sequenceEvaluationOutput,
+            self.transaction_out.entity.outputs.sequenceEvaluationOutput.evaluationOptions
+            ]):
+            self.transaction_out.entity.outputs.evaluationOptions.noBuild=value
+        else :
+            self.generateCommonParserNotice(
+                    noticeBrief='GemsError', 
+                    additionalInfo={"hint":"cannot set noBuild option"})
+    def getIsEvaluationForBuild(self) :
+        if all(v is not None for v in [
+            self.transaction_out, 
+            self.transaction_out.entity, 
+            self.transaction_out.entity.outputs, 
+            self.transaction_out.entity.outputs.sequenceEvaluationOutput,
+            self.transaction_out.entity.outputs.sequenceEvaluationOutput.evaluationOptions
+            ]):
+            return self.transaction_out.entity.outputs.sequenceEvaluationOutput.evaluationOptions.evaluateForBuild
+        else :
+            return False  # the default value if not set otherwise
+    def setIsEvaluationForBuild(self, value) :
+        if all(v is not None for v in [
+            self.transaction_out, 
+            self.transaction_out.entity, 
+            self.transaction_out.entity.outputs, 
+            self.transaction_out.entity.outputs.sequenceEvaluationOutput,
+            self.transaction_out.entity.outputs.sequenceEvaluationOutput.evaluationOptions
+            ]):
+            self.transaction_out.entity.outputs.sequenceEvaluationOutput.evaluationOptions.evaluateForBuild=value
+        else :
+            self.generateCommonParserNotice(
+                    noticeBrief='GemsError', 
+                    additionalInfo={"hint":"cannot set evaluateForBuild option"})
+    def getNumberStructuresHardLimitIn(self) :
+        if all(v is not None for v in [
+            self.transaction_in, 
+            self.transaction_in.entity, 
+            self.transaction_in.entity.inputs, 
+            self.transaction_in.entity.inputs.buildOptions
+            ]):
+            return self.transaction_in.entity.inputs.buildOptions.numberStructuresHardLimit
+        else :
+            return None
+    def setNumberStructuresHardLimitOut(self, value) :
+        if all(v is not None for v in [
+            self.transaction_out, 
+            self.transaction_out.entity, 
+            self.transaction_out.entity.outputs, 
+            self.transaction_out.entity.outputs.sequenceEvaluationOutput,
+            self.transaction_out.entity.outputs.sequenceEvaluationOutput.buildOptions
+            ]):
+            self.transaction_out.entity.outputs.sequenceEvaluationOutput.buildOptions.numberStructuresHardLimit=value
+        else :
+            self.generateCommonParserNotice(
+                    noticeBrief='GemsError', 
+                    additionalInfo={"hint":"cannot set limit for number of structures"})
+            return None
+    # TODO - write all these if-not-None-return recursions to look like the ones above.
     def getSeqIDOut(self) :
         if self.transaction_out is None : 
             return None

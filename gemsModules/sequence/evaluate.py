@@ -29,14 +29,14 @@ def getLinkageOptionsFromGmmlcbBuilder(sequence):
     gmmllinkageOptionsVector = cbBuilder.GenerateUserOptionsDataStruct()
     log.debug("gmmllinkageOptionsVector: " + repr(gmmllinkageOptionsVector))
 
-    gemsLinkageGeometryOptions = sequenceio.AllLinkageRotamerData()
+    gemsLinkageGeometryOptions = sequenceio.AllLinkageRotamerInfo()
     gemsLinkageGeometryOptions.totalPossibleRotamers = cbBuilder.GetNumberOfShapes()
     likelyOnly = True
     gemsLinkageGeometryOptions.totalLikelyRotamers = cbBuilder.GetNumberOfShapes(likelyOnly)
 
     for gmmlLinkageOptions in gmmllinkageOptionsVector:
 
-        gemsLinkageOptions = sequenceio.TheLinkageRotamerData()
+        gemsLinkageOptions = sequenceio.SingleLinkageRotamerData()
 
         gemsLinkageOptions.indexOrderedLabel = gmmlLinkageOptions.indexOrderedLabel_
         gemsLinkageOptions.linkageName = gmmlLinkageOptions.linkageName_
@@ -67,7 +67,7 @@ def getLinkageOptionsFromGmmlcbBuilder(sequence):
             ## dihedralsWithOptions Needed for the website
             gemsLinkageOptions.dihedralsWithOptions.append(gemsRotamers.dihedralName)
 
-        gemsLinkageGeometryOptions.linkageRotamerData.append(gemsLinkageOptions)
+        gemsLinkageGeometryOptions.singleLinkageRotamerDataList.append(gemsLinkageOptions)
 
     log.debug("gemsLinkageGeometryOptions: " + repr(gemsLinkageGeometryOptions))
     return gemsLinkageGeometryOptions
@@ -76,24 +76,24 @@ def getLinkageOptionsFromGmmlcbBuilder(sequence):
 ##  @brief Pass a sequence, get linkage options.
 #   @param  str sequence 
 #   @return dict sequences
-def getSequenceVariants(sequence):
+def getSequenceVariants(validatedSequence : str):
     log.info("getSequenceVariants() was called.\n")
-    this_sequence = gmml.CondensedSequence(sequence)
+    this_sequence = gmml.CondensedSequence(validatedSequence)
     # ## 
     # ##  This function assumes that the validity of the sequence was determined elsewhere
     # ## 
-    # ##   So.... this is not needed....  :   if this_sequence.GetIsSequenceOkay()
-    Sequences = {}
-    Sequences['userSupplied']=sequence
-    Sequences['indexOrdered']= this_sequence.BuildLabeledCondensedSequence(
+    Sequences = sequenceio.TheSequenceVariants()
+
+    Sequences.userOrdered         = validatedSequence
+    Sequences.indexOrdered        = this_sequence.BuildLabeledCondensedSequence(
                     this_sequence.Reordering_Approach_LOWEST_INDEX,
                     this_sequence.Reordering_Approach_LOWEST_INDEX,
                     False) 
-    Sequences['longestChainOrdered']= this_sequence.BuildLabeledCondensedSequence(
+    Sequences.longestChainOrdered = this_sequence.BuildLabeledCondensedSequence(
                     this_sequence.Reordering_Approach_LONGEST_CHAIN,
                     this_sequence.Reordering_Approach_LONGEST_CHAIN,
                     False) 
-    Sequences['indexOrderedLabeled']= this_sequence.BuildLabeledCondensedSequence(
+    Sequences.indexOrderedLabeled = this_sequence.BuildLabeledCondensedSequence(
                     this_sequence.Reordering_Approach_LOWEST_INDEX,
                     this_sequence.Reordering_Approach_LOWEST_INDEX,
                     True) 

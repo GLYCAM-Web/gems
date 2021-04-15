@@ -1,0 +1,100 @@
+        "geometryOptions": {
+            "rotamerData": [
+                {
+                    "dihedrals": [
+                        {
+                            "dihedralName": "phi",
+                            "selectedRotamers": [
+                                "t"
+                            ]
+                        },
+                        {
+                            "dihedralName": "omg",
+                            "selectedRotamers": [
+                                "gt",
+                                "tg"
+                            ]
+                        }
+                    ],
+                    "linkageLabel": "6"
+                },
+                {
+                    "dihedrals": [
+                        {
+                            "dihedralName": "phi",
+                            "selectedRotamers": [
+                                "t"
+                            ]
+                        },
+                        {
+                            "dihedralName": "omg",
+                            "selectedRotamers": [
+                                "gt",
+                                "tg"
+                            ]
+                        }
+                    ],
+                    "linkageLabel": "9"
+                },
+                {
+                    "dihedrals": [
+                        {
+                            "dihedralName": "omg",
+                            "selectedRotamers": [
+                                "gt"
+                            ]
+                        }
+                    ],
+                    "linkageLabel": "10"
+                },
+                {
+                    "dihedrals": [
+                        {
+                            "dihedralName": "phi",
+                            "selectedRotamers": [
+                                "t"
+                            ]
+                        },
+                        {
+                            "dihedralName": "omg",
+                            "selectedRotamers": [
+                                "gt",
+                                "tg"
+                            ]
+                        }
+                    ],
+                    "linkageLabel": "13"
+                },
+                {
+                    "dihedrals": [
+                        {
+                            "dihedralName": "omg",
+                            "selectedRotamers": [
+                                "gg",
+                                "gt"
+                            ]
+                        }
+                    ],
+                    "linkageLabel": "14"
+                },
+                {
+                    "dihedrals": [
+                        {
+                            "dihedralName": "phi",
+                            "selectedRotamers": [
+                                "t"
+                            ]
+                        },
+                        {
+                            "dihedralName": "omg",
+                            "selectedRotamers": [
+                                "gg",
+                                "gt",
+                                "tg"
+                            ]
+                        }
+                    ],
+                    "linkageLabel": "16"
+                }
+            ]
+        }

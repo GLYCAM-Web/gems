@@ -47,6 +47,9 @@ def buildConformerLabel(rotamerCombo): ## Added by Oliver
 
 def convertDihedralNameToCode(dihedralName : str):
     dihedralName = dihedralName.replace("omega", "omg")
+    dihedralName = dihedralName.replace("Omg", "omg")
+    dihedralName = dihedralName.replace("Phi", "phi")
+    dihedralName = dihedralName.replace("Psi", "psi")
     if dihedralName == "phi":
         return "h"
     elif dihedralName == "psi":
@@ -78,20 +81,24 @@ def getSolvationShape(thisTransaction):
 ##  @brief Look at the transaction to see if a force field is specified
 #   @param Transaction thisTransaction
 #   @return String either "default" or the force field name.
-def countNumberOfShapesUpToLimit(rotamerData : [], hardLimit = 1):
-    log.info("countNumberOfShapesUpToLimit was called.")
-#    hardLimit = 64
+def countNumberOfShapes(rotamerData : []):
+    log.info("countNumberOfShapes was called.")
     count = 1
-    for linkage in rotamerData.linkageRotamerData:
+    for linkage in rotamerData.singleLinkageRotamerDataList:
         log.debug("The linkage is: ")
         log.debug(linkage)
         for dihedral in linkage.selectedRotamers:
             log.debug("The dihedral is: ")
             log.debug(dihedral)
             count *= len(dihedral.dihedralValues)
-        if hardLimit != -1 : 
-            if count >= hardLimit: 
-                return hardLimit
+    log.debug("the total count is: " + str(count))
+    return count
+def countNumberOfShapesUpToLimit(rotamerData : [], hardLimit = 1):
+    log.info("countNumberOfShapesUpToLimit was called.")
+    count = countNumberOfShapes(rotamerData)
+    if hardLimit != -1 : 
+        if count >= hardLimit: 
+            return hardLimit
     return count
 
 ##  @brief Parses user's selected rotamers (rotamerData) into a list of 
@@ -128,10 +135,10 @@ def buildStructureInfoOliver(thisTransaction : sequenceio.Transaction, pUUID : s
         #RotamerData is the list of dict objects describing each linkage
         #rotamerData = getRotamerDataFromTransaction(thisTransaction)
         rotamerDataIn = thisTransaction.getRotamerDataIn()
-        log.debug("Found rotamerData, and it is : ")
+        log.debug("Found rotamerData in the input, and it is : ")
         log.debug(rotamerDataIn)
     except Exception as error:
-        log.error("There was a problem getting rotamerData from the transaction: " + str(error))
+        log.error("There was a problem checking for input rotamerData from the transaction: " + str(error))
         log.error(traceback.format_exc())
         raise error
         
@@ -144,38 +151,50 @@ def buildStructureInfoOliver(thisTransaction : sequenceio.Transaction, pUUID : s
     # incoming request, then do whatever was requested - UNLESS
     # this is being run from the website.  In that case, enforce a
     # hard limit of 64 onto the number of structures.
-    doSingleDefaultOnly = False
+    doSingleDefaultOnly = False  # this is probably not needed
     maxNumberOfStructuresToBuild=thisTransaction.getNumberStructuresHardLimitIn()
     if maxNumberOfStructuresToBuild is None :
-        if thisTransaction.getIsEvaluationForBuild() is False :
-            maxNumberOfStructuresToBuild = 1
-            doSingleDefaultOnly = True
+        maxNumberOfStructuresToBuild = -1
+    if thisTransaction.getIsEvaluationForBuild() is False :
+        log.debug("transaction says this is not an evaluation for a build")
+        maxNumberOfStructuresToBuild = 1
+        doSingleDefaultOnly = True
 
+    maxHardLimit = -1
     transactionContext = os.environ.get('GW_GRPC_ROLE')
-    if transactionContext is not None : 
-        if transactionContext is 'Developer' : 
-            maxHardLimit = 8
-        elif transactionContext is 'Swarm' : 
-            maxHardLimit = 64
-        else :
-            maxHardLimit = 64
-    else : 
-        maxHardLimit = -1
+    log.debug("transactionContext is : " + transactionContext)
+    # TODO - make these limits configurable via environment variable
+    if transactionContext == 'Developer' : 
+        maxHardLimit = 8
+    if transactionContext == 'Swarm' :
+        maxHardLimit = 64
+
+    log.debug("The max number structs to build (1) is :  " + str(maxNumberOfStructuresToBuild) )
+    log.debug("The max hard limit (1) is :  " + str(maxHardLimit) )
+    thisTransaction.setNumberStructuresHardLimitOut(maxHardLimit)
 
     if maxHardLimit != -1 :
         if maxHardLimit < maxNumberOfStructuresToBuild :
             maxNumberOfStructuresToBuild = maxHardLimit
+        if maxNumberOfStructuresToBuild == -1 :
+            maxNumberOfStructuresToBuild = maxHardLimit
 
+    log.debug("The max number structs to build (2) is :  " + str(maxNumberOfStructuresToBuild) )
     if rotamerDataIn is None :
         rotamerData = thisTransaction.getRotamerDataOut()
+        for rotamer in rotamerData.singleLinkageRotamerDataList :
+            rotamer.selectedRotamers = rotamer.likelyRotamers
     else :
         rotamerData = rotamerDataIn
 
+    log.debug("The max number structs to build (3) is :  " + str(maxNumberOfStructuresToBuild) )
     if rotamerData is None :
         rotamerData = AllLinkageRotamerData()
         rotamerData.totalPossibleRotamers = 1
         rotamerData.totalLikelyRotamers = 1
+        rotamerData.totalSelectedRotamers = 1
 
+    log.debug("The max number structs to build (4) is :  " + str(maxNumberOfStructuresToBuild) )
     if rotamerData.totalPossibleRotamers == 1 : 
         buildState = sequenceio.Single3DStructureBuildDetails()
         buildState.conformerLabel = "structure"
@@ -185,11 +204,14 @@ def buildStructureInfoOliver(thisTransaction : sequenceio.Transaction, pUUID : s
         structureInfo.individualBuildDetails.append(buildState)
         return structureInfo 
 
-    if doSingleDefaultStructure is True :
+    log.debug("The max number structs to build is :  " + str(maxNumberOfStructuresToBuild) )
+
+    if doSingleDefaultOnly is True :
         if maxNumberOfStructuresToBuild != 1 :
-            log.error("Mismatch between doSingleDefaultStructure and maxNumberOfStructuresToBuild")
+            log.error("Mismatch between doSingleDefaultOnly and maxNumberOfStructuresToBuild")
 
     ## Presence of incoming rotamerData indicates specific rotamer requests.
+    firstStructure=True
     if rotamerData != None:
         #Just get all this info once and append to each buildstate in the loop below
         simulationPhase = checkForSimulationPhase(thisTransaction)
@@ -206,13 +228,18 @@ def buildStructureInfoOliver(thisTransaction : sequenceio.Transaction, pUUID : s
         sequenceRotamerCombos = generateCombinationsFromRotamerData(
                 rotamerData,
                 maxNumberCombos = maxNumberOfStructuresToBuild)
+        log.debug("Here are the sequence rotamer combos: ")
+        log.debug(sequenceRotamerCombos)
         # Now put add these combos to individual build states with other info
         for rotamerCombo in sequenceRotamerCombos:
             buildState = sequenceio.Single3DStructureBuildDetails()
             buildState.sequenceConformation = rotamerCombo
             buildState.conformerLabel = buildConformerLabel(rotamerCombo)
-            if doSingleDefaultOnly is True : 
+            log.debug("The build state after setting conformerLabel is : ")
+            log.debug(buildState.json(indent=2))
+            if firstStructure is True :
                 buildState.isDefaultStructure = True
+                firstStructure = False
             log.debug("label is :" + buildState.conformerLabel)
             if len(buildState.conformerLabel) > 32 :
                 log.debug("conformerLabel is long so building a UUID for structureDirectoryName")
@@ -227,8 +254,8 @@ def buildStructureInfoOliver(thisTransaction : sequenceio.Transaction, pUUID : s
                 buildState.solventShape = solventShape
             buildState.date = date
             buildState.addIons = addIons
+            buildState.conformerID = buildState.structureDirectoryName
             buildState.setDownloadUrl(pUUID)
-
 
             structureInfo.individualBuildDetails.append(buildState)    
     return structureInfo
@@ -237,10 +264,11 @@ def generateCombinationsFromRotamerData(rotamerData, maxNumberCombos=1):
     # First convert into a nested list for itertools to work with
     log.info("generateCombinationsFromRotamerData was called.")
     rotamerDataList = []
-    for linkage in rotamerData.linkageRotamerData:
+    for linkage in rotamerData.singleLinkageRotamerDataList:
         log.debug("the linkage is: ")
         log.debug(linkage)
-        linkageIndex = str(linkage.linkageLabel)
+        #linkageIndex = str(linkage.linkageLabel)
+        linkageIndex = str(linkage.indexOrderedLabel)
         log.debug("the linkage label is: " + str(linkageIndex))
         dihedrals = []
         for dihedral in linkage.selectedRotamers:

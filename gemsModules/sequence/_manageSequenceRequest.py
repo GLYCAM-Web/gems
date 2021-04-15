@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from gemsModules.common.loggingConfig import *
-import traceback
+import traceback, os, sys
 
 if loggers.get(__name__):
     pass
@@ -140,15 +140,21 @@ def manageSequenceRequest(self, defaultOnly : bool = False) :
                 self.transaction_out.entity.outputs.sequenceEvaluationOutput.buildOptions = sequenceio.TheBuildOptions()
             self.transaction_out.entity.outputs.sequenceEvaluationOutput.buildOptions.mdMinimize = False
         #
-Make a switch for this that is settable somewhere...
         # Do the building of the structures
-        # ## TODO:  Make it possible to easily switch between these without needing to comment/uncomment
-        #   using a blocking method:
-        #build.buildEach3DStructureInStructureInfo(self)
-        #   using a non-blocking method:
-        p = logic.EverLastingProcess(target=build.buildEach3DStructureInStructureInfo, args=(self,), daemon=False)
-        p.start()
         #
+        #  First, see if we should use a blocking call rather than the usual non-blocking call.
+        #  Doing this is generally useful only for debugging.
+        #
+        GEMS_FORCE_SERIAL_EXECUTION = os.environ.get('GEMS_FORCE_SERIAL_EXECUTION')
+        #
+        if GEMS_FORCE_SERIAL_EXECUTION is 'True' :
+            #   use a blocking method:
+            build.buildEach3DStructureInStructureInfo(self)
+        else :
+            #   using a non-blocking method:
+            p = logic.EverLastingProcess(target=build.buildEach3DStructureInStructureInfo, args=(self,), daemon=False)
+            p.start()
+            #
         #sequenceProjects.createDefaultSymLinkBuildsDirectory(projectDir, buildDir + conformerID)
             ##  create downloadUrl
             ##  submit to amber for minimization, 
