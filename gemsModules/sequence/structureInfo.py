@@ -162,7 +162,7 @@ def buildStructureInfoOliver(thisTransaction : sequenceio.Transaction, pUUID : s
 
     maxHardLimit = -1
     transactionContext = os.environ.get('GW_GRPC_ROLE')
-    log.debug("transactionContext is : " + transactionContext)
+    log.debug("transactionContext is : " + str(transactionContext))
     # TODO - make these limits configurable via environment variable
     if transactionContext == 'Developer' : 
         maxHardLimit = 8
