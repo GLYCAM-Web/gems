@@ -90,8 +90,8 @@ def receive(receivedTransaction : sequenceio.Transaction):
             from gemsModules.sequence import evaluate
             try:
                 thisTransaction.evaluateCondensedSequence()
-                if thisTransaction.entity.inputs.evaluationOptions is not None :
-                    if thisTransaction.entity.inputs.evaluationOptions.noBuild is False : 
+                if thisTransaction.transaction_out.entity.inputs.evaluationOptions is not None :
+                    if thisTransaction.transaction_out.entity.inputs.evaluationOptions.noBuild is False : 
                         ##Build the Default structure.  
                         from gemsModules.sequence import logic 
                         thisTransaction.manageSequenceRequest(defaultOnly=True)

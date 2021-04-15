@@ -110,8 +110,9 @@ class AllLinkageRotamerInfo(BaseModel):
 
     def __init__(self, **data : Any):
         super().__init__(**data)
-
+        
         if self.singleLinkageRotamerDataList != [] :
+            from gemsModules.sequence import structureInfo
             if self.totalPossibleRotamers == 0 :
                 self.totalPossibleRotamers = structureInfo.countNumberOfShapes(self)
 
