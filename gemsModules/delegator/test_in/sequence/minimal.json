@@ -15,5 +15,6 @@
 		"resources" :[]
             }
     },
-    "prettyPrint" : true
+    "prettyPrint" : true,
+    "mdMinimize" : true
 }
