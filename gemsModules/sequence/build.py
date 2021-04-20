@@ -138,7 +138,8 @@ def buildEach3DStructureInStructureInfo(thisTransaction : sequenceio.Transaction
 #            print("1.2.5")
             build3DStructure(buildState, thisTransaction, outputDirPath, builder)
 #            print("1.2.6")
-            sequenceProjects.addSequenceFolderSymLinkToNewBuild(thisSeqID, thisBuildStrategyID, thisPuuID, conformerID)        
+            if thisTransaction.transaction_in.mdMinimize is True : 
+                sequenceProjects.addSequenceFolderSymLinkToNewBuild(thisSeqID, thisBuildStrategyID, thisPuuID, conformerID)        
             if conformerID == "default": # And doesn't already exist.
                 #sequenceProjects.createDefaultSymLinkSequencesDirectory(this_seqID, conformerID, buildStrategyID)
                 sequenceProjects.createDefaultSymLinkBuildsDirectory(thisProjectDir, buildDir + conformerID)

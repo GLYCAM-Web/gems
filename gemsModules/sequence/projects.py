@@ -163,6 +163,8 @@ def createConformerDirectoryInBuildsDirectory(projectDir : str, conformerDirName
     log.debug("projectDir: " + projectDir)
     log.debug("conformerDirName: " + conformerDirName)
     conformerDirPath = (projectDir + "/New_Builds/" + conformerDirName + '/')
+    try : 
+        log.debug("Checking to see if the conformer path already exists")
     try:
         log.debug("Trying to create conformerDirPath: " + conformerDirPath)
         os.makedirs(conformerDirPath)
