@@ -89,8 +89,12 @@ def structureExists(buildState: sequenceio.Single3DStructureBuildDetails, thisTr
         structureLinkInSequenceDir = sequenceDir + "/All_Builds/" + buildState.structureDirectoryName
         log.debug("structureLinkInSequenceDir: " + structureLinkInSequenceDir)
         if os.path.isdir(structureLinkInSequenceDir):
-            log.debug("The requested structure (" + buildState.structureDirectoryName + ") already exists.")
-            return True
+            log.debug("The requested structure directory exists (" + buildState.structureDirectoryName + ") already exists.")
+            log.debug("checking for output file" + buildState.structureDirectoryName + "/build-status.log).")
+            if os.path.isfile(buildState.structureDirectoryName + "/build-status.log"): 
+                return True
+            else :
+                return False
         else:
             log.debug("The requested structure (" + buildState.structureDirectoryName + ") doesn't exist.")
             return False
@@ -163,6 +167,8 @@ def createConformerDirectoryInBuildsDirectory(projectDir : str, conformerDirName
     log.debug("projectDir: " + projectDir)
     log.debug("conformerDirName: " + conformerDirName)
     conformerDirPath = (projectDir + "/New_Builds/" + conformerDirName + '/')
+    if os.path.isdir(conformerDirPath) :
+        return
     try:
         log.debug("Trying to create conformerDirPath: " + conformerDirPath)
         os.makedirs(conformerDirPath)
