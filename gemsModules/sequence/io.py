@@ -620,6 +620,7 @@ class sequenceTransactionSchema(commonio.TransactionSchema):
     """
     Holds info about the Transaction JSON object used in the Sequence entity.
     """
+    ##  ... means a value is required in Pydantic.
     entity : sequenceEntity = ...
     project : projectio.CbProject = None
 
