@@ -48,6 +48,7 @@ else:
 
 #def buildEach3DStructureInStructureInfo(structureInfo : sequenceio.StructureInfo, buildStrategyID : str, thisTransaction : sequenceio.Transaction, this_seqID : str, this_pUUID : str, projectDir : str):
 def buildEach3DStructureInStructureInfo(thisTransaction : sequenceio.Transaction):
+    log.info("buildEach3DStructureInStructureInfo() was called.")
     needToInstantiateCarbohydrateBuilder = True
     from multiprocessing import Process
 #    print(structureInfo.json(indent=2))
@@ -142,6 +143,7 @@ def buildEach3DStructureInStructureInfo(thisTransaction : sequenceio.Transaction
             if conformerID == "default": # And doesn't already exist.
                 #sequenceProjects.createDefaultSymLinkSequencesDirectory(this_seqID, conformerID, buildStrategyID)
                 sequenceProjects.createDefaultSymLinkBuildsDirectory(thisProjectDir, buildDir + conformerID)
+                
         # buildDir is either New_Builds/ or Existing_Builds/
 #        print("2")
         sequenceProjects.createSymLinkInRequestedStructures(thisProjectDir, buildDir, conformerID)

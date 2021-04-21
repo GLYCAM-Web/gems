@@ -544,8 +544,10 @@ class sequenceEntity(commonio.Entity):
     def getRotamerDataIn(self) :
         log.info("Entity.getRotamerDataIn was called")
         if self.inputs is None :
+            log.debug("inputs is None. returning None.")
             return None
         elif self.inputs.geometryOptions is None :
+            log.debug("inputs.geometryOptions is None. returning None.")
             return None
         else :
             return self.inputs.geometryOptions.getRotamerData()

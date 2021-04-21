@@ -109,7 +109,7 @@ def countNumberOfShapesUpToLimit(rotamerData : [], hardLimit = 1):
 #   @param Transaction 
 #   @TODO: Move this to a better file for this stuff.
 def buildStructureInfoOliver(thisTransaction : sequenceio.Transaction, pUUID : str):
-    log.info("buildStructureInfo() was called.")
+    log.info("buildStructureInfoOliver() was called.")
 
     structureInfo = sequenceio.StructureBuildInfo()
     try:
@@ -164,6 +164,7 @@ def buildStructureInfoOliver(thisTransaction : sequenceio.Transaction, pUUID : s
     transactionContext = os.environ.get('GW_GRPC_ROLE')
     log.debug("transactionContext is : " + str(transactionContext))
     # TODO - make these limits configurable via environment variable
+    # TODO - This impacts the frontend. Make an appropriate plan. FE devs need to know this too.
     if transactionContext == 'Developer' : 
         maxHardLimit = 8
     if transactionContext == 'Swarm' :
@@ -196,12 +197,14 @@ def buildStructureInfoOliver(thisTransaction : sequenceio.Transaction, pUUID : s
 
     log.debug("The max number structs to build (4) is :  " + str(maxNumberOfStructuresToBuild) )
     if rotamerData.totalPossibleRotamers == 1 : 
+        log.debug("totalPossibleRotamers: 1")
         buildState = sequenceio.Single3DStructureBuildDetails()
         buildState.conformerLabel = "structure"
         buildState.structureDirectoryName = "structure"
         buildState.isDefaultStructure = True
         buildState.date = datetime.now()
         structureInfo.individualBuildDetails.append(buildState)
+        log.debug("returning structureInfo: " + repr(structureInfo))
         return structureInfo 
 
     log.debug("The max number structs to build is :  " + str(maxNumberOfStructuresToBuild) )
@@ -257,7 +260,11 @@ def buildStructureInfoOliver(thisTransaction : sequenceio.Transaction, pUUID : s
             buildState.conformerID = buildState.structureDirectoryName
             buildState.setDownloadUrl(pUUID)
 
-            structureInfo.individualBuildDetails.append(buildState)    
+            structureInfo.individualBuildDetails.append(buildState)
+    else:
+        log.debug("rotamerData is None.") 
+
+    log.debug("returning structureInfo: " + repr(structureInfo))  
     return structureInfo
 
 def generateCombinationsFromRotamerData(rotamerData, maxNumberCombos=1):
@@ -621,14 +628,14 @@ def createSeqLog(sequence : str, seqIDPath : str):
 def getStructureInfoFilename(thisTransaction : sequenceio.Transaction):
     log.info("getStructureInfoFilename() was called.")
     try:
-        sequence = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
+        sequence = thisTransaction.getSequenceVariantOut('indexOrdered')
     except Exception as error:
         log.error("There was a problem getting the sequence from the transaction: " + str(error))
         log.error(traceback.format_exc())
         raise error
     else:
-        seqID = getSeqIDForSequence(sequence)
-        userDataDir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/Sequences/"
+        seqID = ProjectUtils.getSeqIDForSequence(sequence)
+        userDataDir = "/website/userdata/tools/cb/git-ignore-me_userdata/Sequences/"
         seqIDPath = userDataDir + seqID
         ##Update the json file for future reference.
         return seqIDPath + "/structureInfo.json"
@@ -639,7 +646,7 @@ def getStructureInfoFilename(thisTransaction : sequenceio.Transaction):
 def getStatusFilename(thisTransaction : sequenceio.Transaction):
     log.info("getStatusFileName() was called.")
     try:
-        projectDir = getProjectDir(thisTransaction)
+        projectDir = thisTransaction.getProjectDirOut()
         log.debug("projectDir: " + projectDir)
     except Exception as error:
         log.error("There was a problem getting the projectDir: " + str(error))
