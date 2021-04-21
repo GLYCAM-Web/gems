@@ -45,19 +45,21 @@ def registerBuild(buildState : sequenceio.Single3DStructureBuildDetails, thisTra
     log.debug("registerBuild() was called.")
     try:
         ##TODO: get the path for structureInfo.json
-        structureInfoFilename = getStructureInfoFilename(thisTransaction)
+        structureInfoFilename = structureInfo.getStructureInfoFilename(thisTransaction)
         log.debug("structureInfoFilename:" + str(structureInfoFilename))
     except Exception as error:
         log.error("There was a problem getting the path for structureInfo.json: " + str(error))
-    else:
-        try:
-            ##TODO: get the path for structureInfo_status.json 
-            statusFilename = getStatusFilename(thisTransaction)
-            log.debug("statusFilename:" + str(statusFilename))
-        except Exception as error:
-            log.error("There was a problem getting the status filename: " + str(error))
-            log.error(traceback.format_exc())
-            raise error
+        log.error(traceback.format_exc())
+        raise error
+
+    try:
+        ##TODO: get the path for structureInfo_status.json 
+        statusFilename = structureInfo.getStatusFilename(thisTransaction)
+        log.debug("statusFilename:" + str(statusFilename))
+    except Exception as error:
+        log.error("There was a problem getting the status filename: " + str(error))
+        log.error(traceback.format_exc())
+        raise error
 
 
 
@@ -69,28 +71,24 @@ def structureExists(buildState: sequenceio.Single3DStructureBuildDetails, thisTr
     if not sequenceExists(buildState, thisTransaction):
         log.debug("Sequence has never been built before; a new sequence is born!")
         return False
-    indexOrderedSequence = thisTransaction.getSequenceVariantOut('indexOrdered')
-    userDataDir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/Sequences/"
-    seqID = projectUtils.getSeqIDForSequence(indexOrderedSequence)
-    sequenceDir = userDataDir + seqID + "/" + buildStrategyID + "/" 
-    log.debug("sequenceDir: " + sequenceDir)
-
-    if buildState.conformerLabel == "default":
-        defaultBuildDir = sequenceDir + "All_Builds/default"
-        log.debug("defaultBuildDir: " + defaultBuildDir)
-        if os.path.isdir(defaultBuildDir):
-            log.debug("default structure found.")
-            return True
-        else:
-            log.debug("default structure not found.")
-            return False
     else:
-        
-        structureLinkInSequenceDir = sequenceDir + "/All_Builds/" + buildState.structureDirectoryName
+        log.debug("Sequence has previous builds. Checking for the requested buildState.")
+        indexOrderedSequence = thisTransaction.getSequenceVariantOut('indexOrdered')
+        userDataDir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/Sequences/"
+        seqID = projectUtils.getSeqIDForSequence(indexOrderedSequence)
+        sequenceDir = userDataDir + seqID + "/" + buildStrategyID + "/" 
+        log.debug("sequenceDir: " + sequenceDir)
+        log.debug("buildState.conformerLabel: " + buildState.conformerLabel)
+           
+        structureLinkInSequenceDir = sequenceDir + "All_Builds/" + buildState.structureDirectoryName
         log.debug("structureLinkInSequenceDir: " + structureLinkInSequenceDir)
         if os.path.isdir(structureLinkInSequenceDir):
-            log.debug("The requested structure (" + buildState.structureDirectoryName + ") already exists.")
-            return True
+            log.debug("The requested structure directory exists (" + buildState.structureDirectoryName + ") already exists.")
+            log.debug("checking for output file" + buildState.structureDirectoryName + "/build-status.log).")
+            if os.path.isfile(buildState.structureDirectoryName + "/build-status.log"): 
+                return True
+            else :
+                return False
         else:
             log.debug("The requested structure (" + buildState.structureDirectoryName + ") doesn't exist.")
             return False
@@ -112,7 +110,7 @@ def sequenceExists(buildState: sequenceio.Single3DStructureBuildDetails, thisTra
         raise error
     ## Check if this sequence has been built before.
     ## Can we assume that seqID has already been initialized and saved?
-    log.debug("Checking for previous builds of this sequence: \n" + sequence)
+    log.debug("Checking for previous builds of this sequence: " + sequence)
     userDataDir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/Sequences/"
     seqID = projectUtils.getSeqIDForSequence(sequence)
     sequenceDir = userDataDir + seqID
@@ -163,6 +161,8 @@ def createConformerDirectoryInBuildsDirectory(projectDir : str, conformerDirName
     log.debug("projectDir: " + projectDir)
     log.debug("conformerDirName: " + conformerDirName)
     conformerDirPath = (projectDir + "/New_Builds/" + conformerDirName + '/')
+    if os.path.isdir(conformerDirPath) :
+        return
     try:
         log.debug("Trying to create conformerDirPath: " + conformerDirPath)
         os.makedirs(conformerDirPath)
