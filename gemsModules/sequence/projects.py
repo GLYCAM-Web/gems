@@ -84,8 +84,8 @@ def structureExists(buildState: sequenceio.Single3DStructureBuildDetails, thisTr
         log.debug("structureLinkInSequenceDir: " + structureLinkInSequenceDir)
         if os.path.isdir(structureLinkInSequenceDir):
             log.debug("The requested structure directory exists (" + buildState.structureDirectoryName + ") already exists.")
-            log.debug("checking for output file" + buildState.structureDirectoryName + "/build-status.log).")
-            if os.path.isfile(buildState.structureDirectoryName + "/build-status.log"): 
+            log.debug("checking for output file: " + structureLinkInSequenceDir + "/build-status.log).")
+            if os.path.isfile(structureLinkInSequenceDir + "/build-status.log"): 
                 return True
             else :
                 return False

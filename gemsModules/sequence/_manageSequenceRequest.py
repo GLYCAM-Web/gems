@@ -152,7 +152,7 @@ def manageSequenceRequest(self, defaultOnly : bool = False) :
         #  Doing this is generally useful only for debugging.
         #
         GEMS_FORCE_SERIAL_EXECUTION = os.environ.get('GEMS_FORCE_SERIAL_EXECUTION')
-        log.debug("GEMS_FORCE_SERIAL_EXECUTION: " + GEMS_FORCE_SERIAL_EXECUTION)
+        log.debug("GEMS_FORCE_SERIAL_EXECUTION: " + str(GEMS_FORCE_SERIAL_EXECUTION))
         #
         if GEMS_FORCE_SERIAL_EXECUTION is 'True' :
             #   use a blocking method:
