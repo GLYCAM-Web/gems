@@ -21,24 +21,9 @@
 									{ 
 										"dihedralName": "omg", 
 										"dihedralValues": [ 
-											"gg", "gt", "tg" ] 
-									}, 
-									{ 
-										"dihedralName": "phi", 
-										"dihedralValues": [ 
-											"t", "-g" ] 
-									} 
-								] 
-							} ,
-							{ 
-								"indexOrderedLabel": "8", 
-								"linkageLabel": "8", 
-								"selectedRotamers": [ 
-									{ 
-										"dihedralName": "omg", 
-										"dihedralValues": [ 
-											"gg", "gt" ] 
-									} 
+											"gg", "gt"
+										] 
+									}
 								] 
 							} 
 						]
@@ -47,5 +32,6 @@
 			}
 		}
 	},
-	"prettyPrint" : true
+	"prettyPrint" : true,
+	"mdMinimize" : true
 }

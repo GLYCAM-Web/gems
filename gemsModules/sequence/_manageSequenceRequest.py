@@ -40,6 +40,7 @@ def manageSequenceRequest(self, defaultOnly : bool = False) :
         try :
             log.debug("Attempting to start a new project")
             self.transaction_out.project=projectUtils.startProject(self).copy(deep=True)
+            ## This is called in startProject, is this duplicated on purpose?
             self.transaction_out.project.startMeUp(self)
         except Exception as error :
             log.error("There was a problem creating a project: " + str(error))
@@ -60,6 +61,7 @@ def manageSequenceRequest(self, defaultOnly : bool = False) :
         self.transaction_out.entity.outputs=sequenceio.SequenceOutputs()
     if self.transaction_out.entity.outputs.structureBuildInfo is None :
         self.transaction_out.entity.outputs.structureBuildInfo=sequenceio.StructureBuildInfo()
+        log.debug("structureBuildInfo: " + str(self.transaction_out.entity.outputs.structureBuildInfo))
     try:
         thisStructureInfo = structureInfo.buildStructureInfoOliver(self, self.transaction_out.project.pUUID)
         self.transaction_out.entity.outputs.structureBuildInfo= thisStructureInfo
@@ -84,8 +86,12 @@ def manageSequenceRequest(self, defaultOnly : bool = False) :
             if os.path.exists(statusFile):
                 structureInfo.updateStructureInfoWithUserOptions(self, thisStructureInfo, statusFile)
             else:
-            ##Create new files for tracking this project.
+                ##Create new files for tracking this project.
                 structureInfo.saveRequestInfo(thisStructureInfo, project_dir)
+        else:
+            log.debug("Failed to find structureInfo_request.json at: " + filename)
+            # TODO: Maybe we need this? Unsure. Timing isn't right for testing. ~ Dan
+            # structureInfo.saveRequestInfo(thisStructureInfo, project_dir)
     except Exception as error:
         log.error("There was a problem saving the request info: " + str(error))
         log.error(traceback.format_exc())
@@ -146,6 +152,7 @@ def manageSequenceRequest(self, defaultOnly : bool = False) :
         #  Doing this is generally useful only for debugging.
         #
         GEMS_FORCE_SERIAL_EXECUTION = os.environ.get('GEMS_FORCE_SERIAL_EXECUTION')
+        log.debug("GEMS_FORCE_SERIAL_EXECUTION: " + GEMS_FORCE_SERIAL_EXECUTION)
         #
         if GEMS_FORCE_SERIAL_EXECUTION is 'True' :
             #   use a blocking method:
