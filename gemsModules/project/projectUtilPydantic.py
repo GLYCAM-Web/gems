@@ -52,7 +52,7 @@ def startProject(thisTransaction):
         raise error
 
     thisProjectOut.startMeUp(thisTransaction)
-    log.debug("project.project_dir, after instantiation: " + thisProjectOut.project_dir)
+    log.debug("project.project_dir, after instantiation: " + str(thisProjectOut.project_dir))
 #    try:
 #        addProjectToResponse(projectio.project, thisTransaction)
 #    except Exception as error:
@@ -91,33 +91,16 @@ def startProject(thisTransaction):
 #   @param transaction
 def getRequestingAgentFromTransaction(thisTransaction: commonio.Transaction):
     log.info("getRequestingAgentFromTransaction() was called.\n")
+    projectIn = getProjectFromTransactionIn(thisTransaction)
 
-    project = getFrontendProjectFromTransaction(thisTransaction)
     requestingAgent = "command_line"
-    if project is not None:
-        requestingAgent = project['requesting_agent']
+    if projectIn is not None:
+        requestingAgent = projectIn.requesting_agent
 
-    log.debug("requestingAgent: " + requestingAgent)
+    log.debug("returning requestingAgent as : " + requestingAgent)
     return requestingAgent
 
 
-##  Pass in a transaction, get the frontend project
-#   @param transaction
-def getProjectFromTransaction(thisTransaction: commonio.Transaction):
-    log.info("getProjectFromTransaction() was called.\n")
-    if 'project' in thisTransaction.request_dict.keys():
-        project = thisTransaction.request_dict['project']
-        log.debug("Object type for project: " + str(type(project)))
-        return project
-    else:
-        return None
-
-##  @brief Pass in a transaction, get the projectDir
-#   @param Transaction thisTransaction
-#   @return project_dir
-def setProjectDir(thisTransaction):
-    # do we need this?
-    pass
 
 
 ##  Creates dirs if needed in preparation for writing files.

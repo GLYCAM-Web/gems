@@ -19,4 +19,13 @@ serviceModules = {
     "StartProject" : "startProject"
 }
 
+# Default project path - see also getProjectPath()
 output_data_dir = '/website/userdata/'
+
+# Default subdirectories per project type.  Typically, these go
+# under whatever is defined for project_path
+project_subdirectory = {
+        'cb'   :  'tools/cb',
+        'pdb'  :  'tools/pdb',
+        'gp'   :  'tools/gp'
+        }

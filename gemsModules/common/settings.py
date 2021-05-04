@@ -88,7 +88,8 @@ helpDict = {
 ##
 ## The key in the following dictionaries is called noticeBrief 
 ##
-## Information about error messages this entity/module might return.
+## These dictionaries contain information about error messages 
+## an entity/module might return.
 ExitTypes = {
     'NoEntityDefined':'error',
     'EntityNotKnown':'error',
@@ -104,7 +105,6 @@ ExitTypes = {
     'NoInputPayloadDefined':'error',
     'UnknownError':'error'
 }
-
 ExitScopes = {
     'NoEntityDefined':'Transaction',
     'EntityNotKnown':'Entity',
@@ -120,7 +120,6 @@ ExitScopes = {
     'NoInputPayloadDefined':'Transaction',
     'UnknownError':'Unknown'
 }
-
 ExitCodes = {
     'NoEntityDefined':'301',
     'EntityNotKnown':'302',
@@ -136,7 +135,6 @@ ExitCodes = {
     'NoInputPayloadDefined':'400',
     'UnknownError':'500'
 }
-
 ExitMessages = {
     'NoEntityDefined':'The JSON object does not contain an Entity.',
     'EntityNotKnown':'The entity in this JSON Onject is not known to the commonServicer.',

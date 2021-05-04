@@ -8,7 +8,8 @@ from gemsModules.sequence import io as sequenceio
 from gemsModules.common import io as commonio
 from gemsModules.common import logic as commonlogic
 from gemsModules.common.loggingConfig import *
-from gemsModules.project import projectUtilPydantic as ProjectUtils
+from gemsModules.project import projectUtilPydantic as projectUtils
+from gemsModules.project import settings as projectSettings
 import gmml, os, sys
 import itertools
 import traceback
@@ -634,8 +635,8 @@ def getStructureInfoFilename(thisTransaction : sequenceio.Transaction):
         log.error(traceback.format_exc())
         raise error
     else:
-        seqID = ProjectUtils.getSeqIDForSequence(sequence)
-        userDataDir = "/website/userdata/tools/cb/git-ignore-me_userdata/Sequences/"
+        seqID = projectUtils.getSeqIDForSequence(sequence)
+        userDataDir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/Sequences/"
         seqIDPath = userDataDir + seqID
         ##Update the json file for future reference.
         return seqIDPath + "/structureInfo.json"

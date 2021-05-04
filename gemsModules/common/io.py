@@ -261,6 +261,34 @@ class Transaction:
         log.debug("The transaction_in is: " )
         log.debug(self.transaction_in.json(indent=2))
 
+    def getProjectIn(self):
+        log.info("getProjectFromTransactionIn() was called.\n")
+        try :
+            if all(v is not None for v in [ 
+                thisTransaction.transaction_in ,
+                thisTransaction.transaction_in.project ]) :
+                log.debug("Found a non-None project in transaction_in of type : " + str(type(project)))
+                return thisTransaction.transaction_in.project
+            else:
+                return None
+        except Exception as error :
+            log.error("There was a problem getting the project from transaction_in :  " + str(error))
+            raise error
+    def getProjectOut(self):
+        log.info("getProjectFromTransactionOut() was called.\n")
+        try :
+            if all(v is not None for v in [ 
+                thisTransaction.transaction_out ,
+                thisTransaction.transaction_out.project ]) :
+                log.debug("Found a non-None project in transaction_out of type : " + str(type(project)))
+                return thisTransaction.transaction_out.project
+            else:
+                return None
+        except Exception as error :
+            log.error("There was a problem getting the project from transaction_out :  " + str(error))
+            raise error
+
+
     def build_outgoing_string(self):
         import json
         isPretty=False

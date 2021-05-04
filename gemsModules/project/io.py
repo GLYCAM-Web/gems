@@ -34,6 +34,9 @@ class Project(BaseModel):
     gems_timestamp : datetime = None
     project_type : str = ""
 
+    ## The parent_path can be used to override settings.output_data_dir
+    parent_path : str = ""  
+    compute_cluster_parent_path : str = ""  
     ## The project path. Used to be output dir, but now that is reserved for subdirs.
     project_dir : str = ""
     requesting_agent : str = ""
@@ -113,21 +116,18 @@ class Project(BaseModel):
         result = result + "\nproject_dir: "  + self.project_dir
         return result
 
-def buildProjectDir(tool, pUUID):
+def buildProjectDir(parentPath, projectSubdirectory, pUUID):
     log.info("buildProjecDir() was called.")
-    log.debug("tool: " + tool)
+    log.debug("parentPath: " + parentPath)
+    log.debug("projectSubdirectory: " + projectSubdirectory)
     log.debug("pUUID: " + pUUID)
-    return os.path.join(project_settings.output_data_dir,  "tools",  tool, "git-ignore-me_userdata/Builds", pUUID )
+    # fun fact - os.path.join isn't very useful if your strings contain forward slashes.
+    #            one day, we should make this more OS-independent.  But... not now.
+    return os.path.join(parentPath,  projectSubdirectory, "git-ignore-me_userdata/Builds", pUUID )
 
 ## @brief cbProject is a typed project that inherits all the fields from project and adds 
 #   its own.
 class CbProject(Project):
-# Taking these out of Project because they cause confusion.
-#    sequence : str = ""
-#    seqID : str = ""
-#    payloadHash : str = ""
-#    structure_count : int = 1
-    #structure_mappings : []
 
     def __init__(self, **data : Any):
         super().__init__(**data)
@@ -150,15 +150,58 @@ class CbProject(Project):
         log.debug("self.project_type in CbProject.startMeUp is : >>>" + self.project_type + "<<<")
 #        log.debug("self.sequence in CbProject.startMeUp is : >>>" + self.sequence + "<<<")
 
+        self.setParentPath(thisTransaction)
         if transIn.project is not None :
             if transIn.project.project_dir is not None  :
                 if transIn.project.project_dir is not "" :
                     self.project_dir = transIn.project.project_dir
         if self.project_dir is None :
-            self.project_dir =  buildProjectDir(self.project_type , self.pUUID)
+            self.project_dir =  buildProjectDir(self.parentPath, project_settings.project_subdirectory[self.project_type] , self.pUUID)
         if self.project_dir is  "" :
-            self.project_dir =  buildProjectDir(self.project_type , self.pUUID)
+            self.project_dir =  buildProjectDir(self.parentPath, project_settings.project_subdirectory[self.project_type] , self.pUUID)
         log.debug("self.project_dir in CbProject.startMeUp is : >>>" + self.project_dir + "<<<")
+
+    def setParentPath(self, thisTransaction, specifiedPath=None):
+        # allow for direct setting of project dir
+        if specifiedPath is not None :
+            log.debug("Setting parent_path to specified path : " + specifiedPath)
+            self.parent_path = specifiedPath
+            return
+        # if it wasn't directly specified, see if it can be found in the incoming transaction
+        projectIn = thisTransaction.getProjectIn()
+        if all(v is not None for v in [ 
+            projectIn,
+            projectIN.parent_path
+            ]):
+            if projectIn.parent_path != "" :
+                message="Using the project directory specified in the incoming transaction." 
+                log.debug(message) 
+                projectOut.parent_path = projectIn.parent_path 
+                return
+    
+        message="There is no incoming or specified project information.  Setting project parent_path internally."
+        log.debug(message)
+    
+        GEMS_PARENT_PATH = os.environ.get('GEMS_PARENT_PATH')
+        if GEMS_PARENT_PATH is None :
+            theParentPath = project_settings.output_data_dir
+        elif GEMS_PARENT_PATH == "" :
+            theParentPath = project_settings.output_data_dir
+        else :
+            theParentPath = GEMS_PARENT_PATH
+    
+        if theParentPath is None :
+            message="Unknown error trying to set project ParentPath."
+            log.error(message)
+            thisTransaction.generateCommonParserNotice(
+                    noticeBrief='GemsError',
+                    messagingEntity=settings.WhoIAm,
+                    additionalInfo={'hint':message})
+            return
+    
+        log.debug("Setting outgoing project ParentPath to : " + theParentPath)
+        projectOut.parent_path = theParentPath
+        return
 
 
     def __str__(self):
