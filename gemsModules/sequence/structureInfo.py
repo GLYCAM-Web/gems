@@ -630,14 +630,15 @@ def getStructureInfoFilename(thisTransaction : sequenceio.Transaction):
     log.info("getStructureInfoFilename() was called.")
     try:
         sequence = thisTransaction.getSequenceVariantOut('indexOrdered')
+        thisProject = thisTransaction.getProjectOut()
     except Exception as error:
         log.error("There was a problem getting the sequence from the transaction: " + str(error))
         log.error(traceback.format_exc())
         raise error
     else:
         seqID = projectUtils.getSeqIDForSequence(sequence)
-        userDataDir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/Sequences/"
-        seqIDPath = userDataDir + seqID
+        sequencePath = thisProject.getFilesystemPath() + "/" + projectSettings.toolPathIdentifier['cb'] + "/Sequences/"
+        seqIDPath = sequencePath + seqID
         ##Update the json file for future reference.
         return seqIDPath + "/structureInfo.json"
 

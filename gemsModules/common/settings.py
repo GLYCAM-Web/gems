@@ -48,8 +48,6 @@ servicesStatus = [
     }
 ]
 
-schemaLocation = "/website/userdata/"
-
 ## Module names for entities that this entity/module knows.
 subEntities = {
     'BatchCompute' : 'batchcompute',
@@ -86,7 +84,9 @@ helpDict = {
 ##
 ## Notices Generator Data
 ##
-## The key in the following dictionaries is called noticeBrief 
+## The key in the following dictionaries is called
+##
+##       noticeBrief 
 ##
 ## These dictionaries contain information about error messages 
 ## an entity/module might return.
@@ -150,37 +150,6 @@ ExitMessages = {
     'NoInputPayloadDefined':'No payload could be found.',
     'UnknownError':'We really have no idea what went wrong.'
 }
-
-##
-## This can probably go very soon
-##
-#def appendCommonParserNotice(theTransaction )  :
-#    # Build the notice for older code
-#        if theTransaction.response_dict is None:
-#            theTransaction.response_dict={}
-#            theTransaction.response_dict['entity']={}
-#    
-#        if theTransaction.response_dict['entity'] is None:
-#            theTransaction.response_dict['entity']={}
-#    
-#        if not 'type' in theTransaction.response_dict['entity']:
-#            theTransaction.response_dict['entity']['type'] = 'CommonServicer'
-#    
-#    
-#        if not 'responses' in theTransaction.response_dict['entity']:
-#            theTransaction.response_dict['entity']['responses']=[]
-#    
-#        theTransaction.response_dict['entity']['responses'].append({
-#                'CommonServicerNotice' : {
-#                'type' : ExitTypes[noticeBrief],
-#                'notice' : {
-#                    'code' : ExitCodes[noticeBrief],
-#                    'brief' : noticeBrief,
-#                    'blockID' : scope,
-#                    'message' : ExitMessages[noticeBrief],
-#                    }
-#                }})
-#    
 
 # ## See above for definition of noticeBrief
 def generateCommonParserNotice(

@@ -41,7 +41,7 @@ def manageSequenceRequest(self, defaultOnly : bool = False) :
             log.debug("Attempting to start a new project")
             self.transaction_out.project=projectUtils.startProject(self).copy(deep=True)
             ## This is called in startProject, is this duplicated on purpose?
-            self.transaction_out.project.startMeUp(self)
+            self.transaction_out.project.setProjectDir(self, noClobber=True)
         except Exception as error :
             log.error("There was a problem creating a project: " + str(error))
             log.error(traceback.format_exc())

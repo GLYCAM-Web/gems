@@ -305,44 +305,64 @@ def getProjectpUUID(thisProject):
     else:
         return pUUID
 
-
-## Pass a pUUID and an appName, get a download url.
-#   appNames should look like frontend app abbreviations, cb, pdb, gp etc...
-#   @param  pUUID
-#   @param  appName
-def getDownloadUrl(pUUID : str, appName : str, optionalSubDir : str = ""):
-    log.info("getDownloadUrl was called.\n")
-    log.debug("pUUID: " + pUUID)
-    log.debug("appName: " + appName)
-    log.debug("optionalSubDir: " + optionalSubDir)
-    try:
-        versionsFile = "/website/userdata/VERSIONS.sh"
-        with open(versionsFile) as file:
-            content = file.read()
-        siteHostName = getSiteHostName(content)
-        url = "http://" + siteHostName + "/json/download/" + appName +"/" + pUUID + "/" + optionalSubDir
-        log.debug("downloadUrl : " + url )
-        return url
-    except AttributeError as error:
-        log.error("Something went wrong building the downloadUrl.")
-        raise error
-
-##  Intended for use by getDownloadUrl. Content is the text contained in
-#   the versionsFile.
-#   @param content
-def getSiteHostName(content):
-    log.info("getSiteHostName was called.\n")
+##  Populates the Project model from text contained in the versionsFile.
+#   @param versionsFilePath
+def getVersionsFileInfo(versionsFilePath : str):
+    log.info("getVersionsFileInfo was called.\n")
+    import re
+    thisDict = {
+            'site_version' :  "",
+            'site_branch' : "", 
+            'gems_version' :  "", 
+            'gems_branch' :  "", 
+            'md_utils_version' :  "", 
+            'md_utils_branch' :  "", 
+            'gmml_version' :  "", 
+            'gmml_branch' :  "", 
+            'gp_version' :  "", 
+            'gp_branch' :  "", 
+            'site_mode' :  "", 
+            'site_host_name' :  ""
+            }
+    with open(versionsFilePath) as file:
+        content = file.read()
     lines = content.split("\n")
     for line in lines:
-        if 'SITE_HOST_NAME' in line:
-            start = line.index("=") + 1
-            siteHostName = line[start:].replace('"', '')
-            log.debug("siteHostName: " + siteHostName)
-    if siteHostName is not None:
-        return siteHostName
-    else:
-        log.error("Never did find a siteHostName.")
-        raise AttributeError
+        # Get rid of any whitespace or newline
+        trimmed_line = re.sub(r'\s+', '', line)
+        theKeyVal =  trimmed_line.split("=")
+        if len(theKeyVal) > 1 : 
+            theKey=theKeyVal[0]
+            theVal=theKeyVal[1] 
+            lowerKey = theKey.lower()
+            if 'git_commit_hash' in  lowerKey : 
+                jsonKey=lowerKey.replace('git_commit_hash', 'version')
+            elif 'git_branch' in lowerKey :
+                jsonKey=lowerKey.replace('git_branch', 'branch')
+            else:
+                jsonKey=lowerKey
+            thisDict[jsonKey]=theVal
+    log.debug("the versions dictionary is : " + str(thisDict))
+    return thisDict
+
+
+
+###  Intended for use by getDownloadUrl. Content is the text contained in
+##   the versionsFile.
+##   @param content
+#def getSiteHostName(content):
+#    log.info("getSiteHostName was called.\n")
+#    lines = content.split("\n")
+#    for line in lines:
+#        if 'SITE_HOST_NAME' in line:
+#            start = line.index("=") + 1
+#            siteHostName = line[start:].replace('"', '')
+#            log.debug("siteHostName: " + siteHostName)
+#    if siteHostName is not None:
+#        return siteHostName
+#    else:
+#        log.error("Never did find a siteHostName.")
+#        raise AttributeError
 
 
 ##  @brief Give a transaction, get a sequence. Note that if more than one input

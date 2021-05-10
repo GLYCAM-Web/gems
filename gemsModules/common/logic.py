@@ -124,7 +124,7 @@ def returnHelp(requestedEntity,requestedHelp):
   theEntity = importEntity(requestedEntity)
   theHelp = entities.helpDict[requestedHelp]
   if theHelp == 'schemaLocation':
-    schema_location = settings.schemaLocation
+    schema_location = settings.getSchemaLocation()
     return schema_location  ## TODO:  make this do something real
   if not hasattr(theEntity, 'helpme'):
     return "No help available for " + requestedEntity

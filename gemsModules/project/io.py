@@ -34,27 +34,37 @@ class Project(BaseModel):
     gems_timestamp : datetime = None
     project_type : str = ""
 
-    ## The parent_path can be used to override settings.output_data_dir
-    parent_path : str = ""  
-    compute_cluster_parent_path : str = ""  
+    ## The filesystem_path can be used to override settings.default_filesystem_output_path
+    filesystem_path : str = ""  
+    compute_cluster_filesystem_path : str = ""  
     ## The project path. Used to be output dir, but now that is reserved for subdirs.
     project_dir : str = ""
     requesting_agent : str = ""
     has_input_files : bool = None
-    
+   
+    ## These can be read in using getVersionsFileInfo
+    site_version : str = ""
+    site_branch : str = ""
     gems_version : str = ""
     gems_branch : str = ""
+    md_utils_version : str = ""
+    md_utils_branch : str = ""
     gmml_version : str = ""
     gmml_branch : str = ""
+    gp_version : str = ""
+    gp_branch : str = ""
     site_mode : str = ""
     site_host_name : str = ""
+    versions_file_path : str = ""
+    download_url :str = ""
+
     force_field : str = "default"
     parameter_version : str = "default"
     amber_version : str = "default"
     json_api_version : str = ""
     _django_version : str = ""
     django_project_id : str = ""
-    
+   
 
     def __init__(self, **data : Any):
         super().__init__(**data)
@@ -65,32 +75,93 @@ class Project(BaseModel):
         if self.timestamp is None : 
             self.gems_timestamp = datetime.now()
 
+    def setProjectDir(self, specifiedDirectory : str = None, noClobber : bool = False) :
+        # First, check if the project directory field is already populated
+        if self.project_dir is not None and self.project_dir is not "" :
+            # If noClobber is set to true, return without changing the directory
+            if noClobber : 
+                return
+        # If a directory was specified, set it and return
+        if specifiedDirectory is not None :
+            self.project_dir = specifiedDirectory
+            return
+        # If we are still here, attempt to build the project directory
+        # First, try to determine the filesystem path
+        if self.filesystem_path is None or self.filesystem_path is "" :
+            self.setFilesystemPath()
+        if self.filesystem_path is None or self.filesystem_path is "" :
+            message = "Cannot set project_dir because cannot determine filesystem path"
+            log.error(message)
+            self.generateCommonParserNotice(
+                    noticeBrief = 'GemsError',
+                    additionalInfo = { 'hint' : message }
+                    )
+            return
+        # If we are still here, set the directory 
+        self.project_dir =  buildProjectDir(self.filesystem_path, project_settings.project_subdirectory[self.project_type] , self.pUUID)
+        log.debug("self.project_dir is : >>>" + self.project_dir + "<<<")
 
-####### These might need to stay somehow:
-####
-#            log.debug("Checking for the django_project_id.")
-#            if 'id' in project.keys():
-#                self.django_project_id = project['id']
-#                log.debug("self.django_project_id: " + self.django_project_id)
-#            else:
-#                log.error("Failed to find the django_project_id!")
-#                log.error("project.keys(): "  + str(project.keys()))
-#
-#
-#        else:
-#            ##  For doing our best if the request doesn't include a project obj.
-#            #   This is where we give defaults for whatever is needed.
-#            self.requesting_agent = "command line"
-#            log.debug("request entity type: " + request_dict['entity']['type'])
-#            if request_dict['entity']['type'] == "Sequence":
-#                self.project_type = "cb"
-#            elif request_dict['entity']['type'] == "MmService":
-#                self.project_type = "md"
-#                self.has_input_files = True
-#            elif request_dict['entity']['type'] == "Conjugate":
-#                self.project_type = "gp"
-#            elif request_dict['entity']['type'] == "StructureFile":
-#                self.project_type = "pdb"
+    def setVersionsFilePath(self, specifiedPath : str = None, noClobber : bool = False) :
+        # First, check if the versions file path field is already populated
+        if self.versions_file_path is not None and self.versions_file_path is not "" :
+            # If noClobber is set to true, return without changing the field
+            if noClobber : 
+                return
+        # If a directory was specified, set it and return
+        if specifiedPath is not None :
+            self.versions_file_path = specifiedPath
+            return
+        # If we are still here, attempt to build the project directory
+        # First, try to determine the filesystem path
+        if self.filesystem_path is None or self.filesystem_path is "" :
+            self.setFilesystemPath()
+        if self.filesystem_path is None or self.filesystem_path is "" :
+            message = "Cannot set versions file path because cannot determine filesystem path"
+            log.error(message)
+            self.generateCommonParserNotice(
+                    noticeBrief = 'GemsError',
+                    additionalInfo = { 'hint' : message }
+                    )
+            return
+        # If we are still here, set the directory 
+        self.versions_file_path =  os.path.join(self.filesystem_path, project_settings.default_versions_file_name  )
+        log.debug("self.versions_file_path is : >>>" + self.versions_file_path + "<<<")
+
+    def loadVersionsFileInfo(self) :
+        if self.versions_file_path is None :
+            self.setVersionsFilePath()
+        if self.versions_file_path is None :
+            log.error("There was a problem setting the versions file path.  Cannot load versions file info")
+        from gemsModules.project.projectUtilPydantic import getVersionsFileInfo
+        try : 
+            self(**getVersionsFileInfo(self.versions_file_path))
+        except Exception as error :
+            log.error("There was aproblem loading the versions file info")
+            raise error
+
+    def getFilesystemPath(self) :
+        log.debug("getting filesystem_path: " + str(self.filesystem_path))
+        return self.filesystem_path 
+    def setFilesystemPath(self, specifiedPath:str) :
+        # allow for direct setting of project dir
+        log.debug("Setting filesystem_path to specified path : " + str(specifiedPath))
+        self.filesystem_path = specifiedPath
+        return
+
+    def setDownloadUrl(self, optionalSubDir : str = None):
+        log.info("getDownloadUrl was called.\n")
+        try :
+            log.debug("pUUID: " + str(self.pUUID))
+            log.debug("project_type: " + str(self.project_type))
+            log.debug("optionalSubDir: " + str(optionalSubDir))
+            self.download_url = "http://" + self.site_host_name + "/json/download/" + self.project_type +"/" + self.pUUID + "/" + optionalSubDir
+            log.debug("downloadUrl : " + self.download_url )
+        except AttributeError as error:
+            log.error("Something went wrong building the downloadUrl.")
+            raise error
+
+    def getDownloadUrl(self) :
+        return self.download_url
                 
 
     def __str__(self):
@@ -116,102 +187,34 @@ class Project(BaseModel):
         result = result + "\nproject_dir: "  + self.project_dir
         return result
 
-def buildProjectDir(parentPath, projectSubdirectory, pUUID):
+def buildProjectDir(filesystemPath, projectSubdirectory, pUUID):
     log.info("buildProjecDir() was called.")
-    log.debug("parentPath: " + parentPath)
+    log.debug("filesystemPath: " + filesystemPath)
     log.debug("projectSubdirectory: " + projectSubdirectory)
     log.debug("pUUID: " + pUUID)
     # fun fact - os.path.join isn't very useful if your strings contain forward slashes.
     #            one day, we should make this more OS-independent.  But... not now.
-    return os.path.join(parentPath,  projectSubdirectory, "git-ignore-me_userdata/Builds", pUUID )
+    return os.path.join(filesystemPath,  projectSubdirectory, "git-ignore-me_userdata/Builds", pUUID )
 
 ## @brief cbProject is a typed project that inherits all the fields from project and adds 
 #   its own.
 class CbProject(Project):
+    has_input_files : bool = False
 
     def __init__(self, **data : Any):
         super().__init__(**data)
         log.info("CbProject.__init__() was called.")
         self.project_type = "cb"
 
-
-    def startMeUp(self, thisTransaction) :
-        from gemsModules.project.projectUtil import getSequenceFromTransaction, getSeqIDForSequence
-        self.has_input_files = False
-
-        transIn = thisTransaction.transaction_in
-
-#        self.sequence = thisTransaction.getInputSequencePayload()
-#        if self.sequence is None :
-#            raise AttributeError("Sequence")
-
-#        self.seqID = getSeqIDForSequence(self.sequence) # poorly named, not indexOrdered version!
-#        log.debug("self.seqID in CbProject.startMeUp is : >>>" + self.seqID + "<<<")
-        log.debug("self.project_type in CbProject.startMeUp is : >>>" + self.project_type + "<<<")
-#        log.debug("self.sequence in CbProject.startMeUp is : >>>" + self.sequence + "<<<")
-
-        self.setParentPath(thisTransaction)
-        if transIn.project is not None :
-            if transIn.project.project_dir is not None  :
-                if transIn.project.project_dir is not "" :
-                    self.project_dir = transIn.project.project_dir
-        if self.project_dir is None :
-            self.project_dir =  buildProjectDir(self.parentPath, project_settings.project_subdirectory[self.project_type] , self.pUUID)
-        if self.project_dir is  "" :
-            self.project_dir =  buildProjectDir(self.parentPath, project_settings.project_subdirectory[self.project_type] , self.pUUID)
-        log.debug("self.project_dir in CbProject.startMeUp is : >>>" + self.project_dir + "<<<")
-
-    def setParentPath(self, thisTransaction, specifiedPath=None):
-        # allow for direct setting of project dir
-        if specifiedPath is not None :
-            log.debug("Setting parent_path to specified path : " + specifiedPath)
-            self.parent_path = specifiedPath
-            return
-        # if it wasn't directly specified, see if it can be found in the incoming transaction
-        projectIn = thisTransaction.getProjectIn()
-        if all(v is not None for v in [ 
-            projectIn,
-            projectIN.parent_path
-            ]):
-            if projectIn.parent_path != "" :
-                message="Using the project directory specified in the incoming transaction." 
-                log.debug(message) 
-                projectOut.parent_path = projectIn.parent_path 
-                return
-    
-        message="There is no incoming or specified project information.  Setting project parent_path internally."
-        log.debug(message)
-    
-        GEMS_PARENT_PATH = os.environ.get('GEMS_PARENT_PATH')
-        if GEMS_PARENT_PATH is None :
-            theParentPath = project_settings.output_data_dir
-        elif GEMS_PARENT_PATH == "" :
-            theParentPath = project_settings.output_data_dir
-        else :
-            theParentPath = GEMS_PARENT_PATH
-    
-        if theParentPath is None :
-            message="Unknown error trying to set project ParentPath."
-            log.error(message)
-            thisTransaction.generateCommonParserNotice(
-                    noticeBrief='GemsError',
-                    messagingEntity=settings.WhoIAm,
-                    additionalInfo={'hint':message})
-            return
-    
-        log.debug("Setting outgoing project ParentPath to : " + theParentPath)
-        projectOut.parent_path = theParentPath
-        return
-
-
-    def __str__(self):
-        result = super().__str__()
-        result = result + "\nproject_type: " + self.project_type
-#        result = result + "\nsequence: " + self.sequence
-#        result = result + "\nseqID: " + self.seqID
-#        result = result + "\nstructure_count: " + str(self.structure_count)
-        #result = result + "\nstructure_mappings: " + str(self.structure_mappings)
-        return result
+#Is this still needed?
+#    def __str__(self):
+#        result = super().__str__()
+##        result = result + "\nproject_type: " + self.project_type
+##        result = result + "\nsequence: " + self.sequence
+##        result = result + "\nseqID: " + self.seqID
+##        result = result + "\nstructure_count: " + str(self.structure_count)
+#        #result = result + "\nstructure_mappings: " + str(self.structure_mappings)
+#        return result
 
 class PdbProject(Project):
     uploaded_file_name : str = ""
@@ -223,49 +226,6 @@ class PdbProject(Project):
 
     def __init__(self, **data : Any):
         super().__init__(**data)
-
-#    def __init__(self, request_dict: dict):
-#        super().__init__(request_dict)
-#        from gemsModules.structureFile.amber.logic import getPdbRequestInput
-#        log.info("PdbProject.__init__() was called.")
-#        self.project_type = "pdb"
-#        self.has_input_files = True
-#        self.uploaded_file_name = getPdbRequestInput(request_dict)
-#        log.debug("uploaded_file_name: " + self.uploaded_file_name)
-#        self.status = "submitted"
-#
-#        ##User may provide a project_dir.
-#        if'project' in request_dict.keys():
-#            log.debug("Found a project in the request.")
-#            project = request_dict['project']
-#            if "u_uuid" in project.keys():
-#                self.u_uuid = project['u_uuid']
-#            if "upload_path" in project.keys():
-#                self.upload_path = project['upload_path']
-#            if "pdb_id" in project.keys():
-#                self.pdb_id = project['pdb_id']
-#            if "input_source" in project.keys():
-#                self.input_source = project['input_source']
-#
-#            if 'project_dir' in project.keys():
-#                log.info("Found a project_dir in the request.")
-#                if request_dict['project']['project_dir'] != " ":
-#                    
-#                    self.project_dir = project['project_dir']
-#                else:
-#                    log.debug("No project_dir found in the project. Using default.")
-#                    ## Default, if none offered by the user.
-#                    self.project_dir =  buildProjectDir(self.project_type , self.pUUID)
-#            else:
-#                log.debug("No project_dir found in the project. Using default.")
-#                ## Default, if none offered by the user.
-#                self.project_dir =  buildProjectDir(self.project_type , self.pUUID)
-#        else:
-#            ## Default, if no project offered by the user.
-#            log.debug("No project found. Using default project dir.")
-#            self.project_dir =  buildProjectDir(self.project_type , self.pUUID)
-#
-#        log.debug("project_dir: " + self.project_dir)
 
     def __str__(self): 
         result = super().__str__()
@@ -288,35 +248,6 @@ class GpProject(Project):
     def __init__(self, **data : Any):
         super().__init__(**data)
 
-#    def __init__(self, request_dict : dict):
-#        super().__init__(request_dict)
-#        log.info("GpProject.__init__() was called.")
-#        pdbProject = PdbProject(request_dict)
-#        log.debug("pdbProject: \n" + str(pdbProject.__dict__))
-#        self.pdbProjectID = pdbProject.pUUID
-#        self.status = "submitted"
-#        self.project_type = "gp"
-#        self.has_input_files = True
-#        self.uploadFileName = pdbProject.uploadFileName
-#        ##User may provide a project_dir.
-#        if'project' in request_dict.keys():
-#            
-#            if 'project_dir' in request_dict['project'].keys():
-#                project = request_dict['project']
-#                self.project_dir = project['project_dir']
-#            else:
-#                ## Default, if none offered by the user.
-#                self.project_dir =  buildProjectDir(self.project_type , self.pUUID)
-#        else:
-#            ## Default, if none offered by the user.
-#                self.project_dir =  buildProjectDir(self.project_type , self.pUUID)
-#
-#
-#    def __str__(self):
-#        result = super().__str__()
-#        result = result + "\npdbProjectId: " + self.pdbProjectID
-#        result = result + "\nstatus: " + self.status
-#        return result
 
 
 ## Details and location of the build of a single pose of a structure.

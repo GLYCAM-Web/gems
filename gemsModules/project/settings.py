@@ -20,12 +20,15 @@ serviceModules = {
 }
 
 # Default project path - see also getProjectPath()
-output_data_dir = '/website/userdata/'
+output_data_dir = '/website/userdata/'  ## Being deprecated
+default_filesystem_output_path = '/website/userdata/' ## Use this instead of output_data_dir
+default_versions_file_path = default_filesystem_output_path
+default_versions_file_name = "VERSIONS.sh"
 
 # Default subdirectories per project type.  Typically, these go
 # under whatever is defined for project_path
-project_subdirectory = {
-        'cb'   :  'tools/cb',
-        'pdb'  :  'tools/pdb',
-        'gp'   :  'tools/gp'
+toolPathIdentifier = {
+        'cb'   :  'tools/cb/git-ignore-me_userdata',
+        'pdb'  :  'tools/pdb/git-ignore-me_userdata',
+        'gp'   :  'tools/gp/git-ignore-me_userdata'
         }

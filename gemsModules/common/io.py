@@ -265,10 +265,10 @@ class Transaction:
         log.info("getProjectFromTransactionIn() was called.\n")
         try :
             if all(v is not None for v in [ 
-                thisTransaction.transaction_in ,
-                thisTransaction.transaction_in.project ]) :
-                log.debug("Found a non-None project in transaction_in of type : " + str(type(project)))
-                return thisTransaction.transaction_in.project
+                self.transaction_in ,
+                self.transaction_in.project ]) :
+                log.debug("Found a non-None project in transaction_in of type : " + str(type(self.transaction_in.project)))
+                return self.transaction_in.project
             else:
                 return None
         except Exception as error :
@@ -278,15 +278,67 @@ class Transaction:
         log.info("getProjectFromTransactionOut() was called.\n")
         try :
             if all(v is not None for v in [ 
-                thisTransaction.transaction_out ,
-                thisTransaction.transaction_out.project ]) :
-                log.debug("Found a non-None project in transaction_out of type : " + str(type(project)))
-                return thisTransaction.transaction_out.project
+                self.transaction_out ,
+                self.transaction_out.project ]) :
+                log.debug("Found a non-None project in transaction_out of type : " + str(type(self.transaction_out.project)))
+                return self.transaction_out.project
             else:
                 return None
         except Exception as error :
             log.error("There was a problem getting the project from transaction_out :  " + str(error))
             raise error
+
+    def getSchemaLocation() :
+        thisProject=self.getProjectOut()
+        return thisProject.getFilesystemPath()
+
+    def setFilesystemPathOut(self, specifiedPath=None):
+        projectOut = self.getProjectOut()
+        if projectOut is None :
+            # TODO:  make this error handling be better
+            log.error("The transaction was asked to set the Filesystem path for a non-existent project.'")
+            return
+        # allow for direct setting of project dir
+        if specifiedPath is not None :
+            log.debug("Setting Filesystem_path to specified path : " + specifiedPath)
+            projectOut.setFilesystemPath(specifiedPath)
+            return
+        # if it wasn't directly specified, see if it can be found in the incoming transaction
+        projectIn = thisTransaction.getProjectIn()
+        if all(v is not None for v in [
+            projectIn,
+            projectIn.filesystem_path,
+            ]):
+            if projectIn.filesystem_path != "" :
+                message="Using the project directory specified in the incoming transaction."
+                log.debug(message)
+                projectOut.setFilesystemPath(projectIn.filesystem_path)
+                return
+
+        message="There is no incoming or specified project information.  Setting project Filesystem_path internally."
+        log.debug(message)
+
+        GEMS_OUTPUT_PATH = os.environ.get('GEMS_OUTPUT_PATH')
+        if GEMS_OUTPUT_PATH is None :
+            theFilesystemPath = project_settings.default_filesystem_output_path
+        elif GEMS_OUTPUT_PATH == "" :
+            theFilesystemPath = project_settings.default_filesystem_output_path
+        else :
+            theFilesystemPath = GEMS_OUTPUT_PATH
+
+        if theFilesystemPath is None :
+            message="Unknown error trying to set project FilesystemPath."
+            log.error(message)
+            thisTransaction.generateCommonParserNotice(
+                    noticeBrief='GemsError',
+                    messagingEntity=settings.WhoIAm,
+                    additionalInfo={'hint':message})
+            return
+
+        log.debug("Setting outgoing project FilesystemPath to : " + theFilesystemPath)
+        projectOut.setFilesystemPath(theFilesystemPath)
+        return
+
 
 
     def build_outgoing_string(self):

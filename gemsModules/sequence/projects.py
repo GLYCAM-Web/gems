@@ -74,12 +74,20 @@ def structureExists(buildState: sequenceio.Single3DStructureBuildDetails, thisTr
     else:
         log.debug("Sequence has previous builds. Checking for the requested buildState.")
         indexOrderedSequence = thisTransaction.getSequenceVariantOut('indexOrdered')
-        userDataDir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/Sequences/"
+        thisProject = thisTransaction.getProjectOut()
+        if thisProject is None :
+            message="The outgoing project is None so cannot determine the filesystem path."
+            log.error(message)
+            thisTransaction.generateCommonParserNotice(
+                    noticeBrief='GemsError',
+                    additionalInfo = { 'hint' : message }
+                    )
+            return
+        sequencePath = thisProject.getFilesystemPath() + "/" + projectSettings.toolPathIdentifier['cb'] + "/Sequences/"
         seqID = projectUtils.getSeqIDForSequence(indexOrderedSequence)
-        sequenceDir = userDataDir + seqID + "/" + buildStrategyID + "/" 
+        sequenceDir = sequencePath + seqID + "/" + buildStrategyID + "/" 
         log.debug("sequenceDir: " + sequenceDir)
         log.debug("buildState.conformerLabel: " + buildState.conformerLabel)
-           
         structureLinkInSequenceDir = sequenceDir + "All_Builds/" + buildState.structureDirectoryName
         log.debug("structureLinkInSequenceDir: " + structureLinkInSequenceDir)
         if os.path.isdir(structureLinkInSequenceDir):
@@ -111,9 +119,18 @@ def sequenceExists(buildState: sequenceio.Single3DStructureBuildDetails, thisTra
     ## Check if this sequence has been built before.
     ## Can we assume that seqID has already been initialized and saved?
     log.debug("Checking for previous builds of this sequence: " + sequence)
-    userDataDir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/Sequences/"
+    thisProject = thisTransaction.getProjectOut()
+    if thisProject is None :
+        message="The outgoing project is None so cannot determine the filesystem path."
+        log.error(message)
+        thisTransaction.generateCommonParserNotice(
+                noticeBrief='GemsError',
+                additionalInfo = { 'hint' : message }
+                )
+        return
+    sequencePath = thisProject.getFilesystemPath() + "/" + projectSettings.toolPathIdentifier['cb'] + "/Sequences/"
     seqID = projectUtils.getSeqIDForSequence(sequence)
-    sequenceDir = userDataDir + seqID
+    sequenceDir = sequencePath + seqID
     log.debug("sequenceExists sequenceDir: " + sequenceDir)
     if os.path.isdir(sequenceDir):
         log.debug("This sequence has previous builds.")
@@ -122,34 +139,9 @@ def sequenceExists(buildState: sequenceio.Single3DStructureBuildDetails, thisTra
         log.debug("No directory exists for this sequence, there cannot be any previous builds.")
         return False
 
-
-
-# ##  I believe the following is no longer used - Lachele
-# ##  @ brief Pass in a gemsProject and get a responseConfig.
-# #   @ param GemsProject gemsProject
-# #   @ return dict config
-# def build3dStructureResponseConfig(thisTransaction : sequenceio.Transaction):
-    #log.info("build3dStructureResponseConfig() was called.\n")
-    #gemsProject = thisTransaction.response_dict['gems_project']
-    #indexOrdered = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
-    #seqID = getSeqIDForSequence(indexOrdered)
-    #downloadUrl = getDownloadUrl(gemsProject['pUUID'], "cb")
-    #sequence = gemsProject['sequence']
-    #config = {
-        #"sequence" : sequence,
-        #"validateOnly" : False,
-        #"outputType" : "Build3DStructure",
-        #"payload" : gemsProject['pUUID'],
-        #"seqID" : seqID,
-        #"downloadUrl" : downloadUrl
-#
-    #}
-#
-    
-
-    log.debug("returning 3dStructureResponseConfig: " + str(config))
-
-    return config
+    ## config is not defined previously in this function, so commenting these out.  BLF
+#    log.debug("returning 3dStructureResponseConfig: " + str(config))
+#    return config
 
 
 ## TODO: make all these directory/link/file making functions into one thing
@@ -211,23 +203,41 @@ def addSequenceFolderSymLinkToNewBuild(sequenceID:str, buildStrategyID:str, proj
     # Add a symlink from Sequences/sequenceID/buildStrategyID/All_Builds/conformerID
     #                 to Builds/projectID/New_Builds/conformerID
     # Don't want to call this function for Existing_Builds, as they should already be linked from All_Builds.
-    parent_dir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/"
-    # sequencePath = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/Sequences/"
-    # seqIDPath = sequencePath + sequenceID
+    thisProject = thisTransaction.getProjectOut()
+    if thisProject is None :
+        message="The outgoing project is None so cannot determine the filesystem path."
+        log.error(message)
+        thisTransaction.generateCommonParserNotice(
+                noticeBrief='GemsError',
+                additionalInfo = { 'hint' : message }
+                )
+        return
+    toolPath = thisProject.getFilesystemPath() + "/" + projectSettings.toolPathIdentifier['cb'] 
+    sequencePath = toolPath + "/Sequences/"
     path_down_to_source = 'Builds/' + projectID + "/New_Builds/" + conformerID
     path_down_to_dest_dir = 'Sequences/' + sequenceID + '/' + buildStrategyID + '/All_Builds/'
-    log.debug("Creating symlink with parentDir " + parent_dir + " called " + conformerID + " from " + path_down_to_dest_dir + " pointing to " + path_down_to_source)
+    log.debug("Creating symlink with toolPath " + toolPath + " called " + conformerID + " from " + path_down_to_dest_dir + " pointing to " + path_down_to_source)
 # make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, dest_link_label, parent_directory)
-    commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, conformerID, parent_dir)
+    commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, conformerID, toolPath)
 
 
 def addBuildFolderSymLinkToExistingConformer(sequenceID:str, buildStrategyID:str, projectID:str, conformerID:str):
     log.info("addBuildFolderSymLinkForExistingConformer() was called.")
-    parent_dir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/"
+    thisProject = thisTransaction.getProjectOut()
+    if thisProject is None :
+        message="The outgoing project is None so cannot determine the filesystem path."
+        log.error(message)
+        thisTransaction.generateCommonParserNotice(
+                noticeBrief='GemsError',
+                additionalInfo = { 'hint' : message }
+                )
+        return
+    toolPath = thisProject.getFilesystemPath() + "/" + projectSettings.toolPathIdentifier['cb'] 
+    sequencePath = toolPath + "/Sequences/"
     path_down_to_dest_dir = 'Builds/' + projectID + '/Existing_Builds/'
     path_down_to_source = 'Sequences/' + sequenceID + '/' + buildStrategyID + '/All_Builds/' + conformerID
-    log.debug("Creating symlink in " + parent_dir + " between " + path_down_to_dest_dir + " called " + conformerID + " to " + path_down_to_source)
-    commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, conformerID, parent_dir)
+    log.debug("Creating symlink in " + toolPath + " between " + path_down_to_dest_dir + " called " + conformerID + " to " + path_down_to_source)
+    commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, conformerID, toolPath)
 
 
 
@@ -238,13 +248,22 @@ def addBuildFolderSymLinkToExistingConformer(sequenceID:str, buildStrategyID:str
 def setupInitialSequenceFolders(sequenceID:str, projectID:str, buildStrategyID:str):
     log.info("setupInitialSequenceFolders() was called.")
     ## Some of the folders in Sequence may already exist via a previous project, those in Builds should not.
-    ## userDataDir is the top level dir that holds the repository of all sequences
     log.debug(projectSettings.output_data_dir)
-    sequencePath = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/Sequences/"
+    thisProject = thisTransaction.getProjectOut()
+    if thisProject is None :
+        message="The outgoing project is None so cannot determine the filesystem path."
+        log.error(message)
+        thisTransaction.generateCommonParserNotice(
+                noticeBrief='GemsError',
+                additionalInfo = { 'hint' : message }
+                )
+        return
+    projectFilesystemPath = thisProject.getFilesystemPath()
+    toolPath =  projectFilesystemPath + "/" + projectSettings.toolPathIdentifier['cb'] 
+    sequencePath = toolPath + "/Sequences/"
     seqIDPath = sequencePath + sequenceID
-    projectPath = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/Builds/"
-    projIDPath = projectPath + projectID
-    parent_dir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/"    
+    buildPath = toolPath + "/Builds/"
+    projIDPath = buildPath + projectID
     buildStrategyPath = seqIDPath + '/' + buildStrategyID + '/'
     if not os.path.isdir(buildStrategyPath):
         try:
@@ -344,13 +363,22 @@ def checkIfDefaultStructureExists(thisTransaction):
         raise error
     else:
         seqID = getSeqIDForSequence(sequence)
-        userDataDir = projectSettings.output_data_dir + "tools/cb/git-ignore-me_userdata/Sequences/"
-        log.debug("userDataDir: " + userDataDir)
+        thisProject = thisTransaction.getProjectOut()
+        if thisProject is None :
+            message="The outgoing project is None so cannot determine the filesystem path."
+            log.error(message)
+            thisTransaction.generateCommonParserNotice(
+                    noticeBrief='GemsError',
+                    additionalInfo = { 'hint' : message }
+                    )
+            return
+        sequencePath = thisProject.getFilesystemPath() + "/" + projectSettings.toolPathIdentifier['cb'] + "/Sequences/"
+        log.debug("sequencePath: " + sequencePath)
         options = getOptionsFromTransaction(thisTransaction)
         try:
-            log.debug("Walking the userDataDir.")
+            log.debug("Walking the sequencePath.")
 
-            for element in os.walk(userDataDir):
+            for element in os.walk(sequencePath):
                 rootPath = element[0]
                 dirNames = element[1]
                 fileNames = element[2]

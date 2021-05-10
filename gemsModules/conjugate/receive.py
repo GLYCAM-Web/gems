@@ -28,6 +28,7 @@ def doDefaultService(thisTransaction):
     #thisTransaction.response_dict['responses'].append({'payload':marco('Conjugate')})
 
 
+
 def receive(thisTransaction):
     log.info("receive() was called.\n")
 
@@ -140,7 +141,6 @@ def writeGpScript(inputFileName, gemsProject):
     log.debug("inputFileName: " + inputFileName)
 
     outputDir = gemsProject.project_dir
-    #/programs/GlycoProteinBuilder/bin/ /website/userdata/tools/gp/git-ignore-me_userdata/4f18b278-d9bb-4111-b502-d91945639fa6/ > /website/userdata/tools/gp/git-ignore-me_userdata/4f18b278-d9bb-4111-b502-d91945639fa6/gp.log
     sbatchArg = "gpScript.sh"
     script = outputDir + sbatchArg
     try:
