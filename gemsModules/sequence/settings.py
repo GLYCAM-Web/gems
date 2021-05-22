@@ -44,11 +44,10 @@ subEntities = [
 
 ## Module names for services that this entity/module can perform.
 serviceModules = {
-    'Validate' : 'validate',
-    'Evaluate' : 'evaluate',
+    'Validate'         : 'validate',
+    'Evaluate'         : 'evaluate',
     'Build3DStructure' : 'build3Dstructure'
 }
-
 
 # ## from Lachele, 2021-04-01:  
 # ##    I'm moving these here from io.py.  They don't

@@ -97,6 +97,9 @@ def buildEach3DStructureInStructureInfo(thisTransaction : sequenceio.Transaction
         log.error(error)
         raise error
 
+    thisProject = thisTransaction.transaction_out.project
+    thisServiceDir = thisProject.service_dir
+
     for buildState in theseBuildStates :
         log.debug("Checking if a structure has been built in this buildState: ")
         log.debug("buildState: " + repr(buildState))
@@ -140,10 +143,7 @@ def buildEach3DStructureInStructureInfo(thisTransaction : sequenceio.Transaction
             build3DStructure(buildState, thisTransaction, outputDirPath, builder)
 #            print("1.2.6")
             if thisTransaction.transaction_in.mdMinimize is True : 
-                sequenceProjects.addSequenceFolderSymLinkToNewBuild(thisSeqID, thisBuildStrategyID, thisPuuID, conformerID)        
-            if conformerID == "default": # And doesn't already exist.
-                #sequenceProjects.createDefaultSymLinkSequencesDirectory(this_seqID, conformerID, buildStrategyID)
-                sequenceProjects.createDefaultSymLinkBuildsDirectory(thisProjectDir, buildDir + conformerID)
+                sequenceProjects.addSequenceFolderSymLinkToNewBuild(thisServiceDir, thisSeqID, thisBuildStrategyID, thisPuuID, conformerID)        
                 
         # buildDir is either New_Builds/ or Existing_Builds/
 #        print("2")

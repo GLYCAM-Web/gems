@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import json, sys, os, re, importlib.util, shutil, uuid
+import json, sys, os, re, importlib.util, shutil, uuid, pathlib
 from datetime import datetime
 #import gemsModules
 import gmml
@@ -83,9 +83,20 @@ def structureExists(buildState: sequenceio.Single3DStructureBuildDetails, thisTr
                     additionalInfo = { 'hint' : message }
                     )
             return
-        sequencePath = thisProject.getFilesystemPath() + "/" + projectSettings.toolPathIdentifier['cb'] + "/Sequences/"
+        thisSequence = thisTransaction.transaction_out.entity
+        if thisSequence is None :
+            message="The Entity (sequence) is None so cannot determine if structure exists."
+            log.error(message)
+            thisTransaction.generateCommonParserNotice(
+                    noticeBrief='GemsError',
+                    additionalInfo = { 'hint' : message }
+                    )
+            return
+      
+        servicePath = os.path.join(thisProject.getFilesystemPath(), thisProject.getEntityId(), thisProject.getServiceId())
+        sequencePath = os.path.join(servicePath, "/Sequences/")
         seqID = projectUtils.getSeqIDForSequence(indexOrderedSequence)
-        sequenceDir = sequencePath + seqID + "/" + buildStrategyID + "/" 
+        sequenceDir = os.path.join(sequencePath , seqID , thisSequence.outputs.getBuildStrategyID())
         log.debug("sequenceDir: " + sequenceDir)
         log.debug("buildState.conformerLabel: " + buildState.conformerLabel)
         structureLinkInSequenceDir = sequenceDir + "All_Builds/" + buildState.structureDirectoryName
@@ -128,9 +139,23 @@ def sequenceExists(buildState: sequenceio.Single3DStructureBuildDetails, thisTra
                 additionalInfo = { 'hint' : message }
                 )
         return
-    sequencePath = thisProject.getFilesystemPath() + "/" + projectSettings.toolPathIdentifier['cb'] + "/Sequences/"
+    thisSequence = thisTransaction.transaction_out.entity
+    if thisSequence is None :
+        message="The Entity (sequence) is None so cannot determine if sequence exists."
+        log.error(message)
+        thisTransaction.generateCommonParserNotice(
+                noticeBrief='GemsError',
+                additionalInfo = { 'hint' : message }
+                )
+        return
+
+    servicePath = os.path.join(thisProject.getFilesystemPath(), thisProject.getEntityId(), thisProject.getServiceId())
+    sequencePath = os.path.join(servicePath, "/Sequences/")
     seqID = projectUtils.getSeqIDForSequence(sequence)
-    sequenceDir = sequencePath + seqID
+    # I think this is correct (Lachele)
+    sequenceDir = os.path.join(sequencePath , seqID , thisSequence.outputs.getBuildStrategyID())
+    # it used to say this
+    # sequenceDir = sequencePath + seqID
     log.debug("sequenceExists sequenceDir: " + sequenceDir)
     if os.path.isdir(sequenceDir):
         log.debug("This sequence has previous builds.")
@@ -138,10 +163,6 @@ def sequenceExists(buildState: sequenceio.Single3DStructureBuildDetails, thisTra
     else:
         log.debug("No directory exists for this sequence, there cannot be any previous builds.")
         return False
-
-    ## config is not defined previously in this function, so commenting these out.  BLF
-#    log.debug("returning 3dStructureResponseConfig: " + str(config))
-#    return config
 
 
 ## TODO: make all these directory/link/file making functions into one thing
@@ -176,68 +197,48 @@ def createSymLinkInRequestedStructures(projectDir : str, buildDir : str, conform
         log.error(traceback.format_exc())
         raise error
 
-# Create default symlinks. Works for either existing/new conformer/default.
-# outputDir can be Existing_Builds/ or New_Builds/ followed by a conformerID or "default"
-def createDefaultSymLinkBuildsDirectory(projectDir : str, outputDir : str):
-    log.info("createDefaultSymLinkBuildsDirectory() was called")
-    try:
-        log.debug("projectDir: " + projectDir)
-        log.debug("outputDir: " + outputDir)
-        parent_dir = projectDir
-        path_down_to_source = outputDir
-        path_down_to_dest_dir = None
+## Create default symlinks. Works for either existing/new conformer/default.
+## outputDir can be Existing_Builds/ or New_Builds/ followed by a conformerID or "default"
+#def createDefaultSymLinkBuildsDirectory(projectDir : str, outputDir : str):
+#    log.info("createDefaultSymLinkBuildsDirectory() was called")
+#    try:
+#        log.debug("projectDir: " + projectDir)
+#        log.debug("outputDir: " + outputDir)
+#        parent_dir = projectDir
+#        path_down_to_source = outputDir
+#        path_down_to_dest_dir = None
+#
+#        commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, "defaultFolder", parent_dir)
+#        path_down_to_source = "defaultFolder/mol_min.pdb"
+#        commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, "default.pdb", parent_dir)
+#        path_down_to_source = "defaultFolder/structure.pdb"
+#        commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, "default_unminimized.pdb", parent_dir)
+#    except Exception as error:
+#        log.error("Cound not create default symlinks in Builds/" + str(error))
+#        log.error(traceback.format_exc())
+#        raise error
 
-        commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, "defaultFolder", parent_dir)
-        path_down_to_source = "defaultFolder/mol_min.pdb"
-        commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, "default.pdb", parent_dir)
-        path_down_to_source = "defaultFolder/structure.pdb"
-        commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, "default_unminimized.pdb", parent_dir)
-    except Exception as error:
-        log.error("Cound not create default symlinks in Builds/" + str(error))
-        log.error(traceback.format_exc())
-        raise error
 
-
-def addSequenceFolderSymLinkToNewBuild(sequenceID:str, buildStrategyID:str, projectID:str, conformerID:str):
+def addSequenceFolderSymLinkToNewBuild(servicePath:str, sequenceID:str, buildStrategyID:str, projectID:str, conformerID:str):
     log.info("addSequenceFolderSymLinkForConformer() was called.")
     # Add a symlink from Sequences/sequenceID/buildStrategyID/All_Builds/conformerID
     #                 to Builds/projectID/New_Builds/conformerID
     # Don't want to call this function for Existing_Builds, as they should already be linked from All_Builds.
-    thisProject = thisTransaction.getProjectOut()
-    if thisProject is None :
-        message="The outgoing project is None so cannot determine the filesystem path."
-        log.error(message)
-        thisTransaction.generateCommonParserNotice(
-                noticeBrief='GemsError',
-                additionalInfo = { 'hint' : message }
-                )
-        return
-    toolPath = thisProject.getFilesystemPath() + "/" + projectSettings.toolPathIdentifier['cb'] 
-    sequencePath = toolPath + "/Sequences/"
+#    sequencePath = os.path.join(servicePath, "/Sequences/")
     path_down_to_source = 'Builds/' + projectID + "/New_Builds/" + conformerID
     path_down_to_dest_dir = 'Sequences/' + sequenceID + '/' + buildStrategyID + '/All_Builds/'
-    log.debug("Creating symlink with toolPath " + toolPath + " called " + conformerID + " from " + path_down_to_dest_dir + " pointing to " + path_down_to_source)
+    log.debug("Creating symlink with toolPath " + servicePath + " called " + conformerID + " from " + path_down_to_dest_dir + " pointing to " + path_down_to_source)
 # make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, dest_link_label, parent_directory)
-    commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, conformerID, toolPath)
+    commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, conformerID, servicePath)
 
 
-def addBuildFolderSymLinkToExistingConformer(sequenceID:str, buildStrategyID:str, projectID:str, conformerID:str):
+def addBuildFolderSymLinkToExistingConformer(servicePath:str, sequenceID:str, buildStrategyID:str, projectID:str, conformerID:str):
     log.info("addBuildFolderSymLinkForExistingConformer() was called.")
-    thisProject = thisTransaction.getProjectOut()
-    if thisProject is None :
-        message="The outgoing project is None so cannot determine the filesystem path."
-        log.error(message)
-        thisTransaction.generateCommonParserNotice(
-                noticeBrief='GemsError',
-                additionalInfo = { 'hint' : message }
-                )
-        return
-    toolPath = thisProject.getFilesystemPath() + "/" + projectSettings.toolPathIdentifier['cb'] 
-    sequencePath = toolPath + "/Sequences/"
+    sequencePath = os.path.join(servicePath, "/Sequences/")
     path_down_to_dest_dir = 'Builds/' + projectID + '/Existing_Builds/'
     path_down_to_source = 'Sequences/' + sequenceID + '/' + buildStrategyID + '/All_Builds/' + conformerID
     log.debug("Creating symlink in " + toolPath + " between " + path_down_to_dest_dir + " called " + conformerID + " to " + path_down_to_source)
-    commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, conformerID, toolPath)
+    commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir, conformerID, servicePath)
 
 
 
@@ -245,29 +246,27 @@ def addBuildFolderSymLinkToExistingConformer(sequenceID:str, buildStrategyID:str
 #           reused via symlink.
 #   @detail Still being worked on, but works for default structures.
 #   @param  Transaction
-def setupInitialSequenceFolders(sequenceID:str, projectID:str, buildStrategyID:str):
+def setupInitialSequenceFolders(servicePath:str, sequenceID:str, projectID:str, buildStrategyID:str):
     log.info("setupInitialSequenceFolders() was called.")
     ## Some of the folders in Sequence may already exist via a previous project, those in Builds should not.
-    log.debug(projectSettings.output_data_dir)
-    thisProject = thisTransaction.getProjectOut()
-    if thisProject is None :
-        message="The outgoing project is None so cannot determine the filesystem path."
-        log.error(message)
-        thisTransaction.generateCommonParserNotice(
-                noticeBrief='GemsError',
-                additionalInfo = { 'hint' : message }
-                )
-        return
-    projectFilesystemPath = thisProject.getFilesystemPath()
-    toolPath =  projectFilesystemPath + "/" + projectSettings.toolPathIdentifier['cb'] 
-    sequencePath = toolPath + "/Sequences/"
-    seqIDPath = sequencePath + sequenceID
-    buildPath = toolPath + "/Builds/"
-    projIDPath = buildPath + projectID
-    buildStrategyPath = seqIDPath + '/' + buildStrategyID + '/'
-    if not os.path.isdir(buildStrategyPath):
+    log.debug("Here are the inputs: ")
+    log.debug("servicePath:str : " + servicePath)
+    log.debug("sequenceID:str : " + sequenceID)
+    log.debug("projectID:str : " + projectID)
+    log.debug("buildStrategyID:str : "  + buildStrategyID)
+    sequencePath = os.path.join(servicePath , "Sequences")
+    seqIDPath = os.path.join(sequencePath , sequenceID)
+    buildPath = os.path.join(servicePath , "Builds")
+    projIDPath = os.path.join(buildPath , projectID)
+    buildStrategyPath = os.path.join(seqIDPath , buildStrategyID)
+    log.debug("sequencePath : " + sequencePath )
+    log.debug("seqIDPath : " + seqIDPath  )
+    log.debug("buildPath : " + buildPath  )
+    log.debug("projIDPath : " + projIDPath  )
+    log.debug("buildStrategyPath : " + buildStrategyPath  )
+    if not os.path.isdir(buildStrategyPath): 
         try:
-            os.makedirs(buildStrategyPath)
+            pathlib.Path(buildStrategyPath).mkdir(parents=True)
             path_down_to_dest_dir = None # Same level as parent directory (seqIDPath)
             commonlogic.make_relative_symbolic_link(buildStrategyPath, None, 'current', seqIDPath)
         except Exception as error:
@@ -285,12 +284,22 @@ def setupInitialSequenceFolders(sequenceID:str, projectID:str, buildStrategyID:s
             raise error
     # Just make everything you might need here.
     try:
-
-        os.makedirs(projIDPath + '/Requested_Builds', exist_ok = True)
-        os.makedirs(projIDPath + '/Existing_Builds',  exist_ok = True)
-        os.makedirs(projIDPath + '/New_Builds', exist_ok = True)
-        os.makedirs(projIDPath + '/New_Builds/' + 'logs/', exist_ok = True)
-        os.makedirs(projIDPath + '/Existing_Builds/' + 'logs/', exist_ok = True)
+        requestedBuildsPath = os.path.join(projIDPath , 'Requested_Builds')
+        existingBuildsPath = os.path.join(projIDPath , 'Existing_Builds')
+        newBuildsPath = os.path.join(projIDPath , 'New_Builds')
+        newBuildsLogsPath = os.path.join(projIDPath , 'New_Builds' + 'logs')
+        existingBuildsLogsPath = os.path.join(projIDPath , 'Existing_Builds' + 'logs')
+        log.debug("Making these paths : " )
+        log.debug("requestedBuildsPath : " + requestedBuildsPath )
+        log.debug("existingBuildsPath : " + existingBuildsPath )
+        log.debug("newBuildsPath : " + newBuildsPath )
+        log.debug("newBuildsLogsPath : " + newBuildsLogsPath )
+        log.debug("existingBuildsLogsPath :"  + existingBuildsLogsPath )
+        pathlib.Path(requestedBuildsPath).mkdir(parents=True, exist_ok = True)
+        pathlib.Path(existingBuildsPath).mkdir(parents=True,  exist_ok = True)
+        pathlib.Path(newBuildsPath).mkdir(parents=True, exist_ok = True)
+        pathlib.Path(newBuildsLogsPath).mkdir(parents=True, exist_ok = True)
+        pathlib.Path(existingBuildsLogsPath).mkdir(parents=True, exist_ok = True)
     except Exception as error:
         log.error("There was a problem making folders or logs in Builds " + str(error))
         log.error(traceback.format_exc())
@@ -301,7 +310,7 @@ def setupInitialSequenceFolders(sequenceID:str, projectID:str, buildStrategyID:s
     try:
         path_down_to_source = 'Sequences/'+ sequenceID
         path_down_to_dest_dir = 'Builds/' + projectID 
-        commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir , 'Sequence_Repository', parent_dir)
+        commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir , 'Sequence_Repository', servicePath)
     except Exception as error:
         log.error("There was a problem making Sequence_Repository link " + str(error))
         log.error(traceback.format_exc())
@@ -311,93 +320,82 @@ def setupInitialSequenceFolders(sequenceID:str, projectID:str, buildStrategyID:s
 ##  @brief Looks at a transaction to determine if the user is requesting the default structure
 #   @param Transaction thisTransaction
 #   @return Boolean isDefault
-def checkIfDefaultStructureRequest(thisTransaction):
-    log.info("checkIfDefaultStructureRequest was called().")
-    from gemsModules.sequence import logic
-    options  = logic.getOptionsFromTransaction(thisTransaction)
-    log.debug("options: " + str(options))
-
-    if options == None:
-        log.debug("No options found, returning true.")
-        return True
-    else:
-        log.debug("options.keys(): " + str(options.keys()))
-        ## The presense of rotamers in options means this is not a request
-        # for the default structure.
-        if "geometryOptions" in options.keys():
-            log.debug("geometryOptions found, returning False.")
-            return False
-        else:
-            log.debug("No geometryOptions found, returning True.")
-            return True
-
-##  @brief gets the path of the default dir for a project. 
-##  @TODO: Evaluate if this is necessary. Possibly deprecate this. 
-def getProjectSubdir(thisTransaction: sequenceio.Transaction):
-    log.info("getProjectSubdir() was called.")
-    project_dir = thisTransaction.response_dict['gems_project']['project_dir']
-    log.debug("project_subdir: " + project_dir)
-
-    ## If default structure, subdir name is 'structure'
-    if checkIfDefaultStructureRequest(thisTransaction):
-        return project_dir 
-    else:
-        log.error("Still writing the logic to handle builds with selectedRotamers.")
-        ##TODO: provide the subdir based on this doc: 
-        ## http://128.192.9.183/eln/gwscratch/2020/01/10/succinct-rotamer-set-labeling-for-sequences/
-        raise AttributeError("rotamerSubdir")
-    return project_dir 
+#
+#  This is defined but not used (Lachele)
+#
+#def checkIfDefaultStructureRequest(thisTransaction):
+#    log.info("checkIfDefaultStructureRequest was called().")
+#    from gemsModules.sequence import logic
+#    options  = logic.getOptionsFromTransaction(thisTransaction)
+#    log.debug("options: " + str(options))
+#
+#    if options == None:
+#        log.debug("No options found, returning true.")
+#        return True
+#    else:
+#        log.debug("options.keys(): " + str(options.keys()))
+#        ## The presense of rotamers in options means this is not a request
+#        # for the default structure.
+#        if "geometryOptions" in options.keys():
+#            log.debug("geometryOptions found, returning False.")
+#            return False
+#        else:
+#            log.debug("No geometryOptions found, returning True.")
+#            return True
 
 
 ##  @brief Looks up the sequence and generates an seqID, then checks for existing builds.
 #   @param Transaction thisTransaction
 #   @return Boolean structureExists
-def checkIfDefaultStructureExists(thisTransaction):
-    log.info("checkIfDefaultStructureExists() was called.")
-    structureExists = False
-    try:
-        sequence = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
-    except Exception as error:
-        log.error("There was a problem getting the sequence from the transaction: "  + str(error))
-        log.error(traceback.format_exc())
-        raise error
-    else:
-        seqID = getSeqIDForSequence(sequence)
-        thisProject = thisTransaction.getProjectOut()
-        if thisProject is None :
-            message="The outgoing project is None so cannot determine the filesystem path."
-            log.error(message)
-            thisTransaction.generateCommonParserNotice(
-                    noticeBrief='GemsError',
-                    additionalInfo = { 'hint' : message }
-                    )
-            return
-        sequencePath = thisProject.getFilesystemPath() + "/" + projectSettings.toolPathIdentifier['cb'] + "/Sequences/"
-        log.debug("sequencePath: " + sequencePath)
-        options = getOptionsFromTransaction(thisTransaction)
-        try:
-            log.debug("Walking the sequencePath.")
-
-            for element in os.walk(sequencePath):
-                rootPath = element[0]
-                dirNames = element[1]
-                fileNames = element[2]
-
-                log.debug("rootPath: " + str(rootPath))
-                log.debug("dirNames: " + str(dirNames))
-                log.debug("fileNames: " + str(fileNames))
-                for dirName in dirNames:
-                    log.debug("dirName: " + dirName)
-                    log.debug("seqID: " + seqID)
-                    if seqID == dirName:
-                        return True
-                        
-        except Exception as error:
-            log.error("There was a problem checking if this structure exists.")
-            log.error(traceback.format_exc())
-            raise error
-        else:
-            return structureExists
+#
+#  This is defined but not used (Lachele)
+#
+#def checkIfDefaultStructureExists(thisTransaction):
+#    log.info("checkIfDefaultStructureExists() was called.")
+#    structureExists = False
+#    try:
+#        sequence = getSequenceFromTransaction(thisTransaction, 'indexOrdered')
+#    except Exception as error:
+#        log.error("There was a problem getting the sequence from the transaction: "  + str(error))
+#        log.error(traceback.format_exc())
+#        raise error
+#    else:
+#        seqID = getSeqIDForSequence(sequence)
+#        thisProject = thisTransaction.getProjectOut()
+#        if thisProject is None :
+#            message="The outgoing project is None so cannot determine the filesystem path."
+#            log.error(message)
+#            thisTransaction.generateCommonParserNotice(
+#                    noticeBrief='GemsError',
+#                    additionalInfo = { 'hint' : message }
+#                    )
+#            return
+#        sequencePath = thisProject.getFilesystemPath() + "/" + projectSettings.toolPathIdentifier['cb'] + "/Sequences/"
+#        log.debug("sequencePath: " + sequencePath)
+#        options = getOptionsFromTransaction(thisTransaction)
+#        try:
+#            log.debug("Walking the sequencePath.")
+#
+#            for element in os.walk(sequencePath):
+#                rootPath = element[0]
+#                dirNames = element[1]
+#                fileNames = element[2]
+#
+#                log.debug("rootPath: " + str(rootPath))
+#                log.debug("dirNames: " + str(dirNames))
+#                log.debug("fileNames: " + str(fileNames))
+#                for dirName in dirNames:
+#                    log.debug("dirName: " + dirName)
+#                    log.debug("seqID: " + seqID)
+#                    if seqID == dirName:
+#                        return True
+#                        
+#        except Exception as error:
+#            log.error("There was a problem checking if this structure exists.")
+#            log.error(traceback.format_exc())
+#            raise error
+#        else:
+#            return structureExists
 
 
 

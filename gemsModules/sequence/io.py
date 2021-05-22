@@ -912,10 +912,9 @@ class Transaction(commonio.Transaction):
             self.initialize_transaction_out_from_transaction_in() 
         self.transaction_out.evaluateCondensedSequence() 
 
-# In file _manageSequenceRequest.py: 
-#    def manageSequenceRequest(self, defaultOnly : bool = False) 
-    from gemsModules.sequence._manageSequenceRequest import manageSequenceRequest
-
+# In file _manageSequenceBuild3DStructureRequest.py: 
+#    def manageSequenceBuild3DStructureRequest(self, defaultOnly : bool = False) 
+    from gemsModules.sequence._manageSequenceBuild3DStructureRequest import manageSequenceBuild3DStructureRequest
 
     def build_outgoing_string(self) :
         if self.transaction_out.prettyPrint is True : 

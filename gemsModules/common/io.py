@@ -292,52 +292,33 @@ class Transaction:
         thisProject=self.getProjectOut()
         return thisProject.getFilesystemPath()
 
-    def setFilesystemPathOut(self, specifiedPath=None):
-        projectOut = self.getProjectOut()
-        if projectOut is None :
-            # TODO:  make this error handling be better
-            log.error("The transaction was asked to set the Filesystem path for a non-existent project.'")
-            return
-        # allow for direct setting of project dir
-        if specifiedPath is not None :
-            log.debug("Setting Filesystem_path to specified path : " + specifiedPath)
-            projectOut.setFilesystemPath(specifiedPath)
-            return
-        # if it wasn't directly specified, see if it can be found in the incoming transaction
-        projectIn = thisTransaction.getProjectIn()
-        if all(v is not None for v in [
-            projectIn,
-            projectIn.filesystem_path,
-            ]):
-            if projectIn.filesystem_path != "" :
-                message="Using the project directory specified in the incoming transaction."
-                log.debug(message)
-                projectOut.setFilesystemPath(projectIn.filesystem_path)
-                return
 
-        message="There is no incoming or specified project information.  Setting project Filesystem_path internally."
-        log.debug(message)
 
+    ## This returns a tuple.
+    #  The first value is the source of the path:
+    #        Default : This is the internal default path.
+    #        Environment : This path is set by an environment variable
+    #        Error : There was an error trying to get the path.
+    #  The second value is the path, unless there was an error. in the
+    #    latter case, it is an error message.
+    #
+    #  This is used in Project for setting the filesystem_path .
+    def getFilesystemOutputPath(self):
+        log.debug("getFilesystemOutputPath was called")
         GEMS_OUTPUT_PATH = os.environ.get('GEMS_OUTPUT_PATH')
-        if GEMS_OUTPUT_PATH is None :
-            theFilesystemPath = project_settings.default_filesystem_output_path
-        elif GEMS_OUTPUT_PATH == "" :
-            theFilesystemPath = project_settings.default_filesystem_output_path
-        else :
-            theFilesystemPath = GEMS_OUTPUT_PATH
+        if GEMS_OUTPUT_PATH is not None and GEMS_OUTPUT_PATH != "" :
+            log.debug="Got Filesystem Output Path from environment.  It is : " + GEMS_OUTPUT_PATH
+            return ( 'Environment' , GEMS_OUTPUT_PATH )
 
-        if theFilesystemPath is None :
-            message="Unknown error trying to set project FilesystemPath."
+        # Currently, if not set by engironment variable, a default is used.
+        gemshome =  gemsModules.common.logic.getGemsHome 
+        if gemshome is None or gemshome == "" :
+            message = "Could not determine GEMSHOME.  Cannot set default filesystem output path."
             log.error(message)
-            thisTransaction.generateCommonParserNotice(
-                    noticeBrief='GemsError',
-                    messagingEntity=settings.WhoIAm,
-                    additionalInfo={'hint':message})
-            return
+        theDefaultPath = gemshome + '/UserSpace'
+        log.debug="Using default Filesystem Output Path.  It is : " + theDefaultPath
+        return ( 'Default' , theDefaultPath )
 
-        log.debug("Setting outgoing project FilesystemPath to : " + theFilesystemPath)
-        projectOut.setFilesystemPath(theFilesystemPath)
-        return
 
 
 

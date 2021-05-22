@@ -8,6 +8,7 @@ from gemsModules.common.loggingConfig import *
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 from pydantic import BaseModel, ValidationError
 from pydantic.schema import schema
+from shutil import copyfile
 import traceback
 
 ## TODO: Update this method to receive actual module name, not its key.
@@ -168,6 +169,59 @@ def getGemsHome():
 
         raise AttributeError("GEMSHOME")
     return GEMSHOME
+
+
+## This returns a tuple.
+#  The first value is the source of the path:
+#        Default : This is the internal default path.
+#        Environment : This path is set by an environment variable
+#        Error : There was an error trying to get the path.
+#  The second value is the path, unless there was an error. in the
+#    latter case, it is an error message.
+#
+#  This is used in Project for setting the filesystem_path .
+def getFilesystemOutputPath():
+    log.debug("getFilesystemOutputPath was called")
+    GEMS_OUTPUT_PATH = os.environ.get('GEMS_OUTPUT_PATH')
+    if GEMS_OUTPUT_PATH is not None and GEMS_OUTPUT_PATH != "" :
+        log.debug="Got Filesystem Output Path from environment.  It is : " + GEMS_OUTPUT_PATH
+        return ( 'Environment' , GEMS_OUTPUT_PATH )
+
+    # Currently, if not set by engironment variable, a default is used.
+    gemshome =  gemsModules.common.logic.getGemsHome 
+    if gemshome is None or gemshome == "" :
+        message = "Could not determine GEMSHOME.  Cannot set default filesystem output path."
+        log.error(message)
+    theDefaultPath = gemshome + '/UserSpace'
+    log.debug="Using default Filesystem Output Path.  It is : " + theDefaultPath
+    return ( 'Default' , theDefaultPath )
+
+
+def copyPathFileToPath( fromPath : str, fromName : str, toPath : str, noClobber : bool = False ) :
+    # If noClobber is True, check to be sure file doesn't already exist.
+    log.debug("common copyPathFileToPath was called")
+    if noClobber is True : 
+        if os.file.exists( os.path.join( toPath, fromName ) ) : 
+            log.debug("noClobber set to True and the file already exists.  Not copying") 
+            return
+    sourceFile = os.path.join( fromPath, fromName )
+    desFile = os.path.join( toPath, fromName )
+    copyfile( sourceFile, destFile )
+
+## Write a string to a file.
+#   @param theString
+#   @param filePath
+#   @param writemode
+#
+# writeMode can be 'w' for overwrite existing or 'a' for append
+def writeStringToFile(theString, filePath, writeMode : str = 'w'):
+    log.info("writeStringToFile() was called.\n")
+    try:
+        with open(filePath, writeMode, encoding='utf-8') as file:
+           file.write(theString)
+    except Exception as error:
+        log.error("There was a problem writing the request to file.")
+        raise error
 
 
 def make_relative_symbolic_link(

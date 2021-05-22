@@ -10,7 +10,7 @@
         "inputs": 
             {
                 "sequence": {
-                    "payload": "DManpa1-OH"
+                    "payload": "DGalpb1-6DManpa1-OH"
                 },
 		"resources" :[]
             }
@@ -18,6 +18,5 @@
     "project" : {
 	    "filesystem_path" : "/website/TESTS"
     },
-    "prettyPrint" : true,
-    "mdMinimize" : true
+    "prettyPrint" : true
 }

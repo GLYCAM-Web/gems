@@ -17,75 +17,7 @@ else:
     log = createLogger(__name__)
 
 
-##  Pass in a transaction, if a project is in the request,
-#   a project is created with any relevant data, and the
-#   transaction is updated with the project.
-#   @param transaction
-def startProject(thisTransaction):
-    log.info("startProject() was called.\n")
-    try:
-        # The requesting entity should have already initialized the transaction_in
-        #     AND the transaction_out
-        entity = thisTransaction.transaction_in.entity.entityType
-    except Exception as error:
-        log.error("There was a problem finding the entity in this transaction: " + str(error))
-        raise error
-    try:
-        ### Start a project
-        thisProjectIn = thisTransaction.transaction_in.project
-        thisProjectOut = thisTransaction.transaction_out.project
-        if entity == "Sequence":
-            log.debug("building a cb project.")
-            thisProjectOut = projectio.CbProject()
-        elif entity == "StructureFile":
-            log.debug("building a pdb project.")
-            thisProjectOut = projectio.PdbProject()
-        elif entity == "Conjugate":
-            log.debug("building a gp project.")
-            thisProjectOut = projectio.GpProject()
-        else:
-            log.error("Need to write code to instantiate projects for entity type: " + entity)
-            raise TypeError("entity: " + entity)
-
-    except Exception as error:
-        log.error("There was a problem starting the project: " + str(error))
-        raise error
-
-    thisProjectOut.startMeUp(thisTransaction)
-    log.debug("project.project_dir, after instantiation: " + str(thisProjectOut.project_dir))
-#    try:
-#        addProjectToResponse(projectio.project, thisTransaction)
-#    except Exception as error:
-#        log.error("There was a problem updating thisTransaction: " + str(error))
-#        raise error
-    ### Find the projectDir.
-    try:
-        project_dir = thisProjectOut.project_dir
-        logs_dir = setupProjectDirs(project_dir)
-    except Exception as error:
-        log.error("There was a problem getting the projectDir: " + str(error))
-        raise error
-    ### Copy any upload files.
-    log.debug("project.has_input_files: " + str(thisProjectOut.has_input_files))
-    if thisProjectOut.has_input_files == "True":
-        try:
-            copyUploadFilesToProject(thisTransaction, thisProjectOut)
-        except Exception as error:
-            log.error("There was a problem uploading the input: " + str(error))
-            raise error
-
-    ### Write the logs to file.
-    try:
-        request = thisTransaction.request_dict
-        writeRequestToFile(request, logs_dir)
-        writeProjectLogFile(thisProjectOut, logs_dir)
-        return thisProjectOut
-    except Exception as error:
-        log.error("There was a problem writing the project logs: " + str(error))
-        raise error
-
-    return thisProjectOut
-
+## TODO - this should be part of Transaction, not Project
 ## Pass in a transaction, figure out the requestingAgent. OK if it doesn't exist.
 #   Default is command line, replaced if a frontend project exists.
 #   @param transaction
@@ -132,34 +64,33 @@ def setupProjectDirs(projectDir):
         raise error
 
 
-## Write the original request to file.
-#   @param request
-#   @param logsDir
-def writeRequestToFile(request, logsDir):
-    log.info("writeRequestToFile() was called.\n")
-    requestFileName = os.path.join(logsDir,"request.json")
-    log.debug("requestFileName: " + requestFileName)
-    try:
-        with open(requestFileName, 'w', encoding='utf-8') as file:
-            json.dump(request, file, ensure_ascii=False, indent=4)
-    except Exception as error:
-        log.error("There was a problem writing the request to file.")
-        raise error
 
+### Write the original request to file.
+##   @param request
+##   @param logsDir
+#def writeRequestToFile(request, logsDir):
+#    log.info("writeRequestToFile() was called.\n")
+#    requestFileName = os.path.join(logsDir,"request.json")
+#    log.debug("requestFileName: " + requestFileName)
+#    try:
+#        with open(requestFileName, 'w', encoding='utf-8') as file:
+#            json.dump(request, file, ensure_ascii=False, indent=4)
+#    except Exception as error:
+#        log.error("There was a problem writing the request to file.")
+#        raise error
 
-
-## Writes the project to file in json format.
-#   @param project
-#   @param logsDir
-def writeProjectLogFile(project, logsDir):
-    log.info("writeProjectLogFile() was called.\n")
-    logFileName = project.project_type + "ProjectLog.json"
-    project_log_file = os.path.join(logsDir, logFileName)
-    log.debug("project_log_file: " + project_log_file)
-    with open(project_log_file, 'w', encoding='utf-8') as file:
-        jsonString = json.dumps(project.__dict__, indent=4, sort_keys=False, default=str)
-        log.debug("jsonString: \n" + jsonString )
-        file.write(jsonString)
+### Writes the project to file in json format.
+##   @param project
+##   @param logsDir
+#def writeProjectLogFile(project, logsDir):
+#    log.info("writeProjectLogFile() was called.\n")
+#    logFileName = project.project_type + "ProjectLog.json"
+#    project_log_file = os.path.join(logsDir, logFileName)
+#    log.debug("project_log_file: " + project_log_file)
+#    with open(project_log_file, 'w', encoding='utf-8') as file:
+#        jsonString = json.dumps(project.__dict__, indent=4, sort_keys=False, default=str)
+#        log.debug("jsonString: \n" + jsonString )
+#        file.write(jsonString)
 
 def updateCbProject(thisTransaction, structureInfo):
     log.info("updateCbProject was called")
@@ -215,60 +146,59 @@ def getUploadsSourceDir(project):
     else:
         return uploads_source_dir
 
-
-##  Creates a copy of uploads from the frontend
-#   @param transaction
-def copyUploadFilesToProject(thisTransaction : commonio.Transaction, project : projectio.Project):
-    log.info("copyUploadFilesToProject() was called.\n")
-    project_dir = getProjectDir(thisTransaction)
-    log.debug("project_dir: " + project_dir)
-
-    ## Find the destination dir
-    try:
-        destination_uploads_dir = getProjectUploadsDir(thisTransaction)
-    except Exception as error:
-        log.error("There was a problem creating the destination for upload files.")
-        log.error("Error type: " + str(type(error)))
-        log.error(traceback.format_exc())
-        raise error
-    # Find the source dir
-    try:
-        uploads_source_dir = getUploadsSourceDir(project)
-        log.debug("uploads_source_dir: " + uploads_source_dir)
-    except Exception as error:
-        log.error("There was a problem finding the upload files.")
-        log.error("Error type: " + str(type(error)))
-        log.error(traceback.format_exc())
-        raise error
-
-    # Find the file name
-    try:
-        target_upload_file = getUploadFileName(project)
-    except Exception as error:
-        log.error("There was a problem finding the upload file name: " + str(error))
-        log.error(traceback.format_exc())
-        raise error
-    try:
-        log.debug("hi")
-        uploads_dir = os.fsencode(uploads_source_dir)
-
-        for upload_file in os.listdir(uploads_dir):
-            filename = os.fsdecode(upload_file)
-            if filename == target_upload_file:
-                log.debug("filename: " + filename)
-                source_file = os.path.join(uploads_source_dir, filename)
-                log.debug("file source: " + source_file)
-                destination_file = os.path.join(destination_uploads_dir, filename)
-                log.debug("file destination: " + destination_file)
-                copyfile(source_file, destination_file)
-                break
-            else:
-                log.debug("Not copying this file: " + filename)
-    except Exception as error:
-        log.error("There was a problem copying the upload files into the project's project_dir.")
-        log.error("Error type: " + str(type(error)))
-        log.error(traceback.format_exc())
-        raise error
+###  Creates a copy of uploads from the frontend
+##   @param transaction
+#def copyUploadFilesToProject(thisTransaction : commonio.Transaction, project : projectio.Project):
+#    log.info("copyUploadFilesToProject() was called.\n")
+#    project_dir = getProjectDir(thisTransaction)
+#    log.debug("project_dir: " + project_dir)
+#
+#    ## Find the destination dir
+#    try:
+#        destination_uploads_dir = getProjectUploadsDir(thisTransaction)
+#    except Exception as error:
+#        log.error("There was a problem creating the destination for upload files.")
+#        log.error("Error type: " + str(type(error)))
+#        log.error(traceback.format_exc())
+#        raise error
+#    # Find the source dir
+#    try:
+#        uploads_source_dir = getUploadsSourceDir(project)
+#        log.debug("uploads_source_dir: " + uploads_source_dir)
+#    except Exception as error:
+#        log.error("There was a problem finding the upload files.")
+#        log.error("Error type: " + str(type(error)))
+#        log.error(traceback.format_exc())
+#        raise error
+#
+#    # Find the file name
+#    try:
+#        target_upload_file = getUploadFileName(project)
+#    except Exception as error:
+#        log.error("There was a problem finding the upload file name: " + str(error))
+#        log.error(traceback.format_exc())
+#        raise error
+#    try:
+#        log.debug("hi")
+#        uploads_dir = os.fsencode(uploads_source_dir)
+#
+#        for upload_file in os.listdir(uploads_dir):
+#            filename = os.fsdecode(upload_file)
+#            if filename == target_upload_file:
+#                log.debug("filename: " + filename)
+#                source_file = os.path.join(uploads_source_dir, filename)
+#                log.debug("file source: " + source_file)
+#                destination_file = os.path.join(destination_uploads_dir, filename)
+#                log.debug("file destination: " + destination_file)
+#                copyfile(source_file, destination_file)
+#                break
+#            else:
+#                log.debug("Not copying this file: " + filename)
+#    except Exception as error:
+#        log.error("There was a problem copying the upload files into the project's project_dir.")
+#        log.error("Error type: " + str(type(error)))
+#        log.error(traceback.format_exc())
+#        raise error
 
 
 ## Only gets the file name. Not the path.
@@ -333,7 +263,7 @@ def getVersionsFileInfo(versionsFilePath : str):
         theKeyVal =  trimmed_line.split("=")
         if len(theKeyVal) > 1 : 
             theKey=theKeyVal[0]
-            theVal=theKeyVal[1] 
+            theVal=theKeyVal[1].strip('"') 
             lowerKey = theKey.lower()
             if 'git_commit_hash' in  lowerKey : 
                 jsonKey=lowerKey.replace('git_commit_hash', 'version')

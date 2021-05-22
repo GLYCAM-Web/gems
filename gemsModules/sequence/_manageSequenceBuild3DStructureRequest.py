@@ -7,54 +7,63 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__)
 
-def manageSequenceRequest(self, defaultOnly : bool = False) :
-    log.info("manageSequenceRequest was called ")
+def manageSequenceBuild3DStructureRequest(self, defaultOnly : bool = False) :
+    log.info("manageSequenceBuild3DStructureRequest was called ")
     from typing import List
     from gemsModules.sequence import structureInfo, projects, logic, build
     from gemsModules.sequence import io as sequenceio
     from gemsModules.project import projectUtilPydantic as projectUtils
+    from gemsModules.project.io import CbProject
     from gemsModules.common import services as commonservices
-    startNewProject = False
-    if self.transaction_out is None and self.transaction_in is None :
-        thisAdditionalInfo={'hint':'Neither the transaction_in nor the transaction_out are populated.'}
+    #
+    # Do some sanity checks
+    if self.transaction_out is None or self.transaction_in is None or self.transaction_out.project is None:
+        thisAdditionalInfo={'hint':'The incoming transaction was not initialized properly.'}
         self.generateCommonParserNotice(
-                noticeBrief = 'InvalidInput', 
+                noticeBrief = 'GemsError', 
                 scope='TransactionWrapper.ManageSeqeunceRequest',
                 additionalInfo=thisAdditionalInfo
                 )
-        raise "Neither the transaction_in nor the transaction_out are populated."
-    if self.transaction_out is None :
-        self.initialize_transaction_out_from_transaction_in() 
-        startNewProject = True
-    log.debug("The transaction_out is :   " )
-    log.debug(self.transaction_out.json(indent=2))
-    ##  If the project dir is not found, a new project is needed
-    if self.transaction_out.project is None :
-        startNewProject = True
-    elif self.transaction_out.project.project_dir is None :
-        startNewProject = True
-    elif self.transaction_out.project.project_dir is  "" :
-        startNewProject = True
-    if startNewProject is True :
-        log.debug("Starting new project in manageSequenceRequest")
-        try :
-            log.debug("Attempting to start a new project")
-            self.transaction_out.project=projectUtils.startProject(self).copy(deep=True)
-            ## This is called in startProject, is this duplicated on purpose?
-            self.transaction_out.project.setProjectDir(self, noClobber=True)
-        except Exception as error :
-            log.error("There was a problem creating a project: " + str(error))
-            log.error(traceback.format_exc())
-            raise error
-        log.debug("Just built a new project.  The transaction_out is :   " )
-        log.debug(self.transaction_out.json(indent=2))
-    project_dir = self.transaction_out.project.project_dir 
-#    log.debug("self.transaction_out.project.project_dir is : >>>" + str(self.transaction_out.project.project_dir) + "<<<")
-#    log.debug("startNewProject in manageSequenceRequest is : " + str(startNewProject))
-    log.debug("Apparent project directory: " + str(project_dir))
-    if commonservices.directoryExists(project_dir) : 
-        log.debug("This directory already exists: " + str(project_dir))
-    ##  Build structureInfo object
+        raise 
+
+#    ## If the project is None, a new project is needed
+#    if self.transaction_out.project is None :
+#        self.transaction_out.project = CbProject()
+    ## Initialize the project with defaults and/or values from the incoming project
+
+    # ## Record the info that is appropriate to this service
+#    try :
+#        log.debug("Recording initial information to the output directory")
+#        incomingRequest = self.transaction_in.json(indent=2)
+#
+#        log.debug("Initializing the outgoing project in manageSequenceBuild3DStructureRequest")
+##        self.transaction_out.project.requested_service = "Build3DStructure"
+#        self.transaction_out.project.defaultInitializeProject(noClobber = True)
+#        thisProject = self.transaction_out.project
+#        thisProjectDir = os.path.join(
+#                thisProject.service_dir,
+#                'Builds',
+#                thisProject.pUUID)
+#        thisProject.setProjectDir(specifiedDirectory=thisProjectDir, noClobber=False)
+#        thisProject.logs_dir = os.path.join(
+#                thisProjectDir,
+#                'logs')
+#        thisProject.createDirectories()
+#        thisProject.writeInitialLogs()
+#        common.logic.writeStringToFile(incomingRequest, os.path.join(thisProject.logs_dir, "request.json") )
+#    except Exception as error :
+#        log.error("There was a problem initializing the outgoing project: " + str(error))
+#        log.error(traceback.format_exc())
+#        raise error
+#    log.debug("Just initialized the outgoing project.  The transaction_out is :   " )
+#    log.debug(self.transaction_out.json(indent=2))
+    ## TODO - think about whether/how we want to vet project directories
+#    project_dir = self.transaction_out.project.project_dir 
+#    log.debug("Apparent project directory: " + str(project_dir))
+#    if commonservices.directoryExists(project_dir) : 
+#        log.debug("This directory already exists: " + str(project_dir))
+
+    ##  Build th structureInfo object
     if self.transaction_out.entity is None :
         log.error("The entity in transaction_out does not exist.")
     if self.transaction_out.entity.outputs is None :
@@ -63,7 +72,7 @@ def manageSequenceRequest(self, defaultOnly : bool = False) :
         self.transaction_out.entity.outputs.structureBuildInfo=sequenceio.StructureBuildInfo()
         log.debug("structureBuildInfo: " + str(self.transaction_out.entity.outputs.structureBuildInfo))
     try:
-        thisStructureInfo = structureInfo.buildStructureInfoOliver(self, self.transaction_out.project.pUUID)
+        thisStructureInfo = structureInfo.buildStructureInfoOliver(self)
         self.transaction_out.entity.outputs.structureBuildInfo= thisStructureInfo
         #thisStructureInfo.buildStates[0].energy=8.8888  # to test change-making
         log.debug("structureInfo: " + thisStructureInfo.json(indent=2))
@@ -107,8 +116,14 @@ def manageSequenceRequest(self, defaultOnly : bool = False) :
         log.debug("this_pUUID is : " + this_pUUID)
         this_sequence = self.getSequenceVariantOut('indexOrdered')
         this_seqID = projectUtils.getSeqIDForSequence(this_sequence)
+        thisProject.sequence_id = this_seqID
         buildStrategyID = "buildStrategyID1" # TODO implement getCurrentBuildStrategyID().
-        projects.setupInitialSequenceFolders(this_seqID, this_pUUID, buildStrategyID)
+        servicePath = thisProject.service_dir
+        thisProject.sequence_path = os.path.join(
+                thisProject.service_dir,
+                'Sequences',
+                thisProject.sequence_id)
+        projects.setupInitialSequenceFolders(servicePath, this_seqID, this_pUUID, buildStrategyID)
         #Can generate the response already:
         for buildState in thisStructureInfo.individualBuildDetails:
             conformerID = buildState.structureDirectoryName

@@ -109,7 +109,7 @@ def countNumberOfShapesUpToLimit(rotamerData : [], hardLimit = 1):
 #           list of unique permutations possible for those selections.
 #   @param Transaction 
 #   @TODO: Move this to a better file for this stuff.
-def buildStructureInfoOliver(thisTransaction : sequenceio.Transaction, pUUID : str):
+def buildStructureInfoOliver(thisTransaction : sequenceio.Transaction):
     log.info("buildStructureInfoOliver() was called.")
 
     structureInfo = sequenceio.StructureBuildInfo()
@@ -214,9 +214,11 @@ def buildStructureInfoOliver(thisTransaction : sequenceio.Transaction, pUUID : s
         if maxNumberOfStructuresToBuild != 1 :
             log.error("Mismatch between doSingleDefaultOnly and maxNumberOfStructuresToBuild")
 
+    downloadUrlPath = thisTransaction.transaction_out.project.getDownloadUrlPath()
     ## Presence of incoming rotamerData indicates specific rotamer requests.
     firstStructure=True
     if rotamerData != None:
+        from urllib.parse import urljoin
         #Just get all this info once and append to each buildstate in the loop below
         simulationPhase = checkForSimulationPhase(thisTransaction)
         log.debug("simulationPhase: " + simulationPhase)
@@ -259,7 +261,7 @@ def buildStructureInfoOliver(thisTransaction : sequenceio.Transaction, pUUID : s
             buildState.date = date
             buildState.addIons = addIons
             buildState.conformerID = buildState.structureDirectoryName
-            buildState.setDownloadUrl(pUUID)
+            buildState.downloadUrl = urljoin(downloadUrlPath, buildState.conformerLabel)
 
             structureInfo.individualBuildDetails.append(buildState)
     else:
@@ -636,11 +638,11 @@ def getStructureInfoFilename(thisTransaction : sequenceio.Transaction):
         log.error(traceback.format_exc())
         raise error
     else:
-        seqID = projectUtils.getSeqIDForSequence(sequence)
-        sequencePath = thisProject.getFilesystemPath() + "/" + projectSettings.toolPathIdentifier['cb'] + "/Sequences/"
-        seqIDPath = sequencePath + seqID
+        #seqID = projectUtils.getSeqIDForSequence(sequence)
+        #seqIDPath = sequencePath + seqID
+        sequencePath = thisProject.sequence_path
         ##Update the json file for future reference.
-        return seqIDPath + "/structureInfo.json"
+        return sequencePath + "/structureInfo.json"
 
 ## @brief pass in a transaction, ,get the structureInfo_status.json for that project.
 #   @detail File for tracking the statuses of requested builds.
@@ -658,6 +660,12 @@ def getStatusFilename(thisTransaction : sequenceio.Transaction):
         statusFilename = projectDir + "logs/structureInfo_status.json"
 
         return statusFilename
+
+## @brief Generates a download URL for this build, assuming there is a website
+#   @detail This build status info is saved in: Single3DStructureBuildDetails
+#   @return Download URL for a conformer build
+def generateDownloadUrl(thisTransaction : sequenceio.Transaction):
+    log.info("generateDownloadUrl was called.")
 
 
 def main():
