@@ -16,7 +16,7 @@
             }
     },
     "project" : {
-	    "filesystem_path" : "/website/TESTS"
+	    "filesystem_path" : "/website/TESTS/git-ignore-me"
     },
     "prettyPrint" : true,
     "mdMinimize" : true
