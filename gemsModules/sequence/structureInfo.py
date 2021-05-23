@@ -202,6 +202,7 @@ def buildStructureInfoOliver(thisTransaction : sequenceio.Transaction):
         buildState = sequenceio.Single3DStructureBuildDetails()
         buildState.conformerLabel = "structure"
         buildState.structureDirectoryName = "structure"
+        buildState.conformerID = buildState.structureDirectoryName
         buildState.isDefaultStructure = True
         buildState.date = datetime.now()
         structureInfo.individualBuildDetails.append(buildState)

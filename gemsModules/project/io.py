@@ -292,9 +292,9 @@ class Project(BaseModel):
     def createDirectories(self) :
         # If not already set, set the service-level logs_dir
         if self.logs_dir is None or self.logs_dir is  "" :
-            self.logs_dir = os.path.join(
-                    self.project_dir,
-                "logs")
+            self.logs_dir = os.path.join( 
+                    self.project_dir, 
+                    "logs")
             message = "the project_dir was already set, and clobbering is not allowed  The path is: " + self.service_dir
             log.debug(message)
     

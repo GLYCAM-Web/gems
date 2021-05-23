@@ -115,7 +115,7 @@ def buildEach3DStructureInStructureInfo(thisTransaction : sequenceio.Transaction
 #            print("1.1.1")
             buildDir = "Existing_Builds/"
 #            print("1.1.2")
-            sequenceProjects.addBuildFolderSymLinkToExistingConformer(thisSeqID, thisBuildStrategyID, thisPuuID, conformerID)
+            sequenceProjects.addBuildFolderSymLinkToExistingConformer(thisServiceDir, thisSeqID, thisBuildStrategyID, thisPuuID, conformerID)
         else: # Doesn't already exist.
 #            print("1.2.0")
             log.debug("Need to build this structure: " + conformerID )
