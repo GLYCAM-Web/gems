@@ -181,7 +181,7 @@ def getGemsHome():
 #
 #  This is used in Project for setting the filesystem_path .
 def getFilesystemOutputPath():
-    log.debug("getFilesystemOutputPath was called")
+    log.info("getFilesystemOutputPath was called")
     GEMS_OUTPUT_PATH = os.environ.get('GEMS_OUTPUT_PATH')
     if GEMS_OUTPUT_PATH is not None and GEMS_OUTPUT_PATH != "" :
         log.debug="Got Filesystem Output Path from environment.  It is : " + GEMS_OUTPUT_PATH
@@ -197,9 +197,26 @@ def getFilesystemOutputPath():
     return ( 'Default' , theDefaultPath )
 
 
+## Try to determine if we might be in a website-like situation
+#  This could be expanded to return other sorts of information about 
+#    the environment in which gens is executing.
+#  For now, it only returns "website" or "default".
+def getGemsExecutionContext() :
+    log.info("getGemsExecutionContext was called.")
+    # Currently, if this variable is set to anything at all, GEMS is
+    # probably operating in support of a wabsite.
+    if GW_LIVE_SWARM in os.environ :
+        log.debug("GW_LIVE_SWARM is defined in the current environment.  Assuming this is a website.")
+        return 'website'
+    else :
+        log.debug("GW_LIVE_SWARM is NOT defined in the current environment.  Assuming this is not a website.")
+        return 'default'
+    
+
+
 def copyPathFileToPath( fromPath : str, fromName : str, toPath : str, noClobber : bool = False ) :
     # If noClobber is True, check to be sure file doesn't already exist.
-    log.debug("common copyPathFileToPath was called")
+    log.info("common copyPathFileToPath was called")
     if noClobber is True : 
         if os.file.exists( os.path.join( toPath, fromName ) ) : 
             log.debug("noClobber set to True and the file already exists.  Not copying") 

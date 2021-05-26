@@ -113,8 +113,12 @@ class AllLinkageRotamerInfo(BaseModel):
         
         if self.singleLinkageRotamerDataList != [] :
             from gemsModules.sequence import structureInfo
+            if self.totalSelectedRotamers == 0 :
+                self.totalSelectedRotamers = structureInfo.countNumberOfShapes(self, 'Selected')
             if self.totalPossibleRotamers == 0 :
-                self.totalPossibleRotamers = structureInfo.countNumberOfShapes(self)
+                self.totalPossibleRotamers = structureInfo.countNumberOfShapes(self, 'Possible')
+            if self.totalLikelyRotamers == 0 :
+                self.totalLikelyRotamers = structureInfo.countNumberOfShapes(self, 'Likely')
 
 ##   @class Single3DStructureBuildDetails
 #    @brief An object that represents one requested build state and its outputs
@@ -193,7 +197,7 @@ class Single3DStructureBuildDetails(BaseModel):
     def setSubDirectory(self) :
         self.subDirectory = '/Requested_Builds/' + conformerID + '/'
     def setDownloadUrl(self, pUUID) :
-        self.downloadUrl = projectUtils.getDownloadUrl(pUUID, "cb", self.conformerLabel)
+        self.downloadUrl = projectio.getDownloadUrl(pUUID, "cb", self.conformerLabel)
     def setSeqID(self) :
         if self.sequence is "" :
             error = "Cannot derive a seqID from an empty sequence string"
@@ -283,6 +287,12 @@ class TheLinkageGeometryOptions(BaseModel) :
         else :
             return self.linkageRotamerInfo
 
+    def createRotamerData(self) :
+        log.info("Linkage geometry options.createRotamerDataOut was called")
+        if self.linkageRotamerInfo is None :
+            self.linkageRotamerInfo = AllLinkageRotamerInfo()
+        self.linkageRotamerInfo.createRotamerData()
+
     def setLinkageRotamerInfo(self, validatedSequence : str):
         from gemsModules.sequence import evaluate
         self.linkageRotamerInfo = evaluate.getLinkageOptionsFromGmmlcbBuilder(validatedSequence)
@@ -305,6 +315,14 @@ class TheGeometryOptions(BaseModel):
             return None
         else :
             return self.linkages.linkageRotamerInfo
+
+    def createRotamerData(self) :
+        log.info("Geometry options.createRotamerDataOut was called")
+        if self.linkages is None :
+            self.linkages = TheLinkageGeometryOptions()
+        if self.linkages.linkageRotamerInfo is None :
+            self.linkages.linkageRotamerInfo = AllLinkageRotamerInfo()
+        self.linkages.linkageRotamerInfo.createRotamerData()
 
     def setLinkageRotamerInfo(self, validatedSequence : str):
         if self.linkages is None :
@@ -341,6 +359,12 @@ class TheBuildOptions(BaseModel):
             return None
         else :
             return self.geometryOptions.getRotamerData()
+
+    def createRotamerData(self) :
+        log.info("Build Options.createRotamerDataOut was called")
+        if self.geometryOptions is None :
+            self.geometryOptions = TheGeometryOptions()
+        self.geometryOptions.createRotamerData()
 
 
 class TheDrawOptions(BaseModel):
@@ -379,6 +403,12 @@ class TheSequenceEvaluationOutput(BaseModel):
             return None
         else :
             return self.buildOptions.getRotamerData()
+
+    def createRotamerData(self) :
+        log.info("Sequence evaluation data.createRotamerDataOut was called")
+        if self.buildOptions is None :
+            self.buildOptions = TheBuildOptions()
+        self.buildOptions.createRotamerData()
 
     def getEvaluation(self, sequence:str, validateOnly):
         log.info("Getting the Evaluation for SequenceEvaluationOutput.")
@@ -491,6 +521,12 @@ class SequenceOutputs(BaseModel) :
         else :
             return self.sequenceEvaluationOutput.getRotamerData()
 
+    def createRotamerData(self) :
+        log.info("Sequence outputs.createRotamerDataOut was called")
+        if self.sequenceEvaluationOutput is None :
+            self.sequenceEvaluationOutput = TheSequenceEvaluationOutput()
+        self.sequenceEvaluationOutput.createRotamerData()
+
 
 class SequenceInputs(BaseModel) :
     sequence               : TheSequence               = None
@@ -558,6 +594,12 @@ class sequenceEntity(commonio.Entity):
             return None
         else :
             return self.outputs.getRotamerData()
+
+    def createRotamerDataOut(self) :
+        log.info("Entity.createRotamerDataOut was called")
+        if self.outputs is None :
+            self.outputs = SequenceOutputs()
+        self.outputs.createRotamerData()
 
     # ## I'm certain there is a better way to do this.  - Lachele
     def getSequenceVariantIn(self, variant) :
@@ -654,6 +696,12 @@ class sequenceTransactionSchema(commonio.TransactionSchema):
         else :
             return self.entity.getRotamerDataOut()
 
+    def createRotamerDataOut(self) :
+        log.info("Transaction.createRotamerDataOut was called")
+        if self.entity is None :
+            self.entity = sequenceEntity()
+        self.entity.createRotamerDataOut()
+
     def getBuildStrategyIDOut(self) :
         if self.entity is None : 
             return None
@@ -728,6 +776,12 @@ class Transaction(commonio.Transaction):
             return None
         else :
             return self.transaction_out.getRotamerDataOut()
+
+    def createRotamerDataOut(self) :
+        log.info("Transaction-Wrapper.createRotamerDataOut was called")
+        if self.transaction_out is None :
+            self.transaction_out = sequenceTransactionSchema()
+        return self.transaction_out.createRotamerDataOut()
 
     # ## I'm certain there is a better way to do this.  - Lachele
     def getInputSequencePayload(self) :

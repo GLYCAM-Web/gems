@@ -76,7 +76,7 @@ def receive(receivedTransaction : sequenceio.Transaction):
         # ##
         if thisTransaction.transaction_out.project is None :
             log.debug("transaction_out.project is None.  Starting a new one.")
-            thisTransaction.transaction_out.project = CbProject()
+            thisTransaction.transaction_out.project = gemsModules.project.io.CbProject()
         # ##
         # ## Initialize the parts of the project that need to be done even if there is no output
         # ## to the filesystem.
@@ -127,8 +127,10 @@ def receive(receivedTransaction : sequenceio.Transaction):
             thisProject.writeInitialLogs
 
             # Generate the complete incoming JSON object, including all defaults
+            incomingString = thisTransaction.incoming_string
             incomingRequest = thisTransaction.transaction_in.json(indent=2)
-            common.logic.writeStringToFile(incomingRequest, os.path.join(thisProject.logs_dir, "request.json") )
+            common.logic.writeStringToFile(incomingString, os.path.join(thisProject.logs_dir, "request-raw.json") )
+            common.logic.writeStringToFile(incomingRequest, os.path.join(thisProject.logs_dir, "request-initialized.json") )
     except Exception as error :
         log.error("There was a problem initializing the outgoing project: " + str(error))
         log.error(traceback.format_exc())

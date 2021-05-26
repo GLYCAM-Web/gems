@@ -79,24 +79,36 @@ def getSolvationShape(thisTransaction):
     return "REC"
     # This info currently lives in sequence.io.Single3DStructureBuildDetails
 
-##  @brief Look at the transaction to see if a force field is specified
-#   @param Transaction thisTransaction
-#   @return String either "default" or the force field name.
-def countNumberOfShapes(rotamerData : []):
+##  @brief count the number of shapes
+#   @param rotamerData : sequenceio.AllLinkageRotamerInfo
+#   @return an integer
+def countNumberOfShapes(rotamerData : sequenceio.AllLinkageRotamerInfo, shapeSet : str = 'Selected'  ):
     log.info("countNumberOfShapes was called.")
     count = 1
+    log.debug("The requested shapeSet is : " + str(shapeSet))
     for linkage in rotamerData.singleLinkageRotamerDataList:
         log.debug("The linkage is: ")
         log.debug(linkage)
-        for dihedral in linkage.selectedRotamers:
+        if shapeSet == 'Selected' :
+            theSet = linkage.selectedRotamers
+        elif shapeSet == 'Possible' :
+            theSet = linkage.possibleRotamers
+        elif shapeSet == 'Likely' :
+            theSet = linkage.likelyRotamers
+        else :
+            log.error("Unknown shapeSet : " + str(shapeSet))
+            return
+        if theSet == [] :
+            return 0
+        for dihedral in theSet :
             log.debug("The dihedral is: ")
             log.debug(dihedral)
             count *= len(dihedral.dihedralValues)
     log.debug("the total count is: " + str(count))
     return count
-def countNumberOfShapesUpToLimit(rotamerData : [], hardLimit = 1):
+def countNumberOfShapesUpToLimit(rotamerData : [], shapeSet : str = 'Selected',  hardLimit = 1):
     log.info("countNumberOfShapesUpToLimit was called.")
-    count = countNumberOfShapes(rotamerData)
+    count = countNumberOfShapes(rotamerData, shapeSet)
     if hardLimit != -1 : 
         if count >= hardLimit: 
             return hardLimit

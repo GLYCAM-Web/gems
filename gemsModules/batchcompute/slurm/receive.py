@@ -48,16 +48,26 @@ def submit(thisSlurmJobInfo):
         return "Was unable to submit the job."
 
 def writeSlurmSubmissionScript(path, thisSlurmJobInfo):
-    import sys
+    import sys, os
     try:
         script = open(path, "w")
     except Exception as error:
         log.error("Cannnot write slurm run script. Aborting")
         log.error("Error type: " + str(type(error)))
         log.error(traceback.format_exc())
-        sys.exit(1)
+        raise error
+        #sys.exit(1)
 
     incoming_dict = thisSlurmJobInfo.incoming_dict
+
+    GEMS_MD_TEST_WORKFLOW = 'False'
+    try :
+        GEMS_MD_TEST_WORKFLOW = os.environ.get('GEMS_MD_TEST_WORKFLOW')
+        log.debug("got GEMS_MD_TEST_WORKFLOW and it is:  " + str(GEMS_MD_TEST_WORKFLOW) )
+    except Exception as error :
+        log.error("Cannnot determine workflow status.")
+        log.error("Error type: " + str(type(error)))
+        log.error(traceback.format_exc())
 
     script.write("#!/bin/bash" + "\n")
     script.write("#SBATCH --chdir=" + incoming_dict["workingDirectory"] + "\n")
@@ -70,7 +80,17 @@ def writeSlurmSubmissionScript(path, thisSlurmJobInfo):
     script.write("#SBATCH --tasks-per-node=4" + "\n")
     script.write("#SBATCH --uid=" + incoming_dict["user"] + "\n")
     script.write("\n")
+    log.debug("still have GEMS_MD_TEST_WORKFLOW and it is:  " + str(GEMS_MD_TEST_WORKFLOW) )
+    if GEMS_MD_TEST_WORKFLOW == 'True' :
+        log.debug("setting testing workflow to yes")
+        script.write("export MDUtilsTestRunWorkflow=Yes" + "\n")
+        script.write("\n")
+    else :
+        log.debug("NOT setting testing workflow to yes")
+    log.debug("The sbatchArgument is : " + incoming_dict["sbatchArgument"])
     script.write(incoming_dict["sbatchArgument"] + "\n")
+
+#    sys.exit(1)
 
 def manageIncomingString(jsonObjectString):
     """

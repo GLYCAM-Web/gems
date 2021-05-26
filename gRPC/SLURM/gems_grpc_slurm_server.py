@@ -104,14 +104,14 @@ class GemsGrpcSlurmReceiver(gems_grpc_slurm_pb2_grpc.GemsGrpcSlurmServicer):
             # Check to see if there were any errors, either by exit code or existence of stderr
             theErrorReturned=None
             if p.returncode == -11 or p.returncode == 139:
-                log.ERROR("gRPC Slurm server caught a segfault.")
+                log.error("gRPC Slurm server caught a segfault.")
                 theErrorReturned='CaughtSegFault'
             elif p.returncode != 0 :
                 theErrorReturned='UnknownError'
-                log.ERROR("gRPC Slurm server caught an unknown error.")
+                log.error("gRPC Slurm server caught an unknown error.")
             elif errorshere :
                 theErrorReturned='HaveStderr'
-                log.ERROR("gRPC Slurm server found output to STDERR despite a zero exit code.")
+                log.error("gRPC Slurm server found output to STDERR despite a zero exit code.")
             # If there was an error, return an error report
             if theErrorReturned is not None:
                 theResponse=JSON_Error_Response(theErrorReturned,p.returncode,str(outputhere),str(errorshere),None)

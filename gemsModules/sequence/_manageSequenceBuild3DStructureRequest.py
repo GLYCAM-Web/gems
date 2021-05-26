@@ -169,7 +169,7 @@ def manageSequenceBuild3DStructureRequest(self, defaultOnly : bool = False) :
         GEMS_FORCE_SERIAL_EXECUTION = os.environ.get('GEMS_FORCE_SERIAL_EXECUTION')
         log.debug("GEMS_FORCE_SERIAL_EXECUTION: " + str(GEMS_FORCE_SERIAL_EXECUTION))
         #
-        if GEMS_FORCE_SERIAL_EXECUTION is 'True' :
+        if GEMS_FORCE_SERIAL_EXECUTION == 'True' :
             #   use a blocking method:
             build.buildEach3DStructureInStructureInfo(self)
         else :

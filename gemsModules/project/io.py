@@ -5,6 +5,7 @@ import uuid
 from datetime import datetime
 from gemsModules.common import services as commonservices
 from gemsModules.common import settings as commonsettings
+from gemsModules.common import logic as commonlogic
 from gemsModules.common.io import Notice
 from gemsModules.project import settings as project_settings
 from pydantic import BaseModel, Field, ValidationError
@@ -110,24 +111,31 @@ class Project(BaseModel):
         except :
             message = "There was an error while asking common for the  GEMS Filesystem Output Path. \nForgins ahead with Project default anyway."
             log.error(message)
-            self.filesystem_path = project.settings.default_filesystem_output_path
+            self.filesystem_path = gemsModules.project.settings.default_filesystem_output_path
+            return
         # Assign the path based on the return values from common
         if source == 'Environment' :
             message = "GEMS Filesystem Output Path was set using an environment variable to: \n" + str(path)
             log.debug(message)
             self.filesystem_path = path
         elif source == 'Default':
-            message = "Overriding GEMS Filesystem Output Path with the default from Project."
-            log.debug(message)
-            self.filesystem_path = project.settings.default_filesystem_output_path
+            context = commonlogic.getGemsExecutionContext()
+            if context == 'website' :    
+                message = "Overriding GEMS Filesystem Output Path with the default from Project." 
+                log.debug(message) 
+                self.filesystem_path = gemsModules.project.settings.default_filesystem_output_path
+            else :
+                message = "Using the default GEMS Filesystem Output Path." 
+                log.debug(message) 
+                self.filesystem_path = path
         elif source == 'Error' :
             message = "Common reported an error trying to determine the GEMS Filesystem Output Path. \nForgins ahead with Project default anyway."
             log.error(message)
-            self.filesystem_path = project.settings.default_filesystem_output_path
+            self.filesystem_path = gemsModules.project.settings.default_filesystem_output_path
         else :
             message = "Unknown source for GEMS Filesystem Output Path.  Using default from Project."
             log.debug(message)
-            self.filesystem_path = project.settings.default_filesystem_output_path
+            self.filesystem_path = gemsModules.project.settings.default_filesystem_output_path
 
 
     def setServiceDir(self, specifiedDirectory : str = None, noClobber : bool = False) :

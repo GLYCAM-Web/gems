@@ -254,6 +254,9 @@ def getVersionsFileInfo(versionsFilePath : str):
             'site_mode' :  "", 
             'site_host_name' :  ""
             }
+    if not os.path.exists(versionsFilePath) :
+        log.error("versionsFilePath does not exist.  Cannot set versions info.")
+        return thisDict
     with open(versionsFilePath) as file:
         content = file.read()
     lines = content.split("\n")
