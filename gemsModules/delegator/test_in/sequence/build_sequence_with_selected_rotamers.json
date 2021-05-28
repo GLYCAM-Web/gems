@@ -1,0 +1,124 @@
+{
+    "entity": {
+        "type": "Sequence", 
+	"services": { 
+		"build": 
+		{ 
+			"type": "Build3DStructure" 
+		} 
+	}, 
+	"inputs": { 
+		"sequence": 
+		{ 
+			"payload": "DNeup5Aca2-6DGalpb1-4DGlcpNAcb1-6[DNeup5Aca2-6DGalpb1-4DGlcpNAcb1-2]DManpa1-6[DNeup5Aca2-6DGalpb1-4DGlcpNAcb1-2[DNeup5Aca2-6DGalpb1-4DGlcpNAcb1-4]DManpa1-3]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH" 
+		}, 
+		"geometryOptions": 
+		    {
+			    "linkages": 
+			    {
+				    "linkageRotamerInfo": 
+				    {
+					    "singleLinkageRotamerDataList": 
+					    [ 
+						    { 
+							    "linkageLabel": "6",
+							    "indexOrderedLabel": "6", 
+							    "selectedRotamers": 
+							    [
+								    {"dihedralName": "omg", 
+									    "dihedralValues": [ "gt", "tg" ] },
+								    { "dihedralName": "phi",
+									    "dihedralValues": [ "t" ] }
+
+							    ]
+
+						    },
+						    {
+							    "linkageLabel": "9",
+							    "indexOrderedLabel": "9", 
+							    "selectedRotamers": 
+							    [ 
+								    { "dihedralName": "phi", 
+									    "dihedralValues": [ "t" ] }, 
+								    { "dihedralName": "omg", 
+									    "dihedralValues": [ "gt", "tg" ] }
+							    ]
+						    },
+						    {
+							    "linkageLabel": "10",
+							    "indexOrderedLabel": "10", 
+							    "selectedRotamers": 
+							    [ 
+								    { "dihedralName": "omg", 
+									    "dihedralValues": [ "gt" ] }
+							    ]
+						    },
+						    {
+							    "linkageLabel": "13",
+							    "indexOrderedLabel": "13", 
+							    "selectedRotamers": 
+							    [ 
+								    { "dihedralName": "phi", 
+									    "dihedralValues": [ "t" ] }, 
+								    { "dihedralName": "omg", 
+									    "dihedralValues": [ "gt", "tg" ] }
+							    ]
+						    },
+						    {
+							    "linkageLabel": "14",
+							    "indexOrderedLabel": "14", 
+							    "selectedRotamers": 
+							    [ 
+								    { "dihedralName": "omg", 
+									    "dihedralValues": [ "gg", "gt" ] }
+							    ]
+						    },
+						    {
+							    "linkageLabel": "16",
+							    "indexOrderedLabel": "16", 
+							    "selectedRotamers": 
+							    [ 
+								    { "dihedralName": "phi", 
+									    "dihedralValues": [ "t" ] }, 
+							   	    { "dihedralName": "omg", 
+									    "dihedralValues": [ "gg", "gt", "tg" ] }
+							    ]
+						    }
+					    ]
+				    }
+			    }
+		    }
+	}
+    }, 
+    "prettyPrint": "True", 
+    "mdMinimize": "True",
+    "project": {
+        "user_id": "None",
+        "email": "",
+        "title": "Untitled project",
+        "comment": " ",
+        "timestamp": "2020-12-01 19:51:23.610752+00:00",
+        "project_type": "cb",
+        "requesting_agent": "website",
+        "gems_version": "",
+        "gems_branch": "",
+        "gmml_version": "",
+        "gmml_branch": "",
+        "site_mode": "",
+        "site_host_name": "",
+        "force_field": "default",
+        "parameter_version": "default",
+        "amber_version": "default",
+        "json_api_version": "0.0.1",
+        "project_ptr_id": "0ba4faaa-d613-497d-a01f-f9ba4f67ec44",
+        "sequence": "DNeup5Aca2-6DGalpb1-4DGlcpNAcb1-6[DNeup5Aca2-6DGalpb1-4DGlcpNAcb1-2]DManpa1-6[DNeup5Aca2-6DGalpb1-4DGlcpNAcb1-2[DNeup5Aca2-6DGalpb1-4DGlcpNAcb1-4]DManpa1-3]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH",
+        "seqID": "7abc4ab5-ae05-52cb-9a5b-a8a0c3d8957a",
+        "structure_count": "1",
+        "linkage_info": "",
+        "rotamer_info": "",
+        "rotamer_list": "['6_phi_t', '6_omg_gt', '6_omg_tg', '9_phi_t', '9_omg_gt', '9_omg_tg', '10_omg_gt', '13_phi_t', '13_omg_gt', '13_omg_tg', '14_omg_gg', '14_omg_gt', '16_phi_t', '16_omg_gg', '16_omg_gt', '16_omg_tg']",
+        "angle_info": "",
+        "job_info": "",
+        "rotamer_data": ""
+    }
+}

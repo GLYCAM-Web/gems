@@ -293,31 +293,31 @@ class Transaction:
         return thisProject.getFilesystemPath()
 
 
-
-    ## This returns a tuple.
-    #  The first value is the source of the path:
-    #        Default : This is the internal default path.
-    #        Environment : This path is set by an environment variable
-    #        Error : There was an error trying to get the path.
-    #  The second value is the path, unless there was an error. in the
-    #    latter case, it is an error message.
-    #
-    #  This is used in Project for setting the filesystem_path .
-    def getFilesystemOutputPath(self):
-        log.debug("getFilesystemOutputPath was called")
-        GEMS_OUTPUT_PATH = os.environ.get('GEMS_OUTPUT_PATH')
-        if GEMS_OUTPUT_PATH is not None and GEMS_OUTPUT_PATH != "" :
-            log.debug="Got Filesystem Output Path from environment.  It is : " + GEMS_OUTPUT_PATH
-            return ( 'Environment' , GEMS_OUTPUT_PATH )
-
-        # Currently, if not set by engironment variable, a default is used.
-        gemshome =  gemsModules.common.logic.getGemsHome 
-        if gemshome is None or gemshome == "" :
-            message = "Could not determine GEMSHOME.  Cannot set default filesystem output path."
-            log.error(message)
-        theDefaultPath = gemshome + '/UserSpace'
-        log.debug="Using default Filesystem Output Path.  It is : " + theDefaultPath
-        return ( 'Default' , theDefaultPath )
+#
+#    ## This returns a tuple.
+#    #  The first value is the source of the path:
+#    #        Default : This is the internal default path.
+#    #        Environment : This path is set by an environment variable
+#    #        Error : There was an error trying to get the path.
+#    #  The second value is the path, unless there was an error. in the
+#    #    latter case, it is an error message.
+#    #
+#    #  This is used in Project for setting the filesystem_path .
+#    def getFilesystemOutputPath(self):
+#        log.debug("getFilesystemOutputPath was called")
+#        GEMS_OUTPUT_PATH = os.environ.get('GEMS_OUTPUT_PATH')
+#        if GEMS_OUTPUT_PATH is not None and GEMS_OUTPUT_PATH != "" :
+#            log.debug="Got Filesystem Output Path from environment.  It is : " + GEMS_OUTPUT_PATH
+#            return ( 'Environment' , GEMS_OUTPUT_PATH )
+#
+#        # Currently, if not set by engironment variable, a default is used.
+#        gemshome =  gemsModules.common.logic.getGemsHome 
+#        if gemshome is None or gemshome == "" :
+#            message = "Could not determine GEMSHOME.  Cannot set default filesystem output path."
+#            log.error(message)
+#        theDefaultPath = gemshome + '/UserSpace'
+#        log.debug="Using default Filesystem Output Path.  It is : " + theDefaultPath
+#        return ( 'Default' , theDefaultPath )
 
 
 

@@ -398,9 +398,9 @@ def getSeqIDForSequence(sequence):
 #   Uses uuid5, which uses SHA-1 rather than Md5Sum
 #   @param str string
 #   @return uuid seqID
-def getUuidForString(string):
-    log.info("getUuidForString() was called. string: " + string)
-    stringID = str(uuid.uuid5(uuid.NAMESPACE_OID, string))
+def getUuidForString(theString):
+    log.info("getUuidForString() was called. string: " + theString)
+    stringID = str(uuid.uuid5(uuid.NAMESPACE_OID, theString))
     log.debug("stringID: " + stringID)
     return stringID
 

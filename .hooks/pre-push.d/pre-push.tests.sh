@@ -23,8 +23,35 @@ check_gemshome() {
    fi
 }
 
+check_website_status() {
+	if [ "${GW_LIVE_SWARM}zzz" == "zzz" ] ; then
+		echo ""
+		echo "You do not appear to be inside a full DevEnv."
+		echo "Pushing is not allowed."
+		echo ""
+		echo "You need to be in the grpc delegator container in a running site."
+		echo ""
+		echo "Exiting"
+		exit 1
+	elif [ "${GW_LIVE_SWARM}" =="true" ] ; then
+		echo ""
+		echo "This appears to be a live swarm."
+		echo "Pushing is not allowed from a live swarm."
+		echo ""
+		echo "Exiting"
+		echo ""
+		exit 1
+	else
+		echo ""
+		echo "This appears to be a full DevEnv that is not a live swarm."
+		echo "Pre-push tests can be run."
+		echo ""
+	fi
+}
+
 gemshome=`pwd`
 check_gemshome $gemshome 
+check_website_status
 
 #Compile gmml if not compiled:
 echo "Pulling gems AND gmml, and then compiling gmml if necessary with ./make.sh no_clean wrap"

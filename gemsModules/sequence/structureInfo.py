@@ -262,7 +262,7 @@ def buildStructureInfoOliver(thisTransaction : sequenceio.Transaction):
             log.debug("label is :" + buildState.conformerLabel)
             if len(buildState.conformerLabel) > 32 :
                 log.debug("conformerLabel is long so building a UUID for structureDirectoryName")
-                buildState.structureDirectoryName = getUuidForString(buildState.conformerLabel)
+                buildState.structureDirectoryName = projectUtils.getUuidForString(buildState.conformerLabel)
                 log.debug("The structureDirectoryName/UUID is : " + buildState.structureDirectoryName)
             else:
                 log.debug("conformerLabel is short so using it for structureDirectoryName")

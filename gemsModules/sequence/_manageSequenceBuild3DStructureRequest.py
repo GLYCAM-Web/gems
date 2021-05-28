@@ -86,12 +86,12 @@ def manageSequenceBuild3DStructureRequest(self, defaultOnly : bool = False) :
     try:
         ## Determine whether to save or update.
         project_dir = self.transaction_out.project.project_dir 
-        filename = project_dir + "logs/structureInfo_request.json"
-        log.debug("looking for existing filename: " + filename)
+        filename = os.path.join(project_dir , "logs" , "structureInfo_request.json")
+        log.debug("Checking for existing filename: " + filename)
         if os.path.exists(filename):
             log.debug("\n\nstructureInfo_request.json found. Updating both the request and the status file.\n\n")
             structureInfo.updateStructureInfoWithUserOptions(self, thisStructureInfo, filename)
-            statusFile = project_dir + "logs/structureInfo_status.json"
+            statusFile = os.path.join( project_dir , "logs" , "structureInfo_status.json")
             if os.path.exists(statusFile):
                 structureInfo.updateStructureInfoWithUserOptions(self, thisStructureInfo, statusFile)
             else:

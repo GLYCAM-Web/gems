@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import json, sys, os, re, importlib.util, shutil, uuid, pathlib
 from datetime import datetime
+from typing import *
 #import gemsModules
 import gmml
 import traceback
@@ -250,8 +251,14 @@ def setupInitialSequenceFolders(servicePath:str, sequenceID:str, projectID:str, 
     log.debug("buildStrategyPath : " + buildStrategyPath  )
     if not os.path.isdir(buildStrategyPath): 
         try:
+            log.debug("buildStrategyPath was not found, so trying to create it.")
+            log.debug("buildStrategyPatth is : " + str(buildStrategyPath))
             pathlib.Path(buildStrategyPath).mkdir(parents=True)
+            log.debug("The path now exists? ")
+            log.debug(os.path.isdir(buildStrategyPath))
             path_down_to_dest_dir = None # Same level as parent directory (seqIDPath)
+            log.debug("seqIDPath is : " + seqIDPath + " ... and does it exist? ")
+            log.debug(os.path.isdir(seqIDPath))
             commonlogic.make_relative_symbolic_link(buildStrategyPath, None, 'current', seqIDPath)
         except Exception as error:
             log.error("There was a problem creating buildStrategyPath: " + str(error))
@@ -292,11 +299,20 @@ def setupInitialSequenceFolders(servicePath:str, sequenceID:str, projectID:str, 
     # Assumes start_project was called before now, so project folder exists in Builds/
     # OG not sure what the Sequence_Repository link be used for, but the plan requires it.
     try:
-        path_down_to_source = 'Sequences/'+ sequenceID
-        path_down_to_dest_dir = 'Builds/' + projectID 
-        commonlogic.make_relative_symbolic_link(path_down_to_source, path_down_to_dest_dir , 'Sequence_Repository', servicePath)
+        path_to_source = 'Sequences/'+ sequenceID
+        path_to_dest_dir = 'Builds/' + projectID 
+        log.debug("About to make a relative symbolib link.  Here are the arguments : " )
+        log.debug("path_to_source : " + path_to_source)
+        log.debug("path_to_dest_dir : " + path_to_dest_dir)
+        log.debug("servicePath : " + str(servicePath))
+        commonlogic.make_relative_symbolic_link(
+                path_down_to_source = path_to_source, 
+                path_down_to_dest_dir = path_to_dest_dir , 
+                dest_link_label = "Sequence_Repository", 
+                parent_directory  = servicePath)
     except Exception as error:
-        log.error("There was a problem making Sequence_Repository link " + str(error))
+        #log.error("There was a problem making Sequence_Repository link " + str(error))
+        log.error("There was a problem making Sequence_Repository link " )
         log.error(traceback.format_exc())
         raise error    
     

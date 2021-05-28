@@ -5,7 +5,7 @@ import gemsModules
 from gemsModules.common.settings import *
 from gemsModules.common.io import *
 from gemsModules.common.loggingConfig import *
-from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
+from typing import *
 from pydantic import BaseModel, ValidationError
 from pydantic.schema import schema
 from shutil import copyfile
@@ -19,7 +19,7 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__)
 
-verbosity=common.utils.gems_environment_verbosity()
+#verbosity=common.utils.gems_environment_verbosity()
 
 
 ##  Pass in the name of an entity, receive a module or an error.
@@ -180,20 +180,20 @@ def getGemsHome():
 #    latter case, it is an error message.
 #
 #  This is used in Project for setting the filesystem_path .
-def getFilesystemOutputPath():
+def getFilesystemOutputPath() :
     log.info("getFilesystemOutputPath was called")
-    GEMS_OUTPUT_PATH = os.environ.get('GEMS_OUTPUT_PATH')
-    if GEMS_OUTPUT_PATH is not None and GEMS_OUTPUT_PATH != "" :
-        log.debug="Got Filesystem Output Path from environment.  It is : " + GEMS_OUTPUT_PATH
-        return ( 'Environment' , GEMS_OUTPUT_PATH )
-
+    gemsOutputPath = os.environ.get('GEMS_OUTPUT_PATH')
+    if gemsOutputPath is not None and gemsOutputPath != "" :
+        log.debug("Got Filesystem Output Path from environment.  It is : " + gemsOutputPath)
+        return ( 'Environment' , gemsOutputPath )
     # Currently, if not set by engironment variable, a default is used.
-    gemshome =  gemsModules.common.logic.getGemsHome 
+    gemshome =  gemsModules.common.logic.getGemsHome()
     if gemshome is None or gemshome == "" :
         message = "Could not determine GEMSHOME.  Cannot set default filesystem output path."
         log.error(message)
-    theDefaultPath = gemshome + '/UserSpace'
-    log.debug="Using default Filesystem Output Path.  It is : " + theDefaultPath
+        return ( 'Error', '' )
+    theDefaultPath = os.path.join( gemshome , 'UserSpace' )
+    log.debug("Using default Filesystem Output Path.  It is : " + theDefaultPath)
     return ( 'Default' , theDefaultPath )
 
 
@@ -205,7 +205,7 @@ def getGemsExecutionContext() :
     log.info("getGemsExecutionContext was called.")
     # Currently, if this variable is set to anything at all, GEMS is
     # probably operating in support of a wabsite.
-    if GW_LIVE_SWARM in os.environ :
+    if 'GW_LIVE_SWARM' in os.environ :
         log.debug("GW_LIVE_SWARM is defined in the current environment.  Assuming this is a website.")
         return 'website'
     else :
@@ -241,12 +241,8 @@ def writeStringToFile(theString, filePath, writeMode : str = 'w'):
         raise error
 
 
-def make_relative_symbolic_link(
-        path_down_to_source : str, 
-        path_down_to_dest_dir : str , 
-        dest_link_label : str, 
-        parent_directory : str
-        ):
+def make_relative_symbolic_link( path_down_to_source , path_down_to_dest_dir  , dest_link_label , parent_directory ) :
+#def make_relative_symbolic_link( path_down_to_source : str, path_down_to_dest_dir : str , dest_link_label : str, parent_directory : str) :
     #  path_down_to_source      Path, relative to parent_directory, to the source of the link
     #  path_down_to_dest_dir    Path, relative to parent_directory, where the link will be placed
     #                           If None, it will be the current working directory
@@ -259,10 +255,12 @@ def make_relative_symbolic_link(
     #                           If None, it will use the current working directory
     #                           Unless you know you are in a shell, you probably want to set this
     log.info("common.logic.make_relative_symbolic_link() was called")
-    log.debug("path_down_to_source: " + path_down_to_source)
+    log.debug("the type for str is : " )
+    log.debug(type(str))
+    log.debug("path_down_to_source: " + str(path_down_to_source))
     log.debug("path_down_to_dest_dir: " + str(path_down_to_dest_dir))
-    log.debug("dest_link_label: " + dest_link_label)
-    log.debug("parent_directory: " + parent_directory)
+    log.debug("dest_link_label: " + str(dest_link_label))
+    log.debug("parent_directory: " + str(parent_directory))
 
     if parent_directory is not None:
         owd=os.getcwd()

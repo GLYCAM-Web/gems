@@ -303,7 +303,7 @@ class Project(BaseModel):
             self.logs_dir = os.path.join( 
                     self.project_dir, 
                     "logs")
-            message = "the project_dir was already set, and clobbering is not allowed  The path is: " + self.service_dir
+            message = "The path to the logs directory is: " + self.logs_dir
             log.debug(message)
     
         ## Create the directories if needed

@@ -125,7 +125,11 @@ def manageIncomingString(jsonObjectString):
     thisSlurmJobInfo.incoming_dict["slurm_runscript_name"] = "slurm_submit.sh"
     slurm_runscript_path = thisSlurmJobInfo.incoming_dict["workingDirectory"] + "/" + thisSlurmJobInfo.incoming_dict["slurm_runscript_name"]
     log.debug ("Slurm runscript path: " + slurm_runscript_path + "\n")
-    writeSlurmSubmissionScript(slurm_runscript_path, thisSlurmJobInfo)
+    if os.path.exists(slurm_runscript_path) :
+        log.debug("Found existing Slurm run script.  Refusing to clobber.")
+    else : 
+        log.debug("Writing a new Slurm run script.")
+        writeSlurmSubmissionScript(slurm_runscript_path, thisSlurmJobInfo)
 
     log.debug("useGRPC: " + str(useGRPC))
     if useGRPC:

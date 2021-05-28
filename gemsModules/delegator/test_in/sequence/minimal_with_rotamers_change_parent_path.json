@@ -16,7 +16,7 @@
             }
     },
     "project" : {
-	    "filesystem_path" : "/website/TESTS/git-ignore-me"
+	    "filesystem_path" : "/website/TESTS/git-ignore-me/temp"
     },
     "prettyPrint" : true
 }
