@@ -33,7 +33,7 @@ check_website_status() {
 		echo ""
 		echo "Exiting"
 		exit 1
-	elif [ "${GW_LIVE_SWARM}" =="true" ] ; then
+	elif [ "${GW_LIVE_SWARM}" == "true" ] ; then
 		echo ""
 		echo "This appears to be a live swarm."
 		echo "Pushing is not allowed from a live swarm."
