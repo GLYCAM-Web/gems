@@ -78,7 +78,9 @@ def writeSlurmSubmissionScript(path, thisSlurmJobInfo):
     script.write("#SBATCH --output=slurm_%x-%A.out" + "\n")
     script.write("#SBATCH --partition=" + incoming_dict["partition"] + "\n")
     script.write("#SBATCH --tasks-per-node=4" + "\n")
-    script.write("#SBATCH --uid=" + incoming_dict["user"] + "\n")
+#  The following was needed until Slurm did their security fix.
+#  Something like it might be needed by someone one day.
+#    script.write("#SBATCH --uid=" + incoming_dict["user"] + "\n")
     script.write("\n")
     log.debug("still have GEMS_MD_TEST_WORKFLOW and it is:  " + str(GEMS_MD_TEST_WORKFLOW) )
     if GEMS_MD_TEST_WORKFLOW == 'True' :
