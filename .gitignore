@@ -8,6 +8,7 @@ log.log
 gemsModules/Docs/html
 External
 UserSpace
+site
 
 ## general things to ignore
 *__pycache__

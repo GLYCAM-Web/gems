@@ -1,0 +1,8 @@
+site_name: GEMS
+site_description:  Documentation for the GLYCAM Extensible Modeling Scripts
+nav: 
+  - 'Overview': 'index.md'
+  - 'Usage': 'usage.md'
+  - 'GEMS Modules': 'gemsModules.md'
+  - 'Examples': 'examples.md'
+  - 'Testing' : 'testing.md'
