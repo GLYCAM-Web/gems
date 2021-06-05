@@ -38,7 +38,7 @@ def addResponse(buildState : sequenceio.Single3DStructureBuildDetails, thisTrans
         raise error
 
     thisBuildOutput.indexOrderedSequence = thisTransaction.getSequenceVariantOut('indexOrdered')
-    thisBuildOutput.seqID = projectUtils.getSeqIDForSequence(thisBuildOutput.indexOrderedSequence)
+    thisBuildOutput.seqID = projectUtils.getSeqIdForSequence(thisBuildOutput.indexOrderedSequence)
     return thisBuildOutput
     
 
@@ -96,7 +96,7 @@ def structureExists(buildState: sequenceio.Single3DStructureBuildDetails, thisTr
       
         servicePath = os.path.join(thisProject.getFilesystemPath(), thisProject.getEntityId(), thisProject.getServiceId())
         sequencePath = os.path.join(servicePath, "Sequences")
-        seqID = projectUtils.getSeqIDForSequence(indexOrderedSequence)
+        seqID = projectUtils.getSeqIdForSequence(indexOrderedSequence)
         sequenceDir = os.path.join(sequencePath , seqID , thisSequence.outputs.getBuildStrategyID())
         log.debug("sequenceDir: " + sequenceDir)
         log.debug("buildState.conformerLabel: " + buildState.conformerLabel)
@@ -158,7 +158,7 @@ def sequenceExists(buildState: sequenceio.Single3DStructureBuildDetails, thisTra
     log.debug("service id : " + thisProject.getServiceId())
     sequencePath = os.path.join(servicePath, "Sequences")
     log.debug("sequencePath is : " + sequencePath)
-    seqID = projectUtils.getSeqIDForSequence(sequence)
+    seqID = projectUtils.getSeqIdForSequence(sequence)
     log.debug("seqID is : " + seqID)
     # I think this is correct (Lachele)
     sequenceDir = os.path.join(sequencePath , seqID , thisSequence.outputs.getBuildStrategyID())
@@ -175,13 +175,14 @@ def sequenceExists(buildState: sequenceio.Single3DStructureBuildDetails, thisTra
 
 ## TODO: make all these directory/link/file making functions into one thing
 ## that gets called by string only
-
-
-def createConformerDirectoryInBuildsDirectory(projectDir : str, conformerDirName : str):
+def createConformerDirectoryInBuildsDirectory(
+        projectDir : str, 
+        conformerDirName : str ,
+        separator : str = 'New_Builds' ) :
     log.info("createConformerDirectoryInBuildsDirectory() was called.")
     log.debug("projectDir: " + projectDir)
     log.debug("conformerDirName: " + conformerDirName)
-    conformerDirPath = (projectDir + "/New_Builds/" + conformerDirName + '/')
+    conformerDirPath = os.path.join( projectDir , separator , conformerDirName )
     if os.path.isdir(conformerDirPath) :
         return
     try:

@@ -1,5 +1,7 @@
 # Installing GEMS (GLYCAM Extensible Modeling Script)
 
+This document is likely somewhat out of date.  We're working on that.
+
 [Prerequisites](#prerequisites)  
 [Obtaining the software](#obtaining-the-software)  
 [Compiling and Installing](#compiling-and-installing)  

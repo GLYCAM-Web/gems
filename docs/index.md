@@ -29,7 +29,8 @@ The input to the modules is primarily in the form of a JSON object.  The
 output is also in that form.  
 
 The GEMS Modules are designed to ensure that the user can obtain exactly 
-the same output despite whether the user is interacting via:
+the same output whether the user interacts via:
+
 * GLYCAM-Web using a browser
 * The JSON API
 * The command line
@@ -44,3 +45,6 @@ script.  This script can also be used on the command line, e.g.:
 
 Here, `GEMSHOME` is the path to your GEMS installation and `my_input.json` is
 a file containing a JSON object to be used as input to the delegator module.
+The delegator inspects your JSON object and, based on what it finds, either
+hands the input to the appropriate entity or, if something has gone wrong, 
+returns an error message.

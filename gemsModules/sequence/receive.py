@@ -120,6 +120,8 @@ def receive(receivedTransaction : sequenceio.Transaction):
                     thisProject.pUUID)
             thisProject.setProjectDir(specifiedDirectory=thisProjectDir, noClobber=False)
 
+            thisProject.setHostUrlBasePath()
+            thisProject.setDownloadUrlPath()
 
             # Create the needed initial directories including a logs directory
             thisProject.createDirectories()
@@ -137,8 +139,6 @@ def receive(receivedTransaction : sequenceio.Transaction):
         raise error
     log.debug("Just initialized the outgoing project.  The transaction_out is :   " )
     log.debug(thisTransaction.transaction_out.json(indent=2))
-
-
 
 
     ###################################################################
@@ -231,7 +231,9 @@ def receive(receivedTransaction : sequenceio.Transaction):
             thisTransaction.generateCommonParserNotice(noticeBrief='ServiceNotKnownToEntity')
 
     ## prepares the transaction for return to the requestor, success or fail.     
-    thisTransaction.build_outgoing_string()
+    thisTransaction.build_outgoing_string() ## NOTE!!! This uses the child method in sequence.io - a better method!
+    outgoingResponse = thisTransaction.transaction_out.json(indent=2)
+    common.logic.writeStringToFile(outgoingResponse, os.path.join(thisProject.logs_dir, "response.json") )
     return thisTransaction
 
 

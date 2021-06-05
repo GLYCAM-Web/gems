@@ -15,51 +15,18 @@ from gemsModules.sequence import io as sequenceIO
 from gemsModules.common.loggingConfig import *
 
 from gemsModules.sequence import projects as sequenceProjects
+from gemsModules.sequence import settings as sequenceSettings
+from gemsModules.sequence.structureInfo import *
 
-from . import settings as sequenceSettings
-from .structureInfo import *
 if loggers.get(__name__):
     pass
 else:
     log = createLogger(__name__)
 
-##  @brief Give a transaction and pUUID, and this method builds the json response and
-#   appends that to the transaction.
-#   @param Transaction thisTransaction
-#   @param String uUUID - Upload ID for user provided input.
-#def appendBuild3DStructureResponse(thisTransaction : sequenceio.Transaction, pUUID : str):
-#    log.info("appendBuild3DStructureResonse() was called.")
-#    if thisTransaction.response_dict is None:
-#        thisTransaction.response_dict={}
-#    if not 'entity' in thisTransaction.response_dict:
-#        thisTransaction.response_dict['entity']={}
-#    if not 'type' in thisTransaction.response_dict['entity']:
-#        thisTransaction.response_dict['entity']['type']='Sequence'
-#    if not 'responses' in thisTransaction.response_dict:
-#        thisTransaction.response_dict['responses']=[]
-#
-#    downloadUrl = getDownloadUrl(pUUID, "cb")
-#    thisTransaction.response_dict['responses'].append({
-#        'Build3DStructure': {
-#            'payload': pUUID ,
-#            'downloadUrl': downloadUrl
-#        }
-#    })
-
-#def buildEach3DStructureInStructureInfo(structureInfo : sequenceio.StructureInfo, buildStrategyID : str, thisTransaction : sequenceio.Transaction, this_seqID : str, this_pUUID : str, projectDir : str):
 def buildEach3DStructureInStructureInfo(thisTransaction : sequenceio.Transaction):
     log.info("buildEach3DStructureInStructureInfo() was called.")
     needToInstantiateCarbohydrateBuilder = True
     from multiprocessing import Process
-#    print(structureInfo.json(indent=2))
-#    print(buildStrategyID)
-#    print(thisTransaction)
-#    print("thisTransaction.transaction_out is :")
-#    print(thisTransaction.transaction_out)
-#    print("thisTransaction.transaction_out.json is :")
-#    print(thisTransaction.transaction_out.json(indent=2))
-#    sys.exit(1)
-
     # get info from the transaction and check sanity
     log.debug("About to get build informaion from the transaction")
     log.debug("Working on the Build States now.")
@@ -81,14 +48,14 @@ def buildEach3DStructureInStructureInfo(thisTransaction : sequenceio.Transaction
         theStructureBuildInfo = thisTransaction.getStructureBuildInfoOut()
         if theStructureBuildInfo.indexOrderedSequence is "" :
             theStructureBuildInfo.setSequence(thisTransaction.getSequenceVariantOut('indexOrdered'))
-            theStructureBuildInfo.setSeqID(theStructureBuildInfo.indexOrderedSequence)
+            theStructureBuildInfo.setSeqId(theStructureBuildInfo.indexOrderedSequence)
         thisBuildStrategyID   = theStructureBuildInfo.getBuildStrategyID()
-        thisSeqID             = thisTransaction.getSeqIDOut()
-        if thisSeqID != theStructureBuildInfo.getSeqID() :
+        thisSeqID             = thisTransaction.getSeqIdOut()
+        if thisSeqID != theStructureBuildInfo.getSeqId() :
             error="Seq IDs do not match in project and build details."
             log.error("error")
             log.error("     project  : " + str(thisSeqID))
-            log.error("     build details  : " + str(theStructureBuildInfo.getSeqID()))
+            log.error("     build details  : " + str(theStructureBuildInfo.getSeqId()))
             return
         thisPuuID             = thisTransaction.getPuuIDOut()
         thisProjectDir        = thisTransaction.getProjectDirOut()
@@ -102,58 +69,53 @@ def buildEach3DStructureInStructureInfo(thisTransaction : sequenceio.Transaction
 
     for buildState in theseBuildStates :
         log.debug("Checking if a structure has been built in this buildState: ")
-        log.debug("buildState: " + repr(buildState))
-        conformerID = buildState.structureDirectoryName # May return "default" or a conformerID
-#        print("1")
-        ##  check if requested structures exitst, update structureInfo_status.json and project when exist
-#        print(repr(sequenceProjects.structureExists(buildState, thisTransaction, buildStrategyID)))
+        log.debug("buildState: ")
+        log.debug(buildState.json(indent=2))
+        subDirectory = buildState.structureDirectoryName # May return "default" or a conformerID
+        
         if sequenceProjects.structureExists(buildState, thisTransaction, thisBuildStrategyID):
-#            print("1.1.0")
             ## Nothing in Sequence/ needs to change. In Builds/ProjectID/
             ## add symLink in Existing to Sequences/SequenceID/defaults/All_builds/conformerID.
-            log.debug("Found an existing structure for " + conformerID)
-#            print("1.1.1")
+            log.debug("Found an existing structure for " + subDirectory)
             buildDir = "Existing_Builds/"
-#            print("1.1.2")
-            sequenceProjects.addBuildFolderSymLinkToExistingConformer(thisServiceDir, thisSeqID, thisBuildStrategyID, thisPuuID, conformerID)
+            sequenceProjects.addBuildFolderSymLinkToExistingConformer(thisServiceDir, thisSeqID, thisBuildStrategyID, thisPuuID, subDirectory)
         else: # Doesn't already exist.
-#            print("1.2.0")
-            log.debug("Need to build this structure: " + conformerID )
-            if needToInstantiateCarbohydrateBuilder:
-#                print("1.2.0.1")
+            log.debug("Need to build this structure: " + subDirectory )
+            if needToInstantiateCarbohydrateBuilder :
                 needToInstantiateCarbohydrateBuilder = False # Only ever do this once.
                 # ## the following should probably use the indexOrdered sequence, but that doesn't work...
                 inputSequence = thisTransaction.getSequenceVariantOut('indexOrdered')          
                 log.debug("About to getCbBuilderForSequence: " + inputSequence)
                 builder = getCbBuilderForSequence(inputSequence)
-#            print("1.2.1")
             buildDir = "New_Builds/"
-#            print("1.2.2")
-            sequenceProjects.createConformerDirectoryInBuildsDirectory(thisProjectDir, conformerID)
+            buildState.setIsNewBuild(True)
+            outputDirPath = buildState.getAbsoluteConformerPath() 
+            sequenceProjects.createConformerDirectoryInBuildsDirectory(thisProjectDir, subDirectory)
             ## TODO - one day, the path on a compute node might differ from the website path
-#            print("1.2.3")
-            outputDirPath = os.path.join(thisProjectDir, buildDir, conformerID)
-#            print("1.2.4")
-            log.debug("outputDirPath: " + outputDirPath)
-            #from multiprocessing import set_start_method
-            #set_start_method("spawn")
-            #d = Process(target=build3DStructure, args=(buildState, thisTransaction, outputDirPath, builder))
-           # d.start()
-#            print("1.2.5")
+            log.debug("Absolute Conformer Path for this New Build: " + buildState.getAbsoluteConformerPath())
+            theJsonObject = buildState.json(indent=2)
+            log.debug("The build state for this New Build, after initializing, is  ")
+            log.debug(theJsonObject)
+            try :
+                commonlogic.writeStringToFile( 
+                        theJsonObject , 
+                        os.path.join ( 
+                            outputDirPath ,
+                            'info.json')
+                        )
+            except Exception as error :
+                log.error("There was an error writing the build state to a file: " )
+                raise error
             build3DStructure(buildState, thisTransaction, outputDirPath, builder)
-#            print("1.2.6")
             if thisTransaction.transaction_in.mdMinimize is True : 
-                sequenceProjects.addSequenceFolderSymLinkToNewBuild(thisServiceDir, thisSeqID, thisBuildStrategyID, thisPuuID, conformerID)        
+                sequenceProjects.addSequenceFolderSymLinkToNewBuild(thisServiceDir, thisSeqID, thisBuildStrategyID, thisPuuID, subDirectory)        
                 
         # buildDir is either New_Builds/ or Existing_Builds/
-#        print("2")
-        sequenceProjects.createSymLinkInRequestedStructures(thisProjectDir, buildDir, conformerID)
+        sequenceProjects.createSymLinkInRequestedStructures(thisProjectDir, buildDir, subDirectory)
         # Needs to be Requested_Structres/. Need to add conformerID separately.
         # sequenceProjects.addResponse(buildState, thisTransaction, conformerID, buildState.conformerLabel)
         # This probably needs work    
-#        print("3")
         sequenceProjects.registerBuild(buildState, thisTransaction)
-#        print("4")
 
 ##TODO: Replace this with more generically useful: build3DStructure(transaction, service)
 ##      Needs to work whether default structure or specific rotamers are requested.

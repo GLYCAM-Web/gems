@@ -321,7 +321,9 @@ class Transaction:
 
 
 
-
+    ######
+    ######  This needs to change to look like the method in sequence.io
+    ######
     def build_outgoing_string(self):
         import json
         isPretty=False

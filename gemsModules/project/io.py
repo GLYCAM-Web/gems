@@ -35,15 +35,17 @@ class Project(BaseModel):
     comment : str = ""
     timestamp : datetime = None
     gems_timestamp : datetime = None
-    project_type : str = ""
-    parent_entity : str = ""
-    requested_service : str = ""
+    # The following should be overridden as needed in child classes.  See CbProject, for example.
+    # Each type of project known to the modules should have a child class.
+    project_type : str = "project"
+    parent_entity : str = "project"
+    requested_service : str = "project"
+    entity_id : str = "project"
+    service_id : str = "project"
 
     ## The filesystem_path can be used to override settings.default_filesystem_output_path
     filesystem_path : str = ""  
     compute_cluster_filesystem_path : str = ""  
-    entity_id : str = ""
-    service_id : str = ""
     service_dir : str = ""
     ## The project path. Used to be output dir, but now that is reserved for subdirs.
     # The project_dir should generally be set after the service dir is set
@@ -66,6 +68,7 @@ class Project(BaseModel):
     site_mode : str = ""
     site_host_name : str = ""
     versions_file_path : str = ""
+    host_url_base_path : str = ""
     download_url_path :str = ""
 
     force_field : str = "default"
@@ -82,10 +85,12 @@ class Project(BaseModel):
         super().__init__(**data)
 
         ## Random uuid for the project uuid if none has been specified
-        if self.pUUID is "" : 
+        if self.pUUID == "" : 
             self.pUUID = str(uuid.uuid4()) 
-        if self.timestamp is None : 
+        if self.gems_timestamp is None : 
             self.gems_timestamp = datetime.now()
+        if self.timestamp is None : 
+            self.timestamp = self.gems_timestamp
 
     # In file _defaultInitializeProject.py:
     #    def defaultInitializeProject(self, referenceProject : Project = None, noClobber : bool = True):
@@ -140,7 +145,7 @@ class Project(BaseModel):
 
     def setServiceDir(self, specifiedDirectory : str = None, noClobber : bool = False) :
         # First, check if the service directory field is already populated
-        if self.service_dir is not None and self.service_dir is not "" :
+        if self.service_dir is not None and self.service_dir != "" :
             # If noClobber is set to true, return without changing the directory
             if noClobber : 
                 return
@@ -165,11 +170,6 @@ class Project(BaseModel):
                     additionalInfo = {'hint' : message } )
             return
         #
-        #  Still here ?
-        #    grab and store locally the entity_id and service_id for future use
-        self.entity_id = gemsModules.project.settings.output_entity_id[self.parent_entity]
-        self.service_id = gemsModules.project.settings.output_entity_service_id[self.parent_entity][self.requested_service]
-        #    set the service_dir
         self.service_dir = os.path.join(
                 self.filesystem_path,
                 self.entity_id,
@@ -180,7 +180,7 @@ class Project(BaseModel):
 
     def setProjectDir(self, specifiedDirectory : str = None, noClobber : bool = False) :
         # First, check if the project directory field is already populated
-        if self.project_dir is not None and self.project_dir is not "" :
+        if self.project_dir is not None and self.project_dir != "" :
             # If noClobber is set to true, return without changing the directory
             if noClobber : 
                 return
@@ -190,7 +190,7 @@ class Project(BaseModel):
             return
         # If we are still here, attempt to build the project directory
         # First, try to determine the service_dir path
-        if self.service_dir is None or self.service_dir is "" :
+        if self.service_dir is None or self.service_dir == "" :
             message = "Cannot set project_dir because cannot determine service_dir"
             log.error(message)
             log.debug(self.json(indent=2))
@@ -200,7 +200,7 @@ class Project(BaseModel):
                     )
             return
         # Next, bail if somehow the pUUID didn't get set
-        if self.pUUID is None or self.pUUID is "" :
+        if self.pUUID is None or self.pUUID == "" :
             message = "Cannot set project_dir because cannot determine pUUID"
             log.error(message)
             log.debug(self.json(indent=2))
@@ -216,7 +216,7 @@ class Project(BaseModel):
     def setVersionsFilePath(self, specifiedPath : str = None, noClobber : bool = False) :
         log.debug("setVersionsFilePath was called.")
         # First, check if the versions file path field is already populated
-        if self.versions_file_path is not None and self.versions_file_path is not "" :
+        if self.versions_file_path is not None and self.versions_file_path != "" :
             # If noClobber is set to true, return without changing the field
             if noClobber : 
                 return
@@ -226,7 +226,7 @@ class Project(BaseModel):
             return
         # If we are still here, attempt to build the project directory
         # First, try to determine the filesystem path
-        if self.filesystem_path is None or self.filesystem_path is "" :
+        if self.filesystem_path is None or self.filesystem_path == "" :
             message = "Cannot set versions file path because cannot determine filesystem path"
             log.error(message)
             self.generateCommonParserNotice(
@@ -263,6 +263,10 @@ class Project(BaseModel):
         log.debug("getting filesystem_path: " + str(self.filesystem_path))
         return self.filesystem_path 
 
+    def getPuuid(self) :
+        log.debug("getting pUUID: " + str(self.pUUID))
+        return self.pUUID
+
     def getEntityId(self) :
         log.debug("getting entity_id: " + str(self.entity_id))
         return self.entity_id 
@@ -271,26 +275,49 @@ class Project(BaseModel):
         log.debug("getting service_id: " + str(self.service_id))
         return self.service_id 
 
+    def getHostUrlBasePath(self) :
+        return self.host_url_base_path
+
+    def setHostUrlBasePath(self) :
+        import os
+        GEMS_HOST_URL_BASE_PATH =  os.environ.get('GEMS_HOST_URL_BASE_PATH')
+        if GEMS_HOST_URL_BASE_PATH is not None and GEMS_HOST_URL_BASE_PATH != "" :
+            self.host_url_base_path = GEMS_HOST_URL_BASE_PATH
+            return
+        if self.site_host_name == "" :
+            log.error("Sete host name not set.  Cannot set Host Url Base Path.")
+            return
+        if commonlogic.getGemsExecutionContext() == 'website' :
+            prefix = 'https://'
+        else :
+            prefix = 'http://'
+        self.host_url_base_path = prefix + self.site_host_name
+
     ## Set the download URL path for this project  
     #   @param  self.pUUID
     #   @param  self.project_type
     def setDownloadUrlPath(self):
         log.info("setDownloadUrlPath was called.\n")
         try :
-            log.debug("pUUID: " + str(self.pUUID))
-            log.debug("project_type: " + str(self.project_type))
-            log.debug("site_host_name: " + str(self.site_host_name))
-            self.download_url_path = "http://" + self.site_host_name + "/" + "json"+ "/" + "download" + "/" + self.project_type + "/" + self.pUUID
+            if self.host_url_base_path == "" :
+                log.error("the host url base path is not set so cannot set download url path.")
+                return
+            from gemsModules.project import projectUtilPydantic as utils
+            self.download_url_path = utils.buildDownloadUrlPath( 
+                    self.host_url_base_path ,
+                    self.entity_id ,
+                    self.service_id ,
+                    self.pUUID )
             log.debug("downloadUrl : " + self.download_url_path )
         except AttributeError as error:
             log.error("Something went wrong building the downloadUrlPath.")
             raise error
 
     def getDownloadUrlPath(self) :
-        if self.download_url_path is None or self.download_url_path is "" :
+        if self.download_url_path is None or self.download_url_path == "" :
             self.setDownloadUrlPath()
-        if self.download_url_path is None or self.download_url_path is "" :
-            log.error("There was a problem setting the download_url_path")
+        if self.download_url_path is None or self.download_url_path == "" :
+            log.error("The downloadUrlPath was unset, and could not be set, so could not be got.")
             return
         return self.download_url_path
         
@@ -299,7 +326,7 @@ class Project(BaseModel):
 
     def createDirectories(self) :
         # If not already set, set the service-level logs_dir
-        if self.logs_dir is None or self.logs_dir is  "" :
+        if self.logs_dir is None or self.logs_dir ==  "" :
             self.logs_dir = os.path.join( 
                     self.project_dir, 
                     "logs")
@@ -366,12 +393,29 @@ class Project(BaseModel):
 class CbProject(Project):
     project_type : str = "cb"
     parent_entity : str = "Sequence"
+    entity_id : str = "sequence"
+    service_id : str = "cb"
     sequence_id : str = ""
     sequence_path : str = ""
     has_input_files : bool = False
+    indexOrderedSequence : str = ""
+    seqID : str = ""
 
-#    def __init__(self, **data : Any):
-#        super().__init__(**data)
+    def setIndexOrderedSequence(self, theSequence : str ) :
+        self.indexOrderedSequence = theSequence
+
+    def getIndexOrderedSequence(self) :
+        log.debug("getting IndexOrderedSequence: " + str(self.indexOrderedSequence))
+        return self.indexOrderedSequence
+    
+    def setSeqId(self, theSeqId : str ) :
+        self.seqID = theSeqId
+
+    def getSeqId(self) :
+        log.debug("getting SeqId: " + str(self.seqID))
+        return self.seqID
+
+
 
 
 class PdbProject(Project):
@@ -384,6 +428,8 @@ class PdbProject(Project):
     input_source : str = ""
     project_type = 'pdb'
     parent_entity : str = "StrucureFile"
+    entity_id : str = "structurefile"
+    service_id : str = "pdb"
 
 #    def __init__(self, **data : Any):
 #        super().__init__(**data)
@@ -399,40 +445,42 @@ class GpProject(Project):
     status : str = ""
     project_type = 'gp'
     parent_entity : str = "Conjugate"
+    entity_id : str = "conjugate"
+    service_id : str = "gp"
 
 #    def __init__(self, **data : Any):
 #        super().__init__(**data)
 
 
 
-## Details and location of the build of a single pose of a structure.
-class StructureMapping():
-    ##  Path to the dir that holds this build. 
-    #   May or may not be in this project dir.
-    structure_path : str = ""
-    ion : str = "No"
-    solvation : str = "No"
-    solvation_size : str = ""
-    solvation_distance : str = ""
-    splvation_shape : str = "REC"
-    timestamp : str = None
+##  Are these used at all?????
+### Details and location of the build of a single pose of a structure.
+#class StructureMapping():
+#    ##  Path to the dir that holds this build. 
+#    #   May or may not be in this project dir.
+#    structure_path : str = ""
+#    ion : str = "No"
+#    solvation : str = "No"
+#    solvation_size : str = ""
+#    solvation_distance : str = ""
+#    splvation_shape : str = "REC"
+#    timestamp : str = None
+#
+###  Figures out the type of structure file being preprocessed.
+#def getStructureFileProjectType(request_dict):
+#    projectType = "not set"
+#    services = request_dict['entity']['services']
+#    for service in services:
+#        if 'Preprocess' in service.keys():
+#            if 'type' in service['Preprocess'].keys():
+#                if 'PreprocessPdbForAmber' == service['Preprocess']['type']:
+#                    projectType = "pdb"
+#
+#    return projectType
 
-##  Figures out the type of structure file being preprocessed.
-def getStructureFileProjectType(request_dict):
-    projectType = "not set"
-    services = request_dict['entity']['services']
-    for service in services:
-        if 'Preprocess' in service.keys():
-            if 'type' in service['Preprocess'].keys():
-                if 'PreprocessPdbForAmber' == service['Preprocess']['type']:
-                    projectType = "pdb"
-
-    return projectType
-
-##TODO: pydantic homework when model has settled down.
-
-# def generateProjectSchema():
-#     print(project.schema_json(indent=2))
+# TODO - do this for all the project types
+def generateProjectSchema():
+    print(Project.schema_json(indent=2))
 
 if __name__ == "__main__":
     generateProjectSchema()

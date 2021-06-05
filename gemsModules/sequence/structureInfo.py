@@ -5,6 +5,7 @@ from datetime import datetime
 from pydantic import BaseModel, Field, ValidationError
 from pydantic.schema import schema
 from gemsModules.sequence import io as sequenceio
+from gemsModules.sequence import projects as sequenceProjects
 from gemsModules.common import io as commonio
 from gemsModules.common import logic as commonlogic
 from gemsModules.common.loggingConfig import *
@@ -136,7 +137,7 @@ def buildStructureInfoOliver(thisTransaction : sequenceio.Transaction):
                     additionalInfo={"hint":error})
             return
         log.debug("indexOrderedSequence: " + str(structureInfo.indexOrderedSequence))
-        structureInfo.setSeqID()
+        structureInfo.setSeqId()
 #        structureInfo.sequence = sequence
         ##TODO: Also grab the following from the request, or set defaults:
         ##    buildType, ions, forceField, date.
@@ -208,15 +209,57 @@ def buildStructureInfoOliver(thisTransaction : sequenceio.Transaction):
         rotamerData.totalLikelyRotamers = 1
         rotamerData.totalSelectedRotamers = 1
 
+    # there is probably a better way than the following, but....
+    projectOut = thisTransaction.transaction_out.project
+    entity_id = projectOut.getEntityId()
+    service_id = projectOut.getServiceId()
+    p_uuid = projectOut.getPuuid()
+    projectOut.setIndexOrderedSequence(thisTransaction.getSequenceVariantOut('indexOrdered'))
+    index_ordered_sequence  = projectOut.getIndexOrderedSequence()
+    projectOut.setSeqId(thisTransaction.getSeqIdOut())
+    seq_id  = projectOut.getSeqId()
+    filesystem_path = projectOut.getFilesystemPath()
+    host_url_base_path = projectOut.getHostUrlBasePath()
+    theStructureBuildInfo = thisTransaction.getStructureBuildInfoOut()
+    thisBuildStrategyID   = theStructureBuildInfo.getBuildStrategyID()
+
     log.debug("The max number structs to build (4) is :  " + str(maxNumberOfStructuresToBuild) )
     if rotamerData.totalPossibleRotamers == 1 : 
         log.debug("totalPossibleRotamers: 1")
+        # there is probably a better way than the following, but....
         buildState = sequenceio.Single3DStructureBuildDetails()
         buildState.conformerLabel = "structure"
         buildState.structureDirectoryName = "structure"
         buildState.conformerID = buildState.structureDirectoryName
         buildState.isDefaultStructure = True
         buildState.date = datetime.now()
+        buildState.setEntityId(entity_id)
+        buildState.setServiceId(service_id)
+        buildState.setPuuid(p_uuid)
+        buildState.setIndexOrderedSequence(index_ordered_sequence)
+        buildState.setSeqId(seq_id)
+        buildState.setFilesystemPath(filesystem_path)
+        buildState.setHostUrlBasePath(host_url_base_path)
+        buildState.date = datetime.now()
+        buildState.setDownloadUrlPath( 
+                projectUtils.buildDownloadUrlPath( 
+                    buildState.host_url_base_path , 
+                    buildState.entity_id , 
+                    buildState.service_id , 
+                    buildState.pUUID , 
+                    buildState.structureDirectoryName ))
+        buildState.setConformerPath()
+        if sequenceProjects.structureExists(buildState, thisTransaction, thisBuildStrategyID):
+            log.debug("Found an existing structure for " + buildState.structureDirectoryName)
+            buildDir = "Existing_Builds/"
+        else: # Doesn't already exist.
+            log.debug("Need to build this structure: " + buildState.structureDirectoryName )
+            buildDir = "New_Builds/"
+            buildState.setIsNewBuild(True)
+        buildState.setAbsoluteConformerPath(buildDir)
+        theJsonObject = buildState.json(indent=2)
+        log.debug("The build state after initializing is  ")
+        log.debug(theJsonObject)
         structureInfo.individualBuildDetails.append(buildState)
         log.debug("returning structureInfo: " + repr(structureInfo))
         return structureInfo 
@@ -227,21 +270,12 @@ def buildStructureInfoOliver(thisTransaction : sequenceio.Transaction):
         if maxNumberOfStructuresToBuild != 1 :
             log.error("Mismatch between doSingleDefaultOnly and maxNumberOfStructuresToBuild")
 
-    downloadUrlPath = thisTransaction.transaction_out.project.getDownloadUrlPath()
     ## Presence of incoming rotamerData indicates specific rotamer requests.
     firstStructure=True
     if rotamerData != None:
         from urllib.parse import urljoin
-        #Just get all this info once and append to each buildstate in the loop below
-        simulationPhase = checkForSimulationPhase(thisTransaction)
-        log.debug("simulationPhase: " + simulationPhase)
-        solvationShape = None
-        if simulationPhase == "solvent":
-            # ## TODO - move this to a method of Transaction
-            solvationShape = getSolvationShape(thisTransaction)
         date = datetime.now()
         log.debug("date: " + str(date))
-        addIons = checkForAddIons(thisTransaction)
         log.debug("\nrotamerData:\n" + str(rotamerData))
         # Now convert the rotamerData object into a List for itertools to work on.
         sequenceRotamerCombos = generateCombinationsFromRotamerData(
@@ -251,31 +285,47 @@ def buildStructureInfoOliver(thisTransaction : sequenceio.Transaction):
         log.debug(sequenceRotamerCombos)
         # Now put add these combos to individual build states with other info
         for rotamerCombo in sequenceRotamerCombos:
+            # initalize a new buildState
             buildState = sequenceio.Single3DStructureBuildDetails()
             buildState.sequenceConformation = rotamerCombo
             buildState.conformerLabel = buildConformerLabel(rotamerCombo)
-            log.debug("The build state after setting conformerLabel is : ")
-            log.debug(buildState.json(indent=2))
+            log.debug("label is :" + buildState.conformerLabel)
+            # there is probably a better way than the following, but....
+            buildState.setEntityId(entity_id)
+            buildState.setServiceId(service_id)
+            buildState.setPuuid(p_uuid)
+            buildState.setIndexOrderedSequence(index_ordered_sequence)
+            buildState.setSeqId(seq_id)
+            buildState.setFilesystemPath(filesystem_path)
+            buildState.setHostUrlBasePath(host_url_base_path)
             if firstStructure is True :
                 buildState.isDefaultStructure = True
                 firstStructure = False
-            log.debug("label is :" + buildState.conformerLabel)
             if len(buildState.conformerLabel) > 32 :
                 log.debug("conformerLabel is long so building a UUID for structureDirectoryName")
                 buildState.structureDirectoryName = projectUtils.getUuidForString(buildState.conformerLabel)
                 log.debug("The structureDirectoryName/UUID is : " + buildState.structureDirectoryName)
-            else:
+            else :
                 log.debug("conformerLabel is short so using it for structureDirectoryName")
                 buildState.structureDirectoryName = buildState.conformerLabel 
                 log.debug("The structureDirectoryName is : " + buildState.structureDirectoryName)
-            buildState.simulationPhase = simulationPhase
-            if solvationShape != None:
-                buildState.solventShape = solventShape
+            buildState.setConformerId(buildState.getStructureDirectoryName())
             buildState.date = date
-            buildState.addIons = addIons
-            buildState.conformerID = buildState.structureDirectoryName
-            buildState.downloadUrl = urljoin(downloadUrlPath, buildState.conformerLabel)
-
+            buildState.setDownloadUrlPath( projectUtils.buildDownloadUrlPath(
+                    buildState.host_url_base_path ,
+                    buildState.entity_id ,
+                    buildState.service_id ,
+                    buildState.pUUID ,
+                    buildState.structureDirectoryName ))
+            buildState.setConformerPath()
+            if sequenceProjects.structureExists(buildState, thisTransaction, thisBuildStrategyID):
+                log.debug("Found an existing structure for " + buildState.structureDirectoryName)
+                buildDir = "Existing_Builds/"
+            else: # Doesn't already exist.
+                log.debug("Need to build this structure: " + buildState.structureDirectoryName )
+                buildDir = "New_Builds/"
+                buildState.setIsNewBuild(True)
+            buildState.setAbsoluteConformerPath(buildDir)
             structureInfo.individualBuildDetails.append(buildState)
     else:
         log.debug("rotamerData is None.") 
@@ -651,7 +701,7 @@ def getStructureInfoFilename(thisTransaction : sequenceio.Transaction):
         log.error(traceback.format_exc())
         raise error
     else:
-        #seqID = projectUtils.getSeqIDForSequence(sequence)
+        #seqID = projectUtils.getSeqIdForSequence(sequence)
         #seqIDPath = sequencePath + seqID
         sequencePath = thisProject.sequence_path
         ##Update the json file for future reference.
