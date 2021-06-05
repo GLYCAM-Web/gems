@@ -115,8 +115,9 @@ def manageSequenceBuild3DStructureRequest(self, defaultOnly : bool = False) :
         this_pUUID = projectUtils.getProjectpUUID(thisProject)
         log.debug("this_pUUID is : " + this_pUUID)
         this_sequence = self.getSequenceVariantOut('indexOrdered')
-        this_seqID = projectUtils.getSeqIDForSequence(this_sequence)
+        this_seqID = projectUtils.getSeqIdForSequence(this_sequence)
         thisProject.sequence_id = this_seqID
+        thisProject.setSeqId(this_seqID)
         buildStrategyID = "buildStrategyID1" # TODO implement getCurrentBuildStrategyID().
         servicePath = thisProject.service_dir
         thisProject.sequence_path = os.path.join(

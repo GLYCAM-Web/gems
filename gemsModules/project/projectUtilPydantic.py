@@ -365,7 +365,7 @@ def getSequenceFromTransaction(thisTransaction: commonio.Transaction, sequenceTy
 #   @param sequence
 #   @return uuid seqID
 #   TODO: merge this into the more generic getUuidForString, below
-def getSeqIDForSequence(sequence):
+def getSeqIdForSequence(sequence):
     log.info("getSeqUUDIFor() was called. sequence: " + str(sequence))
     if sequence is None :
         raise AttributeError("no sequence to get seqID from")

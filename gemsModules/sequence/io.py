@@ -267,7 +267,7 @@ class Single3DStructureBuildDetails(BaseModel):
             error = "Cannot derive a seqID from an empty indexOrderedSequence string"
             log.error(error)
             raise error
-        self.seqID = projectUtils.getSeqIDForSequence(self.indexOrderedSequence)
+        self.seqID = projectUtils.getSeqIdForSequence(self.indexOrderedSequence)
     
     # All the getters are plain so far
 
@@ -319,12 +319,12 @@ class StructureBuildInfo(BaseModel):
         self.indexOrderedSequence = inputSequence
     def setBuildStrategyID(self, newBuildStrategyID) :
         self.buildStrategyID = newBuildStrategyID
-    def setSeqID(self) :
+    def setSeqId(self) :
         if self.indexOrderedSequence is "" :
             error = "Cannot derive a seqID from an empty indexOrderedSequence string"
             log.error(error)
             raise error
-        self.seqID = projectUtils.getSeqIDForSequence(self.indexOrderedSequence)
+        self.seqID = projectUtils.getSeqIdForSequence(self.indexOrderedSequence)
 
     def getIndividualBuildDetails(self) :
         return self.individualBuildDetails
@@ -332,7 +332,7 @@ class StructureBuildInfo(BaseModel):
         return self.buildStrategyID
     def getSequence(self) :
         return self.sequence
-    def getSeqID(self) :
+    def getSeqId(self) :
         return self.seqID
 
 class TheLinkageGeometryOptions(BaseModel) :

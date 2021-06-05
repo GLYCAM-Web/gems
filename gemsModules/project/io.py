@@ -286,7 +286,7 @@ class Project(BaseModel):
             return
         if self.site_host_name == "" :
             log.error("Sete host name not set.  Cannot set Host Url Base Path.")
-            raise ## I am pretty sure I don't know how to use raise.  BLF 
+            return
         if commonlogic.getGemsExecutionContext() == 'website' :
             prefix = 'https://'
         else :
@@ -301,7 +301,7 @@ class Project(BaseModel):
         try :
             if self.host_url_base_path == "" :
                 log.error("the host url base path is not set so cannot set download url path.")
-                raise
+                return
             from gemsModules.project import projectUtilPydantic as utils
             self.download_url_path = utils.buildDownloadUrlPath( 
                     self.host_url_base_path ,

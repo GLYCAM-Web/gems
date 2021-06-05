@@ -137,7 +137,7 @@ def buildStructureInfoOliver(thisTransaction : sequenceio.Transaction):
                     additionalInfo={"hint":error})
             return
         log.debug("indexOrderedSequence: " + str(structureInfo.indexOrderedSequence))
-        structureInfo.setSeqID()
+        structureInfo.setSeqId()
 #        structureInfo.sequence = sequence
         ##TODO: Also grab the following from the request, or set defaults:
         ##    buildType, ions, forceField, date.
@@ -274,16 +274,8 @@ def buildStructureInfoOliver(thisTransaction : sequenceio.Transaction):
     firstStructure=True
     if rotamerData != None:
         from urllib.parse import urljoin
-        #Just get all this info once and append to each buildstate in the loop below
-#        simulationPhase = checkForSimulationPhase(thisTransaction)
-#        log.debug("simulationPhase: " + simulationPhase)
-#        solvationShape = None
-#        if simulationPhase == "solvent":
-#            # ## TODO - move this to a method of Transaction
-#            solvationShape = getSolvationShape(thisTransaction)
         date = datetime.now()
         log.debug("date: " + str(date))
-#        addIons = checkForAddIons(thisTransaction)
         log.debug("\nrotamerData:\n" + str(rotamerData))
         # Now convert the rotamerData object into a List for itertools to work on.
         sequenceRotamerCombos = generateCombinationsFromRotamerData(
@@ -299,7 +291,7 @@ def buildStructureInfoOliver(thisTransaction : sequenceio.Transaction):
             buildState.conformerLabel = buildConformerLabel(rotamerCombo)
             log.debug("label is :" + buildState.conformerLabel)
             # there is probably a better way than the following, but....
-            buildState.setEntituId(entity_id)
+            buildState.setEntityId(entity_id)
             buildState.setServiceId(service_id)
             buildState.setPuuid(p_uuid)
             buildState.setIndexOrderedSequence(index_ordered_sequence)
@@ -317,12 +309,8 @@ def buildStructureInfoOliver(thisTransaction : sequenceio.Transaction):
                 log.debug("conformerLabel is short so using it for structureDirectoryName")
                 buildState.structureDirectoryName = buildState.conformerLabel 
                 log.debug("The structureDirectoryName is : " + buildState.structureDirectoryName)
-            buildState.setConformerID(buildState.getStructureDirectoryName())
-#            buildState.simulationPhase = simulationPhase # fixme
-#            if solvationShape != None : # fixme
-#                buildState.solventShape = solventShape # fixme
+            buildState.setConformerId(buildState.getStructureDirectoryName())
             buildState.date = date
-#            buildState.addIons = addIons
             buildState.setDownloadUrlPath( projectUtils.buildDownloadUrlPath(
                     buildState.host_url_base_path ,
                     buildState.entity_id ,
@@ -339,15 +327,6 @@ def buildStructureInfoOliver(thisTransaction : sequenceio.Transaction):
                 buildState.setIsNewBuild(True)
             buildState.setAbsoluteConformerPath(buildDir)
             structureInfo.individualBuildDetails.append(buildState)
-            theJsonObject = buildState.json(indent=2)
-            log.debug("The build state after initializing is  ")
-            log.debug(theJsonObject)
-            try :
-                commonlogic.writeStringToFile( theJsonObject , 
-                    buildState.getConformerPath()  )
-            except Exception as error :
-                log.error("There was an error writing the build state to a file: " )
-                raise error
     else:
         log.debug("rotamerData is None.") 
 
@@ -722,7 +701,7 @@ def getStructureInfoFilename(thisTransaction : sequenceio.Transaction):
         log.error(traceback.format_exc())
         raise error
     else:
-        #seqID = projectUtils.getSeqIDForSequence(sequence)
+        #seqID = projectUtils.getSeqIdForSequence(sequence)
         #seqIDPath = sequencePath + seqID
         sequencePath = thisProject.sequence_path
         ##Update the json file for future reference.

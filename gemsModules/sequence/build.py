@@ -48,14 +48,14 @@ def buildEach3DStructureInStructureInfo(thisTransaction : sequenceio.Transaction
         theStructureBuildInfo = thisTransaction.getStructureBuildInfoOut()
         if theStructureBuildInfo.indexOrderedSequence is "" :
             theStructureBuildInfo.setSequence(thisTransaction.getSequenceVariantOut('indexOrdered'))
-            theStructureBuildInfo.setSeqID(theStructureBuildInfo.indexOrderedSequence)
+            theStructureBuildInfo.setSeqId(theStructureBuildInfo.indexOrderedSequence)
         thisBuildStrategyID   = theStructureBuildInfo.getBuildStrategyID()
         thisSeqID             = thisTransaction.getSeqIdOut()
-        if thisSeqID != theStructureBuildInfo.getSeqID() :
+        if thisSeqID != theStructureBuildInfo.getSeqId() :
             error="Seq IDs do not match in project and build details."
             log.error("error")
             log.error("     project  : " + str(thisSeqID))
-            log.error("     build details  : " + str(theStructureBuildInfo.getSeqID()))
+            log.error("     build details  : " + str(theStructureBuildInfo.getSeqId()))
             return
         thisPuuID             = thisTransaction.getPuuIDOut()
         thisProjectDir        = thisTransaction.getProjectDirOut()
