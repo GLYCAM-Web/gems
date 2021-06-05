@@ -278,26 +278,6 @@ def getVersionsFileInfo(versionsFilePath : str):
     log.debug("the versions dictionary is : " + str(thisDict))
     return thisDict
 
-
-
-###  Intended for use by getDownloadUrl. Content is the text contained in
-##   the versionsFile.
-##   @param content
-#def getSiteHostName(content):
-#    log.info("getSiteHostName was called.\n")
-#    lines = content.split("\n")
-#    for line in lines:
-#        if 'SITE_HOST_NAME' in line:
-#            start = line.index("=") + 1
-#            siteHostName = line[start:].replace('"', '')
-#            log.debug("siteHostName: " + siteHostName)
-#    if siteHostName is not None:
-#        return siteHostName
-#    else:
-#        log.error("Never did find a siteHostName.")
-#        raise AttributeError
-
-
 ##  @brief Give a transaction, get a sequence. Note that if more than one input
 #   contains a "Sequence" key, only the last sequence is returned.
 #   @detail Note that this method is only good for transactions with a single sequence.
@@ -404,6 +384,30 @@ def getUuidForString(theString):
     log.debug("stringID: " + stringID)
     return stringID
 
+## Build the download URL path for this project/build/whatever
+#  Depends on project.settings.
+#   @param  hostUrlBasePath
+#   @param  pUUID
+#   @param  entity_id
+#   @param  service_id
+#   @param  subdirectory (optional)
+#   @return str downloadUrlPath
+def buildDownloadUrlPath( 
+        hostUrlBasePath : str ,
+        entity_id : str ,
+        service_id : str ,
+        pUUID : str , 
+        subdirectory : str = None ):
+    log.info("buildDownloadUrlPath was called.\n")
+    try :
+        downloadUrlPath =  hostUrlBasePath + "/" + "json"+ "/" + "download" + "/" + entity_id + "/" + service_id + "/" + pUUID + "/"
+        if subdirectory is not None :
+            downloadUrlPath = downloadUrlPath + subdirectory + "/"
+        log.debug("downloadUrlPath : " + downloadUrlPath )
+        return downloadUrlPath
+    except AttributeError as error:
+        log.error("Something went wrong building the downloadUrlPath.")
+        raise error
 
 def addProjectToResponse(project, thisTransaction):
     log.info("addProjectToResponse() was called.")

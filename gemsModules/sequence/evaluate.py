@@ -6,13 +6,13 @@ import traceback
 import gemsModules.common.utils
 from gemsModules.project import projectUtilPydantic as projectUtils
 from gemsModules.project import settings as projectSettings
-from gemsModules.sequence import io as sequenceio
 from gemsModules.common import io as commonio
 from gemsModules.common import logic as commonlogic
 from gemsModules.common import services as commonservices
 from gemsModules.common.loggingConfig import *
-from . import settings as sequenceSettings
-from . import io as sequencelogic
+from gemsModules.sequence import io as sequenceio
+from gemsModules.sequence import settings as sequenceSettings
+from gemsModules.sequence import io as sequencelogic
 
 if loggers.get(__name__):
     pass

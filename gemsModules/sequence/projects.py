@@ -175,13 +175,14 @@ def sequenceExists(buildState: sequenceio.Single3DStructureBuildDetails, thisTra
 
 ## TODO: make all these directory/link/file making functions into one thing
 ## that gets called by string only
-
-
-def createConformerDirectoryInBuildsDirectory(projectDir : str, conformerDirName : str):
+def createConformerDirectoryInBuildsDirectory(
+        projectDir : str, 
+        conformerDirName : str ,
+        separator : str = 'New_Builds' ) :
     log.info("createConformerDirectoryInBuildsDirectory() was called.")
     log.debug("projectDir: " + projectDir)
     log.debug("conformerDirName: " + conformerDirName)
-    conformerDirPath = (projectDir + "/New_Builds/" + conformerDirName + '/')
+    conformerDirPath = os.path.join( projectDir , separator , conformerDirName )
     if os.path.isdir(conformerDirPath) :
         return
     try:

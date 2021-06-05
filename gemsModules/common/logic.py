@@ -197,7 +197,7 @@ def getFilesystemOutputPath() :
     return ( 'Default' , theDefaultPath )
 
 
-## Try to determine if we might be in a website-like situation
+## @brief Try to determine if we might be in a website-like situation
 #  This could be expanded to return other sorts of information about 
 #    the environment in which gens is executing.
 #  For now, it only returns "website" or "default".
@@ -211,9 +211,8 @@ def getGemsExecutionContext() :
     else :
         log.debug("GW_LIVE_SWARM is NOT defined in the current environment.  Assuming this is not a website.")
         return 'default'
-    
-
-
+   
+## @brief Copy a file in a given path to some other path with option not to overwrite
 def copyPathFileToPath( fromPath : str, fromName : str, toPath : str, noClobber : bool = False ) :
     # If noClobber is True, check to be sure file doesn't already exist.
     log.info("common copyPathFileToPath was called")

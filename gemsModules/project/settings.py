@@ -55,37 +55,13 @@ default_filesystem_output_path = '/website/userdata/' ## Use this instead of out
 default_versions_file_path = default_filesystem_output_path
 default_versions_file_name = "VERSIONS.sh"
 
-# Default entity IDs
-output_entity_id = {
-        'Sequence'      : 'sequence',
-        'Conjugate'     : 'conjugate',
-        'Query'         : 'query',
-        'StructureFile' : 'structureFile'
-        }
-
-output_entity_service_id = {
-        'Sequence'      :   {
-            'Validate'          : 'cb',
-            'Evaluate'          : 'cb',
-            'Build3DStructure'  : 'cb',
-            'DrawGlycan'        : 'cb'
-            },
-        'Conjugate'     :   {
-            'BuildGlycoprotein' : 'gp'
-            },
-        'StructureFile'         :   {
-            'PreprocessPDB'     : 'pdb'
-            }
-        }
-
-
 # Default subdirectories per project type.  Typically, these go
 # under whatever is defined for project_path
 ##
 ##  Old and being deprecated
 ##
 toolPathIdentifier = {
-#        'cb'   :  'tools/cb/git-ignore-me_userdata',
+#        'cb'   :  'tools/cb/git-ignore-me_userdata', # should not be used anywhere now
         'pdb'  :  'tools/pdb/git-ignore-me_userdata',
         'gp'   :  'tools/gp/git-ignore-me_userdata'
         }

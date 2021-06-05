@@ -140,7 +140,9 @@ class Single3DStructureBuildDetails(BaseModel):
     # The sequence that inspired this build is contained here.
     # This should be the official version that is used to generate the primary 
     # key for database searches.  See seqID.
-#    sequence : str  = ""
+    pUUID : str = ""
+    entity_id : str = ""
+    service_id : str = ""
     incomingSequence : str = ""
     indexOrderedSequence : str = ""
     # For convenience: 
@@ -170,15 +172,19 @@ class Single3DStructureBuildDetails(BaseModel):
     sequenceConformation : List = []
     #  When there are multiple structures, one is chosen for the default.
     isDefaultStructure : bool = False
+    isNewBuild : bool = False
     # The following are locations needed by builders and/or retrievers.
     structureDirectoryName : str = ""
-    subDirectory : str = ""
-    downloadUrl : str = ""
+    filesystem_path : str = ""
+    host_url_base_path : str = ""
+    conformer_path : str = ""
+    absolute_conformer_path : str = ""
+    downloadUrlPath : str = ""
     # The following are options relevant to how the structure is built.
-    simulationPhase : str = "gas-phase"  ## also solvent model, e.g., TIP3P, TIP5P
-    solvationShape : str = None   ## Solvated requests might specify a shape.
-    addIons : str = "default" ## Is there a benefit for this to be a String? Boolean?
-    energy : str = None ## kcal/mol
+#    simulationPhase : str = "gas-phase"  ## also solvent model, e.g., TIP3P, TIP5P
+#    solvationShape : str = None   ## Solvated requests might specify a shape.
+#    addIons : str = "default" ## Is there a benefit for this to be a String? Boolean?
+#    energy : str = None ## kcal/mol
     forceField : str = 'See Build Directory Files' ## TODO: This needs to be a class. Schedule design with Lachele.
 
     def __init__(self, **data : Any):
@@ -190,53 +196,105 @@ class Single3DStructureBuildDetails(BaseModel):
         log.debug("indexOrderedSequence: " + self.indexOrderedSequence)
         log.debug("seqID: " + self.seqID)
         log.debug("conformerID: " + self.conformerID)
-        log.debug("conformerLabel: " + self.conformerID)
-        log.debug("subDirectory: " + self.subDirectory)
-        log.debug("downloadUrl: " + self.downloadUrl)
+        log.debug("conformerLabel: " + self.conformerLabel)
+        log.debug("conformerPath: " + self.conformer_path)
+        log.debug("downloadUrlPath: " + self.downloadUrlPath)
 
-    def setSubDirectory(self) :
-        self.subDirectory = '/Requested_Builds/' + conformerID + '/'
-    def setDownloadUrl(self, pUUID) :
-        self.downloadUrl = projectio.getDownloadUrl(pUUID, "cb", self.conformerLabel)
-    def setSeqID(self) :
-        if self.sequence is "" :
-            error = "Cannot derive a seqID from an empty sequence string"
+
+    # Plain setters because logic elsewhere should determine them
+
+    def setIsNewBuild(self, IsNewBuild : bool ) :
+        self.isNewBuild = IsNewBuild
+
+    def setEntityId(self, theEntityId : str) :
+        self.entity_id = theEntityId
+
+    def setServiceId(self, theServiceId : str) :
+        self.service_id = theServiceId
+
+    def setPuuid(self, thePuuid : str) :
+        self.pUUID = thePuuid
+
+    def setFilesystemPath(self, thePath : str) :
+        self.filesystem_path = thePath
+
+    def setHostUrlBasePath(self, thePath : str) :
+        self.host_url_base_path = thePath
+
+    def setConformerLabel(self, theLabel : str) :
+        self.conformerLabel = theLabel
+
+    def setConformerId(self, theId : str) :
+        self.conformerID = theId
+
+    def setStructureDirectoryName(self, theStructureDirectoryName : str) :
+        self.structureDirectoryName = theStructureDirectoryName
+
+    def setIndexOrderedSequence(self, theIndexOrderedSequence : str) :
+        self.indexOrderedSequence = theIndexOrderedSequence
+
+    def setDownloadUrlPath(self, theDownloadUrlPath : str ) :
+        self.downloadUrlPath = theDownloadUrlPath
+
+    # Setters that contain logic
+
+    # theBuildDir is usually "New_Builds" or "Existing_Builds" unlesss it is the general case
+    def setAbsoluteConformerPath(self, theBuildDir :str) :
+        self.absolute_conformer_path = os.path.join(
+                self.filesystem_path , 
+                self.entity_id ,
+                self.service_id ,
+                'Builds' ,
+                self.pUUID ,
+                theBuildDir ,
+                self.structureDirectoryName)
+
+    def setConformerPath(self) :
+        self.conformer_path = os.path.join(
+                self.filesystem_path , 
+                self.entity_id ,
+                self.service_id ,
+                'Builds' ,
+                self.pUUID ,
+                'Requested_Builds' ,
+                self.structureDirectoryName)
+
+    def setSeqId(self, theSeqID : str = None) :  # does this need a noclobber option?
+        if theSeqID is not None :
+            self.seqID = theSeqID
+            return
+        if self.indexOrderedSequence is "" :
+            error = "Cannot derive a seqID from an empty indexOrderedSequence string"
             log.error(error)
             raise error
-        self.seqID = projectUtils.getSeqIDForSequence(self.sequence)
+        self.seqID = projectUtils.getSeqIDForSequence(self.indexOrderedSequence)
     
-    def getSubDirectory(self) :
-        return self.subDirectory 
-    def getDownloadUrl(self) :
-        return self.downloadUrl
-    def getSeqID(self) :
+    # All the getters are plain so far
+
+    def getEntityId(self) :
+        return self.entity_id
+    def getServiceId(self) :
+        return self.service_id
+    def getConformerPath(self) :
+        return self.conformer_path 
+    def getAbsoluteConformerPath(self) :
+        return self.absolute_conformer_path
+    def getDownloadUrlPath(self) :
+        return self.downloadUrlPath
+    def getSeqId(self) :
         return self.seqID
-    #   ## Write in other getters as needed
-
-
-###   @class BuildState
-##    @brief An object that represents one requested build state.
-##    @TODO: Add more fields, ringPucker, protonationState, etc...
-#class OLD_DEPRECATED_BuildState(BaseModel):
-#    ## Labels may be either "structure" if there is only one for this project.
-#    #    or, they may be a terse label,
-#    #    or they may be uuids if the terse label is > 32 char long.
-#    conformerLabel : str = ""
-#    structureDirectoryName : str = ""
-#    simulationPhase : str = "gas-phase"
-#    ## Solvated requests might specify a shape.
-#    solvationShape : str = None
-#    isDefaultStructure : bool = False
-#    ## new, building, ready, submitted, complete, failed, delayed
-#    status : str = "new"
-#    date : datetime = None
-#    addIons : str = "default" ## Is there a benefit for this to be a String? Boolean?
-#    energy : str = None ## kcal/mol
-#    forceField : str = None ## TODO: This needs to be a class. Schedule design with Lachele.
-#    #sequenceConformation : List[RotamerConformation] = None 
-#    sequenceConformation : List = None
-#    ## Would be nice to just directly use the gmml level class like this:
-#    #gmmlConformerInfo : gmml.single_rotamer_info_vector = None   
+    def getFilesystemPath(self) :
+        return self.filesystem_path
+    def getHostUrlBasePath(self) :
+        return self.host_url_base_path 
+    def getConformerLabel(self) :
+        return self.conformerLabel
+    def getConformerID(self) :
+        return self.conformerID
+    def getStructureDirectoryName(self) :
+        return self.structureDirectoryName
+    def getIndexOrderedSequence(self) :
+        return self.indexOrderedSequence
 
 ##   @class StructureBuildInfo
 #    @brief An object to represent the data previously held in the Structure_Mapping_Table.
@@ -885,7 +943,7 @@ class Transaction(commonio.Transaction):
                     additionalInfo={"hint":"cannot set limit for number of structures"})
             return None
     # TODO - write all these if-not-None-return recursions to look like the ones above.
-    def getSeqIDOut(self) :
+    def getSeqIdOut(self) :
         if self.transaction_out is None : 
             return None
         if self.transaction_out.entity is None :
