@@ -50,7 +50,7 @@ run_newBuild_test()
 run_existingBuild_test() 
 {
 	cat $inputJson | $GEMSHOME/bin/delegate > out.json
-	pUUID=$(grep pUUID out.json | cut -d '"' -f4)
+	pUUID=$(grep -m 1  pUUID out.json | cut -d '"' -f4)
 	currentOutput="${gemsBuildPath}/${pUUID}/Existing_Builds/${conformerID}/min-t5p.pdb"
 	if ! cmp $currentOutput $correctOutput > /dev/null 2>&1; then
 		echo "Test FAILED!" 
@@ -92,7 +92,7 @@ Checking now that existing builds are found.
 if ! run_existingBuild_test; then
 	return 1;
 else
+	## Remove what we made
+	( cd ${gemsServicePath} && rm -rf Sequences Builds )
 	return 0;
 fi
-## Remove what we made
-( cd ${gemsServicePath} && rm -rf Sequences Builds )
