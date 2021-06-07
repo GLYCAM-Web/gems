@@ -232,8 +232,9 @@ def receive(receivedTransaction : sequenceio.Transaction):
 
     ## prepares the transaction for return to the requestor, success or fail.     
     thisTransaction.build_outgoing_string() ## NOTE!!! This uses the child method in sequence.io - a better method!
-    outgoingResponse = thisTransaction.transaction_out.json(indent=2)
-    common.logic.writeStringToFile(outgoingResponse, os.path.join(thisProject.logs_dir, "response.json") )
+    if needFilesystemWrites :
+        outgoingResponse = thisTransaction.transaction_out.json(indent=2)
+        common.logic.writeStringToFile(outgoingResponse, os.path.join(thisProject.logs_dir, "response.json") )
     return thisTransaction
 
 
