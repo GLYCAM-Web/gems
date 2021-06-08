@@ -43,8 +43,8 @@ Ring oxygens are identified by:
 8 saccharide residue(s) were detected:
 
 Residue Identity               Name  Serial ResName Chain ResSer InsCode AltLoc
-N-acetyl-b-D-glucopyranose     O5      3706 NAG     A          1 n/a     n/a   
-N-acetyl-b-D-glucopyranose     O5      3720 NAG     A          2 n/a     n/a   
+N-acetyl-b-D-glucosamine       O5      3706 NAG     A          1 n/a     n/a   
+N-acetyl-b-D-glucosamine       O5      3720 NAG     A          2 n/a     n/a   
 b-D-mannopyranose              O5      3732 BMA     A          3 n/a     n/a   
 a-D-mannopyranose              O5      3743 MAN     A          4 n/a     n/a   
 a-D-mannopyranose              O5      3754 MAN     A          6 n/a     n/a   

@@ -1,0 +1,18 @@
+{
+	"entity" :
+	{
+		"type": "Sequence",
+		"services" :
+		[
+			{ "Validate" :
+				{ "type" : "Validate" }
+			}
+		],
+		"inputs" :
+		[
+			{ "Sequence" :
+				{ "payload" : "Manpa1-OH" }
+			}
+		]
+	}
+}

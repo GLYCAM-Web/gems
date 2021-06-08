@@ -1,0 +1,49 @@
+{
+    "entity": {
+        "type": "StructureFile",
+        "services": [{
+            "Preprocess": {
+                "type": "Evaluate"
+            }
+        }],
+        "inputs": [{
+            "pdb_file_name": "1buy.pdb"
+        }]
+    },
+    "options": {
+        "preprocessor_options": {
+            "targetModule": "amber"
+        }
+    },
+    "project": {
+        "_state": "<django.db.models.base.ModelState object at 0x7effd3db2150>",
+        "id": "0dd24a03-bfc4-4c51-bb67-51638481ae78",
+        "user_id": "None",
+        "email": "nobody@home.com",
+        "pUUID": "None",
+        "title": "Dan's Project",
+        "comment": "commentyness",
+        "timestamp": "2021-03-04 19:02:30.302390+00:00",
+        "gems_timestamp": " ",
+        "project_type": "pdb",
+        "project_dir": " ",
+        "requesting_agent": "website",
+        "gems_version": "ea12ef4b5c15053dc2fe16ca1746c5e3b494024c",
+        "gems_branch": "gems-dev",
+        "gmml_version": "3243718e7ae18032a9f2e2e2a38d7b3d83903136",
+        "gmml_branch": "gmml-dev",
+        "site_mode": "CONTAINERS",
+        "site_host_name": "192.168.192.2",
+        "force_field": "",
+        "parameter_version": "",
+        "amber_version": "",
+        "json_api_version": "0.0.1",
+        "project_ptr_id": "0dd24a03-bfc4-4c51-bb67-51638481ae78",
+        "uploaded_file_name": "1buy.pdb",
+        "u_uuid": "4c82fce4-b413-49ff-b420-23a6dbd33eb7",
+        "upload_path": "/website/TESTS/pdb/test_in/",
+        "pdb_id": " ",
+        "status": "requested",
+        "input_source": "upload"
+    }
+}

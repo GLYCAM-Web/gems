@@ -1,0 +1,16 @@
+Parameters:
+/home/oliver/Programs/Cplusplus/GlycoproteinBuilder/glycoproteinBuilder/CurrentParams
+
+Protein:
+2GUC_Achain.pdb
+
+Glycans:
+glycans/
+
+Protein Residue list:
+97
+END
+
+Glycan id list:
+2VCO
+END

@@ -1,0 +1,26 @@
+{
+    "entity": {
+        "type": "Sequence",
+        "services": [
+            {
+                "Build": {
+                    "type": "Evaluate"
+                }
+            }
+        ],
+        "inputs": [
+            {
+                "Sequence": {
+                    "payload": "DGlcpNAcb1-2DManpa1-6[DGlcpNAcb1-2DManpa1-3]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH"
+                }
+            }
+        ]
+    },
+    "project": {
+        "json_api_version": "0.0.1",
+        "requesting_agent": "website",
+        "sequence": "DGlcpNAcb1-2DManpa1-6[DGlcpNAcb1-2DManpa1-3]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH",
+        "project_dir": "/website/userdata/tools/cb/git-ignore-me_userdata/Builds/",
+        "_django_version": "2.2.2"
+    }
+}

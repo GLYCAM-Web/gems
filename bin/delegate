@@ -1,0 +1,66 @@
+#!/usr/bin/env python3
+##  Use this file to:
+##    * Run the GEMS Delegator as a standalone script.
+import importlib.util, os, sys, getopt
+#import faulthandler
+#faulthandler.enable()
+
+USAGE="""
+USAGE:
+
+    This script takes in a JSON object and returns a JSON object.  
+    The object can be specified as a filename or piped from standard input.
+
+    Examples:
+
+        Using a pipe from standard input:
+
+            echo <json string> | delegate
+            cat /path/to/file | delegate
+
+        Using a filename (with path as appropriate):
+        
+            delegate /path/to/file
+
+    If you are having trouble, you can set the verbosity up.  This will write 
+    messages mostly to standard error, but some might come to standard out. 
+    We recommend doing this only for debugging purposes.
+
+    Verbosity values:
+        error       Only Fatal errors are logged. (Default)
+        info        Log statements that track what methods are called, plus errors.
+        debug       Log lots of detail. For detailed debugging.
+        none        No logging.
+
+    To set the verbosity, set GEMS_LOGGING_LEVEL to one of the values above.  
+    For example:
+        (bash)  export GEMS_LOGGING_LEVEL=debug
+        (csh)   setenv GEMS_LOGGING_LEVEL debug
+
+\n"""
+
+if len(sys.argv) > 1:
+    if sys.argv[1] in ( "-h", "--help") :
+        sys.stderr.write(USAGE)
+        sys.exit(1)
+
+
+if importlib.util.find_spec("gemsModules") is None:
+  this_dir, this_filename = os.path.split(__file__)
+  sys.path.append(this_dir + "/../gemsModules/")
+  if importlib.util.find_spec("common") is None:
+    sys.stderr.write("Unable to locate Common Services.  Exiting.\n")
+    sys.exit(129)
+  else:
+    from common import utils
+else:
+  from gemsModules.common import utils
+jsonObjectString=utils.JSON_From_Command_Line(sys.argv)
+
+
+from gemsModules.delegator.receive import delegate
+responseObjectString=delegate(jsonObjectString)
+sys.stdout.write(responseObjectString)
+
+
+

@@ -1,0 +1,19 @@
+{
+    "entity": {
+        "type": "Sequence",
+        "services": 
+            {
+                "build": {
+                    "type": "Build3DStructure"
+                }
+            },
+        "inputs": 
+            {
+                "sequence": {
+                    "payload": "DGalpb1-6DManpa1-OH"
+                },
+		"resources" :[]
+            }
+    },
+    "prettyPrint" : true
+}

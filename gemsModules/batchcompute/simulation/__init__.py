@@ -1,1 +1,0 @@
-from simulation.simulation_class import Simulation, check_if_dir_content_good

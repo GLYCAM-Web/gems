@@ -1,1 +1,1 @@
-from . import entity, helpme, settings, run_query
+from . import receive, helpme, settings, run_query
