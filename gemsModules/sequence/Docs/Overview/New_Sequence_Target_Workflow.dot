@@ -1,0 +1,72 @@
+digraph {
+  compound="true";
+  node [ shape = "rect" labelFontSize="12" fontName="Helvetica" ] ;
+  edge [ labelfontsize="12" labelfontname="Helvetica" splines=false ];
+  rankdir=LR;
+  subgraph cluster0 {
+    shape="rect";
+    style="dashed, rounded";
+    penwidth="3";
+    color="gray";
+    label="Upstream Process";
+    jsonOrigin [shape="oval" label="Prepare\nJSON Input"];
+  }
+  subgraph cluster1 {
+    label="Sequence";
+    evaluateRequest [ label="Evaluate\nthe request" ] ;
+    getProjectAge [ shape="diamond" label="Determine\nProject Age" ] ;
+    needNewStructs [ shape="diamond" label="Need New\nStructures?" ];
+    buildOffFile [ label="Build Off File(s)" ];
+    needsMin [ shape="diamond" label="Minimization\nRequested?" ] ;
+    evaluateRequest -> getProjectAge;
+    getProjectAge -> needNewStructs [label="New Project" ];
+    needNewStructs -> buildOffFile [label="Yes" ];
+    buildOffFile -> needsMin;
+    yesMin [ shape="circle" label="Yes" ];
+    needsMin -> yesMin ;
+  }
+  jsonOrigin -> evaluateRequest [ltail=cluster0 lhead=cluster1 label="Send to\nSequence" ];
+  subgraph cluster12 {
+    shape="rect";
+    style="dashed, rounded";
+    penwidth="3";
+    color="gray";
+    label="MM Service";
+    evaluateMMRequest [ label="Evaluate\nthe request" ] ;
+    chooseProvider [ label="Select MM Provider" ];
+    evaluateMMRequest -> chooseProvider;
+  }
+  evaluateRequest -> evaluateMMRequest [ ltail=cluster1 lhead=cluster12 xlabel="(Yes)" ];
+  subgraph cluster2 {
+    shape="rect";
+    style="dashed, rounded";
+    penwidth="3";
+    color="gray";
+    label="AMBER\n(part of MM Service)";
+    checkForAmberParm [shape="diamond" label="Are Parm/Rst\nFiles Present?"];
+    makeLeapInputFiles [ label="Generate tleap\ninput files." ];
+    checkForAmberParm -> makeLeapInputFiles [ label="No" ];
+    makeLeapRunScript [ label="Generate script\nfor running tleap." ];
+    makeMdInFiles [ label="Generate MD run\ncontrol files." ] ;
+    makeMDRunScript [ label="Generate script\nfor running MD." ];
+    makeLeapInputFiles -> makeLeapRunScript -> makeMdInFiles -> makeMDRunScript ;
+    determineFFs [ label="Process to assign\nforce fields:\nNeeds chemical\ntype info." ] ;
+    determineSys [ label="Process to know\nsystem info:\nSolvent? Ions?\nEnsemble? Box?" ] ;
+    determineMDINs [ label="Process to assignnMD workflow:\nNeeds lots of\nmodeling info." ] ;
+    determineFFs -> makeLeapInputFiles ;
+    determineSys -> makeLeapInputFiles ;
+    determineMDINs -> makeMdInFiles ;
+  }
+  evaluateMMRequest -> checkForAmberParm [ltail=cluster12 lhead=cluster2 xlabel="Send to AMBER\nby default" ];
+  subgraph cluster3 {
+    shape="rect";
+    style="dashed, rounded";
+    penwidth="3";
+    color="gray";
+    label="JobRunner";
+    evaluateJob [ label="Evaluate the\njob request" ] ;
+    sendJob [ label="Send job where\nit should go" ];
+    evaluateJob -> sendJob;
+  }
+  determineSys -> evaluateJob [ ltail=cluster2 lhead=cluster3 xlabel="Send to\njob runner" ] ;
+}

@@ -1,6 +1,6 @@
 import datetime
 import subprocess
-import key_and_values
+from . import key_and_values
 
 def parse(file_path):
     SMAT_ENTRIES=[]
@@ -19,7 +19,7 @@ def parse(file_path):
                 SMAT_LINE_ENTRY[key_and_values.DATE_KEY] = Split_Label_Type_Status_Date_Ions_Energy[3].strip()
                 SMAT_LINE_ENTRY[key_and_values.IONS_KEY] = Split_Label_Type_Status_Date_Ions_Energy[4].strip()
                 SMAT_LINE_ENTRY[key_and_values.ENERGY_KEY] = Split_Label_Type_Status_Date_Ions_Energy[5].strip()
-            
+
                 RotamerList = split_by_double_semicolon[1]
                 Split_RotamerList = RotamerList.split(';')
                 Strip_Split_RotamerList = list(map (str.strip, Split_RotamerList))
@@ -62,4 +62,4 @@ def write_shadow_SMAT(SMAT_ENTRIES, file_path):
             energy_formatted = entry[key_and_values.ENERGY_KEY].center(max(12,max_length_per_column[5]), ' ')
             line_formatted_str = label_formatted + ";" + type_formatted + ";" + status_formatted + ";" + date_formatted + ";" + ions_formatted + ";" + energy_formatted + ";;" + rotamer_list_str1_formatted + '\n'
             SHADOW_SMAT.write(line_formatted_str)
-        
+

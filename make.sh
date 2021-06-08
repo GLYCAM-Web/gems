@@ -105,6 +105,38 @@ check_gmmldir() {
     fi
 }
 
+check_pull_mdutils() {
+    theDir="$GEMSHOME/External/MD_Utils"
+    if [ ! -d "${theDir}" ]; then
+	    mkdir -p ${theDir}
+    fi
+    if [ ! -d "${theDir}/.git" ]; then
+        echo ""
+        echo "MD_Utils repo does not exist. Attempting to clone."
+	git clone https://github.com/GLYCAM-Web/MD_Utils.git ${theDir}
+    	if [ ! -d "${theDir}/.git" ]; then
+        	echo ""
+        	echo "Error:  Unable to clone MD_Utils.  Some functions will be unavailable."
+        	echo "You can try again on your own using the following command."
+        	echo "You will not need to remake GEMS or GMML after cloning."
+        	echo ""
+		echo "git clone https://github.com/GLYCAM-Web/MD_Utils.git ${theDir}"
+	fi
+    else
+	echo "Updating MD_Utils"
+	( cd ${theDir} && git pull )
+	returnValue=$?
+	if [ "${returnValue}" != 0 ] ; then
+		echo ""
+		echo "Unable to update MD_Utils.  Some functions may be unavailable."
+        	echo "You can try again on your own using the following command."
+        	echo "You will not need to remake GEMS or GMML after pulling."
+        	echo ""
+		echo "cd ${theDir} && git pull"
+	fi
+    fi
+}
+
 ################################################################
 #########                CHECK SETTINGS                #########
 ################################################################
@@ -114,6 +146,7 @@ echo "Starting installation of GEMS at `date`".
 gemshome=`pwd`
 check_gemshome $gemshome
 check_gmmldir $GEMSHOME/gmml
+check_pull_mdutils
 get_numprocs
 
 ################################################################
@@ -198,6 +231,8 @@ while [ ${i} -le $# ]; do
         WRAP_GMML="${!i}"
     elif [ "$argument" = "debug" ]||[ "$argument" = "no_debug" ];then
         DEBUG="${!i}"
+    elif [ "$argument" = "optimize" ]||[ "$argument" = "no_optimize" ]||[ "$argument" = "O1" ]||[ "$argument" = "O2" ];then
+        OPTIMIZE="${!i}"
     fi
     i=$[$i+1]
 done
@@ -214,6 +249,7 @@ printf "GEMSHOME: $GEMSHOME\n"
 printf "TARGET_MAKE_FILE: $TARGET_MAKE_FILE\n"
 printf "CLEAN: $CLEAN\n"
 printf "DEBUG: $DEBUG\n"
+printf "OPTIMIZE: $OPTIMIZE\n"
 printf "WRAP_GMML: $WRAP_GMML\n\n"
 
 ################################################################
@@ -221,7 +257,7 @@ printf "WRAP_GMML: $WRAP_GMML\n\n"
 ################################################################
 
 cd gmml/
-./make.sh $CLEAN $DEBUG
+./make.sh $CLEAN $DEBUG $OPTIMIZE
 cd ../
 
 ################################################################

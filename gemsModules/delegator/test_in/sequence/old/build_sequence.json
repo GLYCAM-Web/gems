@@ -1,0 +1,26 @@
+{
+    "entity": {
+        "type": "Sequence",
+        "services": [
+            {
+                "Build": {
+                    "type": "Build3DStructure"
+                }
+            }
+        ],
+        "inputs": [
+            {
+                "Sequence": {
+                    "payload": "DManpa1-OH"
+                }
+            }
+        ]
+    },
+    "project": {
+        "json_api_version": "0.0.1",
+        "requesting_agent": "website",
+        "sequence": "DManpa1-OH",
+        "project_dir": "/website/userdata/tools/cb/git-ignore-me_userdata/Builds/",
+        "_django_version": "2.2.2"
+    }
+}

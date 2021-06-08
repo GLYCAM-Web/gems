@@ -1,0 +1,17 @@
+build/*.o
+test1eer/
+best_cycles/
+gp_builder
+glycoproteinBuilder.pro
+glycoproteinBuilder.pro.user.3.2-pre1
+glycoproteinBuilder.pro.user
+outputs/
+genetic_algorithm_output.txt
+log.log
+tmp
+*.swp
+tests/GlycoProtein_Resolved.pdb
+test1/
+test2/
+plot.pdf
+large_scale_testing

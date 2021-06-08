@@ -1,0 +1,148 @@
+{
+	"timestamp": "2020-04-23_14:43:17",
+	"entity": {
+		"type": "Sequence", 
+		"responses": [
+			{"SequenceIsValid": "true"},
+			{"SequenceVariants" : {
+				"monospacedTextDiagram": "\n                                   DNeupNAca2-6DGlcp[2S]a1-4-DGlcpAa1-OME\n                                                            /\n                                                           3\n                                                          /\nDNeupNAca2-8DNeupNAca2-8DNeupNAca2-5LFrupa2-6-DGalp[2Me]b1\n                                    /\n                                   4\n                                  /\n                          LIdopAa1 "}, 
+				"sUUID" : "5ffc3999-7245-5490-82ce-4e1579103dbd" , 
+				"sMD5sum":  "97b4627a5c02eff6f2f4429635d311b2" , 
+				"userSupplied" : "DNeupNAca2-6DGlcp[2S]a1-4[DNeupNAca2-8DNeupNAca2-8DNeupNAca2-5[LIdopAa1-4]LFrupa2-6DGalp[2Me]b1-3]DGlcpAa1-OME" , 
+				"indexOrdered" : "LIdopAa1-4[DNeupNAca2-8DNeupNAca2-8DNeupNAca2-5]LFrupa2-6DGalp[2Me]b1-3[DNeupNAca2-6DGlcp[2S]a1-4]DGlcpAa1-OME" , 
+				"longestChainOrdered": "DNeupNAca2-8DNeupNAca2-8DNeupNAca2-5[LIdopAa1-4]LFrupa2-6DGalp[2Me]b1-3[DNeupNAca2-6DGlcp[2S]a1-4]DGlcpAa1-OME" , 
+				"monospacedTextDiagramLabeled": "\n                                                                    DNeupNAca2-&Label='3';6DGlcp[2S]a1-4-DGlcpAa1-OME\n                                                                                                        /\n                                                                                                       3\n                                                                                                      /\nDNeupNAca2-&Label='9';8DNeupNAca2-&Label='8';8DNeupNAca2-&Label='7';5-LFrupa2-&Label='6';6DGalp[2Me]b1\n                                                                     /\n                                                                    4\n                                                                   /\n                                               LIdopAa&Label='11';1 " , 
+				"userSuppliedLabeled" : "DNeupNAca2-&Label='Linkage A';6DGlcp[2S]a1-4[DNeupNAca2-&Label='Linkage E';8DNeupNAca2-&Label='Linkage D';8DNeupNAca2-&Label='Linkage C';5[LIdopAa1-4]LFrupa2-&Label='Linkage B'6DGalp[2Me]b1-3]DGlcpAa1-OME" , 
+				"indexOrderedLabeled" :  "LIdopAa&Label='11';1-4[DNeupNAca2-&Label='9';8DNeupNAca2-&Label='8';8DNeupNAca2-&Label='7';5]LFrupa2-&Label='6';6DGalp[2Me]b1-3[DNeupNAca2-&Label='3';6DGlcp[2S]a1-4]DGlcpAa1-OME" ,
+				"longestChainOrderedLabeled": "None" 
+			},
+			{"Definitions" : [ 
+				{"phi": { 
+					"valueUnit": "degrees",
+					"ketoAtoms": "C3-C2-Ox-Cx",
+					"aldoAtoms": "C2-C1-Ox-Cx",
+					"rotamers": [
+						{"t":{
+							"name": "trans",
+							"setValue" : "180.0" ,
+							"loValueRange" : "20.0",
+							"hiValueRange" : "20.0"
+						}},
+						{"-g":{
+							"name": "minus-gauche",
+							"setValue" : "-60.0" ,
+							"loValueRange" : "20.0",
+							"hiValueRange" : "20.0"
+						}}
+
+					}
+				},
+				{"omega": { "tbd": "tbd" }}, 
+				{"Set1": { "tbd": "tbd" }}, 
+				{"Set2": { "tbd": "tbd" }}, 
+				{"Set3": { "tbd": "tbd" }}, 
+				{"4C1": { "tbd": "tbd" }}, 
+				{"1C4": { "tbd": "tbd" }}, 
+				{"2SO": { "tbd": "tbd" }}, 
+				{"4d1": { "tbd": "tbd" }}, 
+				{"1d4": { "tbd": "tbd" }}, 
+				{"2t6": { "tbd": "tbd" }}
+			]},
+			{"BuildOptions": {
+				"SolvationOptions" : { "tbd" : "tbd" },
+				"geometryOptions": { 
+					"Residues": { 
+						"RingPuckers": [ 
+							{"11": { 
+								"indexOrderedLabel":"11", 
+								"residueName":"DIdopAa", 
+								"possiblePuckers":{ 
+									"IUPAC":["1C4","2SO","4C1"], 
+									"BFMP":["1d4","2t6","4d1"] }, 
+								"likelyPuckers":{ 
+									"IUPAC":["1C4","2SO","4C1"], 
+									"BFMP":["1d4","2t6","4d1"] } 
+							}}
+						]
+					}, 
+					"Linkages": {
+						"Rotamers": [
+							{"3": { 
+								"indexOrderedLabel" : "3", 
+								"userDefinedLabel" : "Linkage A", 
+								"linkageContext" : "DNeupNAca2-&Label='3';6DGlcp[2S]a", 
+								"likelyRotamers": [ 
+									{"phi": ["-g", "t"]},
+									{"Omega": ["gg", "gt", "tg"] }
+								], 
+								"possibleRotamers": [ 
+									{"phi": ["-g", "t", "g"]},
+									{"Omega": ["gg", "gt", "tg"] }
+								], 
+								"selectedRotamers": [ 
+									{"phi": ["-g", "t", "g"]},
+									{"Omega": ["gg", "gt", "tg"] }
+								] 
+							}}, 
+							{"6": {
+								"indexOrderedLabel" : "6", 
+								"userDefinedLabel" : "Linkage B", 
+								"linkageContext" : "LFrupa2-&Label='6';6DGalp[2Me]b",
+								"likelyRotamers": { 
+									"Omega": ["gg", "gt"] 
+								}, 
+								"possibleRotamers": { 
+									"Omega": ["gg", "gt", "tg"] 
+								} 
+							}}, 
+							{"7": {
+								"indexOrderedLabel" : "7", 
+								"userDefinedLabel" : "Linkage C", 
+								"linkageContext" : "DNeupNAca2-&Label='7';5]LFrupa",
+								"likelyRotamers": { 
+									"phi": ["-g", "t"]
+								}, 
+								"possibleRotamers": { 
+									"phi": ["-g", "t", "g"]
+								} 
+							}} 
+							],
+						"RotamerSets": [
+							{"8": {
+								"indexOrderedLabel" : "8", 
+								"userDefinedLabel" : "Linkage D", 
+								"linkageContext" : "DNeupNAca2-&Label='8';8DNeupNAca",
+								"likelyRotamerSets": { 
+									"Set1": ["tbd", "tbd"],
+									"Set2": ["tbd", "tbd"] 
+								}, 
+								"possibleRotamerSets": { 
+									"Set1": ["tbd", "tbd"],
+									"Set2": ["tbd", "tbd"],
+								"Set3": ["tbd", "tbd"] 
+								} 
+							}}, 
+							{"9": {
+								"indexOrderedLabel" : "9", 
+								"userDefinedLabel" : "Linkage E", 
+								"linkageContext" : "DNeupNAca2-&Label='9';8DNeupNAca",
+								"likelyRotamerSets": { 
+									"Set1": ["tbd", "tbd"],
+									"Set2": ["tbd", "tbd"],
+									"Set3": ["tbd", "tbd"],
+									"Set4": ["tbd", "tbd"] 
+								}, 
+								"possibleRotamerSets": { 
+									"Set1": ["tbd", "tbd"],
+									"Set3": ["tbd", "tbd"] 
+								} 
+							}} 
+						] 
+					} 
+				}
+			} } 
+		]
+	}
+}
+
+

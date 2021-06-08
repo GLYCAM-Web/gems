@@ -1,0 +1,149 @@
+{
+	"entity": {
+		"type": "StructureFile"
+	},
+	"gems_project": {
+		"status": "submitted",
+		"requesting_agent": "website",
+		"timestamp": "2020-04-09 09:05:28.057693",
+		"pUUID": "93f03245-29e5-4d51-8594-6c4a5d8be6d0",
+		"project_dir": "/website/userdata/tools/pdb/git-ignore-me_userdata/93f03245-29e5-4d51-8594-6c4a5d8be6d0/",
+		"hasInputFiles": true,
+		"project_type": "pdb"
+	},
+	"responses": [{
+		"PreprocessingOptions": {
+			"histidineProtonation": [{
+				"chainID": "A",
+				"residueNumber": "32",
+				"mappingFormat": "HID"
+			}, {
+				"chainID": "A",
+				"residueNumber": "94",
+				"mappingFormat": "HID"
+			}],
+			"disulfideBonds": [{
+				"residue1Number": "7",
+				"residue2Number": "161",
+				"distance": "2.0197"
+			}, {
+				"residue1Number": "29",
+				"residue2Number": "33",
+				"distance": "2.0216"
+			}],
+			"unrecognizedResidues": [{
+				"chainID": "A",
+				"index": "666",
+				"name": "z0z",
+				"isMidChain": "False"
+			}],
+			"chainTerminations": [{
+				"chainID": "A",
+				"startIndex": "1",
+				"endIndex": "166"
+			}],
+			"replacedHydrogens": [{
+				"index": "6",
+				"atomName": "H1",
+				"residueName": "ALA",
+				"chainID": "A",
+				"residueNumber": "1"
+			}, {
+				"index": "7",
+				"atomName": "H2",
+				"residueName": "ALA",
+				"chainID": "A",
+				"residueNumber": "1"
+			}, {
+				"index": "8",
+				"atomName": "H3",
+				"residueName": "ALA",
+				"chainID": "A",
+				"residueNumber": "1"
+			}, {
+				"index": "109",
+				"atomName": "HZZ",
+				"residueName": "CYS",
+				"chainID": "A",
+				"residueNumber": "7"
+			}],
+			"unrecognizedHeavyAtoms": [{
+				"index": "31",
+				"atomName": "SI",
+				"residueName": "PRO",
+				"chainID": "A",
+				"residueNumber": "3"
+			}, {
+				"index": "107",
+				"atomName": "SI",
+				"residueName": "CYS",
+				"chainID": "A",
+				"residueNumber": "7"
+			}, {
+				"index": "2621",
+				"atomName": "OXT",
+				"residueName": "ARG",
+				"chainID": "A",
+				"residueNumber": "166"
+			}],
+			"missingResidues": [{
+				"chainID": "A",
+				"startSequenceNumber": "1",
+				"endSequenceNumber": "166",
+				"residueBeforeGap": "3",
+				"residueAfterGap": "7"
+			}]
+		},
+		"tableMetaData": {
+			"histidineProtonation": {
+				"tableLabel": "Histidine Protonation",
+				"interactionRequirement": "optional",
+				"urgency": "info",
+				"count": "2"
+			},
+			"disulfideBonds": {
+				"tableLabel": "Disulfide Bonds",
+				"interactionRequirement": "optional",
+				"urgency": "warning",
+				"count": "2"
+			},
+			"unrecognizedResidues": {
+				"tableLabel": "Unrecognized Residues",
+				"interactionRequirement": "none",
+				"urgency": "warning",
+				"count": "1"
+			},
+			"chainTerminations": {
+				"tableLabel": "Chain Terminations",
+				"interactionRequirement": "optional",
+				"urgency": "warning",
+				"count": "1"
+			},
+			"replacedHydrogens": {
+				"tableLabel": "Replaced Hydrogens",
+				"interactionRequirement": "none",
+				"urgency": "info",
+				"count": "4"
+			},
+			"unrecognizedHeavyAtoms": {
+				"tableLabel": "Unrecognized Heavy Atoms",
+				"interactionRequirement": "none",
+				"urgency": "error",
+				"count": "3"
+			},
+			"missingResidues": {
+				"tableLabel": "Missing Residues",
+				"interactionRequirement": "optional",
+				"urgency": "warning",
+				"count": "1"
+			}
+		}
+	}, {
+		"PreprocessPdbForAmber": {
+			"project_status": "submitted",
+			"payload": "93f03245-29e5-4d51-8594-6c4a5d8be6d0",
+			"downloadUrl": "http://172.25.0.2/json/download/pdb/93f03245-29e5-4d51-8594-6c4a5d8be6d0"
+		}
+	}],
+	"timestamp": "2020-04-09_09:05:28"
+}

@@ -1,0 +1,12 @@
+{
+ "entity" : {
+    "type": "Delegator",
+    "services" : 
+    [
+    	{ "testSegfault" :
+    		{"type" : "testSegfault"}
+    	}
+    ]
+  }
+ 
+}

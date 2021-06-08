@@ -1,0 +1,71 @@
+{
+    "entity": {
+        "type": "Sequence",
+        "services": [
+            {
+                "Build": {
+                    "type": "Build3DStructure"
+                }
+            }
+        ],
+        "inputs": [
+            {
+                "Sequence": {
+                    "payload": "DGlcpNAcb1-2DManpa1-6[DGlcpNAcb1-2DManpa1-3]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH"
+                }
+            }
+        ]
+    },
+    "options": {
+        "geometryOptions": {
+            "rotamerData": [
+                {
+                    "dihedrals": [
+                        {
+                            "dihedralName": "omg",
+                            "selectedRotamers": [
+                                "gg",
+                                "gt",
+                                "tg"
+                            ]
+                        }
+                    ],
+                    "linkageLabel": "5"
+                }
+            ]
+        }
+    },
+    "project": {
+        "_state": "<django.db.models.base.ModelState object at 0x7fe1c60710d0>",
+        "id": "919c7c4e-bb4c-4ce4-8326-fc872da19fd2",
+        "user_id": "None",
+        "email": "",
+        "pUUID": "437464fd-6324-4615-99cd-14db4ef61f94",
+        "title": "Untitled project",
+        "comment": " ",
+        "timestamp": "2020-12-10 21:21:48.154888+00:00",
+        "project_type": "cb",
+        "project_dir": "/website/userdata/tools/cb/git-ignore-me_userdata/Builds/437464fd-6324-4615-99cd-14db4ef61f94",
+        "requesting_agent": "website",
+        "gems_version": "",
+        "gems_branch": "",
+        "gmml_version": "",
+        "gmml_branch": "",
+        "site_mode": "",
+        "site_host_name": "",
+        "force_field": "default",
+        "parameter_version": "default",
+        "amber_version": "default",
+        "json_api_version": "0.0.1",
+        "project_ptr_id": "919c7c4e-bb4c-4ce4-8326-fc872da19fd2",
+        "sequence": "DGlcpNAcb1-2DManpa1-6[DGlcpNAcb1-2DManpa1-3]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH",
+        "seqID": "f6b26e06-feaf-5b05-91e9-7d293ea1bdb3",
+        "structure_count": "1",
+        "linkage_info": "",
+        "rotamer_info": "",
+        "rotamer_list": "['5_omg_gg', '5_omg_gt', '5_omg_tg']",
+        "angle_info": "",
+        "job_info": "",
+        "rotamer_data": ""
+    }
+}

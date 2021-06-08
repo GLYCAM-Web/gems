@@ -1,0 +1,41 @@
+SequenceEvaluationOutput(
+	sequenceIsValid=True, 
+	validateOnly=False, 
+	sequenceVariants={
+		'userSupplied': 'DManpa1-6DManpa1-OH', 
+		'indexOrdered': 'DManpa1-6DManpa1-1-OH', 
+		'longestChainOrdered': 'DManpa1-6DManpa1-1-OH', 
+		'indexOrderedLabeled': 'DManp&Label=residue-2;a1-6&Label=link-1;DManp&Label=residue-1;a1-1&Label=link-0;-OH&Label=residue-0;'
+	}, 
+	buildOptions=BuildOptions(
+		solvationOptions=None, 
+		geometryOptions=GeometryOptions(
+			residues=None, 
+			linkages=LinkageGeometryOptions(
+				linkageRotamersList=[
+					LinkageRotamers(
+						indexOrderedLabel='1', 
+						linkageName='DManpa1-6DManpa', 
+						firstResidueNumber='3', 
+						secondResidueNumber='2', 
+						possibleRotamers=[
+							DihedralRotamers(
+								dihedralName='Omg',
+								dihedralValues=['gg', 'gt', 'tg']
+							)
+						], 
+						likelyRotamers=[
+							DihedralRotamers(
+								dihedralName='Omg',
+								dihedralValues=['gg', 'gt']
+							)
+						]
+					)
+				], 
+				totalLikelyRotamers=2, 
+				totalPossibleRotamers=3
+			)
+		)
+	), 
+	drawOptions=None
+)
