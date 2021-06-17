@@ -39,6 +39,7 @@ def buildQueryString(thisTransaction : Transaction):
     # THIS IS A KLUGE!   See the [0]?  That's ugly...  and bad.
     # And, if I knew Python better....
     #
+    log.debug("buildQueryString() was called")
     try:
         virtLocation = os.getenv('VIRTUOSO_DB') + ":" + str(8890) + "/sparql"
     except Exception as error:
