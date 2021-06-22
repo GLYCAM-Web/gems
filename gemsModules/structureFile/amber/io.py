@@ -46,6 +46,8 @@ class UnrecognizedAtomsTableMetadata(BaseModel):
         result = result + "\ndescription: " + self.description
         return result
 
+    
+
 
 ##  A record of a found instance
 class UnrecognizedAtom(BaseModel):
@@ -72,6 +74,11 @@ class UnrecognizedAtom(BaseModel):
         result = result + "\nchainID: " + self.chainID
         result = result + "\nresidueNumber: " + self.residueNumber
         return result
+
+
+def generateUnrecognizedAtomSchema():
+    print("generateUnrecognizedAtomSchema() was called.")
+    print(UnrecognizedAtom.schema_json(indent=2))
 
 
 
@@ -133,6 +140,11 @@ class UnrecognizedMolecule(BaseModel):
         result = result + "\nisMidChain: " + self.isMidChain
         result = result + "\ncanPreprocess: " + str(self.canPreprocess)
         return result
+
+
+def generateUnrecognizedMoleculeSchema():
+    print("generateUnrecognizedMoleculeSchema() was called.")
+    print(UnrecognizedMolecule.schema_json(indent=2))
 
 ## Data for the table, offers summary
 class MissingResiduesTableMetadata(BaseModel):
@@ -647,10 +659,7 @@ class ServiceResponse(BaseModel):
             for output in outputs:
                 self.outputs.append(output)
 
-def generateTransactionSchema():
-    import json
-    print(TransactionSchema.schema_json(indent=2))
 
 if __name__ == "__main__":
-  generateTransactionSchema()
-
+  generateUnrecognizedAtomSchema()
+  generateUnrecognizedMoleculeSchema()
