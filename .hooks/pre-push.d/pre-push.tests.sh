@@ -49,6 +49,23 @@ check_website_status() {
 	fi
 }
 
+#### Allow skipping tests ####
+branch=`git rev-parse --abbrev-ref HEAD`
+if [[ "$branch" != "gems-dev" ]] && [[ "$branch" != "dev" ]]; then
+    printf "Branch is %s\nSkipping tests is allowed.\nDo you want to skip them?\ns=skip\na=abort\nEnter anything to run tests.\n" $branch
+    read -p "Enter response: " response < /dev/tty
+    if [[ $response == [sS] ]]; then
+        printf "Skipping tests!\n"
+        exit 0;
+    elif [[ $response == [aA] ]]; then
+        printf "Abort!\n"
+        exit 1;
+    else
+        printf "Running tests.\n"
+    fi
+fi
+#### Allow skipping tests ####
+
 gemshome=`pwd`
 check_gemshome $gemshome 
 check_website_status
