@@ -3,7 +3,7 @@
         "type": "StructureFile", 
         "services" : [{
             "Schema" : {
-                "type" : "All"
+                "type" : "Schema"
             }
         }]
     },

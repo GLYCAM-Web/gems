@@ -19,11 +19,17 @@ servicesStatus = [
     {
         "service" : "Evaluate",
         "status" : "In development.",
-        "statusDetail" : "In development."
+        "statusDetail" : "In development. Currently fails to return a valid response. Queued for after Schema service."
+    },
+    {
+        "service" : "Schema",
+        "status" : "In development.",
+        "statusDetail" : "In active development."
     }
 ]
 
 serviceModules = {
     'PreprocessPdbForAmber' : 'preprocessPdbForAmber',
-    'Evaluate' : 'evaluate'
+    'Evaluate' : 'evaluate',
+    'Schema' : 'schema'
 }

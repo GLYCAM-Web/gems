@@ -51,6 +51,14 @@ def receive(thisTransaction : commonio.Transaction):
                     log.error(traceback.format_exc())
                     raise error
 
+            elif requestedService == "Schema":
+                try:
+                    generateStructureFileSchemaForWeb()
+                except Exception as error:
+                    log.error("There was a problem generating the structureFile schema for web: " + str(error))
+                    log.error(traceback.format_exc())
+                    thisTransaction.generateCommonParserNotice(noticeBrief='UnknownError')
+
             
 
 def doDefaultService(thisTransaction : commonio.Transaction):
