@@ -1,0 +1,11 @@
+{
+    "entity" : {
+        "type": "StructureFile", 
+        "services" : [{
+            "Schema" : {
+                "type" : "All"
+            }
+        }]
+    },
+    "prettyPrint" : true
+}
