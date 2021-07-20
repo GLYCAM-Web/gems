@@ -45,7 +45,7 @@ class UnrecognizedAtomsTableMetadata(BaseModel):
 
 def generateUnrecognizedAtomsTableMetadataSchema():
     log.info("generateUnrecognizedAtomsTableMetadataSchema() was called.")
-    return UnrecognizedAtomsTableMetadata.schema_json(indent=2) 
+    return UnrecognizedAtomsTableMetadata.schema_json() 
 
 
 ##  A record of a found instance
@@ -77,7 +77,7 @@ class UnrecognizedAtom(BaseModel):
 
 def generateUnrecognizedAtomSchema():
     log.info("generateUnrecognizedAtomSchema() was called.")
-    return UnrecognizedAtom.schema_json(indent=2)
+    return UnrecognizedAtom.schema_json()
 
 
 
@@ -109,7 +109,7 @@ class UnrecognizedMoleculesTableMetadata(BaseModel):
 
 def generateUnrecognizedMoleculesTableMetadataSchema():
     log.info("generateUnrecognizedMoleculesTableMetadataSchema() was called.")
-    return UnrecognizedMoleculesTableMetadata.schema_json(indent=2)
+    return UnrecognizedMoleculesTableMetadata.schema_json()
 
 ##  A record of a found instance
 ##  Used to be Unrecognized Residues
@@ -146,7 +146,7 @@ class UnrecognizedMolecule(BaseModel):
 
 def generateUnrecognizedMoleculeSchema():
     log.info("generateUnrecognizedMoleculeSchema() was called.")
-    return UnrecognizedMolecule.schema_json(indent=2)
+    return UnrecognizedMolecule.schema_json()
 
 ## Data for the table, offers summary
 class MissingResiduesTableMetadata(BaseModel):
@@ -174,7 +174,7 @@ class MissingResiduesTableMetadata(BaseModel):
 
 def generateMissingResiduesTableMetadataSchema():
     log.info("generateMissingResiduesTableMetadataSchema() was called.")
-    return MissingResiduesTableMetadata.schema_json(indent=2)
+    return MissingResiduesTableMetadata.schema_json()
 
 ##  A record of a found instance
 class MissingResidue(BaseModel):
@@ -211,7 +211,7 @@ class MissingResidue(BaseModel):
 
 def generateMissingResidueSchema():
     log.info("generateMissingResidueSchema() was called.")
-    return MissingResidue.schema_json(indent=2)
+    return MissingResidue.schema_json()
 
 ## Data for the table, offers summary
 class HistidineProtonationsTableMetadata(BaseModel):
@@ -239,7 +239,7 @@ class HistidineProtonationsTableMetadata(BaseModel):
 
 def generateHistidineProtonationsTableMetadataSchema():
     log.info("generateHistidineProtonationsTableMetadataSchema() was called.")
-    return HistidineProtonationsTableMetadata.schema_json(indent=2)
+    return HistidineProtonationsTableMetadata.schema_json()
 
 ##  A record of a found instance
 class HistidineProtonation(BaseModel):
@@ -267,7 +267,7 @@ class HistidineProtonation(BaseModel):
 
 def generateHistidineProtonationSchema():
     log.info("generateHistidineProtonationSchema() was called.")
-    return HistidineProtonation.schema_json(indent=2)
+    return HistidineProtonation.schema_json()
 
 ## Data for the table, offers summary
 class DisulfideBondsTableMetadata(BaseModel):
@@ -295,7 +295,7 @@ class DisulfideBondsTableMetadata(BaseModel):
 
 def generateDisulfideBondsTableMetadataSchema():
     log.info("generateDisulfideBondsTableMetadataSchema() was called.")
-    return DisulfideBondsTableMetadata.schema_json(indent=2)
+    return DisulfideBondsTableMetadata.schema_json()
 
 
 ##  A record of a found instance
@@ -337,7 +337,7 @@ class DisulfideBond(BaseModel):
 
 def generateDisulfideBondSchema():
     log.info("generateDisulfideBondSchema() was called.")
-    return DisulfideBond.schema_json(indent=2)
+    return DisulfideBond.schema_json()
 
 def getAmberResidueName(item):
     log.info("getAmberResidueName() was called.")
@@ -376,7 +376,7 @@ class ChainTerminationsTableMetadata(BaseModel):
 
 def generateChainTerminationsTableMetadataSchema():
     log.info("generateChainTerminationsTableMetadataSchema() was called.")
-    return ChainTerminationsTableMetadata.schema_json(indent=2)
+    return ChainTerminationsTableMetadata.schema_json()
 
 ##  A record of a found instance
 class ChainTermination(BaseModel):
@@ -407,7 +407,7 @@ class ChainTermination(BaseModel):
 
 def generateChainTerminationSchema():
     log.info("generateChainTerminationSchema() was called.")
-    return ChainTermination.schema_json(indent=2)
+    return ChainTermination.schema_json()
 
 ## Data for the table, offers summary
 class ReplacedHydrogensTableMetadata(BaseModel):
@@ -435,7 +435,7 @@ class ReplacedHydrogensTableMetadata(BaseModel):
 
 def generateReplacedHydrogensTableMetadataSchema():
     log.info("generateReplacedHydrogensTableMetadataSchema() was called.")
-    return ReplacedHydrogensTableMetadata.schema_json(indent=2)
+    return ReplacedHydrogensTableMetadata.schema_json()
 
 ##  A record of a found instance
 class ReplacedHydrogen(BaseModel):
@@ -467,7 +467,7 @@ class ReplacedHydrogen(BaseModel):
 
 def generateReplacedHydrogenSchema():
     log.info("generateReplacedHydrogenSchema() was called.")
-    return ReplacedHydrogen.schema_json(indent=2)
+    return ReplacedHydrogen.schema_json()
 
 ## Services
 class EvaluationOutput(BaseModel):

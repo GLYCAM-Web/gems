@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-import os, sys, importlib.util
+import os, sys, json, importlib.util
 import pathlib
 import traceback
 import gemsModules.structureFile.amber.io as amberIO
-# from gemsModules.common.loggingConfig import *
-# from gemsModules.common import io as commonio
+from gemsModules.common.loggingConfig import *
+from gemsModules.common.logic import getGemsHome
 # from gemsModules.common.logic import updateResponse, getGemsHome
 
 
@@ -110,8 +110,28 @@ def generateStructureFileSchemaForWeb():
         log.error("There was a problem writing the schema to file.")
     else:
         log.debug("Writing schema to file.")
-        file = os.path.join(getGemsHome(), "gemsModules", "Schema", 'pdbOptionsSchema.json')
-        log.debug("file: " + file)
+        amberDir = os.path.join(getGemsHome(), "gemsModules", "Schema", 'structureFile', 'amber')
+        log.debug("amberDir: " + amberDir)
+        if not os.path.isdir(amberDir):
+            log.debug("amberDir doesn't exist. Creating it now.")
+            try:
+                os.makedirs(amberDir)
+            except Exception as error:
+                log.error("There was a problem creating the dir for holding amber schema: " + str(error))
+                log.error(traceback.format_exc())
+                raise error
+        else:
+            log.debug("amberDir already exists.")
+
+        amberSchemaFile = os.path.join(amberDir, 'amberSchema.json')
+
+        try:
+            with open(amberSchemaFile, 'w') as jsonFile:
+                jsonFile.write(json.dumps(schema))
+
+        except Exception as error:
+            log.error("There was a problem writing the amber schema to file: " + str(error))
+            raise error
 
 
 if __name__ == "__main__":
