@@ -9,6 +9,6 @@ The gemsModules are being designed to use JSON as their interface.  All of the
 top-level modules will take in JSON objects as arguments and return them as 
 output.
 
-See the Schema directory for JSON schems definitions.
+See the Schema directory for JSON schema definitions.
 
 See the Docs directory for general information. 

@@ -1,10 +1,14 @@
+#!/usr/bin/env python3
 import os, sys, importlib.util
 import gemsModules
 from gemsModules.common.services import *
+from gemsModules.common.logic import updateResponse
 from gemsModules.common import io as commonio
 from gemsModules.project.projectUtil import *
 from gemsModules.common.loggingConfig import *
 from gemsModules.structureFile.amber.receive import preprocessPdbForAmber, evaluatePdb
+from gemsModules.structureFile.amber import io as amberIO
+
 import gemsModules.structureFile.settings as structureFileSettings
 import traceback
 
@@ -14,16 +18,27 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__)
 
-def receive(thisTransaction : commonio.Transaction):
-    log.info("receive() was called.\n")
-    #log.debug("thisTransaction: " + str(thisTransaction.__dict__))
+def receive(receivedTransaction : amberIO.Transaction):
+    log.info("structureFile receive() was called.")
+    log.debug("structureFile transaction.request_dict: " )
+    # ## Ensure that our Transacation is the Sequence variety
+    thisTransaction=amberIO.Transaction(receivedTransaction.incoming_string)
+    prettyPrint(thisTransaction.request_dict)
+    try:
+        thisTransaction.populate_transaction_in()
+    except Exception as e:
+        log.error("There was a problem populating transaction_in: " + str(e))
+        log.error(traceback.format_exc())
+        thisTransaction.generateCommonParserNotice(noticeBrief='UnknownError')
+        return
+
 
     #Look to see if services are specified, else do default.
     if 'services' not in thisTransaction.request_dict['entity'].keys():
         doDefaultService(thisTransaction)
         
     else:
-        services = getTypesFromList(thisTransaction.request_dict['entity']['services'])
+        services = thisTransaction.request_dict['entity']['services']
         log.debug("requestedServices: " + str(services))
 
         for requestedService in services:
@@ -52,12 +67,20 @@ def receive(thisTransaction : commonio.Transaction):
                     raise error
 
             elif requestedService == "Schema":
+                ## This one is unique. No inputs are needed. Used by website only.
                 try:
-                    generateStructureFileSchemaForWeb()
+                    output = amberIO.StructureFileSchemaForWebOutput()
+                    log.debug("output generated. obj type: " + repr(output))
+                    thisTransaction.createStructureFileResponse(serviceType="Schema", inputs={}, outputs=[output])
+                    thisTransaction.build_outgoing_string()
+                    log.debug("thisTransaction now: ")
+                    prettyPrint(thisTransaction.__dict__)
                 except Exception as error:
-                    log.error("There was a problem generating the structureFile schema for web: " + str(error))
+                    log.error("There was a problem generating the structureFile schema response: " + str(error))
                     log.error(traceback.format_exc())
                     thisTransaction.generateCommonParserNotice(noticeBrief='UnknownError')
+
+    return thisTransaction
 
             
 

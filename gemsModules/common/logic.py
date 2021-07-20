@@ -416,7 +416,7 @@ def updateResponse(thisTransaction, serviceResponse):
     else:
         log.debug("Services object already exists.")
 
-    log.debug("serviceResponse['type']: " + serviceResponse['type'])
+    log.debug("serviceResponse['type']: " + serviceResponse['typename'])
 
     try:
         serviceType = serviceResponse['type']

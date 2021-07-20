@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from enum import Enum, auto
-from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
+from typing import Dict, List, Optional, Sequence, Set, Tuple, Union, Any
 from typing import ForwardRef
 from pydantic import BaseModel, Field, ValidationError, validator
 from pydantic.schema import schema
@@ -16,9 +16,6 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__)
 
-class Services(str, Enum):
-    evaluate = 'Evaluate'
-    preprocessPdbForAmber = 'PreprocessPdbForAmber'
 
 
 ## Data for the table, offers summary
@@ -46,7 +43,9 @@ class UnrecognizedAtomsTableMetadata(BaseModel):
         result = result + "\ndescription: " + self.description
         return result
 
-    
+def generateUnrecognizedAtomsTableMetadataSchema():
+    log.info("generateUnrecognizedAtomsTableMetadataSchema() was called.")
+    return UnrecognizedAtomsTableMetadata.schema_json(indent=2) 
 
 
 ##  A record of a found instance
@@ -77,8 +76,8 @@ class UnrecognizedAtom(BaseModel):
 
 
 def generateUnrecognizedAtomSchema():
-    print("generateUnrecognizedAtomSchema() was called.")
-    print(UnrecognizedAtom.schema_json(indent=2))
+    log.info("generateUnrecognizedAtomSchema() was called.")
+    return UnrecognizedAtom.schema_json(indent=2)
 
 
 
@@ -108,6 +107,9 @@ class UnrecognizedMoleculesTableMetadata(BaseModel):
         result = result + "\ndescription: " + self.description
         return result
 
+def generateUnrecognizedMoleculesTableMetadataSchema():
+    log.info("generateUnrecognizedMoleculesTableMetadataSchema() was called.")
+    return UnrecognizedMoleculesTableMetadata.schema_json(indent=2)
 
 ##  A record of a found instance
 ##  Used to be Unrecognized Residues
@@ -143,8 +145,8 @@ class UnrecognizedMolecule(BaseModel):
 
 
 def generateUnrecognizedMoleculeSchema():
-    print("generateUnrecognizedMoleculeSchema() was called.")
-    print(UnrecognizedMolecule.schema_json(indent=2))
+    log.info("generateUnrecognizedMoleculeSchema() was called.")
+    return UnrecognizedMolecule.schema_json(indent=2)
 
 ## Data for the table, offers summary
 class MissingResiduesTableMetadata(BaseModel):
@@ -170,6 +172,9 @@ class MissingResiduesTableMetadata(BaseModel):
         result = result + "\ndescription: " + self.description
         return result
 
+def generateMissingResiduesTableMetadataSchema():
+    log.info("generateMissingResiduesTableMetadataSchema() was called.")
+    return MissingResiduesTableMetadata.schema_json(indent=2)
 
 ##  A record of a found instance
 class MissingResidue(BaseModel):
@@ -204,6 +209,9 @@ class MissingResidue(BaseModel):
         result = result + "\nresidueAfterGap: " + self.residueAfterGap
         return result
 
+def generateMissingResidueSchema():
+    log.info("generateMissingResidueSchema() was called.")
+    return MissingResidue.schema_json(indent=2)
 
 ## Data for the table, offers summary
 class HistidineProtonationsTableMetadata(BaseModel):
@@ -229,6 +237,10 @@ class HistidineProtonationsTableMetadata(BaseModel):
         result = result + "\ndescription: " + self.description
         return result
 
+def generateHistidineProtonationsTableMetadataSchema():
+    log.info("generateHistidineProtonationsTableMetadataSchema() was called.")
+    return HistidineProtonationsTableMetadata.schema_json(indent=2)
+
 ##  A record of a found instance
 class HistidineProtonation(BaseModel):
     chainID : str = None
@@ -253,6 +265,10 @@ class HistidineProtonation(BaseModel):
 
         return result
 
+def generateHistidineProtonationSchema():
+    log.info("generateHistidineProtonationSchema() was called.")
+    return HistidineProtonation.schema_json(indent=2)
+
 ## Data for the table, offers summary
 class DisulfideBondsTableMetadata(BaseModel):
     tableLabel : str = "Disulfide Bonds"
@@ -276,6 +292,10 @@ class DisulfideBondsTableMetadata(BaseModel):
         result = result + "\ncount: " + str(self.count)
         result = result + "\ndescription: " + self.description
         return result
+
+def generateDisulfideBondsTableMetadataSchema():
+    log.info("generateDisulfideBondsTableMetadataSchema() was called.")
+    return DisulfideBondsTableMetadata.schema_json(indent=2)
 
 
 ##  A record of a found instance
@@ -315,6 +335,10 @@ class DisulfideBond(BaseModel):
         result = result + "\nbonded: " + str(self.bonded)
         return result
 
+def generateDisulfideBondSchema():
+    log.info("generateDisulfideBondSchema() was called.")
+    return DisulfideBond.schema_json(indent=2)
+
 def getAmberResidueName(item):
     log.info("getAmberResidueName() was called.")
     ### TODO: Replace this dummy gems method with gmml logic.
@@ -350,6 +374,10 @@ class ChainTerminationsTableMetadata(BaseModel):
         result = result + "\ndescription: " + self.description
         return result
 
+def generateChainTerminationsTableMetadataSchema():
+    log.info("generateChainTerminationsTableMetadataSchema() was called.")
+    return ChainTerminationsTableMetadata.schema_json(indent=2)
+
 ##  A record of a found instance
 class ChainTermination(BaseModel):
     chainID : str = None
@@ -377,6 +405,10 @@ class ChainTermination(BaseModel):
 
         return result
 
+def generateChainTerminationSchema():
+    log.info("generateChainTerminationSchema() was called.")
+    return ChainTermination.schema_json(indent=2)
+
 ## Data for the table, offers summary
 class ReplacedHydrogensTableMetadata(BaseModel):
     tableLabel : str = "Replaced Hydrogens"
@@ -400,6 +432,10 @@ class ReplacedHydrogensTableMetadata(BaseModel):
         result = result + "\ncount: " + str(self.count)
         result = result + "\ndescription: " + self.description
         return result
+
+def generateReplacedHydrogensTableMetadataSchema():
+    log.info("generateReplacedHydrogensTableMetadataSchema() was called.")
+    return ReplacedHydrogensTableMetadata.schema_json(indent=2)
 
 ##  A record of a found instance
 class ReplacedHydrogen(BaseModel):
@@ -429,6 +465,9 @@ class ReplacedHydrogen(BaseModel):
         result = result + "\nresidueNumber: " + self.residueNumber
         return result
 
+def generateReplacedHydrogenSchema():
+    log.info("generateReplacedHydrogenSchema() was called.")
+    return ReplacedHydrogen.schema_json(indent=2)
 
 ## Services
 class EvaluationOutput(BaseModel):
@@ -631,22 +670,60 @@ class PreprocessPdbForAmberOutput(BaseModel):
 
 
 
-class ServiceResponse(BaseModel):
-    """Holds a response from a Service requested of the Sequence Entity."""
-    entity : str = "StructureFile"
-    typename : Services = Field(
-            'Evaluate',
+class StructureFileSchemaForWebOutput(BaseModel):
+    tables : dict = None
+
+    def __init__(self):
+        super().__init__()
+        log.info("Generating all schema for the pdb options table.")
+
+        self.tables =  {
+            "unrecognizedAtom" : generateUnrecognizedAtomSchema(),
+            "unrecognizedAtomsTableMetadata" : generateUnrecognizedAtomsTableMetadataSchema(),
+            "unrecognizedMolecule" : generateUnrecognizedMoleculeSchema(),
+            "unrecognizedMoleculesTableMetadata" : generateUnrecognizedMoleculesTableMetadataSchema(),
+            "missingResidue" : generateMissingResidueSchema(),
+            "missingResiduesTableMetadata" : generateMissingResiduesTableMetadataSchema(), 
+            "histidineProtonation" : generateHistidineProtonationSchema(),
+            "histidineProtonationsTableMetadata" : generateHistidineProtonationsTableMetadataSchema(),
+            "disulfideBond" : generateDisulfideBondSchema(),
+            "disulfideBondsTableMetadata" : generateDisulfideBondsTableMetadataSchema(), 
+            "chainTermination" : generateChainTerminationSchema(),
+            "chainTerminationsTableMetadata" : generateChainTerminationsTableMetadataSchema(),
+            "replacedHydrogen" : generateReplacedHydrogenSchema(),
+            "replacedHydrogensTableMetadata" : generateReplacedHydrogensTableMetadataSchema()
+        }
+
+class StructureFileInputs(BaseModel):
+    pdb_file_name : str = ""
+    pdb_ID : str = ""
+
+class StructureFileOutputs(BaseModel):
+    structureFileEvaluationOutput : EvaluationOutput = None 
+    schemaOutput : StructureFileSchemaForWebOutput = None 
+
+    def createSchemaOutput(self):
+        log.info("createSchemaOutput() was called.")
+        if self.schemaOutput is None:
+            self.schemaOutput = StructureFileSchemaForWebOutput()
+
+
+class StructureFileResponse(BaseModel):
+    typename : str = Field(
+            None,
+            title='Responding Service.',
             alias='type',
-            title = 'Requested Service',
-            description = 'The service that was requested of StructureFile Entity'
+            description='The type service that produced this response.'
             )
-    inputs : List[str] = None
-    outputs: List[Union[EvaluationOutput, PreprocessPdbForAmberOutput]] = None
+    inputs : StructureFileInputs = None
+    outputs : StructureFileOutputs = None
+    # notices : List[Notice] = None
 
     def __init__(self, serviceType: str, inputs= None, outputs = None):
         super().__init__()
-        log.info("Instantiating a ServiceResponse")
+        log.info("Instantiating a StructureFileSchemaResponse")
         log.debug("serviceType: " + serviceType)
+
         self.typename = serviceType
         if not inputs == None:
             if self.inputs == None:
@@ -658,6 +735,86 @@ class ServiceResponse(BaseModel):
                 self.outputs = []
             for output in outputs:
                 self.outputs.append(output)
+
+
+
+class StructureFileService(commonio.Service):
+    typename : StructureFileServices = Field(
+        'Evaluate',
+        alias='type',
+        title = 'Requested Service',
+        description = 'The service that was requested of StructureFile Entity'
+    )
+    
+
+    def __init__(self, **data : Any):
+        super().__init__()
+        log.info("Initializing Service.")
+        log.debug("the data " + repr(self))
+        log.debug("Init for the Services in StructureFile was called.")
+        
+
+
+
+
+class StructureFileEntity(commonio.Entity):
+    entityType : str = Field(
+        settings.WhoIAm,
+        title='Type',
+        alias='type'
+    )
+    services : Dict[str, StructureFileService] = {}
+    inputs : StructureFileInputs =  {}
+    outputs : StructureFileOutputs =  None
+
+    def __init__(self, **data: Any):
+        super().__init__(**data)
+        log.info("Instantiating a structureFileEntity")
+        log.debug("entityType: " + self.entityType)
+
+
+class structureFileTransactionSchema(commonio.TransactionSchema):
+    entity : StructureFileEntity = None
+
+    def __init__(self, **data : Any):
+        super().__init__(**data)
+
+
+
+class Transaction(commonio.Transaction):
+    transaction_in : structureFileTransactionSchema 
+    transaction_out : structureFileTransactionSchema
+
+    def populate_transaction_in(self):
+        log.info("structureFile Transaction populate_transaction_in() was called.")
+        log.debug("self.request_dict: " )
+        prettyPrint(self.request_dict)
+        self.transaction_in = structureFileTransactionSchema(**self.request_dict)
+
+        self.initialize_transaction_out_from_transaction_in() 
+
+    def initialize_transaction_out_from_transaction_in(self) :
+        log.info("structureFile - Transaction.initialize_transaction_out_from_transaction_in was called")
+        self.transaction_out=self.transaction_in.copy(deep=True)
+        log.debug("The transaction_out is: " )
+        log.debug(self.transaction_out.json(indent=2))
+
+    def createStructureFileResponse(self, serviceType, inputs, outputs):
+        log.info("createStructureFileResponse() was called.")
+        log.debug("self.transaction")
+        self.transaction_out.entity.outputs.append(StructureFileResponse(serviceType, inputs, outputs))
+
+    
+    def build_outgoing_string(self) :
+        log.info("build_outgoing_string() was called.")
+        
+        if self.transaction_out.prettyPrint is True : 
+            self.outgoing_string = self.transaction_out.json(indent=2)
+        else :
+            self.outgoing_string = self.transaction_out.json()
+
+        log.debug("self.outgoing_string: " + self.outgoing_string)
+
 
 
 if __name__ == "__main__":
