@@ -110,22 +110,7 @@ def generateStructureFileSchemaForWeb():
     if schema == {}:
         log.error("There was a problem writing the schema to file.")
     else:
-        log.debug("Writing schema to file.")
-        structureFileSchemaDir = os.path.join(getGemsHome(), "gemsModules", "Schema", '0.0.1', 'structureFile')
-        log.debug("structureFileSchemaDir: " + structureFileSchemaDir)
-        if not os.path.isdir(structureFileSchemaDir):
-            log.debug("structureFileSchemaDir doesn't exist. Creating it now.")
-            try:
-                os.makedirs(structureFileSchemaDir)
-            except Exception as error:
-                log.error("There was a problem creating the structureFileSchemaDir: " + str(error))
-                log.error(traceback.format_exc())
-                raise error
-        else:
-            log.debug("structureFileSchemaDir already exists.")
-
-        structureFileSchemaDir = os.path.join(SCHEMA_DIR, 'structureFileSchemaDir.json')
-
+        log.debug("Checking for the SCHEMA_DIR")
         try:
             if not os.path.exists(SCHEMA_DIR):
                 log.debug("Need to create the SCHEMA_DIR")
@@ -136,7 +121,8 @@ def generateStructureFileSchemaForWeb():
 
 
         try:
-            with open(structureFileSchemaDir, 'w') as jsonFile:
+            structureFileSchema = os.path.join(SCHEMA_DIR, 'structureFileSchema.json')
+            with open(structureFileSchema, 'w') as jsonFile:
                 jsonFile.write(json.dumps(schema))
 
         except Exception as error:
