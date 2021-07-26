@@ -5,6 +5,7 @@ import traceback
 import gemsModules.structureFile.amber.io as amberIO
 from gemsModules.common.loggingConfig import *
 from gemsModules.common.logic import getGemsHome
+from gemsModules.common.settings import SCHEMA_DIR
 # from gemsModules.common.logic import updateResponse, getGemsHome
 
 
@@ -110,27 +111,36 @@ def generateStructureFileSchemaForWeb():
         log.error("There was a problem writing the schema to file.")
     else:
         log.debug("Writing schema to file.")
-        amberDir = os.path.join(getGemsHome(), "gemsModules", "Schema", 'structureFile', 'amber')
-        log.debug("amberDir: " + amberDir)
-        if not os.path.isdir(amberDir):
-            log.debug("amberDir doesn't exist. Creating it now.")
+        structureFileSchemaDir = os.path.join(getGemsHome(), "gemsModules", "Schema", '0.0.1', 'structureFile')
+        log.debug("structureFileSchemaDir: " + structureFileSchemaDir)
+        if not os.path.isdir(structureFileSchemaDir):
+            log.debug("structureFileSchemaDir doesn't exist. Creating it now.")
             try:
-                os.makedirs(amberDir)
+                os.makedirs(structureFileSchemaDir)
             except Exception as error:
-                log.error("There was a problem creating the dir for holding amber schema: " + str(error))
+                log.error("There was a problem creating the structureFileSchemaDir: " + str(error))
                 log.error(traceback.format_exc())
                 raise error
         else:
-            log.debug("amberDir already exists.")
+            log.debug("structureFileSchemaDir already exists.")
 
-        amberSchemaFile = os.path.join(amberDir, 'amberSchema.json')
+        structureFileSchemaDir = os.path.join(SCHEMA_DIR, 'structureFileSchemaDir.json')
 
         try:
-            with open(amberSchemaFile, 'w') as jsonFile:
+            if not os.path.exists(SCHEMA_DIR):
+                log.debug("Need to create the SCHEMA_DIR")
+                os.makedirs(SCHEMA_DIR)
+        except Exception as error:
+            log.error("There was a problem creating the dirs needed for writing schema: " + str(error))
+            raise error
+
+
+        try:
+            with open(structureFileSchemaDir, 'w') as jsonFile:
                 jsonFile.write(json.dumps(schema))
 
         except Exception as error:
-            log.error("There was a problem writing the amber schema to file: " + str(error))
+            log.error("There was a problem writing the structureFileSchema to file: " + str(error))
             raise error
 
 
