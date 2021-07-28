@@ -30,7 +30,7 @@ else:
 ##          Primarily for use by the pdb app in the website.
 def generateStructureFileSchemaForWeb():
     log.info("generateStructureFileSchemaForWeb() was called.")
-    schema = {}
+    schema = { "djangoAppName" : "pdb", "gemsModule" : "structureFile", "subModule" : "amber"}
     try:
         ## unrecognizedAtom ##
         unrecognizedAtomsTableMetadataSchema = amberIO.generateUnrecognizedAtomsTableMetadataSchema()
