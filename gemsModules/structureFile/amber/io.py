@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field, ValidationError, validator
 from pydantic.schema import schema
 from gemsModules.common.loggingConfig import *
 from gemsModules.common import io as commonio
+from gemsModules.common.settings import SCHEMA_DIR
 from gemsModules.project import dataio as projectio
 from gemsModules.project import projectUtil as projectUtil
 from gemsModules.structureFile.amber.logic import*
@@ -43,9 +44,7 @@ class UnrecognizedAtomsTableMetadata(BaseModel):
         result = result + "\ndescription: " + self.description
         return result
 
-def generateUnrecognizedAtomsTableMetadataSchema():
-    log.info("generateUnrecognizedAtomsTableMetadataSchema() was called.")
-    return UnrecognizedAtomsTableMetadata.schema_json() 
+
 
 
 ##  A record of a found instance
@@ -75,12 +74,6 @@ class UnrecognizedAtom(BaseModel):
         return result
 
 
-def generateUnrecognizedAtomSchema():
-    log.info("generateUnrecognizedAtomSchema() was called.")
-    return UnrecognizedAtom.schema_json()
-
-
-
 ## Data for the table, offers summary
 ##  Used to be unrecognizedResidues
 class UnrecognizedMoleculesTableMetadata(BaseModel):
@@ -107,9 +100,6 @@ class UnrecognizedMoleculesTableMetadata(BaseModel):
         result = result + "\ndescription: " + self.description
         return result
 
-def generateUnrecognizedMoleculesTableMetadataSchema():
-    log.info("generateUnrecognizedMoleculesTableMetadataSchema() was called.")
-    return UnrecognizedMoleculesTableMetadata.schema_json()
 
 ##  A record of a found instance
 ##  Used to be Unrecognized Residues
@@ -144,10 +134,6 @@ class UnrecognizedMolecule(BaseModel):
         return result
 
 
-def generateUnrecognizedMoleculeSchema():
-    log.info("generateUnrecognizedMoleculeSchema() was called.")
-    return UnrecognizedMolecule.schema_json()
-
 ## Data for the table, offers summary
 class MissingResiduesTableMetadata(BaseModel):
     tableLabel : str = "Missing Residues"
@@ -172,9 +158,6 @@ class MissingResiduesTableMetadata(BaseModel):
         result = result + "\ndescription: " + self.description
         return result
 
-def generateMissingResiduesTableMetadataSchema():
-    log.info("generateMissingResiduesTableMetadataSchema() was called.")
-    return MissingResiduesTableMetadata.schema_json()
 
 ##  A record of a found instance
 class MissingResidue(BaseModel):
@@ -209,9 +192,6 @@ class MissingResidue(BaseModel):
         result = result + "\nresidueAfterGap: " + self.residueAfterGap
         return result
 
-def generateMissingResidueSchema():
-    log.info("generateMissingResidueSchema() was called.")
-    return MissingResidue.schema_json()
 
 ## Data for the table, offers summary
 class HistidineProtonationsTableMetadata(BaseModel):
@@ -237,9 +217,6 @@ class HistidineProtonationsTableMetadata(BaseModel):
         result = result + "\ndescription: " + self.description
         return result
 
-def generateHistidineProtonationsTableMetadataSchema():
-    log.info("generateHistidineProtonationsTableMetadataSchema() was called.")
-    return HistidineProtonationsTableMetadata.schema_json()
 
 ##  A record of a found instance
 class HistidineProtonation(BaseModel):
@@ -265,9 +242,6 @@ class HistidineProtonation(BaseModel):
 
         return result
 
-def generateHistidineProtonationSchema():
-    log.info("generateHistidineProtonationSchema() was called.")
-    return HistidineProtonation.schema_json()
 
 ## Data for the table, offers summary
 class DisulfideBondsTableMetadata(BaseModel):
@@ -293,9 +267,6 @@ class DisulfideBondsTableMetadata(BaseModel):
         result = result + "\ndescription: " + self.description
         return result
 
-def generateDisulfideBondsTableMetadataSchema():
-    log.info("generateDisulfideBondsTableMetadataSchema() was called.")
-    return DisulfideBondsTableMetadata.schema_json()
 
 
 ##  A record of a found instance
@@ -335,9 +306,6 @@ class DisulfideBond(BaseModel):
         result = result + "\nbonded: " + str(self.bonded)
         return result
 
-def generateDisulfideBondSchema():
-    log.info("generateDisulfideBondSchema() was called.")
-    return DisulfideBond.schema_json()
 
 def getAmberResidueName(item):
     log.info("getAmberResidueName() was called.")
@@ -374,9 +342,6 @@ class ChainTerminationsTableMetadata(BaseModel):
         result = result + "\ndescription: " + self.description
         return result
 
-def generateChainTerminationsTableMetadataSchema():
-    log.info("generateChainTerminationsTableMetadataSchema() was called.")
-    return ChainTerminationsTableMetadata.schema_json()
 
 ##  A record of a found instance
 class ChainTermination(BaseModel):
@@ -405,9 +370,6 @@ class ChainTermination(BaseModel):
 
         return result
 
-def generateChainTerminationSchema():
-    log.info("generateChainTerminationSchema() was called.")
-    return ChainTermination.schema_json()
 
 ## Data for the table, offers summary
 class ReplacedHydrogensTableMetadata(BaseModel):
@@ -433,9 +395,6 @@ class ReplacedHydrogensTableMetadata(BaseModel):
         result = result + "\ndescription: " + self.description
         return result
 
-def generateReplacedHydrogensTableMetadataSchema():
-    log.info("generateReplacedHydrogensTableMetadataSchema() was called.")
-    return ReplacedHydrogensTableMetadata.schema_json()
 
 ##  A record of a found instance
 class ReplacedHydrogen(BaseModel):
@@ -465,9 +424,6 @@ class ReplacedHydrogen(BaseModel):
         result = result + "\nresidueNumber: " + self.residueNumber
         return result
 
-def generateReplacedHydrogenSchema():
-    log.info("generateReplacedHydrogenSchema() was called.")
-    return ReplacedHydrogen.schema_json()
 
 ## Services
 class EvaluationOutput(BaseModel):
@@ -658,8 +614,6 @@ class EvaluationOutput(BaseModel):
             result = result + "\n\ttable:" + str(table)
         return result
         
-        
-
 
 class PreprocessPdbForAmberOutput(BaseModel):
     project_status : str = "submitted"
@@ -669,43 +623,13 @@ class PreprocessPdbForAmberOutput(BaseModel):
     ##TODO: needs an init
 
 
-
-class StructureFileSchemaForWebOutput(BaseModel):
-    tables : dict = None
-
-    def __init__(self):
-        super().__init__()
-        log.info("Generating all schema for the pdb options table.")
-
-        self.tables =  {
-            "unrecognizedAtom" : generateUnrecognizedAtomSchema(),
-            "unrecognizedAtomsTableMetadata" : generateUnrecognizedAtomsTableMetadataSchema(),
-            "unrecognizedMolecule" : generateUnrecognizedMoleculeSchema(),
-            "unrecognizedMoleculesTableMetadata" : generateUnrecognizedMoleculesTableMetadataSchema(),
-            "missingResidue" : generateMissingResidueSchema(),
-            "missingResiduesTableMetadata" : generateMissingResiduesTableMetadataSchema(), 
-            "histidineProtonation" : generateHistidineProtonationSchema(),
-            "histidineProtonationsTableMetadata" : generateHistidineProtonationsTableMetadataSchema(),
-            "disulfideBond" : generateDisulfideBondSchema(),
-            "disulfideBondsTableMetadata" : generateDisulfideBondsTableMetadataSchema(), 
-            "chainTermination" : generateChainTerminationSchema(),
-            "chainTerminationsTableMetadata" : generateChainTerminationsTableMetadataSchema(),
-            "replacedHydrogen" : generateReplacedHydrogenSchema(),
-            "replacedHydrogensTableMetadata" : generateReplacedHydrogensTableMetadataSchema()
-        }
-
 class StructureFileInputs(BaseModel):
     pdb_file_name : str = ""
     pdb_ID : str = ""
 
 class StructureFileOutputs(BaseModel):
     structureFileEvaluationOutput : EvaluationOutput = None 
-    schemaOutput : StructureFileSchemaForWebOutput = None 
 
-    def createSchemaOutput(self):
-        log.info("createSchemaOutput() was called.")
-        if self.schemaOutput is None:
-            self.schemaOutput = StructureFileSchemaForWebOutput()
 
 
 class StructureFileResponse(BaseModel):
@@ -737,7 +661,6 @@ class StructureFileResponse(BaseModel):
                 self.outputs.append(output)
 
 
-
 class StructureFileService(commonio.Service):
     typename : StructureFileServices = Field(
         'Evaluate',
@@ -752,9 +675,6 @@ class StructureFileService(commonio.Service):
         log.info("Initializing Service.")
         log.debug("the data " + repr(self))
         log.debug("Init for the Services in StructureFile was called.")
-        
-
-
 
 
 class StructureFileEntity(commonio.Entity):
@@ -778,7 +698,6 @@ class structureFileTransactionSchema(commonio.TransactionSchema):
 
     def __init__(self, **data : Any):
         super().__init__(**data)
-
 
 
 class Transaction(commonio.Transaction):
@@ -817,6 +736,73 @@ class Transaction(commonio.Transaction):
 
 
 
+def generateSchemaForWeb():
+    log.info("generateSchemaForWeb() was called.")
+    spaceCount=2
+    log.debug("SCHEMA_DIR: " + SCHEMA_DIR)
+    try:
+        filePath = os.path.join(SCHEMA_DIR, 'unrecognizedAtomsTableMetadataSchema.json')
+        with open(filePath, 'w') as file:
+            json.dump(UnrecognizedAtomsTableMetadata.schema_json(indent=spaceCount), file)
+
+        filePath = os.path.join(SCHEMA_DIR, 'unrecognizedAtomSchema.json')
+        with open(filePath, 'w') as file:
+            json.dump(UnrecognizedAtom.schema_json(indent=spaceCount), file)
+
+        filePath = os.path.join(SCHEMA_DIR, 'unrecognizedMoleculesTableMetadata.json')
+        with open(filePath, 'w') as file:
+            json.dump(UnrecognizedMoleculesTableMetadata.schema_json(indent=spaceCount), file)
+
+        filePath = os.path.join(SCHEMA_DIR, 'unrecognizedMoleculeSchema.json')
+        with open(filePath, 'w') as file:
+            json.dump(UnrecognizedMolecule.schema_json(indent=spaceCount), file)
+
+        filePath = os.path.join(SCHEMA_DIR, 'missingResiduesTableMetadataSchema.json')
+        with open(filePath, 'w') as file:
+            json.dump(MissingResiduesTableMetadata.schema_json(indent=spaceCount), file)
+
+        filePath = os.path.join(SCHEMA_DIR, 'missingResidueSchema.json')
+        with open(filePath, 'w') as file:
+            json.dump(MissingResidue.schema_json(indent=spaceCount), file)
+
+        filePath = os.path.join(SCHEMA_DIR, 'histidineProtonationsTableMetadataSchema.json')
+        with open(filePath, 'w') as file:
+            json.dump(HistidineProtonationsTableMetadata.schema_json(indent=spaceCount), file)
+ 
+        filePath = os.path.join(SCHEMA_DIR, 'histidineProtonationSchema.json')
+        with open(filePath, 'w') as file:
+            json.dump(HistidineProtonation.schema_json(indent=spaceCount), file)
+
+        filePath = os.path.join(SCHEMA_DIR, 'disulfideBondsTableMetadataSchema.json')
+        with open(filePath, 'w') as file:
+            json.dump(DisulfideBondsTableMetadata.schema_json(indent=spaceCount), file)
+
+        filePath = os.path.join(SCHEMA_DIR, 'disulfideBondSchema.json')
+        with open(filePath, 'w') as file:
+            json.dump(DisulfideBond.schema_json(indent=spaceCount), file)
+
+        filePath = os.path.join(SCHEMA_DIR, 'chainTerminationsTableMetadataSchema.json')
+        with open(filePath, 'w') as file:
+            json.dump(ChainTerminationsTableMetadata.schema_json(indent=spaceCount), file)
+
+        filePath = os.path.join(SCHEMA_DIR, 'chainTerminationSchema.json')
+        with open(filePath, 'w') as file:
+            json.dump(ChainTermination.schema_json(indent=spaceCount), file)
+
+        filePath = os.path.join(SCHEMA_DIR, 'replacedHydrogensTableMetadataSchema.json')
+        with open(filePath, 'w') as file:
+            json.dump(ReplacedHydrogensTableMetadata.schema_json(indent=spaceCount), file)
+
+        filePath = os.path.join(SCHEMA_DIR, 'replacedHydrogenSchema.json')
+        with open(filePath, 'w') as file:
+            json.dump(ReplacedHydrogen.schema_json(indent=spaceCount), file)   
+
+    
+    except Exception as error:
+        log.error("There was a problem writing the structureFile schema to file: " + str(error))
+        log.error(traceback.format_exc())
+        raise error
+
+
 if __name__ == "__main__":
-  generateUnrecognizedAtomSchema()
-  generateUnrecognizedMoleculeSchema()
+  generateSchemaForWeb()
