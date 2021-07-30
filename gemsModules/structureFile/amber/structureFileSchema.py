@@ -5,7 +5,7 @@ import traceback
 import gemsModules.structureFile.amber.io as amberIO
 from gemsModules.common.loggingConfig import *
 from gemsModules.common.logic import getGemsHome
-from gemsModules.common.settings import SCHEMA_DIR
+
 # from gemsModules.common.logic import updateResponse, getGemsHome
 
 
