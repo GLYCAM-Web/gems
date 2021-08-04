@@ -22,6 +22,8 @@ else:
 ## Data for the table, offers summary
 ## Used to be unrecognizedHeavyAtoms
 class UnrecognizedAtomsTableMetadata(BaseModel):
+    app : str = "pdb"
+    page : str = "options"
     tableLabel : str = "Unrecognized Atoms"
     tableKey : str = "unrecognizedAtoms"
     interactionRequirement : str = "none"
@@ -42,6 +44,8 @@ class UnrecognizedAtomsTableMetadata(BaseModel):
         result = result + "\nurgency: " + self.urgency
         result = result + "\ncount: " + str(self.count)
         result = result + "\ndescription: " + self.description
+        result = result + "\napp: " + self.app
+        result = result + "\npage: " + self.page
         return result
 
 
@@ -49,6 +53,8 @@ class UnrecognizedAtomsTableMetadata(BaseModel):
 
 ##  A record of a found instance
 class UnrecognizedAtom(BaseModel):
+    app : str = "pdb"
+    page : str = "options"
     atomIndex : str = None
     atomName : str = None
     residueName : str = None
@@ -71,12 +77,16 @@ class UnrecognizedAtom(BaseModel):
         result = result + "\nresidueName: " + self.residueName
         result = result + "\nchainID: " + self.chainID
         result = result + "\nresidueNumber: " + self.residueNumber
+        result = result + "\napp: " + self.app
+        result = result + "\npage: " + self.page
         return result
 
 
 ## Data for the table, offers summary
 ##  Used to be unrecognizedResidues
 class UnrecognizedMoleculesTableMetadata(BaseModel):
+    app : str = "pdb"
+    page : str = "options"
     tableLabel : str = "Unrecognized Molecules"
     tableKey : str = "unrecognizedMolecules"
     interactionRequirement : str = "none"
@@ -98,12 +108,16 @@ class UnrecognizedMoleculesTableMetadata(BaseModel):
         result = result + "\nurgency: " + self.urgency
         result = result + "\ncount: " + str(self.count)
         result = result + "\ndescription: " + self.description
+        result = result + "\napp: " + self.app
+        result = result + "\npage: " + self.page
         return result
 
 
 ##  A record of a found instance
 ##  Used to be Unrecognized Residues
 class UnrecognizedMolecule(BaseModel):
+    app : str = "pdb"
+    page : str = "options"
     chainID : str = None
     index : str = None
     name : str = None
@@ -131,11 +145,15 @@ class UnrecognizedMolecule(BaseModel):
         result = result + "\nname: " + self.name
         result = result + "\nisMidChain: " + self.isMidChain
         result = result + "\ncanPreprocess: " + str(self.canPreprocess)
+        result = result + "\napp: " + self.app
+        result = result + "\npage: " + self.page
         return result
 
 
 ## Data for the table, offers summary
 class MissingResiduesTableMetadata(BaseModel):
+    app : str = "pdb"
+    page : str = "options"
     tableLabel : str = "Missing Residues"
     tableKey : str = "missingResidues"
     interactionRequirement : str = "optional"
@@ -156,11 +174,15 @@ class MissingResiduesTableMetadata(BaseModel):
         result = result + "\nurgency: " + self.urgency
         result = result + "\ncount: " + str(self.count)
         result = result + "\ndescription: " + self.description
+        result = result + "\napp: " + self.app
+        result = result + "\npage: " + self.page
         return result
 
 
 ##  A record of a found instance
 class MissingResidue(BaseModel):
+    app : str = "pdb"
+    page : str = "options"
     chainID : str = None
     startSequenceNumber : str = None
     endSequenceNumber : str = None
@@ -190,11 +212,15 @@ class MissingResidue(BaseModel):
         result = result + "\nendSequenceNumber: " + self.endSequenceNumber
         result = result + "\nresidueBeforeGap: " + self.residueBeforeGap
         result = result + "\nresidueAfterGap: " + self.residueAfterGap
+        result = result + "\napp: " + self.app
+        result = result + "\npage: " + self.page
         return result
 
 
 ## Data for the table, offers summary
 class HistidineProtonationsTableMetadata(BaseModel):
+    app : str = "pdb"
+    page : str = "options"
     tableLabel : str = "Histidine Protonations"
     tableKey : str = "histidineProtonations"
     interactionRequirement : str = "optional"
@@ -215,11 +241,15 @@ class HistidineProtonationsTableMetadata(BaseModel):
         result = result + "\nurgency: " + self.urgency
         result = result + "\ncount: " + str(self.count)
         result = result + "\ndescription: " + self.description
+        result = result + "\napp: " + self.app
+        result = result + "\npage: " + self.page
         return result
 
 
 ##  A record of a found instance
 class HistidineProtonation(BaseModel):
+    app : str = "pdb"
+    page : str = "options"
     chainID : str = None
     residueNumber : str = None
     mappingFormat : str = None
@@ -239,12 +269,15 @@ class HistidineProtonation(BaseModel):
         result = result + "\nchainID: " + self.chainID
         result = result + "\nresidueNumber: " + self.residueNumber
         result = result + "\nmappingFormat: " + self.mappingFormat
-
+        result = result + "\napp: " + self.app
+        result = result + "\npage: " + self.page
         return result
 
 
 ## Data for the table, offers summary
 class DisulfideBondsTableMetadata(BaseModel):
+    app : str = "pdb"
+    page : str = "options"
     tableLabel : str = "Disulfide Bonds"
     tableKey : str = "disulfideBonds"
     interactionRequirement : str = "optional"
@@ -265,12 +298,16 @@ class DisulfideBondsTableMetadata(BaseModel):
         result = result + "\nurgency: " + self.urgency
         result = result + "\ncount: " + str(self.count)
         result = result + "\ndescription: " + self.description
+        result = result + "\napp: " + self.app
+        result = result + "\npage: " + self.page
         return result
 
 
 
 ##  A record of a found instance
 class DisulfideBond(BaseModel):
+    app : str = "pdb"
+    page : str = "options"
     residue1ChainId : str = None
     residue1Number : str = None
     residue1AmberResidueName : str = None
@@ -304,6 +341,8 @@ class DisulfideBond(BaseModel):
         result = result + "\nresidue2AmberResidueName: " + self.residue2AmberResidueName
         result = result + "\ndistance: " + self.distance
         result = result + "\nbonded: " + str(self.bonded)
+        result = result + "\napp: " + self.app
+        result = result + "\npage: " + self.page
         return result
 
 
@@ -320,6 +359,8 @@ def getAmberResidueName(item):
 
 ## Data for the table, offers summary
 class ChainTerminationsTableMetadata(BaseModel):
+    app : str = "pdb"
+    page : str = "options"
     tableLabel : str = "Chain Terminations"
     tableKey : str = "chainTerminations"
     interactionRequirement : str = "optional"
@@ -340,11 +381,15 @@ class ChainTerminationsTableMetadata(BaseModel):
         result = result + "\nurgency: " + self.urgency
         result = result + "\ncount: " + str(self.count)
         result = result + "\ndescription: " + self.description
+        result = result + "\napp: " + self.app
+        result = result + "\npage: " + self.page
         return result
 
 
 ##  A record of a found instance
 class ChainTermination(BaseModel):
+    app : str = "pdb"
+    page : str = "options"
     chainID : str = None
     startIndex : str = None
     endIndex : str = None
@@ -367,12 +412,15 @@ class ChainTermination(BaseModel):
         result = result + "\nchainID: " + self.chainID
         result = result + "\nstartIndex: " + self.startIndex
         result = result + "\nendIndex: " + self.endIndex
-
+        result = result + "\napp: " + self.app
+        result = result + "\npage: " + self.page
         return result
 
 
 ## Data for the table, offers summary
 class ReplacedHydrogensTableMetadata(BaseModel):
+    app : str = "pdb"
+    page : str = "options"
     tableLabel : str = "Replaced Hydrogens"
     tableKey : str = "replacedHydrogens"
     interactionRequirement : str = "none"
@@ -393,11 +441,15 @@ class ReplacedHydrogensTableMetadata(BaseModel):
         result = result + "\nurgency: " + self.urgency
         result = result + "\ncount: " + str(self.count)
         result = result + "\ndescription: " + self.description
+        result = result + "\napp: " + self.app
+        result = result + "\npage: " + self.page
         return result
 
 
 ##  A record of a found instance
 class ReplacedHydrogen(BaseModel):
+    app : str = "pdb"
+    page : str = "options"
     index : str = None
     atomName : str = None
     residueName : str = None
@@ -422,6 +474,8 @@ class ReplacedHydrogen(BaseModel):
         result = result + "\nresidueName: " + self.residueName
         result = result + "\nchainID: " + str(self.chainID)
         result = result + "\nresidueNumber: " + self.residueNumber
+        result = result + "\napp: " + self.app
+        result = result + "\npage: " + self.page
         return result
 
 
