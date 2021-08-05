@@ -797,59 +797,59 @@ def generateSchemaForWeb():
     try:
         filePath = os.path.join(SCHEMA_DIR, 'unrecognizedAtomsTableMetadataSchema.json')
         with open(filePath, 'w') as file:
-            json.dump(UnrecognizedAtomsTableMetadata.schema_json(indent=spaceCount), file)
+            file.write(UnrecognizedAtomsTableMetadata.schema_json(indent=spaceCount))
 
         filePath = os.path.join(SCHEMA_DIR, 'unrecognizedAtomSchema.json')
         with open(filePath, 'w') as file:
-            json.dump(UnrecognizedAtom.schema_json(indent=spaceCount), file)
+            file.write(UnrecognizedAtom.schema_json(indent=spaceCount))
 
         filePath = os.path.join(SCHEMA_DIR, 'unrecognizedMoleculesTableMetadata.json')
         with open(filePath, 'w') as file:
-            json.dump(UnrecognizedMoleculesTableMetadata.schema_json(indent=spaceCount), file)
+            file.write(UnrecognizedMoleculesTableMetadata.schema_json(indent=spaceCount))
 
         filePath = os.path.join(SCHEMA_DIR, 'unrecognizedMoleculeSchema.json')
         with open(filePath, 'w') as file:
-            json.dump(UnrecognizedMolecule.schema_json(indent=spaceCount), file)
+            file.write(UnrecognizedMolecule.schema_json(indent=spaceCount))
 
         filePath = os.path.join(SCHEMA_DIR, 'missingResiduesTableMetadataSchema.json')
         with open(filePath, 'w') as file:
-            json.dump(MissingResiduesTableMetadata.schema_json(indent=spaceCount), file)
+            file.write(MissingResiduesTableMetadata.schema_json(indent=spaceCount))
 
         filePath = os.path.join(SCHEMA_DIR, 'missingResidueSchema.json')
         with open(filePath, 'w') as file:
-            json.dump(MissingResidue.schema_json(indent=spaceCount), file)
+            file.write(MissingResidue.schema_json(indent=spaceCount))
 
         filePath = os.path.join(SCHEMA_DIR, 'histidineProtonationsTableMetadataSchema.json')
         with open(filePath, 'w') as file:
-            json.dump(HistidineProtonationsTableMetadata.schema_json(indent=spaceCount), file)
+            file.write(HistidineProtonationsTableMetadata.schema_json(indent=spaceCount))
  
         filePath = os.path.join(SCHEMA_DIR, 'histidineProtonationSchema.json')
         with open(filePath, 'w') as file:
-            json.dump(HistidineProtonation.schema_json(indent=spaceCount), file)
+            file.write(HistidineProtonation.schema_json(indent=spaceCount))
 
         filePath = os.path.join(SCHEMA_DIR, 'disulfideBondsTableMetadataSchema.json')
         with open(filePath, 'w') as file:
-            json.dump(DisulfideBondsTableMetadata.schema_json(indent=spaceCount), file)
+            file.write(DisulfideBondsTableMetadata.schema_json(indent=spaceCount))
 
         filePath = os.path.join(SCHEMA_DIR, 'disulfideBondSchema.json')
         with open(filePath, 'w') as file:
-            json.dump(DisulfideBond.schema_json(indent=spaceCount), file)
+            file.write(DisulfideBond.schema_json(indent=spaceCount))
 
         filePath = os.path.join(SCHEMA_DIR, 'chainTerminationsTableMetadataSchema.json')
         with open(filePath, 'w') as file:
-            json.dump(ChainTerminationsTableMetadata.schema_json(indent=spaceCount), file)
+            file.write(ChainTerminationsTableMetadata.schema_json(indent=spaceCount))
 
         filePath = os.path.join(SCHEMA_DIR, 'chainTerminationSchema.json')
         with open(filePath, 'w') as file:
-            json.dump(ChainTermination.schema_json(indent=spaceCount), file)
+            file.write(ChainTermination.schema_json(indent=spaceCount))
 
         filePath = os.path.join(SCHEMA_DIR, 'replacedHydrogensTableMetadataSchema.json')
         with open(filePath, 'w') as file:
-            json.dump(ReplacedHydrogensTableMetadata.schema_json(indent=spaceCount), file)
+            file.write(ReplacedHydrogensTableMetadata.schema_json(indent=spaceCount))
 
         filePath = os.path.join(SCHEMA_DIR, 'replacedHydrogenSchema.json')
         with open(filePath, 'w') as file:
-            json.dump(ReplacedHydrogen.schema_json(indent=spaceCount), file)   
+            file.write(ReplacedHydrogen.schema_json(indent=spaceCount))   
 
     
     except Exception as error:
