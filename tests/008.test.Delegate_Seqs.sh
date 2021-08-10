@@ -19,7 +19,7 @@ Testing delegator using a sequence request with specified conformers.
 # Runs the script that is being tested.
 run_newBuild_test() 
 {
-	cat $inputJson | $GEMSHOME/bin/delegate > out.json
+	cat $inputJson | $GEMSHOME/bin/delegate > out1.json
 	currentOutput=${gemsSequencePath}/${sequenceID}/current/All_Builds/${conformerID}/min-t5p.pdb
 	count=0
 	while [ "${count}" -lt "${maxCount}" ] ; do
@@ -37,7 +37,7 @@ run_newBuild_test()
 		fi
 		echo "Waited $((count*sleepTime)) seconds so far."
 	done
-	if ! cmp $currentOutput $correctOutput > /dev/null 2>&1; then
+	if ! cmp $currentOutput $correctOutput > newBuildCompare.txt; then
 		echo "Test 008.a FAILED!" 
 		return 1;
 	else 
@@ -49,18 +49,13 @@ run_newBuild_test()
 
 run_existingBuild_test() 
 {
-	cat $inputJson | $GEMSHOME/bin/delegate > out.json
+	cat $inputJson | $GEMSHOME/bin/delegate > out2.json
 	pUUID=$(grep -m 1  pUUID out.json | cut -d '"' -f4)
 	currentOutput="${gemsBuildPath}/${pUUID}/Existing_Builds/${conformerID}/min-t5p.pdb"
 
-	if ! cmp $currentOutput $correctOutput > /dev/null 2>&1; then
-		echo "Test 008.b FAILED!" 
-		echo "currentOutput:"
-		echo "${currentOutput}"
-		echo ""
-		echo "correctOutput:"
-		echo "${correctOutput}"
 
+	if ! cmp $currentOutput $correctOutput > existingBuildCompare.txt; then
+		echo "Test 008.b FAILED!" 
 		return 1;
 	else 
 		echo "Test 008.b passed." 
