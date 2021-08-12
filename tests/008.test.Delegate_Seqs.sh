@@ -19,7 +19,7 @@ Testing delegator using a sequence request with specified conformers.
 # Runs the script that is being tested.
 run_newBuild_test() 
 {
-	cat $inputJson | $GEMSHOME/bin/delegate > out1.json
+	cat $inputJson | $GEMSHOME/bin/delegate > newBuild_out.json
 	currentOutput=${gemsSequencePath}/${sequenceID}/current/All_Builds/${conformerID}/min-t5p.pdb
 	count=0
 	while [ "${count}" -lt "${maxCount}" ] ; do
@@ -32,34 +32,58 @@ run_newBuild_test()
 			echo "Output still not found after 300 seconds.  Aborting."
 			echo "The output being sought is : "
 			echo "${currentOutput}"
-			echo "Test 008.a FAILED!" 
+			echo "Test FAILED!" 
 			return 1
 		fi
 		echo "Waited $((count*sleepTime)) seconds so far."
 	done
-	if ! cmp $currentOutput $correctOutput > newBuildCompare.txt; then
-		echo "Test 008.a FAILED!" 
+	if ! cmp $currentOutput $correctOutput > /dev/null 2>&1; then
+		echo "Test FAILED!" 
 		return 1;
 	else 
-		echo "Test 008.a passed." 
-		rm out.json 
+		echo "Test passed." 
+		#rm newBuild_out.json 
 		return 0; 
 	fi
 }
 
 run_existingBuild_test() 
 {
-	cat $inputJson | $GEMSHOME/bin/delegate > out2.json
-	pUUID=$(grep -m 1  pUUID out.json | cut -d '"' -f4)
+	cat $inputJson | $GEMSHOME/bin/delegate > existingBuild_out.json
+	pUUID=$(grep -m 1  pUUID existingBuild_out.json | cut -d '"' -f4)
+	echo "pUUID: ${pUUID}"
+	echo "conformerID: ${conformerID}" 
 	currentOutput="${gemsBuildPath}/${pUUID}/Existing_Builds/${conformerID}/min-t5p.pdb"
+	echo "currentOutput: ${currentOutput}"
+	if ! cmp $currentOutput $correctOutput > /dev/null 2>&1; then
+		echo "Test FAILED!" 
+		echo "compared ${currentOutput}"
+		echo "to       ${correctOutput}"
+		echo $(cmp $currentOutput $correctOutput)
 
-
-	if ! cmp $currentOutput $correctOutput > existingBuildCompare.txt; then
-		echo "Test 008.b FAILED!" 
+		if [ ! -d "${gemsBuildPath}/${pUUID}/" ] ; then
+			echo "failed to find project dir: ${gemsBuildPath}/${pUUID}/ "
+		else
+			echo "found the project dir: ${gemsBuildPath}/${pUUID}/ "
+			if [ ! -d "${gemsBuildPath}/${pUUID}/Existing_Builds/" ] ; then 
+				echo "Existing_Builds dir does not exist."
+			else
+				echo "found the Existing_Builds dir: ${gemsBuildPath}/${pUUID}/Existing_Builds/"
+				if [ ! -d "${gemsBuildPath}/${pUUID}/Existing_Builds/${conformerID}/" ] ; then 
+					echo "conformerID dir does not exist."
+				else
+					echo "found the conformerId dir: ${gemsBuildPath}/${pUUID}/Existing_Builds/${conformerID}/"
+					if [ ! -f $currentOutput ]; then
+					    echo "${currentOutput} not found!"
+					fi
+				fi
+				
+			fi
+		fi
 		return 1;
 	else 
-		echo "Test 008.b passed." 
-		rm out.json 
+		echo "Test passed." 
+		#rm existingBuild_out.json 
 		return 0; 
 	fi
 }
@@ -78,7 +102,7 @@ if [ ! -d "${gemsServicePath}" ] ; then
 fi
 
 echo "
-008.a Checking that new builds work properly.
+Checking that new builds work properly.
 "
 echo "Allowing up to $((maxCount*sleepTime)) seconds to complete the new build."
 echo "If your build completes, but takes longer, update the test to wait longer."
@@ -87,7 +111,7 @@ if ! run_newBuild_test; then
 	return 1;
 fi
 echo "
-008.b Checking now that existing builds are found.
+Checking now that existing builds are found.
 "
 
 # Check that the build is found
