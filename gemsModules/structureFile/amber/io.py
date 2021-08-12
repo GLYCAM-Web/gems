@@ -794,64 +794,68 @@ def generateSchemaForWeb():
     log.info("generateSchemaForWeb() was called.")
     spaceCount=2
     log.debug("SCHEMA_DIR: " + SCHEMA_DIR)
+    moduleSchemaDir = os.path.join(SCHEMA_DIR, "structureFile")
+
     try:
-        filePath = os.path.join(SCHEMA_DIR, 'unrecognizedAtomsTableMetadataSchema.json')
+        if not os.path.isdir(moduleSchemaDir):
+            os.makedirs(moduleSchemaDir)
+        
+        filePath = os.path.join(moduleSchemaDir, 'unrecognizedAtomsTableMetadataSchema.json')
         with open(filePath, 'w') as file:
             file.write(UnrecognizedAtomsTableMetadata.schema_json(indent=spaceCount))
 
-        filePath = os.path.join(SCHEMA_DIR, 'unrecognizedAtomSchema.json')
+        filePath = os.path.join(moduleSchemaDir, 'unrecognizedAtomSchema.json')
         with open(filePath, 'w') as file:
             file.write(UnrecognizedAtom.schema_json(indent=spaceCount))
 
-        filePath = os.path.join(SCHEMA_DIR, 'unrecognizedMoleculesTableMetadata.json')
+        filePath = os.path.join(moduleSchemaDir, 'unrecognizedMoleculesTableMetadata.json')
         with open(filePath, 'w') as file:
             file.write(UnrecognizedMoleculesTableMetadata.schema_json(indent=spaceCount))
 
-        filePath = os.path.join(SCHEMA_DIR, 'unrecognizedMoleculeSchema.json')
+        filePath = os.path.join(moduleSchemaDir, 'unrecognizedMoleculeSchema.json')
         with open(filePath, 'w') as file:
             file.write(UnrecognizedMolecule.schema_json(indent=spaceCount))
 
-        filePath = os.path.join(SCHEMA_DIR, 'missingResiduesTableMetadataSchema.json')
+        filePath = os.path.join(moduleSchemaDir, 'missingResiduesTableMetadataSchema.json')
         with open(filePath, 'w') as file:
             file.write(MissingResiduesTableMetadata.schema_json(indent=spaceCount))
 
-        filePath = os.path.join(SCHEMA_DIR, 'missingResidueSchema.json')
+        filePath = os.path.join(moduleSchemaDir, 'missingResidueSchema.json')
         with open(filePath, 'w') as file:
             file.write(MissingResidue.schema_json(indent=spaceCount))
 
-        filePath = os.path.join(SCHEMA_DIR, 'histidineProtonationsTableMetadataSchema.json')
+        filePath = os.path.join(moduleSchemaDir, 'histidineProtonationsTableMetadataSchema.json')
         with open(filePath, 'w') as file:
             file.write(HistidineProtonationsTableMetadata.schema_json(indent=spaceCount))
  
-        filePath = os.path.join(SCHEMA_DIR, 'histidineProtonationSchema.json')
+        filePath = os.path.join(moduleSchemaDir, 'histidineProtonationSchema.json')
         with open(filePath, 'w') as file:
             file.write(HistidineProtonation.schema_json(indent=spaceCount))
 
-        filePath = os.path.join(SCHEMA_DIR, 'disulfideBondsTableMetadataSchema.json')
+        filePath = os.path.join(moduleSchemaDir, 'disulfideBondsTableMetadataSchema.json')
         with open(filePath, 'w') as file:
             file.write(DisulfideBondsTableMetadata.schema_json(indent=spaceCount))
 
-        filePath = os.path.join(SCHEMA_DIR, 'disulfideBondSchema.json')
+        filePath = os.path.join(moduleSchemaDir, 'disulfideBondSchema.json')
         with open(filePath, 'w') as file:
             file.write(DisulfideBond.schema_json(indent=spaceCount))
 
-        filePath = os.path.join(SCHEMA_DIR, 'chainTerminationsTableMetadataSchema.json')
+        filePath = os.path.join(moduleSchemaDir, 'chainTerminationsTableMetadataSchema.json')
         with open(filePath, 'w') as file:
             file.write(ChainTerminationsTableMetadata.schema_json(indent=spaceCount))
 
-        filePath = os.path.join(SCHEMA_DIR, 'chainTerminationSchema.json')
+        filePath = os.path.join(moduleSchemaDir, 'chainTerminationSchema.json')
         with open(filePath, 'w') as file:
             file.write(ChainTermination.schema_json(indent=spaceCount))
 
-        filePath = os.path.join(SCHEMA_DIR, 'replacedHydrogensTableMetadataSchema.json')
+        filePath = os.path.join(moduleSchemaDir, 'replacedHydrogensTableMetadataSchema.json')
         with open(filePath, 'w') as file:
             file.write(ReplacedHydrogensTableMetadata.schema_json(indent=spaceCount))
 
-        filePath = os.path.join(SCHEMA_DIR, 'replacedHydrogenSchema.json')
+        filePath = os.path.join(moduleSchemaDir, 'replacedHydrogenSchema.json')
         with open(filePath, 'w') as file:
             file.write(ReplacedHydrogen.schema_json(indent=spaceCount))   
 
-    
     except Exception as error:
         log.error("There was a problem writing the structureFile schema to file: " + str(error))
         log.error(traceback.format_exc())
