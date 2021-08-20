@@ -478,9 +478,35 @@ class GpProject(Project):
 #
 #    return projectType
 
-# TODO - do this for all the project types
+def generateProjectSchemaForWeb():
+    spaceCount=2
+    log.info("generateProjectSchemaForWeb() was called.")
+    
+    log.debug("SCHEMA_DIR: " + commonsettings.SCHEMA_DIR)
+    moduleSchemaDir = os.path.join(commonsettings.SCHEMA_DIR, "gemsProject")
+
+    try:
+        if not os.path.isdir(moduleSchemaDir):
+            os.makedirs(moduleSchemaDir)
+        
+        filePath = os.path.join(moduleSchemaDir, 'GemsProjectSchema.json')
+        with open(filePath, 'w') as file:
+            file.write(Project.schema_json(indent=spaceCount))
+
+        childFilePath = os.path.join(moduleSchemaDir, 'GemsPdbProject.json')
+        with open(childFilePath, 'w') as childFile:
+            childFile.write(PdbProject.schema_json(indent=spaceCount))
+
+
+    except Exception as error:
+        log.error("There was a problem writing the Project schema to file: " + str(error))
+        log.error(traceback.format_exc())
+        raise error
+
+
 def generateProjectSchema():
     print(Project.schema_json(indent=2))
+
 
 if __name__ == "__main__":
     generateProjectSchema()
