@@ -8,7 +8,7 @@ from gemsModules.common import settings as commonsettings
 from gemsModules.common import logic as commonlogic
 from gemsModules.common.io import Notice
 from gemsModules.project import settings as project_settings
-from pydantic import BaseModel, Field, ValidationError
+from pydantic import BaseModel, Field, ValidationError, constr
 from pydantic.schema import schema
 from typing import Any, List
 from gemsModules.common.loggingConfig import *
@@ -30,54 +30,54 @@ else:
 #   @detail This is the generic project object. See subtypes for more specific fields
 class Project(BaseModel):
     ## The name of the output dir is the pUUID
-    pUUID : str = ""
-    title : str = ""
-    comment : str = ""
+    pUUID : constr(max_length=32)=""
+    title : constr(max_length=25)=""
+    comment : constr(max_length=50)=""
     timestamp : datetime = None
     gems_timestamp : datetime = None
     # The following should be overridden as needed in child classes.  See CbProject, for example.
     # Each type of project known to the modules should have a child class.
-    project_type : str = "project"
-    parent_entity : str = "project"
-    requested_service : str = "project"
-    entity_id : str = "project"
-    service_id : str = "project"
+    project_type : constr(max_length=25)="project"
+    parent_entity : constr(max_length=25)="project"
+    requested_service : constr(max_length=25)="project"
+    entity_id : constr(max_length=25)="project"
+    service_id : constr(max_length=25)="project"
 
     ## The filesystem_path can be used to override settings.default_filesystem_output_path
-    filesystem_path : str = ""  
-    compute_cluster_filesystem_path : str = ""  
-    service_dir : str = ""
+    filesystem_path : constr(max_length=255)="" 
+    compute_cluster_filesystem_path : constr(max_length=255)=""
+    service_dir : constr(max_length=255)=""
     ## The project path. Used to be output dir, but now that is reserved for subdirs.
     # The project_dir should generally be set after the service dir is set
-    project_dir : str = ""
-    logs_dir : str = ""
-    requesting_agent : str = ""
+    project_dir : constr(max_length=255)=""
+    logs_dir : constr(max_length=255)=""
+    requesting_agent : constr(max_length=25)=""
     has_input_files : bool = None
    
     ## These can be read in using getVersionsFileInfo
-    site_version : str = ""
-    site_branch : str = ""
-    gems_version : str = ""
-    gems_branch : str = ""
-    md_utils_version : str = ""
-    md_utils_branch : str = ""
-    gmml_version : str = ""
-    gmml_branch : str = ""
-    gp_version : str = ""
-    gp_branch : str = ""
-    site_mode : str = ""
-    site_host_name : str = ""
-    versions_file_path : str = ""
-    host_url_base_path : str = ""
-    download_url_path :str = ""
+    site_version : constr(max_length=32)=""
+    site_branch : constr(max_length=25)=""
+    gems_version : constr(max_length=32)=""
+    gems_branch : constr(max_length=25)=""
+    md_utils_version : constr(max_length=25)=""
+    md_utils_branch : constr(max_length=25)=""
+    gmml_version : constr(max_length=25)=""
+    gmml_branch : constr(max_length=25)=""
+    gp_version : constr(max_length=25)=""
+    gp_branch : constr(max_length=25)=""
+    site_mode : constr(max_length=25)=""
+    site_host_name : constr(max_length=25)=""
+    versions_file_path : constr(max_length=255)=""
+    host_url_base_path : constr(max_length=255)=""
+    download_url_path : constr(max_length=255)=""
 
-    force_field : str = "default"
-    parameter_version : str = "default"
-    amber_version : str = "default"
-    json_api_version : str = ""
-    _django_version : str = ""
-    django_project_id : str = ""
-    app : str = "project"
+    force_field : constr(max_length=25)="default"
+    parameter_version : constr(max_length=25)="default"
+    amber_version : constr(max_length=25)="default"
+    json_api_version : constr(max_length=10)="0.0.1"
+    _django_version : constr(max_length=10)=""
+    django_project_id : constr(max_length=32)=""
+    app : constr(max_length=25)="project"
   
     notices : List[Notice] = []
 
@@ -392,15 +392,10 @@ class Project(BaseModel):
 ## @brief cbProject is a typed project that inherits all the fields from project and adds 
 #   its own.
 class CbProject(Project):
-    project_type : str = "cb"
-    parent_entity : str = "Sequence"
-    entity_id : str = "sequence"
-    service_id : str = "cb"
-    sequence_id : str = ""
-    sequence_path : str = ""
-    has_input_files : bool = False
-    indexOrderedSequence : str = ""
-    seqID : str = ""
+    sequence_id : constr(max_length=255)=""
+    sequence_path : constr(max_length=255)=""
+    indexOrderedSequence : constr(max_length=255)=""
+    seqID : constr(max_length=32)=""
 
     def setIndexOrderedSequence(self, theSequence : str ) :
         self.indexOrderedSequence = theSequence
@@ -416,62 +411,73 @@ class CbProject(Project):
         log.debug("getting SeqId: " + str(self.seqID))
         return self.seqID
 
+    def __init__(self, **data : Any):
+        super().__init__(**data)
+        self.project_type = "cb"
+        self.parent_entity = "Sequence"
+        self.entity_id = "sequence"
+        self.service_id = "cb"
+        self.has_input_files = False
 
 
 
 class PdbProject(Project):
-    has_input_files : bool = True
-    uploaded_file_name : str = ""
-    status : str = ""
-    u_uuid : str = ""
-    upload_path : str = ""
-    pdb_id : str = ""
-    input_source : str = ""
-    project_type = 'pdb'
-    parent_entity : str = "StrucureFile"
-    entity_id : str = "structurefile"
-    service_id : str = "pdb"
+    uploaded_file_name : constr(max_length=255)=""
+    status : constr(max_length=10)="submitted"
+    u_uuid : constr(max_length=32)=""
+    upload_path : constr(max_length=255)=""
+    pdb_id : constr(max_length=4)=""
+    input_source : constr(max_length=25)=""
 
-#    def __init__(self, **data : Any):
-#        super().__init__(**data)
+    def __init__(self, **data : Any):
+       super().__init__(**data)
+       self.has_input_files = True
+       self.project_type = 'pdb'
+       self.parent_entity = "StrucureFile"
+       self.entity_id = "structurefile"
+       self.service_id = "pdb"
 
 
 class GpProject(Project):
-    pdb_project_uuid : str = ""
-    has_input_files : bool = False
-#  Presunably, the following can be obtained from the PdbProject
-#    has_input_files : bool = True
-#    uploaded_file_name : str = ""
-#    upload_path : str = ""
-    status : str = ""
-    project_type = 'gp'
-    parent_entity : str = "Conjugate"
-    entity_id : str = "conjugate"
-    service_id : str = "gp"
+    pdb_project_pUUID : constr(max_length=32)=""
+    status : constr(max_length=10)="submitted"
 
-#    def __init__(self, **data : Any):
-#        super().__init__(**data)
+    
+    def __init__(self, **data : Any):
+       super().__init__(**data)
+       self.has_input_files = False
+       self.project_type = 'gp'
+       self.parent_entity = "Conjugate"
+       self.entity_id = "conjugate"
+       self.service_id = "gp"
+
 
 class GrProject(Project):
-    project_type : str = "gr"
-    uploaded_file_name : str = ""
-    u_uuid : str = ""
-    upload_path : str = ""
+    uploaded_file_name : constr(max_length=255)=""
+    u_uuid : constr(max_length=32)=""
+    upload_path :  constr(max_length=255)=""
+
+    def __init__(self, **data : Any):
+       super().__init__(**data)
+       self.project_type = "gr"
 
 class MdProject(Project):
-    project_type : str = "md"
-    system_phase : str = "In solvent."
-    input_type : str = "Amber-prmtop & inpcrd"
-    prmtop_file_name : str = " "
-    inpcrd_file_name : str = " "
-    pdb_file_name  : str = " "
-    mmcif_file_name : str = " "
-    off_file_name : str = " "
-    u_uuid : str = " "
-    water_model : str = "TIP-3P"
-    sim_length : str = '100'
+    system_phase : constr(max_length=25) = "In solvent."
+    input_type : constr(max_length=25) = "Amber-prmtop & inpcrd"
+    prmtop_file_name : constr(max_length=255) = " "
+    inpcrd_file_name : constr(max_length=255) = " "
+    pdb_file_name  : constr(max_length=255) = " "
+    mmcif_file_name : constr(max_length=255) = " "
+    off_file_name : constr(max_length=255)  = " "
+    u_uuid : constr(max_length=32) = " "
+    water_model : constr(max_length=10) = "TIP-3P"
+    sim_length : constr(max_length=5) = '100'
     notify : bool =True
-    upload_path : str = " "
+    upload_path : constr(max_length=255)  = " "
+    
+    def __init__(self, **data : Any):
+       super().__init__(**data)
+       self.project_type = "md"
 
 ##  Are these used at all?????
 ### Details and location of the build of a single pose of a structure.
