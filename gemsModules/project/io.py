@@ -77,6 +77,7 @@ class Project(BaseModel):
     json_api_version : str = ""
     _django_version : str = ""
     django_project_id : str = ""
+    app : str = "project"
   
     notices : List[Notice] = []
 
@@ -451,7 +452,26 @@ class GpProject(Project):
 #    def __init__(self, **data : Any):
 #        super().__init__(**data)
 
+class GrProject(Project):
+    project_type : str = "gr"
+    uploaded_file_name : str = ""
+    u_uuid : str = ""
+    upload_path : str = ""
 
+class MdProject(Project):
+    project_type : str = "md"
+    system_phase : str = "In solvent."
+    input_type : str = "Amber-prmtop & inpcrd"
+    prmtop_file_name : str = " "
+    inpcrd_file_name : str = " "
+    pdb_file_name  : str = " "
+    mmcif_file_name : str = " "
+    off_file_name : str = " "
+    u_uuid : str = " "
+    water_model : str = "TIP-3P"
+    sim_length : str = '100'
+    notify : bool =True
+    upload_path : str = " "
 
 ##  Are these used at all?????
 ### Details and location of the build of a single pose of a structure.
@@ -489,13 +509,31 @@ def generateProjectSchemaForWeb():
         if not os.path.isdir(moduleSchemaDir):
             os.makedirs(moduleSchemaDir)
         
-        filePath = os.path.join(moduleSchemaDir, 'GemsProjectSchema.json')
-        with open(filePath, 'w') as file:
-            file.write(Project.schema_json(indent=spaceCount))
+        # filePath = os.path.join(moduleSchemaDir, 'GemsProjectSchema.json')
+        # with open(filePath, 'w') as file:
+        #     file.write(Project.schema_json(indent=spaceCount))
 
-        childFilePath = os.path.join(moduleSchemaDir, 'GemsPdbProject.json')
+        ## Need a file for cb, pdb, gp
+
+        childFilePath = os.path.join(moduleSchemaDir, 'CbProject.json')
+        with open(childFilePath, 'w') as childFile:
+            childFile.write(CbProject.schema_json(indent=spaceCount))
+
+        childFilePath = os.path.join(moduleSchemaDir, 'PdbProject.json')
         with open(childFilePath, 'w') as childFile:
             childFile.write(PdbProject.schema_json(indent=spaceCount))
+
+        childFilePath = os.path.join(moduleSchemaDir, 'GpProject.json')
+        with open(childFilePath, 'w') as childFile:
+            childFile.write(GpProject.schema_json(indent=spaceCount))
+
+        childFilePath = os.path.join(moduleSchemaDir, 'MdProject.json')
+        with open(childFilePath, 'w') as childFile:
+            childFile.write(MdProject.schema_json(indent=spaceCount))
+
+        childFilePath = os.path.join(moduleSchemaDir, 'GrProject.json')
+        with open(childFilePath, 'w') as childFile:
+            childFile.write(GrProject.schema_json(indent=spaceCount))
 
 
     except Exception as error:
