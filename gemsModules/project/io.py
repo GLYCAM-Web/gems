@@ -25,12 +25,16 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__)
 
+##TODO It makes sense that the length of things like a git hash won't change often. System-wide vars could 
+##  provide constants or single-points-of-edit for types of max-length values. 
+##  TTITLE_MAX_LENGTH could then be edited in a single place, but applied to all gemsModule classes.
+
 
 ##  @brief The primary way of tracking data related to a project
 #   @detail This is the generic project object. See subtypes for more specific fields
 class Project(BaseModel):
     ## The name of the output dir is the pUUID
-    pUUID : constr(max_length=32)=""
+    pUUID : constr(max_length=36)=""
     title : constr(max_length=25)=""
     comment : constr(max_length=50)=""
     timestamp : datetime = None
@@ -55,16 +59,16 @@ class Project(BaseModel):
     has_input_files : bool = None
    
     ## These can be read in using getVersionsFileInfo
-    site_version : constr(max_length=32)=""
-    site_branch : constr(max_length=25)=""
-    gems_version : constr(max_length=32)=""
-    gems_branch : constr(max_length=25)=""
-    md_utils_version : constr(max_length=25)=""
-    md_utils_branch : constr(max_length=25)=""
-    gmml_version : constr(max_length=25)=""
-    gmml_branch : constr(max_length=25)=""
-    gp_version : constr(max_length=25)=""
-    gp_branch : constr(max_length=25)=""
+    site_version : constr(max_length=40)=""
+    site_branch : constr(max_length=50)=""
+    gems_version : constr(max_length=40)=""
+    gems_branch : constr(max_length=50)=""
+    md_utils_version : constr(max_length=40)=""
+    md_utils_branch : constr(max_length=50)=""
+    gmml_version : constr(max_length=40)=""
+    gmml_branch : constr(max_length=50)=""
+    gp_version : constr(max_length=40)=""
+    gp_branch : constr(max_length=50)=""
     site_mode : constr(max_length=25)=""
     site_host_name : constr(max_length=25)=""
     versions_file_path : constr(max_length=255)=""
@@ -76,7 +80,7 @@ class Project(BaseModel):
     amber_version : constr(max_length=25)="default"
     json_api_version : constr(max_length=10)="0.0.1"
     _django_version : constr(max_length=10)=""
-    django_project_id : constr(max_length=32)=""
+    django_project_id : constr(max_length=36)=""
     app : constr(max_length=25)="project"
   
     notices : List[Notice] = []
@@ -395,7 +399,7 @@ class CbProject(Project):
     sequence_id : constr(max_length=255)=""
     sequence_path : constr(max_length=255)=""
     indexOrderedSequence : constr(max_length=255)=""
-    seqID : constr(max_length=32)=""
+    seqID : constr(max_length=36)=""
 
     def setIndexOrderedSequence(self, theSequence : str ) :
         self.indexOrderedSequence = theSequence
@@ -424,7 +428,7 @@ class CbProject(Project):
 class PdbProject(Project):
     uploaded_file_name : constr(max_length=255)=""
     status : constr(max_length=10)="submitted"
-    u_uuid : constr(max_length=32)=""
+    u_uuid : constr(max_length=36)=""
     upload_path : constr(max_length=255)=""
     pdb_id : constr(max_length=4)=""
     input_source : constr(max_length=25)=""
@@ -439,7 +443,7 @@ class PdbProject(Project):
 
 
 class GpProject(Project):
-    pdb_project_pUUID : constr(max_length=32)=""
+    pdb_project_pUUID : constr(max_length=36)=""
     status : constr(max_length=10)="submitted"
 
     
@@ -454,7 +458,7 @@ class GpProject(Project):
 
 class GrProject(Project):
     uploaded_file_name : constr(max_length=255)=""
-    u_uuid : constr(max_length=32)=""
+    u_uuid : constr(max_length=36)=""
     upload_path :  constr(max_length=255)=""
 
     def __init__(self, **data : Any):
@@ -469,7 +473,7 @@ class MdProject(Project):
     pdb_file_name  : constr(max_length=255) = " "
     mmcif_file_name : constr(max_length=255) = " "
     off_file_name : constr(max_length=255)  = " "
-    u_uuid : constr(max_length=32) = " "
+    u_uuid : constr(max_length=36) = " "
     water_model : constr(max_length=10) = "TIP-3P"
     sim_length : constr(max_length=5) = '100'
     notify : bool =True
