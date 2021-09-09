@@ -5,7 +5,7 @@ echo """
 Number of tests found: ${required_passing_tests}
 Beginning testing.
 """
-
+START=$SECONDS
 run_test() 
 {
     sh $1
@@ -26,15 +26,26 @@ for i in $(/bin/ls *.test.*.sh) ; do
 	tests_attempted=$((tests_attempted+1))
 	if run_test ${i} ; then tests_passed=$((tests_passed+1)); fi
 done
+
+END=$SECONDS
+TESTING_TIME=$((END - START))
+MIN=$((TESTING_TIME/60%60))
+SEC=$((TESTING_TIME%60))
+
 echo """
 $tests_attempted tests were attempted
 $tests_passed tests passed 
 $required_passing_tests were required"
+echo "
+Testing time: "$MIN:$SEC
+
+
+
 
 if [ "$tests_passed" -ge "$required_passing_tests" ]; then 
-    #echo "The required number of tests passed"
+    echo "The required number of tests passed"
     exit 0
 else
-    #echo "Some required tests did not pass."
+    echo "Some required tests did not pass."
     exit 1
 fi

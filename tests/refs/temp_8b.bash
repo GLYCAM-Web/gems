@@ -18,7 +18,7 @@ Testing delegator using a sequence request with specified conformers.
 "
 run_existingBuild_test() 
 {
-	#cat $inputJson | $GEMSHOME/bin/delegate > git-ignore-me_temp_out_8b.json
+	cat $inputJson | $GEMSHOME/bin/delegate > git-ignore-me_temp_out_8b.json
 	pUUID=$(grep -m 1  pUUID git-ignore-me_temp_out_8b.json | cut -d '"' -f4)
 
 	echo "Trying to get the symlnked file the original way"
@@ -33,9 +33,11 @@ run_existingBuild_test()
 	echo "changing dir to :"
 	echo "${gemsBuildPath}/${pUUID}/Existing_Builds/"
 	cd "${gemsBuildPath}/${pUUID}/Existing_Builds/"
-	echo "Listing long"
-	ls -l
+	echo "Listing long:"
+	ls -la 
 	currentOutput="${conformerID}/min-t5p.pdb"
+
+
 	if ! cmp $currentOutput $correctOutput > /dev/null 2>&1; then
 		echo "Test FAILED!" 
 	else 
@@ -46,11 +48,13 @@ run_existingBuild_test()
 	echo "changing dir to :"
 	echo "${gemsBuildPath}/${pUUID}/Existing_Builds/${conformerID}"
 	cd "${gemsBuildPath}/${pUUID}/Existing_Builds/${conformerID}"
-	echo "Listing long"
-	ls -l
+	echo "Listing long:"
+	ls -la 
 	currentOutput="min-t5p.pdb"
 	if ! cmp $currentOutput $correctOutput > /dev/null 2>&1; then
 		echo "Test FAILED!" 
+		echo "currentOutput:"
+		echo $currentOutput
 	else 
 		echo "Test passed." 
 	fi
