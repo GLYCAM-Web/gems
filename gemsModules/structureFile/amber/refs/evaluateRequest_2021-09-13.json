@@ -1,0 +1,65 @@
+{
+    "entity": {
+        "type": "StructureFile",
+        "services": {
+            "evaluate": {
+                "type": "Evaluate"
+            }
+        },
+        "inputs": {
+            "pdb_file_name": "structure.pdb"
+        }
+    },
+    "options": {
+        "preprocessor_options": {
+            "targetModule": "amber"
+        }
+    },
+    "project": {
+        "id": "aed5ce9a-673f-4be0-b35b-a1d6627afe3d",
+        "pUUID": "",
+        "title": "",
+        "comment": "",
+        "timestamp": "",
+        "gems_timestamp": "",
+        "project_type": "pdb",
+        "parent_entity": "StructureFile",
+        "requested_service": "project",
+        "entity_id": "structureFile",
+        "service_id": "pdb",
+        "filesystem_path": "",
+        "compute_cluster_filesystem_path": "",
+        "service_dir": "",
+        "project_dir": "",
+        "logs_dir": "",
+        "requesting_agent": "",
+        "has_input_files": "True",
+        "site_version": "",
+        "site_branch": "",
+        "gems_version": "",
+        "gems_branch": "",
+        "md_utils_version": "",
+        "md_utils_branch": "",
+        "gmml_version": "",
+        "gmml_branch": "",
+        "gp_version": "",
+        "gp_branch": "",
+        "site_mode": "",
+        "site_host_name": "",
+        "versions_file_path": "",
+        "host_url_base_path": "",
+        "download_url_path": "",
+        "force_field": "default",
+        "parameter_version": "default",
+        "amber_version": "default",
+        "json_api_version": "0.0.1",
+        "django_project_id": "",
+        "app": "project",
+        "uploaded_file_name": "structure.pdb",
+        "status": "submitted",
+        "u_uuid": "aed5ce9a-673f-4be0-b35b-a1d6627afe3d",
+        "upload_path": "/website/uploads/tools/pdb/git-ignore-me_userdata/aed5ce9a-673f-4be0-b35b-a1d6627afe3d",
+        "pdb_id": "",
+        "input_source": ""
+    }
+}
