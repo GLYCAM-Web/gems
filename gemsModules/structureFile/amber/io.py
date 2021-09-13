@@ -760,8 +760,9 @@ class Transaction(commonio.Transaction):
 
     def populate_transaction_in(self):
         log.info("structureFile Transaction populate_transaction_in() was called.")
-        log.debug("self.request_dict: " )
-        prettyPrint(self.request_dict)
+        ##The following debug lines are also sometimes useful, but normally redundant.
+        #log.debug("self.request_dict: " )
+        #prettyPrint(self.request_dict)
         self.transaction_in = structureFileTransactionSchema(**self.request_dict)
 
         self.initialize_transaction_out_from_transaction_in() 

@@ -23,7 +23,7 @@ def receive(receivedTransaction : amberIO.Transaction):
     log.debug("structureFile transaction.request_dict: " )
     # ## Ensure that our Transacation is the Sequence variety
     thisTransaction=amberIO.Transaction(receivedTransaction.incoming_string)
-    #prettyPrint(thisTransaction.request_dict)
+    prettyPrint(thisTransaction.request_dict)
     try:
         thisTransaction.populate_transaction_in()
     except Exception as e:
