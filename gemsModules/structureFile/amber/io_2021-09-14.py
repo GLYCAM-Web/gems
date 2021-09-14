@@ -7,7 +7,7 @@ from pydantic.schema import schema
 from gemsModules.common.loggingConfig import *
 from gemsModules.common import io as commonio
 from gemsModules.common.settings import SCHEMA_DIR
-from gemsModules.project import dataio as projectIO
+from gemsModules.project import dataio as projectio
 from gemsModules.project import projectUtil as projectUtil
 from gemsModules.structureFile.amber.logic import*
 import traceback
@@ -480,7 +480,6 @@ class ReplacedHydrogen(BaseModel):
 
 
 ## Services
-##  @brief This should only be instantiated after uploading/sideloading is finished.
 class EvaluationOutput(BaseModel):
     # PreprocessingOptions
     preprocessingOptions : List[Union[
@@ -491,7 +490,7 @@ class EvaluationOutput(BaseModel):
             DisulfideBond,
             ChainTermination,
             ReplacedHydrogen        
-        ]] = None
+        ]] = []
 
     # Data about the tables    
     tableMetadata : List[Union[
@@ -502,7 +501,7 @@ class EvaluationOutput(BaseModel):
             DisulfideBondsTableMetadata,
             ChainTerminationsTableMetadata,
             ReplacedHydrogensTableMetadata
-        ]] = None
+        ]] = []
 
     def __init__(self, uploadFile):
         super().__init__()
@@ -683,7 +682,7 @@ class StructureFileInputs(BaseModel):
     pdb_ID : str = ""
 
 class StructureFileOutputs(BaseModel):
-    evaluationOutput : EvaluationOutput = None 
+    structureFileEvaluationOutput : EvaluationOutput = None 
 
 
 
@@ -741,7 +740,6 @@ class StructureFileEntity(commonio.Entity):
     services : Dict[str, StructureFileService] = {}
     inputs : StructureFileInputs =  {}
     outputs : StructureFileOutputs =  None
-    
 
     def __init__(self, **data: Any):
         super().__init__(**data)
@@ -749,50 +747,31 @@ class StructureFileEntity(commonio.Entity):
         log.debug("entityType: " + self.entityType)
 
 
-## @brief Override TransactionSchema, setting this entity to StructureFile
-class StructureFileTransactionSchema(commonio.TransactionSchema):
-    entity : StructureFileEntity = ...
-    project : projectIO.PdbProject = None
+class structureFileTransactionSchema(commonio.TransactionSchema):
+    entity : StructureFileEntity = None
 
     def __init__(self, **data : Any):
         super().__init__(**data)
 
-##  @brief Transactions for PDB Preprocessing.
-##  @detail Transaction schema contains entity, options, notices, and projects
-class PdbTransaction(commonio.Transaction):
-    #Request
-    transaction_in : StructureFileTransactionSchema 
-    #Response
-    transaction_out : StructureFileTransactionSchema
+
+class Transaction(commonio.Transaction):
+    transaction_in : structureFileTransactionSchema 
+    transaction_out : structureFileTransactionSchema
 
     def populate_transaction_in(self):
-        log.info("Initializing a PdbTransaction.")
-        try:
-            self.transaction_in = StructureFileTransactionSchema(**self.request_dict)
-            self.initialize_transaction_out_from_transaction_in() 
-        except Exception as error:
-            log.error("There was a problem building the StructureFileTransaction: " + str(error))
-            log.error(traceback.format_exc())
-            raise error
+        log.info("structureFile Transaction populate_transaction_in() was called.")
+        ##The following debug lines are also sometimes useful, but normally redundant.
+        #log.debug("self.request_dict: " )
+        #prettyPrint(self.request_dict)
+        self.transaction_in = structureFileTransactionSchema(**self.request_dict)
 
+        self.initialize_transaction_out_from_transaction_in() 
 
-    # ## @brief Copies request input into transaction object, before providing services
-    # def populate_transaction_in(self):
-    #     log.info("structureFile Transaction populate_transaction_in() was called.")
-    #     ##The following debug lines are also sometimes useful, but normally redundant.
-    #     #log.debug("self.request_dict: " )
-    #     #prettyPrint(self.request_dict)
-    #     self.transaction_in = StructureFileTransactionSchema(**self.request_dict)
-
-    #     self.initialize_transaction_out_from_transaction_in() 
-
-    ## @brief Gets started on the output, before providing services.
     def initialize_transaction_out_from_transaction_in(self) :
         log.info("structureFile - Transaction.initialize_transaction_out_from_transaction_in was called")
         self.transaction_out=self.transaction_in.copy(deep=True)
         log.debug("The transaction_out is: " )
         log.debug(self.transaction_out.json(indent=2))
-
 
     def createStructureFileResponse(self, serviceType, inputs, outputs):
         log.info("createStructureFileResponse() was called.")
