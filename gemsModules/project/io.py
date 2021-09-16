@@ -432,14 +432,14 @@ class PdbProject(Project):
     upload_path : constr(max_length=255)=""
     pdb_id : constr(max_length=4)=""
     input_source : constr(max_length=25)=""
+    has_input_files : bool = True
+    project_type : constr(max_length=25)='pdb'
+    parent_entity : constr(max_length=25)="StrucureFile"
+    entity_id : constr(max_length=25)="structurefile"
+    service_id : constr(max_length=25)="pdb"
 
-    def __init__(self, **data : Any):
-       super().__init__(**data)
-       self.has_input_files = True
-       self.project_type = 'pdb'
-       self.parent_entity = "StrucureFile"
-       self.entity_id = "structurefile"
-       self.service_id = "pdb"
+
+       
 
 
 class GpProject(Project):
