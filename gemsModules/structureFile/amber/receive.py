@@ -25,23 +25,7 @@ else:
 ##  Evaluate a pdb for use with Amber.
 #   @param thisTransaction A request containing either the path to an uploaded pdb, or a pdbID for sideloading.
 def evaluatePdb(thisTransaction : commonio.Transaction):
-    log.info("evaluatePdb() was called.\n")
-    try:
-        ### Some projects will already have been created. 
-        #   However, these two conditions need new projects.
-        if thisTransaction.response_dict == None: 
-            project = startProject(thisTransaction)
-        elif 'project' not in thisTransaction.response_dict.keys():
-            project = startProject(thisTransaction)
-        else:
-            log.debug("response_dict or project already exists, not starting a project.")
-
-        prettyPrint(thisTransaction.request_dict)
-
-    except Exception as error:
-        log.error("There was a problem starting a pdb project." + str(error))
-        log.error(traceback.format_exc())
-        raise error
+    log.info("evaluatePdb() was called.")
 
     log.debug("\n\nthisTransaction.response_dict: " + str(thisTransaction.response_dict))
     uploadedFileName = thisTransaction.response_dict['project']['uploaded_file_name']
