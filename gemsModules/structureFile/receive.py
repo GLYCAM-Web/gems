@@ -26,16 +26,8 @@ def receive(receivedTransaction : commonIO.Transaction):
     try:
         # ## Ensure that our Transacation is the Sequence variety
         pdbTransaction=amberIO.PdbTransaction(receivedTransaction.incoming_string)
-        
-        # log.debug("receivedTransaction: " + str(receivedTransaction))
-        # log.debug("Transaction:")
-        # log.debug(dir(receivedTransaction))
         log.debug("request_dict: ")
         prettyPrint(pdbTransaction.request_dict)
-        # log.debug("pdbTransaction: " + str(pdbTransaction))
-        # log.debug("pdbTransaction:")
-        # log.debug(dir(pdbTransaction))
-
     except Exception as e:
         log.error("There was a problem instantiating the PdbTransaction: " + str(e))
         log.error(traceback.format_exc())
@@ -50,7 +42,39 @@ def receive(receivedTransaction : commonIO.Transaction):
         pdbTransaction.generateCommonParserNotice(noticeBrief='UnknownError')
         return
 
-    ## TODO: need to call the service.
+    try:
+        services = pdbTransaction.request_dict['entity']['services']
+        for key in services.keys():
+            requestedService = services[key]['type']
+            if requestedService not in structureFileSettings.serviceModules.keys():
+                log.error("The requested service is not recognized.")
+                log.error("services: " + str(structureFileSettings.serviceModules.keys()))
+                thisTransaction.generateCommonParserNotice(noticeBrief='ServiceNotKnownToEntity')
+                raise AttributeError(requestedService)
+            elif requestedService == "Evaluate":
+                ## start a project here.
+                ## TODO!!!!!!!!!!!!!!!
+                ## Add sideloading back in. See amber/logic.py sideloadPdbFromRcsb()
+                ## evaluatePdb service will require:
+                ##  uploaded_file_name
+                ##   
+                try:
+                    evaluatePdb(receivedTransaction)
+                except Exception as error:
+                    log.error("There was a problem evaluating the pdb: " + str(error))
+                    thisTransaction.generateCommonParserNotice(noticeBrief='Failed to evaluate')
+                    raise AttributeError(requestedService)
+            else:
+                log.error("Still developing services for the structureFile gemsModule.")
+
+
+
+    except Exception as e:
+        log.error("There was a problem populating the the PdbTransaction in: " + str(e))
+        log.error(traceback.format_exc())
+        pdbTransaction.generateCommonParserNotice(noticeBrief='UnknownError')
+        return
+
     return pdbTransaction
 
             
