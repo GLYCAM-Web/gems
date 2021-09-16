@@ -811,7 +811,7 @@ class Transaction(commonio.Transaction):
         log.debug(self.transaction_in.json(indent=2))
 
     def initialize_transaction_out_from_transaction_in(self) :
-        log.info("sequence - Transaction.initialize_transaction_out_from_transaction_in was called")
+        log.info("initialize_transaction_out_from_transaction_in was called")
         self.transaction_out=self.transaction_in.copy(deep=True)
         log.debug("The transaction_out is: " )
         log.debug(self.transaction_out.json(indent=2))
