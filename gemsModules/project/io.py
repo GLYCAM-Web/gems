@@ -438,6 +438,11 @@ class PdbProject(Project):
     entity_id : constr(max_length=25)="structurefile"
     service_id : constr(max_length=25)="pdb"
 
+    def setUploadFile(self, uploadFile:str):
+        log.info("PdbProject setUploadFile was called.")
+        log.debug("uploadFile: " + uploadFile)
+        self.uploaded_file_name = uploadFile
+
 
        
 
