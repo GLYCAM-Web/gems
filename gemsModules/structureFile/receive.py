@@ -32,7 +32,7 @@ def receive(receivedTransaction : commonIO.Transaction):
     except Exception as e:
         log.error("There was a problem instantiating the PdbTransaction: " + str(e))
         log.error(traceback.format_exc())
-        pdbTransaction.generateCommonParserNotice(noticeBrief='UnknownError')
+        pdbTransaction.generateCommonParserNotice(noticeBrief='Failed to instantiate PdbTransaction')
         return
 
     try:    
@@ -40,8 +40,17 @@ def receive(receivedTransaction : commonIO.Transaction):
     except Exception as e:
         log.error("There was a problem populating the the PdbTransaction in: " + str(e))
         log.error(traceback.format_exc())
-        pdbTransaction.generateCommonParserNotice(noticeBrief='UnknownError')
+        pdbTransaction.generateCommonParserNotice(noticeBrief='Failed to populate transaction input')
         return
+
+    try:
+        pdbTransaction.initialize_transaction_out_from_transaction_in()
+        log.debug("pdbTransaction.transaction_out: " )
+        log.debug(pdbTransaction.transaction_out.json(indent=2))
+    except Exception as error :
+        log.error("There was a problem initializing the outgoing transaction : " + str(error))
+        log.error(traceback.format_exc())
+        raise error
 
     try:
         services = pdbTransaction.request_dict['entity']['services']
@@ -49,38 +58,33 @@ def receive(receivedTransaction : commonIO.Transaction):
         for key in services.keys():
             requestedService = services[key]['type']
 
-
             if requestedService not in structureFileSettings.serviceModules.keys():
                 log.error("The requested service is not recognized.")
                 log.error("services: " + str(structureFileSettings.serviceModules.keys()))
-                thisTransaction.generateCommonParserNotice(noticeBrief='ServiceNotKnownToEntity')
+                pdbTransaction.generateCommonParserNotice(noticeBrief='Service Not Known To Entity')
                 raise AttributeError(requestedService)
 
             elif requestedService == "Evaluate":
-  
                 try:
-                    evaluatePdb(receivedTransaction)
+                    evaluatePdb(pdbTransaction)
                 except Exception as error:
                     log.error("There was a problem evaluating the pdb: " + str(error))
-                    thisTransaction.generateCommonParserNotice(noticeBrief='Failed to evaluate')
+                    pdbTransaction.generateCommonParserNotice(noticeBrief='Failed to evaluate')
                     raise AttributeError(requestedService)
 
 
             elif requestedService == "PreprocessPdbForAmber":
                 try:
-                    preprocessPdbForAmber(receivedTransaction)
+                    preprocessPdbForAmber(pdbTransaction)
                 except Exception as error:
                     log.error("There was a problem evaluating the pdb: " + str(error))
-                    thisTransaction.generateCommonParserNotice(noticeBrief='Failed to preprocess.')
+                    pdbTransaction.generateCommonParserNotice(noticeBrief='Failed to preprocess.')
                     raise AttributeError(requestedService)
             else:
                 log.error("The requested service is not recognized.")
                 log.error("services: " + str(structureFileSettings.serviceModules.keys()))
-                thisTransaction.generateCommonParserNotice(noticeBrief='ServiceNotKnownToEntity')
+                pdbTransaction.generateCommonParserNotice(noticeBrief='ServiceNotKnownToEntity')
                 raise AttributeError(requestedService)
-
-
-
 
     except Exception as e:
         log.error("There was a problem identifying the requested service" + str(e))

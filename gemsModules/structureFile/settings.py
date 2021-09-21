@@ -20,12 +20,10 @@ servicesStatus = [
         "service" : "PreprocessPdbForAmber",
         "status" : "In development.",
         "statusDetail" : "In development."
-
     }
 ]
 
 serviceModules = {
     'Evaluate' : 'evaluate',
     'PreprocessPdbForAmber' : 'preprocessPdbForAmber'
-
 }

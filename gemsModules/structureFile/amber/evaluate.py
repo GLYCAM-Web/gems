@@ -13,20 +13,47 @@ else:
 def evaluatePdb(receivedTransaction : amberIO.Transaction):
     log.info("evaluatePdb() was called. Still in development!!!")
 
-    ## start a project here.
-    ## TODO!!!!!!!!!!!!!!!
-    ## Add sideloading back in. See amber/logic.py sideloadPdbFromRcsb()
-    ## evaluatePdb service will require:
-    ##  uploaded_file_name
-    ## 
+    try:
+        #
+        inputs = receivedTransaction.request_dict['entity']['inputs']
+        log.debug("inputs.keys(): " + str(inputs.keys()))
+        if 'pdb_file_name' in inputs.keys():
+            uploadFile = inputs['pdb_file_name']
+        elif 'pdb_ID' in inputs.keys():
+            uploadFile = sideloadPdbFromRcsb(inputs['pdb_ID'])
+    except Exception as error:
+        log.error("There was a problem finding the input in the evaluate PDB request: " + str(error))
+        log.error(traceback.format_exc())
+        raise error
 
-    log.debug("\n\nreceivedTransaction.response_dict: " + str(receivedTransaction.response_dict))
-    uploadedFileName = receivedTransaction.response_dict['project']['uploaded_file_name']
-    log.debug("uploadedFileName: " + uploadedFileName)
+    try:
+        if receivedTransaction.transaction_out.project is None:
+            log.debug("Starting a new project for transaction_out.")
+            receivedTransaction.transaction_out.project = gemsModules.project.io.PdbProject()
+        else:
+            log.debug("receivedTransaction.transaction_out.project: " + str(receivedTransaction.transaction_out.project))
 
-    projectDir = receivedTransaction.response_dict['project']['project_dir']
-    uploadFile = projectDir + "/uploads/" + uploadedFileName
-    log.debug("uploadFile: " + uploadFile)
+        pdbProject = receivedTransaction.transaction_out.project 
+        log.debug("pdbProject: " + repr(pdbProject))
+        pdbProject.setFilesystemPath()
+        pdbProject.loadVersionsFileInfo()
+        pdbProject.setUploadFile(uploadFile)
+        log.debug("pdbProject: " + repr(pdbProject))
+
+    except Exception as error:
+        log.error("There was a problem starting a PdbProject: " + str(error))
+        log.error(traceback.format_exc())
+        raise error
+
+    # log.debug("\n\nreceivedTransaction.response_dict: " + str(receivedTransaction.response_dict))
+    # ##TODO:
+    # ## This is now an input
+    # uploadedFileName = receivedTransaction.response_dict['project']['uploaded_file_name']
+    # log.debug("uploadedFileName: " + uploadedFileName)
+
+    # projectDir = receivedTransaction.response_dict['project']['project_dir']
+    # uploadFile = projectDir + "/uploads/" + uploadedFileName
+    # log.debug("uploadFile: " + uploadFile)
 
 
     ### generate the processed pdb's content

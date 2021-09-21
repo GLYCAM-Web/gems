@@ -507,12 +507,18 @@ class EvaluationOutput(BaseModel):
 
     def __init__(self, uploadFile):
         super().__init__()
-        log.info("Intantiating a EvaluationOutput")
-        aminoLibs = getDefaultAminoLibs()
-        prepFile = getDefaultPrepFile()
-        glycamLibs = gmml.string_vector()
-        otherLibs = gmml.string_vector()
-        preprocessor = gmml.PdbPreprocessor()
+        try:
+            log.info("Evaluating a PDB file")
+            aminoLibs = getDefaultAminoLibs()
+            prepFile = getDefaultPrepFile()
+            glycamLibs = gmml.string_vector()
+            otherLibs = gmml.string_vector()
+            preprocessor = gmml.PdbPreprocessor()
+        except Exception as error:
+            log.error("There was a problem loading gmml resources: " + str(error))
+            log.error(traceback.format_exc())
+            raise error
+
 
         ## need a pdb file object.
         try:
