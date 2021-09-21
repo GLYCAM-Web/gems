@@ -6,7 +6,7 @@ from gemsModules.common.services import *
 from gemsModules.common.transaction import * # might need whole file...
 from gemsModules.common.loggingConfig import *
 from gemsModules.project.projectUtil import *
-from gemsModules.structureFile.amber.receive import *
+from gemsModules.structureFile.amber.preprocess import preprocessPdbForAmber
 import gemsModules.conjugate.settings as conjugateSettings
 import subprocess
 import urllib.request

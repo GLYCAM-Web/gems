@@ -6,7 +6,8 @@ from gemsModules.common.logic import updateResponse
 from gemsModules.common import io as commonIO
 from gemsModules.project.projectUtil import *
 from gemsModules.common.loggingConfig import *
-from gemsModules.structureFile.amber.receive import preprocessPdbForAmber, evaluatePdb
+from gemsModules.structureFile.amber.evaluate import evaluatePdb
+from gemsModules.structureFile.amber.preprocess import preprocessPdbForAmber
 from gemsModules.structureFile.amber import io as amberIO
 import gemsModules.structureFile.settings as structureFileSettings
 import traceback
@@ -44,33 +45,45 @@ def receive(receivedTransaction : commonIO.Transaction):
 
     try:
         services = pdbTransaction.request_dict['entity']['services']
+        ## Keys at this level are allowed to be arbitrary, so dig for recognized types.
         for key in services.keys():
             requestedService = services[key]['type']
+
+
             if requestedService not in structureFileSettings.serviceModules.keys():
                 log.error("The requested service is not recognized.")
                 log.error("services: " + str(structureFileSettings.serviceModules.keys()))
                 thisTransaction.generateCommonParserNotice(noticeBrief='ServiceNotKnownToEntity')
                 raise AttributeError(requestedService)
+
             elif requestedService == "Evaluate":
-                ## start a project here.
-                ## TODO!!!!!!!!!!!!!!!
-                ## Add sideloading back in. See amber/logic.py sideloadPdbFromRcsb()
-                ## evaluatePdb service will require:
-                ##  uploaded_file_name
-                ##   
+  
                 try:
                     evaluatePdb(receivedTransaction)
                 except Exception as error:
                     log.error("There was a problem evaluating the pdb: " + str(error))
                     thisTransaction.generateCommonParserNotice(noticeBrief='Failed to evaluate')
                     raise AttributeError(requestedService)
+
+
+            elif requestedService == "PreprocessPdbForAmber":
+                try:
+                    preprocessPdbForAmber(receivedTransaction)
+                except Exception as error:
+                    log.error("There was a problem evaluating the pdb: " + str(error))
+                    thisTransaction.generateCommonParserNotice(noticeBrief='Failed to preprocess.')
+                    raise AttributeError(requestedService)
             else:
-                log.error("Still developing services for the structureFile gemsModule.")
+                log.error("The requested service is not recognized.")
+                log.error("services: " + str(structureFileSettings.serviceModules.keys()))
+                thisTransaction.generateCommonParserNotice(noticeBrief='ServiceNotKnownToEntity')
+                raise AttributeError(requestedService)
+
 
 
 
     except Exception as e:
-        log.error("There was a problem populating the the PdbTransaction in: " + str(e))
+        log.error("There was a problem identifying the requested service" + str(e))
         log.error(traceback.format_exc())
         pdbTransaction.generateCommonParserNotice(noticeBrief='UnknownError')
         return
