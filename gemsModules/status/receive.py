@@ -164,10 +164,10 @@ def main():
             inputFile = sys.argv[1]
         else:
             #print("got an arg that is not a filename: " + sys.argv[1])
-            inputFile = GemsPath + "/gemsModules/delegator/test_in/statusReport_All.json"
+            inputFile = GemsPath + "/gemsModules/delegator/test_in/status/statusReport_All.json"
     else:
         #print("no argv was offered.")
-        inputFile = GemsPath + "/gemsModules/delegator/test_in/statusReport_All.json"
+        inputFile = GemsPath + "/gemsModules/delegator/test_in/status/statusReport_All.json"
 
     #print("using the default inputFile: " + inputFile)
     #print(os.listdir("../../delegator/test_in/"))
