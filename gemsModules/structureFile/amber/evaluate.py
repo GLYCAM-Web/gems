@@ -1,5 +1,6 @@
 from gemsModules.structureFile.amber import io as amberIO
 from gemsModules.common.loggingConfig import *
+from gemsModules.common.logic import prettyPrint, updateResponse
 import traceback
 
 if loggers.get(__name__):
@@ -13,6 +14,7 @@ else:
 def evaluatePdb(receivedTransaction : amberIO.Transaction):
     log.info("evaluatePdb() was called. Still in development!!!")
 
+    ## Grab the input
     try:
         #
         inputs = receivedTransaction.request_dict['entity']['inputs']
@@ -26,6 +28,7 @@ def evaluatePdb(receivedTransaction : amberIO.Transaction):
         log.error(traceback.format_exc())
         raise error
 
+    # Ensure a project exists
     try:
         if receivedTransaction.transaction_out.project is None:
             log.debug("Starting a new project for transaction_out.")
@@ -45,23 +48,16 @@ def evaluatePdb(receivedTransaction : amberIO.Transaction):
         log.error(traceback.format_exc())
         raise error
 
-    # log.debug("\n\nreceivedTransaction.response_dict: " + str(receivedTransaction.response_dict))
-    # ##TODO:
-    # ## This is now an input
-    # uploadedFileName = receivedTransaction.response_dict['project']['uploaded_file_name']
-    # log.debug("uploadedFileName: " + uploadedFileName)
-
-    # projectDir = receivedTransaction.response_dict['project']['project_dir']
-    # uploadFile = projectDir + "/uploads/" + uploadedFileName
-    # log.debug("uploadFile: " + uploadFile)
 
 
-    ### generate the processed pdb's content
+    ### Generate the processed pdb's content
     try:
-        output = amberIO.EvaluationOutput(uploadFile)
-        outputDict = output.dict(by_alias=True)
-        log.debug("outputDict: \n\n")
-        prettyPrint(outputDict)
+        evaluator = amberIO.Evaluator()
+        output = evaluator.doEvaluation(uploadFile)
+        log.debug("output obj type: " + str(type(output)))
+        outputDict = output.__dict__
+        log.debug("outputDict: " + str(outputDict))
+
     except Exception as error:
         log.error("There was a problem evaluating the uploaded file: " + str(error))
         log.error(traceback.format_exc())
@@ -69,20 +65,18 @@ def evaluatePdb(receivedTransaction : amberIO.Transaction):
 
     ## Add the output to the response.
     try:
-        inputs = []
-        inputs.append(uploadedFileName)
         outputs = []
         outputs.append(outputDict)
         log.debug("Attempting to build the response.")
-        log.debug("inputs: " + repr(inputs))
-        log.debug("outputs: " + repr(outputs))
-        responseObj = amberIO.ServiceResponse("Evaluate", inputs=inputs, outputs=outputs)
+        responseObj = amberIO.StructureFileResponse("Evaluate", inputs=inputs, outputs=outputs)
+        log.debug("responseObj type: " + str(type(responseObj)))
+        log.debug("responseObj: " + repr(responseObj))
+        receivedTransaction.transaction_out.entity.outputs = responseObj
     except Exception as error:
         log.error("There was a problem building an evaluation response: " + str(error))
         log.error(traceback.format_exc())
         raise error
 
-    updateResponse(receivedTransaction, responseObj.dict(by_alias=True))
     try:
         log.debug("About to build the outgoing string.")
         receivedTransaction.build_outgoing_string()
