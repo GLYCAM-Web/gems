@@ -1,0 +1,13 @@
+{
+    "entity": {
+        "type": "StructureFile",
+        "services": {
+            "Preprocess": {
+                "type": "PreprocessPdbForAmber"
+            }
+        },
+        "inputs": {
+            "pdb_ID": "1EER"
+        }
+    }
+}

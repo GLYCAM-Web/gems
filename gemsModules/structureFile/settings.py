@@ -8,28 +8,22 @@ WhoIAm='StructureFile'
 
 ##Status Report
 status = "Dev"
-moduleStatusDetail = "PDB Pre-processing for Amber currently in development."
+moduleStatusDetail = "PDB Pre-processing for Amber currently in development. Writing evaluate service."
 
 servicesStatus = [
-    {
-        "service" : "PreprocessPdbForAmber",
-        "status" : "In queue for development.",
-        "statusDetail" : "Queued for after Evaluate service."
-    },
     {
         "service" : "Evaluate",
         "status" : "In development.",
         "statusDetail" : "In development. Currently fails to return a valid response. Queued for after Schema service."
     },
     {
-        "service" : "Schema",
+        "service" : "PreprocessPdbForAmber",
         "status" : "In development.",
-        "statusDetail" : "In active development."
+        "statusDetail" : "In development."
     }
 ]
 
 serviceModules = {
-    'PreprocessPdbForAmber' : 'preprocessPdbForAmber',
     'Evaluate' : 'evaluate',
-    'Schema' : 'schema'
+    'PreprocessPdbForAmber' : 'preprocessPdbForAmber'
 }
