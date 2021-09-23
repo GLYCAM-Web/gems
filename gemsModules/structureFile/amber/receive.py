@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os, sys, importlib.util
 import pathlib
 import urllib.request

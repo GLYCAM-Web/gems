@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 from gemsModules import common
 from gemsModules.common.transaction import *
 from gemsModules.common.loggingConfig import *
@@ -13,6 +14,11 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__)
 
+
+##Root for all mounted volumes that are for sharing data across containers
+DEFAULT_DATA_ROOT =  '/website/'
+CURRENT_STABLE_VERSION = '0.0.1'
+SCHEMA_DIR = os.path.join(DEFAULT_DATA_ROOT, 'SCHEMA', CURRENT_STABLE_VERSION)
 
 ## Who I am
 WhoIAm='CommonServicer'
