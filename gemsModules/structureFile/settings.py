@@ -27,3 +27,11 @@ serviceModules = {
     'Evaluate' : 'evaluate',
     'PreprocessPdbForAmber' : 'preprocessPdbForAmber'
 }
+
+
+## Is this the best place for these?
+amino_libs = "gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/amino12.lib",
+glycam_libs = "gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminont12.lib",
+other_libs = "gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminoct12.lib" 
+prep_file = "gmml/dat/CurrentParams/leaprc_GLYCAM_06j-1_2014-03-14/GLYCAM_06j-1.prep"
+
