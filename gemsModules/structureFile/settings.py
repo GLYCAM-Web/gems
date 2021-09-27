@@ -28,6 +28,12 @@ serviceModules = {
     'PreprocessPdbForAmber' : 'preprocessPdbForAmber'
 }
 
+# ## Services
+# ##
+class Services(str,Enum):
+    evaluate = 'Evaluate'
+    status = 'Status'
+    preprocessPdbForAmber = 'PreprocessPdbForAmber'
 
 ## Is this the best place for these?
 amino_libs = "gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/amino12.lib",
