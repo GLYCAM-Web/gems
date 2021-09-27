@@ -11,7 +11,7 @@ else:
 
 ##  Evaluate a pdb for use with Amber.
 #   @param receivedTransaction A request containing either the path to an uploaded pdb, or a pdbID for sideloading.
-def evaluatePdb(receivedTransaction : amberIO.Transaction):
+def evaluatePdb(receivedTransaction : amberIO.PdbTransaction):
     log.info("evaluatePdb() was called. Still in development!!!")
 
     ## Grab the input
