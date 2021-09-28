@@ -6,11 +6,15 @@ Number of tests found: ${required_passing_tests}
 Beginning testing.
 """
 START=$SECONDS
+export badOutDir='bad_outputs'
 run_test() 
 {
     sh $1
     return $?
 }
+if [ ! -d ${badOutDir} ] ; then
+	mkdir -p ${badOutDir}
+fi
 
 ##
 ##   To disable a test:
@@ -44,6 +48,8 @@ Testing time: "$MIN:$SEC
 
 if [ "$tests_passed" -ge "$required_passing_tests" ]; then 
     echo "The required number of tests passed"
+    echo "removing bad outputs directory"
+    rm -rf ${badOutDir}
     exit 0
 else
     echo "Some required tests did not pass."
