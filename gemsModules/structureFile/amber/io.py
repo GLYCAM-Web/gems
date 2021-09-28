@@ -6,11 +6,13 @@ from pydantic import BaseModel, Field, ValidationError, validator
 from pydantic.schema import schema
 from gemsModules.common.loggingConfig import *
 from gemsModules.common import io as commonIO
-import gemsModules.common.logic as commonLogic
+from gemsModules.common.logic import prettyPrint
 from gemsModules.common.settings import SCHEMA_DIR
+from gemsModules.common.services import roundHalfUp
 from gemsModules.project import io as projectIO
 from gemsModules.project import projectUtil as projectUtil
-from gemsModules.structureFile import settings
+from gemsModules.structureFile import settings as structureFileSettings
+from gemsModules.structureFile.amber import settings as amberSettings
 import gmml, traceback
 
 if loggers.get(__name__):
@@ -475,73 +477,44 @@ class Evaluator:
     aminoLibs : gmml.string_vector = None
     prepFile : gmml.string_vector = None
     glycamLibs : gmml.string_vector = None
-    glycamLibs : gmml.string_vector = None
+    otherLibs : gmml.string_vector = None
     preprocessor : gmml.PdbPreprocessor = None
 
     pdbFileObj : gmml.PdbFile = None
 
     preprocessingOptions = []
     metadata = []
-
-    ## A method for providing default Amino libs
-    ##TODO:  Move these paths to settings
-    #   @param gemsHome
-    def loadDefaultAminoLibs(self):
-        log.info("getDefaultAminoLibs() was called.\n")
-
-        try:
-            gemsHome = commonLogic.getGemsHome()
-            log.debug("gemsHome: " + gemsHome)
-        except Exception as error:
-            log.error("There was a problem getting GEMSHOME.")
-            raise error
-
-        self.amino_libs = gmml.string_vector()
-        self.amino_libs.push_back(gemsHome + "/gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/amino12.lib")
-        self.amino_libs.push_back(gemsHome + "/gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminont12.lib")
-        self.amino_libs.push_back(gemsHome + "/gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminoct12.lib")
-
-        for item in self.amino_libs:
-            log.debug("amino_libs item: " + str(item))
-
-
-    ##Prep file
-    ## TODO: Move the prep file location to settings.
-    def loadDefaultPrepFile(self):
-        log.info("getDefaultPrepFile() was called.\n")
-
-        try:
-            gemsHome = commonLogic.getGemsHome()
-            log.debug("gemsHome: " + gemsHome)
-        except Exception as error:
-            log.error("There was a problem getting GEMSHOME.")
-            raise error
-        
-        self.prepFile = gmml.string_vector()
-        self.prepFile.push_back(gemsHome + "/gmml/dat/CurrentParams/leaprc_GLYCAM_06j-1_2014-03-14/GLYCAM_06j-1.prep")
-        for item in self.prepFile:
-            log.debug("prepFile item: " + str(item))
-
     
     def load_gmml_resources(self):
         log.info("__load_gmml_resources() was called.")
+        
         try:
             log.info("Evaluating a PDB file")
-            self.loadDefaultAminoLibs()
-            self.loadDefaultPrepFile()
+            self.aminoLibs = gmml.string_vector()
+            self.aminoLibs.push_back(amberSettings.AMINO_LIBS)
+
+            self.prepFile = gmml.string_vector()
+            self.prepFile.push_back(amberSettings.PREP_FILE)
+
             self.glycamLibs = gmml.string_vector()
+            self.glycamLibs.push_back(amberSettings.GLYCAM_LIBS)
+
             self.otherLibs = gmml.string_vector()
+            self.otherLibs.push_back(amberSettings.OTHER_LIBS)
+
             self.preprocessor = gmml.PdbPreprocessor()
         except Exception as error:
             log.error("There was a problem loading gmml resources: " + str(error))
             log.error(traceback.format_exc())
             raise error
 
+    ## Only meant to be used in this class. Python automatically throws an error if methods
+    #   that begin with 2 underscores are called from other files.
     def __load_pdb_file(self, uploadFile):
         log.info("__load_pdb_file() was called.")
         # need a pdb file object.
         try:
-            log.debug("working dir: " + os.getcwd())
+            #log.debug("working dir: " + os.getcwd())
             self.pdbFileObj = gmml.PdbFile(uploadFile)
             log.debug("pdbFile: " + str(self.pdbFileObj))
         except Exception as error:
@@ -567,6 +540,23 @@ class Evaluator:
 
         ## need a preprocessor object.
         try:
+            log.debug("About to preprocess an unevaluated file.")
+            log.debug("Evaluator: ")
+            log.debug("pdbFileObj: " + str(self.pdbFileObj))
+
+            log.debug("aminoLibs:")
+            for item in self.aminoLibs:
+                log.debug(str(item))
+            log.debug("glycamLibs:")
+            for item in self.glycamLibs:
+                log.debug(str(item))
+            log.debug("otherLibs:")
+            for item in self.otherLibs:
+                log.debug(str(item))
+            log.debug("prepFile:")
+            for item in self.prepFile:
+                log.debug(str(item))
+
             ### GMML's Preprocess
             self.preprocessor.Preprocess(self.pdbFileObj, self.aminoLibs, self.glycamLibs, self.otherLibs, self.prepFile)
         except Exception as error:
@@ -825,7 +815,7 @@ class StructureFileResponse(BaseModel):
 
 
 class StructureFileService(commonIO.Service):
-    typename : settings.Services = Field(
+    typename : structureFileSettings.Services = Field(
         'Evaluate',
         alias='type',
         title = 'Requested Service',
@@ -842,7 +832,7 @@ class StructureFileService(commonIO.Service):
 
 class StructureFileEntity(commonIO.Entity):
     entityType : str = Field(
-        settings.WhoIAm,
+        structureFileSettings.WhoIAm,
         title='Type',
         alias='type'
     )

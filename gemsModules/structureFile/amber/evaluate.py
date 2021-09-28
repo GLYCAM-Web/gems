@@ -16,7 +16,6 @@ def evaluatePdb(receivedTransaction : amberIO.PdbTransaction):
 
     ## Grab the input
     try:
-        #
         inputs = receivedTransaction.request_dict['entity']['inputs']
         log.debug("inputs.keys(): " + str(inputs.keys()))
         if 'pdb_file_name' in inputs.keys():
@@ -37,12 +36,11 @@ def evaluatePdb(receivedTransaction : amberIO.PdbTransaction):
             log.debug("receivedTransaction.transaction_out.project: " + str(receivedTransaction.transaction_out.project))
 
         pdbProject = receivedTransaction.transaction_out.project 
-        log.debug("pdbProject: " + repr(pdbProject))
         pdbProject.setFilesystemPath()
         pdbProject.loadVersionsFileInfo()
         pdbProject.setUploadFile(uploadFile)
-        log.debug("pdbProject: " + repr(pdbProject))
-
+        log.debug("pdbProject: " )
+        prettyPrint(pdbProject.__dict__)
     except Exception as error:
         log.error("There was a problem starting a PdbProject: " + str(error))
         log.error(traceback.format_exc())

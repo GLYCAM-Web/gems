@@ -256,7 +256,7 @@ class Project(BaseModel):
             theDict = getVersionsFileInfo(self.versions_file_path)
             log.debug("The dictionary is : " + str(theDict))
             for k in theDict.keys() :
-                log.debug("k is : " + k)
+                #log.debug("k is : " + k)
                 setattr(self, k, theDict[k])
             log.debug("My contents are now: ")
             log.debug(self.json(indent=2))
