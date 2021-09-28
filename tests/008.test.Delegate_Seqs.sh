@@ -60,8 +60,20 @@ run_newBuild_test()
 		fi
 		echo "Waited $((count*sleepTime)) seconds so far." | tee -a $badOutput
 	done
+
 	if ! cmp $currentOutput $correctOutput > /dev/null 2>&1; then
-		echo "Test 008a FAILED!" | tee -a $badOutput
+		echo "Test 008a FAILED! Jack" | tee -a $badOutput
+		if  test -e "$correctOutput"  ; then
+			echo "correctOutput exists: $correctOutput"
+		else
+			echo "correctOutput is missing: $correctOutput"
+		fi
+
+		if  test -e "$currentOutput"  ; then
+			echo "currentOutput exists: $currentOutput"
+		else
+			echo "currentOutput is missing: $currentOutput"
+		fi
 		return 1;
 	else 
 		echo "Test 008a passed." 
