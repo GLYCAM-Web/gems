@@ -22,9 +22,9 @@ run_test()
 tests_attempted=0
 tests_passed=0
 for i in $(/bin/ls *.test.*.sh) ; do 
-	printf "Using test file:  ${i} \n"
-	tests_attempted=$((tests_attempted+1))
-	if run_test ${i} ; then tests_passed=$((tests_passed+1)); fi
+    printf "Using test file:  ${i} \n"
+    tests_attempted=$((tests_attempted+1))
+    if run_test ${i} ; then tests_passed=$((tests_passed+1)); fi
 done
 
 END=$SECONDS
