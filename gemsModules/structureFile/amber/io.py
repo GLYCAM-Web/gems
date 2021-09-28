@@ -473,7 +473,7 @@ class ReplacedHydrogen(BaseModel):
         result = result + "\npage: " + self.page
         return result
 
-class Evaluator:
+class PreprocessorManager:
     aminoLibs : gmml.string_vector = None
     prepFile : gmml.string_vector = None
     glycamLibs : gmml.string_vector = None
@@ -521,6 +521,63 @@ class Evaluator:
             log.error("There was a problem creating the pdbFile object from the uploaded pdb file: " + str(error))
             log.error(traceback.format_exc())
             raise error
+
+    ## For now, uses default resources. Need to update this to allow users to specify things 
+    ##  like prep files and libs.
+    def preprocessPdbForAmber(self, uploadFile, projectDir):
+        log.info("preprocessPdbForAmber() was called.")
+        try:
+            self.load_gmml_resources()
+        except Exception as error:
+            log.error("There was a problem loading resources from gmml: " + str(error))
+            log.error(traceback.format_exc())
+            raise error
+
+        try:
+            self.__load_pdb_file(uploadFile)
+        except Exception as error:
+            log.error("There was a problem uploading the pdb file: " + str(error))
+            log.error(traceback.format_exc())
+            raise error
+
+        ## need a preprocessor object.
+        try:
+            log.debug("About to preprocess an unevaluated file.")
+            log.debug("Evaluator: ")
+            log.debug("pdbFileObj: " + str(self.pdbFileObj))
+
+            log.debug("aminoLibs:")
+            for item in self.aminoLibs:
+                log.debug(str(item))
+            log.debug("glycamLibs:")
+            for item in self.glycamLibs:
+                log.debug(str(item))
+            log.debug("otherLibs:")
+            for item in self.otherLibs:
+                log.debug(str(item))
+            log.debug("prepFile:")
+            for item in self.prepFile:
+                log.debug(str(item))
+
+            ### GMML's Preprocess
+            self.preprocessor.Preprocess(self.pdbFileObj, self.aminoLibs, self.glycamLibs, self.otherLibs, self.prepFile)
+            ##pdbfile, amino_libs, glycam_libs, prep
+            self.preprocessor.ApplyPreprocessingWithTheGivenModelNumber(self.pdbFileObj, self.aminoLibs, self.glycamLibs, self.prepFile)
+            # self.preprocessor.Print()
+
+            seq_map = self.pdbFileObj.GetSequenceNumberMapping()
+            log.debug(seq_map.size())
+            for x in seq_map:
+                log.debug(x, seq_map[x])
+            fileName = os.path.join(projectDir, 'updated_pdb.pdb')
+            log.debug("Output destination: " + fileName)
+            self.pdbFileObj.WriteWithTheGivenModelNumber(fileName)
+            log.debug("Finished preprocessing.")
+        except Exception as error:
+            log.error("There was a prolem preprocessing the input: " + str(error))
+            log.error(traceback.format_exc())
+            raise error
+
 
     def doEvaluation(self, uploadFile):
         log.info("doEvaluation() was called.")
@@ -908,7 +965,59 @@ class PdbTransaction(commonIO.Transaction):
 
         log.debug("self.outgoing_string: " + self.outgoing_string)
 
+    ##Returns the filename of a pdb file that is written to the dir you offer.
+    #   Creates the dir if it doesn't exist.
+    #   @param pdbID String to be used for the RCSB search.
+    #   @param uploadDir Destination path for the sideloaded pdb file.
+    def sideloadPdbFromRcsb(pdbID, uploadDir):
+        log.info("sideloadPdbFromRcsb() was called.")
 
+        ##Sideload pdb from rcsb.org
+        pdbID = pdbID.upper()
+        log.debug("pdbID: " + pdbID)
+        try:
+            contentBytes =  getContentBytes(pdbID)
+            contentString = str(contentBytes, 'utf-8')
+            log.debug("Response content object type: " + str(type(contentString)))
+            #log.debug("Response content: \n" + str(contentString))
+            ##Get the uploads dir
+            log.debug("uploadDir: " + uploadDir)
+            if not os.path.exists(uploadDir):
+                pathlib.Path(uploadDir).mkdir(parents=True, exist_ok=True)
+            pdbFileName = pdbID + ".pdb"
+            uploadTarget = uploadDir  + pdbFileName
+            log.debug("uploadTarget: " + uploadTarget)
+        except Exception as error:
+            log.error("There was a problem getting the content from the RCSB: " + str(error))
+            log.error(traceback.format_exc())
+            raise error
+
+        try:
+            ##Save the string to file in the uploads dir.
+            with open(uploadTarget, "w") as uploadFile:
+                uploadFile.write(contentString)
+        except Exception as error:
+            log.error("There was a problem writing the sideloaded content into the file: " + str(error))
+            log.error(traceback.format_exc())
+            raise error
+        
+        return pdbFileName
+
+    def getUploadFileFromPdbTransaction(self):
+        ## Grab the input
+        try:
+            inputs = self.request_dict['entity']['inputs']
+            # log.debug("inputs.keys(): " + str(inputs.keys()))
+            if 'pdb_file_name' in inputs.keys():
+                uploadFile = inputs['pdb_file_name']
+            elif 'pdb_ID' in inputs.keys():
+                uploadFile = self.sideloadPdbFromRcsb(inputs['pdb_ID'])
+        except Exception as error:
+            log.error("There was a problem finding the input in the evaluate PDB request: " + str(error))
+            log.error(traceback.format_exc())
+            raise error
+
+        return uploadFile
 
 def generateSchemaForWeb():
     log.info("generateSchemaForWeb() was called.")

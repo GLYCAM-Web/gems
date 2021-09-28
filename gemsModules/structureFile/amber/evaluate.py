@@ -9,36 +9,31 @@ else:
     log = createLogger(__name__)
 
 
-##  Evaluate a pdb for use with Amber.
-#   @param receivedTransaction A request containing either the path to an uploaded pdb, or a pdbID for sideloading.
-def evaluatePdb(receivedTransaction : amberIO.PdbTransaction):
-    log.info("evaluatePdb() was called. Still in development!!!")
 
-    ## Grab the input
+##  Evaluate a pdb for use with Amber.
+#   @param pdbTransaction A request containing either the path to an uploaded pdb, or a pdbID for sideloading.
+def evaluatePdb(pdbTransaction : amberIO.PdbTransaction):
+    log.info("evaluatePdb() was called. Still in development!!!")
     try:
-        inputs = receivedTransaction.request_dict['entity']['inputs']
-        log.debug("inputs.keys(): " + str(inputs.keys()))
-        if 'pdb_file_name' in inputs.keys():
-            uploadFile = inputs['pdb_file_name']
-        elif 'pdb_ID' in inputs.keys():
-            uploadFile = sideloadPdbFromRcsb(inputs['pdb_ID'])
+        uploadFile = pdbTransaction.getUploadFileFromPdbTransaction()
     except Exception as error:
-        log.error("There was a problem finding the input in the evaluate PDB request: " + str(error))
+        log.error("There was a problem getting the upload file from the PdbTransaction: " + str(error))
         log.error(traceback.format_exc())
         raise error
 
     # Ensure a project exists
     try:
-        if receivedTransaction.transaction_out.project is None:
+        if pdbTransaction.transaction_out.project is None:
             log.debug("Starting a new project for transaction_out.")
-            receivedTransaction.transaction_out.project = gemsModules.project.io.PdbProject()
+            pdbTransaction.transaction_out.project = gemsModules.project.io.PdbProject()
         else:
-            log.debug("receivedTransaction.transaction_out.project: " + str(receivedTransaction.transaction_out.project))
+            log.debug("pdbTransaction.transaction_out.project: " + str(pdbTransaction.transaction_out.project))
 
-        pdbProject = receivedTransaction.transaction_out.project 
+        pdbProject = pdbTransaction.transaction_out.project 
         pdbProject.setFilesystemPath()
         pdbProject.loadVersionsFileInfo()
         pdbProject.setUploadFile(uploadFile)
+        pdbProject.requested_service = "Evaluate"
         log.debug("pdbProject: " )
         prettyPrint(pdbProject.__dict__)
     except Exception as error:
@@ -50,8 +45,8 @@ def evaluatePdb(receivedTransaction : amberIO.PdbTransaction):
 
     ### Generate the processed pdb's content
     try:
-        evaluator = amberIO.Evaluator()
-        output = evaluator.doEvaluation(uploadFile)
+        mngr = amberIO.PreprocessorManager()
+        output = mngr.doEvaluation(uploadFile)
         log.debug("output obj type: " + str(type(output)))
         outputDict = output.__dict__
         log.debug("outputDict: " + str(outputDict))
@@ -66,10 +61,10 @@ def evaluatePdb(receivedTransaction : amberIO.PdbTransaction):
         outputs = []
         outputs.append(outputDict)
         log.debug("Attempting to build the response.")
-        responseObj = amberIO.StructureFileResponse("Evaluate", inputs=inputs, outputs=outputs)
+        responseObj = amberIO.StructureFileResponse("Evaluate", inputs=pdbTransaction.request_dict['entity']['inputs'], outputs=outputs)
         log.debug("responseObj type: " + str(type(responseObj)))
         log.debug("responseObj: " + repr(responseObj))
-        receivedTransaction.transaction_out.entity.outputs = responseObj
+        pdbTransaction.transaction_out.entity.outputs = responseObj
     except Exception as error:
         log.error("There was a problem building an evaluation response: " + str(error))
         log.error(traceback.format_exc())
@@ -77,7 +72,7 @@ def evaluatePdb(receivedTransaction : amberIO.PdbTransaction):
 
     try:
         log.debug("About to build the outgoing string.")
-        receivedTransaction.build_outgoing_string()
+        pdbTransaction.build_outgoing_string()
         
     except Exception as error:
         log.error("There was a problem building the outgoing string: " + str(error))
