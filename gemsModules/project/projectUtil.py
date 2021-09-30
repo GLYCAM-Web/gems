@@ -1,7 +1,7 @@
 import gemsModules
 from shutil import copyfile
 from gemsModules.project import settings as projectSettings
-from gemsModules.project.dataio import *
+from gemsModules.project.io import *
 from gemsModules.common.transaction import *
 from gemsModules.common.services import *
 from gemsModules.common import utils

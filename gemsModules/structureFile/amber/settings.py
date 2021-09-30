@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
-from gemsModules import common
-from gemsModules.common.transaction import *
-from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
-from pydantic import BaseModel
+from gemsModules.common.logic import getGemsHome
+from gemsModules.common.loggingConfig import *
+from os.path import join
+
+if loggers.get(__name__):
+    pass
+else:
+    log = createLogger(__name__)
+
 
 ## Who I am
 WhoIAm='Amber'
@@ -30,3 +35,19 @@ descriptions = {
 	"missingResidues" : "Here is the description for the purpose behind the Missing Residues data"
 }
 
+try:
+    gemsHome = getGemsHome()
+    log.debug("gemsHome: " + gemsHome)
+except Exception as error:
+    log.error("There was a problem getting GEMSHOME.")
+    raise error
+
+try:
+	## Is this the best place for these?
+	AMINO_LIBS = os.path.join(gemsHome, "gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/amino12.lib")
+	PREP_FILE = os.path.join(gemsHome, "gmml/dat/CurrentParams/leaprc_GLYCAM_06j-1_2014-03-14/GLYCAM_06j-1.prep")
+	GLYCAM_LIBS = os.path.join(gemsHome, "gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminont12.lib")
+	OTHER_LIBS = os.path.join(gemsHome, "gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminoct12.lib")
+except Exception as error:
+    log.error("There was a problem setting the default gmml resources: " + str(error))
+    raise error

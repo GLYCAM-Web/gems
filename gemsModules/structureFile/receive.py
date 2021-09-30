@@ -3,98 +3,127 @@ import os, sys, importlib.util
 import gemsModules
 from gemsModules.common.services import *
 from gemsModules.common.logic import updateResponse
-from gemsModules.common import io as commonio
+from gemsModules.common import io as commonIO
 from gemsModules.project.projectUtil import *
 from gemsModules.common.loggingConfig import *
-from gemsModules.structureFile.amber.receive import preprocessPdbForAmber, evaluatePdb
+from gemsModules.structureFile.amber.evaluate import evaluatePdb
+from gemsModules.structureFile.amber.preprocess import preprocessPdbForAmber
 from gemsModules.structureFile.amber import io as amberIO
-
 import gemsModules.structureFile.settings as structureFileSettings
 import traceback
-
 
 if loggers.get(__name__):
     pass
 else:
     log = createLogger(__name__)
 
-def receive(receivedTransaction : amberIO.Transaction):
+## Receives requests related to preprocessing files 
+def receive(receivedTransaction : commonIO.Transaction):
     log.info("structureFile receive() was called.")
-    log.debug("structureFile transaction.request_dict: " )
-    # ## Ensure that our Transacation is the Sequence variety
-    thisTransaction=amberIO.Transaction(receivedTransaction.incoming_string)
-    prettyPrint(thisTransaction.request_dict)
     try:
-        thisTransaction.populate_transaction_in()
+        pdbTransaction = __setup(receivedTransaction)
+    except Exception as error:
+        log.error("There was a problem setting up a pdbTransaction: " + str(error))
+        receivedTransaction.generateCommonParserNotice(nodiceBrief="Failed to setup the pdbTransaction.")
+        raise RuntimeError("Cannot instantiate a transaction.")
+    try:
+        if 'services' not in pdbTransaction.request_dict['entity'].keys():
+            doDefaultService(pdbTransaction)
+        else:
+            services = pdbTransaction.request_dict['entity']['services']
+            ## Keys at this level are allowed to be arbitrary, so dig for recognized types.
+            for key in services.keys():
+                requestedService = services[key]['type']
+
+                if requestedService not in structureFileSettings.serviceModules.keys():
+                    log.error("The requested service is not recognized.")
+                    log.error("services: " + str(structureFileSettings.serviceModules.keys()))
+                    pdbTransaction.generateCommonParserNotice(noticeBrief='Service not known to entity.')
+                    raise AttributeError(requestedService)
+
+                elif requestedService == "Evaluate":
+                    try:
+                        evaluatePdb(pdbTransaction)
+                    except Exception as error:
+                        log.error("There was a problem evaluating the pdb: " + str(error))
+                        pdbTransaction.generateCommonParserNotice(noticeBrief='Failed to evaluate.')
+                        raise AttributeError(requestedService)
+
+
+                elif requestedService == "PreprocessPdbForAmber":
+                    try:
+                        preprocessPdbForAmber(pdbTransaction)
+                    except Exception as error:
+                        log.error("There was a problem evaluating the pdb: " + str(error))
+                        pdbTransaction.generateCommonParserNotice(noticeBrief='Failed to preprocess.')
+                        raise AttributeError(requestedService)
+                else:
+                    log.error("The requested service is not recognized.")
+                    log.error("services: " + str(structureFileSettings.serviceModules.keys()))
+                    pdbTransaction.generateCommonParserNotice(noticeBrief='Service not Known to entity.')
+                    raise AttributeError(requestedService)
+
     except Exception as e:
-        log.error("There was a problem populating transaction_in: " + str(e))
+        log.error("There was a problem identifying the requested service" + str(e))
         log.error(traceback.format_exc())
-        thisTransaction.generateCommonParserNotice(noticeBrief='UnknownError')
+        pdbTransaction.generateCommonParserNotice(noticeBrief='Failed to provide a service.')
         return
 
+    return pdbTransaction
 
-    #Look to see if services are specified, else do default.
-    if 'services' not in thisTransaction.request_dict['entity'].keys():
-        doDefaultService(thisTransaction)
-        
-    else:
-        services = thisTransaction.request_dict['entity']['services']
-        log.debug("requestedServices: " + str(services))
+## This method will throw errors if called from other files.
+def __setup(receivedTransaction : commonIO.Transaction):
+    log.debug("setting up a pdb preprocessor transaction.")
+    ## This transaction pattern is strange. We take a generic transaction and instantiate that in 
+    ##  the delegator, then use that here to create a new object that is a typed version
+    ##  of the same class? 
+    try:
+        # ## Ensure that our Transacation is the Sequence variety
+        pdbTransaction=amberIO.PdbTransaction(receivedTransaction.incoming_string)
+        log.debug("request_dict: ")
+        prettyPrint(pdbTransaction.request_dict)
+    except Exception as e:
+        log.error("There was a problem instantiating the PdbTransaction: " + str(e))
+        log.error(traceback.format_exc())
+        pdbTransaction.generateCommonParserNotice(noticeBrief='Failed to instantiate PdbTransaction')
+        return
 
-        for requestedService in services:
-            log.debug("requestedService: " + str(requestedService))
+    try:    
+        pdbTransaction.populate_transaction_in()
+    except Exception as e:
+        log.error("There was a problem populating the the PdbTransaction in: " + str(e))
+        log.error(traceback.format_exc())
+        pdbTransaction.generateCommonParserNotice(noticeBrief='Failed to populate transaction input')
+        return
 
-            if requestedService not in structureFileSettings.serviceModules.keys():
-                log.error("The requested service is not recognized.")
-                log.error("services: " + str(structureFileSettings.serviceModules.keys()))
-                thisTransaction.generateCommonParserNotice(noticeBrief='ServiceNotKnownToEntity')
-                raise AttributeError(requestedService)
-            elif requestedService == "PreprocessPdbForAmber":
-                try:
-                    log.debug("This is still in development.")
-                    preprocessPdbForAmber(thisTransaction)
-                except Exception as error:
-                    log.error("There was a problem preprocessing the PDB for amber: " + str(error))
-                    log.error(traceback.format_exc())
-                    raise error
+    try:
+        pdbTransaction.initialize_transaction_out_from_transaction_in()
+        log.debug("pdbTransaction.transaction_out: " )
+        log.debug(pdbTransaction.transaction_out.json(indent=2))
+    except Exception as error :
+        log.error("There was a problem initializing the outgoing transaction : " + str(error))
+        log.error(traceback.format_exc())
+        raise error
+    return pdbTransaction
 
-            elif requestedService == "Evaluate":
-                try:
-                    evaluatePdb(thisTransaction)
-                except Exception as error:
-                    log.error("There was a problem evaluating the pdb: " + str(error))
-                    log.error(traceback.format_exc())
-                    raise error
-
-            elif requestedService == "Schema":
-                ## This one is unique. No inputs are needed. Used by website only.
-                try:
-                    output = amberIO.StructureFileSchemaForWebOutput()
-                    log.debug("output generated. obj type: " + repr(output))
-                    thisTransaction.createStructureFileResponse(serviceType="Schema", inputs={}, outputs=[output])
-                    thisTransaction.build_outgoing_string()
-                    log.debug("thisTransaction now: ")
-                    prettyPrint(thisTransaction.__dict__)
-                except Exception as error:
-                    log.error("There was a problem generating the structureFile schema response: " + str(error))
-                    log.error(traceback.format_exc())
-                    thisTransaction.generateCommonParserNotice(noticeBrief='UnknownError')
-
-    return thisTransaction
-
-            
-
-def doDefaultService(thisTransaction : commonio.Transaction):
-    log.info("doDefaultService() was called.\n")
+def doDefaultService(receivedTransaction : commonIO.Transaction):
+    log.info("doDefaultService() was called.")
+    try:
+        pdbTransaction = __setup(receivedTransaction)
+    except Exception as error:
+        log.error("There was a problem setting up a pdbTransaction: " + str(error))
+        pdbTransaction.generateCommonParserNotice(nodiceBrief="Failed to setup the pdbTransaction.")
+        raise RuntimeError("Cannot instantiate a transaction.")
     ##Preprocess PDB will be the default. Given a request to the StructureFile entity,
     ##  with no services or options defined, look for a pdb file and preprocess it for Amber.
     try:
-        evaluatePdb(thisTransaction)
+        preprocessPdbForAmber(pdbTransaction)
+        receivedTransaction.build_outgoing_string()
     except Exception as error:
         log.error("There was a problem doing the default service in the structureFile module.")
         raise error
     
-    thisTransaction.build_outgoing_string()
+    
 
 
 def main():
@@ -108,17 +137,17 @@ def main():
     with open(inputFile, 'r') as file:
         jsonObjectString = file.read().replace('\n', '')
 
-    thisTransaction = commonio.Transaction(jsonObjectString)
+    receivedTransaction = commonIO.Transaction(jsonObjectString)
 
     try:
-        parseInput(thisTransaction)
+        parseInput(receivedTransaction)
     except Exception as error:
         log.error("Error parsing input.")
         log.error("Error type: " + str(type(error)))
         log.error(traceback.format_exc())
-    receive(thisTransaction)
+    receive(receivedTransaction)
 
-    responseObjectString = thisTransaction.outgoing_string
+    responseObjectString = receivedTransaction.outgoing_string
     return responseObjectString
 
 if __name__ == "__main__":

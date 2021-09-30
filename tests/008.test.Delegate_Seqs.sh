@@ -18,7 +18,7 @@ now=$(date "+%Y-%m-%d-%H-%M-%S")
 
 ## Outputs
 filename=git-ignore-me_test08_out.txt
-badOutput="bad_outputs/"$now"_"$filename
+badOutput="${badOutDir}/${now}_${filename}"
 
 ## Edit if your machine needs more time for minimization to finish
 maxCount=40
@@ -26,9 +26,9 @@ sleepTime=10
 
 clear_output()
 {
-	if [ -f $badOutput ] ; then
+	if [ -f ${badOutput} ] ; then
 		#echo "Removing output."
-		rm $badOutput
+		rm ${badOutput}
 	fi
 }
 
@@ -60,8 +60,20 @@ run_newBuild_test()
 		fi
 		echo "Waited $((count*sleepTime)) seconds so far." | tee -a $badOutput
 	done
+
 	if ! cmp $currentOutput $correctOutput > /dev/null 2>&1; then
-		echo "Test 008a FAILED!" | tee -a $badOutput
+		echo "Test 008a FAILED! Jack" | tee -a $badOutput
+		if  test -e "$correctOutput"  ; then
+			echo "correctOutput exists: $correctOutput"
+		else
+			echo "correctOutput is missing: $correctOutput"
+		fi
+
+		if  test -e "$currentOutput"  ; then
+			echo "currentOutput exists: $currentOutput"
+		else
+			echo "currentOutput is missing: $currentOutput"
+		fi
 		return 1;
 	else 
 		echo "Test 008a passed." 

@@ -234,17 +234,20 @@ class Transaction:
         from gemsModules.common import settings as commonSettings
         from gemsModules.common import io as commonio
 
-        log.debug("The in_string is: " + in_string)
+        ##The following debug line is sometimes useful, but normally redundant.
+        #log.debug("The in_string is: " + in_string)
         self.incoming_string = in_string
-        log.debug("The incoming_string is: " )
-        log.debug(self.incoming_string)
+        ##The following debug lines are also sometimes useful, but normally redundant.
+        # log.debug("The incoming_string is: " )
+        # log.debug(self.incoming_string)
         if self.incoming_string is None :
             commonSettings.generateCommonParserNotice(noticeBrief='InvalidInput', messagingEntity=commonSettings.WhoIAm)
             return
         else : 
             self.request_dict = json.loads(self.incoming_string) 
-            log.debug("The request_dict is: " ) 
-            log.debug(self.request_dict)
+            ##The following debug lines are also sometimes useful, but normally redundant.
+            # log.debug("The request_dict is: " ) 
+            # log.debug(self.request_dict)
 
         if self.incoming_string is None :
             commonSettings.generateCommonParserNotice(noticeBrief='InvalidInput', messagingEntity=commonSettings.WhoIAm)
