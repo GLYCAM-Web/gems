@@ -10,6 +10,7 @@ tests/bad_outputs
 External
 UserSpace
 site
+*VERSIONS.sh
 
 ## general things to ignore
 *__pycache__
