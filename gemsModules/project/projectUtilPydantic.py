@@ -111,7 +111,7 @@ def getProjectUploadsDir(thisTransaction):
     log.info("getProjectUploadsDir() was called.\n")
     project = getProjectFromTransaction(thisTransaction)
     
-    if str(type(project)) == "<class 'gemsModules.project.dataio.PdbProject'>":
+    if str(type(project)) == "<class 'gemsModules.project.io.PdbProject'>":
         project = project.__dict__
 
     try:
@@ -134,7 +134,7 @@ def getProjectUploadsDir(thisTransaction):
 #   @param  project
 def getUploadsSourceDir(project):
     log.info("getUploadsSourceDir() was called.\n")
-    if str(type(project)) == "<class 'gemsModules.project.dataio.PdbProject'>":
+    if str(type(project)) == "<class 'gemsModules.project.io.PdbProject'>":
         project = project.__dict__
 
     log.debug("project obj type: " + str(type(project)))
@@ -205,7 +205,7 @@ def getUploadsSourceDir(project):
 #   @aparam project
 def getUploadFileName(project):
     log.info("getUploadFileName() was called.\n")
-    if str(type(project)) == "<class 'gemsModules.project.dataio.PdbProject'>":
+    if str(type(project)) == "<class 'gemsModules.project.io.PdbProject'>":
         project = project.__dict__
     
     uploaded_file_name = ""
