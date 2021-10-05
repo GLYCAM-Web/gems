@@ -43,6 +43,7 @@ run_Valid_Json_Response_Test()
 	# exit code from is_Valid_JSON_py
 	isValid=$?
 	rm f
+	
 	if [ $isValid  != '0' ] ; then
 		return 1
 	fi
