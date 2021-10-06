@@ -110,31 +110,51 @@ check_pull_mdutils() {
     if [ ! -d "${theDir}" ]; then
 	    mkdir -p ${theDir}
     fi
+    if [ "${GW_GRPC_ROLE}" == "Swarm" ] ; then
+        echo "Swarm deployment detected.  MD_Utils should be controlled by upstream processes. "
+        echo "!!!  NOT ALTERING MD_Utils  !!!"
+	return 0; 
+    elif [ "${GW_GRPC_ROLE}" == "Developer" ] ; then
+	echo "Developer environment detected; pulling MD_Utils from md-test."
+	mdBranch="md-test"
+    else 
+        mdBranch="main"
+    fi
     if [ ! -d "${theDir}/.git" ]; then
         echo ""
         echo "MD_Utils repo does not exist. Attempting to clone."
-	git clone https://github.com/GLYCAM-Web/MD_Utils.git ${theDir}
+	git clone -b ${mdBranch} https://github.com/GLYCAM-Web/MD_Utils.git ${theDir}
     	if [ ! -d "${theDir}/.git" ]; then
         	echo ""
         	echo "Error:  Unable to clone MD_Utils.  Some functions will be unavailable."
         	echo "You can try again on your own using the following command."
         	echo "You will not need to remake GEMS or GMML after cloning."
         	echo ""
-		echo "git clone https://github.com/GLYCAM-Web/MD_Utils.git ${theDir}"
+		echo "git clone -b ${mdBranch} https://github.com/GLYCAM-Web/MD_Utils.git ${theDir}"
 	fi
     else
 	echo "Updating MD_Utils"
-	( cd ${theDir} && git pull )
-	returnValue=$?
-	if [ "${returnValue}" != 0 ] ; then
-		echo ""
-		echo "Unable to update MD_Utils.  Some functions may be unavailable."
-        	echo "You can try again on your own using the following command."
-        	echo "You will not need to remake GEMS or GMML after pulling."
-        	echo ""
-		echo "cd ${theDir} && git pull"
-	fi
+	currentBranch="$( cd ${theDir} && git branch | grep ^* | cut -d ' ' -f2)"
+	if [ "${currentBranch}" != "${mdBranch}" ] ; then
+	    echo ""
+	    echo "Your MD_Utils is on branch ${currentBranch} instead of the expected branch ${mdBranch}"
+	    echo "I presume you know what you're doing, so I will not modify the state of the branch."
+	    echo "Warning:   !!!  MD_Utils NOT UPDATED BY make.sh  !!!"
+	    echo ""
+	else
+	    ( cd ${theDir} && git pull origin ${mdBranch} )
+            returnValue=$?
+            if [ "${returnValue}" != 0 ] ; then
+                echo ""
+                echo "Unable to update MD_Utils.  Some functions may be unavailable."
+                echo "You can try again on your own using the following command."
+                echo "You will not need to remake GEMS or GMML after pulling."
+                echo ""
+                echo "cd ${theDir} && git pull"
+	    fi
+        fi
     fi
+#exit 139
 }
 
 ################################################################
