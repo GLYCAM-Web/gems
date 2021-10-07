@@ -105,7 +105,7 @@ class UnrecognizedMoleculesMetadata(BaseModel):
     interactionRequirement : str = "none"
     urgency : str = "warning"
     count : int = 0
-    description : str = "The following unrecognized residues were found. They must be deleted (for you to use this site). If Mid-Chain is False, no further action is required. Otherwise, pleaseinspect the missing residues (see Missing Residues table) to choose how we should handle the new chain termini that are created by removing these residues."
+    description : str = "The following unrecognized residues were found. They must be deleted (for you to use this site). If Mid-Chain is False, no further action is required. Otherwise, please inspect the missing residues (see Missing Residues table) to choose how we should handle the new chain termini that are created by removing these residues."
 
     def loadUnrecognizedMoleculeMetadata(self, moleculeCount, urgencyLevel):
         log.info("loadUnrecognizedMoleculeMetadata() was called.")
