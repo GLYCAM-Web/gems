@@ -117,8 +117,10 @@ check_pull_mdutils() {
     elif [ "${GW_GRPC_ROLE}" == "Developer" ] ; then
 	echo "Developer environment detected; pulling MD_Utils from md-test."
 	mdBranch="md-test"
+	inDevEnv="true"
     else 
-        mdBranch="main"
+        mdBranch="stable"
+	inDevEnv="false"
     fi
     if [ ! -d "${theDir}/.git" ]; then
         echo ""
@@ -131,30 +133,111 @@ check_pull_mdutils() {
         	echo "You will not need to remake GEMS or GMML after cloning."
         	echo ""
 		echo "git clone -b ${mdBranch} https://github.com/GLYCAM-Web/MD_Utils.git ${theDir}"
+		return 1
 	fi
+	echo "Cloning of MD_Utils was successfil"
+	return 0
+    fi
+    ## Still here?  If on the correct branch, pull and return.
+    currentBranch="$( cd ${theDir} && git branch | grep ^* | cut -d ' ' -f2)"
+    if [ "${currentBranch}" == "${mdBranch}" ] ; then
+        echo "Attempting to update MD_Utils"
+	##  Ensure upstream is tracked properly, then pull
+	( cd ${theDir} \
+		&& git branch -u origin/${mdBranch} \
+		&& git pull )
+        returnValue=$?
+        if [ "${returnValue}" != 0 ] ; then
+            echo ""
+            echo "Error!  Unable to update MD_Utils. "
+            echo "You can try again on your own using the command below."
+            echo ""
+            echo "cd ${theDir} && git pull origin ${mdBranch}"
+	    return 1
+        else
+	    return 0
+        fi
+    fi
+    ## Still here?  Ask what to do about it.
+    echo ""
+    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    echo "Your MD_Utils repo (\$GEMSHOME/External/MD_Utils) is not on the expected branch."
+    echo "    Expected branch:  ${mdBranch}"
+    echo "    Current branch:   ${currentBranch}"
+    echo ""
+    echo "What do you want to do? "
+    echo "   p  (pull)       :  Issue 'git pull' in the repo on the current branch "
+    echo "   s  (skip)       :  Don't do anything in the repo.  Carry on with make. "
+    echo "   a  (abort)      :  Don't do anything in the repo.  Exit make. "
+    echo "   just hit enter  :  Change to the expected branch and update the repo. "
+    echo ""
+    echo "If you don't know what to do, you should probably just htt enter."
+    echo ""
+    read -p "Your response:  " branchResponse
+    if [[ $branchResponse == [sS] ]]; then
+        printf "Skipping update of MD_Utils repo.\n"
+        return 0;
+    elif [[ $branchResponse == [aA] ]]; then
+        printf "Abort!\n"
+        exit 1;
+    elif [[ $branchResponse == [pP] ]]; then
+        printf "Pulling from within the current branch\n"
+	( cd ${theDir} && git pull )
+        returnValue=$?
+        if [ "${returnValue}" != 0 ] ; then
+            echo ""
+            echo "Error!  Unable to update MD_Utils within the current branch. "
+            echo "You can try again on your own using the command below."
+            echo "Exiting for now."
+            echo ""
+            echo "cd ${theDir} && git pull"
+	    return 1
+        else
+	    return 0
+        fi
     else
-	echo "Updating MD_Utils"
-	currentBranch="$( cd ${theDir} && git branch | grep ^* | cut -d ' ' -f2)"
-	if [ "${currentBranch}" != "${mdBranch}" ] ; then
-	    echo ""
-	    echo "Your MD_Utils is on branch ${currentBranch} instead of the expected branch ${mdBranch}"
-	    echo "I presume you know what you're doing, so I will not modify the state of the branch."
-	    echo "Warning:   !!!  MD_Utils NOT UPDATED BY make.sh  !!!"
-	    echo ""
-	else
-	    ( cd ${theDir} && git pull origin ${mdBranch} )
+        echo "Changing to branch ${mdBranch}, ensuring proper upstream, and pulling"
+	COMMAND="( cd ${theDir} &&  git branch | grep -q ${mdBranch} )"
+	echo "running :  ${COMMAND}"
+	if ! eval ${COMMAND} ; then
+            echo "The expected branch does not already exist.  Setting it up now."
+	    COMMAND="( cd ${theDir} \
+	        && git remote set-branches --add origin ${mdBranch} \
+		&& git fetch \
+		&& git checkout -b ${mdBranch}  origin/${mdBranch} )"
+	    eval ${COMMAND}
             returnValue=$?
             if [ "${returnValue}" != 0 ] ; then
                 echo ""
-                echo "Unable to update MD_Utils.  Some functions may be unavailable."
-                echo "You can try again on your own using the following command."
-                echo "You will not need to remake GEMS or GMML after pulling."
+                echo "Error!  Unable to change branches and update MD_Utils. "
+                echo "You can try again on your own using the command below."
+                echo "Exiting for now."
                 echo ""
-                echo "cd ${theDir} && git pull"
-	    fi
-        fi
+                echo "${COMMAND}"
+	        return 1
+            else
+	        return 0
+            fi
+        else
+	    ##  Check out the branch, ensure upstream is tracked properly, then pull
+	    COMMAND="( cd ${theDir} \
+		&& git checkout ${mdBranch} \
+		&& git branch -u origin/${mdBranch} \
+		&& git pull )"
+	    eval ${COMMAND}
+            returnValue=$?
+            if [ "${returnValue}" != 0 ] ; then
+                echo ""
+                echo "Error!  Unable to update MD_Utils. "
+                echo "You can try again on your own using the command below."
+                echo ""
+                echo "${COMMAND}"
+	        return 1
+            else
+	        return 0
+            fi
+	fi
     fi
-#exit 139
 }
 
 ################################################################
