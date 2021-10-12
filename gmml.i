@@ -42,9 +42,6 @@
 #include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequence.hpp"
 #include "gmml/includes/InputSet/CondensedSequenceSpace/sequencestring.hpp"
 
-#include "gmml/includes/InternalPrograms/CarbohydrateBuilder/carbohydrateBuilder.hpp"
-#include "gmml/includes/InternalPrograms/GlycoproteinBuilder/glycoproteinBuilder.hpp"
-
 //#include "gmml/includes/InputSet/CifFileSpace/ciffileatom.hpp"
 //#include "gmml/includes/InputSet/CifFileSpace/ciffile.hpp"
 //#include "gmml/includes/InputSet/CifFileSpace/ciffileprocessingexception.hpp"
@@ -185,6 +182,8 @@
 #include "gmml/includes/InputSet/TopologyFileSpace/topologyresidue.hpp"
 #include "gmml/includes/InputSet/TopologyFileSpace/topologyfileprocessingexception.hpp"
 
+#include "gmml/includes/InternalPrograms/CarbohydrateBuilder/carbohydrateBuilder.hpp"
+
 //#include "gmml/includes/External_Libraries/json.hpp"
 
 %}
@@ -227,9 +226,6 @@ std::ostream & get_cout() { return std::cout; }
 %include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceglycam06residue.hpp"
 %include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequence.hpp"
 %include "gmml/includes/InputSet/CondensedSequenceSpace/sequencestring.hpp"
-
-%include "gmml/includes/InternalPrograms/CarbohydrateBuilder/carbohydrateBuilder.hpp"
-%include "gmml/includes/InternalPrograms/GlycoproteinBuilder/glycoproteinBuilder.hpp"
 
 %include "gmml/includes/InputSet/PdbFileSpace/pdbatomsection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbatomcard.hpp"
@@ -369,6 +365,8 @@ std::ostream & get_cout() { return std::cout; }
 %include "gmml/includes/InputSet/TopologyFileSpace/topologyfile.hpp"
 %include "gmml/includes/InputSet/TopologyFileSpace/topologyresidue.hpp"
 %include "gmml/includes/InputSet/TopologyFileSpace/topologyfileprocessingexception.hpp"
+
+%include "gmml/includes/InternalPrograms/CarbohydrateBuilder/carbohydrateBuilder.hpp"
 
 //%include "gmml/includes/External_Libraries/json.hpp"
 

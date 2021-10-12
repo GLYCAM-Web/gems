@@ -390,7 +390,7 @@ if [[ "$WRAP_GMML" != "no_wrap" ]]; then
         echo "Using $PYTHON_FILE header file."
         if [ -f "gmml_wrap.cxx" ]; then
             echo "Compiling wrapped gmml library in python ..."
-            g++ -std=c++11 -O3 -fPIC -c gmml_wrap.cxx -I"$PYTHON_HEADER_HOME"
+            g++ -std=c++17 -O3 -fPIC -c gmml_wrap.cxx -I"$PYTHON_HEADER_HOME"
         else
             echo "Warning:  gmml_wrap.cxx does not exist."
         fi
@@ -401,7 +401,7 @@ if [[ "$WRAP_GMML" != "no_wrap" ]]; then
     echo ""
     if [[ -f "gmml_wrap.o" ]]; then
         echo "Building python interface ..."
-        g++ -std=c++11 -shared gmml/build/*.o gmml_wrap.o -o _gmml.so
+        g++ -std=c++17 -shared gmml/build/*.o gmml_wrap.o -o _gmml.so
     else
         echo "Warning:  gmml python interface has not been compiled correctly."
     fi
