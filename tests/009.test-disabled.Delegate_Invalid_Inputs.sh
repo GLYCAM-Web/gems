@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# comment this code
+# Tests should be about passing invalid inputs to the delegator
 
 # python script that will determine is json is valid
 is_Valid_JSON_py=$GEMSHOME/testbin/isvalidjson.py
 
-# json inputs
+# JSON INPUTS
 invalid_Payload=$GEMSHOME/gemsModules/delegator/test_in/sequence/minimal_invalid_payload.json
 invalid_Json=$GEMSHOME/gemsModules/delegator/test_in/sequence/invalid_json.json
 
