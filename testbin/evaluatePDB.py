@@ -6,22 +6,26 @@ import sys
 import json
 import traceback
 
+##### make sure 2 args are present #####
 try: 
 	testOutput = sys.argv[1]
 	correctOutput = sys.argv[2]
 except:
 	print("must supply file paths for argv[1] and argv[2]")
+	print(traceback.format_exc())
 	exit(2)
 
+##### read in argv[1], arv[2] #####
 try:
 	with open(testOutput) as f:
 		try:
 			string = f.read()			
-			test = json.loads(string)			
-			exit(0)
+			test = json.loads(string)						
 		except Exception as error:	
 			string = "json.loads() failed -- problem with JSON: " + testOutput		
-			exit(1)
+			print(string)
+			print(traceback.format_exc())
+			exit(2)
 except Exception as err:
 	string  = "could not open " + filepath
 	print(string)
@@ -33,12 +37,53 @@ try:
 		try:
 			string = f.read()			
 			correct = json.loads(string)			
-			exit(0)
 		except Exception as error:	
 			string = "json.loads() failed -- problem with JSON: " + testOutput		
-			exit(1)
+			print(string)
+			print(traceback.format_exc())
+			exit(2)
 except Exception as err:
 	string  = "could not open " + filepath
 	print(string)
 	print(traceback.format_exc())
 	exit(2)
+
+##### prune stuff that will be host-specific #####
+remove = ["timestamp", "gems_timestamp", "site_version", "site_branch", "gems_version",
+"gems_branch", "md_utils_version", "md_utils_branch", "gmml_version", "gmml_branch",
+"gp_version", "gp_branch", "site_mode", "site_host_name"]
+
+'''
+for thing in remove:
+	del test["project"][thing]
+	del correct["project"][thing]
+
+##### compare the dictionaries #####
+print (test==correct)
+
+'''
+
+def walk(node):
+	if isinstance(node, dict):
+		for k,v in node.items():
+			if isinstance(v, dict):
+				walk(v)
+			if isinstance(v, list):
+				walk(v)
+			print ('dict item')
+			print (k, v)
+	elif isinstance(node, list):
+		for v in node:
+			if isinstance(v, dict):
+				walk(v)
+			if isinstance(v, list):
+				walk(v)
+			print ('list item')
+			print (v)
+
+
+
+walk(test)
+a = {'1': 1, '2': 2}
+b = {'3': 3, '2': 2}
+print (a==b)
