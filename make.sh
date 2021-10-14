@@ -110,29 +110,132 @@ check_pull_mdutils() {
     if [ ! -d "${theDir}" ]; then
 	    mkdir -p ${theDir}
     fi
+    if [ "${GW_GRPC_ROLE}" == "Swarm" ] ; then
+        echo "Swarm deployment detected.  MD_Utils should be controlled by upstream processes. "
+        echo "!!!  NOT ALTERING MD_Utils  !!!"
+	return 0; 
+    elif [ "${GW_GRPC_ROLE}" == "Developer" ] ; then
+	echo "Developer environment detected; pulling MD_Utils from md-test."
+	mdBranch="md-test"
+	inDevEnv="true"
+    else 
+        mdBranch="stable"
+	inDevEnv="false"
+    fi
     if [ ! -d "${theDir}/.git" ]; then
         echo ""
         echo "MD_Utils repo does not exist. Attempting to clone."
-	git clone https://github.com/GLYCAM-Web/MD_Utils.git ${theDir}
+	git clone -b ${mdBranch} https://github.com/GLYCAM-Web/MD_Utils.git ${theDir}
     	if [ ! -d "${theDir}/.git" ]; then
         	echo ""
         	echo "Error:  Unable to clone MD_Utils.  Some functions will be unavailable."
         	echo "You can try again on your own using the following command."
         	echo "You will not need to remake GEMS or GMML after cloning."
         	echo ""
-		echo "git clone https://github.com/GLYCAM-Web/MD_Utils.git ${theDir}"
+		echo "git clone -b ${mdBranch} https://github.com/GLYCAM-Web/MD_Utils.git ${theDir}"
+		return 1
 	fi
-    else
-	echo "Updating MD_Utils"
+	echo "Cloning of MD_Utils was successfil"
+	return 0
+    fi
+    ## Still here?  If on the correct branch, pull and return.
+    currentBranch="$( cd ${theDir} && git branch | grep ^* | cut -d ' ' -f2)"
+    if [ "${currentBranch}" == "${mdBranch}" ] ; then
+        echo "Attempting to update MD_Utils"
+	##  Ensure upstream is tracked properly, then pull
+	( cd ${theDir} \
+		&& git branch -u origin/${mdBranch} \
+		&& git pull )
+        returnValue=$?
+        if [ "${returnValue}" != 0 ] ; then
+            echo ""
+            echo "Error!  Unable to update MD_Utils. "
+            echo "You can try again on your own using the command below."
+            echo ""
+            echo "cd ${theDir} && git pull origin ${mdBranch}"
+	    return 1
+        else
+	    return 0
+        fi
+    fi
+    ## Still here?  Ask what to do about it.
+    echo ""
+    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    echo "Your MD_Utils repo (\$GEMSHOME/External/MD_Utils) is not on the expected branch."
+    echo "    Expected branch:  ${mdBranch}"
+    echo "    Current branch:   ${currentBranch}"
+    echo ""
+    echo "What do you want to do? "
+    echo "   p  (pull)       :  Issue 'git pull' in the repo on the current branch "
+    echo "   s  (skip)       :  Don't do anything in the repo.  Carry on with make. "
+    echo "   a  (abort)      :  Don't do anything in the repo.  Exit make. "
+    echo "   just hit enter  :  Change to the expected branch and update the repo. "
+    echo ""
+    echo "If you don't know what to do, you should probably just htt enter."
+    echo ""
+    read -p "Your response:  " branchResponse
+    if [[ $branchResponse == [sS] ]]; then
+        printf "Skipping update of MD_Utils repo.\n"
+        return 0;
+    elif [[ $branchResponse == [aA] ]]; then
+        printf "Abort!\n"
+        exit 1;
+    elif [[ $branchResponse == [pP] ]]; then
+        printf "Pulling from within the current branch\n"
 	( cd ${theDir} && git pull )
-	returnValue=$?
-	if [ "${returnValue}" != 0 ] ; then
-		echo ""
-		echo "Unable to update MD_Utils.  Some functions may be unavailable."
-        	echo "You can try again on your own using the following command."
-        	echo "You will not need to remake GEMS or GMML after pulling."
-        	echo ""
-		echo "cd ${theDir} && git pull"
+        returnValue=$?
+        if [ "${returnValue}" != 0 ] ; then
+            echo ""
+            echo "Error!  Unable to update MD_Utils within the current branch. "
+            echo "You can try again on your own using the command below."
+            echo "Exiting for now."
+            echo ""
+            echo "cd ${theDir} && git pull"
+	    return 1
+        else
+	    return 0
+        fi
+    else
+        echo "Changing to branch ${mdBranch}, ensuring proper upstream, and pulling"
+	COMMAND="( cd ${theDir} &&  git branch | grep -q ${mdBranch} )"
+	echo "running :  ${COMMAND}"
+	if ! eval ${COMMAND} ; then
+            echo "The expected branch does not already exist.  Setting it up now."
+	    COMMAND="( cd ${theDir} \
+	        && git remote set-branches --add origin ${mdBranch} \
+		&& git fetch \
+		&& git checkout -b ${mdBranch}  origin/${mdBranch} )"
+	    eval ${COMMAND}
+            returnValue=$?
+            if [ "${returnValue}" != 0 ] ; then
+                echo ""
+                echo "Error!  Unable to change branches and update MD_Utils. "
+                echo "You can try again on your own using the command below."
+                echo "Exiting for now."
+                echo ""
+                echo "${COMMAND}"
+	        return 1
+            else
+	        return 0
+            fi
+        else
+	    ##  Check out the branch, ensure upstream is tracked properly, then pull
+	    COMMAND="( cd ${theDir} \
+		&& git checkout ${mdBranch} \
+		&& git branch -u origin/${mdBranch} \
+		&& git pull )"
+	    eval ${COMMAND}
+            returnValue=$?
+            if [ "${returnValue}" != 0 ] ; then
+                echo ""
+                echo "Error!  Unable to update MD_Utils. "
+                echo "You can try again on your own using the command below."
+                echo ""
+                echo "${COMMAND}"
+	        return 1
+            else
+	        return 0
+            fi
 	fi
     fi
 }
@@ -287,7 +390,7 @@ if [[ "$WRAP_GMML" != "no_wrap" ]]; then
         echo "Using $PYTHON_FILE header file."
         if [ -f "gmml_wrap.cxx" ]; then
             echo "Compiling wrapped gmml library in python ..."
-            g++ -std=c++11 -O3 -fPIC -c gmml_wrap.cxx -I"$PYTHON_HEADER_HOME"
+            g++ -std=c++17 -O3 -fPIC -c gmml_wrap.cxx -I"$PYTHON_HEADER_HOME"
         else
             echo "Warning:  gmml_wrap.cxx does not exist."
         fi
@@ -298,7 +401,7 @@ if [[ "$WRAP_GMML" != "no_wrap" ]]; then
     echo ""
     if [[ -f "gmml_wrap.o" ]]; then
         echo "Building python interface ..."
-        g++ -std=c++11 -shared gmml/build/*.o gmml_wrap.o -o _gmml.so
+        g++ -std=c++17 -shared gmml/build/*.o gmml_wrap.o -o _gmml.so
     else
         echo "Warning:  gmml python interface has not been compiled correctly."
     fi

@@ -15,9 +15,18 @@ correct_PDB_Output=$GEMSHOME/tests/correct_outputs/test10_output
 cat $evaluate_PDB_Json | $GEMSHOME/bin/delegate > f
 
 # pass f and test10_output to the compare script
-echo "here"
+echo "1"
 $evaluate_PDB_py f $correct_PDB_Output
-echo "there"
+echo "1"
+
+echo "2"
+$evaluate_PDB_py f f
+echo "2"
+
+echo "3"
+$evaluate_PDB_py $correct_PDB_Output $correct_PDB_Output
+echo "3"
+
 # clean up
 rm f
 

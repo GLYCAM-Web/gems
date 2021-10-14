@@ -33,7 +33,7 @@ except Exception as err:
 	exit(2)
 
 try:
-	with open(testOutput) as f:
+	with open(correctOutput) as f:
 		try:
 			string = f.read()			
 			correct = json.loads(string)			
@@ -53,7 +53,7 @@ remove = ["timestamp", "gems_timestamp", "site_version", "site_branch", "gems_ve
 "gems_branch", "md_utils_version", "md_utils_branch", "gmml_version", "gmml_branch",
 "gp_version", "gp_branch", "site_mode", "site_host_name"]
 
-'''
+
 for thing in remove:
 	del test["project"][thing]
 	del correct["project"][thing]
@@ -61,29 +61,4 @@ for thing in remove:
 ##### compare the dictionaries #####
 print (test==correct)
 
-'''
 
-def walk(node):
-	if isinstance(node, dict):
-		for k,v in node.items():
-			if isinstance(v, dict):
-				walk(v)
-			if isinstance(v, list):
-				walk(v)
-			print ('dict item')
-			print (k, v)
-	elif isinstance(node, list):
-		for v in node:
-			if isinstance(v, dict):
-				walk(v)
-			if isinstance(v, list):
-				walk(v)
-			print ('list item')
-			print (v)
-
-
-
-walk(test)
-a = {'1': 1, '2': 2}
-b = {'3': 3, '2': 2}
-print (a==b)

@@ -61,6 +61,8 @@ class Project(BaseModel):
     ## These can be read in using getVersionsFileInfo
     site_version : constr(max_length=40)=""
     site_branch : constr(max_length=50)=""
+    site_code_name : constr(max_length=50)=""
+
     gems_version : constr(max_length=40)=""
     gems_branch : constr(max_length=50)=""
     md_utils_version : constr(max_length=40)=""
