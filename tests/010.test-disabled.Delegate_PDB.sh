@@ -11,24 +11,39 @@ evaluate_PDB_Json=$GEMSHOME/gemsModules/delegator/test_in/pdb/evaluatePdb.json
 # path to test10_output
 correct_PDB_Output=$GEMSHOME/tests/correct_outputs/test10_output 
 
-# pipe .json input to delegator; redirect to f
-cat $evaluate_PDB_Json | $GEMSHOME/bin/delegate > f
+run_evalute_sideload_PDB_test()
+{
+	echo "TODO"
+}
 
-# pass f and test10_output to the compare script
-echo "1"
-$evaluate_PDB_py f $correct_PDB_Output
-echo "1"
+# invoke delegator with an uploaded pdb file
+# compare test output to known good output
+run_evaluate_upload_PDB_test()
+{
+	# pipe .json input to delegator; redirect to f
+	cat $evaluate_PDB_Json | $GEMSHOME/bin/delegate > f
+	# pass f and test10_output to the compare script
+	$evaluate_PDB_py f $correct_PDB_Output
+	# exit code from evaluate_PDB_py
+	isValid=$?
+	# clean up
+	rm f
 
-echo "2"
-$evaluate_PDB_py f f
-echo "2"
+	if [ $isValid  != '0' ] ; then
+		return 1
+	fi
 
-echo "3"
-$evaluate_PDB_py $correct_PDB_Output $correct_PDB_Output
-echo "3"
+	return 0
+}
 
-# clean up
-rm f
+if run_evaluate_upload_PDB_test; then
+	echo "010a -- run_evaluate_upload_PDB_test passed"
+else
+	echo "010a -- run_evaluate_upload_PDB_test failed"
+	echo "010a -- exiting"
+	exit 1
+fi
 
-exit 1
+echo "All 010 tests passed"
+exit 0
 

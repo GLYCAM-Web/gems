@@ -48,8 +48,8 @@ except Exception as err:
 	print(traceback.format_exc())
 	exit(2)
 
-##### prune stuff that will be host-specific #####
-remove = ["timestamp", "gems_timestamp", "site_version", "site_branch", "gems_version",
+##### prune stuff that will be unique #####
+remove = ["pUUID", "timestamp", "gems_timestamp", "site_version", "site_branch", "gems_version",
 "gems_branch", "md_utils_version", "md_utils_branch", "gmml_version", "gmml_branch",
 "gp_version", "gp_branch", "site_mode", "site_host_name"]
 
@@ -59,6 +59,9 @@ for thing in remove:
 	del correct["project"][thing]
 
 ##### compare the dictionaries #####
-print (test==correct)
+#print (test==correct)
+if test == correct:
+	exit(0)
+exit(1)
 
 
