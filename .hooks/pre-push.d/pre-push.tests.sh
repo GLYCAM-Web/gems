@@ -49,6 +49,11 @@ check_website_status() {
 	fi
 }
 
+gemshome=`pwd`
+check_gemshome $gemshome 
+## OG Oct 2021 have the hooks update themselves.
+cp -r $GEMSHOME/.hooks/* $GEMSHOME/.git/hooks/
+
 #### Allow skipping tests ####
 branch=`git rev-parse --abbrev-ref HEAD`
 if [[ "$branch" != "gems-dev" ]] && [[ "$branch" != "gems-test" ]]; then
@@ -66,9 +71,10 @@ if [[ "$branch" != "gems-dev" ]] && [[ "$branch" != "gems-test" ]]; then
 fi
 #### End Allow skipping tests ####
 
-gemshome=`pwd`
-check_gemshome $gemshome 
+
 check_website_status
+
+
 
 #Compile gmml if not compiled:
 echo "Pulling gems AND gmml, and then compiling gmml if necessary with ./make.sh no_clean wrap"
