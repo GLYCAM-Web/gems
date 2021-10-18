@@ -181,7 +181,7 @@ def buildQueryString(thisTransaction : Transaction):
         (out, err) = proc.communicate()
         out = str(out.decode('utf-8'))
         log.debug(out)
-        gmml.log(getframeinfo(currentframe()).lineno, getframeinfo(currentframe()).filename, gmml.INF, str(out), GemsPath + "/queryLog.txt")
+#        gmml.log(getframeinfo(currentframe()).lineno, getframeinfo(currentframe()).filename, gmml.INF, str(out), GemsPath + "/queryLog.txt")
         # text_file = open(debugFileLocation, "a+")
         # text_file.write(str(out))
         # text_file.write(str(theQueryString))
