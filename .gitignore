@@ -6,9 +6,11 @@ gmml_wrap.cxx
 gmml_wrap.o
 log.log
 gemsModules/Docs/html
+tests/bad_outputs
 External
 UserSpace
 site
+*VERSIONS.sh
 
 ## general things to ignore
 *__pycache__
