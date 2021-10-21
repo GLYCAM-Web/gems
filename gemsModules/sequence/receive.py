@@ -51,6 +51,7 @@ def receive(receivedTransaction : sequenceio.Transaction):
         thisTransaction.populate_transaction_in()
     except ValidationError as e :
         log.error(e)
+        log.error(traceback.format_exc())
         thisTransaction.generateCommonParserNotice(
                 noticeBrief='JsonParseEror',
                 additionalInfo={'hint' : str(e)})
