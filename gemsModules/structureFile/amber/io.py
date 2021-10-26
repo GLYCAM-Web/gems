@@ -1055,7 +1055,12 @@ class PdbTransaction(commonIO.Transaction):
             if 'pdb_file_name' in inputs.keys():
                 uploadFile = inputs['pdb_file_name']
             elif 'pdb_ID' in inputs.keys():
-                uploadFile = self.sideloadPdbFromRcsb(inputs['pdb_ID'], inputs['sideload_file_destination'])
+                ##Set a default sideload destination
+                sideloadDestination = "/website/TESTS/pdb/test_in/sideloads/"
+                if 'sideload_file_destination' in inputs.keys():
+                    sideloadDestination = inputs['sideload_file_destination']
+                log.debug("sideloadDestination: " + sideloadDestination)
+                uploadFile = self.sideloadPdbFromRcsb(inputs['pdb_ID'], sideloadDestination)
         except Exception as error:
             log.error("There was a problem finding the input in the evaluate PDB request: " + str(error))
             log.error(traceback.format_exc())
