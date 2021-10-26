@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import urllib.request
+import pathlib
 from enum import Enum, auto
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union, Any
 from typing import ForwardRef
@@ -485,7 +487,7 @@ class PreprocessorManager:
     preprocessingOptions = []
     metadata = []
     
-    def load_gmml_resources(self):
+    def __load_gmml_resources(self):
         log.info("__load_gmml_resources() was called.")
         
         try:
@@ -512,9 +514,10 @@ class PreprocessorManager:
     #   that begin with 2 underscores are called from other files.
     def __load_pdb_file(self, uploadFile):
         log.info("__load_pdb_file() was called.")
+        log.debug("uploadFile: " + uploadFile)
         # need a pdb file object.
         try:
-            #log.debug("working dir: " + os.getcwd())
+            log.debug("working dir: " + os.getcwd())
             self.pdbFileObj = gmml.PdbFile(uploadFile)
             log.debug("pdbFile: " + str(self.pdbFileObj))
         except Exception as error:
@@ -527,7 +530,7 @@ class PreprocessorManager:
     def preprocessPdbForAmber(self, uploadFile, projectDir):
         log.info("preprocessPdbForAmber() was called.")
         try:
-            self.load_gmml_resources()
+            self.__load_gmml_resources()
         except Exception as error:
             log.error("There was a problem loading resources from gmml: " + str(error))
             log.error(traceback.format_exc())
@@ -582,7 +585,7 @@ class PreprocessorManager:
     def doEvaluation(self, uploadFile):
         log.info("doEvaluation() was called.")
         try:
-            self.load_gmml_resources()
+            self.__load_gmml_resources()
         except Exception as error:
             log.error("There was a problem loading resources from gmml: " + str(error))
             log.error(traceback.format_exc())
@@ -838,6 +841,8 @@ class PreprocessPdbForAmberOutput(BaseModel):
 class StructureFileInputs(BaseModel):
     pdb_file_name : str = ""
     pdb_ID : str = ""
+    sideload_file_destination : str = ""
+
 
 class StructureFileOutputs(BaseModel):
     evaluationOutput : EvaluationOutput = None 
@@ -969,14 +974,14 @@ class PdbTransaction(commonIO.Transaction):
     #   Creates the dir if it doesn't exist.
     #   @param pdbID String to be used for the RCSB search.
     #   @param uploadDir Destination path for the sideloaded pdb file.
-    def sideloadPdbFromRcsb(pdbID, uploadDir):
+    def sideloadPdbFromRcsb(self, pdbID, uploadDir):
         log.info("sideloadPdbFromRcsb() was called.")
 
         ##Sideload pdb from rcsb.org
         pdbID = pdbID.upper()
         log.debug("pdbID: " + pdbID)
         try:
-            contentBytes =  getContentBytes(pdbID)
+            contentBytes =  self.__getContentBytes(pdbID)
             contentString = str(contentBytes, 'utf-8')
             log.debug("Response content object type: " + str(type(contentString)))
             #log.debug("Response content: \n" + str(contentString))
@@ -1001,17 +1006,56 @@ class PdbTransaction(commonIO.Transaction):
             log.error(traceback.format_exc())
             raise error
         
-        return pdbFileName
+        return uploadTarget
+
+    def __getContentBytes(self, pdbID):
+        log.info("__getContentBytes() was called.")
+        try:
+            rcsbURL = "https://files.rcsb.org/download/" + pdbID + ".pdb1"
+            contentBytes = self.__makeRequest(rcsbURL)
+            return contentBytes
+        except Exception as error:
+            code = error.getcode()
+            if code == 404:
+                log.info("Not found. code: " + str(code))
+                ## Check if the 1 at the end is the issue.
+                try:
+                    log.debug("First request failed. Trying again with a slight edit...")
+                    rcsbURL2 = "https://files.rcsb.org/download/" + pdbID + ".pdb"
+                    log.debug("Trying again with url: " + rcsbURL2)
+                    contentBytes = self.__makeRequest(rcsbURL2)
+                    return contentBytes
+                except Exception as error:
+                    log.error("There was a problem requesting this pdb from RCSB.org: " + str(error))
+                    raise error
+            else:
+                log.error("code: " + str(code))
+                log.error("Caught an error of type: " + str(type(error)))
+                log.error("error fields: " + str(dir(error)))
+                
+                
+                raise error
+
+    ## Used for sideloading.
+    def __makeRequest(self, url):
+        log.info("__makeRequest() was called. url: " + url)
+        try:
+            with urllib.request.urlopen(url) as response:
+                contentBytes = response.read()
+                return contentBytes
+        except Exception as error:
+            log.error("There was a problem making the request: " + str(error))
+            raise error
 
     def getUploadFileFromPdbTransaction(self):
         ## Grab the input
         try:
             inputs = self.request_dict['entity']['inputs']
-            # log.debug("inputs.keys(): " + str(inputs.keys()))
+            log.debug("inputs.keys(): " + str(inputs.keys()))
             if 'pdb_file_name' in inputs.keys():
                 uploadFile = inputs['pdb_file_name']
             elif 'pdb_ID' in inputs.keys():
-                uploadFile = self.sideloadPdbFromRcsb(inputs['pdb_ID'])
+                uploadFile = self.sideloadPdbFromRcsb(inputs['pdb_ID'], inputs['sideload_file_destination'])
         except Exception as error:
             log.error("There was a problem finding the input in the evaluate PDB request: " + str(error))
             log.error(traceback.format_exc())

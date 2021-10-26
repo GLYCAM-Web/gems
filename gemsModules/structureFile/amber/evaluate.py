@@ -16,6 +16,7 @@ def evaluatePdb(pdbTransaction : amberIO.PdbTransaction):
     log.info("evaluatePdb() was called. Still in development!!!")
     try:
         uploadFile = pdbTransaction.getUploadFileFromPdbTransaction()
+        log.debug("uploadFile: " + uploadFile)
     except Exception as error:
         log.error("There was a problem getting the upload file from the PdbTransaction: " + str(error))
         log.error(traceback.format_exc())
@@ -45,6 +46,7 @@ def evaluatePdb(pdbTransaction : amberIO.PdbTransaction):
 
     ### Generate the processed pdb's content
     try:
+        log.debug("instantiating the mngr")
         mngr = amberIO.PreprocessorManager()
         output = mngr.doEvaluation(uploadFile)
         log.debug("output obj type: " + str(type(output)))

@@ -1,0 +1,17 @@
+{
+    "entity": {
+        "type": "StructureFile",
+        "services": {
+            "evaluate": {
+                "type": "Evaluate"
+            }
+        },
+        "inputs": {
+            "pdb_ID": "1BUY",
+            "sideload_file_destination" : "/website/TESTS/pdb/test_in/sideloads/"
+        }
+    },
+    "options": {
+        "targetModule": "amber"
+    }
+}
