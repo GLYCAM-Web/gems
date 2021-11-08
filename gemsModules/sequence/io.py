@@ -83,7 +83,7 @@ class TheResidueRingPucker(BaseModel):
             )
 
 class TheRotamerDihedralInfo(BaseModel):
-    dihedralName : str = None # phi, psi etc. Use Enum above once anything works :(
+    dihedralName : str = None # phi, psi etc. 
     dihedralValues : List[str] = [] # gg, -g, tg, etc
 
 class SingleLinkageRotamerData(BaseModel): 
