@@ -659,8 +659,13 @@ class PreprocessorManager:
                     unrecognizedMoleculeObj = UnrecognizedMolecule()
                     unrecognizedMoleculeObj.loadUnrecognizedMolecule(molecule)
                     unrecognizedMolecules.append(unrecognizedMoleculeObj)
-                    if unrecognizedMoleculeObj.isMidChain:
+                    if unrecognizedMoleculeObj.isMidChain == "True":
+                        log.debug("unrecognizedMoleculeObj.isMidChain == True")
                         urgencyLevel = "error"
+                    elif unrecognizedMoleculeObj.isMidChain == "False":
+                        log.debug("unrecognizedMoleculeObj.isMidChain == False")
+                    else:
+                        log.debug("unrecognizedMoleculeObj.isMidChain obj is: " + str(type(unrecognizedMoleculeObj.isMidChain)))
 
                 self.preprocessingOptions.append({"unrecognizedMolecules" : unrecognizedMolecules})
 
