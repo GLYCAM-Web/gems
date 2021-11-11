@@ -1061,7 +1061,7 @@ class PdbTransaction(commonIO.Transaction):
                 uploadFile = inputs['pdb_file_name']
             elif 'pdb_ID' in inputs.keys():
                 ##Set a default sideload destination
-                sideloadDestination = "/website/TESTS/pdb/test_in/sideloads/"
+                sideloadDestination = "/website/uploads/tools/pdb/git-ignore-me_sideloads/"
                 if 'sideload_file_destination' in inputs.keys():
                     sideloadDestination = inputs['sideload_file_destination']
                 log.debug("sideloadDestination: " + sideloadDestination)
