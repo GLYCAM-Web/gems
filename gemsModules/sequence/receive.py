@@ -174,10 +174,31 @@ def receive(receivedTransaction : sequenceio.Transaction):
         thisTransaction.doDefaultService()
         return
 
+    
+    log.info("Sequence has been validated. Thank you.")
     ## for each requested service:
     for currentService in thisSequence.services:
         log.debug("service, currentService: " + str(currentService))
         thisService=thisSequence.services[currentService]
+
+        ## OGNov21: Always validate the sequence. If not valid, always stop.
+        ## Can remove all other sequence validation checks from sequence code.
+        ## Note that "payload" is used above, no need to check here.
+        ## Instantiating carbBuilder in multiple places isn't great design.
+        ## Wrapping just the new condensedSequence class wasn't possible for Oliver's poor brain.
+        ## doing thisTransaction.generateCommonParserNotice before the "for currentService ..." loop causes a "doesn't exist" fault
+        from gemsModules.sequence import build
+        carbBuilder = build.getCbBuilderForSequence(thisSequence.inputs.sequence.payload);
+        valid = carbBuilder.IsStatusOk()
+        if not valid:
+            log.error(carbBuilder.GetStatusMessage()) # Is incorrect user input an error?
+            log.debug("Just about to call generateCommonParserNotice with the outgoing project.  The transaction_out is :   " )
+            log.debug(thisTransaction.transaction_out.json(indent=2))
+            thisTransaction.generateCommonParserNotice(noticeBrief = 'InvalidInputPayload', exitMessage = carbBuilder.GetStatusMessage())
+            ## prepares the transaction for return to the requestor, success or fail.     
+            thisTransaction.build_outgoing_string() ## NOTE!!! This uses the child method in sequence.io - a better method!
+            return thisTransaction
+        ## End OGNov21 edit.
         if 'Evaluate' in thisService.typename :
             log.debug("Evaluate service requested from sequence entity.")
             from gemsModules.sequence import evaluate

@@ -1,0 +1,98 @@
+{
+  "timestamp": null,
+  "entity": {
+    "entityType": "Sequence",
+    "requestID": null,
+    "services": {
+      "build": {
+        "typename": "Build3DStructure",
+        "givenName": null,
+        "myUuid": null,
+        "inputs": null,
+        "options": null
+      }
+    },
+    "responses": null,
+    "resources": null,
+    "notices": null,
+    "options": null,
+    "inputs": {
+      "sequence": {
+        "payload": "DGlNAcb1-OH",
+        "sequenceFormat": "GlycamCondensed"
+      },
+      "sequenceVariants": null,
+      "systemSolvationOptions": null,
+      "geometryOptions": null,
+      "buildOptions": null,
+      "evaluationOptions": null,
+      "drawOptions": null
+    },
+    "outputs": null
+  },
+  "project": {
+    "pUUID": "3bf24545-9844-49f9-b0c1-5484d206a7ef",
+    "title": "",
+    "comment": "",
+    "timestamp": "2021-11-12T05:14:17.477206",
+    "gems_timestamp": "2021-11-12T05:14:17.477206",
+    "project_type": "cb",
+    "parent_entity": "Sequence",
+    "requested_service": "Build3DStructure",
+    "entity_id": "sequence",
+    "service_id": "cb",
+    "filesystem_path": "/website/userdata/",
+    "compute_cluster_filesystem_path": "",
+    "service_dir": "/website/userdata/sequence/cb",
+    "project_dir": "/website/userdata/sequence/cb/Builds/3bf24545-9844-49f9-b0c1-5484d206a7ef",
+    "logs_dir": "/website/userdata/sequence/cb/Builds/3bf24545-9844-49f9-b0c1-5484d206a7ef/logs",
+    "requesting_agent": "",
+    "has_input_files": false,
+    "site_version": "7a7db4b8b62ff6aa57857433827782e0c0487333",
+    "site_branch": "web-test",
+    "site_code_name": "Developer-Environment",
+    "gems_version": "82f3d3d0793f51a0ef71b340f0a4b6cb80034f22",
+    "gems_branch": "gems-test",
+    "md_utils_version": "589abe37c358b65119194ec8859d85aea3cadcf4",
+    "md_utils_branch": "md-test",
+    "gmml_version": "c00c12e4a1678a820d89dfd6ff0afb5cc5e27c58",
+    "gmml_branch": "feature-RemoveOldCondensedSequenceStuff",
+    "gp_version": "",
+    "gp_branch": "",
+    "site_mode": "CONTAINERS",
+    "site_host_name": "172.24.0.2",
+    "versions_file_path": "/website/userdata/VERSIONS.sh",
+    "host_url_base_path": "https://172.24.0.2",
+    "download_url_path": "https://172.24.0.2/json/download/sequence/cb/3bf24545-9844-49f9-b0c1-5484d206a7ef/",
+    "force_field": "default",
+    "parameter_version": "default",
+    "amber_version": "default",
+    "json_api_version": "0.0.1",
+    "django_project_id": "",
+    "app": "project",
+    "notices": [],
+    "sequence_id": "",
+    "sequence_path": "",
+    "indexOrderedSequence": "",
+    "seqID": "",
+    "selected_rotamers": ""
+  },
+  "prettyPrint": true,
+  "mdMinimize": true,
+  "options": null,
+  "notices": [
+    {
+      "noticeType": [
+        "error"
+      ],
+      "noticeCode": [
+        "400"
+      ],
+      "noticeBrief": "InvalidInputPayload",
+      "noticeMessage": "Cannot create 3D structure as no GLYCAM residue code was found in the GMML metadata for residue: DGlNAcb",
+      "noticeScope": "Transaction",
+      "messagingEntity": "CommonServicer",
+      "additionalInfo": null
+    }
+  ]
+}
