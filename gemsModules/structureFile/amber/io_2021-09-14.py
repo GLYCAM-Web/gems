@@ -1,21 +1,16 @@
 #!/usr/bin/env python3
-import urllib.request
-import pathlib
 from enum import Enum, auto
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union, Any
 from typing import ForwardRef
 from pydantic import BaseModel, Field, ValidationError, validator
 from pydantic.schema import schema
 from gemsModules.common.loggingConfig import *
-from gemsModules.common import io as commonIO
-from gemsModules.common.logic import prettyPrint
+from gemsModules.common import io as commonio
 from gemsModules.common.settings import SCHEMA_DIR
-from gemsModules.common.services import roundHalfUp
-from gemsModules.project import io as projectIO
+from gemsModules.project import dataio as projectio
 from gemsModules.project import projectUtil as projectUtil
-from gemsModules.structureFile import settings as structureFileSettings
-from gemsModules.structureFile.amber import settings as amberSettings
-import gmml, traceback
+from gemsModules.structureFile.amber.logic import*
+import traceback
 
 if loggers.get(__name__):
     pass
@@ -24,36 +19,26 @@ else:
 
 
 
-def getAmberResidueName(item):
-    log.info("getAmberResidueName() was called.")
-    ### TODO: Replace this dummy gems method with gmml logic.
-    amberResidueName = ""
-    if item.GetIsBonded():
-        amberResidueName = "CYX"
-    else:
-        amberResidueName = "CYS"
-
-    return amberResidueName
-
-## summary data
+## Data for the table, offers summary
 ## Used to be unrecognizedHeavyAtoms
-class UnrecognizedAtomsMetadata(BaseModel):
+class UnrecognizedAtomsTableMetadata(BaseModel):
     app : str = "pdb"
     page : str = "options"
-    label : str = "Unrecognized Atoms"
+    tableLabel : str = "Unrecognized Atoms"
     tableKey : str = "unrecognizedAtoms"
     interactionRequirement : str = "none"
     urgency : str = "error"
     count : int = 0
     description: str = "The following atoms were not recognized."
 
-    def setAtomCount(self, atomCount):
-        log.info("setAtomCount() was called.")
+    def __init__(self, atomCount):
+        super().__init__()
+        log.info("Instantiating an unrecognized atoms metadata object.")
         self.count = atomCount
 
     def __str__(self):
         result = super().__str__()
-        result = result + "\nlabel: " + self.label
+        result = result + "\ntableLabel: " + self.tableLabel
         result = result + "\ntableKey: " + self.tableKey
         result = result + "\ninteractionRequirement: " + self.interactionRequirement
         result = result + "\nurgency: " + self.urgency
@@ -76,14 +61,14 @@ class UnrecognizedAtom(BaseModel):
     chainID : str = None
     residueNumber : str = None
 
-    def loadAtom(self, atom):
-        log.info("loadAtom() was called.")
+    def __init__(self, atom):
+        super().__init__()
+        log.info("Instantiating an unrecognized atom.")
         self.atomIndex = str(atom.GetAtomSerialNumber())
         self.atomName = atom.GetAtomName()
         self.residueName = atom.GetResidueName()
         self.chainID = atom.GetResidueChainId()
         self.residueNumber = str(atom.GetResidueSequenceNumber())
-
 
     def __str__(self):
         result = super().__str__()
@@ -97,26 +82,27 @@ class UnrecognizedAtom(BaseModel):
         return result
 
 
-## summary data
+## Data for the table, offers summary
 ##  Used to be unrecognizedResidues
-class UnrecognizedMoleculesMetadata(BaseModel):
+class UnrecognizedMoleculesTableMetadata(BaseModel):
     app : str = "pdb"
     page : str = "options"
-    label : str = "Unrecognized Molecules"
+    tableLabel : str = "Unrecognized Molecules"
     tableKey : str = "unrecognizedMolecules"
     interactionRequirement : str = "none"
     urgency : str = "warning"
     count : int = 0
-    description : str = "The following unrecognized residues were found. They must be deleted (for you to use this site). If Mid-Chain is False, no further action is required. Otherwise, please inspect the missing residues (see Missing Residues table) to choose how we should handle the new chain termini that are created by removing these residues."
+    description : str = "The following unrecognized residues were found. They must be deleted (for you to use this site). If Mid-Chain is False, no further action is required. Otherwise, pleaseinspect the missing residues (see Missing Residues table) to choose how we should handle the new chain termini that are created by removing these residues."
 
-    def loadUnrecognizedMoleculeMetadata(self, moleculeCount, urgencyLevel):
-        log.info("loadUnrecognizedMoleculeMetadata() was called.")
+    def __init__(self, moleculeCount, urgencyLevel):
+        super().__init__()
+        log.info("Instantiating an unrecognized molecules metadata object.")
         self.count = moleculeCount
         self.urgency = urgencyLevel
 
     def __str__(self):
         result = super().__str__()
-        result = result + "\nlabel: " + self.label
+        result = result + "\ntableLabel: " + self.tableLabel
         result = result + "\ntableKey: " + self.tableKey
         result = result + "\ninteractionRequirement: " + self.interactionRequirement
         result = result + "\nurgency: " + self.urgency
@@ -138,8 +124,9 @@ class UnrecognizedMolecule(BaseModel):
     isMidChain : bool = True
     canPreprocess : bool = True
 
-    def loadUnrecognizedMolecule(self, molecule):
-        log.info("loadUnrecognizedMolecule() was called.")
+    def __init__(self, molecule):
+        super().__init__()
+        log.info("Instantiating an unrecognized molecule.")
         self.chainID  = molecule.GetResidueChainId()
         self.index  = str(molecule.GetResidueSequenceNumber())
         insertionCode = molecule.GetResidueInsertionCode()
@@ -149,6 +136,7 @@ class UnrecognizedMolecule(BaseModel):
 
         self.name = molecule.GetResidueName()
         self.isMidChain = str(molecule.GetMiddleOfChain())
+        ##TODO: Can we ask gmml if we canPreprocess, rather than hard coding?
 
     def __str__(self):
         result = super().__str__()
@@ -162,24 +150,25 @@ class UnrecognizedMolecule(BaseModel):
         return result
 
 
-## summary data
-class MissingResiduesMetadata(BaseModel):
+## Data for the table, offers summary
+class MissingResiduesTableMetadata(BaseModel):
     app : str = "pdb"
     page : str = "options"
-    label : str = "Missing Residues"
+    tableLabel : str = "Missing Residues"
     tableKey : str = "missingResidues"
     interactionRequirement : str = "optional"
     urgency : str = "warning"
     count : int = 0
     description : str = "Gaps were detected."
 
-    def setMoleculeCount(self, moleculeCount):
-        log.info("setMoleculeCount() was called.")
+    def __init__(self, moleculeCount):
+        super().__init__()
+        log.info("Instantiating an unrecognized missing residues metadata object.")
         self.count = moleculeCount
 
     def __str__(self):
         result = super().__str__()
-        result = result + "\nlabel: " + self.label
+        result = result + "\ntableLabel: " + self.tableLabel
         result = result + "\ntableKey: " + self.tableKey
         result = result + "\ninteractionRequirement: " + self.interactionRequirement
         result = result + "\nurgency: " + self.urgency
@@ -200,8 +189,8 @@ class MissingResidue(BaseModel):
     residueBeforeGap : str = None
     residueAfterGap : str = None
 
-    def loadMissingResidue(self, residue):
-        log.info("loadMissingResidue() was called.")
+    def __init__(self, residue):
+        super().__init__()
         self.chainID = residue.GetResidueChainId()
         self.startSequenceNumber = str(residue.GetStartingResidueSequenceNumber())
         startInsertionCode = residue.GetStartingResidueInsertionCode()
@@ -228,24 +217,25 @@ class MissingResidue(BaseModel):
         return result
 
 
-## summary data
-class HistidineProtonationsMetadata(BaseModel):
+## Data for the table, offers summary
+class HistidineProtonationsTableMetadata(BaseModel):
     app : str = "pdb"
     page : str = "options"
-    label : str = "Histidine Protonations"
+    tableLabel : str = "Histidine Protonations"
     tableKey : str = "histidineProtonations"
     interactionRequirement : str = "optional"
     urgency : str = "info"
     count : int = 0
     description : str = "Choose HIS mappings."
 
-    def setMappingCount(self, mappingCount):
-        log.info("setMappingCount() was called")
+    def __init__(self, mappingCount):
+        super().__init__()
+        log.info("Instantiating a histidine protonations metadata object.")
         self.count = mappingCount
 
     def __str__(self):
         result = super().__str__()
-        result = result + "\nlabel: " + self.label
+        result = result + "\ntableLabel: " + self.tableLabel
         result = result + "\ntableKey: " + self.tableKey
         result = result + "\ninteractionRequirement: " + self.interactionRequirement
         result = result + "\nurgency: " + self.urgency
@@ -264,8 +254,8 @@ class HistidineProtonation(BaseModel):
     residueNumber : str = None
     mappingFormat : str = None
 
-    def loadHistidineProtonation(self, mapping):
-        log.info("loadHistidineProtonation() was called.")
+    def __init__(self, mapping):
+        super().__init__()
         self.chainID = mapping.GetResidueChainId()
         self.residueNumber = str(mapping.GetResidueSequenceNumber())
         insertionCode = mapping.GetResidueInsertionCode()
@@ -284,24 +274,25 @@ class HistidineProtonation(BaseModel):
         return result
 
 
-## summary data
-class DisulfideBondsMetadata(BaseModel):
+## Data for the table, offers summary
+class DisulfideBondsTableMetadata(BaseModel):
     app : str = "pdb"
     page : str = "options"
-    label : str = "Disulfide Bonds"
+    tableLabel : str = "Disulfide Bonds"
     tableKey : str = "disulfideBonds"
     interactionRequirement : str = "optional"
     urgency : str = "info"
     count : int = 0
     description : str = "Select disulfide bonds."
 
-    def setBondCount(self, bondCount):
-        log.info("setBondCount() was called.")
+    def __init__(self, bondCount):
+        super().__init__()
+        log.info("Instantiating a disulfide bonds metadata object.")
         self.count = bondCount
 
     def __str__(self):
         result = super().__str__()
-        result = result + "\nlabel: " + self.label
+        result = result + "\ntableLabel: " + self.tableLabel
         result = result + "\ntableKey: " + self.tableKey
         result = result + "\ninteractionRequirement: " + self.interactionRequirement
         result = result + "\nurgency: " + self.urgency
@@ -327,8 +318,8 @@ class DisulfideBond(BaseModel):
     distance : str = None
     bonded : bool = True
 
-    def loadDisulfideBond(self, bond):
-        log.info("loadDisulfideBond() was called: ")
+    def __init__(self, bond):
+        super().__init__()
         self.residue1ChainId = bond.GetResidueChainId1()
         self.residue1Number = str(bond.GetResidueSequenceNumber1())
         self.residue1AmberResidueName = getAmberResidueName(bond)
@@ -355,25 +346,36 @@ class DisulfideBond(BaseModel):
         return result
 
 
+def getAmberResidueName(item):
+    log.info("getAmberResidueName() was called.")
+    ### TODO: Replace this dummy gems method with gmml logic.
+    amberResidueName = ""
+    if item.GetIsBonded():
+        amberResidueName = "CYX"
+    else:
+        amberResidueName = "CYS"
+
+    return amberResidueName
 
 ## Data for the table, offers summary
-class ChainTerminationsMetadata(BaseModel):
+class ChainTerminationsTableMetadata(BaseModel):
     app : str = "pdb"
     page : str = "options"
-    label : str = "Chain Terminations"
+    tableLabel : str = "Chain Terminations"
     tableKey : str = "chainTerminations"
     interactionRequirement : str = "optional"
     urgency : str = "info"
     count : int = 0
     description : str = "Select terminal residues."
 
-    def setTerminalCount(self, terminalCount):
-        log.info("setTerminalCount() was called.")
+    def __init__(self, terminalCount):
+        super().__init__()
+        log.info("Instantiating a chain terminations metadata object.")
         self.count = terminalCount
 
     def __str__(self):
         result = super().__str__()
-        result = result + "\nlabel: " + self.label
+        result = result + "\ntableLabel: " + self.tableLabel
         result = result + "\ntableKey: " + self.tableKey
         result = result + "\ninteractionRequirement: " + self.interactionRequirement
         result = result + "\nurgency: " + self.urgency
@@ -392,8 +394,8 @@ class ChainTermination(BaseModel):
     startIndex : str = None
     endIndex : str = None
 
-    def loadChainTermination(self, terminal):
-        log.info("loadChainTermination() was called.")
+    def __init__(self, terminal):
+        super().__init__()
         self.chainID = terminal.GetResidueChainId()
         self.startIndex = str(terminal.GetStartingResidueSequenceNumber())
         startInsertion = str(terminal.GetStartingResidueInsertionCode())
@@ -416,23 +418,24 @@ class ChainTermination(BaseModel):
 
 
 ## Data for the table, offers summary
-class ReplacedHydrogensMetadata(BaseModel):
+class ReplacedHydrogensTableMetadata(BaseModel):
     app : str = "pdb"
     page : str = "options"
-    label : str = "Replaced Hydrogens"
+    tableLabel : str = "Replaced Hydrogens"
     tableKey : str = "replacedHydrogens"
     interactionRequirement : str = "none"
     urgency : str = "info"
     count : int = 0
     description : str = "The following atoms were removed..."
 
-    def setHydrogenCount(self, hydrogenCount):
-        log.info("setHydrogenCount() was called")
+    def __init__(self, hydrogenCount):
+        super().__init__()
+        log.info("Instantiating a replaced hydrogens metadata object.")
         self.count = hydrogenCount
 
     def __str__(self):
         result = super().__str__()
-        result = result + "\nlabel: " + self.label
+        result = result + "\ntableLabel: " + self.tableLabel
         result = result + "\ntableKey: " + self.tableKey
         result = result + "\ninteractionRequirement: " + self.interactionRequirement
         result = result + "\nurgency: " + self.urgency
@@ -453,8 +456,8 @@ class ReplacedHydrogen(BaseModel):
     chainID : str = None
     residueNumber : str = None
 
-    def loadReplacedHydrogen(self, hydrogen):
-        log.info("loadReplacedHydrogen() was called.")
+    def __init__(self, hydrogen):
+        super().__init__()
         self.index = str(hydrogen.GetAtomSerialNumber())
         self.atomName = hydrogen.GetAtomName()
         self.residueName = hydrogen.GetResidueName()
@@ -475,170 +478,71 @@ class ReplacedHydrogen(BaseModel):
         result = result + "\npage: " + self.page
         return result
 
-class PreprocessorManager:
-    aminoLibs : gmml.string_vector = None
-    prepFile : gmml.string_vector = None
-    glycamLibs : gmml.string_vector = None
-    otherLibs : gmml.string_vector = None
-    preprocessor : gmml.PdbPreprocessor = None
 
-    pdbFileObj : gmml.PdbFile = None
+## Services
+class EvaluationOutput(BaseModel):
+    # PreprocessingOptions
+    preprocessingOptions : List[Union[
+            UnrecognizedAtom,
+            UnrecognizedMolecule,
+            MissingResidue,
+            HistidineProtonation,
+            DisulfideBond,
+            ChainTermination,
+            ReplacedHydrogen        
+        ]] = []
 
-    preprocessingOptions = []
-    metadata = []
-    
-    def __load_gmml_resources(self):
-        log.info("__load_gmml_resources() was called.")
-        
-        try:
-            log.info("Evaluating a PDB file")
-            self.aminoLibs = gmml.string_vector()
-            self.aminoLibs.push_back(amberSettings.AMINO_LIBS)
+    # Data about the tables    
+    tableMetadata : List[Union[
+            UnrecognizedAtomsTableMetadata,
+            UnrecognizedMoleculesTableMetadata,
+            MissingResiduesTableMetadata,
+            HistidineProtonationsTableMetadata,
+            DisulfideBondsTableMetadata,
+            ChainTerminationsTableMetadata,
+            ReplacedHydrogensTableMetadata
+        ]] = []
 
-            self.prepFile = gmml.string_vector()
-            self.prepFile.push_back(amberSettings.PREP_FILE)
+    def __init__(self, uploadFile):
+        super().__init__()
+        log.info("Intantiating a EvaluationOutput")
+        aminoLibs = getDefaultAminoLibs()
+        prepFile = getDefaultPrepFile()
+        glycamLibs = gmml.string_vector()
+        otherLibs = gmml.string_vector()
+        preprocessor = gmml.PdbPreprocessor()
 
-            self.glycamLibs = gmml.string_vector()
-            self.glycamLibs.push_back(amberSettings.GLYCAM_LIBS)
-
-            self.otherLibs = gmml.string_vector()
-            self.otherLibs.push_back(amberSettings.OTHER_LIBS)
-
-            self.preprocessor = gmml.PdbPreprocessor()
-        except Exception as error:
-            log.error("There was a problem loading gmml resources: " + str(error))
-            log.error(traceback.format_exc())
-            raise error
-
-    ## Only meant to be used in this class. Python automatically throws an error if methods
-    #   that begin with 2 underscores are called from other files.
-    def __load_pdb_file(self, uploadFile):
-        log.info("__load_pdb_file() was called.")
-        log.debug("uploadFile: " + uploadFile)
-        # need a pdb file object.
+        ## need a pdb file object.
         try:
             log.debug("working dir: " + os.getcwd())
-            self.pdbFileObj = gmml.PdbFile(uploadFile)
-            log.debug("pdbFile: " + str(self.pdbFileObj))
+            pdbFileObj = gmml.PdbFile(uploadFile)
+            log.debug("pdbFile: " + str(pdbFileObj))
+
         except Exception as error:
             log.error("There was a problem creating the pdbFile object from the uploaded pdb file: " + str(error))
             log.error(traceback.format_exc())
             raise error
 
-    ## For now, uses default resources. Need to update this to allow users to specify things 
-    ##  like prep files and libs.
-    def preprocessPdbForAmber(self, uploadFile, projectDir):
-        log.info("preprocessPdbForAmber() was called.")
-        try:
-            self.__load_gmml_resources()
-        except Exception as error:
-            log.error("There was a problem loading resources from gmml: " + str(error))
-            log.error(traceback.format_exc())
-            raise error
-
-        try:
-            self.__load_pdb_file(uploadFile)
-        except Exception as error:
-            log.error("There was a problem uploading the pdb file: " + str(error))
-            log.error(traceback.format_exc())
-            raise error
-
         ## need a preprocessor object.
         try:
-            log.debug("About to preprocess an unevaluated file.")
-            log.debug("Evaluator: ")
-            log.debug("pdbFileObj: " + str(self.pdbFileObj))
-
-            log.debug("aminoLibs:")
-            for item in self.aminoLibs:
-                log.debug(str(item))
-            log.debug("glycamLibs:")
-            for item in self.glycamLibs:
-                log.debug(str(item))
-            log.debug("otherLibs:")
-            for item in self.otherLibs:
-                log.debug(str(item))
-            log.debug("prepFile:")
-            for item in self.prepFile:
-                log.debug(str(item))
-
             ### GMML's Preprocess
-            self.preprocessor.Preprocess(self.pdbFileObj, self.aminoLibs, self.glycamLibs, self.otherLibs, self.prepFile)
-            ##pdbfile, amino_libs, glycam_libs, prep
-            self.preprocessor.ApplyPreprocessingWithTheGivenModelNumber(self.pdbFileObj, self.aminoLibs, self.glycamLibs, self.prepFile)
-            # self.preprocessor.Print()
-
-            seq_map = self.pdbFileObj.GetSequenceNumberMapping()
-            log.debug(seq_map.size())
-            for x in seq_map:
-                log.debug(x, seq_map[x])
-            fileName = os.path.join(projectDir, 'updated_pdb.pdb')
-            log.debug("Output destination: " + fileName)
-            self.pdbFileObj.WriteWithTheGivenModelNumber(fileName)
-            log.debug("Finished preprocessing.")
+            preprocessor.Preprocess(pdbFileObj, aminoLibs, glycamLibs, otherLibs, prepFile)
         except Exception as error:
             log.error("There was a prolem preprocessing the input: " + str(error))
             log.error(traceback.format_exc())
             raise error
-
-
-    def doEvaluation(self, uploadFile):
-        log.info("doEvaluation() was called.")
-        try:
-            self.__load_gmml_resources()
-        except Exception as error:
-            log.error("There was a problem loading resources from gmml: " + str(error))
-            log.error(traceback.format_exc())
-            raise error
-        
-        try:
-            self.__load_pdb_file(uploadFile)
-        except Exception as error:
-            log.error("There was a problem uploading the pdb file: " + str(error))
-            log.error(traceback.format_exc())
-            raise error
-
-        ## need a preprocessor object.
-        try:
-            log.debug("About to preprocess an unevaluated file.")
-            log.debug("Evaluator: ")
-            log.debug("pdbFileObj: " + str(self.pdbFileObj))
-
-            log.debug("aminoLibs:")
-            for item in self.aminoLibs:
-                log.debug(str(item))
-            log.debug("glycamLibs:")
-            for item in self.glycamLibs:
-                log.debug(str(item))
-            log.debug("otherLibs:")
-            for item in self.otherLibs:
-                log.debug(str(item))
-            log.debug("prepFile:")
-            for item in self.prepFile:
-                log.debug(str(item))
-
-            ### GMML's Preprocess
-            self.preprocessor.Preprocess(self.pdbFileObj, self.aminoLibs, self.glycamLibs, self.otherLibs, self.prepFile)
-        except Exception as error:
-            log.error("There was a prolem preprocessing the input: " + str(error))
-            log.error(traceback.format_exc())
-            raise error
-
 
         ##UnrecognizedAtoms
         try: 
-            log.debug("unrecognized heavy atoms?")
-            atoms = self.preprocessor.GetUnrecognizedHeavyAtoms()
-            log.debug("atoms: " + repr(atoms))
+            atoms = preprocessor.GetUnrecognizedHeavyAtoms()
             if len(atoms) > 0:
-                unrecognizedAtomsMetadata = UnrecognizedAtomsMetadata()
-                unrecognizedAtomsMetadata.setAtomCount(len(atoms))
-                self.metadata.append(unrecognizedAtomsMetadata)
+                metadata = UnrecognizedAtomsTableMetadata(len(atoms))
+                log.debug("metadata: " + str(type(metadata)))
+                self.tableMetadata.append(metadata)
                 unrecognizedAtoms = []
 
                 for atom in atoms:
-                    unrecognizedAtomObj = UnrecognizedAtom()
-                    unrecognizedAtomObj.loadAtom(atom)
+                    unrecognizedAtomObj = UnrecognizedAtom(atom)
                     unrecognizedAtoms.append(unrecognizedAtomObj)
                 
                 self.preprocessingOptions.append({"unrecognizedAtoms": unrecognizedAtoms})
@@ -651,22 +555,19 @@ class PreprocessorManager:
         ##UnrecognizedMolecules
         ##  Used to be unrecognizedResidues
         try: 
-            modlecules = self.preprocessor.GetUnrecognizedResidues()
+            modlecules = preprocessor.GetUnrecognizedResidues()
             if len(modlecules) > 0:
                 urgencyLevel = "warning"
                 unrecognizedMolecules = []
                 for molecule in modlecules:
-                    unrecognizedMoleculeObj = UnrecognizedMolecule()
-                    unrecognizedMoleculeObj.loadUnrecognizedMolecule(molecule)
+                    unrecognizedMoleculeObj = UnrecognizedMolecule(molecule)
                     unrecognizedMolecules.append(unrecognizedMoleculeObj)
                     if unrecognizedMoleculeObj.isMidChain:
                         urgencyLevel = "error"
 
                 self.preprocessingOptions.append({"unrecognizedMolecules" : unrecognizedMolecules})
-
-                unrecognizedMoleculesMetadata = UnrecognizedMoleculesMetadata()
-                unrecognizedMoleculesMetadata.loadUnrecognizedMoleculeMetadata(len(modlecules), urgencyLevel)
-                self.metadata.append(unrecognizedMoleculesMetadata)
+                metadata = UnrecognizedMoleculesTableMetadata(len(modlecules), urgencyLevel)
+                self.tableMetadata.append(metadata)
             
         except Exception as error:
             log.error("There was a problem creating the pdbFile object from the uploaded pdb file: " + str(error))
@@ -675,16 +576,12 @@ class PreprocessorManager:
 
         ##MissingResidues
         try: 
-            residues = self.preprocessor.GetMissingResidues()
+            residues = preprocessor.GetMissingResidues()
             if len(residues) > 0:
-                missingResiduesMetadata = MissingResiduesMetadata()
-                missingResiduesMetadata.setMoleculeCount(len(residues))
-                self.metadata.append(missingResiduesMetadata)
-
+                self.tableMetadata.append(MissingResiduesTableMetadata(len(residues)))
                 missingResidues = []
                 for residue in residues:
-                    missingResidueObj = MissingResidue()
-                    missingResidueObj.loadMissingResidue(residue)
+                    missingResidueObj = MissingResidue(residue)
                     missingResidues.append(missingResidueObj)
 
                 self.preprocessingOptions.append({"missingResidues" : missingResidues})
@@ -696,16 +593,12 @@ class PreprocessorManager:
 
         ##HistidineProtonations
         try: 
-            histidineMappings = self.preprocessor.GetHistidineMappings()
+            histidineMappings = preprocessor.GetHistidineMappings()
             if len(histidineMappings) > 0:
-                histidineProtonationsMetadata = HistidineProtonationsMetadata()
-                histidineProtonationsMetadata.setMappingCount(len(histidineMappings))
-                self.metadata.append( histidineProtonationsMetadata )
-
+                self.tableMetadata.append( HistidineProtonationsTableMetadata(len(histidineMappings)))
                 histidineProtonations = []
                 for mapping in histidineMappings:
-                    mappingObj = HistidineProtonation()
-                    mappingObj.loadHistidineProtonation(mapping)
+                    mappingObj = HistidineProtonation(mapping)
                     histidineProtonations.append(mappingObj)
                 
                 self.preprocessingOptions.append({"histidineProtonations" : histidineProtonations})
@@ -717,15 +610,12 @@ class PreprocessorManager:
 
         ##DisulfideBonds
         try: 
-            disulfideBonds = self.preprocessor.GetDisulfideBonds()
+            disulfideBonds = preprocessor.GetDisulfideBonds()
             if len(disulfideBonds) > 0:
-                disulfideBondsMetadata = DisulfideBondsMetadata()
-                disulfideBondsMetadata.setBondCount(len(disulfideBonds))
-                self.metadata.append(disulfideBondsMetadata)
+                self.tableMetadata.append(DisulfideBondsTableMetadata(len(disulfideBonds)))
                 disulfides = []
                 for bond in disulfideBonds:
-                    disulfideBondObj = DisulfideBond()
-                    disulfideBondObj.loadDisulfideBond(bond)
+                    disulfideBondObj = DisulfideBond(bond)
                     disulfides.append(disulfideBondObj)
 
                 self.preprocessingOptions.append({"disulfideBonds" : disulfides})
@@ -734,18 +624,14 @@ class PreprocessorManager:
             log.error("There was a problem creating the pdbFile object from the uploaded pdb file: " + str(error))
             log.error(traceback.format_exc())
             raise error
-
         ##ChainTerminations
         try: 
-            chainTerminations = self.preprocessor.GetChainTerminations()
+            chainTerminations = preprocessor.GetChainTerminations()
             if len(chainTerminations) > 0:
-                chainTerminationsMetadata = ChainTerminationsMetadata()
-                chainTerminationsMetadata.setTerminalCount(len(chainTerminations))
-                self.metadata.append(chainTerminationsMetadata)
+                self.tableMetadata.append(ChainTerminationsTableMetadata(len(chainTerminations)))
                 terminations = []
                 for terminal in chainTerminations:
-                    terminalObj = ChainTermination()
-                    terminalObj.loadChainTermination(terminal)
+                    terminalObj = ChainTermination(terminal)
                     terminations.append(terminalObj)
 
                 self.preprocessingOptions.append({"chainTerminations" : terminations})
@@ -754,18 +640,14 @@ class PreprocessorManager:
             log.error("There was a problem creating the pdbFile object from the uploaded pdb file: " + str(error))
             log.error(traceback.format_exc())
             raise error
-
         ##ReplacedHydrogens
         try: 
-            replacedHydrogens = self.preprocessor.GetReplacedHydrogens()
+            replacedHydrogens = preprocessor.GetReplacedHydrogens()
             if len(replacedHydrogens) > 0:
-                replacedHydrogensMetadata = ReplacedHydrogensMetadata()
-                replacedHydrogensMetadata.setHydrogenCount(len(replacedHydrogens))
-                self.metadata.append(replacedHydrogensMetadata)
+                self.tableMetadata.append(ReplacedHydrogensTableMetadata(len(replacedHydrogens)))
                 hydrogens = []
                 for hydrogen in replacedHydrogens:
-                    hydrogenObj = ReplacedHydrogen()
-                    hydrogenObj.loadReplacedHydrogen(hydrogen)
+                    hydrogenObj = ReplacedHydrogen(hydrogen)
                     hydrogens.append(hydrogenObj)
 
                 self.preprocessingOptions.append({"replacedHydrogens" : hydrogens})
@@ -775,60 +657,14 @@ class PreprocessorManager:
             log.error(traceback.format_exc())
             raise error
 
-        evaluationData = {
-            'preprocessingOptions' : self.preprocessingOptions,
-            'metadata' : self.metadata
-        }
-
-        try:
-            log.debug("evaluationData obj type: " + str(type(evaluationData)))
-            log.debug("evaluationData: " + repr(evaluationData))
-            evaluationOutput = EvaluationOutput()
-            evaluationOutput.loadEvaluationOutput(evaluationData)
-            return evaluationOutput
-        except Exception as error:
-            log.error("There was a problem instantiating an EvaluationOutput obj: " + str(error))
-            log.error(traceback.format_exc())
-            raise error
-
-## Services
-##  @brief This should only be instantiated after uploading/sideloading is finished.
-class EvaluationOutput(BaseModel):
-    # PreprocessingOptions
-    preprocessingOptions : List[Union[
-            UnrecognizedAtom,
-            UnrecognizedMolecule,
-            MissingResidue,
-            HistidineProtonation,
-            DisulfideBond,
-            ChainTermination,
-            ReplacedHydrogen        
-        ]] = None
-
-    # Data about the tables    
-    metadata : List[Union[
-            UnrecognizedAtomsMetadata,
-            UnrecognizedMoleculesMetadata,
-            MissingResiduesMetadata,
-            HistidineProtonationsMetadata,
-            DisulfideBondsMetadata,
-            ChainTerminationsMetadata,
-            ReplacedHydrogensMetadata
-        ]] = None
-
-    def loadEvaluationOutput(self, data):
-        log.debug("loadEvaluationOutput was called.")
-        self.preprocessingOptions = data['preprocessingOptions']
-        self.metadata = data['metadata']  
-
     def __str__(self):
         result = super().__str__()
         result = result + "\npreprocessingOptions:"
         for option in self.preprocessingOptions:
             result = result + "\n\t" + str(type(self)) + " option: " + str(option)
             
-        result = result + "\nmetadata:"
-        for table in self.metadata:
+        result = result + "\ntableMetadata:"
+        for table in self.tableMetadata:
             result = result + "\n\ttable:" + str(table)
         return result
         
@@ -838,14 +674,17 @@ class PreprocessPdbForAmberOutput(BaseModel):
     payload : str = None
     downloadUrl : str = None
 
+    ##TODO: needs an init
+
+
 class StructureFileInputs(BaseModel):
     pdb_file_name : str = ""
     pdb_ID : str = ""
-    sideload_file_destination : str = ""
-
 
 class StructureFileOutputs(BaseModel):
-    evaluationOutput : EvaluationOutput = None 
+    structureFileEvaluationOutput : EvaluationOutput = None 
+
+
 
 class StructureFileResponse(BaseModel):
     typename : str = Field(
@@ -876,8 +715,8 @@ class StructureFileResponse(BaseModel):
                 self.outputs.append(output)
 
 
-class StructureFileService(commonIO.Service):
-    typename : structureFileSettings.Services = Field(
+class StructureFileService(commonio.Service):
+    typename : StructureFileServices = Field(
         'Evaluate',
         alias='type',
         title = 'Requested Service',
@@ -892,67 +731,47 @@ class StructureFileService(commonIO.Service):
         log.debug("Init for the Services in StructureFile was called.")
 
 
-class StructureFileEntity(commonIO.Entity):
+class StructureFileEntity(commonio.Entity):
     entityType : str = Field(
-        structureFileSettings.WhoIAm,
+        settings.WhoIAm,
         title='Type',
         alias='type'
     )
     services : Dict[str, StructureFileService] = {}
     inputs : StructureFileInputs =  {}
     outputs : StructureFileOutputs =  None
-    
 
-    # def __init__(self, **data: Any):
-    #     super().__init__(**data)
-    #     log.info("Instantiating a structureFileEntity")
-    #     log.debug("entityType: " + self.entityType)
+    def __init__(self, **data: Any):
+        super().__init__(**data)
+        log.info("Instantiating a structureFileEntity")
+        log.debug("entityType: " + self.entityType)
 
 
-## @brief Override TransactionSchema, setting this entity to StructureFile
-class StructureFileTransactionSchema(commonIO.TransactionSchema):
-    entity : StructureFileEntity = ...
-    project : projectIO.PdbProject = None
+class structureFileTransactionSchema(commonio.TransactionSchema):
+    entity : StructureFileEntity = None
 
     def __init__(self, **data : Any):
         super().__init__(**data)
 
-##  @brief Transactions for PDB Preprocessing.
-##  @detail Transaction schema contains entity, options, notices, and projects
-class PdbTransaction(commonIO.Transaction):
-    transaction_in : StructureFileTransactionSchema 
-    transaction_out : StructureFileTransactionSchema
+
+class Transaction(commonio.Transaction):
+    transaction_in : structureFileTransactionSchema 
+    transaction_out : structureFileTransactionSchema
 
     def populate_transaction_in(self):
-        log.info("Populating transaction_in for a PdbTransaction:")
-        self.transaction_in = StructureFileTransactionSchema(**self.request_dict)
-        log.debug("The transaction_in is: " )
-        log.debug(self.transaction_in.json(indent=2))
-        
+        log.info("structureFile Transaction populate_transaction_in() was called.")
+        ##The following debug lines are also sometimes useful, but normally redundant.
+        #log.debug("self.request_dict: " )
+        #prettyPrint(self.request_dict)
+        self.transaction_in = structureFileTransactionSchema(**self.request_dict)
 
+        self.initialize_transaction_out_from_transaction_in() 
 
-    # ## @brief Copies request input into transaction object, before providing services
-    # def populate_transaction_in(self):
-    #     log.info("structureFile Transaction populate_transaction_in() was called.")
-    #     ##The following debug lines are also sometimes useful, but normally redundant.
-    #     #log.debug("self.request_dict: " )
-    #     #prettyPrint(self.request_dict)
-    #     self.transaction_in = StructureFileTransactionSchema(**self.request_dict)
-
-    #     self.initialize_transaction_out_from_transaction_in() 
-
-    ## @brief Gets started on the output, before providing services.
     def initialize_transaction_out_from_transaction_in(self) :
-        log.info("initialize_transaction_out_from_transaction_in() was called.")
-        try:
-            self.transaction_out=self.transaction_in.copy(deep=True)
-            log.debug("The transaction_out is: " )
-            log.debug(self.transaction_out.json(indent=2))
-        except Exception as error:
-            log.error("There was a problem copying transaction in into transaction out: " + str(error))
-            log.error(traceback.format_exc())
-            raise error
-
+        log.info("structureFile - Transaction.initialize_transaction_out_from_transaction_in was called")
+        self.transaction_out=self.transaction_in.copy(deep=True)
+        log.debug("The transaction_out is: " )
+        log.debug(self.transaction_out.json(indent=2))
 
     def createStructureFileResponse(self, serviceType, inputs, outputs):
         log.info("createStructureFileResponse() was called.")
@@ -970,103 +789,7 @@ class PdbTransaction(commonIO.Transaction):
 
         log.debug("self.outgoing_string: " + self.outgoing_string)
 
-    ##Returns the filename of a pdb file that is written to the dir you offer.
-    #   Creates the dir if it doesn't exist.
-    #   @param pdbID String to be used for the RCSB search.
-    #   @param uploadDir Destination path for the sideloaded pdb file.
-    def sideloadPdbFromRcsb(self, pdbID, uploadDir):
-        log.info("sideloadPdbFromRcsb() was called.")
 
-        ##Sideload pdb from rcsb.org
-        pdbID = pdbID.upper()
-        log.debug("pdbID: " + pdbID)
-        try:
-            contentBytes =  self.__getContentBytes(pdbID)
-            contentString = str(contentBytes, 'utf-8')
-            log.debug("Response content object type: " + str(type(contentString)))
-            #log.debug("Response content: \n" + str(contentString))
-            ##Get the uploads dir
-            log.debug("uploadDir: " + uploadDir)
-            if not os.path.exists(uploadDir):
-                pathlib.Path(uploadDir).mkdir(parents=True, exist_ok=True)
-            pdbFileName = pdbID + ".pdb"
-            uploadTarget = uploadDir  + pdbFileName
-            log.debug("uploadTarget: " + uploadTarget)
-        except Exception as error:
-            log.error("There was a problem getting the content from the RCSB: " + str(error))
-            log.error(traceback.format_exc())
-            raise error
-
-        try:
-            ##Save the string to file in the uploads dir.
-            with open(uploadTarget, "w") as uploadFile:
-                uploadFile.write(contentString)
-        except Exception as error:
-            log.error("There was a problem writing the sideloaded content into the file: " + str(error))
-            log.error(traceback.format_exc())
-            raise error
-        
-        return uploadTarget
-
-    def __getContentBytes(self, pdbID):
-        log.info("__getContentBytes() was called.")
-        try:
-            rcsbURL = "https://files.rcsb.org/download/" + pdbID + ".pdb1"
-            contentBytes = self.__makeRequest(rcsbURL)
-            return contentBytes
-        except Exception as error:
-            code = error.getcode()
-            if code == 404:
-                log.info("Not found. code: " + str(code))
-                ## Check if the 1 at the end is the issue.
-                try:
-                    log.debug("First request failed. Trying again with a slight edit...")
-                    rcsbURL2 = "https://files.rcsb.org/download/" + pdbID + ".pdb"
-                    log.debug("Trying again with url: " + rcsbURL2)
-                    contentBytes = self.__makeRequest(rcsbURL2)
-                    return contentBytes
-                except Exception as error:
-                    log.error("There was a problem requesting this pdb from RCSB.org: " + str(error))
-                    raise error
-            else:
-                log.error("code: " + str(code))
-                log.error("Caught an error of type: " + str(type(error)))
-                log.error("error fields: " + str(dir(error)))
-                
-                
-                raise error
-
-    ## Used for sideloading.
-    def __makeRequest(self, url):
-        log.info("__makeRequest() was called. url: " + url)
-        try:
-            with urllib.request.urlopen(url) as response:
-                contentBytes = response.read()
-                return contentBytes
-        except Exception as error:
-            log.error("There was a problem making the request: " + str(error))
-            raise error
-
-    def getUploadFileFromPdbTransaction(self):
-        ## Grab the input
-        try:
-            inputs = self.request_dict['entity']['inputs']
-            log.debug("inputs.keys(): " + str(inputs.keys()))
-            if 'pdb_file_name' in inputs.keys():
-                uploadFile = inputs['pdb_file_name']
-            elif 'pdb_ID' in inputs.keys():
-                ##Set a default sideload destination
-                sideloadDestination = "/website/TESTS/pdb/test_in/sideloads/"
-                if 'sideload_file_destination' in inputs.keys():
-                    sideloadDestination = inputs['sideload_file_destination']
-                log.debug("sideloadDestination: " + sideloadDestination)
-                uploadFile = self.sideloadPdbFromRcsb(inputs['pdb_ID'], sideloadDestination)
-        except Exception as error:
-            log.error("There was a problem finding the input in the evaluate PDB request: " + str(error))
-            log.error(traceback.format_exc())
-            raise error
-
-        return uploadFile
 
 def generateSchemaForWeb():
     log.info("generateSchemaForWeb() was called.")
@@ -1078,57 +801,57 @@ def generateSchemaForWeb():
         if not os.path.isdir(moduleSchemaDir):
             os.makedirs(moduleSchemaDir)
         
-        filePath = os.path.join(moduleSchemaDir, 'unrecognizedAtomsMetadataSchema.json')
+        filePath = os.path.join(moduleSchemaDir, 'unrecognizedAtomsTableMetadataSchema.json')
         with open(filePath, 'w') as file:
-            file.write(UnrecognizedAtomsMetadata.schema_json(indent=spaceCount))
+            file.write(UnrecognizedAtomsTableMetadata.schema_json(indent=spaceCount))
 
         filePath = os.path.join(moduleSchemaDir, 'unrecognizedAtomSchema.json')
         with open(filePath, 'w') as file:
             file.write(UnrecognizedAtom.schema_json(indent=spaceCount))
 
-        filePath = os.path.join(moduleSchemaDir, 'unrecognizedMoleculesMetadata.json')
+        filePath = os.path.join(moduleSchemaDir, 'unrecognizedMoleculesTableMetadata.json')
         with open(filePath, 'w') as file:
-            file.write(UnrecognizedMoleculesMetadata.schema_json(indent=spaceCount))
+            file.write(UnrecognizedMoleculesTableMetadata.schema_json(indent=spaceCount))
 
         filePath = os.path.join(moduleSchemaDir, 'unrecognizedMoleculeSchema.json')
         with open(filePath, 'w') as file:
             file.write(UnrecognizedMolecule.schema_json(indent=spaceCount))
 
-        filePath = os.path.join(moduleSchemaDir, 'missingResiduesMetadataSchema.json')
+        filePath = os.path.join(moduleSchemaDir, 'missingResiduesTableMetadataSchema.json')
         with open(filePath, 'w') as file:
-            file.write(MissingResiduesMetadata.schema_json(indent=spaceCount))
+            file.write(MissingResiduesTableMetadata.schema_json(indent=spaceCount))
 
         filePath = os.path.join(moduleSchemaDir, 'missingResidueSchema.json')
         with open(filePath, 'w') as file:
             file.write(MissingResidue.schema_json(indent=spaceCount))
 
-        filePath = os.path.join(moduleSchemaDir, 'histidineProtonationsMetadataSchema.json')
+        filePath = os.path.join(moduleSchemaDir, 'histidineProtonationsTableMetadataSchema.json')
         with open(filePath, 'w') as file:
-            file.write(HistidineProtonationsMetadata.schema_json(indent=spaceCount))
+            file.write(HistidineProtonationsTableMetadata.schema_json(indent=spaceCount))
  
         filePath = os.path.join(moduleSchemaDir, 'histidineProtonationSchema.json')
         with open(filePath, 'w') as file:
             file.write(HistidineProtonation.schema_json(indent=spaceCount))
 
-        filePath = os.path.join(moduleSchemaDir, 'disulfideBondsMetadataSchema.json')
+        filePath = os.path.join(moduleSchemaDir, 'disulfideBondsTableMetadataSchema.json')
         with open(filePath, 'w') as file:
-            file.write(DisulfideBondsMetadata.schema_json(indent=spaceCount))
+            file.write(DisulfideBondsTableMetadata.schema_json(indent=spaceCount))
 
         filePath = os.path.join(moduleSchemaDir, 'disulfideBondSchema.json')
         with open(filePath, 'w') as file:
             file.write(DisulfideBond.schema_json(indent=spaceCount))
 
-        filePath = os.path.join(moduleSchemaDir, 'chainTerminationsMetadataSchema.json')
+        filePath = os.path.join(moduleSchemaDir, 'chainTerminationsTableMetadataSchema.json')
         with open(filePath, 'w') as file:
-            file.write(ChainTerminationsMetadata.schema_json(indent=spaceCount))
+            file.write(ChainTerminationsTableMetadata.schema_json(indent=spaceCount))
 
         filePath = os.path.join(moduleSchemaDir, 'chainTerminationSchema.json')
         with open(filePath, 'w') as file:
             file.write(ChainTermination.schema_json(indent=spaceCount))
 
-        filePath = os.path.join(moduleSchemaDir, 'replacedHydrogensMetadataSchema.json')
+        filePath = os.path.join(moduleSchemaDir, 'replacedHydrogensTableMetadataSchema.json')
         with open(filePath, 'w') as file:
-            file.write(ReplacedHydrogensMetadata.schema_json(indent=spaceCount))
+            file.write(ReplacedHydrogensTableMetadata.schema_json(indent=spaceCount))
 
         filePath = os.path.join(moduleSchemaDir, 'replacedHydrogenSchema.json')
         with open(filePath, 'w') as file:

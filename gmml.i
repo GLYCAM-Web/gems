@@ -15,6 +15,7 @@
 #include "gmml/includes/utils.hpp"
 #include "gmml/includes/generictypedefs.hpp"
 #include "gmml/includes/CodeUtils/codetests.hpp"
+#include "gmml/includes/CodeUtils/logging.hpp"
 #include "gmml/includes/InputSet/CoordinateFileSpace/coordinatefile.hpp"
 #include "gmml/includes/InputSet/CoordinateFileSpace/coordinatefileprocessingexception.hpp"
 #include "gmml/includes/GeometryTopology/coordinate.hpp"
@@ -40,7 +41,6 @@
 #include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceglycam06residue.hpp"
 #include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequence.hpp"
 #include "gmml/includes/InputSet/CondensedSequenceSpace/sequencestring.hpp"
-#include "gmml/includes/InputSet/CondensedSequenceSpace/carbohydratebuilder.hpp"
 
 //#include "gmml/includes/InputSet/CifFileSpace/ciffileatom.hpp"
 //#include "gmml/includes/InputSet/CifFileSpace/ciffile.hpp"
@@ -182,6 +182,8 @@
 #include "gmml/includes/InputSet/TopologyFileSpace/topologyresidue.hpp"
 #include "gmml/includes/InputSet/TopologyFileSpace/topologyfileprocessingexception.hpp"
 
+#include "gmml/includes/InternalPrograms/CarbohydrateBuilder/carbohydrateBuilder.hpp"
+
 //#include "gmml/includes/External_Libraries/json.hpp"
 
 %}
@@ -198,6 +200,7 @@ std::ostream & get_cout() { return std::cout; }
 %include "gmml/includes/utils.hpp"
 %include "gmml/includes/generictypedefs.hpp"
 %include "gmml/includes/CodeUtils/codetests.hpp"
+#include "gmml/includes/CodeUtils/logging.hpp"
 %include "gmml/includes/InputSet/CoordinateFileSpace/coordinatefile.hpp"
 %include "gmml/includes/InputSet/CoordinateFileSpace/coordinatefileprocessingexception.hpp"
 %include "gmml/includes/GeometryTopology/coordinate.hpp"
@@ -223,7 +226,6 @@ std::ostream & get_cout() { return std::cout; }
 %include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceglycam06residue.hpp"
 %include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequence.hpp"
 %include "gmml/includes/InputSet/CondensedSequenceSpace/sequencestring.hpp"
-%include "gmml/includes/InputSet/CondensedSequenceSpace/carbohydratebuilder.hpp"
 
 %include "gmml/includes/InputSet/PdbFileSpace/pdbatomsection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbatomcard.hpp"
@@ -363,6 +365,8 @@ std::ostream & get_cout() { return std::cout; }
 %include "gmml/includes/InputSet/TopologyFileSpace/topologyfile.hpp"
 %include "gmml/includes/InputSet/TopologyFileSpace/topologyresidue.hpp"
 %include "gmml/includes/InputSet/TopologyFileSpace/topologyfileprocessingexception.hpp"
+
+%include "gmml/includes/InternalPrograms/CarbohydrateBuilder/carbohydrateBuilder.hpp"
 
 //%include "gmml/includes/External_Libraries/json.hpp"
 

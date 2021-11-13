@@ -35,7 +35,7 @@ def receive(receivedTransaction : sequenceio.Transaction):
     log.info("sequence.receive() was called:\n")
     log.debug("The received transaction contains this incoming string: ")
     log.debug(receivedTransaction.incoming_string)
-    log.debug("The received transaction contains this request dict: ")
+    log.debug("request dict: ")
     log.debug(receivedTransaction.request_dict)
 
     # ##
@@ -51,6 +51,7 @@ def receive(receivedTransaction : sequenceio.Transaction):
         thisTransaction.populate_transaction_in()
     except ValidationError as e :
         log.error(e)
+        log.error(traceback.format_exc())
         thisTransaction.generateCommonParserNotice(
                 noticeBrief='JsonParseEror',
                 additionalInfo={'hint' : str(e)})

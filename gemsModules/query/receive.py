@@ -26,8 +26,8 @@ def doDefaultService(thisTransaction):
 def receive(thisTransaction):
     log.info("Query received it")
     # doDefaultService(thisTransaction)
-    from . import run_query
-    run_query.buildQueryString(thisTransaction)
+    # from . import run_query
+    # run_query.buildQueryString(thisTransaction)
 
 def main():
   import importlib.util, os, sys

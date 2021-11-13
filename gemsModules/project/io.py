@@ -8,7 +8,7 @@ from gemsModules.common import settings as commonsettings
 from gemsModules.common import logic as commonlogic
 from gemsModules.common.io import Notice
 from gemsModules.project import settings as project_settings
-from pydantic import BaseModel, Field, ValidationError
+from pydantic import BaseModel, Field, ValidationError, constr
 from pydantic.schema import schema
 from typing import Any, List
 from gemsModules.common.loggingConfig import *
@@ -25,58 +25,65 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__)
 
+##TODO It makes sense that the length of things like a git hash won't change often. System-wide vars could 
+##  provide constants or single-points-of-edit for types of max-length values. 
+##  TTITLE_MAX_LENGTH could then be edited in a single place, but applied to all gemsModule classes.
+
 
 ##  @brief The primary way of tracking data related to a project
 #   @detail This is the generic project object. See subtypes for more specific fields
 class Project(BaseModel):
     ## The name of the output dir is the pUUID
-    pUUID : str = ""
-    title : str = ""
-    comment : str = ""
+    pUUID : constr(max_length=36)=""
+    title : constr(max_length=25)=""
+    comment : constr(max_length=50)=""
     timestamp : datetime = None
     gems_timestamp : datetime = None
     # The following should be overridden as needed in child classes.  See CbProject, for example.
     # Each type of project known to the modules should have a child class.
-    project_type : str = "project"
-    parent_entity : str = "project"
-    requested_service : str = "project"
-    entity_id : str = "project"
-    service_id : str = "project"
+    project_type : constr(max_length=25)="project"
+    parent_entity : constr(max_length=25)="project"
+    requested_service : constr(max_length=25)="project"
+    entity_id : constr(max_length=25)="project"
+    service_id : constr(max_length=25)="project"
 
     ## The filesystem_path can be used to override settings.default_filesystem_output_path
-    filesystem_path : str = ""  
-    compute_cluster_filesystem_path : str = ""  
-    service_dir : str = ""
+    filesystem_path : constr(max_length=255)="" 
+    compute_cluster_filesystem_path : constr(max_length=255)=""
+    service_dir : constr(max_length=255)=""
     ## The project path. Used to be output dir, but now that is reserved for subdirs.
     # The project_dir should generally be set after the service dir is set
-    project_dir : str = ""
-    logs_dir : str = ""
-    requesting_agent : str = ""
+    project_dir : constr(max_length=255)=""
+    logs_dir : constr(max_length=255)=""
+    requesting_agent : constr(max_length=25)=""
     has_input_files : bool = None
    
     ## These can be read in using getVersionsFileInfo
-    site_version : str = ""
-    site_branch : str = ""
-    gems_version : str = ""
-    gems_branch : str = ""
-    md_utils_version : str = ""
-    md_utils_branch : str = ""
-    gmml_version : str = ""
-    gmml_branch : str = ""
-    gp_version : str = ""
-    gp_branch : str = ""
-    site_mode : str = ""
-    site_host_name : str = ""
-    versions_file_path : str = ""
-    host_url_base_path : str = ""
-    download_url_path :str = ""
+    site_version : constr(max_length=40)=""
+    site_branch : constr(max_length=50)=""
+    site_code_name : constr(max_length=50)=""
 
-    force_field : str = "default"
-    parameter_version : str = "default"
-    amber_version : str = "default"
-    json_api_version : str = ""
-    _django_version : str = ""
-    django_project_id : str = ""
+    gems_version : constr(max_length=40)=""
+    gems_branch : constr(max_length=50)=""
+    md_utils_version : constr(max_length=40)=""
+    md_utils_branch : constr(max_length=50)=""
+    gmml_version : constr(max_length=40)=""
+    gmml_branch : constr(max_length=50)=""
+    gp_version : constr(max_length=40)=""
+    gp_branch : constr(max_length=50)=""
+    site_mode : constr(max_length=25)=""
+    site_host_name : constr(max_length=25)=""
+    versions_file_path : constr(max_length=255)=""
+    host_url_base_path : constr(max_length=255)=""
+    download_url_path : constr(max_length=255)=""
+
+    force_field : constr(max_length=25)="default"
+    parameter_version : constr(max_length=25)="default"
+    amber_version : constr(max_length=25)="default"
+    json_api_version : constr(max_length=10)="0.0.1"
+    _django_version : constr(max_length=10)=""
+    django_project_id : constr(max_length=36)=""
+    app : constr(max_length=25)="project"
   
     notices : List[Notice] = []
 
@@ -251,7 +258,7 @@ class Project(BaseModel):
             theDict = getVersionsFileInfo(self.versions_file_path)
             log.debug("The dictionary is : " + str(theDict))
             for k in theDict.keys() :
-                log.debug("k is : " + k)
+                #log.debug("k is : " + k)
                 setattr(self, k, theDict[k])
             log.debug("My contents are now: ")
             log.debug(self.json(indent=2))
@@ -391,15 +398,11 @@ class Project(BaseModel):
 ## @brief cbProject is a typed project that inherits all the fields from project and adds 
 #   its own.
 class CbProject(Project):
-    project_type : str = "cb"
-    parent_entity : str = "Sequence"
-    entity_id : str = "sequence"
-    service_id : str = "cb"
-    sequence_id : str = ""
-    sequence_path : str = ""
-    has_input_files : bool = False
-    indexOrderedSequence : str = ""
-    seqID : str = ""
+    sequence_id : constr(max_length=255)=""
+    sequence_path : constr(max_length=255)=""
+    indexOrderedSequence : constr(max_length=255)=""
+    seqID : constr(max_length=36)=""
+    selected_rotamers : constr(max_length=3000)=""
 
     def setIndexOrderedSequence(self, theSequence : str ) :
         self.indexOrderedSequence = theSequence
@@ -415,43 +418,78 @@ class CbProject(Project):
         log.debug("getting SeqId: " + str(self.seqID))
         return self.seqID
 
+    def __init__(self, **data : Any):
+        super().__init__(**data)
+        self.project_type = "cb"
+        self.parent_entity = "Sequence"
+        self.entity_id = "sequence"
+        self.service_id = "cb"
+        self.has_input_files = False
 
 
 
 class PdbProject(Project):
+    uploaded_file_name : constr(max_length=255)=""
+    status : constr(max_length=10)="submitted"
+    u_uuid : constr(max_length=36)=""
+    upload_path : constr(max_length=255)=""
+    pdb_id : constr(max_length=4)=""
+    input_source : constr(max_length=25)=""
     has_input_files : bool = True
-    uploaded_file_name : str = ""
-    status : str = ""
-    u_uuid : str = ""
-    upload_path : str = ""
-    pdb_id : str = ""
-    input_source : str = ""
-    project_type = 'pdb'
-    parent_entity : str = "StrucureFile"
-    entity_id : str = "structurefile"
-    service_id : str = "pdb"
+    project_type : constr(max_length=25)='pdb'
+    parent_entity : constr(max_length=25)="StrucureFile"
+    entity_id : constr(max_length=25)="structurefile"
+    service_id : constr(max_length=25)="pdb"
 
-#    def __init__(self, **data : Any):
-#        super().__init__(**data)
+    def setUploadFile(self, uploadFile:str):
+        log.info("PdbProject setUploadFile was called.")
+        log.debug("uploadFile: " + uploadFile)
+        self.uploaded_file_name = uploadFile
+
+
+       
 
 
 class GpProject(Project):
-    pdb_project_uuid : str = ""
-    has_input_files : bool = False
-#  Presunably, the following can be obtained from the PdbProject
-#    has_input_files : bool = True
-#    uploaded_file_name : str = ""
-#    upload_path : str = ""
-    status : str = ""
-    project_type = 'gp'
-    parent_entity : str = "Conjugate"
-    entity_id : str = "conjugate"
-    service_id : str = "gp"
+    pdb_project_pUUID : constr(max_length=36)=""
+    status : constr(max_length=10)="submitted"
 
-#    def __init__(self, **data : Any):
-#        super().__init__(**data)
+    
+    def __init__(self, **data : Any):
+       super().__init__(**data)
+       self.has_input_files = False
+       self.project_type = 'gp'
+       self.parent_entity = "Conjugate"
+       self.entity_id = "conjugate"
+       self.service_id = "gp"
 
 
+class GrProject(Project):
+    uploaded_file_name : constr(max_length=255)=""
+    u_uuid : constr(max_length=36)=""
+    upload_path :  constr(max_length=255)=""
+
+    def __init__(self, **data : Any):
+       super().__init__(**data)
+       self.project_type = "gr"
+
+class MdProject(Project):
+    system_phase : constr(max_length=25) = "In solvent."
+    input_type : constr(max_length=25) = "Amber-prmtop & inpcrd"
+    prmtop_file_name : constr(max_length=255) = " "
+    inpcrd_file_name : constr(max_length=255) = " "
+    pdb_file_name  : constr(max_length=255) = " "
+    mmcif_file_name : constr(max_length=255) = " "
+    off_file_name : constr(max_length=255)  = " "
+    u_uuid : constr(max_length=36) = " "
+    water_model : constr(max_length=10) = "TIP-3P"
+    sim_length : constr(max_length=5) = '100'
+    notify : bool =True
+    upload_path : constr(max_length=255)  = " "
+    
+    def __init__(self, **data : Any):
+       super().__init__(**data)
+       self.project_type = "md"
 
 ##  Are these used at all?????
 ### Details and location of the build of a single pose of a structure.
@@ -478,9 +516,53 @@ class GpProject(Project):
 #
 #    return projectType
 
-# TODO - do this for all the project types
+def generateProjectSchemaForWeb():
+    spaceCount=2
+    log.info("generateProjectSchemaForWeb() was called.")
+    
+    log.debug("SCHEMA_DIR: " + commonsettings.SCHEMA_DIR)
+    moduleSchemaDir = os.path.join(commonsettings.SCHEMA_DIR, "gemsProject")
+
+    try:
+        if not os.path.isdir(moduleSchemaDir):
+            os.makedirs(moduleSchemaDir)
+        
+        # filePath = os.path.join(moduleSchemaDir, 'GemsProjectSchema.json')
+        # with open(filePath, 'w') as file:
+        #     file.write(Project.schema_json(indent=spaceCount))
+
+        ## Need a file for cb, pdb, gp
+
+        childFilePath = os.path.join(moduleSchemaDir, 'CbProject.json')
+        with open(childFilePath, 'w') as childFile:
+            childFile.write(CbProject.schema_json(indent=spaceCount))
+
+        childFilePath = os.path.join(moduleSchemaDir, 'PdbProject.json')
+        with open(childFilePath, 'w') as childFile:
+            childFile.write(PdbProject.schema_json(indent=spaceCount))
+
+        childFilePath = os.path.join(moduleSchemaDir, 'GpProject.json')
+        with open(childFilePath, 'w') as childFile:
+            childFile.write(GpProject.schema_json(indent=spaceCount))
+
+        childFilePath = os.path.join(moduleSchemaDir, 'MdProject.json')
+        with open(childFilePath, 'w') as childFile:
+            childFile.write(MdProject.schema_json(indent=spaceCount))
+
+        childFilePath = os.path.join(moduleSchemaDir, 'GrProject.json')
+        with open(childFilePath, 'w') as childFile:
+            childFile.write(GrProject.schema_json(indent=spaceCount))
+
+
+    except Exception as error:
+        log.error("There was a problem writing the Project schema to file: " + str(error))
+        log.error(traceback.format_exc())
+        raise error
+
+
 def generateProjectSchema():
     print(Project.schema_json(indent=2))
+
 
 if __name__ == "__main__":
     generateProjectSchema()
