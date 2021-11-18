@@ -184,6 +184,7 @@
 
 #include "gmml/includes/Abstract/builder.hpp"
 #include "gmml/includes/InternalPrograms/CarbohydrateBuilder/carbohydrateBuilder.hpp"
+#include "gmml/includes/InternalPrograms/glycosylationSiteFinder.hpp"
 
 //#include "gmml/includes/External_Libraries/json.hpp"
 
@@ -369,6 +370,7 @@ std::ostream & get_cout() { return std::cout; }
 
 %include "gmml/includes/Abstract/builder.hpp"
 %include "gmml/includes/InternalPrograms/CarbohydrateBuilder/carbohydrateBuilder.hpp"
+%include "gmml/includes/InternalPrograms/glycosylationSiteFinder.hpp"
 
 //%include "gmml/includes/External_Libraries/json.hpp"
 
