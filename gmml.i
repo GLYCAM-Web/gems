@@ -182,6 +182,7 @@
 #include "gmml/includes/InputSet/TopologyFileSpace/topologyresidue.hpp"
 #include "gmml/includes/InputSet/TopologyFileSpace/topologyfileprocessingexception.hpp"
 
+#include "gmml/includes/Abstract/builder.hpp"
 #include "gmml/includes/InternalPrograms/CarbohydrateBuilder/carbohydrateBuilder.hpp"
 
 //#include "gmml/includes/External_Libraries/json.hpp"
@@ -366,6 +367,7 @@ std::ostream & get_cout() { return std::cout; }
 %include "gmml/includes/InputSet/TopologyFileSpace/topologyresidue.hpp"
 %include "gmml/includes/InputSet/TopologyFileSpace/topologyfileprocessingexception.hpp"
 
+%include "gmml/includes/Abstract/builder.hpp"
 %include "gmml/includes/InternalPrograms/CarbohydrateBuilder/carbohydrateBuilder.hpp"
 
 //%include "gmml/includes/External_Libraries/json.hpp"
