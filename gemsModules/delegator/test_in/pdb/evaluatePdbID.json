@@ -7,8 +7,7 @@
             }
         },
         "inputs": {
-            "pdb_ID": "1BUY",
-            "sideload_file_destination" : "/website/TESTS/pdb/test_in/sideloads/"
+            "pdb_ID": "1BUY"
         }
     },
     "options": {

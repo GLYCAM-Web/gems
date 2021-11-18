@@ -7,7 +7,8 @@
             }
         },
         "inputs": {
-            "pdb_file_name": "/website/uploads/tools/pdb/git-ignore-me_userdata/986b478e-62c0-468e-af62-c4915c857475/1buy.pdb"
+            "pdb_ID": "1BUY",
+            "sideload_file_destination" : "git-ignore-me_sideloads/"
         }
     },
     "options": {
