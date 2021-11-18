@@ -186,6 +186,7 @@
 #include "gmml/includes/InternalPrograms/CarbohydrateBuilder/carbohydrateBuilder.hpp"
 #include "gmml/includes/InternalPrograms/GlycoproteinBuilder/gpInputStructs.hpp"
 #include "gmml/includes/InternalPrograms/GlycoproteinBuilder/glycoproteinBuilder.hpp"
+#include "gmml/includes/InternalPrograms/glycosylationSiteFinder.hpp"
 
 //#include "gmml/includes/External_Libraries/json.hpp"
 
@@ -371,8 +372,12 @@ std::ostream & get_cout() { return std::cout; }
 
 %include "gmml/includes/Abstract/builder.hpp"
 %include "gmml/includes/InternalPrograms/CarbohydrateBuilder/carbohydrateBuilder.hpp"
+<<<<<<< HEAD
 %include "gmml/includes/InternalPrograms/GlycoproteinBuilder/gpInputStructs.hpp"
 %include "gmml/includes/InternalPrograms/GlycoproteinBuilder/glycoproteinBuilder.hpp"
+=======
+%include "gmml/includes/InternalPrograms/glycosylationSiteFinder.hpp"
+>>>>>>> 270d902 (Wrapped up the new gmml class that creates a GlycosylationSiteTable. Created an example to show, but it needs proper integration.)
 
 //%include "gmml/includes/External_Libraries/json.hpp"
 
