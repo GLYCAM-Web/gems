@@ -930,21 +930,15 @@ class PdbTransaction(commonIO.Transaction):
 
     def populate_transaction_in(self):
         log.info("Populating transaction_in for a PdbTransaction:")
-        self.transaction_in = StructureFileTransactionSchema(**self.request_dict)
-        log.debug("The transaction_in is: " )
-        log.debug(self.transaction_in.json(indent=2))
-        
+        try:
+            self.transaction_in = StructureFileTransactionSchema(**self.request_dict)
+            log.debug("The transaction_in is: " )
+            log.debug(self.transaction_in.json(indent=2))
+        except Exception as error:
+            log.error("Failed to populate the transaction_in: " + str(error))
+            log.error(traceback.format_exc())
+            raise error
 
-
-    # ## @brief Copies request input into transaction object, before providing services
-    # def populate_transaction_in(self):
-    #     log.info("structureFile Transaction populate_transaction_in() was called.")
-    #     ##The following debug lines are also sometimes useful, but normally redundant.
-    #     #log.debug("self.request_dict: " )
-    #     #prettyPrint(self.request_dict)
-    #     self.transaction_in = StructureFileTransactionSchema(**self.request_dict)
-
-    #     self.initialize_transaction_out_from_transaction_in() 
 
     ## @brief Gets started on the output, before providing services.
     def initialize_transaction_out_from_transaction_in(self) :

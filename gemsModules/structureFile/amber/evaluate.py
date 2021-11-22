@@ -14,9 +14,11 @@ else:
 #   @param pdbTransaction A request containing either the path to an uploaded pdb, or a pdbID for sideloading.
 def evaluatePdb(pdbTransaction : amberIO.PdbTransaction):
     log.info("evaluatePdb() was called. Still in development!!!")
+    ##Inputs.
     try:
         uploadFile = pdbTransaction.getUploadFileFromPdbTransaction()
         log.debug("uploadFile: " + uploadFile)
+        customProjectDir = pdbTransaction.getCustomProjectDirFromPdbTransaction()
     except Exception as error:
         log.error("There was a problem getting the upload file from the PdbTransaction: " + str(error))
         log.error(traceback.format_exc())
@@ -29,12 +31,14 @@ def evaluatePdb(pdbTransaction : amberIO.PdbTransaction):
             pdbTransaction.transaction_out.project = gemsModules.project.io.PdbProject()
         else:
             log.debug("pdbTransaction.transaction_out.project: " + str(pdbTransaction.transaction_out.project))
-
+        ##Derived field values need to be added
         pdbProject = pdbTransaction.transaction_out.project 
         pdbProject.setFilesystemPath()
         pdbProject.loadVersionsFileInfo()
         pdbProject.setUploadFile(uploadFile)
+        pdbProject.setLogsDir()
         pdbProject.requested_service = "Evaluate"
+
         log.debug("pdbProject: " )
         prettyPrint(pdbProject.__dict__)
     except Exception as error:
