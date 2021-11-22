@@ -25,18 +25,33 @@ def evaluatePdb(pdbTransaction : amberIO.PdbTransaction):
         raise error
 
     # Ensure a project exists
+    ##  TODO: Move all instantiation logic into the __init__ for pdbProject.
     try:
         if pdbTransaction.transaction_out.project is None:
             log.debug("Starting a new project for transaction_out.")
             pdbTransaction.transaction_out.project = gemsModules.project.io.PdbProject()
         else:
             log.debug("pdbTransaction.transaction_out.project: " + str(pdbTransaction.transaction_out.project))
-        ##Derived field values need to be added
+        
+
+
         pdbProject = pdbTransaction.transaction_out.project 
+
+        ##Derived field values need to be added
+        pdbProject.setServiceDir()
+        if customProjectDir != "":
+            pdbProject.project_dir = customProjectDir 
+        else:
+            ## give it the default project dir.
+            defaultProjectDir = os.path.join(
+                pdbProject.service_dir,
+                'outputs',
+                pdbProject.pUUID
+            )
+            pdbProject.project_dir = defaultProjectDir 
         pdbProject.setFilesystemPath()
         pdbProject.loadVersionsFileInfo()
         pdbProject.setUploadFile(uploadFile)
-        pdbProject.setLogsDir()
         pdbProject.requested_service = "Evaluate"
 
         log.debug("pdbProject: " )

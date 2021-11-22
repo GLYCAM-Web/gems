@@ -1046,6 +1046,20 @@ class PdbTransaction(commonIO.Transaction):
             log.error("There was a problem making the request: " + str(error))
             raise error
 
+    def getCustomProjectDirFromPdbTransaction(self):
+        ## Grab the input
+        try:
+            project_dir = ""
+            inputs = self.request_dict['entity']['inputs']
+            if "project_dir" in inputs.keys():
+                projectDir = inputs['project_dir']
+            return project_dir
+        except Exception as error:
+            log.error("An error occurred while looking for a custom project_dir in the transaction inputs: " + str(error))
+            log.error(traceback.format_exc())
+            raise error
+
+
     def getUploadFileFromPdbTransaction(self):
         ## Grab the input
         try:
