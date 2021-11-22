@@ -184,6 +184,8 @@
 
 #include "gmml/includes/Abstract/builder.hpp"
 #include "gmml/includes/InternalPrograms/CarbohydrateBuilder/carbohydrateBuilder.hpp"
+#include "gmml/includes/InternalPrograms/GlycoproteinBuilder/gpInputStructs.hpp"
+#include "gmml/includes/InternalPrograms/GlycoproteinBuilder/glycoproteinBuilder.hpp"
 
 //#include "gmml/includes/External_Libraries/json.hpp"
 
@@ -369,6 +371,8 @@ std::ostream & get_cout() { return std::cout; }
 
 %include "gmml/includes/Abstract/builder.hpp"
 %include "gmml/includes/InternalPrograms/CarbohydrateBuilder/carbohydrateBuilder.hpp"
+%include "gmml/includes/InternalPrograms/GlycoproteinBuilder/gpInputStructs.hpp"
+%include "gmml/includes/InternalPrograms/GlycoproteinBuilder/glycoproteinBuilder.hpp"
 
 //%include "gmml/includes/External_Libraries/json.hpp"
 
@@ -748,7 +752,8 @@ std::ostream & get_cout() { return std::cout; }
 //typedef std::vector<SingleRotamerInfo> SingleRotamerInfoVector;
 %template(single_rotamer_info_vector) std::vector<CondensedSequenceSpace::SingleRotamerInfo>;
 
-//typedef std::vector<MolecularModeling::Residue*> ResidueVector;
-%template(residue_vector) std::vector<MolecularModeling::Residue* >;
+///GlycoproteinBuilder
+//std::vector<GlycositeInput> glycositesInputVector_;
+%template(glycosite_input_vector) std::vector<GlycositeInput>;
 
 //constexpr operator size_t() { return 0; }
