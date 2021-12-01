@@ -35,13 +35,6 @@ subEntities = [
     }
 ]
 
-
-#Validate service in focus.
-#Evaluate service still needs to be developed.
-#Build3DStructure can create a default structure.
-#No minimization is applied yet.
-#No options can be set yet."
-
 ## Module names for services that this entity/module can perform.
 serviceModules = {
     'Validate'         : 'validate',
@@ -84,11 +77,3 @@ class Formats(str,Enum):
 
 class Locations(str,Enum):
     internal='internal'  ##< All input at this time must be internal to the JSON object(s)
-
-### This does not appear to be used anywhere.   (Lachele 2021-04-01)
-class LinkageRotamerNames(str, Enum):
-    phi = 'phi'
-    psi = 'psi'
-    omg = 'omg'
-    omega = 'omega'
-

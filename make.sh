@@ -390,7 +390,7 @@ if [[ "$WRAP_GMML" != "no_wrap" ]]; then
         echo "Using $PYTHON_FILE header file."
         if [ -f "gmml_wrap.cxx" ]; then
             echo "Compiling wrapped gmml library in python ..."
-            g++ -std=c++17 -O3 -fPIC -c gmml_wrap.cxx -I"$PYTHON_HEADER_HOME"
+            g++ -std=c++17 -O3 -fPIC -c gmml_wrap.cxx -I"$PYTHON_HEADER_HOME" -I gmml/
         else
             echo "Warning:  gmml_wrap.cxx does not exist."
         fi
