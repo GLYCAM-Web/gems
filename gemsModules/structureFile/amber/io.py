@@ -888,10 +888,9 @@ class StructureFileService(commonIO.Service):
         title = 'Requested Service',
         description = 'The service that was requested of StructureFile Entity'
     )
-    
 
     def __init__(self, **data : Any):
-        super().__init__()
+        super().__init__(**data)
         log.info("Initializing Service.")
         log.debug("the data " + repr(self))
         log.debug("Init for the Services in StructureFile was called.")
@@ -908,10 +907,10 @@ class StructureFileEntity(commonIO.Entity):
     outputs : StructureFileOutputs =  None
     
 
-    # def __init__(self, **data: Any):
-    #     super().__init__(**data)
-    #     log.info("Instantiating a structureFileEntity")
-    #     log.debug("entityType: " + self.entityType)
+    def __init__(self, **data: Any):
+        super().__init__(**data)
+        log.info("Instantiating a structureFileEntity")
+        log.debug("entityType: " + self.entityType)
 
 
 ## @brief Override TransactionSchema, setting this entity to StructureFile
