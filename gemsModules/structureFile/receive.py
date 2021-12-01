@@ -90,6 +90,8 @@ def __setup(receivedTransaction : commonIO.Transaction):
 
     try:    
         pdbTransaction.populate_transaction_in()
+        # log.debug("transaction_in:")
+        # log.debug(pdbTransaction.transaction_in.json(indent=2))
     except Exception as e:
         log.error("There was a problem populating the the PdbTransaction in: " + str(e))
         log.error(traceback.format_exc())
@@ -98,8 +100,8 @@ def __setup(receivedTransaction : commonIO.Transaction):
 
     try:
         pdbTransaction.initialize_transaction_out_from_transaction_in()
-        log.debug("pdbTransaction.transaction_out: " )
-        log.debug(pdbTransaction.transaction_out.json(indent=2))
+        # log.debug("pdbTransaction.transaction_out: " )
+        # log.debug(pdbTransaction.transaction_out.json(indent=2))
     except Exception as error :
         log.error("There was a problem initializing the outgoing transaction : " + str(error))
         log.error(traceback.format_exc())

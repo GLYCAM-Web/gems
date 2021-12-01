@@ -13,7 +13,7 @@ else:
 ##  Evaluate a pdb for use with Amber.
 #   @param pdbTransaction A request containing either the path to an uploaded pdb, or a pdbID for sideloading.
 def evaluatePdb(pdbTransaction : amberIO.PdbTransaction):
-    log.info("evaluatePdb() was called. Still in development!!!")
+    log.info("evaluatePdb was called.")
     ##Inputs.
     try:
         uploadFile = pdbTransaction.getUploadFileFromPdbTransaction()
@@ -32,13 +32,14 @@ def evaluatePdb(pdbTransaction : amberIO.PdbTransaction):
             pdbTransaction.transaction_out.project = gemsModules.project.io.PdbProject()
         else:
             log.debug("pdbTransaction.transaction_out.project: " + str(pdbTransaction.transaction_out.project))
-        
-
 
         pdbProject = pdbTransaction.transaction_out.project 
 
+        #######################################
         ##Derived field values need to be added
-        pdbProject.setServiceDir()
+        
+
+        ## Default project dir looks like /website/userdata/structurefile/pdb/outputs/<pUUID>
         if customProjectDir != "":
             pdbProject.project_dir = customProjectDir 
         else:
@@ -49,11 +50,11 @@ def evaluatePdb(pdbTransaction : amberIO.PdbTransaction):
                 pdbProject.pUUID
             )
             pdbProject.project_dir = defaultProjectDir 
-        pdbProject.setFilesystemPath()
-        pdbProject.loadVersionsFileInfo()
+
         pdbProject.setUploadFile(uploadFile)
         pdbProject.requested_service = "Evaluate"
-
+        pdbProject.createDirectories()
+        #########################################
         log.debug("pdbProject: " )
         prettyPrint(pdbProject.__dict__)
     except Exception as error:

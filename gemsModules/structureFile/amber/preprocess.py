@@ -9,10 +9,13 @@ else:
 
 
 def preprocessPdbForAmber(pdbTransaction : amberIO.PdbTransaction):
-    log.info("preprocessPdbForAmber() was called. Still in Development!!!!!!!!")
+    log.info("preprocessPdbForAmber was called. Still in Development!!!!!!!!")
     ## Find the input
     try:
         uploadFile = pdbTransaction.getUploadFileFromPdbTransaction()
+        log.debug("uploadFile: " + uploadFile)
+        customProjectDir = pdbTransaction.getCustomProjectDirFromPdbTransaction()
+        log.debug("customProjectDir: " + customProjectDir)
     except Exception as error:
         log.error("There was a problem getting the upload file from the PdbTransaction: " + str(error))
         log.error(traceback.format_exc())
@@ -27,31 +30,36 @@ def preprocessPdbForAmber(pdbTransaction : amberIO.PdbTransaction):
             log.debug("pdbTransaction.transaction_out.project: " + str(pdbTransaction.transaction_out.project))
 
         pdbProject = pdbTransaction.transaction_out.project 
-        pdbProject.setFilesystemPath()
-        pdbProject.loadVersionsFileInfo()
+
+        #######################################
+        ##Derived field values need to be added
+        
+
+        ## Default project dir looks like /website/userdata/structurefile/pdb/outputs/<pUUID>
+        if customProjectDir != "":
+            pdbProject.project_dir = customProjectDir 
+        else:
+            ## give it the default project dir.
+            defaultProjectDir = os.path.join(
+                pdbProject.service_dir,
+                'outputs',
+                pdbProject.pUUID
+            )
+            pdbProject.project_dir = defaultProjectDir
+        
+
         pdbProject.setUploadFile(uploadFile)
         pdbProject.requested_service = "PreprocessPdbForAmber"
-        pdbProject.setServiceDir()
-        projectDir = os.path.join(
-                pdbProject.service_dir,
-                pdbProject.pUUID)
-        ## TODO: Need to allow users to specify this in requests.
-        pdbProject.setProjectDir(specifiedDirectory=projectDir, noClobber=False)
-
-        pdbProject.setHostUrlBasePath()
-        pdbProject.setDownloadUrlPath()
-
-        # Create the needed initial directories including a logs directory
         pdbProject.createDirectories()
-
         pdbProject.writeInitialLogs()
-
         # Generate the complete incoming JSON object, including all defaults
         incomingString = pdbTransaction.incoming_string
         incomingRequest = pdbTransaction.transaction_in.json(indent=2)
+        log.debug("Writing log files.")
         common.logic.writeStringToFile(incomingString, os.path.join(pdbProject.logs_dir, "request-raw.json") )
         common.logic.writeStringToFile(incomingRequest, os.path.join(pdbProject.logs_dir, "request-initialized.json") )
-
+        pdbProject.setHostUrlBasePath()
+        pdbProject.setDownloadUrlPath()
         log.debug("Just initialized the outgoing project.  The transaction_out is :   " )
         log.debug(pdbTransaction.transaction_out.json(indent=2))
     except Exception as error:
@@ -61,7 +69,7 @@ def preprocessPdbForAmber(pdbTransaction : amberIO.PdbTransaction):
 
     try:
         mngr = amberIO.PreprocessorManager()
-        mngr.preprocessPdbForAmber(uploadFile, projectDir)
+        mngr.preprocessPdbForAmber(uploadFile, pdbProject.project_dir)
     except Exception as error:
         log.error("There was a problem preprocessing the pdb for amber: " + str(error))
         log.error(traceback.format_exc())
@@ -70,7 +78,7 @@ def preprocessPdbForAmber(pdbTransaction : amberIO.PdbTransaction):
     try:
         pdbTransaction.build_outgoing_string()
         outgoingResponse = pdbTransaction.transaction_out.json(indent=2)
-        common.logic.writeStringToFile(outgoingResponse, os.path.join(projectDir, "response.json"))
+        common.logic.writeStringToFile(outgoingResponse, os.path.join(pdbProject.project_dir, "response.json"))
     except Exception as error:
         log.error("There was a problem generating the output after preprocessing the pdb: " + str(error))
         log.error(traceback.format_exc())

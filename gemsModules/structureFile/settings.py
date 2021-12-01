@@ -12,13 +12,13 @@ moduleStatusDetail = "PDB Pre-processing for Amber currently in development. Wri
 servicesStatus = [
     {
         "service" : "Evaluate",
-        "status" : "In development.",
-        "statusDetail" : "In development. Currently fails to return a valid response. Queued for after Schema service."
+        "status" : "Alpha.",
+        "statusDetail" : "Testing for deployment. In-house testing only so far."
     },
     {
         "service" : "PreprocessPdbForAmber",
         "status" : "In development.",
-        "statusDetail" : "In development."
+        "statusDetail" : "Actively in development. Working to preprocess with default settings."
     }
 ]
 
