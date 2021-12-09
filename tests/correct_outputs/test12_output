@@ -1,0 +1,317 @@
+{
+  "timestamp": null,
+  "entity": {
+    "entityType": "StructureFile",
+    "requestID": null,
+    "services": {
+      "evaluate": {
+        "typename": "Evaluate",
+        "givenName": null,
+        "myUuid": null,
+        "inputs": null,
+        "options": null
+      }
+    },
+    "responses": null,
+    "resources": null,
+    "notices": null,
+    "options": null,
+    "inputs": {
+      "pdb_file_name": "/website/TESTS/pdb/test_in/1BUY_modified.pdb",
+      "pdb_ID": "",
+      "sideload_file_destination": ""
+    },
+    "outputs": {
+      "typename": "Evaluate",
+      "inputs": [
+        "pdb_file_name"
+      ],
+      "outputs": [
+        {
+          "preprocessingOptions": [
+            {
+              "unrecognizedAtoms": [
+                {
+                  "app": "pdb",
+                  "page": "options",
+                  "atomIndex": "31",
+                  "atomName": "SI",
+                  "residueName": "PRO",
+                  "chainID": "A",
+                  "residueNumber": "3"
+                },
+                {
+                  "app": "pdb",
+                  "page": "options",
+                  "atomIndex": "107",
+                  "atomName": "SI",
+                  "residueName": "CYS",
+                  "chainID": "A",
+                  "residueNumber": "7"
+                },
+                {
+                  "app": "pdb",
+                  "page": "options",
+                  "atomIndex": "2621",
+                  "atomName": "OXT",
+                  "residueName": "ARG",
+                  "chainID": "A",
+                  "residueNumber": "166"
+                }
+              ]
+            },
+            {
+              "unrecognizedMolecules": [
+                {
+                  "app": "pdb",
+                  "page": "options",
+                  "chainID": "A",
+                  "index": "666",
+                  "name": "z0z",
+                  "isMidChain": "False",
+                  "canPreprocess": true
+                }
+              ]
+            },
+            {
+              "missingResidues": [
+                {
+                  "app": "pdb",
+                  "page": "options",
+                  "chainID": "A",
+                  "startSequenceNumber": "1",
+                  "endSequenceNumber": "166",
+                  "residueBeforeGap": "3",
+                  "residueAfterGap": "7"
+                }
+              ]
+            },
+            {
+              "histidineProtonations": [
+                {
+                  "app": "pdb",
+                  "page": "options",
+                  "chainID": "A",
+                  "residueNumber": "32",
+                  "mappingFormat": "HID"
+                },
+                {
+                  "app": "pdb",
+                  "page": "options",
+                  "chainID": "A",
+                  "residueNumber": "94",
+                  "mappingFormat": "HID"
+                }
+              ]
+            },
+            {
+              "disulfideBonds": [
+                {
+                  "app": "pdb",
+                  "page": "options",
+                  "residue1ChainId": "A",
+                  "residue1Number": "7",
+                  "residue1AmberResidueName": "CYX",
+                  "residue2ChainId": "A",
+                  "residue2Number": "161",
+                  "residue2AmberResidueName": "CYX",
+                  "distance": "2.0197",
+                  "bonded": true
+                },
+                {
+                  "app": "pdb",
+                  "page": "options",
+                  "residue1ChainId": "A",
+                  "residue1Number": "29",
+                  "residue1AmberResidueName": "CYX",
+                  "residue2ChainId": "A",
+                  "residue2Number": "33",
+                  "residue2AmberResidueName": "CYX",
+                  "distance": "2.0216",
+                  "bonded": true
+                }
+              ]
+            },
+            {
+              "chainTerminations": [
+                {
+                  "app": "pdb",
+                  "page": "options",
+                  "chainID": "A",
+                  "startIndex": "1",
+                  "endIndex": "166"
+                }
+              ]
+            },
+            {
+              "replacedHydrogens": [
+                {
+                  "app": "pdb",
+                  "page": "options",
+                  "index": "6",
+                  "atomName": "H1",
+                  "residueName": "ALA",
+                  "chainID": "A",
+                  "residueNumber": "1"
+                },
+                {
+                  "app": "pdb",
+                  "page": "options",
+                  "index": "7",
+                  "atomName": "H2",
+                  "residueName": "ALA",
+                  "chainID": "A",
+                  "residueNumber": "1"
+                },
+                {
+                  "app": "pdb",
+                  "page": "options",
+                  "index": "8",
+                  "atomName": "H3",
+                  "residueName": "ALA",
+                  "chainID": "A",
+                  "residueNumber": "1"
+                },
+                {
+                  "app": "pdb",
+                  "page": "options",
+                  "index": "109",
+                  "atomName": "HZZ",
+                  "residueName": "CYS",
+                  "chainID": "A",
+                  "residueNumber": "7"
+                }
+              ]
+            }
+          ],
+          "metadata": [
+            {
+              "app": "pdb",
+              "page": "options",
+              "label": "Unrecognized Atoms",
+              "tableKey": "unrecognizedAtoms",
+              "interactionRequirement": "none",
+              "urgency": "error",
+              "count": 3,
+              "description": "The following atoms were not recognized."
+            },
+            {
+              "app": "pdb",
+              "page": "options",
+              "label": "Unrecognized Molecules",
+              "tableKey": "unrecognizedMolecules",
+              "interactionRequirement": "none",
+              "urgency": "warning",
+              "count": 1,
+              "description": "The following unrecognized residues were found. They must be deleted (for you to use this site). If Mid-Chain is False, no further action is required. Otherwise, please inspect the missing residues (see Missing Residues table) to choose how we should handle the new chain termini that are created by removing these residues."
+            },
+            {
+              "app": "pdb",
+              "page": "options",
+              "label": "Missing Residues",
+              "tableKey": "missingResidues",
+              "interactionRequirement": "optional",
+              "urgency": "warning",
+              "count": 1,
+              "description": "Gaps were detected."
+            },
+            {
+              "app": "pdb",
+              "page": "options",
+              "label": "Histidine Protonations",
+              "tableKey": "histidineProtonations",
+              "interactionRequirement": "optional",
+              "urgency": "info",
+              "count": 2,
+              "description": "Choose HIS mappings."
+            },
+            {
+              "app": "pdb",
+              "page": "options",
+              "label": "Disulfide Bonds",
+              "tableKey": "disulfideBonds",
+              "interactionRequirement": "optional",
+              "urgency": "info",
+              "count": 2,
+              "description": "Select disulfide bonds."
+            },
+            {
+              "app": "pdb",
+              "page": "options",
+              "label": "Chain Terminations",
+              "tableKey": "chainTerminations",
+              "interactionRequirement": "optional",
+              "urgency": "info",
+              "count": 1,
+              "description": "Select terminal residues."
+            },
+            {
+              "app": "pdb",
+              "page": "options",
+              "label": "Replaced Hydrogens",
+              "tableKey": "replacedHydrogens",
+              "interactionRequirement": "none",
+              "urgency": "info",
+              "count": 4,
+              "description": "The following atoms were removed..."
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "project": {
+    "pUUID": "7d92d0fa-8980-4ad8-9f00-e892fc4e0142",
+    "title": "",
+    "comment": "",
+    "timestamp": "2021-12-09T13:28:48.721317",
+    "gems_timestamp": "2021-12-09T13:28:48.721317",
+    "project_type": "pdb",
+    "parent_entity": "StructureFile",
+    "requested_service": "Evaluate",
+    "entity_id": "structurefile",
+    "service_id": "pdb",
+    "filesystem_path": "/website/userdata/",
+    "compute_cluster_filesystem_path": "",
+    "service_dir": "/website/userdata/structurefile/pdb",
+    "project_dir": "/website/userdata/structurefile/pdb/outputs/7d92d0fa-8980-4ad8-9f00-e892fc4e0142",
+    "logs_dir": "/website/userdata/structurefile/pdb/outputs/7d92d0fa-8980-4ad8-9f00-e892fc4e0142/logs",
+    "requesting_agent": "",
+    "has_input_files": true,
+    "site_version": "c132097e6fabc47662459283ab9a561cf4ccb7de",
+    "site_branch": "pdb",
+    "site_code_name": "Developer-Environment",
+    "gems_version": "91a8d7707cdfeb6384d2e6d4ff180b0d81fbc6ac",
+    "gems_branch": "pdb",
+    "md_utils_version": "589abe37c358b65119194ec8859d85aea3cadcf4",
+    "md_utils_branch": "md-test",
+    "gmml_version": "9e2ac2f004a97017eb8135106f477f5b3611dd7c",
+    "gmml_branch": "gmml-test",
+    "gp_version": "",
+    "gp_branch": "",
+    "site_mode": "CONTAINERS",
+    "site_host_name": "172.24.0.2",
+    "versions_file_path": "/website/userdata/VERSIONS.sh",
+    "host_url_base_path": "",
+    "download_url_path": "",
+    "force_field": "default",
+    "parameter_version": "default",
+    "amber_version": "default",
+    "json_api_version": "0.0.1",
+    "django_project_id": "",
+    "app": "project",
+    "notices": [],
+    "uploaded_file_name": "/website/TESTS/pdb/test_in/1BUY_modified.pdb",
+    "status": "submitted",
+    "u_uuid": "",
+    "pdb_id": "",
+    "input_source": "",
+    "upload_path": ""
+  },
+  "prettyPrint": true,
+  "mdMinimize": true,
+  "options": {
+    "targetModule": "amber"
+  },
+  "notices": []
+}
