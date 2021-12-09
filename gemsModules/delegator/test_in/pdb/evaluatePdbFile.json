@@ -12,5 +12,6 @@
     },
     "options": {
         "targetModule": "amber"
-    }
+    },
+    "prettyPrint": "True"
 }
