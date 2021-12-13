@@ -70,12 +70,25 @@ def preprocessPdbForAmber(pdbTransaction : amberIO.PdbTransaction):
     try:
         mngr = amberIO.PreprocessorManager()
         mngr.preprocessPdbForAmber(uploadFile, pdbProject.project_dir)
+
     except Exception as error:
         log.error("There was a problem preprocessing the pdb for amber: " + str(error))
         log.error(traceback.format_exc())
         raise error
 
     try:
+        log.debug("Building response output.")
+        log.debug("transaction out: " + str(pdbTransaction.transaction_out))
+        outputs = []
+        log.debug("pdbProject.download_url_path: " + pdbProject.download_url_path)
+        output = amberIO.PreprocessPdbForAmberOutput(project_status="All complete", downloadUrl=pdbProject.download_url_path)
+        outputs.append(output)
+        responseObj = amberIO.StructureFileResponse("PreprocessPdbForAmber", inputs=pdbTransaction.transaction_in.entity.inputs, outputs=outputs)
+        log.debug("responseObj type: " + str(type(responseObj)))
+        log.debug("responseObj: " + repr(responseObj))
+        responses = []
+        responses.append(responseObj)
+        pdbTransaction.transaction_out.entity.responses = responses
         pdbTransaction.build_outgoing_string()
         outgoingResponse = pdbTransaction.transaction_out.json(indent=2)
         common.logic.writeStringToFile(outgoingResponse, os.path.join(pdbProject.project_dir, "response.json"))

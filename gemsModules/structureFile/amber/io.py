@@ -576,6 +576,7 @@ class PreprocessorManager:
             log.debug("Output destination: " + fileName)
             self.pdbFileObj.WriteWithTheGivenModelNumber(fileName)
             log.debug("Finished preprocessing.")
+
         except Exception as error:
             log.error("There was a prolem preprocessing the input: " + str(error))
             log.error(traceback.format_exc())
@@ -840,8 +841,16 @@ class EvaluationOutput(BaseModel):
 
 class PreprocessPdbForAmberOutput(BaseModel):
     project_status : str = "submitted"
-    payload : str = None
     downloadUrl : str = None
+
+    def __init__(self, project_status: str, downloadUrl = None):
+        super().__init__()
+        log.info("Instantiating a PreprocessPdbForAmberOutput")
+        log.debug("project_status: " + project_status)
+        log.debug("downloadUrl: " + downloadUrl)
+        self.project_status = project_status
+        self.downloadUrl = downloadUrl
+
 
 class StructureFileInputs(BaseModel):
     pdb_file_name : str = ""
@@ -850,7 +859,8 @@ class StructureFileInputs(BaseModel):
 
 
 class StructureFileOutputs(BaseModel):
-    evaluationOutput : EvaluationOutput = None 
+    evaluationOutput : EvaluationOutput = None
+    preprocessPdbForAmberOutput : PreprocessPdbForAmberOutput = None
 
 class StructureFileResponse(BaseModel):
     typename : str = Field(
@@ -951,13 +961,14 @@ class PdbTransaction(commonIO.Transaction):
             log.error(traceback.format_exc())
             raise error
 
-
-    def createStructureFileResponse(self, serviceType, inputs, outputs):
-        log.info("createStructureFileResponse() was called.")
-        log.debug("self.transaction")
-        self.transaction_out.entity.outputs.append(StructureFileResponse(serviceType, inputs, outputs))
+    # Not used.
+    # def createStructureFileResponse(self, serviceType, outputs):
+    #     log.info("createStructureFileResponse() was called.")
+    #     log.debug("self.transaction")
+    #     self.transaction_out.entity.outputs.append(StructureFileResponse(serviceType, outputs))
 
     
+    ## Method only works if transaction_out is up to date first.
     def build_outgoing_string(self) :
         log.info("build_outgoing_string() was called.")
         
