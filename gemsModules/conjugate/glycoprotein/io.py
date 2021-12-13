@@ -16,46 +16,55 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__)
 
+class GlycosylationSitesMetadata(BaseModel):
+    app : str = "gp"
+    page : str = "addGlycans"
+    pages : [str]  = [ "addGlycans", "reviewGlycosylation" ]
+    label : str = "Glycosylation Site"
+    tableKey : str = "glycosylationSites"
+    interactionRequirement : str = "optional"
+    urgency : str = "info"
+    count : int = 0
+    description : str = "Add, Remove or Change Glycosylation"
+    descriptions : [str] = [ "Add, Remove or Change Glycosylation" , "Review Glycosylation" ] 
 
-## OG Never tested code, just showing what it might look like:
-# class TheGlycosylationSiteInput(BaseModel):
-#     proteinResidueId : str = None  # E.g. ?_20 if no chain ID and residue number is 20. C_20 if chain id is C.
-#     glycanInputType : str = None # "Library" if pre-build as a pdb file (not implemented for website) or "Sequence" if glycam condensed nomenclature.
-#     glycanInput :  str = None # E.g. E.g. DGlcpNAcb1-4DGlcpNAcb1-OH if "Sequence".
+class GlycosylationSiteInfo(BaseModel):
+    chain : str = "?"
+    residueNumber : str = "?"
+    insertionCode : str = "?"
+    sequenceContext : str = ""
+    occupied : bool = False
+    attachedGlycanSpecifier : str = None ## 'Sequence' or 'Library'
+    attachedGlycan : str = None
+    tags : [str] = []
 
-# class GlycoproteinBuilderInputs(BaseModel): 
-#     workingDirectory : str = None
-#     prepFileLocation : str = None
-#     substrateFileName : str = None
-#     number3DStructures : str = None
-#     maxThreads : str = None
-#     presistCycles : str = None 
-#     overlapTolerance : str = None
-#     isDeterministic : str = None
-#     glycositesInputVector : List[TheGlycosylationSiteInput] = [] 
+    def __init__(self, **data : Any):
+        super().__init__(**data)
+        log.info("Initializing Glycosylation Site Info.")
+        log.debug("the data " + repr(self))
+        if occupied == True:
+            if attachedGlycan is None :
+                except AttributeError:
+                    log.error("Site set as occupied but has no glycan.")
+        if attachedGlycan is not None :
+            if attachedGlycanSpecifier is None :
+                except AttributeError:
+                    log.error("attachedGlycanSpecifier must not be None.")
+            if occupied == False:
+                log.debug("Found attached glycan but occupied=False; fixing.")
+                self.occupied=True
 
-#     @classmethod
-#     def with_defaults():
-#         workingDirectory = "Default"
-#         prepFileLocation = "Default"
-#         substrateFileName = "Undefined"
-#         number3DStructures = "1"
-#         maxThreads = "1" 
-#         presistCycles = "5"
-#         overlapTolerance = "0.1"
-#         isDeterministic = "false"
+class GlycoproteinInputs(BaseModel):
+    sites : [GlycosylationSiteInfo] = []
 
-#     @classmethod
-#     def with_gmmlClass(gpbInputs):
-#         workingDirectory = gpbInputs.workingDirectory_
 
 class glycoproteinModuleIO(commonio.TransactionSchema):
     """
     Holds info about the Transaction JSON object used in the Sequence entity.
     """
     ##  ... means a value is required in Pydantic.
-    entity : sequenceEntity = ...
-    project : projectio.CbProject = None
+    entity : glycoproteinEntity = ...
+    project : projectio.GpProject = None
 
     def __init__(self, **data : Any):
         super().__init__(**data)
@@ -64,11 +73,11 @@ class glycoproteinModuleIO(commonio.TransactionSchema):
 # ####
 # ####  Container for use in the modules
 # ####
-class Transaction:
+class Transaction: ## base off of commonio.Transaction???
     """Holds information relevant to a delegated transaction"""
     incoming_string :str = None
-    inputs : moduleIO
-    outputs: moduleIO
+    inputs : glycoproteinModuleIO
+    outputs: glycoproteinModuleIO
     outgoing_string : str = None
 
 
@@ -161,24 +170,36 @@ class Transaction:
         else :
             self.outgoing_string = self.transaction_out.json
 
-
-
-def generateSchema():
-    import json
-    #print(Service.schema_json(indent=2))
-    print(TransactionSchema.schema_json(indent=2))
-
-if __name__ == "__main__":
-  generateSchema()
-
         
 
-## Declare and define the main function.
-def main():
     
-    # The gmml level builder uses an input file and a function to fill in this struct. Here I imagine we want to convert from JSON, so I'm showing how to explicitely set stuff.
-    gpbInStruct = gmml.GlycoproteinBuilderInputs()
-    gpbInStruct.substrateFileName_ = "gmml/tests/tests/inputs/017.1eer_eop_Asn.pdb"
+
+
+## OG Never tested code, just showing what it might look like:
+ class TheGlycosylationSiteInput(BaseModel):
+     proteinResidueId : str = None  # E.g. ?_20 if no chain ID and residue number is 20. C_20 if chain id is C.
+     glycanInputType : str = None # "Library" if pre-build as a pdb file (not implemented for website) or "Sequence" if glycam condensed nomenclature.
+     glycanInput :  str = None # E.g. E.g. DGlcpNAcb1-4DGlcpNAcb1-OH if "Sequence".
+
+ class GlycoproteinBuilderInputs(BaseModel): 
+     workingDirectory : str = None
+         workingDirectory = "Default"
+     prepFileLocation : str = None
+         prepFileLocation = "Default"
+     substrateFileName : str = None
+         substrateFileName = "Undefined"
+     number3DStructures : str = None
+         number3DStructures = "1"
+     maxThreads : str = None
+         maxThreads = "1" 
+     presistCycles : str = None 
+         presistCycles = "5"
+     overlapTolerance : str = None
+         overlapTolerance = "0.1"
+     isDeterministic : str = None
+         isDeterministic = "false"
+     glycositesInputVector : List[TheGlycosylationSiteInput] = [] 
+
     gpbInStruct.isDeterministic_ = "true" # Only good for testing, so you get the same 3D structure each time. Don't do this in live site, overlap algo is better with rng.
     gpbInStruct.prepFileLocation_ = "gmml/dat/prep/GLYCAM_06j-1_GAGS.prep" # "Default" doesn't work at gems level.
     glycositeInputA = gmml.GlycositeInput("F_24", "Sequence", "DManpa1-6[DManpa1-2DManpa1-2DManpa1-3]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH")
@@ -190,9 +211,15 @@ def main():
     gpBuilder.ResolveOverlaps()
     gpBuilder.WriteOutputFiles()
     
-    sys.exit(0)
 
-## Now we call main function.
+
+
+
+def generateSchema():
+    import json
+    #print(Service.schema_json(indent=2))
+    print(TransactionSchema.schema_json(indent=2))
+
 if __name__ == "__main__":
-    main()
+  generateSchema()
 
