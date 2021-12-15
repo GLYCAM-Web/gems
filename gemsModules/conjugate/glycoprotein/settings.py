@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
-#from gemsModules import common
-#from gemsModules.common.transaction import *
 from enum import Enum, auto
-#from pydantic import BaseModel
 
 ## Who I am
-WhoIAm='Conjugate'
+WhoIAm='GlycoProtein'
 
 ## Module names for services that this entity/module can perform.
 ## These should not include the Common Services.
