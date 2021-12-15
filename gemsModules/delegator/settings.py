@@ -30,12 +30,13 @@ ServiceModule = {
 ## Module names for entities that the Delegator knows about
 subEntities = {
     'BatchCompute' : 'batchcompute',
-    'Conjugate' : 'conjugate',
     'CommonServices' : 'common',
+    'Conjugate' : 'conjugate',
+    'DrawGlycan' : 'drawglycan',
+    'Glycoprotein' : 'conjugate',
     'MmService' : 'mmservice',
     'Query' : 'query',
     'Sequence' : 'sequence',
-    'DrawGlycan' : 'drawglycan',
     'Status' : 'status',
     'StructureFile' : 'structureFile'
 }
