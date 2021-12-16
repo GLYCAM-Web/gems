@@ -28,6 +28,48 @@ def delegate(jsonObjectString):
     log.info("delegate() was called.\n")
     log.debug("incoming jsonObjectString: " + jsonObjectString)
 
+    ###
+    ### I'm trying to clean up entity handling.  Delegator currently does too much.
+    ### The following handling of conjugate is currently the better method.
+    ### Feel free to improve it further.
+    ### (Lachele)
+    ###
+    conjugateEntities=['Conjugate','Glycoprotein'] ## this goes away once the rest is refactored
+    thisEntityType = getEntityType(jsonObjectString)
+    if thisEntityType is None:
+        return buildInvalidInputErrorResponseJsonString(
+                thisMessagingEntity='delegator',
+                message="entity type not found in json input string")
+    if str(thisEntityType) in conjugateEntities: ## this looks at all entities once the rest is refactored
+        try:
+            from gemsModules.common.logic import importEntity as logic_importEntity
+            thisEntity = logic_importEntity(thisEntityType)
+            log.debug("thisEntityType: " + str(thisEntityType))
+            log.debug("thisEntity (should be a reference): " + str(thisEntity))
+            returnedTransaction = thisEntity.receive.receive(
+                    jsonObjectString,
+                    entityType=thisEntityType)
+            returnedTransaction.build_outgoing_string()
+            return returnedTransaction.outgoing_string
+        except Exception as error:
+            error_msg = "There was a problem importing the entity: " + str(error)
+            log.error(error_msg)
+            log.error(traceback.format_exc())
+            thisTransaction.generateCommonParserNotice(
+                    messagingEntity='delegator', 
+                    additionalInfo={"errorMessage":error_msg})
+            thisTransaction.build_outgoing_string()
+            return thisTransaction.outgoing_string
+    # When the rest is refactored, add something like this:
+    # else:
+    #     return buildInvalidInputErrorResponseJsonString(
+    #             thisMessagingEntity='delegator',
+    #             message="entity type not recognized")
+    ###
+    ### End of new, cleaner block
+    ###
+
+
     # Make a new Transaction object for holding I/O information.
     from gemsModules.common.io import Transaction as ioTransaction
     thisTransaction=ioTransaction(jsonObjectString)
@@ -49,6 +91,7 @@ def delegate(jsonObjectString):
         log.error("The requested entity is CommonServices, so something must have gone wrong.")
         log.error("I'm returning that oject. as-is.  Delegator cannot delegate to CommonServices.")
         return jsonObjectString
+
 
     ### See if it is possible to load a module for the requested Entity
     try:

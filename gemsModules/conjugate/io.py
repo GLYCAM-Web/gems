@@ -87,11 +87,6 @@ class GlycosylationSiteInfo(BaseModel):
                 log.debug("Found attached glycan but occupied=False; fixing.")
                 self.occupied=True
 
-    def gmmlGlycositeInput():
-        if residueNumber == "?" :
-            raise ValueError ("residueNumber must be specified & cannot be '?'")
-        siteID = self.chain + "_" + self.residueNumber + "_" + self.insertionCode
-        return gmml.GlycositeInput( siteID, self.glycanSpecifier, self.glycan ) 
 
 class GlycosylationStatus(str,Enum):
     attached = 'Attached' # glycan was successfully attached
@@ -156,18 +151,19 @@ class conjugateModuleIO(commonio.TransactionSchema):
 class Transaction(commonio.Transaction): ## base off of commonio.Transaction???
     """Holds information relevant to a delegated transaction"""
     incoming_string :str = None
-    inputs : conjugateModuleIO
-    outputs: conjugateModuleIO
+    inputs : conjugateModuleIO = None
+    outputs: conjugateModuleIO = None
     outgoing_string : str = None
 
     def __init__(self, in_string):
+        super().__init__()
         log.debug("The in_string is: " + in_string)
         self.incoming_string = in_string
         if self.incoming_string is None :
             generateCommonParserNotice(noticeBrief='InvalidInput', messagingEntity=settings.WhoIAm)
             return
         try: 
-            self.inputs.parse_raw(self.inputs) 
+            self.inputs.parse_raw(self.incoming_string) 
             log.debug("The inputs object is: " ) 
             log.debug(self.inputs.json(indent=2))
             self.outputs = self.inputs.copy(deep=true)
@@ -193,7 +189,7 @@ class Transaction(commonio.Transaction): ## base off of commonio.Transaction???
         if self.inputs.prettyPrint is True :
             self.outgoing_string = self.outputs.json(indent=2)
         else :
-            self.outgoing_string = self.outputs.json
+            self.outgoing_string = self.outputs.json()
 
         
 
