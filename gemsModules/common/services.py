@@ -63,6 +63,47 @@ def importEntity(requestedEntity):
             log.debug("module_spec: " + str(module_spec))
             return importlib.import_module(requestedModule,package="gemsModules")
 
+
+def getEntityTypeFromJson(jsonObjectString):
+    try:
+        temp_dict=json.loads(jsonObjectString)
+        thisEntityType = temp_dict['entity']['type']
+        return thisEntityType
+    except Exception as error:
+        error_msg = "There was a problem finding the entity type.  Here is more info: " + str(error)
+        log.error(error_msg)
+        log.error(traceback.format_exc())
+        return None
+
+
+def getServicesFromJson(jsonObjectString):
+    try:
+        temp_dict=json.loads(jsonObjectString)
+        theServicesObject = temp_dict['entity']['services']
+        theServices=list(theServicesObject.keys())
+        return theServices
+    except Exception as error:
+        error_msg = "There was a problem finding the services.  Here is more info: " + str(error)
+        log.error(error_msg)
+        log.error(traceback.format_exc())
+        return None
+
+
+def buildInvalidInputErrorResponseJsonString(
+        thisMessagingEntity : str = 'commonServicer',
+        message : str = 'No additional information available',
+        prettyPrint : bool = False):
+    responseSchema=common.io.TransactionSchema()
+    responseSchema.generateCommonParserNotice(
+        noticeBrief='InvalidInput',
+        messagingEntity=thisMessagingEntity,
+        additionalInfo={"errorMessage":message})
+    if prettyPrint == True: 
+        return responseSchema.json(indent=2)
+    else:
+        return responseSchema.json()
+
+
 def parseInput(thisTransaction):
     log.info("parseInput() was called.\n")
     import json

@@ -158,6 +158,10 @@ ExitMessages = {
 }
 
 # ## See above for definition of noticeBrief
+###
+### This should really move to services.py.  It's only here because it relies so
+###   much on the notice info above.  
+###
 def generateCommonParserNotice(
         noticeBrief     : str  = 'UnknownError' ,  # Lookup keyword for the error
         scope           : str  = None,             # Is this from entity? service? transaction?
