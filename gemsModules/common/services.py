@@ -361,7 +361,7 @@ def roundHalfUp(number, decimals=0):
 def main():
     import importlib, os, sys
     from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
-    from pydantic import BaseModel, Schema
+    from pydantic import BaseModel
     from pydantic.schema import schema
     if importlib.util.find_spec("gemsModules") is None:
       this_dir, this_filename = os.path.split(__file__)

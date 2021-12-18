@@ -25,92 +25,15 @@ from uuid import UUID
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union, Any
 from pydantic import BaseModel, Field, Json
 from pydantic.schema import schema
-from gemsModules.project import dataio as projectio
+#from gemsModules.project import dataio as projectio
 from gemsModules.common import settings
 from gemsModules.common.loggingConfig import *
+from gemsModules.common.classes import Notice, Resource
 
 if loggers.get(__name__):
     pass
 else:
     log = createLogger(__name__)
-
-class NoticeTypes(str, Enum):
-    note = 'Note'
-    warning = 'Warning'
-    error = 'Error'
-    exit = 'Exit'
-
-#class Tags(BaseModel):
-    #options : Dict[str,str] = Field(
-            #None,
-            #description='Key-value pairs that are specific to each entity, service, etc'
-            #)
-
-class Notice(BaseModel):
-    """Description of a Notice."""
-    noticeType: NoticeTypes = Field(
-            None,
-            title='Type',
-            alias='type'
-            )
-    noticeCode: str = Field(
-            None,
-            title='Code',
-            alias='code',
-            description='Numeric code associated with this notice, for users who like this sort of thing.'
-            )
-    noticeBrief: str = Field(
-            None,
-            title='Brief',
-            alias='brief',
-            description='Brief title, status or name for this notice or notice type.'
-            )
-    noticeMessage : str = Field(
-            None,
-            title='Message',
-            alias='message',
-            description='A more detailed message for this notice.'
-            )
-    noticeScope : str = Field(
-            None,
-            title='Context of notice',
-            alias='scope',
-            description='The scope at which the error occured.'
-            )
-    messagingEntity : str = Field(
-            None,
-            title='Messaging Entity',
-            description='The Entity that raised the notice, if known.'
-            )
-    additionalInfo : Dict[str,str] = Field(
-            None,
-            description='Key-value pairs that are specific to each entity, service, etc'
-            )
-
-class Resource(BaseModel):
-    """Information describing a resource containing data."""
-    locationType: Json[str] = Field(
-            None,
-            title='Location Type',
-            description='Supported locations will vary with each Entity.'
-            )
-    resourceFormat: Json[str] = Field(
-            None,
-            title='Resource Format',
-            description='Supported formats will varu with each Entity.',
-            )
-    payload : Json[str] = Field(
-        None,
-        description='The thing that is described by the location and format'
-        )
-    notices : List[Notice] = None
-    options : Dict[str,str] = Field(
-            None,
-            description='Key-value pairs that are specific to each entity, service, etc'
-            )
-
-    def generateCommonParserNotice(self, *args, **kwargs) :
-        self.notices.append(settings.generateCommonParserNotice(*args, **kwargs))
 
 # ## Services
 # ##
@@ -188,9 +111,10 @@ class Entity(BaseModel):
         self.notices.append(settings.generateCommonParserNotice(*args, **kwargs))
 
 class TransactionSchema(BaseModel):
+    from gemsModules.project.io import Project
     timestamp : str = None
     entity  : Entity = None
-    project : projectio.Project = None
+    project : Project = None
     prettyPrint : bool = False
     mdMinimize : bool = True
     options : Dict[str,str] = Field(

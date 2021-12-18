@@ -19,6 +19,6 @@ def batch_compute_delegation (incoming_json_dict):
 
     
 if (__name__ == '__main__'):
-    batch_compute (sys.argv[1])
+    batch_compute_delegation (sys.argv[1])
 
   

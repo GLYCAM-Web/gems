@@ -2,4 +2,5 @@
 import gemsModules.project.io as projectIO
 
 if __name__ == "__main__":
-    projectIO.generateProjectSchemaForWeb() 
+#    projectIO.generateProjectSchemaForWeb() # commenting this out until written
+    pass
