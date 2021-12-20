@@ -11,10 +11,9 @@ def manageSequenceBuild3DStructureRequest(self, defaultOnly : bool = False) :
     log.info("manageSequenceBuild3DStructureRequest was called ")
     from typing import List
     from gemsModules.sequence import structureInfo, projects, logic, build
-    from gemsModules.sequence import io as sequenceio
+    from gemsModules.sequence import jsoninterface as sequenceio
     from gemsModules.project import projectUtilPydantic as projectUtils
-    from gemsModules.project.io import CbProject
-    from gemsModules.common import services as commonservices
+    from gemsModules.project.jsoninterface import CbProject
     #
     # Do some sanity checks
     if self.transaction_out is None or self.transaction_in is None or self.transaction_out.project is None:
@@ -25,43 +24,6 @@ def manageSequenceBuild3DStructureRequest(self, defaultOnly : bool = False) :
                 additionalInfo=thisAdditionalInfo
                 )
         raise 
-
-#    ## If the project is None, a new project is needed
-#    if self.transaction_out.project is None :
-#        self.transaction_out.project = CbProject()
-    ## Initialize the project with defaults and/or values from the incoming project
-
-    # ## Record the info that is appropriate to this service
-#    try :
-#        log.debug("Recording initial information to the output directory")
-#        incomingRequest = self.transaction_in.json(indent=2)
-#
-#        log.debug("Initializing the outgoing project in manageSequenceBuild3DStructureRequest")
-##        self.transaction_out.project.requested_service = "Build3DStructure"
-#        self.transaction_out.project.defaultInitializeProject(noClobber = True)
-#        thisProject = self.transaction_out.project
-#        thisProjectDir = os.path.join(
-#                thisProject.service_dir,
-#                'Builds',
-#                thisProject.pUUID)
-#        thisProject.setProjectDir(specifiedDirectory=thisProjectDir, noClobber=False)
-#        thisProject.logs_dir = os.path.join(
-#                thisProjectDir,
-#                'logs')
-#        thisProject.createDirectories()
-#        thisProject.writeInitialLogs()
-#        common.logic.writeStringToFile(incomingRequest, os.path.join(thisProject.logs_dir, "request.json") )
-#    except Exception as error :
-#        log.error("There was a problem initializing the outgoing project: " + str(error))
-#        log.error(traceback.format_exc())
-#        raise error
-#    log.debug("Just initialized the outgoing project.  The transaction_out is :   " )
-#    log.debug(self.transaction_out.json(indent=2))
-    ## TODO - think about whether/how we want to vet project directories
-#    project_dir = self.transaction_out.project.project_dir 
-#    log.debug("Apparent project directory: " + str(project_dir))
-#    if commonservices.directoryExists(project_dir) : 
-#        log.debug("This directory already exists: " + str(project_dir))
 
     ##  Build th structureInfo object
     if self.transaction_out.entity is None :

@@ -3,7 +3,8 @@ import  os, sys, subprocess, warnings
 import json, re
 from pathlib import Path
 from datetime import datetime
-from gemsModules.common.services import *
+#from gemsModules.common.services import *  # prefer to use common.logic
+import gemsModules.common.logic as commonLogic
 from pydantic import BaseModel, Field, ValidationError, validator
 from pydantic.schema import schema
 from gemsModules.common.loggingConfig import *

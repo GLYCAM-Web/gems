@@ -5,10 +5,10 @@ from datetime import datetime
 from pydantic import BaseModel, Field, ValidationError, validator, PositiveFloat, PositiveInt
 from pydantic.schema import schema
 from gemsModules.common.loggingConfig import *
-from gemsModules.common import io as commonio
-from gemsModules.project import io as projectio
-from gemsModules.project import projectUtilPydantic as projectUtils
-from gemsModules.conjugate import io as parentio
+import gemsModules.common.jsoninterface as commonio
+import gemsModules.project.jsoninterface as projectio
+import gemsModules.project.projectUtilPydantic as projectUtils
+import gemsModules.conjugate.jsoninterface as parentio
 from gemsModules.conjugate.glycoprotein import settings
 import traceback
 

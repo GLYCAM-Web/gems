@@ -1,13 +1,7 @@
 #!/usr/bin/env python3
 import json, sys, os, re, importlib.util, shutil, uuid
 import traceback
-import gemsModules
-import gemsModules.sequence
-from gemsModules.common import io as commonio
-from gemsModules.common import logic as commonlogic
-from gemsModules.common import services as commonservices
-from gemsModules.sequence import settings as sequenceSettings
-from gemsModules.sequence import io as sequenceio
+from gemsModules.sequence import jsoninterface as sequenceio
 
 from gemsModules.common.loggingConfig import *
 if loggers.get(__name__):

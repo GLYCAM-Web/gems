@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-#from gemsModules import common
-#from gemsModules.common.transaction import *
 from enum import Enum, auto
-#from pydantic import BaseModel
 
 ## Who I am
 WhoIAm='Conjugate'

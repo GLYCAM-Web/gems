@@ -1,9 +1,10 @@
 import gemsModules
 from shutil import copyfile
 from gemsModules.project import settings as projectSettings
-from gemsModules.project import io as projectio
-from gemsModules.common import io as commonio
-from gemsModules.common import services as commonservices
+from gemsModules.project import jsoninterface as projectio
+from gemsModules.common import jsoninterface as commonio
+#from gemsModules.common import services as commonservices ## services is deprecated; use logic
+from gemsModules.common import logic as commonlogic
 from gemsModules.common import utils as commonutils
 from gemsModules.common.loggingConfig import *
 import traceback

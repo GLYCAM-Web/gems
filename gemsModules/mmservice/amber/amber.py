@@ -1,7 +1,8 @@
 import os, sys
 from gemsModules.common.loggingConfig import *
 from gemsModules.common.loggingConfig import *
-from . import conf, io
+from . import conf
+from . import jsoninterface as amberio
 
 if loggers.get(__name__):
     pass
@@ -16,7 +17,7 @@ def manageIncomingString(jsonObjectString: str):
     log.debug("amber.py input_json_dict is : " + str(input_json_dict))
 
     try : 
-        amber_job = io.amberProject(**input_json_dict)
+        amber_job = amberio.amberProject(**input_json_dict)
         amber_job.initialize()
         amber_job.copy_protocol_files()
     except:

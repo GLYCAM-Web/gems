@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 import json, math, os, sys,importlib.util
 from datetime import datetime
-#import gemsModules
 from gemsModules.common import settings
-from gemsModules.common.io import Notice
+from gemsModules.common.jsonpieces import Notice
 from gemsModules.common.loggingConfig import *
 from typing import *
 from pydantic import BaseModel, ValidationError
@@ -34,65 +33,31 @@ def directoryExists(directory : str) :
 def importEntity(requestedEntity):
     log.info("importEntity() was called.\n")
     log.debug("requestedEntity: " + requestedEntity)
-    #log.debug("Entities known to Common Services: " + str(subEntities))
+    log.debug("Entities known to Common Services: " + str(settings.subEntities))
 
     try:
-        requestedModule = '.' + subEntities[requestedEntity]
+        requestedModule = '.' + settings.subEntities[requestedEntity]
         log.debug("requestedModule: " + requestedModule)
     except Exception as error:
         log.error("There was a problem finding the requested entity. Does it exist? requestedEntity: " + requestedEntity)
         log.error(traceback.format_exc())
         raise error
-    else:
-        try:
-            module_spec = importlib.util.find_spec(requestedModule,package="gemsModules")
-        except Exception as error:
-            log.error("There was a problem importing the requested module.")
-            log.error(traceback.format_exc())
-            raise error
-        else:
 
-            if module_spec is None:
-                log.error("The module spec returned None for rquestedEntity: " + requestedEntity)
-                raise FileNotFoundError(requestedEntity)
+    try:
+        module_spec = importlib.util.find_spec(requestedModule,package="gemsModules")
+        log.debug("module spec is : " + str(module_spec))
+    except Exception as error:
+        log.error("There was a problem importing the requested module.")
+        log.error(traceback.format_exc())
+        raise error
 
-            #log.debug("module_spec: " + str(module_spec))
-            return importlib.import_module(requestedModule,package="gemsModules")
+    if module_spec is None:
+        log.error("The module spec returned None for rquestedEntity: " + requestedEntity)
+        raise FileNotFoundError(requestedEntity)
 
-# ###  This now is part of the Transaction Class
-# ###  It is deprecated and should go away.   Lachele 2021-04-02
-# ###  
-# ###  Starting letting it go away by commenting it out
-#def parseInput(thisTransaction):
-#    log.info("common.logic.parseInput() was called.\n")
-#    import json
-#    from io import StringIO
-#    from pydantic import BaseModel, ValidationError
-#    import jsonpickle
-#    io=StringIO()
-#
-#    # Load the JSON string into the incoming dictionary
-#    thisTransaction.request_dict = json.loads(thisTransaction.incoming_string)
-#    #log.debug("thisTransaction.request_dict: \n\n")
-#    #prettyPrint(thisTransaction.request_dict)
-#
-#    # Check to see if there are errors.  If there are, bail, but give a reason
-#    if thisTransaction.request_dict is None:
-#        thisTransaction.generateCommonParserNotice(noticeBrief = 'JsonParseError')
-#        log.error(traceback.format_exc())
-#        raise AttributeError("request_dict")
-#    try:
-#        TransactionSchema(**thisTransaction.request_dict)
-#    except Exception as error:
-#        log.error("There was an error parsing transaction.request_dict.")
-#        log.error("Error type : " + str(type(error)))
-#        log.error(traceback.format_exc())
-#        raise error
-#    else:
-#        # If still here, load the data into a Transaction object and return success
-#        thisTransaction.transaction_in = jsonpickle.decode(thisTransaction.incoming_string)
-#        #log.debug("thisTransaction.transaction_in: " + str(thisTransaction.transaction_in))
-#        return 0
+    the_module = importlib.import_module(requestedModule,package="gemsModules")
+    log.debug("the module: " + str(the_module))
+    return the_module
 
 
 def getEntityTypeFromJson(jsonObjectString):
@@ -120,29 +85,28 @@ def getServicesFromJson(jsonObjectString):
         return None
 
 
-def buildInvalidInputErrorResponseJsonString(
+def buildInvalidInputErrorResponse(
         thisMessagingEntity : str = 'commonServicer',
-        message : str = 'No additional information available',
-        prettyPrint : bool = False):
+        message : str = 'No additional information available'):
     responseSchema=common.io.TransactionSchema()
     responseSchema.generateCommonParserNotice(
         noticeBrief='InvalidInput',
         messagingEntity=thisMessagingEntity,
         additionalInfo={"errorMessage":message})
-    if prettyPrint == True:
-        return responseSchema.json(indent=2)
-    else:
-        return responseSchema.json()
+    return responseSchema
 
 
 def marco(requestedEntity):
     log.info("marco() was called.\n")
     log.debug("The Marco method was called and is being fulfilled by CommonServices.")
     theEntity = importEntity(requestedEntity)
-    if hasattr(theEntity, 'receive'):
-        return "Polo"
-    else:
+    log.debug("the returned entity is : " + str(theEntity))
+    module_spec = importlib.util.find_spec('receive',package=theEntity)
+    log.debug("module_spec is : " + str(module_spec))
+    if module_spec is None:
         return "The entity you seek is not responding properly."
+    else:
+        return "Polo"
 
 def getTypesFromList(theList):
     log.info("getTypesFromList() was called.\n")
@@ -168,7 +132,7 @@ def getTypesFromList(theList):
 ## TODO make this more generic
 def listEntities(requestedEntity='Delegator'):
   log.info("listEntities() was called.\n")
-  return list(subEntities.keys())
+  return list(settings.subEntities.keys())
 
 def returnHelp(requestedEntity,requestedHelp):
   log.info("returnHelp() was called.\n")

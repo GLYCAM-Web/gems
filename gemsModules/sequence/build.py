@@ -1,21 +1,16 @@
 #!/usr/bin/env python3
 import json, sys, os, re, importlib.util, shutil, uuid
-import gemsModules
+#import gemsModules
 import gmml
 import traceback
 import gemsModules.common.utils
 from multiprocessing import Process
 from gemsModules.project import projectUtilPydantic as projectUtils
-from gemsModules.project import settings as projectSettings
-from gemsModules.sequence import io as sequenceio
-from gemsModules.common import io as commonio
+from gemsModules.sequence import jsoninterface as sequenceio
 from gemsModules.common import logic as commonLogic
-from gemsModules.common import services as commonservices
-from gemsModules.sequence import io as sequenceIO
 from gemsModules.common.loggingConfig import *
 
 from gemsModules.sequence import projects as sequenceProjects
-from gemsModules.sequence import settings as sequenceSettings
 from gemsModules.sequence.structureInfo import *
 
 if loggers.get(__name__):
@@ -219,7 +214,7 @@ def divideListIntoChunks(l, n):
 #   @return CarbohydrateBuilder object from gmml.
 def getCbBuilderForSequence(sequence : str):
     log.info("getCbBuilderForSequence() was called.\n")
-    GemsPath = commonservices.getGemsHome()
+    GemsPath = commonLogic.getGemsHome()
     log.debug("GemsPath: " + GemsPath )
 
     prepfile = GemsPath + "/gemsModules/sequence/GLYCAM_06j-1.prep"

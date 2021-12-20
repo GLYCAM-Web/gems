@@ -3,9 +3,9 @@ import os, sys
 import json
 import uuid
 from datetime import datetime
-from gemsModules.common import settings as commonsettings
-from gemsModules.common import logic as commonlogic
-from gemsModules.common.classes import Notice
+import gemsModules.common.settings as commonsettings
+import gemsModules.common.logic as commonlogic
+import gemsModules.common.jsonpieces as commonjson
 from gemsModules.project import settings as project_settings
 from pydantic import BaseModel, Field, ValidationError, constr
 from pydantic.schema import schema
@@ -84,7 +84,7 @@ class Project(BaseModel):
     django_project_id : constr(max_length=36)=""
     app : constr(max_length=25)="project"
   
-    notices : List[Notice] = []
+    notices : List[commonjson.Notice] = []
 
 
     def __init__(self, **data : Any):

@@ -7,12 +7,12 @@ from typing import ForwardRef
 from pydantic import BaseModel, Field, ValidationError, validator
 from pydantic.schema import schema
 from gemsModules.common.loggingConfig import *
-from gemsModules.common import io as commonIO
+from gemsModules.common import jsoninterface as commonIO
 from gemsModules.common.logic import prettyPrint
 from gemsModules.common.settings import SCHEMA_DIR
-from gemsModules.common.services import roundHalfUp
-from gemsModules.project import io as projectIO
-from gemsModules.project import projectUtil as projectUtil
+#from gemsModules.common.services import roundHalfUp  # add this to logic
+from gemsModules.project import jsoninterface as projectIO
+from gemsModules.project import projectUtilPydantic as projectUtil
 from gemsModules.structureFile import settings as structureFileSettings
 from gemsModules.structureFile.amber import settings as amberSettings
 import gmml, traceback

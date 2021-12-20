@@ -1,4 +1,4 @@
-from gemsModules.structureFile.amber import io as amberIO
+from gemsModules.structureFile.amber import jsoninterface as amberIO
 from gemsModules.common.loggingConfig import *
 import traceback
 
