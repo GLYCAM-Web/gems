@@ -39,6 +39,35 @@ class glycoproteinService(parentio.conjugateService):
         log.debug("Init for the Services in glycoprotein was called.")
 
 
+Add to the table metadata:
+
+For N-links you know the columns: Man9, Man8, Man5, Man3, Hybrid, Complex.
+For O-links they are: GlcNAcb, GalNAca, Core1, Core2, Core3, Core4
+For C-links it's just one column: Manb
+
+remove Man8 from the first table
+
+
+
+N-glycans
+Man9 DManpa1-2DManpa1-6[DManpa1-2DManpa1-3]DManpa1-6[DManpa1-2DManpa1-2DManpa1-3]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH
+Man5 DManpa1-6[DManpa1-3]DManpa1-6[DManpa1-3]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH
+Man3 DManpa1-3[DManpa1-6]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH
+Hybrid DManpa1-3DManpa1-6[DNeup5Aca2-6DGalpb1-4DGlcpNAcb1-2DManpa1-3]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH
+Complex DNeup5Aca2-3DGalpb1-4DGlcpNAcb1-2DManpa1-6[DNeup5Aca2-3DGalpb1-4DGlcpNAcb1-2DManpa1-3]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH
+O-glycans
+GlcNAcb DGlcpNAcb1-OH
+GalNAca DGalpNAca1-OH
+Core1 DGalpb1-3DGalpNAca1-OH
+Core2 DGlcpNAcb1-6[DGalpb1-3]DGalpNAca1-OH
+Core3 DGlcpNAcb1-3DGalpNAca1-OH
+Core4 DGlcpNAcb1-6[DGlcpNAcb1-3]DGalpNAca1-OH
+C-glycans
+Manb DManpb1-OH
+
+
+
+
 class gpGlycosylationSiteInfo(parentio.GlycosylationSiteInfo):
     aminoAcidLetterCode : str  = '?'
     nLinkCapable        : bool = False
