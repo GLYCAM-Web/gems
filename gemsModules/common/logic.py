@@ -2,7 +2,7 @@
 import json, math, os, sys,importlib.util
 from datetime import datetime
 from gemsModules.common import settings
-from gemsModules.common.jsonpieces import Notice
+from gemsModules.common.notices import Notice
 from gemsModules.common.loggingConfig import *
 from typing import *
 from pydantic import BaseModel, ValidationError

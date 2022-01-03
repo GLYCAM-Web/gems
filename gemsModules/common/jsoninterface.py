@@ -26,7 +26,8 @@ from typing import Dict, List, Optional, Sequence, Set, Tuple, Union, Any
 from pydantic import BaseModel, Field, Json
 from pydantic.schema import schema
 from gemsModules.project.jsoninterface import Project as Project
-import gemsModules.common.jsonpieces as jsoninc
+from gemsModules.common.notices import Notice
+from gemsModules.common.resources import Resource
 from gemsModules.common import settings
 
 from gemsModules.common import loggingConfig 
@@ -169,7 +170,7 @@ class Response(Service):
             description='The type service that produced this response.'
             )
     outputs : Json = None
-    notices : List[jsoninc.Notice] = None
+    notices : List[Notice] = None
 
 
 class Entity(BaseModel):
@@ -186,8 +187,8 @@ class Entity(BaseModel):
             )
     services : Dict[str,Service] = None
     responses : Dict[str,Response] = None
-    resources : List[jsoninc.Resource] = None
-    notices : List[jsoninc.Notice] = None
+    resources : List[Resource] = None
+    notices : List[Notice] = None
     options : Dict[str,str] = Field(
             None,
             description='Key-value pairs that are specific to each entity, service, etc'
@@ -204,7 +205,7 @@ class TransactionSchema(BaseModel):
             None,
             description='Key-value pairs that are specific to each entity, service, etc'
             )
-    notices : List[jsoninc.Notice] = []
+    notices : List[Notice] = []
     class Config:
         title = 'gemsModulesCommonTransaction'
 
@@ -239,9 +240,7 @@ class Transaction:
         # ## I think it is wrong to have Transaction call something from
         # ## some other place to modify itself, but I don't have time to
         # ## refactor this all to make it right.  Lachele 2021-04-02
-        from gemsModules.common import services as commonServices
         from gemsModules.common import settings as commonSettings
-        from gemsModules.common import io as commonio
 
         # The following debug line is sometimes useful, but normally redundant.
         #log.debug("The in_string is: " + in_string)
