@@ -3,6 +3,7 @@ import  os, sys, subprocess, warnings
 import json, re
 from pathlib import Path
 from datetime import datetime
+from typing import List
 #from gemsModules.common.services import *  # prefer to use common.logic
 import gemsModules.common.logic as commonLogic
 from pydantic import BaseModel, Field, ValidationError, validator
@@ -118,22 +119,22 @@ class amberProject(BaseModel):
     def initialize(self):
         log.info("mmservice/amber/io.py amberProject initialize was called")
         try : 
-            gemshome : str = getGemsHome()
+            gemshome : str = commonLogic.getGemsHome()
         except :
             log.error("Could not get GEMSHOME")
             raise
         if self.protocolSourceLocation is None : 
             self.protocolSourceLocation = gemshome + '/External/MD_Utils'
-        log.debug("self.protocolSourceLocation is : " + self.protocolSourceLocation)
+        log.debug("self.protocolSourceLocation is : " + str(self.protocolSourceLocation))
         log.debug("AANNNNNDDDD.... I get to here.....")
         try : 
-            log.debug("0th - localWorkingDirectory is : " + self.localWorkingDirectory)
+            log.debug("0th - localWorkingDirectory is : " + str(self.localWorkingDirectory))
         except :
             log.debug("could not write the localWorkingDirectory")
             raise
         if self.localWorkingDirectory is None : 
             self.localWorkingDirectory = gemshome + "/UserSpace/amberJob"
-        log.debug("1st - localWorkingDirectory is : " + self.localWorkingDirectory)
+        log.debug("1st - localWorkingDirectory is : " + str(self.localWorkingDirectory))
         if self.thisProjectLog is None : 
             self.thisProjectLog = gemshome + "/UserSpace/amberJob/gemsAmberProject.log"
         if self.thisProjectJson is None : 

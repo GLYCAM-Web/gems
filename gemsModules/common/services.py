@@ -61,7 +61,9 @@ def importEntity(requestedEntity):
                 raise FileNotFoundError(requestedEntity)
 
             log.debug("module_spec: " + str(module_spec))
-            return importlib.import_module(requestedModule,package="gemsModules")
+            theModule = importlib.import_module(requestedModule,package="gemsModules")
+            log.debug("the module:  " + str(theModule))
+            return theModule
 
 
 def getEntityTypeFromJson(jsonObjectString):

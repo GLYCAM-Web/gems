@@ -1,8 +1,8 @@
-import os, sys
+import os, sys, traceback
 from gemsModules.common.loggingConfig import *
 from gemsModules.common.loggingConfig import *
-from . import conf
-from . import jsoninterface as amberio
+from gemsModules.mmservice.amber import conf
+from gemsModules.mmservice.amber import jsoninterface as amberio
 
 if loggers.get(__name__):
     pass
