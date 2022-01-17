@@ -11,7 +11,7 @@ else:
 
 NoticeDatum = namedtuple(
         "NoticeDatum",
-            "Brief Scope RespondingEntity Type Code Message")
+            "Brief Scope Messenger Type Code Message")
 NoticeData : List[NoticeDatum] = []
 
 NoticeData.append(NoticeDatum(
