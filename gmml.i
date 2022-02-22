@@ -36,11 +36,14 @@
 #include "gmml/includes/ParameterSet/PrepFileSpace/prepfileresidue.hpp"
 #include "gmml/includes/ParameterSet/PrepFileSpace/prepfileprocessingexception.hpp"
 
-#include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceprocessingexception.hpp"
-#include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceresidue.hpp"
-#include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceglycam06residue.hpp"
-#include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequence.hpp"
-#include "gmml/includes/InputSet/CondensedSequenceSpace/sequencestring.hpp"
+//#include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceprocessingexception.hpp"
+//#include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceresidue.hpp"
+//#include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceglycam06residue.hpp"
+//#include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequence.hpp"
+//#include "gmml/includes/InputSet/CondensedSequenceSpace/sequencestring.hpp"
+
+#include "gmml/includes/InputSet/CondensedSequence/graphVizDotConfig.hpp"
+#include "gmml/includes/InternalPrograms/DrawGlycan/drawGlycan.hpp"
 
 //#include "gmml/includes/InputSet/CifFileSpace/ciffileatom.hpp"
 //#include "gmml/includes/InputSet/CifFileSpace/ciffile.hpp"
@@ -222,11 +225,15 @@ std::ostream & get_cout() { return std::cout; }
 %include "gmml/includes/ParameterSet/PrepFileSpace/prepfileresidue.hpp"
 %include "gmml/includes/ParameterSet/PrepFileSpace/prepfileprocessingexception.hpp"
 
-%include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceprocessingexception.hpp"
-%include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceresidue.hpp"
-%include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceglycam06residue.hpp"
-%include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequence.hpp"
-%include "gmml/includes/InputSet/CondensedSequenceSpace/sequencestring.hpp"
+//%include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceprocessingexception.hpp"
+//%include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceresidue.hpp"
+//%include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceglycam06residue.hpp"
+//%include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequence.hpp"
+//%include "gmml/includes/InputSet/CondensedSequenceSpace/sequencestring.hpp"
+
+
+%include "gmml/includes/InputSet/CondensedSequence/graphVizDotConfig.hpp"
+%include "gmml/includes/InternalPrograms/DrawGlycan/drawGlycan.hpp"
 
 %include "gmml/includes/InputSet/PdbFileSpace/pdbatomsection.hpp"
 %include "gmml/includes/InputSet/PdbFileSpace/pdbatomcard.hpp"
@@ -688,16 +695,16 @@ std::ostream & get_cout() { return std::cout; }
 //%template(condensedsequence_token_type_vector) std::vector<gmml::CondensedSequenceTokenType>;
 
 //typedef std::vector<CondensedSequenceSpace::CondensedSequenceResidue*> CondensedSequenceResidueTree;
-%template(condensedsequence_residue_tree) std::vector<CondensedSequenceSpace::CondensedSequenceResidue*>;
+//%template(condensedsequence_residue_tree) std::vector<CondensedSequenceSpace::CondensedSequenceResidue*>;
 
 //typedef std::vector<CondensedSequenceSpace::CondensedSequenceGlycam06Residue*> CondensedSequenceGlycam06ResidueTree;
-%template(condensedsequence_glycam06_residue_tree) std::vector<CondensedSequenceSpace::CondensedSequenceGlycam06Residue*>;
+//%template(condensedsequence_glycam06_residue_tree) std::vector<CondensedSequenceSpace::CondensedSequenceGlycam06Residue*>;
 
 //typedef std::pair<std::string, CondensedSequenceSpace::RotamersAndGlycosidicAnglesInfo*> RotamerNameInfoPair;
-%template(rotamer_name_info_pair) std::pair<std::string, CondensedSequenceSpace::RotamersAndGlycosidicAnglesInfo*>;
+//%template(rotamer_name_info_pair) std::pair<std::string, CondensedSequenceSpace::RotamersAndGlycosidicAnglesInfo*>;
 
 //typedef std::vector<RotamerNameInfoPair> CondensedSequenceRatomersAndGlycosidicAnglesInfo;
-%template(rotamer_angle_info_vector) std::vector<std::pair<std::string, CondensedSequenceSpace::RotamersAndGlycosidicAnglesInfo*> >;
+//%template(rotamer_angle_info_vector) std::vector<std::pair<std::string, CondensedSequenceSpace::RotamersAndGlycosidicAnglesInfo*> >;
 
 //std::pair<std::string, double>
 %template(string_double_pair) std::pair<std::string, double>;
@@ -740,13 +747,13 @@ std::ostream & get_cout() { return std::cout; }
 
 ///Carbohydrate Builder///
 //typedef std::vector<DihedralOptions> DihedralOptionsVector;
-%template(dihedral_options_vector) std::vector<CondensedSequenceSpace::DihedralOptions>;
+%template(dihedral_options_vector) std::vector<CondensedSequence::DihedralOptions>;
 
 //typedef std::vector<LinkageOptions> LinkageOptionsVector;
-%template(linkage_options_vector) std::vector<CondensedSequenceSpace::LinkageOptions>;
+%template(linkage_options_vector) std::vector<CondensedSequence::LinkageOptions>;
 
 //typedef std::vector<SingleRotamerInfo> SingleRotamerInfoVector;
-%template(single_rotamer_info_vector) std::vector<CondensedSequenceSpace::SingleRotamerInfo>;
+%template(single_rotamer_info_vector) std::vector<CondensedSequence::SingleRotamerInfo>;
 
 //typedef std::vector<MolecularModeling::Residue*> ResidueVector;
 %template(residue_vector) std::vector<MolecularModeling::Residue* >;

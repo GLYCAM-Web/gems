@@ -1,38 +1,47 @@
-graph G {
-	graph [splines=false forcelabels=true  dpi=72];
-	node [shape="none" fontname=Helvetica labelfontsize=12 forcelabels="true"; label="none" size=50 fixedsize="true" scale="true"];
-	edge [labelfontsize=12 fontname=Helvetica labeldistance=1.2 labelangle = 320.0];
-	rankdir=RL
-	nodesep="0.01" ;
-	0 [shape=box label="OME"]
-	1 [label="" image="/programs/gw_misc/SNFG/V1/DGalpNAc.svg" height="0.7"]
-	b1 [shape="plaintext",fontsize="12",forcelabels="true"; height="0.3"; labelloc=b;  label="6S "]
-	{rank="same"; b1 1}
-	{nodesep="0.02"; b1;1}
-	b1--1 [style=invis];
-	2 [label="" image="/programs/gw_misc/SNFG/V1/DGalpNAc.svg" height="0.7"]
-	b2 [shape="plaintext",fontsize="12",forcelabels="true"; height="0.3"; labelloc=b;  label="6Me "]
-	{rank="same"; b2 2}
-	{nodesep="0.02"; b2;2}
-	b2--2 [style=invis];
-	3 [label="" image="/programs/gw_misc/SNFG/V1/DManp.svg" height="0.7"]
-	b3 [shape="plaintext",fontsize="12",forcelabels="true"; height="0.3"; labelloc=b;  label="3A "]
-	{rank="same"; b3 3}
-	{nodesep="0.02"; b3;3}
-	b3--3 [style=invis];
-	4 [label="" image="/programs/gw_misc/SNFG/V1/DGlcpNAc.svg" height="0.7"]
-	b4 [shape="plaintext",fontsize="12",forcelabels="true"; height="0.3"; labelloc=b;  label="3A "]
-	{rank="same"; b4 4}
-	{nodesep="0.02"; b4;4}
-	b4--4 [style=invis];
-	5 [label="" image="/programs/gw_misc/SNFG/V1/LFucp.svg" height="0.7"]
-	b5 [shape="plaintext",fontsize="12",forcelabels="true"; height="0.3"; labelloc=b;  label="2S "]
-	{rank="same"; b5 5}
-	{nodesep="0.02"; b5;5}
-	b5--5 [style=invis];
-	0--1 [headlabel="b"]
-	1--2 [headlabel="a" taillabel="4"]
-	1--3 [headlabel="a" taillabel="3"]
-	3--4 [headlabel="a" taillabel="2"]
-	3--5 [headlabel="b" taillabel="6"]
+graph G {graph [splines=false forcelabels=true  dpi=72];
+node [ shape="none" fontname=Helvetica labelfontsize=12 forcelabels="true";
+label="none" size=50 fixedsize="true" scale="true"];
+edge [labelfontsize=12 fontname=Helvetica labeldistance=1.2 labelangle = 320.0];
+rankdir=LR nodesep="0.05" ranksep="0.8";
+1 [shape=box label="OME"]
+2 [label="" height="0.7" image="/programs/gems/gmml/includes/MolecularMetadata/Sugars/SNFG_Symbol_Images/DGalNAc.svg"];
+
+b2[ shape="plaintext",fontsize="12",forcelabels="true"; height = "0.3"; labelloc = b;  label="6S "];
+{ rank="same"; b2 2};
+{nodesep="0.2";b2;2};
+b2--2 [style=invis];
+2--1[label="b1-"];
+
+4 [label="" height="0.7" image="/programs/gems/gmml/includes/MolecularMetadata/Sugars/SNFG_Symbol_Images/DGalNAc.svg"];
+
+b4[ shape="plaintext",fontsize="12",forcelabels="true"; height = "0.3"; labelloc = b;  label="6Me "];
+{ rank="same"; b4 4};
+{nodesep="0.2";b4;4};
+b4--4 [style=invis];
+4--2[label="a1-4"];
+
+6 [label="" height="0.7" image="/programs/gems/gmml/includes/MolecularMetadata/Sugars/SNFG_Symbol_Images/DMan.svg"];
+
+b6[ shape="plaintext",fontsize="12",forcelabels="true"; height = "0.3"; labelloc = b;  label="3A "];
+{ rank="same"; b6 6};
+{nodesep="0.2";b6;6};
+b6--6 [style=invis];
+6--2[label="a1-3"];
+
+8 [label="" height="0.7" image="/programs/gems/gmml/includes/MolecularMetadata/Sugars/SNFG_Symbol_Images/DGlcNAc.svg"];
+
+b8[ shape="plaintext",fontsize="12",forcelabels="true"; height = "0.3"; labelloc = b;  label="3A "];
+{ rank="same"; b8 8};
+{nodesep="0.2";b8;8};
+b8--8 [style=invis];
+8--6[label="a1-2"];
+
+10 [label="" height="0.7" image="/programs/gems/gmml/includes/MolecularMetadata/Sugars/SNFG_Symbol_Images/LFuc.svg"];
+
+b10[ shape="plaintext",fontsize="12",forcelabels="true"; height = "0.3"; labelloc = b;  label="2S "];
+{ rank="same"; b10 10};
+{nodesep="0.2";b10;10};
+b10--10 [style=invis];
+10--6[label="b1-6"];
+
 }

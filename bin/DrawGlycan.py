@@ -81,8 +81,8 @@ def main():
         "show_edge_labels": False, # bool
         "show_position_labels": True, # bool
         "dpi": 72, # int
-        "svg_directory_path": "/programs/gw_misc/SNFG/V1/", # string
-        "dot_file_name": "drawglycan.dot", # string
+        "svg_directory_path": "/programs/gems/gmml/includes/MolecularMetadata/Sugars/SNFG_Symbol_Images/", # string
+        "dot_file_name": "oligosaccharide.dot", # string
         "sequence": "" # string
     }
     sequence = False
@@ -208,35 +208,10 @@ def main():
     configs.svg_directory_path_ = data['svg_directory_path']
     configs.file_name_ = data['dot_file_name']
 
-    ## Intialize a GMML CondensedSequenceSpace::CondensedSequence
-    if verbose:
-        print("Trying to Initialize a GMML CondensedSequenceSpace::CondensedSequence Object using " + data['sequence'])
-    ## If this sequence is not a valid sequence for GMML, this doesn't fail gracefully. Hope to fix one day.
-    try:
-        condensed_sequence = gmml.CondensedSequence(data['sequence'])
-    except gmml.CondensedSequenceProcessingException as err:
-        print(err, file=sys.stderr)
-        sys.exit(1)
-
-    ## Check if the output file exists and if it doesn't, then create it.
-    try:
-        if verbose:
-            print("Looking for the ouput file. If it is not there, then it will try to make it. This will fail if you don't have permission to open it for writing or creating it.")
-        output_file = open(data['dot_file_name'], 'w')
-    except OSError as err:
-        print(err, file=sys.stdout)
-        if verbose:
-            print("Exiting with Failure(1)")
-        sys.exit(1)
-    else:
-        if verbose:
-            print("Closing file, so GMML can use it to write the dot file.")
-        output_file.close()
-
     ## Call the WriteGraphVizDotFile function.
     if verbose:
-        print("Calling CondensedSequenceSpace::CondensedSequence::WriteGraphVizDotFile() to generate the dot file.")
-    condensed_sequence.WriteGraphVizDotFile(configs)
+        print("Calling CondensedSequence::DrawGlycan to generate the dot file.")
+    gmml.DrawGlycan(configs, data['sequence'])
 
     if verbose:
         print("We made it to the end. Congratulations!")
