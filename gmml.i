@@ -36,11 +36,11 @@
 #include "gmml/includes/ParameterSet/PrepFileSpace/prepfileresidue.hpp"
 #include "gmml/includes/ParameterSet/PrepFileSpace/prepfileprocessingexception.hpp"
 
-//#include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceprocessingexception.hpp"
-//#include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceresidue.hpp"
-//#include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceglycam06residue.hpp"
-//#include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequence.hpp"
-//#include "gmml/includes/InputSet/CondensedSequenceSpace/sequencestring.hpp"
+#include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceprocessingexception.hpp"
+#include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceresidue.hpp"
+#include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceglycam06residue.hpp"
+#include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequence.hpp"
+#include "gmml/includes/InputSet/CondensedSequenceSpace/sequencestring.hpp"
 
 #include "gmml/includes/InputSet/CondensedSequence/graphVizDotConfig.hpp"
 #include "gmml/includes/InternalPrograms/DrawGlycan/drawGlycan.hpp"
@@ -225,12 +225,11 @@ std::ostream & get_cout() { return std::cout; }
 %include "gmml/includes/ParameterSet/PrepFileSpace/prepfileresidue.hpp"
 %include "gmml/includes/ParameterSet/PrepFileSpace/prepfileprocessingexception.hpp"
 
-//%include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceprocessingexception.hpp"
-//%include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceresidue.hpp"
-//%include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceglycam06residue.hpp"
-//%include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequence.hpp"
-//%include "gmml/includes/InputSet/CondensedSequenceSpace/sequencestring.hpp"
-
+%include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceprocessingexception.hpp"
+%include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceresidue.hpp"
+%include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequenceglycam06residue.hpp"
+%include "gmml/includes/InputSet/CondensedSequenceSpace/condensedsequence.hpp"
+%include "gmml/includes/InputSet/CondensedSequenceSpace/sequencestring.hpp"
 
 %include "gmml/includes/InputSet/CondensedSequence/graphVizDotConfig.hpp"
 %include "gmml/includes/InternalPrograms/DrawGlycan/drawGlycan.hpp"
@@ -689,22 +688,22 @@ std::ostream & get_cout() { return std::cout; }
 
 ///Condensed Sequence///
 //typedef std::vector<CondensedSequenceSpace::CondensedSequenceResidue*> CondensedSequenceResidueVector;
-//%template(condensedsequence_residue_vector) std::vector<CondensedSequenceSpace::CondensedSequenceResidue*>;
+%template(condensedsequence_residue_vector) std::vector<CondensedSequenceSpace::CondensedSequenceResidue*>;
 
 //typedef std::vector<gmml::CondensedSequenceTokenType> CondensedSequenceTokenTypeVector;
-//%template(condensedsequence_token_type_vector) std::vector<gmml::CondensedSequenceTokenType>;
+%template(condensedsequence_token_type_vector) std::vector<gmml::CondensedSequenceTokenType>;
 
 //typedef std::vector<CondensedSequenceSpace::CondensedSequenceResidue*> CondensedSequenceResidueTree;
 //%template(condensedsequence_residue_tree) std::vector<CondensedSequenceSpace::CondensedSequenceResidue*>;
 
 //typedef std::vector<CondensedSequenceSpace::CondensedSequenceGlycam06Residue*> CondensedSequenceGlycam06ResidueTree;
-//%template(condensedsequence_glycam06_residue_tree) std::vector<CondensedSequenceSpace::CondensedSequenceGlycam06Residue*>;
+%template(condensedsequence_glycam06_residue_tree) std::vector<CondensedSequenceSpace::CondensedSequenceGlycam06Residue*>;
 
 //typedef std::pair<std::string, CondensedSequenceSpace::RotamersAndGlycosidicAnglesInfo*> RotamerNameInfoPair;
-//%template(rotamer_name_info_pair) std::pair<std::string, CondensedSequenceSpace::RotamersAndGlycosidicAnglesInfo*>;
+%template(rotamer_name_info_pair) std::pair<std::string, CondensedSequenceSpace::RotamersAndGlycosidicAnglesInfo*>;
 
 //typedef std::vector<RotamerNameInfoPair> CondensedSequenceRatomersAndGlycosidicAnglesInfo;
-//%template(rotamer_angle_info_vector) std::vector<std::pair<std::string, CondensedSequenceSpace::RotamersAndGlycosidicAnglesInfo*> >;
+%template(rotamer_angle_info_vector) std::vector<std::pair<std::string, CondensedSequenceSpace::RotamersAndGlycosidicAnglesInfo*> >;
 
 //std::pair<std::string, double>
 %template(string_double_pair) std::pair<std::string, double>;
