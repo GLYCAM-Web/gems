@@ -46,7 +46,7 @@ def buildEach3DStructureInStructureInfo(thisTransaction : sequenceio.Transaction
     log.debug("Working on getting other data now.")
     try :
         theStructureBuildInfo = thisTransaction.getStructureBuildInfoOut()
-        if theStructureBuildInfo.indexOrderedSequence is "" :
+        if theStructureBuildInfo.indexOrderedSequence == "" :
             theStructureBuildInfo.setSequence(thisTransaction.getSequenceVariantOut('indexOrdered'))
             theStructureBuildInfo.setSeqId(theStructureBuildInfo.indexOrderedSequence)
         thisBuildStrategyID   = theStructureBuildInfo.getBuildStrategyID()
