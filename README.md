@@ -19,8 +19,7 @@ In order to install GEMS, you will need to have the following software available
 * `python-dev` (you need the Python header files for your Linux distro, which may not be part of your existing Python package)
 * `swig` 
 * Kernel headers (the source code for the Linux kernel, which may not be installed on your system)
-* `qmake`
-* `qt4-dev-tools`
+* `cmake`
 * `boost`
 
 **NOTE** - installing some prerequisites may require `root` access.
@@ -28,7 +27,7 @@ In order to install GEMS, you will need to have the following software available
 Installation instructions will vary according to the package management software your distro uses.  If you use Ubuntu or any other Debian based system, you should be able to use a command like this:
 
 ```bash
-sudo apt-get install openssl git python3 python3-dev swig build-essential qt4-qmake qt4-dev-tools libboost-all-dev 
+sudo apt-get install openssl git python3 python3-dev swig build-essential cmake libboost-all-dev 
 ```
 For other Linux distros, please follow the instructions for the package management software included with your system. 
 

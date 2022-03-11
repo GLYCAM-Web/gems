@@ -113,12 +113,12 @@ check_pull_mdutils() {
     if [ "${GW_GRPC_ROLE}" == "Swarm" ] ; then
         echo "Swarm deployment detected.  MD_Utils should be controlled by upstream processes. "
         echo "!!!  NOT ALTERING MD_Utils  !!!"
-	return 0; 
+	return 0;
     elif [ "${GW_GRPC_ROLE}" == "Developer" ] ; then
 	echo "Developer environment detected; pulling MD_Utils from md-test."
 	mdBranch="md-test"
 	inDevEnv="true"
-    else 
+    else
         mdBranch="stable"
 	inDevEnv="false"
     fi
@@ -317,10 +317,10 @@ fi
 ################################################################
 
 #Changing the following options are for developers.
-CLEAN="no_clean"
-DEBUG="no_debug"
+CLEAN=""
+BUILD_LEVEL="O2"
 TARGET_MAKE_FILE="Makefile"
-WRAP_GMML="wrap"
+WRAP_GMML=""
 
 ################################################################
 #########               COMMAND LINE INPUTS            #########
@@ -329,13 +329,22 @@ i=1
 while [ ${i} -le $# ]; do
     argument="${!i}"
     if [ "$argument" = "clean" ]||[ "$argument" = "no_clean" ];then
-        CLEAN="${!i}"
+        if [ "$argument" = "clean" ]; then
+			CLEAN="-c"
+		fi
     elif [ "$argument" = "wrap" ]||[ "$argument" = "no_wrap" ];then
-        WRAP_GMML="${!i}"
-    elif [ "$argument" = "debug" ]||[ "$argument" = "no_debug" ];then
-        DEBUG="${!i}"
-    elif [ "$argument" = "optimize" ]||[ "$argument" = "no_optimize" ]||[ "$argument" = "O1" ]||[ "$argument" = "O2" ];then
-        OPTIMIZE="${!i}"
+        if [ "$argument" = "wrap" ]; then
+			WRAP_GMML="-w"
+		fi
+    elif [ "$argument" = "optimize" ]||[ "$argument" = "no_optimize" ]||[ "$argument" = "O1" ]||[ "$argument" = "O2" ]||[ "$argument" = "debug" ]||[ "$argument" = "no_debug" ];then
+
+		if [ "$argument" = "O1" ]||[ "$argument" = "O2" ]||[ "$argument" = "optimize" ]; then
+			BUILD_LEVEL=O2
+		elif [ "$argument" = "no_optimize" ]; then
+			BUILD_LEVEL=O0
+		elif [ "$argument" = "debug" ];then
+			BUILD_LEVEL=OG
+        fi
     fi
     i=$[$i+1]
 done
@@ -351,8 +360,7 @@ printf "\nBuilding with these settings:\n"
 printf "GEMSHOME: $GEMSHOME\n"
 printf "TARGET_MAKE_FILE: $TARGET_MAKE_FILE\n"
 printf "CLEAN: $CLEAN\n"
-printf "DEBUG: $DEBUG\n"
-printf "OPTIMIZE: $OPTIMIZE\n"
+printf "BUILD_LEVEL: $BUILD_LEVEL\n"
 printf "WRAP_GMML: $WRAP_GMML\n\n"
 
 ################################################################
@@ -360,52 +368,54 @@ printf "WRAP_GMML: $WRAP_GMML\n\n"
 ################################################################
 
 cd gmml/
-./make.sh $CLEAN $DEBUG $OPTIMIZE
+./make.sh $CLEAN $WRAP_GMML -o $BUILD_LEVEL
 cd ../
 
 ################################################################
 #########              WRAP UP TO GEMS                 #########
 ################################################################
+                #WRAPPING DONE IN GMML
 
-if [[ "$WRAP_GMML" != "no_wrap" ]]; then
 
-    check_pythonhome
-
-    echo ""
-    if [[ -f "gmml.i" ]]; then
-        echo "Wrapping gmml library in python ..."
-        swig -version
-        swig -c++ -python gmml.i
-    else
-        echo "Warning:  Interface file for swig does not exist."
-    fi
-
-    echo ""
-    # In some cases Python.h does not live in PYTHON_HOME; allow user control.
-    if [ -z "$PYTHON_HEADER_HOME" ]; then
-        PYTHON_HEADER_HOME="$PYTHON_HOME"
-    fi
-    PYTHON_FILE="$PYTHON_HEADER_HOME/Python.h"
-    if [ -f $PYTHON_FILE ]; then
-        echo "Using $PYTHON_FILE header file."
-        if [ -f "gmml_wrap.cxx" ]; then
-            echo "Compiling wrapped gmml library in python ..."
-            g++ -std=c++17 -O3 -fPIC -c gmml_wrap.cxx -I"$PYTHON_HEADER_HOME" -I gmml/
-        else
-            echo "Warning:  gmml_wrap.cxx does not exist."
-        fi
-    else
-        echo "Warning:  $PYTHON_FILE not found !"
-    fi
-
-    echo ""
-    if [[ -f "gmml_wrap.o" ]]; then
-        echo "Building python interface ..."
-        g++ -std=c++17 -shared gmml/build/*.o gmml_wrap.o -o _gmml.so
-    else
-        echo "Warning:  gmml python interface has not been compiled correctly."
-    fi
-fi
+#if [[ "$WRAP_GMML" != "no_wrap" ]]; then
+#
+#    check_pythonhome
+#
+#    echo ""
+#    if [[ -f "gmml.i" ]]; then
+#        echo "Wrapping gmml library in python ..."
+#        swig -version
+#        swig -c++ -python gmml.i
+#    else
+#        echo "Warning:  Interface file for swig does not exist."
+#    fi
+#
+#    echo ""
+#    # In some cases Python.h does not live in PYTHON_HOME; allow user control.
+#    if [ -z "$PYTHON_HEADER_HOME" ]; then
+#        PYTHON_HEADER_HOME="$PYTHON_HOME"
+#    fi
+#    PYTHON_FILE="$PYTHON_HEADER_HOME/Python.h"
+#    if [ -f $PYTHON_FILE ]; then
+#        echo "Using $PYTHON_FILE header file."
+#        if [ -f "gmml_wrap.cxx" ]; then
+#            echo "Compiling wrapped gmml library in python ..."
+#            g++ -std=c++17 -O3 -fPIC -c gmml_wrap.cxx -I"$PYTHON_HEADER_HOME" -I gmml/
+#        else
+#            echo "Warning:  gmml_wrap.cxx does not exist."
+#        fi
+#    else
+#        echo "Warning:  $PYTHON_FILE not found !"
+#    fi
+#
+#    echo ""
+#    if [[ -f "gmml_wrap.o" ]]; then
+#        echo "Building python interface ..."
+#        g++ -std=c++17 -shared gmml/build/*.o gmml_wrap.o -o _gmml.so
+#    else
+#        echo "Warning:  gmml python interface has not been compiled correctly."
+#    fi
+#fi
 
 echo ""
 echo "GEMS compilation is finished at `date`".
