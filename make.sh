@@ -320,7 +320,7 @@ fi
 CLEAN=""
 BUILD_LEVEL="O2"
 TARGET_MAKE_FILE="Makefile"
-WRAP_GMML=""
+WRAP_GMML="-w"
 
 ################################################################
 #########               COMMAND LINE INPUTS            #########
@@ -333,8 +333,8 @@ while [ ${i} -le $# ]; do
 			CLEAN="-c"
 	fi
     elif [ "$argument" = "wrap" ]||[ "$argument" = "no_wrap" ];then
-        if [ "$argument" = "wrap" ]; then
-			WRAP_GMML="-w"
+        if [ "$argument" = "no_wrap" ]; then
+			WRAP_GMML=""
 	fi
     elif [ "$argument" = "optimize" ]||[ "$argument" = "no_optimize" ]||[ "$argument" = "O1" ]||[ "$argument" = "O2" ]||[ "$argument" = "debug" ]||[ "$argument" = "no_debug" ];then
 
