@@ -379,6 +379,9 @@ cd ../
 ################################################################
                 #WRAPPING DONE IN GMML
 
+#Make symbolic links so we can actually use the wrapped goodies
+ln -s ./gmml/cmakeBuild/gmml.py gmml.py
+ln -s ./gmml/cmakeBuild/_gmml_wrapped.so _gmml.so
 
 #if [[ "$WRAP_GMML" != "no_wrap" ]]; then
 #
