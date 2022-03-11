@@ -331,20 +331,23 @@ while [ ${i} -le $# ]; do
     if [ "$argument" = "clean" ]||[ "$argument" = "no_clean" ];then
         if [ "$argument" = "clean" ]; then
 			CLEAN="-c"
-		fi
+	fi
     elif [ "$argument" = "wrap" ]||[ "$argument" = "no_wrap" ];then
         if [ "$argument" = "wrap" ]; then
 			WRAP_GMML="-w"
-		fi
+	fi
     elif [ "$argument" = "optimize" ]||[ "$argument" = "no_optimize" ]||[ "$argument" = "O1" ]||[ "$argument" = "O2" ]||[ "$argument" = "debug" ]||[ "$argument" = "no_debug" ];then
 
-		if [ "$argument" = "O1" ]||[ "$argument" = "O2" ]||[ "$argument" = "optimize" ]; then
-			BUILD_LEVEL=O2
-		elif [ "$argument" = "no_optimize" ]; then
-			BUILD_LEVEL=O0
-		elif [ "$argument" = "debug" ];then
-			BUILD_LEVEL=OG
+	if [ "$argument" = "O1" ]||[ "$argument" = "O2" ]||[ "$argument" = "optimize" ]; then
+		BUILD_LEVEL=O2
+	elif [ "$argument" = "no_optimize" ]; then
+		BUILD_LEVEL=O0
+	elif [ "$argument" = "debug" ];then
+		BUILD_LEVEL=OG
         fi
+    elif [ "$argument" = "jobs" ];then
+	i=$[$i+1]
+	NMP="${!i}"		
     fi
     i=$[$i+1]
 done
@@ -368,7 +371,7 @@ printf "WRAP_GMML: $WRAP_GMML\n\n"
 ################################################################
 
 cd gmml/
-./make.sh $CLEAN $WRAP_GMML -o $BUILD_LEVEL
+./make.sh $CLEAN $WRAP_GMML -o $BUILD_LEVEL -j $NMP
 cd ../
 
 ################################################################
