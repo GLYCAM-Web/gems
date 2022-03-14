@@ -8,7 +8,6 @@ import shutil
 import uuid
 import pathlib
 from datetime import datetime
-from typing import *
 #import gemsModules
 import gmml
 import traceback
