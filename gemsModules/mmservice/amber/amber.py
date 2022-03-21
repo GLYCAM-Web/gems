@@ -1,6 +1,7 @@
 import os, sys
-from gemsModules.common.loggingConfig import *
-from gemsModules.common.loggingConfig import *
+
+from gemsModules.common.loggingConfig import loggers, createLogger
+
 from . import conf, io
 
 if loggers.get(__name__):
