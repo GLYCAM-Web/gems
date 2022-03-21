@@ -6,7 +6,7 @@ from datetime import datetime
 from gemsModules.common.services import *
 from pydantic import BaseModel, Field, ValidationError, validator
 from pydantic.schema import schema
-from gemsModules.common.loggingConfig import *
+from gemsModules.common.loggingConfig import loggers, createLogger
 import traceback
 
 if loggers.get(__name__):
