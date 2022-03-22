@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-import json, sys, os, re, importlib.util, shutil, uuid
+import json
+import sys
+import os
+import re
+import importlib.util
+import shutil
+import uuid
 import gemsModules
 import gmml
 import traceback
@@ -9,7 +15,8 @@ from gemsModules.project import settings as projectSettings
 from gemsModules.common import io as commonio
 from gemsModules.common import logic as commonlogic
 from gemsModules.common import services as commonservices
-from gemsModules.common.loggingConfig import *
+from gemsModules.common.loggingConfig import loggers, createLogger
+from gemsModules.common.settings import generateCommonParserNotice
 from gemsModules.sequence import io as sequenceio
 from gemsModules.sequence import settings as sequenceSettings
 from gemsModules.sequence import io as sequencelogic
@@ -21,6 +28,8 @@ else:
 
 # I think if we got all the names to match, we could use parse_object_as instead of this. OG.
 # Probably it would fail on sub-classes though, but maybe.
+
+
 def getLinkageOptionsFromGmmlcbBuilder(sequence):
     log.info("getLinkageOptionsFromGmmlcbBuilder() was called.\n")
     log.debug("sequence: " + sequence)
@@ -32,7 +41,8 @@ def getLinkageOptionsFromGmmlcbBuilder(sequence):
     gemsLinkageGeometryOptions = sequenceio.AllLinkageRotamerInfo()
     gemsLinkageGeometryOptions.totalPossibleRotamers = cbBuilder.GetNumberOfShapes()
     likelyOnly = True
-    gemsLinkageGeometryOptions.totalLikelyRotamers = cbBuilder.GetNumberOfShapes(likelyOnly)
+    gemsLinkageGeometryOptions.totalLikelyRotamers = cbBuilder.GetNumberOfShapes(
+        likelyOnly)
 
     for gmmlLinkageOptions in gmmllinkageOptionsVector:
 
@@ -45,12 +55,12 @@ def getLinkageOptionsFromGmmlcbBuilder(sequence):
 
         """ Likely Rotamers """
         for dihedralOptions in gmmlLinkageOptions.likelyRotamers_:
-            gemsRotamers = sequenceio.TheRotamerDihedralInfo() 
+            gemsRotamers = sequenceio.TheRotamerDihedralInfo()
             gemsRotamers.dihedralName = dihedralOptions.dihedralName_
-            
+
             for rotamer in dihedralOptions.rotamers_:
-                gemsRotamers.dihedralValues.extend([rotamer]);
-            
+                gemsRotamers.dihedralValues.extend([rotamer])
+
             gemsLinkageOptions.likelyRotamers.append(gemsRotamers)
 
         """ Possible Rotamers """
@@ -58,95 +68,96 @@ def getLinkageOptionsFromGmmlcbBuilder(sequence):
             gemsRotamers = sequenceio.TheRotamerDihedralInfo()
             gemsRotamers.dihedralName = dihedralOptions.dihedralName_
 
-
             for rotamer in dihedralOptions.rotamers_:
-                gemsRotamers.dihedralValues.extend([rotamer]);
+                gemsRotamers.dihedralValues.extend([rotamer])
 
             gemsLinkageOptions.possibleRotamers.append(gemsRotamers)
 
-            ## dihedralsWithOptions Needed for the website
-            gemsLinkageOptions.dihedralsWithOptions.append(gemsRotamers.dihedralName)
+            # dihedralsWithOptions Needed for the website
+            gemsLinkageOptions.dihedralsWithOptions.append(
+                gemsRotamers.dihedralName)
 
-        gemsLinkageGeometryOptions.singleLinkageRotamerDataList.append(gemsLinkageOptions)
+        gemsLinkageGeometryOptions.singleLinkageRotamerDataList.append(
+            gemsLinkageOptions)
 
-    log.debug("gemsLinkageGeometryOptions: " + repr(gemsLinkageGeometryOptions))
+    log.debug("gemsLinkageGeometryOptions: " +
+              repr(gemsLinkageGeometryOptions))
     return gemsLinkageGeometryOptions
 
 
-##  @brief Pass a sequence, get linkage options.
-#   @param  str sequence 
+# @brief Pass a sequence, get linkage options.
+#   @param  str sequence
 #   @return dict sequences
-def getSequenceVariants(validatedSequence : str):
+def getSequenceVariants(validatedSequence: str):
     log.info("getSequenceVariants() was called.\n")
     this_sequence = gmml.CondensedSequence(validatedSequence)
-    # ## 
+    # ##
     # ##  This function assumes that the validity of the sequence was determined elsewhere
-    # ## 
+    # ##
     Sequences = sequenceio.TheSequenceVariants()
 
-    Sequences.userOrdered         = validatedSequence
-    Sequences.indexOrdered        = this_sequence.BuildLabeledCondensedSequence(
-                    this_sequence.Reordering_Approach_LOWEST_INDEX,
-                    this_sequence.Reordering_Approach_LOWEST_INDEX,
-                    False) 
+    Sequences.userOrdered = validatedSequence
+    Sequences.indexOrdered = this_sequence.BuildLabeledCondensedSequence(
+        this_sequence.Reordering_Approach_LOWEST_INDEX,
+        this_sequence.Reordering_Approach_LOWEST_INDEX,
+        False)
     Sequences.longestChainOrdered = this_sequence.BuildLabeledCondensedSequence(
-                    this_sequence.Reordering_Approach_LONGEST_CHAIN,
-                    this_sequence.Reordering_Approach_LONGEST_CHAIN,
-                    False) 
+        this_sequence.Reordering_Approach_LONGEST_CHAIN,
+        this_sequence.Reordering_Approach_LONGEST_CHAIN,
+        False)
     Sequences.indexOrderedLabeled = this_sequence.BuildLabeledCondensedSequence(
-                    this_sequence.Reordering_Approach_LOWEST_INDEX,
-                    this_sequence.Reordering_Approach_LOWEST_INDEX,
-                    True) 
+        this_sequence.Reordering_Approach_LOWEST_INDEX,
+        this_sequence.Reordering_Approach_LOWEST_INDEX,
+        True)
     log.debug("Here are the Sequences: " + str(Sequences))
     return Sequences
 
 
-
-
-##  @brief Determine if a sequence is valid
+# @brief Determine if a sequence is valid
 #   @param  sequence - a string
 #   @return boolean valid
 def checkIsSequenceSane(sequence):
-    log.info("~~~ checkIsSequenceSane was called.\n") 
-    # ## TODO:  This try-except is a total kluge. 
+    log.info("~~~ checkIsSequenceSane was called.\n")
+    # ## TODO:  This try-except is a total kluge.
     # ##  Without it, there is a problem in gmml/swig for bad sequences like:  DManpa1-6-DManpa1-OH
     # ##  The std error:
     # ##        Exception thrown in condensedSequence constructor. Look in the response object.
-    # ##  This also goes to std out: 
+    # ##  This also goes to std out:
     # ##        swig/python detected a memory leak of type 'InputOutput::Response *', no destructor found.
-    try: 
-        this_sequence = gmml.CondensedSequence(sequence) 
+    try:
+        this_sequence = gmml.CondensedSequence(sequence)
         valid = this_sequence.GetIsSequenceOkay()
     except:
-        the_response=this_sequence.GetResponse() 
+        the_response = this_sequence.GetResponse()
         log.error("Seq is NOT valid.  The following is the response object:")
         log.error(the_response)
-        valid=False
+        valid = False
     if not valid:
         return valid
-    log.debug("getting prepResidues.") 
-    #Get prep residues 
-    prepResidues = gmml.condensedsequence_glycam06_residue_tree() 
-    log.debug("Instantiating an assembly.") 
-    #Create an assembly
-    assembly = gmml.Assembly() 
-    try: 
-        log.debug("Checking sequence sanity.") 
-        #Call assembly.CheckCondensed sequence sanity.  
-        valid = assembly.CheckCondensedSequenceSanity(sequence, prepResidues) 
-        log.debug("validation result: " + str(valid)) 
-    except: 
-        log.error("Something went wrong while validating this sequence.") 
-        log.error("sequence: " + sequence) 
-        log.error(traceback.format_exc()) 
-        common.settings.generateCommonParserNotice(noticeBrief='GmmlError')
+    log.debug("getting prepResidues.")
+    # Get prep residues
+    prepResidues = gmml.condensedsequence_glycam06_residue_tree()
+    log.debug("Instantiating an assembly.")
+    # Create an assembly
+    assembly = gmml.Assembly()
+    try:
+        log.debug("Checking sequence sanity.")
+        # Call assembly.CheckCondensed sequence sanity.
+        valid = assembly.CheckCondensedSequenceSanity(sequence, prepResidues)
+        log.debug("validation result: " + str(valid))
+    except:
+        log.error("Something went wrong while validating this sequence.")
+        log.error("sequence: " + sequence)
+        log.error(traceback.format_exc())
+        generateCommonParserNotice(noticeBrief='GmmlError')
         valid = False
     return valid
 
 
-
 def main():
-    import importlib.util, os, sys
+    import importlib.util
+    import os
+    import sys
     if importlib.util.find_spec("gemsModules") is None:
         this_dir, this_filename = os.path.split(__file__)
         sys.path.append(this_dir + "/../")
@@ -157,11 +168,8 @@ def main():
             from common import utils
     else:
         from gemsModules.common import utils
-    data=utils.JSON_From_Command_Line(sys.argv)
-
-
+    data = utils.JSON_From_Command_Line(sys.argv)
 
 
 if __name__ == "__main__":
     main()
-
