@@ -12,8 +12,6 @@ gemsBuildPath=${GEMS_OUTPUT_PATH}/sequence/cb/Builds
 ## Inputs
 inputJson=$GEMSHOME/gemsModules/delegator/test_in/sequence/build_sequence_with_selected_rotamers.json
 sequenceID='00e7d454-06dd-5067-b6c9-441dd52db586'
-conformerID='caec5dc2-05f8-582a-b76a-f2be379ece8d'
-correctOutput=correct_outputs/test008_output_subTest1.pdb
 now=$(date "+%Y-%m-%d-%H-%M-%S")
 
 ## Outputs
@@ -22,7 +20,7 @@ filename=git-ignore-me_test08_out.txt
 badOutput="${badOutDir}/${now}_${filename}"
 
 ## Edit if your machine needs more time for minimization to finish
-maxCount=40
+maxTimeCount=40
 sleepTime=10
 
 clear_output()
@@ -68,16 +66,17 @@ run_newBuild_test()
 	cat $inputJson | $GEMSHOME/bin/delegate > newBuild_out.json
 	check_json_output_test newBuild_out.json 
 	export isJsonOk=$?
-	currentOutput=${gemsSequencePath}/${sequenceID}/current/All_Builds/${conformerID}/min-t5p.pdb
+	#currentOutput=${gemsSequencePath}/${sequenceID}/current/All_Builds/${conformerID}/min-t5p.pdb
 	count=0
-	while [ "${count}" -lt "${maxCount}" ] ; do
+	while [ "${count}" -lt "${maxTimeCount}" ] ; do
 		sleep ${sleepTime} # Wait for it to be generated.
-		if [ -e  "${currentOutput}" ] ; then
+		currentNumberOfConformers=$(ls ${gemsSequencePath}/${sequenceID}/current/All_Builds/*/min-t5p.pdb | wc -l)
+		if [ $currentNumberOfConformers -eq 8 ]; then
 			break
 		fi
 		count=$((count+1))
-		if [ "${count}" -eq "${maxCount}" ] ; then
-			echo "Output still not found after $((maxCount*sleepTime)) seconds.  Aborting." | tee -a $badOutput
+		if [ "${count}" -eq "${maxTimeCount}" ] ; then
+			echo "Output still not found after $((maxTimeCount*sleepTime)) seconds.  Aborting." | tee -a $badOutput
 			echo "The output being sought is : " | tee -a $badOutput
 			echo "${currentOutput}" | tee -a $badOutput
 			echo "Test 008a FAILED!" | tee -a $badOutput
@@ -85,27 +84,25 @@ run_newBuild_test()
 		fi
 		echo "Waited $((count*sleepTime)) seconds so far." | tee -a $badOutput
 	done
-
-	if ! cmp $currentOutput $correctOutput > /dev/null 2>&1; then
-		echo "Test 008a FAILED! Jack" | tee -a $badOutput
-		if  test -e "$correctOutput"  ; then
-			echo "correctOutput exists: $correctOutput"
-		else
-			echo "correctOutput is missing: $correctOutput"
+	for conformerID in $(cat inputs/008.conformerIdList.txt);
+	do
+		currentOutput=${gemsSequencePath}/${sequenceID}/current/All_Builds/${conformerID}/min-t5p.pdb
+		correctOutput=correct_outputs/008.conformers/${conformerID}/min-t5p.pdb
+		if ! cmp $currentOutput $correctOutput > /dev/null 2>&1; then
+			echo "Test 008a FAILED!" | tee -a $badOutput
+			echo "These files are different:\n$currentOutput\n$correctOutput\n"
+			if  test -e "$currentOutput"  ; then
+				echo "output from test exists: $currentOutput"
+			else
+				echo "output from test is missing, expected is: $currentOutput"
+			fi
+			return 1;
 		fi
-
-		if  test -e "$currentOutput"  ; then
-			echo "currentOutput exists: $currentOutput"
-		else
-			echo "currentOutput is missing: $currentOutput"
-		fi
-		return 1;
-	else 
-		echo "Test 008a passed." 
-		rm newBuild_out.json 
-		clear_output
-		return 0; 
-	fi
+	done
+	echo "Test 008a passed." 
+	rm newBuild_out.json 
+	clear_output
+	return 0; 
 }
 
 run_existingBuild_test() 
@@ -146,7 +143,7 @@ run_existingBuild_test()
 		if [ ! -e $currentOutput ]; then
 		    echo "currentOutput file not found yet. Sleeping in case it just needs time..." | tee -a $badOutput
 		    count=0
-		    while [ "${count}" -lt "${maxCount}" ] ; do
+		    while [ "${count}" -lt "${maxTimeCount}" ] ; do
 				sleep ${sleepTime} # Wait for it to be generated.
 				if [ -f $currentOutput ]; then
 					echo "currentOutput found." >> $badOutput
@@ -193,7 +190,7 @@ fi
 
 echo "008a (and 008c): new builds.
 " | tee -a $badOutput
-echo "Allowing up to $((maxCount*sleepTime)) seconds to complete the new build." | tee -a $badOutput
+echo "Allowing up to $((maxTimeCount*sleepTime)) seconds to complete the new build." | tee -a $badOutput
 echo "If your build completes, but takes longer, update the test to wait longer." | tee -a $badOutput
 # Build something from scratch
 if ! run_newBuild_test; then
