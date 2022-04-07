@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
+import imp
 import os, sys, importlib.util
 import gemsModules
-from gemsModules.common.services import *
+import gemsModules.structureFile.settings as structureFileSettings
+import traceback
+from gemsModules.common.services import prettyPrint, getGemsHome, parseInput
 from gemsModules.common.logic import updateResponse
 from gemsModules.common import io as commonIO
 from gemsModules.project.projectUtil import *
-from gemsModules.common.loggingConfig import *
+from gemsModules.common.loggingConfig import loggers, createLogger
 from gemsModules.structureFile.amber.evaluate import evaluatePdb
 from gemsModules.structureFile.amber.preprocess import preprocessPdbForAmber
 from gemsModules.structureFile.amber import io as amberIO
-import gemsModules.structureFile.settings as structureFileSettings
-import traceback
 
 if loggers.get(__name__):
     pass
@@ -108,6 +109,8 @@ def __setup(receivedTransaction : commonIO.Transaction):
         raise error
     return pdbTransaction
 
+## TODO: document me
+#
 def doDefaultService(receivedTransaction : commonIO.Transaction):
     log.info("doDefaultService() was called.")
     try:
@@ -127,7 +130,8 @@ def doDefaultService(receivedTransaction : commonIO.Transaction):
     
     
 
-
+## TODO: document me
+#
 def main():
     GemsPath = getGemsHome()
     if len(sys.argv) > 1:
