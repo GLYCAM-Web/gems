@@ -22,14 +22,14 @@ In order to install GEMS, you will need to have the following software available
 * `cmake` (Version >= 3.13.4)
 * `boost`
 
-**NOTE** - installing some prerequisites may require `root` access.
+**NOTE** - installing some prerequisites may require `root` access. Also swig must be installed from [their website](https://www.swig.org/download.html)
 
 Please note that in order to use GEMS you must also have GMML installed and compiled. Most of the above packages are needed for compiling GMML
 
 Installation instructions will vary according to the package management software your distro uses.  If you use Ubuntu or any other Debian based system, you should be able to use a command like this:
 
 ```bash
-sudo apt-get install openssl git python3 python3-dev swig build-essential cmake libboost-all-dev 
+sudo apt-get install openssl git python3.9 python3.9-dev build-essential cmake libboost-all-dev 
 ```
 For other Linux distros, please follow the instructions for the package management software included with your system. 
 
