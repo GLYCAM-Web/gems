@@ -66,11 +66,11 @@ run_newBuild_test()
 	cat $inputJson | $GEMSHOME/bin/delegate > newBuild_out.json
 	check_json_output_test newBuild_out.json 
 	export isJsonOk=$?
-	#currentOutput=${gemsSequencePath}/${sequenceID}/current/All_Builds/${conformerID}/min-t5p.pdb
+	#currentOutput=${gemsSequencePath}/${sequenceID}/current/All_Builds/${conformerID}/min-gas.pdb
 	count=0
 	while [ "${count}" -lt "${maxTimeCount}" ] ; do
 		sleep ${sleepTime} # Wait for it to be generated.
-		currentNumberOfConformers=$(ls ${gemsSequencePath}/${sequenceID}/current/All_Builds/*/min-t5p.pdb | wc -l)
+		currentNumberOfConformers=$(ls ${gemsSequencePath}/${sequenceID}/current/All_Builds/*/min-gas.pdb | wc -l)
 		if [ $currentNumberOfConformers -eq 8 ]; then
 			break
 		fi
@@ -86,8 +86,8 @@ run_newBuild_test()
 	done
 	for conformerID in $(cat inputs/008.conformerIdList.txt);
 	do
-		currentOutput=${gemsSequencePath}/${sequenceID}/current/All_Builds/${conformerID}/min-t5p.pdb
-		correctOutput=correct_outputs/008.conformers/${conformerID}/min-t5p.pdb
+		currentOutput=${gemsSequencePath}/${sequenceID}/current/All_Builds/${conformerID}/min-gas.pdb
+		correctOutput=correct_outputs/008.conformers/${conformerID}/min-gas.pdb
 		if ! cmp $currentOutput $correctOutput > /dev/null 2>&1; then
 			echo "Test 008a FAILED!" | tee -a $badOutput
 			echo "These files are different:\n$currentOutput\n$correctOutput\n"
@@ -111,7 +111,7 @@ run_existingBuild_test()
 	pUUID=$(grep -m 1  pUUID existingBuild_out.json | cut -d '"' -f4)
 	echo "pUUID: ${pUUID}" >> $badOutput
 	echo "conformerID: ${conformerID}" >> $badOutput
-	currentOutput="${gemsBuildPath}/${pUUID}/Existing_Builds/${conformerID}/min-t5p.pdb"
+	currentOutput="${gemsBuildPath}/${pUUID}/Existing_Builds/${conformerID}/min-gas.pdb"
 	echo "currentOutput: ${currentOutput}" >> $badOutput
 
 	## Initial compare
