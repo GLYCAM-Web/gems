@@ -2,6 +2,9 @@
 from gemsModules.common.transaction import *
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 from pydantic import BaseModel
+from enum import Enum
+
+
 ## Who I am
 WhoIAm='StructureFile'
 
