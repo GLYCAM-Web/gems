@@ -8,6 +8,8 @@ Then you will need to edit the following:
 - receive.py
 
 From there, you will need to:
+- register your new gems module with the common gems module settings.py
+- register your services in common/transaction.py
 - define your data models in a new file you will create, named io.py
 - validate incoming requests against those models via pydantic
 - create new python scripts (modules) for each service you need
