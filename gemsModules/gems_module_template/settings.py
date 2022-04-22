@@ -15,6 +15,11 @@ servicesStatus = [
         "statusDetail" : "Will need to write this."
     },
     {
+        "service" : "Status",
+        "status" : "Queued for dev",
+        "statusDetail" : "Will need to write this."
+    },
+    {
         "service" : "YourNewService",
         "status" : "Queued for dev",
         "statusDetail" : "Will need to write this."
