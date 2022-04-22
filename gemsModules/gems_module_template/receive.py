@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from gemsModules.common.loggingConfig import loggers, createLogger
 import gemsModules
 
