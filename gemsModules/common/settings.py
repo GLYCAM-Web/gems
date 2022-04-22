@@ -57,6 +57,7 @@ subEntities = {
     'BatchCompute' : 'batchcompute',
     'CommonServices' : 'common',
     'Conjugate' : 'conjugate',
+    'Complex' : 'complex',
     'Delegator' : 'delegator',
     'Graph' : 'graph',
     'Query' : 'query',
