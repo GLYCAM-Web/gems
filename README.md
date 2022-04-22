@@ -15,20 +15,21 @@ In order to install GEMS, you will need to have the following software available
 
 * `openssl` 
 * `git` 
-* `python`   
-* `python-dev` (you need the Python header files for your Linux distro, which may not be part of your existing Python package)
-* `swig` 
+* `python3.9`
+* `python3.9-dev` (you need the Python header files for your Linux distro, which may not be part of your existing Python package)
+* `swig` (Version >= 4.0.2)
 * Kernel headers (the source code for the Linux kernel, which may not be installed on your system)
-* `qmake`
-* `qt4-dev-tools`
+* `cmake` (Version >= 3.13.4)
 * `boost`
 
-**NOTE** - installing some prerequisites may require `root` access.
+**NOTE** - installing some prerequisites may require `root` access. Also swig must be installed from [their website](https://www.swig.org/download.html)
+
+Please note that in order to use GEMS you must also have GMML installed and compiled. Most of the above packages are needed for compiling GMML
 
 Installation instructions will vary according to the package management software your distro uses.  If you use Ubuntu or any other Debian based system, you should be able to use a command like this:
 
 ```bash
-sudo apt-get install openssl git python3 python3-dev swig build-essential qt4-qmake qt4-dev-tools libboost-all-dev 
+sudo apt-get install openssl git python3.9 python3.9-dev build-essential cmake libboost-all-dev 
 ```
 For other Linux distros, please follow the instructions for the package management software included with your system. 
 
@@ -64,15 +65,22 @@ pwd
 
 Set your **`PYTHON_HOME`** environment variable to the location of the `Python.h` file for your Python version. For Ubuntu, use something like one of the following: 
 
-`export PYTHON_HOME=/usr/include/python3.4`   
+`export PYTHON_HOME=/usr/include/python3.9`   
 or   
-`setenv PYTHON_HOME /usr/include/python3.4`  
+`setenv PYTHON_HOME /usr/include/python3.9`  
 
 Make sure to use the correct path to your Python version, and the correct version of Python. 
-
 For other Linux distros, please follow the instructions to set environment variables specific to your system. 
 
-To control the number of processors used during the *`make`* process, set the GEMSMAKEPROCS environment variable.  
+There are a handful of ways to use more processors while compiling GMML through GEMS. The easiest is to pass a value of processors using the `jobs` flag within the `make.sh` script. An example is directly below:
+
+```bash
+.../gems$ make.sh jobs 8
+``` 
+
+This will compile GMML with 8 cores.
+
+Another way to control the number of processors used during the *`make`* process, set the GEMSMAKEPROCS environment variable.  
 The default value of 4 will be used if you do not set this variable. For exmaple, a command like one of the 
 will set the number of processors to be used during *`make`* to 8:
 
@@ -113,6 +121,8 @@ The test passed.
 ```        
 
 **NOTE** - the test suite is a Bash shell script. Bash is generally installed by default on most Linux distros. If you try to run the test suite and get any errors, make sure that Bash is installed with the **`which bash`** command. This should return the `$PATH` variable for the `bash` executable, such as `/bin/bash`. If you get nothing back, you will need to either install Bash (which is far outside the scope of this README) or contact your system administrator for assistance. 
+
+Please note that there are more tests within the `tests/` directory but many will fail because they require you to have a stack running that can handle DNS because we submit a JSON request with one of the tests (specifically test 08). These tests are expected to fail if you are only running GEMS. 
 
 ---
 
