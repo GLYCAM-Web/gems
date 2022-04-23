@@ -184,21 +184,16 @@ def manageSequenceBuild3DStructureRequest(self, defaultOnly: bool = False):
         log.debug("GEMS_FORCE_SERIAL_EXECUTION: " +
                   str(GEMS_FORCE_SERIAL_EXECUTION))
         #
+        from gemsModules.sequence.build import buildEach3DStructureInStructureInfo
         if GEMS_FORCE_SERIAL_EXECUTION == 'True':
             #   use a blocking method:
-            build.buildEach3DStructureInStructureInfo(self)
+            buildEach3DStructureInStructureInfo(self)
         else:
-            #   using a non-blocking method:
-            p = logic.EverLastingProcess(
-                target=build.buildEach3DStructureInStructureInfo, args=(self,), daemon=False)
-            p.start()
-            #
-        #sequenceProjects.createDefaultSymLinkBuildsDirectory(projectDir, buildDir + conformerID)
-            # create downloadUrl
-            # submit to amber for minimization,
-            # update structureInfo_status.json again
-            # update project again
-            # append response to transaction
+            #   use a background, daemonic method:
+            import multiprocessing
+            daemonBuild=multiprocessing.Process(target= buildEach3DStructureInStructureInfo, args=(self,))
+            daemonBuild.daemon=True
+            daemonBuild.start()
     except Exception as error:
         log.error(
             "There was a problem managing this sequence request: " + str(error))
