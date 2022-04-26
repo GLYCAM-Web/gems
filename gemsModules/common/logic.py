@@ -539,6 +539,61 @@ def processFieldForPrettyPrinting(field):
         return field
 
 
+##
+## This is inspired by code at these locations:
+##   
+##    https://stackoverflow.com/questions/6011235/run-a-program-from-python-and-have-it-continue-to-run-after-the-script-is-kille
+##
+##    https://www.workaround.cz/howto-make-code-daemon-python-3/
+##
+import os,sys
+def spawnDaemon(func):
+    # do the UNIX double-fork magic, see Stevens' "Advanced
+    # Programming in the UNIX Environment" for details (ISBN 0201563177)
+    try:
+        pid = os.fork()
+        if pid > 0:
+            # parent process
+            return
+            #sys.exit(0)
+    except OSError as e:
+        log.error("fork #1 failed. See next. " )
+        log.error(e)
+        sys.exit(1)
+
+    # Decouple from the parent environment.
+    os.chdir("/")
+    os.setsid()
+    os.umask(0)
+
+    # do second fork
+    try:
+        pid = os.fork()
+        if pid > 0:
+            # exit from second parent
+            sys.exit(0)
+    except OSError as  e:
+        log.error("fork #2 failed. See next. " )
+        log.error(e)
+        sys.exit(1)
+
+    # Redirect standard file descriptors.
+    sys.stdout.flush()
+    sys.stderr.flush()
+    si = open('/dev/null', 'r')
+    so = open('/dev/null', 'a+')
+    se = open('/dev/null', 'a+')
+    os.dup2(si.fileno(), sys.stdin.fileno())
+    os.dup2(so.fileno(), sys.stdout.fileno())
+    os.dup2(se.fileno(), sys.stderr.fileno())
+
+    # do stuff
+    func()
+
+
+    # all done
+    os._exit(os.EX_OK)
+
 
 ##  Logic borrowed from https://realpython.com/python-rounding/
 #   @param number
