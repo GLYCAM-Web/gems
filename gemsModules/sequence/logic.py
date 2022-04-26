@@ -8,6 +8,7 @@ else:
     log = createLogger(__name__)
 
 
+
 def main():
     log.info("main() was called.\n")
 
