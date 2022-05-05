@@ -17,7 +17,15 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__)
 
-#verbosity=common.utils.gems_environment_verbosity()
+def directoryExists(directory : str) :
+    log.info("directoryExists() was called.")
+    log.debug("The directory to check : " + directory)
+    if os.path.exists(directory):
+        log.debug("Found the directory.")
+        return True
+    else:
+        log.debug("Directory not found.")
+        return False
 
 
 ##  Pass in the name of an entity, receive a module or an error.
@@ -51,41 +59,83 @@ def importEntity(requestedEntity):
 
 # ###  This now is part of the Transaction Class
 # ###  It is deprecated and should go away.   Lachele 2021-04-02
-def parseInput(thisTransaction):
-    log.info("common.logic.parseInput() was called.\n")
-    import json
-    from io import StringIO
-    from pydantic import BaseModel, ValidationError
-    import jsonpickle
-    io=StringIO()
+# ###  
+# ###  Starting letting it go away by commenting it out
+#def parseInput(thisTransaction):
+#    log.info("common.logic.parseInput() was called.\n")
+#    import json
+#    from io import StringIO
+#    from pydantic import BaseModel, ValidationError
+#    import jsonpickle
+#    io=StringIO()
+#
+#    # Load the JSON string into the incoming dictionary
+#    thisTransaction.request_dict = json.loads(thisTransaction.incoming_string)
+#    #log.debug("thisTransaction.request_dict: \n\n")
+#    #prettyPrint(thisTransaction.request_dict)
+#
+#    # Check to see if there are errors.  If there are, bail, but give a reason
+#    if thisTransaction.request_dict is None:
+#        thisTransaction.generateCommonParserNotice(noticeBrief = 'JsonParseError')
+#        log.error(traceback.format_exc())
+#        raise AttributeError("request_dict")
+#    try:
+#        TransactionSchema(**thisTransaction.request_dict)
+#    except Exception as error:
+#        log.error("There was an error parsing transaction.request_dict.")
+#        log.error("Error type : " + str(type(error)))
+#        log.error(traceback.format_exc())
+#        raise error
+#    else:
+#        # If still here, load the data into a Transaction object and return success
+#        thisTransaction.transaction_in = jsonpickle.decode(thisTransaction.incoming_string)
+#        #log.debug("thisTransaction.transaction_in: " + str(thisTransaction.transaction_in))
+#        return 0
 
-    # Load the JSON string into the incoming dictionary
-    thisTransaction.request_dict = json.loads(thisTransaction.incoming_string)
-    #log.debug("thisTransaction.request_dict: \n\n")
-    #prettyPrint(thisTransaction.request_dict)
 
-    # Check to see if there are errors.  If there are, bail, but give a reason
-    if thisTransaction.request_dict is None:
-        thisTransaction.generateCommonParserNotice(noticeBrief = 'JsonParseError')
-        log.error(traceback.format_exc())
-        raise AttributeError("request_dict")
+def getEntityTypeFromJson(jsonObjectString):
     try:
-        TransactionSchema(**thisTransaction.request_dict)
+        temp_dict=json.loads(jsonObjectString)
+        thisEntityType = temp_dict['entity']['type']
+        return thisEntityType
     except Exception as error:
-        log.error("There was an error parsing transaction.request_dict.")
-        log.error("Error type : " + str(type(error)))
+        error_msg = "There was a problem finding the entity type.  Here is more info: " + str(error)
+        log.error(error_msg)
         log.error(traceback.format_exc())
-        raise error
+        return None
+
+
+def getServicesFromJson(jsonObjectString):
+    try:
+        temp_dict=json.loads(jsonObjectString)
+        theServicesObject = temp_dict['entity']['services']
+        theServices=list(theServicesObject.keys())
+        return theServices
+    except Exception as error:
+        error_msg = "There was a problem finding the services.  Here is more info: " + str(error)
+        log.error(error_msg)
+        log.error(traceback.format_exc())
+        return None
+
+
+def buildInvalidInputErrorResponseJsonString(
+        thisMessagingEntity : str = 'commonServicer',
+        message : str = 'No additional information available',
+        prettyPrint : bool = False):
+    responseSchema=common.io.TransactionSchema()
+    responseSchema.generateCommonParserNotice(
+        noticeBrief='InvalidInput',
+        messagingEntity=thisMessagingEntity,
+        additionalInfo={"errorMessage":message})
+    if prettyPrint == True:
+        return responseSchema.json(indent=2)
     else:
-        # If still here, load the data into a Transaction object and return success
-        thisTransaction.transaction_in = jsonpickle.decode(thisTransaction.incoming_string)
-        #log.debug("thisTransaction.transaction_in: " + str(thisTransaction.transaction_in))
-        return 0
+        return responseSchema.json()
+
 
 def marco(requestedEntity):
     log.info("marco() was called.\n")
-    if verbosity > 1 :
-        print("The Marco method was called and is being fulfilled by CommonServices.")
+    log.debug("The Marco method was called and is being fulfilled by CommonServices.")
     theEntity = importEntity(requestedEntity)
     if hasattr(theEntity, 'receive'):
         return "Polo"
@@ -554,7 +604,7 @@ def roundHalfUp(number, decimals=0):
 def main():
     import importlib, os, sys
     from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
-    from pydantic import BaseModel, Schema
+    from pydantic import BaseModel
     from pydantic.schema import schema
     if importlib.util.find_spec("gemsModules") is None:
       this_dir, this_filename = os.path.split(__file__)
@@ -574,11 +624,15 @@ def main():
     data=utils.JSON_From_Command_Line(sys.argv)
     print("The object is:")
     print(data)
+    from gemsModules.common.io import Transaction 
     thisTransaction=Transaction(data)
-    parseInput(thisTransaction)
-    print("finished parsing")
+    thisTransaction.populate_transaction_in()
+    print("Finished initializing. ")
+    print("The incoming pydantic classes:")
+    print(str(thisTransaction.transaction_in))
 
 
 
 if __name__ == "__main__":
-  main()
+#  main()
+    pass

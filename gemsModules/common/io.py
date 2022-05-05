@@ -25,14 +25,17 @@ from uuid import UUID
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union, Any
 from pydantic import BaseModel, Field, Json
 from pydantic.schema import schema
-from gemsModules.project import dataio as projectio
+#from gemsModules.project import dataio as projectio
 from gemsModules.common import settings
+
 from gemsModules.common.loggingConfig import loggers, createLogger
+
 
 if loggers.get(__name__):
     pass
 else:
     log = createLogger(__name__)
+
 
 
 class NoticeTypes(str, Enum):
@@ -201,17 +204,17 @@ class Entity(BaseModel):
 
 
 class TransactionSchema(BaseModel):
-    timestamp: str = None
-    entity: Entity = None
-    project: projectio.Project = None
-    prettyPrint: bool = False
-    mdMinimize: bool = True
-    options: Dict[str, str] = Field(
-        None,
-        description='Key-value pairs that are specific to each entity, service, etc'
-    )
-    notices: List[Notice] = []
-
+    from gemsModules.project.io import Project
+    timestamp : str = None
+    entity  : Entity = None
+    project : Project = None
+    prettyPrint : bool = False
+    mdMinimize : bool = True
+    options : Dict[str,str] = Field(
+            None,
+            description='Key-value pairs that are specific to each entity, service, etc'
+            )
+    notices : List[Notice] = []
     class Config:
         title = 'gemsModulesCommonTransaction'
 

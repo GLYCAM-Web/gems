@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
-import gemsModules
-from gemsModules.batchcompute.receive import *
-from gemsModules import common
-from gemsModules.common.services import *
-from gemsModules.common.transaction import * # might need whole file...
+#import gemsModules
+#from gemsModules.batchcompute.receive import *
+#from gemsModules.common.transaction import * # might need whole file...
+from gemsModules.common import logic
 from gemsModules.common.loggingConfig import *
-from gemsModules.project.projectUtil import *
+#from gemsModules.project.projectUtilPydantic import *
 from gemsModules.structureFile.amber.preprocess import preprocessPdbForAmber
 import gemsModules.conjugate.settings as conjugateSettings
 import gemsModules.conjugate.io as conjugateio
-import subprocess
-import urllib.request
+#import subprocess
+#import urllib.request
 
 if loggers.get(__name__):
     pass
@@ -48,11 +47,10 @@ def receive(jsonObjectString, entityType=None):
     ##Look in transaction for the requested service. If none, do default service.
     if 'services' not in jsonObjectString:
         log.debug("could not find the services in the input - calling default")
-        doDefaultService(jsonObjectString)
+        return doDefaultService(jsonObjectString)
 
     theServices = getServicesFromJson(jsonObjectString)
     if theServices is None:
-        ####!!!!!!!  FIX ME  !!!!!!
         return buildInvalidInputErrorResponseJsonString(
                 thisMessagingEntity=settings.WhoIAm,
                 message="something went wrong trying to get the list of services")
@@ -94,8 +92,7 @@ def main():
   jsonObjectString=utils.JSON_From_Command_Line(sys.argv)
   returnedTransaction=receive(jsonObjectString)
   returnedTransaction.build_outgoing_string()
-  return returnedTransaction.outgoing_string
-  print(responseObjectString)
+  print(returnedTransaction.outgoing_string)
 
 
 if __name__ == "__main__":

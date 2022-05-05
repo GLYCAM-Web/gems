@@ -40,12 +40,45 @@ class glycoproteinService(parentio.conjugateService):
 
 
 class gpGlycosylationSiteInfo(parentio.GlycosylationSiteInfo):
+    aminoAcidLetterCode : str  = '?'
+    nLinkCapable        : bool = False
+    nLinkLikely         : bool = False
+    oLinkCapable        : bool = False
+    oLinkLikely         : bool = False
+    cLinkCapable        : bool = False
+    cLinkLikely         : bool = False
+
+    def __init__(self, **data : Any):
+        super().__init__(**data)
+        log.info("Initializing gpGlycosylationSiteInfo.")
+        log.debug("the data before this init" + repr(self))
+        log.debug("Init for the glycosylation site info in glycoprotein was called.")
 
     def gmmlGlycositeInput():
         if residueNumber == "?" :
             raise ValueError ("residueNumber must be specified & cannot be '?'")
         siteID = self.chain + "_" + self.residueNumber + "_" + self.insertionCode
         return gmml.GlycositeInput( siteID, self.glycanSpecifier, self.glycan ) 
+
+    def parseGmmlGlycositeInfo(info):
+        self.chain               = info.chain_
+        self.residueNumber       = info.residueNumber_
+        self.insertionCode       = info.insertionCode_
+        self.sequenceContext     = info.sequenceContext_
+        self.aminoAcidLetterCode = self.sequenceContext.split('_')[1]
+        for tag in info.tags_ :
+            if tag == oLink :
+                self.oLinkCapable = True
+            if tag == oLinkLikely :
+                self.oLinkLikely = True
+            if tag == nLink :
+                self.nLinkCapable = True
+            if tag == nLinkLikely :
+                self.nLinkLikely = True
+            if tag == cLink :
+                self.cLinkCapable = True
+            if tag == cLinkLikely :
+                self.cLinkLikely = True
 
 class gpGlycosylationIO(parentio.GlycosylationIO):
     sites : List[gpGlycosylationSiteInfo] = []
@@ -115,8 +148,8 @@ class Transaction(parentio.Transaction):
 
 def generateSchema():
     import json
-    #print(Service.schema_json(indent=2))
-    print(glycoproteinModuleIO.schema_json(indent=2))
+    #print(glycoproteinModuleIO.schema_json(indent=2))
+    print(gpGlycosylationSiteInfo.schema_json(indent=2))
 
 if __name__ == "__main__":
   generateSchema()

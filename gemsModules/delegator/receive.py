@@ -35,7 +35,7 @@ def delegate(jsonObjectString):
     ### (Lachele)
     ###
     conjugateEntities=['Conjugate','Glycoprotein'] ## this goes away once the rest is refactored
-    thisEntityType = getEntityType(jsonObjectString)
+    thisEntityType = getEntityTypeFromJson(jsonObjectString)
     if thisEntityType is None:
         return buildInvalidInputErrorResponseJsonString(
                 thisMessagingEntity='delegator',
