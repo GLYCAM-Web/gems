@@ -21,7 +21,8 @@ else:
 ##
 
 
-##TODO: Refactor for better encapsulation
+##TODO: REFACTOR for better encapsulation
+##TODO: REFACTOR to use the new code (common.io rather than common.transaction)
 ##TODO: Use Doxygen-style comments.
 """
 The receive() method receives a transaction, and checks for the requested service.
@@ -69,53 +70,10 @@ def doDefaultService(thisTransaction):
     # batchcompute.submit(thisTransaction)
 
 def main():
-     ## TODO:  Make this look more like the main in delegator's receive.py
-    GemsPath = os.environ.get('GEMSHOME')
-    if GemsPath == None:
-        this_dir, this_filename = os.path.split(__file__)
-        print("""
+    ## TODO:  Make this look more like the main in delegator's receive.py
+    ## TODO:  Make this do something successful even with no arguments.
+    pass
 
-        GEMSHOME environment variable is not set.
-
-        Set it using somthing like:
-
-          BASH:  export GEMSHOME=/path/to/gems
-          SH:    setenv GEMSHOME /path/to/gems
-        """)
-
-    #print("length of argv: " + str(len(sys.argv)))
-    if len(sys.argv) > 1:
-        #print("looking for the input filename.")
-        if os.path.isfile(sys.argv[1]):
-            inputFile = sys.argv[1]
-        else:
-            #print("got an arg that is not a filename: " + sys.argv[1])
-            inputFile = GemsPath + "/gemsModules/delegator/test_in/amberMdRequest.json"
-    else:
-        #print("no argv was offered.")
-        inputFile = GemsPath + "/gemsModules/delegator/test_in/amberMdRequest.json"
-
-    #print("using the default inputFile: " + inputFile)
-    #print(os.listdir("../../delegator/test_in/"))
-
-    with open(inputFile, 'r') as file:
-        jsonObjectString = file.read().replace('\n', '')
-        #print("jsonObjectString: " + str(jsonObjectString))
-
-    #Create transaction, then pass that to receive
-    thisTransaction = Transaction(jsonObjectString)
-
-    try:
-        parseInput(thisTransaction)
-    except Exception as error:
-        log.error("Error parsing input.")
-        log.error("Error type: " + str(type(error)))
-        log.error(traceback.format_exc())
-
-    receive(thisTransaction)
-
-    responseObjectString = thisTransaction.outgoing_string
-    return responseObjectString
 
 if __name__ == "__main__":
     main()

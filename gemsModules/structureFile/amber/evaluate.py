@@ -1,4 +1,4 @@
-from gemsModules.structureFile.amber import jsoninteface as amberIO
+from gemsModules.structureFile.amber import jsoninterface as amberIO
 from gemsModules.common.loggingConfig import *
 from gemsModules.common.logic import prettyPrint, updateResponse
 import traceback

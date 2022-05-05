@@ -25,6 +25,9 @@ ServiceModule = {
         'GlyFinder' : 'glyfinder'
         }
 
+def main():
+    pass
+
 # def main():
 #     import importlib, os, sys
 #     if importlib.util.find_spec("gemsModules") is None:
