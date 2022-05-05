@@ -1,9 +1,17 @@
 #!/usr/bin/env python3
 import gemsModules
 from datetime import datetime
-from gemsModules import common
-from gemsModules.common.services import *
-from gemsModules.common.transaction import * # might need whole file...
+# ###
+# ### Note comments about the following pairs
+# ###
+import gemsModules.common.services as commonServices  # being deprecated
+import gemsModules.common.logic as commonLogic # replacing services
+# ###
+import gemsModules.common.transaction as commonTransaction # being deprecated
+import gemsModules.common.jsoninterface as commonIO # replacing transaction
+# ###
+# ###
+# ###
 from gemsModules.common.loggingConfig import *
 import traceback
 
@@ -46,6 +54,7 @@ def delegate(jsonObjectString):
             thisEntity = logic_importEntity(thisEntityType)
             log.debug("thisEntityType: " + str(thisEntityType))
             log.debug("thisEntity (should be a reference): " + str(thisEntity))
+            # ### There is no need to know ahead of time what sort of transaction it is
             returnedTransaction = thisEntity.receive.receive(
                     jsonObjectString,
                     entityType=thisEntityType)
@@ -55,6 +64,7 @@ def delegate(jsonObjectString):
             error_msg = "There was a problem importing the entity: " + str(error)
             log.error(error_msg)
             log.error(traceback.format_exc())
+            thisTransaction=commonIO.Transaction()
             thisTransaction.generateCommonParserNotice(
                     messagingEntity='delegator', 
                     additionalInfo={"errorMessage":error_msg})
@@ -71,7 +81,7 @@ def delegate(jsonObjectString):
 
 
     # Make a new Transaction object for holding I/O information.
-    from gemsModules.common.io import Transaction as ioTransaction
+    import commonTransaction.Transaction as ioTransaction
     thisTransaction=ioTransaction(jsonObjectString)
 
 #    # If the incoming string was improperly formed, bail, but give a reason.

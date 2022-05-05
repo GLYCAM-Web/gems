@@ -25,16 +25,15 @@ from uuid import UUID
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union, Any
 from pydantic import BaseModel, Field, Json
 from pydantic.schema import schema
-#from gemsModules.project import dataio as projectio
+from gemsModules.project.jsoninterface import Project as Project
+import gemsModules.common.jsonpieces as jsoninc
 from gemsModules.common import settings
 
-from gemsModules.common.loggingConfig import loggers, createLogger
-
-
-if loggers.get(__name__):
+from gemsModules.common import loggingConfig 
+if loggingConfig.loggers.get(__name__):
     pass
 else:
-    log = createLogger(__name__)
+    log = loggingConfig.createLogger(__name__)
 
 
 
@@ -163,48 +162,39 @@ class Response(Service):
     Holds information about a response to a service request.
     This object will have different forms in each Entity.
     """
-    typename: str = Field(
-        None,
-        title='Responding Service.',
-        alias='type',
-        description='The type service that produced this response.'
-    )
-    outputs: Json = None
-    notices: List[Notice] = None
-
-    def generateCommonParserNotice(self, *args, **kwargs):
-        self.notices.append(
-            settings.generateCommonParserNotice(*args, **kwargs))
+    typename : str = Field(
+            None,
+            title='Responding Service.',
+            alias='type',
+            description='The type service that produced this response.'
+            )
+    outputs : Json = None
+    notices : List[jsoninc.Notice] = None
 
 
 class Entity(BaseModel):
     """Holds information about the main object responsible for a service."""
-    entityType: str = Field(
-        settings.WhoIAm,
-        title='Type',
-        alias='type'
-    )
-    requestID: str = Field(
-        None,
-        title='Request ID',
-        description='User-specified ID that will be echoed in responses.'
-    )
-    services: Dict[str, Service] = None
-    responses: Dict[str, Response] = None
-    resources: List[Resource] = None
-    notices: List[Notice] = None
-    options: Dict[str, str] = Field(
-        None,
-        description='Key-value pairs that are specific to each entity, service, etc'
-    )
-
-    def generateCommonParserNotice(self, *args, **kwargs):
-        self.notices.append(
-            settings.generateCommonParserNotice(*args, **kwargs))
+    entityType : str = Field(
+            settings.WhoIAm,
+            title='Type',
+            alias='type'
+            )
+    requestID : str = Field(
+            None,
+            title = 'Request ID',
+            description = 'User-specified ID that will be echoed in responses.'
+            )
+    services : Dict[str,Service] = None
+    responses : Dict[str,Response] = None
+    resources : List[jsoninc.Resource] = None
+    notices : List[jsoninc.Notice] = None
+    options : Dict[str,str] = Field(
+            None,
+            description='Key-value pairs that are specific to each entity, service, etc'
+            )
 
 
 class TransactionSchema(BaseModel):
-    from gemsModules.project.io import Project
     timestamp : str = None
     entity  : Entity = None
     project : Project = None
@@ -214,7 +204,7 @@ class TransactionSchema(BaseModel):
             None,
             description='Key-value pairs that are specific to each entity, service, etc'
             )
-    notices : List[Notice] = []
+    notices : List[jsoninc.Notice] = []
     class Config:
         title = 'gemsModulesCommonTransaction'
 
@@ -259,20 +249,13 @@ class Transaction:
         # The following debug lines are also sometimes useful, but normally redundant.
         # log.debug("The incoming_string is: " )
         # log.debug(self.incoming_string)
-        if self.incoming_string is None:
-            commonSettings.generateCommonParserNotice(
-                noticeBrief='InvalidInput', messagingEntity=commonSettings.WhoIAm)
+        if self.incoming_string is None :
+            self.transaction_out = TransactionSchema()
+            self.transaction_out.generateCommonParserNotice(noticeBrief='InvalidInput', messagingEntity=commonSettings.WhoIAm)
             return
-        else:
-            self.request_dict = json.loads(self.incoming_string)
-            # The following debug lines are also sometimes useful, but normally redundant.
-            # log.debug("The request_dict is: " )
-            # log.debug(self.request_dict)
+        else : 
+            self.request_dict = json.loads(self.incoming_string) 
 
-        if self.incoming_string is None:
-            commonSettings.generateCommonParserNotice(
-                noticeBrief='InvalidInput', messagingEntity=commonSettings.WhoIAm)
-            return
 
     def generateCommonParserNotice(self, *args, **kwargs):
         if self.transaction_out is None:
@@ -322,31 +305,6 @@ class Transaction:
         return thisProject.getFilesystemPath()
 
 
-#
-#    ## This returns a tuple.
-#    #  The first value is the source of the path:
-#    #        Default : This is the internal default path.
-#    #        Environment : This path is set by an environment variable
-#    #        Error : There was an error trying to get the path.
-#    #  The second value is the path, unless there was an error. in the
-#    #    latter case, it is an error message.
-#    #
-#    #  This is used in Project for setting the filesystem_path .
-#    def getFilesystemOutputPath(self):
-#        log.debug("getFilesystemOutputPath was called")
-#        GEMS_OUTPUT_PATH = os.environ.get('GEMS_OUTPUT_PATH')
-#        if GEMS_OUTPUT_PATH is not None and GEMS_OUTPUT_PATH != "" :
-#            log.debug="Got Filesystem Output Path from environment.  It is : " + GEMS_OUTPUT_PATH
-#            return ( 'Environment' , GEMS_OUTPUT_PATH )
-#
-#        # Currently, if not set by engironment variable, a default is used.
-#        gemshome =  gemsModules.common.logic.getGemsHome
-#        if gemshome is None or gemshome == "" :
-#            message = "Could not determine GEMSHOME.  Cannot set default filesystem output path."
-#            log.error(message)
-#        theDefaultPath = gemshome + '/UserSpace'
-#        log.debug="Using default Filesystem Output Path.  It is : " + theDefaultPath
-#        return ( 'Default' , theDefaultPath )
 
     ######
     # This needs to change to look like the method in sequence.io
@@ -354,13 +312,7 @@ class Transaction:
 
     def build_outgoing_string(self):
         import json
-        isPretty = False
-
-#        ## TODO: read in whether the output should be pretty
-#        # this might work:
-#        if self.transaction_in.options is not None:
-#            if ('jsonObjectOutputFormat', 'prettyOutput') in self.transaction_in.options:
-#                isPretty = True
+        isPretty=False
         log.info("build_outgoing_string() was called.")
         if self.response_dict is None:
             msg = "Transaction has no response_dict! request_dict: " + \
@@ -391,6 +343,7 @@ class Transaction:
                     "There was a problem dumping the response_dict to string.")
                 raise error
 
+    
     def build_general_error_output(self, msg=None):
         if msg == None:
             msg = 'fix me there was an error'

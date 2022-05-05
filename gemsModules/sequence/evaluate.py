@@ -1,25 +1,11 @@
 #!/usr/bin/env python3
-import json
-import sys
-import os
-import re
-import importlib.util
-import shutil
-import uuid
-import gemsModules
+import json, sys, os, re, importlib.util, shutil, uuid
+#import gemsModules
 import gmml
 import traceback
 import gemsModules.common.utils
-from gemsModules.project import projectUtilPydantic as projectUtils
-from gemsModules.project import settings as projectSettings
-from gemsModules.common import io as commonio
-from gemsModules.common import logic as commonlogic
-from gemsModules.common import services as commonservices
-from gemsModules.common.loggingConfig import loggers, createLogger
-from gemsModules.common.settings import generateCommonParserNotice
-from gemsModules.sequence import io as sequenceio
-from gemsModules.sequence import settings as sequenceSettings
-from gemsModules.sequence import io as sequencelogic
+from gemsModules.common.loggingConfig import *
+from gemsModules.sequence import jsoninterface as sequenceio
 
 if loggers.get(__name__):
     pass

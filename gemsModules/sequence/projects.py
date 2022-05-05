@@ -8,17 +8,14 @@ import shutil
 import uuid
 import pathlib
 from datetime import datetime
-#import gemsModules
+from typing import *
 import gmml
 import traceback
 import gemsModules.common.utils
 from gemsModules.project import projectUtilPydantic as projectUtils
-from gemsModules.project import settings as projectSettings
-from gemsModules.common import io as commonio
 from gemsModules.common import logic as commonlogic
-from gemsModules.common.loggingConfig import loggers, createLogger
-from gemsModules.sequence import io as sequenceio
-from gemsModules.sequence import settings as sequenceSettings
+from gemsModules.common.loggingConfig import *
+from gemsModules.sequence import jsoninterface as sequenceio
 from gemsModules.sequence import structureInfo
 
 if loggers.get(__name__):

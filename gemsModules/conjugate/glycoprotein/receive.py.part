@@ -2,10 +2,12 @@
 from gemsModules.common import logic
 from gemsModules.common import utils
 from gemsModules.common.loggingConfig import *
+#from gemsModules.project.projectUtilPydantic import *
 from gemsModules.structureFile.amber.preprocess import preprocessPdbForAmber
-import gemsModules.conjugate.glycoprotein
-import gemsModules.conjugate.settings as settings
-import gemsModules.conjugate.jsoninterface as conjugateio
+import gemsModules.conjugate
+import gemsModules.conjugate.glycoprotein.settings as settings
+import gemsModules.conjugate.glycoprotein.io as gpio
+#import urllib.request
 
 if loggers.get(__name__):
     pass
@@ -13,27 +15,29 @@ else:
     log = createLogger(__name__)
 
 ###
-### For conjugate, the default is Marco-Polo, maybe with help text.
+### For glycoprotein, the default is Marco-Polo, maybe with help text.
 ###
 def doDefaultService(jsonObjectString):
     log.info("doDefaultService() was called.\n")
     thisTransaction=conjugateio.Transaction(jsonObjectString)
     thisTransaction.outputs.entity.entityType=settings.WhoIAm
+    log.debug("thisTransaction.outputs.entity.entityType is " + thisTransaction.outputs.entity.entityType + " .\n")
     thisTransaction.outputs.entity.responses=[]
     thisTransaction.outputs.entity.responses.append({'payload': logic.marco(settings.WhoIAm)})
+    log.debug("thisTransaction.outputs.entity.entityType is now " + thisTransaction.outputs.entity.entityType + " .\n")
     return thisTransaction
 
 
 def receive(jsonObjectString, entityType=None):
-    log.info("receive() in conjugate was called.\n")
+    log.info("receive() in conjugate.glycoprotein was called.\n")
     if entityType is None:
         entityType = logic.getEntityTypeFromJson(jsonObjectString)
         if entityType is None: 
-            return logic.buildInvalidInputErrorResponse(
+            return logic.buildInvalidInputErrorResponseJsonString(
                     thisMessagingEntity=settings.WhoIAm,
                     message="entity type not found in json input string")
 
-    if entityType == 'Glycoprotein':
+    if entityType != 'Glycoprotein':
         returnedTransaction = glycoprotein.receive.receive(
                     jsonObjectString,
                     entityType=entityType)
@@ -73,6 +77,7 @@ def receive(jsonObjectString, entityType=None):
 
 def main():
   import importlib.util, os, sys
+  #from importlib import util
   if importlib.util.find_spec("gemsModules") is None:
     this_dir, this_filename = os.path.split(__file__)
     sys.path.append(this_dir + "/../")

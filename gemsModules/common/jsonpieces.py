@@ -34,11 +34,13 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__)
 
+
 class NoticeTypes(str, Enum):
     note = 'Note'
     warning = 'Warning'
     error = 'Error'
     exit = 'Exit'
+
 
 class Notice(BaseModel):
     """Description of a Notice."""

@@ -5,10 +5,9 @@ from datetime import datetime
 from pydantic import BaseModel, Field, ValidationError, validator, PositiveFloat, PositiveInt
 from pydantic.schema import schema
 from gemsModules.common.loggingConfig import *
-from gemsModules.common import io as commonio
+from gemsModules.common import jsoninterface as commonio
 from gemsModules.common import settings as commonSettings
-#from gemsModules.common import services as commonServices
-from gemsModules.project import io as projectio
+from gemsModules.project import jsoninterface as projectio
 from gemsModules.project import projectUtilPydantic as projectUtils
 from gemsModules.conjugate import settings
 import traceback
@@ -53,19 +52,19 @@ class GlycosylationSitesMetadata(BaseModel):
 class GlycosylationSiteInfo(BaseModel):
     chain : str = "?"
     residueNumber : str = Field(
-            "?",
-            description="This must be a valid residue number."
+            ...,
+            description="Required Input.  This must be a valid residue number."
             )
     insertionCode : str = "?"
     sequenceContext : str = ""
     occupied : bool = False
     glycanFormat : str = Field(
-            None,
-            description="Format in which the glycan is given.  Required if occupied=True. Possible values are 'Sequence' and 'Library'"
+            ...,
+            description="Required Input.  Format in which the glycan is given.  Required if occupied=True. Possible values are 'Sequence' and 'Library'"
             )
     glycan : str = Field(
-            None,
-            description="Glycan sequence or other ID.  Required if occupied=True. Format must match glycanFormat"
+            ...,
+            description="Required Input.  Glycan sequence or other ID.  Required if occupied=True. Format must match glycanFormat"
             )
     tags : List[str] = []
 
@@ -84,8 +83,7 @@ class GlycosylationSiteInfo(BaseModel):
                 log.error(error)
                 raise AttributeError(error)
             if occupied == False:
-                log.debug("Found attached glycan but occupied=False; fixing.")
-                self.occupied=True
+                log.debug("Found attached glycan but occupied=False.  Hoping that's ok.")
 
 
 class GlycosylationStatus(str,Enum):

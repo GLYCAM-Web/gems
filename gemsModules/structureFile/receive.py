@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
 import imp
 import os, sys, importlib.util
-import gemsModules
-import gemsModules.structureFile.settings as structureFileSettings
-import traceback
-from gemsModules.common.services import prettyPrint, getGemsHome, parseInput
+#import gemsModules
+#from gemsModules.common.services import * ## services is deprecated in favor of logic
 from gemsModules.common.logic import updateResponse
-from gemsModules.common import io as commonIO
-from gemsModules.project.projectUtil import *
-from gemsModules.common.loggingConfig import loggers, createLogger
+import gemsModules.common.logic as commonLogic
+import gemsModules.common.jsoninterface as commonIO
+#from gemsModules.project.projectUtil import *  ## this should not be used with jsoninterface
+from gemsModules.project.projectUtilPydantic import *
+from gemsModules.common.loggingConfig import *
 from gemsModules.structureFile.amber.evaluate import evaluatePdb
 from gemsModules.structureFile.amber.preprocess import preprocessPdbForAmber
-from gemsModules.structureFile.amber import io as amberIO
+from gemsModules.structureFile.amber import jsoninterface as amberIO
+import gemsModules.structureFile.settings as structureFileSettings
+import traceback
 
 if loggers.get(__name__):
     pass
