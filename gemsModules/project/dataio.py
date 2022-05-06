@@ -165,7 +165,7 @@ class CbProject(Project):
             if "Sequence" in element.keys():
                 sequence = element['Sequence']['payload']
 
-        if sequence is not "":
+        if sequence != "":
             self.sequence = sequence
             self.seqID = getSeqIDForSequence(sequence) # poorly named, not indexOrdered version!
         else:
