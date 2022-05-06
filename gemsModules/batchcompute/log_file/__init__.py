@@ -1,1 +1,1 @@
-from . import logFile
+import logFile
