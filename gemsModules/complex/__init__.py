@@ -1,1 +1,1 @@
-from . import receive, helpme, settings
+import receive, helpme, settings
