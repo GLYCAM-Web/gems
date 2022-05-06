@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from gemsModules.common.loggingConfig import loggers, createLogger
-from gemsModules.common import io as commonIO
+from gemsModules.common import jsoninterface
+#from gemsModules.common import io as commonIO
 import gemsModules
 
 if loggers.get(__name__):
@@ -11,7 +12,7 @@ else:
 
 ## TODO: document me
 #
-def receive(receivedTransaction : commonIO.Transaction):
+def receive(receivedTransaction : jsoninterface.Transaction):
     log.info("receive was called.")
     try:
         ## Validate request against your module's classes with Pydantic.
@@ -30,7 +31,7 @@ def receive(receivedTransaction : commonIO.Transaction):
 
 ## TODO: document me
 #
-def doDefaultService(receivedTransaction : commonIO.Transaction):
+def doDefaultService(receivedTransaction : jsoninterface.Transaction):
     log.info("doDefaultService was called.")
     try:
         ##Do something.
