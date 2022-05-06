@@ -13,7 +13,7 @@ class Foo(BaseModel):
         print("dumClass was called")
         super().__init__(**data)
         print("dumClass was initialized")
-        if self.A is "Hello" : 
+        if self.A == "Hello" : 
             self.B = "Goodbye"
 
     def saySomething(self):
@@ -37,8 +37,8 @@ def troubleshoot() :
     #thisJSON={"A":"Hello","C":True}
     thisBumble=Bumble()
     try :
-        thisproject = thisBumble.Baz(**thisJSON)
-        #thisproject = Bar(**thisJSON)
+        #thisproject = thisBumble.Baz(**thisJSON)
+        thisproject = Bar(**thisJSON)
         #thisproject = Foo(**thisJSON)
     except ValidationError as e :
         print(e)
