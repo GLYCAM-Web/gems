@@ -4,10 +4,10 @@ from datetime import datetime
 # ###
 # ### Note comments about the following pairs
 # ###
-import gemsModules.common.services as commonServices  # being deprecated
+#import gemsModules.common.services as commonServices  # being deprecated
 import gemsModules.common.logic as commonLogic # replacing services
 # ###
-import gemsModules.common.transaction as commonTransaction # being deprecated
+#import gemsModules.common.transaction as commonTransaction # being deprecated
 import gemsModules.common.jsoninterface as commonIO # replacing transaction
 # ###
 # ###
@@ -43,7 +43,7 @@ def delegate(jsonObjectString):
     ### (Lachele)
     ###
     conjugateEntities=['Conjugate','Glycoprotein'] ## this goes away once the rest is refactored
-    thisEntityType = getEntityTypeFromJson(jsonObjectString)
+    thisEntityType = commonLogic.getEntityTypeFromJson(jsonObjectString)
     if thisEntityType is None:
         return buildInvalidInputErrorResponseJsonString(
                 thisMessagingEntity='delegator',
@@ -81,8 +81,9 @@ def delegate(jsonObjectString):
 
 
     # Make a new Transaction object for holding I/O information.
-    import commonTransaction.Transaction as ioTransaction
-    thisTransaction=ioTransaction(jsonObjectString)
+#    import commonTransaction.Transaction as ioTransaction  # deprecated
+#    thisTransaction=ioTransaction(jsonObjectString)  # deprecated
+    thisTransaction=commonIO.Transaction(jsonObjectString)
 
 #    # If the incoming string was improperly formed, bail, but give a reason.
 #    ##TODO: Look at this more closely. Predates current error handling approach.
@@ -93,8 +94,13 @@ def delegate(jsonObjectString):
 #        return thisTransaction.outgoing_string
 
     # Grab the entity type
-    entityType = thisTransaction.request_dict['entity']['type']
+#    entityType = thisTransaction.request_dict['entity']['type'] # deprecated
+    entityType = commonLogic.getEntityTypeFromJson(jsonObjectString)
     log.debug("Requested entityType: " + entityType)
+    if entityType is None:
+        return buildInvalidInputErrorResponseJsonString(
+                thisMessagingEntity='delegator',
+                message="entity type not found in json input string")
     # If the entity type is CommonServies, then something was very wrong,
     # and the JSON object is coming from internal errors.  So, just return it.
     if entityType == 'CommonServices':

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import gemsModules
 from gemsModules import common
-from gemsModules.common.services import *
-from gemsModules.common.transaction import * # might need whole file...
+from gemsModules.common import logic as commonLogic
+from gemsModules.common import jsoninterface as commonIO 
 from gemsModules.common.loggingConfig import *
 import gemsModules.batchcompute.settings as batchcomputeSettings
 from gemsModules.batchcompute.slurm.receive import manageIncomingString
@@ -121,6 +121,7 @@ def main():
     from gemsModules.common import utils
   jsonObjectString=utils.JSON_From_Command_Line(sys.argv)
   try:
+    from gemsModules.delegator.receive import delegate
     responseObjectString=delegate(jsonObjectString)
   except Exception as error:
     print("\nThe delegator module captured an error.")
