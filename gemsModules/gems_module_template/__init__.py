@@ -1,1 +1,1 @@
-from . import receive, helpme, settings
+#from . import receive, helpme, settings  # avoid hidden imports

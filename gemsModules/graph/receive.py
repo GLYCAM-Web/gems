@@ -2,10 +2,12 @@ import sys, os, re, importlib.util
 import gemsModules
 import gmml
 
-from . import settings
-from gemsModules.common.services import *
+from gemsModules.graph import settings
+#from gemsModules.graph import jsoninterface as graphio # doesn't exist yet but probably needs to
 
-from gemsModules.common.transaction import *
+from gemsModules.common import services as commonservices
+
+from gemsModules.common import jsoninterface as commonio
 from gemsModules.common.loggingConfig import loggers, createLogger
 
 if loggers.get(__name__):
@@ -14,7 +16,7 @@ else:
     log = createLogger(__name__)
 
 
-def receive(thisTransaction : Transaction):
+def receive(thisTransaction : commonio.Transaction): # probably needs to become a graph-specific child
     log.info("receive() was called.\n")
     import gemsModules.graph
 

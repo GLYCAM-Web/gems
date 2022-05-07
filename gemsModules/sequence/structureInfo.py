@@ -4,7 +4,7 @@ from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 from datetime import datetime
 from pydantic import BaseModel, Field, ValidationError
 from pydantic.schema import schema
-from gemsModules.sequence import io as sequenceio
+from gemsModules.sequence import jsoninterface as sequenceio
 from gemsModules.sequence import projects as sequenceProjects
 from gemsModules.common.loggingConfig import *
 from gemsModules.project import projectUtilPydantic as projectUtils
@@ -456,9 +456,9 @@ def convertStructureInfoToDict(structureInfo: sequenceio.StructureBuildInfo()):
     inputIsGood = True
     if structureInfo is None:
         inputIsGood = False
-    if structureInfo is "":
+    if structureInfo == "":
         inputIsGood = False
-    if inputIsGood is False:
+    if inputIsGood == False:
         error = "Bad data passed to convertStructureInfoToDict : " + \
             str(structureInfo)
         log.error(error)

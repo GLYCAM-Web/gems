@@ -4,7 +4,7 @@ import subprocess
 import signal
 
 def handler(signum,frame):
-    print "Error Occured",signum
+    print("Error Occured",signum)
     raise IOError("Segmentation Fault Occured.")
 
 #The C++ code is already compiled
@@ -12,8 +12,8 @@ def handler(signum,frame):
 #a = subprocess.Popen(["./isegfault"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 a = subprocess.Popen(["./isegfault"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 (outputhere,errorshere) = a.communicate()
-print("The output is: " + outputhere)
-print("The error is: " + errorshere)
+print("The output is: " + str(outputhere))
+print("The error is: " + str(errorshere))
 print("The return code is:  " )
 print(a.returncode )
 if a.returncode == -11 or a.returncode == 139:
@@ -22,9 +22,9 @@ if a.returncode == -11 or a.returncode == 139:
 try:
     signal.signal(signal.SIGSEGV,handler)  
     signal.signal(signal.SIGCHLD,handler)  
-    print("The output is: " + outputhere)
-    print("The error is: " + errorshere)
+    print("The output is: " + str(outputhere))
+    print("The error is: " + str(errorshere))
 except IOError as e:
-    print e
-    print("The output is: " + outputhere)
-    print("The error is: " + errorshere)
+    print(e)
+    print("The output is: " + str(outputhere))
+    print("The error is: " + str(errorshere))

@@ -198,6 +198,6 @@ def generateSchema():
 
 if __name__ == "__main__":
   #generateSchema()
-  print("""This io.py does little on its own.  It is the parent for
-  io.py in the specific conjugates.  Glycoprotein is the first.""")
+  print("""This jsoninterface.py does little on its own.  It is the parent for
+  jsoninterface.py in the specific conjugates.  Glycoprotein is the first.""")
 

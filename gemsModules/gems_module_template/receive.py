@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from gemsModules.common import jsoninterface as commonIO  # can become a module-specific child
 from gemsModules.common.loggingConfig import loggers, createLogger
 import gemsModules
 
