@@ -49,6 +49,7 @@ def delegate(jsonObjectString):
                 thisMessagingEntity='delegator',
                 message="entity type not found in json input string")
     if str(thisEntityType) in conjugateEntities: ## this looks at all entities once the rest is refactored
+        log.info("In delegate and found conjugateEnities")
         try:
             from gemsModules.common.logic import importEntity as logic_importEntity
             thisEntity = logic_importEntity(thisEntityType)
@@ -83,7 +84,7 @@ def delegate(jsonObjectString):
     # Make a new Transaction object for holding I/O information.
 #    import commonTransaction.Transaction as ioTransaction  # deprecated
 #    thisTransaction=ioTransaction(jsonObjectString)  # deprecated
-    thisTransaction=commonIO.Transaction(jsonObjectString)
+#    thisTransaction=commonIO.Transaction(jsonObjectString)
 
 #    # If the incoming string was improperly formed, bail, but give a reason.
 #    ##TODO: Look at this more closely. Predates current error handling approach.
@@ -113,7 +114,7 @@ def delegate(jsonObjectString):
     try:
         from gemsModules.common.logic import importEntity as logic_importEntity
         theEntity = logic_importEntity(entityType)
-        #log.debug("theEntity: " + str(theEntity))
+        log.debug("theEntity: " + str(theEntity))
     except Exception as error:
         error_msg = "There was a problem importing the entity: " + str(error)
         log.error(error_msg)
@@ -134,6 +135,7 @@ def delegate(jsonObjectString):
             thisTransaction = returnedTransaction
     
     try:
+        log.info("In delegate and trying to call receive from the entiy")
         ## This is where specific requested services are called.
         returnedTransaction = theEntity.receive.receive(thisTransaction)
         if returnedTransaction is not None :
@@ -227,9 +229,20 @@ def receive(thisTransaction):
         doDefaultService(thisTransaction)
     else:
         requestedServices = thisTransaction.request_dict['entity']['services']
+        log.debug("equestedServices: " )
+        log.debug(requestedServices)
+        log.debug("the type is")
+        log.debug(type(requestedServices))
         log.debug("len(requestedServices): " + str(len(requestedServices)))
+        for service in requestedServices:
+            log.debug("this is the service")
+            log.debug(service)
+            log.debug("This is the value?")
+            log.debug(requestedServices[service])
         for element in requestedServices:
-            log.debug("element.keys(): " + str(element.keys()))
+            #log.debug("element.keys(): " + str(element.keys()))
+            log.debug("element.keys(): " )
+            log.debug(element.keys())
             if 'listEntities' in element.keys():
                 entities = listEntities("Delegator")
                 log.debug("entities: " + str(entities))
