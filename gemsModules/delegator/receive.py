@@ -45,7 +45,10 @@ def delegate(jsonObjectString):
     conjugateEntities=['Conjugate','Glycoprotein'] ## this goes away once the rest is refactored
     thisEntityType = commonLogic.getEntityTypeFromJson(jsonObjectString)
     if thisEntityType is None:
-        return buildInvalidInputErrorResponseJsonString(
+        # return buildInvalidInputErrorResponseJsonString(
+        #         thisMessagingEntity='delegator',
+        #         message="entity type not found in json input string")
+        return commonLogic.buildInvalidInputErrorResponseJsonString(
                 thisMessagingEntity='delegator',
                 message="entity type not found in json input string")
     if str(thisEntityType) in conjugateEntities: ## this looks at all entities once the rest is refactored
@@ -99,7 +102,10 @@ def delegate(jsonObjectString):
     entityType = commonLogic.getEntityTypeFromJson(jsonObjectString)
     log.debug("Requested entityType: " + entityType)
     if entityType is None:
-        return buildInvalidInputErrorResponseJsonString(
+        # return buildInvalidInputErrorResponseJsonString(
+        #         thisMessagingEntity='delegator',
+        #         message="entity type not found in json input string")
+        return commonLogic.buildInvalidInputErrorResponseJsonString(
                 thisMessagingEntity='delegator',
                 message="entity type not found in json input string")
     # If the entity type is CommonServies, then something was very wrong,
@@ -112,7 +118,8 @@ def delegate(jsonObjectString):
 
     ### See if it is possible to load a module for the requested Entity
     try:
-        from gemsModules.common.logic import importEntity as logic_importEntity
+        import gemsModules.common.logic as logic_importEntity
+        # from gemsModules.common.logic import importEntity as logic_importEntity
         theEntity = logic_importEntity(entityType)
         log.debug("theEntity: " + str(theEntity))
     except Exception as error:
@@ -178,8 +185,8 @@ def delegate(jsonObjectString):
 
     # Return whatever outgoing string was made
     log.debug("About to return whatever output I have at this point:")
-    log.debug(prettyPrint(thisTransaction.response_dict))
-
+    # log.debug(prettyPrint(thisTransaction.response_dict))
+    log.debug(log.prettyPrint(thisTransaction.response_dict))
     log.debug("thisTransaction.outgoing_string obj type: " + str(type(thisTransaction.outgoing_string)))
     log.debug("thisTransaction.outgoing_string: " + thisTransaction.outgoing_string)
     
@@ -203,7 +210,8 @@ def setResponseApiVersion(thisTransaction):
         thisTransaction.response_dict = {}
     if 'json_api_version' not in thisTransaction.response_dict.keys():
         try:
-            thisTransaction.response_dict['json_api_version'] = getCurrentStableJsonApiVersion()
+            #thisTransaction.response_dict['json_api_version'] = getCurrentStableJsonApiVersion()
+            thisTransaction.response_dict['json_api_version'] = commonLogic.getCurrentStableJsonApiVersion()
         except Exception as error:
             log.error("There was a problem getting the current stable json api version.")
             raise error
@@ -217,7 +225,8 @@ def doDefaultService(thisTransaction):
     thisTransaction.response_dict['entity']={}
     thisTransaction.response_dict['entity']['type']='Delegator'
     thisTransaction.response_dict['responses']=[]
-    thisTransaction.response_dict['responses'].append({'payload':marco('Delegator')})
+    #thisTransaction.response_dict['responses'].append({'payload':marco('Delegator')})
+    thisTransaction.response_dict['responses'].append({'payload':commonLogic.marco('Delegator')})
     thisTransaction.build_outgoing_string()
 
 ## TODO:  this reception code does not conform to the current JSON schema (is close...).
@@ -244,7 +253,8 @@ def receive(thisTransaction):
             log.debug("element.keys(): " )
             log.debug(element.keys())
             if 'listEntities' in element.keys():
-                entities = listEntities("Delegator")
+                #entities = listEntities("Delegator")
+                entities = commonLogic.listEntities("Delegator")
                 log.debug("entities: " + str(entities))
                 if thisTransaction.response_dict is None:
                     thisTransaction.response_dict={}
@@ -268,15 +278,18 @@ def receive(thisTransaction):
                     ]
                 }
 
-                appendResponse(thisTransaction, responseConfig)
+                #appendResponse(thisTransaction, responseConfig)
+                commonLogic.appendResponse(thisTransaction, responseConfig)
 
 ##  Return the content of the current schema, as defined in CurrentStableSchema
 def getJsonSchema():
     log.info("getJsonSchema() was called.\n")
-    versionFilename = getGemsHome() + "/gemsModules/Schema/currentStableSchema"
+    #versionFilename = getGemsHome() + "/gemsModules/Schema/currentStableSchema"
+    versionFilename = commonLogic.getGemsHome() + "/gemsModules/Schema/currentStableSchema"
     with open(versionFilename, 'r') as versionFile:
         currentStableVersion = versionFile.read().strip()
-    schemaFileName = getGemsHome() + "/gemsModules/Schema/" + currentStableVersion + "/schema.json"
+    #schemaFileName = getGemsHome() + "/gemsModules/Schema/" + currentStableVersion + "/schema.json"
+    schemaFileName = commonLogic.getGemsHome() + "/gemsModules/Schema/" + currentStableVersion + "/schema.json"
     with open(schemaFileName, 'r') as schemaFile:
         content = schemaFile.read()
     #log.debug("schema content: \n" + content )
