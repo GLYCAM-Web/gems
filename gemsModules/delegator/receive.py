@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from gems.gemsModules import common
 import gemsModules
 from datetime import datetime
 # ###
@@ -35,6 +36,38 @@ def delegate(jsonObjectString):
     """
     log.info("delegate() was called.\n")
     log.debug("incoming jsonObjectString: " + jsonObjectString)
+
+    # ###
+    # # instantiate Transaction
+    # try: 
+    #     incomingTransaction = commonIO.Transaction(jsonObjectString)
+    # except Exception as error:
+    #     log.error("problem instantiating Transaction: " + str(jsonObjectString))
+    #     log.error(traceback.format_exc())
+
+    # # instantiate TransactionSchema
+    # try:
+    #     incomingTransaction.transaction_in = incomingTransaction.transaction_in.parse_raw(jsonObjectString, check_fields=False) # cannot find docs or info about passing in 'check-fields=False'
+    # except Exception as error:
+    #     log.error("problem instantiating TransactionSchema: " + str(incomingTransaction.transaction_in))
+    #     log.error(traceback.format_exc())
+    
+    # # validate Transaction
+    
+    # # prepare + generate notices?
+
+    # # get the entityType
+    
+    # #import entityType as module
+    # #outgoingTransaction = module.receive.receive(...)
+
+    # # validate response
+
+    # # return
+    # #return outgoingTransaction.outgoing_string
+
+    # ###
+
 
     ###
     ### I'm trying to clean up entity handling.  Delegator currently does too much.
