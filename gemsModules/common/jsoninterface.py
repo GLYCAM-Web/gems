@@ -217,8 +217,6 @@ class TransactionSchema(BaseModel):
 # ####
 # ####  Container for use in the modules
 # ####
-
-
 class Transaction:
     """Holds information relevant to a delegated transaction"""
     incoming_string: str = None
@@ -261,10 +259,29 @@ class Transaction:
                 return
             # else : 
             #     self.request_dict = json.loads(self.incoming_string)        
-            # cannot find docs or info about passing in 'check-fields=False'
-            self.transaction_in = self.transaction_in.parse_raw(in_string)
+            
+            try:
+                # cannot find docs or info about passing in 'check-fields=False'
+                self.transaction_in = TransactionSchema.parse_raw(in_string)
+            except Exception as error:
+                errMsg = "problem with call to parse_raw() while instantiating transaction with: " + str(in_string)
+                responseObject = {
+                    'CommonNotice' : {
+                        'type' : 'FatalError',
+                        'notice' : {
+                            'code' : '500',
+                            'brief' : 'Failed to instantiate top-level Transaction.',
+                            'message' : errMsg,
+                            'noticeType' : 'Error',
+                            'scope' : 'Delegator',
+                            'messenger' : 'Common'
+                            }
+                        }
+                    }
+                log.error(errMsg)
+                log.error(traceback.format_exc())
         except Exception as error:
-            errMsg = "problem with call to parse_raw() while instantiating transaction with: " + str(in_string)
+            errMsg = "problem with call to __init__() while instantiating transaction with: " + str(in_string)
             responseObject = {
                 'CommonNotice' : {
                     'type' : 'FatalError',
@@ -282,7 +299,7 @@ class Transaction:
             log.error(traceback.format_exc())
             # TODO: how to handle this?
             return str(responseObject)
-
+        
 
     def generateCommonParserNotice(self, *args, **kwargs):
         if self.transaction_out is None:

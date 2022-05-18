@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 #from gems.gemsModules import common
+from tkinter import E
 import gemsModules
 from datetime import datetime
 # ###
@@ -49,15 +50,13 @@ def delegate(jsonObjectString):
         log.error(errorMessage)
         #TODO: stuff error message into notice
         return errorMessage 
-
-    
-    
     
     try:
         #TODO validate jsonObjectString first
-        log.debug("try to instantiate Transaction")
+        log.debug("try to instantiate Transaction")  
+        
         thisTransaction = commonIO.Transaction(jsonObjectString)
-        #thisTransaction = commonIO.Transaction(jsonIn=str(jsonObjectString))
+
     except Exception as error:
         #TODO: 
         errorMessage = ("problem instantiating Transaction from string: " + str(jsonObjectString))
@@ -68,9 +67,9 @@ def delegate(jsonObjectString):
         #         outgoingOnly=True, haveError=True, brief="GemsError", 
         #         additionalInfo={'DelegatorMessage':'Could not instantiate Transaction from JSON object string'})
         
-        raise error
-    log.debug("incoming data structure is: " + str(thisTransaction.incoming_string))
-    return thisTransaction.incoming_string
+    #     raise error
+    # log.debug("incoming data structure is: " + str(thisTransaction.incoming_string))
+    # return thisTransaction.incoming_string
 #     # If something non-vomit-making, but still fatal, happened, have Transaction automatically 
 #     #     populate transaction_out, adding error messages if possible, and build an outgoing string:
 #     if thisTransaction.outgoing_string is not None :
@@ -376,10 +375,10 @@ def main():
             from common import utils
     else:
         from gemsModules.common import utils
-        #jsonObjectString=utils.JSON_From_Command_Line(sys.argv)
+        jsonObjectString=utils.JSON_From_Command_Line(sys.argv)
 
     try:
-        responseObjectString=delegate(sys.argv[1])
+        responseObjectString=delegate(jsonObjectString)
     except IndexError as error:
         print("\nlength of argv: " + str(len(sys.argv)))
         print("at least one json formatted string argument is required\n")
@@ -416,7 +415,7 @@ def main():
                     }
                 }
             }  
-    responseObjectString = str(responseObject)
+        responseObjectString = str(responseObject)
 
     print("\ndelegator is returning this: \n" +  str(responseObjectString))
 
