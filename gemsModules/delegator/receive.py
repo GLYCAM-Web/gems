@@ -56,7 +56,8 @@ def delegate(jsonObjectString):
         log.debug("try to instantiate Transaction")  
         
         thisTransaction = commonIO.Transaction(jsonObjectString)
-
+        log.debug("thisTransaction.incoming_string: " + str(thisTransaction.incoming_string))
+        log.debug("thisTransaction.transaction_in: " + str(thisTransaction.transaction_in))
     except Exception as error:
         #TODO: 
         errorMessage = ("problem instantiating Transaction from string: " + str(jsonObjectString))
