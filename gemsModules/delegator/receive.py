@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
-from gems.gemsModules import common
+#from gems.gemsModules import common
 import gemsModules
 from datetime import datetime
 # ###
 # ### Note comments about the following pairs
 # ###
+
+from gemsModules import common
+
 #import gemsModules.common.services as commonServices  # being deprecated
 import gemsModules.common.logic as commonLogic # replacing services
 # ###
@@ -34,196 +37,227 @@ def delegate(jsonObjectString):
     reads the identity of the top-level Entity and, if it can load a
     module for that entity, it passes the Transaction object over.
     """
-    log.info("delegate() was called.\n")
-    log.debug("incoming jsonObjectString: " + jsonObjectString)
 
-    # ###
-    # # instantiate Transaction
-    # try: 
-    #     incomingTransaction = commonIO.Transaction(jsonObjectString)
-    # except Exception as error:
-    #     log.error("problem instantiating Transaction: " + str(jsonObjectString))
-    #     log.error(traceback.format_exc())
-
-    # # instantiate TransactionSchema
-    # try:
-    #     incomingTransaction.transaction_in = incomingTransaction.transaction_in.parse_raw(jsonObjectString, check_fields=False) # cannot find docs or info about passing in 'check-fields=False'
-    # except Exception as error:
-    #     log.error("problem instantiating TransactionSchema: " + str(incomingTransaction.transaction_in))
-    #     log.error(traceback.format_exc())
-    
-    # # validate Transaction
-    
-    # # prepare + generate notices?
-
-    # # get the entityType
-    
-    # #import entityType as module
-    # #outgoingTransaction = module.receive.receive(...)
-
-    # # validate response
-
-    # # return
-    # #return outgoingTransaction.outgoing_string
-
-    # ###
-
-
-    ###
-    ### I'm trying to clean up entity handling.  Delegator currently does too much.
-    ### The following handling of conjugate is currently the better method.
-    ### Feel free to improve it further.
-    ### (Lachele)
-    ###
-    conjugateEntities=['Conjugate','Glycoprotein'] ## this goes away once the rest is refactored
-    thisEntityType = commonLogic.getEntityTypeFromJson(jsonObjectString)
-    if thisEntityType is None:
-        # return buildInvalidInputErrorResponseJsonString(
-        #         thisMessagingEntity='delegator',
-        #         message="entity type not found in json input string")
-        return commonLogic.buildInvalidInputErrorResponseJsonString(
-                thisMessagingEntity='delegator',
-                message="entity type not found in json input string")
-    if str(thisEntityType) in conjugateEntities: ## this looks at all entities once the rest is refactored
-        log.info("In delegate and found conjugateEnities")
-        try:
-            from gemsModules.common.logic import importEntity as logic_importEntity
-            thisEntity = logic_importEntity(thisEntityType)
-            log.debug("thisEntityType: " + str(thisEntityType))
-            log.debug("thisEntity (should be a reference): " + str(thisEntity))
-            # ### There is no need to know ahead of time what sort of transaction it is
-            returnedTransaction = thisEntity.receive.receive(
-                    jsonObjectString,
-                    entityType=thisEntityType)
-            returnedTransaction.build_outgoing_string()
-            return returnedTransaction.outgoing_string
-        except Exception as error:
-            error_msg = "There was a problem importing the entity: " + str(error)
-            log.error(error_msg)
-            log.error(traceback.format_exc())
-            thisTransaction=commonIO.Transaction()
-            thisTransaction.generateCommonParserNotice(
-                    messagingEntity='delegator', 
-                    additionalInfo={"errorMessage":error_msg})
-            thisTransaction.build_outgoing_string()
-            return thisTransaction.outgoing_string
-    # When the rest is refactored, add something like this:
-    # else:
-    #     return buildInvalidInputErrorResponseJsonString(
-    #             thisMessagingEntity='delegator',
-    #             message="entity type not recognized")
-    ###
-    ### End of new, cleaner block
-    ###
-
-
-    # Make a new Transaction object for holding I/O information.
-#    import commonTransaction.Transaction as ioTransaction  # deprecated
-#    thisTransaction=ioTransaction(jsonObjectString)  # deprecated
-#    thisTransaction=commonIO.Transaction(jsonObjectString)
-
-#    # If the incoming string was improperly formed, bail, but give a reason.
-#    ##TODO: Look at this more closely. Predates current error handling approach.
-#    from gemsModules.common.logic import parseInput as logic_parseInput
-#    if logic_parseInput(thisTransaction) != 0:
-#        log.error(" There was an error parsing the input!")
-#        thisTransaction.build_outgoing_string()
-#        return thisTransaction.outgoing_string
-
-    # Grab the entity type
-#    entityType = thisTransaction.request_dict['entity']['type'] # deprecated
-    entityType = commonLogic.getEntityTypeFromJson(jsonObjectString)
-    log.debug("Requested entityType: " + entityType)
-    if entityType is None:
-        # return buildInvalidInputErrorResponseJsonString(
-        #         thisMessagingEntity='delegator',
-        #         message="entity type not found in json input string")
-        return commonLogic.buildInvalidInputErrorResponseJsonString(
-                thisMessagingEntity='delegator',
-                message="entity type not found in json input string")
-    # If the entity type is CommonServies, then something was very wrong,
-    # and the JSON object is coming from internal errors.  So, just return it.
-    if entityType == 'CommonServices':
-        log.error("The requested entity is CommonServices, so something must have gone wrong.")
-        log.error("I'm returning that oject. as-is.  Delegator cannot delegate to CommonServices.")
-        return jsonObjectString
-
-
-    ### See if it is possible to load a module for the requested Entity
     try:
-        import gemsModules.common.logic as logic_importEntity
-        # from gemsModules.common.logic import importEntity as logic_importEntity
-        theEntity = logic_importEntity(entityType)
-        log.debug("theEntity: " + str(theEntity))
+        log.info("delegate() was called.\n")
+        log.debug("incoming jsonObjectString: " + jsonObjectString)   
+        log.debug("incoming jsonObjectString type: " + str(type(jsonObjectString)))
+        # instantiate Transaction
+        log.debug("calling commonIO.Transaction")
     except Exception as error:
-        error_msg = "There was a problem importing the entity: " + str(error)
-        log.error(error_msg)
-        log.error(traceback.format_exc())
-        thisTransaction.generateCommonParserNotice(messagingEntity='delegator', additionalInfo={"errorMessage":error_msg})
+        errorMessage = "failed to read incoming jsonObjectString: " + str(error)
+        log.error(errorMessage)
+        #TODO: stuff error message into notice
+        return errorMessage 
+
     
-    ##Figure out what service to do.
-    if theEntity is None:
-        log.error("there was no entity to call.  bailing")
-        thisTransaction.generateCommonParserNotice(noticeBrief='NoEntityDefined')
-    elif not 'services' in thisTransaction.request_dict['entity'].keys():
-        ## If no service is requested in the json object, do the default service.
-        ## This logic could possibly move down to the Entity level.  Is ok here. (Lachele)
-        log.debug("No service defined in the request. Calling the default service")
-        returnedTransaction = theEntity.receive.doDefaultService(thisTransaction)
-        if returnedTransaction is not None :
-            # ## !!!!! This might not work as planned....
-            thisTransaction = returnedTransaction
+    
     
     try:
-        log.info("In delegate and trying to call receive from the entiy")
-        ## This is where specific requested services are called.
-        returnedTransaction = theEntity.receive.receive(thisTransaction)
-        if returnedTransaction is not None :
-            # ## !!!!! This might not work as planned....
-            thisTransaction = returnedTransaction
+        #TODO validate jsonObjectString first
+        log.debug("try to instantiate Transaction")
+        thisTransaction = commonIO.Transaction(jsonObjectString)
+        #thisTransaction = commonIO.Transaction(jsonIn=str(jsonObjectString))
     except Exception as error:
-        error_msg = str(error)
-        log.error("There was a problem providing the requested service: " + str(error))
+        #TODO: 
+        errorMessage = ("problem instantiating Transaction from string: " + str(jsonObjectString))
+        log.error(errorMessage)
         log.error(traceback.format_exc())
-        thisTransaction.generateCommonParserNotice(messagingEntity='delegator', additionalInfo={"errorMessage":error_msg})
+        # figure out intent (is it okay to just return a jsonObject?)
+        # errorTransaction = commonIO.Transaction(
+        #         outgoingOnly=True, haveError=True, brief="GemsError", 
+        #         additionalInfo={'DelegatorMessage':'Could not instantiate Transaction from JSON object string'})
+        
+        raise error
+    log.debug("incoming data structure is: " + str(thisTransaction.incoming_string))
+    return thisTransaction.incoming_string
+#     # If something non-vomit-making, but still fatal, happened, have Transaction automatically 
+#     #     populate transaction_out, adding error messages if possible, and build an outgoing string:
+#     if thisTransaction.outgoing_string is not None :
+#         ####  Figure out some way to be sure that there was actually a problem.
+#         return thisTransaction.outgoing_string
     
-    ##Set the json_api_version in the response_dict.
-    try:
-        setResponseApiVersion(thisTransaction)
-    except Exception as error:
-        error_msg  = "There was a problem setting the response JSON API version: " + str(error)
-        log.error(error_msg)
-        log.error(traceback.format_exc())
-        thisTransaction.generateCommonParserNotice(messagingEntity='delegator', additionalInfo={"errorMessage":error_msg})
-    
-    ##Set the response timestamp.
-    setResponseTimestamp(thisTransaction)
-    
-    ## Set the response site host.
-    setResponseSiteHost(thisTransaction)
+#     # get entityType
 
-    ## Build outgoing string or error.
-    log.debug("The resquest dict is:  \n" + str(thisTransaction.request_dict) + "\n")
-    log.debug("The response dict is:  \n" + str(thisTransaction.response_dict) + "\n")
+#     #thisEntityType=thisTransaction.getEntityType()
+#     #thisEntityType =
 
-    if thisTransaction.outgoing_string is None:
-        log.debug("An outgoing string does not already exist.  About to build one.")
-        try:
-            thisTransaction.build_outgoing_string()
-        except Exception as error:
-            error_msg = "There was a problem building the outgoing string: " + str(error)
-            log.error(error_msg)
-            log.error("Error type: " + str(type(error)))
-            thisTransaction.generateCommonParserNotice(messagingEntity='delegator', additionalInfo={"errorMessage":error_msg})
 
-    # Return whatever outgoing string was made
-    log.debug("About to return whatever output I have at this point:")
-    # log.debug(prettyPrint(thisTransaction.response_dict))
-    log.debug(log.prettyPrint(thisTransaction.response_dict))
-    log.debug("thisTransaction.outgoing_string obj type: " + str(type(thisTransaction.outgoing_string)))
-    log.debug("thisTransaction.outgoing_string: " + thisTransaction.outgoing_string)
+
+#     #..... etc.....
     
-    return thisTransaction.outgoing_string
+#     # validate Transaction
+    
+#     # prepare + generate notices?
+
+#     # get the entityType
+    
+#     #import entityType as module
+#     #outgoingTransaction = module.receive.receive(...)
+
+#     # validate response
+
+#     # return
+#     #return outgoingTransaction.outgoing_string
+
+#     ###
+
+
+#     ###
+#     ### I'm trying to clean up entity handling.  Delegator currently does too much.
+#     ### The following handling of conjugate is currently the better method.
+#     ### Feel free to improve it further.
+#     ### (Lachele)
+#     ###
+#     conjugateEntities=['Conjugate','Glycoprotein'] ## this goes away once the rest is refactored
+#     thisEntityType = commonLogic.getEntityTypeFromJson(jsonObjectString)
+#     if thisEntityType is None:
+#         # return buildInvalidInputErrorResponseJsonString(
+#         #         thisMessagingEntity='delegator',
+#         #         message="entity type not found in json input string")
+#         return commonLogic.buildInvalidInputErrorResponseJsonString(
+#                 thisMessagingEntity='delegator',
+#                 message="entity type not found in json input string")
+#     if str(thisEntityType) in conjugateEntities: ## this looks at all entities once the rest is refactored
+#         log.info("In delegate and found conjugateEnities")
+#         try:
+#             from gemsModules.common.logic import importEntity as logic_importEntity
+#             thisEntity = logic_importEntity(thisEntityType)
+#             log.debug("thisEntityType: " + str(thisEntityType))
+#             log.debug("thisEntity (should be a reference): " + str(thisEntity))
+#             # ### There is no need to know ahead of time what sort of transaction it is
+#             returnedTransaction = thisEntity.receive.receive(
+#                     jsonObjectString,
+#                     entityType=thisEntityType)
+#             returnedTransaction.build_outgoing_string()
+#             return returnedTransaction.outgoing_string
+#         except Exception as error:
+#             error_msg = "There was a problem importing the entity: " + str(error)
+#             log.error(error_msg)
+#             log.error(traceback.format_exc())
+#             thisTransaction=commonIO.Transaction()
+#             thisTransaction.generateCommonParserNotice(
+#                     messagingEntity='delegator', 
+#                     additionalInfo={"errorMessage":error_msg})
+#             thisTransaction.build_outgoing_string()
+#             return thisTransaction.outgoing_string
+#     # When the rest is refactored, add something like this:
+#     # else:
+#     #     return buildInvalidInputErrorResponseJsonString(
+#     #             thisMessagingEntity='delegator',
+#     #             message="entity type not recognized")
+#     ###
+#     ### End of new, cleaner block
+#     ###
+
+
+#     # Make a new Transaction object for holding I/O information.
+# #    import commonTransaction.Transaction as ioTransaction  # deprecated
+# #    thisTransaction=ioTransaction(jsonObjectString)  # deprecated
+# #    thisTransaction=commonIO.Transaction(jsonObjectString)
+
+# #    # If the incoming string was improperly formed, bail, but give a reason.
+# #    ##TODO: Look at this more closely. Predates current error handling approach.
+# #    from gemsModules.common.logic import parseInput as logic_parseInput
+# #    if logic_parseInput(thisTransaction) != 0:
+# #        log.error(" There was an error parsing the input!")
+# #        thisTransaction.build_outgoing_string()
+# #        return thisTransaction.outgoing_string
+
+#     # Grab the entity type
+# #    entityType = thisTransaction.request_dict['entity']['type'] # deprecated
+#     entityType = commonLogic.getEntityTypeFromJson(jsonObjectString)
+#     log.debug("Requested entityType: " + entityType)
+#     if entityType is None:
+#         # return buildInvalidInputErrorResponseJsonString(
+#         #         thisMessagingEntity='delegator',
+#         #         message="entity type not found in json input string")
+#         return commonLogic.buildInvalidInputErrorResponseJsonString(
+#                 thisMessagingEntity='delegator',
+#                 message="entity type not found in json input string")
+#     # If the entity type is CommonServies, then something was very wrong,
+#     # and the JSON object is coming from internal errors.  So, just return it.
+#     if entityType == 'CommonServices':
+#         log.error("The requested entity is CommonServices, so something must have gone wrong.")
+#         log.error("I'm returning that oject. as-is.  Delegator cannot delegate to CommonServices.")
+#         return jsonObjectString
+
+
+#     ### See if it is possible to load a module for the requested Entity
+#     try:
+#         import gemsModules.common.logic as logic_importEntity
+#         # from gemsModules.common.logic import importEntity as logic_importEntity
+#         theEntity = logic_importEntity(entityType)
+#         log.debug("theEntity: " + str(theEntity))
+#     except Exception as error:
+#         error_msg = "There was a problem importing the entity: " + str(error)
+#         log.error(error_msg)
+#         log.error(traceback.format_exc())
+#         thisTransaction.generateCommonParserNotice(messagingEntity='delegator', additionalInfo={"errorMessage":error_msg})
+    
+#     ##Figure out what service to do.
+#     if theEntity is None:
+#         log.error("there was no entity to call.  bailing")
+#         thisTransaction.generateCommonParserNotice(noticeBrief='NoEntityDefined')
+#     elif not 'services' in thisTransaction.request_dict['entity'].keys():
+#         ## If no service is requested in the json object, do the default service.
+#         ## This logic could possibly move down to the Entity level.  Is ok here. (Lachele)
+#         log.debug("No service defined in the request. Calling the default service")
+#         returnedTransaction = theEntity.receive.doDefaultService(thisTransaction)
+#         if returnedTransaction is not None :
+#             # ## !!!!! This might not work as planned....
+#             thisTransaction = returnedTransaction
+    
+#     try:
+#         log.info("In delegate and trying to call receive from the entiy")
+#         ## This is where specific requested services are called.
+#         returnedTransaction = theEntity.receive.receive(thisTransaction)
+#         if returnedTransaction is not None :
+#             # ## !!!!! This might not work as planned....
+#             thisTransaction = returnedTransaction
+#     except Exception as error:
+#         error_msg = str(error)
+#         log.error("There was a problem providing the requested service: " + str(error))
+#         log.error(traceback.format_exc())
+#         thisTransaction.generateCommonParserNotice(messagingEntity='delegator', additionalInfo={"errorMessage":error_msg})
+    
+#     ##Set the json_api_version in the response_dict.
+#     try:
+#         setResponseApiVersion(thisTransaction)
+#     except Exception as error:
+#         error_msg  = "There was a problem setting the response JSON API version: " + str(error)
+#         log.error(error_msg)
+#         log.error(traceback.format_exc())
+#         thisTransaction.generateCommonParserNotice(messagingEntity='delegator', additionalInfo={"errorMessage":error_msg})
+    
+#     ##Set the response timestamp.
+#     setResponseTimestamp(thisTransaction)
+    
+#     ## Set the response site host.
+#     setResponseSiteHost(thisTransaction)
+
+#     ## Build outgoing string or error.
+#     log.debug("The resquest dict is:  \n" + str(thisTransaction.request_dict) + "\n")
+#     log.debug("The response dict is:  \n" + str(thisTransaction.response_dict) + "\n")
+
+#     if thisTransaction.outgoing_string is None:
+#         log.debug("An outgoing string does not already exist.  About to build one.")
+#         try:
+#             thisTransaction.build_outgoing_string()
+#         except Exception as error:
+#             error_msg = "There was a problem building the outgoing string: " + str(error)
+#             log.error(error_msg)
+#             log.error("Error type: " + str(type(error)))
+#             thisTransaction.generateCommonParserNotice(messagingEntity='delegator', additionalInfo={"errorMessage":error_msg})
+
+#     # Return whatever outgoing string was made
+#     log.debug("About to return whatever output I have at this point:")
+#     # log.debug(prettyPrint(thisTransaction.response_dict))
+#     log.debug(log.prettyPrint(thisTransaction.response_dict))
+#     log.debug("thisTransaction.outgoing_string obj type: " + str(type(thisTransaction.outgoing_string)))
+#     log.debug("thisTransaction.outgoing_string: " + thisTransaction.outgoing_string)
+    
+#     return thisTransaction.outgoing_string
 
 def setResponseSiteHost(thisTransaction):
     log.info("setResponseSiteHost() was called.\n")
@@ -329,43 +363,63 @@ def getJsonSchema():
     return content
 
 def main():
-  import importlib.util, os, sys
-  #from importlib import util
-  if importlib.util.find_spec("gemsModules") is None:
-    this_dir, this_filename = os.path.split(__file__)
-    sys.path.append(this_dir + "/../")
-    if importlib.util.find_spec("common") is None:
-      print("I cannot find the Common Servicer.  No clue what to do. Exiting")
-      sys.exit(1)
+    # 
+    import importlib.util, os, sys
+    #from importlib import util
+    if importlib.util.find_spec("gemsModules") is None:
+        this_dir, this_filename = os.path.split(__file__)
+        sys.path.append(this_dir + "/../")
+        if importlib.util.find_spec("common") is None:
+            print("I cannot find the Common Servicer.  No clue what to do. Exiting")
+            sys.exit(1)
+        else:
+            from common import utils
     else:
-      from common import utils
-  else:
-    from gemsModules.common import utils
-  jsonObjectString=utils.JSON_From_Command_Line(sys.argv)
-  try:
-    responseObjectString=delegate(jsonObjectString)
-  except Exception as error:
-    print("\nThe delegator module captured an error.")
-    print("Error type: " + str(type(error)))
-    print(traceback.format_exc())
-    ##TODO: see about exploring this error and returning more info. Temp solution for now.
-    responseObject = {
-        'DelegatorNotice' : {
-            'type' : 'UnknownError',
-            'notice' : {
-                'code' : '500',
-                'brief' : 'unknownError',
-                'blockID' : 'unknown',
-                'message' : 'Not sure what went wrong. Error captured by the Delegator gemsModule.'
+        from gemsModules.common import utils
+        #jsonObjectString=utils.JSON_From_Command_Line(sys.argv)
+
+    try:
+        responseObjectString=delegate(sys.argv[1])
+    except IndexError as error:
+        print("\nlength of argv: " + str(len(sys.argv)))
+        print("at least one json formatted string argument is required\n")
+        responseObject = {
+            'DelegatorNotice' : {
+                'type' : 'IndexError',
+                'notice' : {
+                    'code' : '500',
+                    'brief' : 'No json input string!',
+                    'noticeType' : 'Error',
+                    'message' : 'Delegator requires a json formatted string as input.',
+                    'scope' : 'Delegator',
+                    'messenger' : 'Delegator'
+                    }
+                }
             }
-        }
-    }
+        responseObjectString = str(responseObject)
+
+    except Exception as error:
+        print("\nThe delegator module captured an error.")
+        print("Error type: " + str(type(error)))
+        print(traceback.format_exc())
+
+        responseObject = {
+            'DelegatorNotice' : {
+                'type' : 'UnknownError',
+                'notice' : {
+                    'code' : '500',
+                    'brief' : 'unknownError',
+                    'message' : 'Not sure what went wrong. Error captured by the Delegator gemsModule.',
+                    'noticeType' : 'Error',
+                    'scope' : 'Delegator',
+                    'messenger' : 'Delegator'
+                    }
+                }
+            }  
     responseObjectString = str(responseObject)
 
-
-  print("\ndelegator is returning this: \n" +  responseObjectString)
-
+    print("\ndelegator is returning this: \n" +  str(responseObjectString))
 
 if __name__ == "__main__":
-  main()
+    main()
 

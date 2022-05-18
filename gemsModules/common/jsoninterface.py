@@ -19,6 +19,7 @@
 # ##  Got a better accounting method?  Let's hear it!
 # ##
 # ###############################################################
+from ast import Try
 import traceback
 from enum import Enum, auto
 from uuid import UUID
@@ -221,10 +222,10 @@ class TransactionSchema(BaseModel):
 class Transaction:
     """Holds information relevant to a delegated transaction"""
     incoming_string: str = None
-    request_dict: {} = None
+    #request_dict: {} = None
     transaction_in: TransactionSchema
     transaction_out: TransactionSchema
-    response_dict: {} = None
+    #response_dict: {} = None
     outgoing_string: str = None
 
     def __init__(self, in_string):
@@ -236,31 +237,58 @@ class Transaction:
         the response dictionary is built up.  From that the outgoing string
         is generated.
         """
-        import json
+        log.info("called __init__ for Transaction")
+        #import json
+        
         # ## I think it is wrong to have Transaction call something from
         # ## some other place to modify itself, but I don't have time to
         # ## refactor this all to make it right.  Lachele 2021-04-02
-        from gemsModules.common import settings as commonSettings
+        try:
 
-        # The following debug line is sometimes useful, but normally redundant.
-        #log.debug("The in_string is: " + in_string)
-        self.incoming_string = in_string
-        # The following debug lines are also sometimes useful, but normally redundant.
-        # log.debug("The incoming_string is: " )
-        # log.debug(self.incoming_string)
-        if self.incoming_string is None :
-            self.transaction_out = TransactionSchema()
-            self.transaction_out.generateCommonParserNotice(noticeBrief='InvalidInput', messagingEntity=commonSettings.WhoIAm)
-            return
-        else : 
-            self.request_dict = json.loads(self.incoming_string) 
+            from gemsModules.common import settings as commonSettings
+            
+        
+            # The following debug line is sometimes useful, but normally redundant.
+            #log.debug("The in_string is: " + in_string)
+            self.incoming_string = in_string
+            log.debug("incoming string is: " + str(in_string))
+            # The following debug lines are also sometimes useful, but normally redundant.
+            # log.debug("The incoming_string is: " )
+            # log.debug(self.incoming_string)
+            if self.incoming_string is None :
+                self.transaction_out = TransactionSchema()
+                self.transaction_out.generateCommonParserNotice(noticeBrief='InvalidInput', messagingEntity=commonSettings.WhoIAm)
+                return
+            # else : 
+            #     self.request_dict = json.loads(self.incoming_string)        
+            # cannot find docs or info about passing in 'check-fields=False'
+            self.transaction_in = self.transaction_in.parse_raw(in_string)
+        except Exception as error:
+            errMsg = "problem with call to parse_raw() while instantiating transaction with: " + str(in_string)
+            responseObject = {
+                'CommonNotice' : {
+                    'type' : 'FatalError',
+                    'notice' : {
+                        'code' : '500',
+                        'brief' : 'Failed to instantiate top-level Transaction.',
+                        'message' : errMsg,
+                        'noticeType' : 'Error',
+                        'scope' : 'Delegator',
+                        'messenger' : 'Common'
+                    }
+                }
+            }
+            log.error(errMsg)
+            log.error(traceback.format_exc())
+            # TODO: how to handle this?
+            return str(responseObject)
 
 
     def generateCommonParserNotice(self, *args, **kwargs):
         if self.transaction_out is None:
             self.transaction_out = TransactionSchema()
         self.transaction_out.generateCommonParserNotice(*args, **kwargs)
-
+    # delete this??
     def populate_transaction_in(self):
 
         self.transaction_in = TransactionSchema(**self.request_dict)
@@ -354,6 +382,12 @@ def generateSchema():
     import json
     # print(Service.schema_json(indent=2))
     print(TransactionSchema.schema_json(indent=2))
+
+def getEntityType(self):
+    """
+    TODO: write me
+    """
+    return None
 
 
 if __name__ == "__main__":
