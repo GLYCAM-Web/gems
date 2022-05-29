@@ -45,8 +45,8 @@ class TestModule(unittest.TestCase):
         exists = os.path.isfile(targetFile)
         self.assertTrue(exists)
 
-    def test_structures_file_exists(self):
-        targetFile = GemsPath + "/gemsModules/sequence/structures.py"
+    def test_structureInfo_file_exists(self):
+        targetFile = GemsPath + "/gemsModules/sequence/structureInfo.py"
         exists = os.path.isfile(targetFile)
         self.assertTrue(exists)
 

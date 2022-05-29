@@ -159,6 +159,7 @@ class Transaction(commonio.Transaction): ## base off of commonio.Transaction???
         self.incoming_string = in_string
         if self.incoming_string is None :
             generateCommonParserNotice(noticeBrief='InvalidInput', messagingEntity=settings.WhoIAm)
+            #projectio.generateCommonParserNotice(noticeBrief='InvalidInput', messagingEntity=settings.WhoIAm)
             return
         try: 
             self.inputs = conjugateModuleIO.parse_raw(self.incoming_string) 
@@ -170,10 +171,13 @@ class Transaction(commonio.Transaction): ## base off of commonio.Transaction???
             log.debug(self.outputs.json(indent=2))
         except ValidationError as e :
             log.error(e)
-            log.error(traceback.format.exc())
+            log.error(traceback.format_exc())
             thisTransaction.generateCommonParserNotice(
                 noticeBrief='JsonParseEror',
                 additionalInfo={'hint' : str(e)})
+            # projectio.generateCommonParserNotice(
+            #     noticeBrief='JsonParseEror',
+            #     additionalInfo={'hint' : str(e)})
             self.outgoing_string=self.outputs.json(indent=2)
             raise e
         except Exception as error :
@@ -182,6 +186,9 @@ class Transaction(commonio.Transaction): ## base off of commonio.Transaction???
             thisTransaction.generateCommonParserNotice(
                 noticeBrief='UnknownError',
                 additionalInfo={'hint' : str(error)})
+            # projectio.generateCommonParserNotice(
+            #     noticeBrief='UnknownError',
+            #     additionalInfo={'hint' : str(error)})
             raise error
 
     def build_outgoing_string(self):
