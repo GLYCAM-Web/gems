@@ -45,7 +45,7 @@ except Exception as error:
 try:
 	## Is this the best place for these?
 	AMINO_LIBS = os.path.join(gemsHome, "gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/amino12.lib")
-	PREP_FILE = os.path.join(gemsHome, "gmml/dat/CurrentParams/leaprc_GLYCAM_06j-1_2014-03-14/GLYCAM_06j-1.prep")
+	PREP_FILE = os.path.join(gemsHome, "gmml/dat/prep/GLYCAM_06j-1_GAGS.prep")
 	GLYCAM_LIBS = os.path.join(gemsHome, "gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminont12.lib")
 	OTHER_LIBS = os.path.join(gemsHome, "gmml/dat/CurrentParams/leaprc.ff12SB_2014-04-24/aminoct12.lib")
 except Exception as error:

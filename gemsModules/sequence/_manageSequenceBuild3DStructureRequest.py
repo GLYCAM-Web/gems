@@ -29,7 +29,7 @@ def manageSequenceBuild3DStructureRequest(self, defaultOnly: bool = False):
         )
         raise
 
-    ##  Build th structureInfo object
+    # Build the structureInfo object
     if self.transaction_out.entity is None :
         log.error("The entity in transaction_out does not exist.")
     if self.transaction_out.entity.outputs is None:
@@ -140,27 +140,23 @@ def manageSequenceBuild3DStructureRequest(self, defaultOnly: bool = False):
         #
         #  First, see if we should use a blocking call rather than the usual non-blocking call.
         #  Doing this is generally useful only for debugging.
-        #
         GEMS_FORCE_SERIAL_EXECUTION = os.environ.get(
             'GEMS_FORCE_SERIAL_EXECUTION')
         log.debug("GEMS_FORCE_SERIAL_EXECUTION: " +
                   str(GEMS_FORCE_SERIAL_EXECUTION))
-        #
+        # Now start the build process
+        from gemsModules.sequence.build import buildEach3DStructureInStructureInfo
         if GEMS_FORCE_SERIAL_EXECUTION == 'True':
-            #   use a blocking method:
-            build.buildEach3DStructureInStructureInfo(self)
+            buildEach3DStructureInStructureInfo(self)
         else:
-            #   using a non-blocking method:
-            p = logic.EverLastingProcess(
-                target=build.buildEach3DStructureInStructureInfo, args=(self,), daemon=False)
-            p.start()
-            #
-        #sequenceProjects.createDefaultSymLinkBuildsDirectory(projectDir, buildDir + conformerID)
-            # create downloadUrl
-            # submit to amber for minimization,
-            # update structureInfo_status.json again
-            # update project again
-            # append response to transaction
+            from gemsModules.common import logic as commonlogic
+            def buildArgs() : # This merely simplifies the multiprocessing.Process call below
+                buildEach3DStructureInStructureInfo(self)
+            import multiprocessing
+            detachedBuild=multiprocessing.Process(target=commonlogic.spawnDaemon, args=(buildArgs,))
+            detachedBuild.daemon=False
+            detachedBuild.start()
+
     except Exception as error:
         log.error(
             "There was a problem managing this sequence request: " + str(error))

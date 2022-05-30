@@ -247,7 +247,7 @@ def getCbBuilderForSequence(sequence: str):
     GemsPath = commonLogic.getGemsHome()
     log.debug("GemsPath: " + GemsPath )
 
-    prepfile = GemsPath + "/gemsModules/sequence/GLYCAM_06j-1.prep"
+    prepfile = GemsPath + "/gmml/dat/prep/GLYCAM_06j-1_GAGS.prep"
     if os.path.exists(prepfile):
         log.debug("Instantiating the carbohydrateBuilder.")
         builder = gmml.carbohydrateBuilder(sequence, prepfile)
