@@ -27,7 +27,7 @@ from typing import Dict, List, Optional, Sequence, Set, Tuple, Union, Any
 from pydantic import BaseModel, Field, Json
 from pydantic.schema import schema
 from gemsModules.project.jsoninterface import Project as Project
-from gemsModules.common.notices import Notice
+from gemsModules.common.notices import Notices
 from gemsModules.common.resources import Resource
 from gemsModules.common import settings
 
@@ -37,97 +37,17 @@ if loggingConfig.loggers.get(__name__):
 else:
     log = loggingConfig.createLogger(__name__)
 
-
-
-class NoticeTypes(str, Enum):
-    note = 'Note'
-    warning = 'Warning'
-    error = 'Error'
-    exit = 'Exit'
-
 # class Tags(BaseModel):
     # options : Dict[str,str] = Field(
     # None,
     #description='Key-value pairs that are specific to each entity, service, etc'
     # )
 
-
-class Notice(BaseModel):
-    """Description of a Notice."""
-    noticeType: NoticeTypes = Field(
-        None,
-        title='Type',
-        alias='type'
-    )
-    noticeCode: str = Field(
-        None,
-        title='Code',
-        alias='code',
-        description='Numeric code associated with this notice, for users who like this sort of thing.'
-    )
-    noticeBrief: str = Field(
-        None,
-        title='Brief',
-        alias='brief',
-        description='Brief title, status or name for this notice or notice type.'
-    )
-    noticeMessage: str = Field(
-        None,
-        title='Message',
-        alias='message',
-        description='A more detailed message for this notice.'
-    )
-    noticeScope: str = Field(
-        None,
-        title='Context of notice',
-        alias='scope',
-        description='The scope at which the error occured.'
-    )
-    messagingEntity: str = Field(
-        None,
-        title='Messaging Entity',
-        description='The Entity that raised the notice, if known.'
-    )
-    additionalInfo: Dict[str, str] = Field(
-        None,
-        description='Key-value pairs that are specific to each entity, service, etc'
-    )
-
-
-class Resource(BaseModel):
-    """Information describing a resource containing data."""
-    locationType: Json[str] = Field(
-        None,
-        title='Location Type',
-        description='Supported locations will vary with each Entity.'
-    )
-    resourceFormat: Json[str] = Field(
-        None,
-        title='Resource Format',
-        description='Supported formats will varu with each Entity.',
-    )
-    payload: Json[str] = Field(
-        None,
-        description='The thing that is described by the location and format'
-    )
-    notices: List[Notice] = None
-    options: Dict[str, str] = Field(
-        None,
-        description='Key-value pairs that are specific to each entity, service, etc'
-    )
-
-    def generateCommonParserNotice(self, *args, **kwargs):
-        self.notices.append(
-            settings.generateCommonParserNotice(*args, **kwargs))
-
 # ## Services
 # ##
-
-
 class Services(str, Enum):
     errorNotification = 'ErrorNotification'
     status = 'Status'
-
 
 class Service(BaseModel):
     """
@@ -171,7 +91,7 @@ class Response(Service):
             description='The type service that produced this response.'
             )
     outputs : Json = None
-    notices : List[Notice] = None
+    notices : Notices = Notices()
 
 
 class Entity(BaseModel):
@@ -189,7 +109,7 @@ class Entity(BaseModel):
     services : Dict[str,Service] = None
     responses : Dict[str,Response] = None
     resources : List[Resource] = None
-    notices : List[Notice] = None
+    notices : Notices = Notices()
     options : Dict[str,str] = Field(
             None,
             description='Key-value pairs that are specific to each entity, service, etc'
@@ -206,13 +126,13 @@ class TransactionSchema(BaseModel):
             None,
             description='Key-value pairs that are specific to each entity, service, etc'
             )
-    notices : List[Notice] = []
+    notices : Notices = Notices()
     class Config:
         title = 'gemsModulesCommonTransaction'
 
-    def generateCommonParserNotice(self, *args, **kwargs):
-        self.notices.append(
-            settings.generateCommonParserNotice(*args, **kwargs))
+#    def generateCommonParserNotice(self, *args, **kwargs):
+#        self.notices.append(
+#            settings.generateCommonParserNotice(*args, **kwargs))
 
 # ####
 # ####  Container for use in the modules
@@ -255,7 +175,9 @@ class Transaction:
             # log.debug(self.incoming_string)
             if self.incoming_string is None :
                 self.transaction_out = TransactionSchema()
-                self.transaction_out.generateCommonParserNotice(noticeBrief='InvalidInput', messagingEntity=commonSettings.WhoIAm)
+                self.transaction_out.notices.addDefaultNotice(
+                        brief='InvalidInput', 
+                        messenger=commonSettings.WhoIAm)
                 return
             # else : 
             #     self.request_dict = json.loads(self.incoming_string)        
@@ -301,11 +223,11 @@ class Transaction:
             return str(responseObject)
         
 
-    def generateCommonParserNotice(self, *args, **kwargs):
-        if self.transaction_out is None:
-            self.transaction_out = TransactionSchema()
-        self.transaction_out.generateCommonParserNotice(*args, **kwargs)
-    # delete this??
+#    def generateCommonParserNotice(self, *args, **kwargs):
+#        if self.transaction_out is None:
+#            self.transaction_out = TransactionSchema()
+#        self.transaction_out.generateCommonParserNotice(*args, **kwargs)
+
     def populate_transaction_in(self):
 
         self.transaction_in = TransactionSchema(**self.request_dict)

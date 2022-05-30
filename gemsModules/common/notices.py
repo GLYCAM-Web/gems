@@ -133,69 +133,69 @@ class Notices(BaseModel):
 
 
     def addDefaultNotice(self,
-            brief           : str  = 'UnknownError' ,  # Lookup keyword for the error
-            scope           : str  = None,             # Is this from entity? service? transaction?
-            messenger       : str  = None,             # Which entity sends this message?
-            noticeType      : str  = None,             # Error, Warning, Info
-            code            : str  = None,             # Numeric code because those can be useful
-            message         : str  = None,             # Human-readable brief description
-            additionalInfo  : Dict = None  # Free-form dictionary of data to return 
+            Brief           : str  = 'UnknownError' ,  # Lookup keyword for the error
+            Scope           : str  = None,             # Is this from entity? service? transaction?
+            Messenger       : str  = None,             # Which entity sends this message?
+            Type      : str  = None,             # Error, Warning, Info
+            Code            : str  = None,             # Numeric code because those can be useful
+            Message         : str  = None,             # Human-readable brief description
+            AdditionalInfo  : Dict = None  # Free-form dictionary of data to return 
             ):
         log.info("addDefaultNotice() was called.\n")
       
         baseNotice = None
 
         for N in self._defaultNoticeTypes :
-            if N.Brief == brief :
+            if N.Brief == Brief :
                 baseNotice = N
                 break
 
         if baseNotice is None :
-            errorMessage="Request to addDefaultNotice for unknown Brief -  " + brief 
+            errorMessage="Request to addDefaultNotice for unknown Brief -  " + Brief 
             log.error(errorMessage)
             for N in self._defaultNoticeTypes :
                 if N.Brief == 'UnknownError' :
                     baseNotice = N
                     break
-            if additionalInfo is None :
-                additionalInfo = {}
-            additionalInfo['commonServicerMessage']=errorMessage
+            if AdditionalInfo is None :
+                AdditionalInfo = {}
+            AdditionalInfo['commonServicerMessage']=errorMessage
 
-        if scope is None :
-            scope = baseNotice.Scope 
-        if noticeType is None :
-            noticeType = baseNotice.Type
-        if code is None :
-            code = baseNotice.Code
-        if messenger is None :
-            messenger = baseNotice.Messenger
-        if message is None :
-            message = baseNotice.Message
+        if Scope is None :
+            Scope = baseNotice.Scope 
+        if Type is None :
+            Type = baseNotice.Type
+        if Code is None :
+            Code = baseNotice.Code
+        if Messenger is None :
+            Messenger = baseNotice.Messenger
+        if Message is None :
+            Message = baseNotice.Message
 
-        self.addNotice(brief=brief, scope=scope, messenger=messenger, noticeType=noticeType, code=code, message=message, additionalInfo=additionalInfo)
+        self.addNotice(Brief=Brief, Scope=Scope, Messenger=Messenger, Type=Type, Code=Code, Message=Message, AdditionalInfo=AdditionalInfo)
 
 
     def addNotice(self,
-            brief           : str,    # Lookup keyword for the error
-            scope           : str,    # Is this from entity? service? transaction?
-            messenger       : str,    # Which entity sends this message?
-            noticeType      : str,    # Error, Warning, Info
-            code            : str,    # Numeric code because those can be useful
-            message         : str,    # Human-readable brief description
-            additionalInfo  : Dict = None  # Free-form dictionary of data to return 
+            Brief           : str,    # Lookup keyword for the error
+            Scope           : str,    # Is this from entity? service? transaction?
+            Messenger       : str,    # Which entity sends this message?
+            Type      : str,    # Error, Warning, Info
+            Code            : str,    # Numeric code because those can be useful
+            Message         : str,    # Human-readable brief description
+            AdditionalInfo  : Dict = None  # Free-form dictionary of data to return 
             ):
         log.info("addNotice() was called.\n")
         
         # Build the notice 
         thisNotice = Notice()
-        thisNotice.Brief=brief
-        thisNotice.Scope=scope
-        thisNotice.Type=noticeType
-        thisNotice.Code=code
-        thisNotice.Message=message
-        thisNotice.Messenger=messenger
-        if additionalInfo is not None : 
-            thisNotice.AdditionalInfo=additionalInfo
+        thisNotice.Brief=Brief
+        thisNotice.Scope=Scope
+        thisNotice.Type=Type
+        thisNotice.Code=Code
+        thisNotice.Message=Message
+        thisNotice.Messenger=Messenger
+        if AdditionalInfo is not None : 
+            thisNotice.AdditionalInfo=AdditionalInfo
     
         if self.__root__ is None:
             self.__root__ : List[Notice] = []
@@ -218,8 +218,8 @@ def showDefaultNotices():
 
 def testDefaultNoticeAddition():
     tempNotices=Notices()
-    #tempNotices.addDefaultNotice(brief='notKnownBrief')
-    tempNotices.addDefaultNotice(brief='GemsError')
+    #tempNotices.addDefaultNotice(Brief='notKnownBrief')
+    tempNotices.addDefaultNotice(Brief='GemsError')
     tempNotices.printNotices(style='terse',sendTo='stdout')
 
 

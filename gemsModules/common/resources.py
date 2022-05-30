@@ -57,9 +57,6 @@ class Resource(BaseModel):
             description='Key-value pairs that are specific to each entity, service, etc'
             )
 
-    def generateCommonParserNotice(self, *args, **kwargs) :
-        self.notices.append(settings.generateCommonParserNotice(*args, **kwargs))
-
 
 def generateSchema():
     print(Resource.schema_json(indent=2))
