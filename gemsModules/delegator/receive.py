@@ -1,22 +1,10 @@
 #!/usr/bin/env python3
-#from gems.gemsModules import common
-from tkinter import E
 import gemsModules
 from datetime import datetime
-# ###
-# ### Note comments about the following pairs
-# ###
-
 from gemsModules import common
-
-#import gemsModules.common.services as commonServices  # being deprecated
 import gemsModules.common.logic as commonLogic # replacing services
-# ###
-#import gemsModules.common.transaction as commonTransaction # being deprecated
+from gemsModules.delegator import settings
 import gemsModules.common.jsoninterface as commonIO # replacing transaction
-# ###
-# ###
-# ###
 from gemsModules.common.loggingConfig import *
 import traceback
 
@@ -39,22 +27,13 @@ def delegate(jsonObjectString):
     module for that entity, it passes the Transaction object over.
     """
 
+    log.info("delegate() was called.\n")
+    log.debug("incoming jsonObjectString: " + jsonObjectString)   
+    log.debug("incoming jsonObjectString type: " + str(type(jsonObjectString)))
+    # instantiate Transaction
+    log.debug("calling commonIO.Transaction")
     try:
-        log.info("delegate() was called.\n")
-        log.debug("incoming jsonObjectString: " + jsonObjectString)   
-        log.debug("incoming jsonObjectString type: " + str(type(jsonObjectString)))
-        # instantiate Transaction
-        log.debug("calling commonIO.Transaction")
-    except Exception as error:
-        errorMessage = "failed to read incoming jsonObjectString: " + str(error)
-        log.error(errorMessage)
-        #TODO: stuff error message into notice
-        return errorMessage 
-    
-    try:
-        #TODO validate jsonObjectString first
         log.debug("try to instantiate Transaction")  
-        
         thisTransaction = commonIO.Transaction(jsonObjectString)
         log.debug("thisTransaction.incoming_string: " + str(thisTransaction.incoming_string))
         log.debug("thisTransaction.transaction_in: " + str(thisTransaction.transaction_in))
@@ -63,6 +42,22 @@ def delegate(jsonObjectString):
         errorMessage = ("problem instantiating Transaction from string: " + str(jsonObjectString))
         log.error(errorMessage)
         log.error(traceback.format_exc())
+    
+    if thisTransaction.transaction_in.entity.entityType == settings.WhoIAm:
+        if thisTransaction.transaction_in.entity.services is None:
+            log.info("delegating to doDefaultService()")
+            thisTransaction.doDefaultService()
+            return thisTransaction.outgoing_string
+        for thisService in thisTransaction.transaction_in.entity.services:
+            log.debug("thisService: " + str(thisService))
+            if thisService.serviceName == 'Marco':
+                thisTransaction.initialize_transaction_out_from_transaction_in()
+                thisTransaction.transaction_out.entity.responses = []
+                thisTransaction.transaction_out.entity.responses.append({'payload':commonLogic.marco(settings.WhoIAm)})
+                thisTransaction.build_outgoing_string()
+                return thisTransaction.outgoing_string
+        return thisTransaction.response_string
+
         # figure out intent (is it okay to just return a jsonObject?)
         # errorTransaction = commonIO.Transaction(
         #         outgoingOnly=True, haveError=True, brief="GemsError", 
