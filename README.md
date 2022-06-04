@@ -1,3 +1,25 @@
+# GLYCAM Extensible Modeling Scripts (GEMS)
+
+This code serves as a convenient interface to the molecular modeling code
+in the [Glycam Molecular Modeling Library](https://github.com/GLYCAM-Web/gmml).
+
+The code is constantly in flux, but the main idea is that you use a JSON
+file as input to the bin/delegate script.  
+
+We need more docs.  Would you like to help?
+
+# Used by [GLYCAM-Web](https/glycam.org)
+
+This code also serves as the main interface to GLYCAM-Web.  Use of 
+this interface ensures that the services provided by the website give
+exactly the same results as you would get using GEMS on the command line.
+
+# Funding Sources
+
+We are very grateful to our funders.  
+[Please check them out!](https://github.com/GLYCAM-Web/website/blob/master/funding.md)
+
+
 # Installing GEMS (GLYCAM Extensible Modeling Script)
 
 This document is likely somewhat out of date.  We're working on that.
