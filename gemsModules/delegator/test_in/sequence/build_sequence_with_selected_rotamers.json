@@ -45,8 +45,8 @@
 							    ]
 						    },
 						    {
-							    "linkageLabel": "10",
-							    "indexOrderedLabel": "10", 
+							    "linkageLabel": "3",
+							    "indexOrderedLabel": "3", 
 							    "selectedRotamers": 
 							    [ 
 								    { "dihedralName": "omg", 
@@ -65,8 +65,8 @@
 							    ]
 						    },
 						    {
-							    "linkageLabel": "14",
-							    "indexOrderedLabel": "14", 
+							    "linkageLabel": "4",
+							    "indexOrderedLabel": "4", 
 							    "selectedRotamers": 
 							    [ 
 								    { "dihedralName": "omg", 
