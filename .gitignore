@@ -11,6 +11,11 @@ External
 UserSpace
 site
 *VERSIONS.sh
+*All-the-dot-py-files.txt
+*Full-dot-py-output.txt
+*all-dot-py-file-results.txt
+*SUCCESS-dot-py-file-results.txt
+*FAIL-dot-py-file-results.txt
 
 ## general things to ignore
 *__pycache__
