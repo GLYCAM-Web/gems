@@ -14,13 +14,15 @@ AllFiles=(
 USAGE="""
 Usage:
 
-	check-all-the-py-files.bash [ full | help ] 
+	check-all-the-py-files.bash [ full | remove | help ] 
 
 	where:
 
 		full = keep all the output from all the scripts
 			- this is optional. 
 		        - Normally, these go to /dev/null
+
+		remove = remove any previously generated files
 
 		help = display this message
 			- this is optional
@@ -61,6 +63,13 @@ What the script does:
 
 if [ "${1}" == "help" ] ; then
 	echo "${USAGE}"
+	exit 0
+fi
+
+if [ "${1}" == "remove" ] ; then
+	for file in ${AllFiles[@]} ; do
+		rm -f ${file}
+	done
 	exit 0
 fi
 
