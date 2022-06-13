@@ -22,10 +22,17 @@ servicesStatus = [
 
 ## Module names for services that this entity/module can perform.
 ## These should not include the Common Services.
-ServiceModule = {
+ServiceModule = {  # probably will be deprecated
     'delegate' : 'delegate',
     'ListEntities' : 'listEntities',
 }
+
+# Names of available services in JSON mapped to internal names
+AvailableServices = {
+        'Delegate' 
+        'ListEntities' 
+        'Marco' 
+        }
 
 ## Module names for entities that the Delegator knows about
 subEntities = {

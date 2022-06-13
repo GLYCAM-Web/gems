@@ -57,6 +57,9 @@ class Resource(BaseModel):
             description='Key-value pairs that are specific to each entity, service, etc'
             )
 
+class Resources(BaseModel):
+    __root__ : List[Resource] = None
+    
 
 def generateSchema():
     print(Resource.schema_json(indent=2))

@@ -28,8 +28,8 @@ from typing import Dict, List, Optional, Sequence, Set, Tuple, Union, Any
 from typing import ForwardRef
 from pydantic import BaseModel, Field, Json
 from pydantic.schema import schema
-import gemsModules.common.jsoninterface as commonio
-import gemsModules.project.jsoninterface as projectio
+import gemsModules.common.common_api as commonio
+import gemsModules.project.project_api as projectio
 from gemsModules.common.loggingConfig import *
 
 if loggers.get(__name__):
