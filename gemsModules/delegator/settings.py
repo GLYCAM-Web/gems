@@ -1,59 +1,79 @@
 #!/usr/bin/env python3
+import traceback
+from enum import Enum
+from gemsModules.common.loggingConfig import *
 
-## Who I am
+if loggers.get(__name__):
+    pass
+else:
+    log = createLogger(__name__)
+
+
 WhoIAm='Delegator'
 
-status = "Stable"
-moduleStatusDetail = "Can Delegate and ListEntities."
-
-servicesStatus = [
-    {
-        "service" : "delegate",
-        "status" : "Stable.",
-        "statusDetail" : "Can receive a request for an entity and service, validate the request, and forward the request to the appropriate entity."
-    },
-    {
-        "service" : "ListEntities",
-        "status" : "Stable.",
-        "statusDetail" : "Simply lists the entities that have been developed."
-    }
-]
-
-
-## Module names for services that this entity/module can perform.
-## These should not include the Common Services.
-ServiceModule = {  # probably will be deprecated
-    'delegate' : 'delegate',
-    'ListEntities' : 'listEntities',
-}
-
 # Names of available services in JSON mapped to internal names
-AvailableServices = {
-        'Delegate' 
-        'ListEntities' 
-        'Marco' 
-        }
+class AvailableServices(str, Enum) :
+    delegate     = 'Delegate'
+    listEntities = 'ListEntities'
+    marco        = 'Marco'
 
-## Module names for entities that the Delegator knows about
-subEntities = {
-    'BatchCompute' : 'batchcompute',
-    'CommonServices' : 'common',
-    'Conjugate' : 'conjugate',
-    'DrawGlycan' : 'drawglycan',
-    'Glycoprotein' : 'conjugate',
-    'MmService' : 'mmservice',
-    'Query' : 'query',
-    'Sequence' : 'sequence',
-    'Status' : 'status',
-    'StructureFile' : 'structureFile'
-}
+    @classmethod
+    def get_list(self):
+        theList = []
+        for item in self :
+            theList.append(item.value)
+        return theList
 
 
+## List of entities that the Delegator knows about
+class KnownEntities(str, Enum) :
+    batchcompute  = 'BatchCompute'
+    drawglycan    = 'DrawGlycan'
+    glycomimetic  = 'Glycomimetic'   
+    glycoprotein  = 'Glycoprotein'   
+    mmservice     = 'MmService'      
+    query         = 'Query'          
+    sequence      = 'Sequence'       
+    status        = 'Status'         
+    structureFile = 'StructureFile'  
 
+    @classmethod
+    def get_list(self):
+        theList = []
+        for item in self :
+            theList.append(item.value)
+        return theList
 
-def main():
-    print("Ths script only contains dictionary-type information.")
+## Module location for entities that the Delegator knows about
+class subEntities(str, Enum) :
+    BatchCompute   = 'batchcompute'
+    Delegator      = 'delegator'
+    DrawGlycan     = 'drawglycan'
+    Glycomimetic   = 'complex/glycoprotein'
+    Glycoprotein   = 'conjugate/glycoprotein'
+    MmService      = 'mmservice'
+    Query          = 'query'
+    Sequence       = 'sequence'
+    Status         = 'status'
+    StructureFile  = 'structureFile'
+
+    @classmethod
+    def get_list(self):
+        theList = []
+        for item in self :
+            theList.append(item.value)
+        return theList
 
 if __name__ == "__main__":
-  main()
+    print("This is my name:  " + str(WhoIAm))
+    print("The entities known to me are: ")
+    print(KnownEntities.get_list())
+    print("My available services are: ")
+    print(AvailableServices.get_list())
+
+    print("here is a subEntity entry")
+    theEntity='Delegator'
+    print(subEntities[theEntity].value)
+    print("here is a subEntity entry again")
+    print(subEntities['Delegator'].value)
 

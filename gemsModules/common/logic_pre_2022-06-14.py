@@ -30,20 +30,19 @@ def directoryExists(directory : str) :
 
 
 ##  Pass in the name of an entity, receive a module or an error.
-def importEntity(requestedModule):
+def importEntity(requestedEntity):
     log.info("importEntity() was called.\n")
-    log.debug("requestedModule: " + requestedModule)
-#    log.debug("Entities known to Common Services: " + str(settings.subEntities))
+    log.debug("requestedEntity: " + requestedEntity)
+    log.debug("Entities known to Common Services: " + str(settings.subEntities))
 
-#    try:
-#        requestedModule = '.' + settings.subEntities[requestedEntity]
-#        log.debug("requestedModule: " + requestedModule)
-#    except Exception as error:
-#        log.error("There was a problem finding the requested entity. Does it exist? requestedEntity: " + requestedEntity)
-#        log.error(traceback.format_exc())
-#        raise error
+    try:
+        requestedModule = '.' + settings.subEntities[requestedEntity]
+        log.debug("requestedModule: " + requestedModule)
+    except Exception as error:
+        log.error("There was a problem finding the requested entity. Does it exist? requestedEntity: " + requestedEntity)
+        log.error(traceback.format_exc())
+        raise error
 
-    requestedModule = '.' + requestedModule
     try:
         module_spec = importlib.util.find_spec(requestedModule,package="gemsModules")
         log.debug("module spec is : " + str(module_spec))
@@ -53,8 +52,8 @@ def importEntity(requestedModule):
         raise error
 
     if module_spec is None:
-        log.error("The module spec returned None for rquestedModule: " + requestedModule)
-        raise FileNotFoundError(requestedModule)
+        log.error("The module spec returned None for rquestedEntity: " + requestedEntity)
+        raise FileNotFoundError(requestedEntity)
 
     the_module = importlib.import_module(requestedModule,package="gemsModules")
     log.debug("the module: " + str(the_module))

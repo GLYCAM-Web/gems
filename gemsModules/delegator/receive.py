@@ -4,7 +4,8 @@ from datetime import datetime
 from gemsModules import common
 import gemsModules.common.logic as commonLogic # replacing services
 from gemsModules.delegator import settings
-import gemsModules.common.common_api as commonIO # replacing transaction
+#import gemsModules.common.common_api as commonIO # replacing transaction
+import gemsModules.delegator.delegator_api as delegatorIO # replacing transaction
 from gemsModules.common.loggingConfig import *
 import traceback
 
@@ -32,7 +33,8 @@ def receive(jsonObjectString):
     log.debug("calling commonIO.Transaction")
     try:
         log.debug("trying to instantiate Transaction")  
-        thisTransaction = commonIO.Transaction()
+        #thisTransaction = commonIO.Transaction()
+        thisTransaction = delegatorIO.Transaction()
         response_code = thisTransaction.process_incoming_string(
             in_string = jsonObjectString,  
             no_check_fields = True, 
@@ -50,15 +52,15 @@ def receive(jsonObjectString):
     if thisTransaction.transaction_in.entity.entityType == settings.WhoIAm :
         thisTransaction.process()
     else :
-     try:
-         import gemsModules.common.logic as logic_importEntity
-         theEntity = logic_importEntity(entityType)
-         log.debug("theEntity: " + str(theEntity))
-     except Exception as error:
-         error_msg = "There was a problem importing the entity: " + str(error)
-         log.error(error_msg)
-         log.error(traceback.format_exc())
-         thisTransaction.generateCommonParserNotice(messagingEntity='delegator', additionalInfo={"errorMessage":error_msg})
+        try:
+            import gemsModules.common.logic as logic_importEntity
+            theEntity = logic_importEntity(entityType)
+            log.debug("theEntity: " + str(theEntity))
+        except Exception as error:
+            error_msg = "There was a problem importing the entity: " + str(error)
+            log.error(error_msg)
+            log.error(traceback.format_exc())
+            thisTransaction.generateCommonParserNotice(messagingEntity='delegator', additionalInfo={"errorMessage":error_msg})
 
     return thisTransaction.outgoing_string
 

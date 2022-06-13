@@ -99,6 +99,9 @@ class Transaction:
     def doDefaultService(self) :
         self.marco()
 
+    def getEntityModuleName(self):
+        return 'common'
+
     def marco(self) :
         from . import logic as commonLogic
         if self.transaction_out is None :
@@ -109,7 +112,7 @@ class Transaction:
             self.transaction_out.entity.services.add_service(typename='Marco')
         self.transaction_out.entity.responses.add_response(
                 typename = thisEntity,
-                outputs = {'payload': commonLogic.marco(thisEntity)})
+                outputs = {'payload': commonLogic.marco(self.getEntityModuleName())})
         self.build_outgoing_string()
 
     def generate_error_response(self, Brief='UnknownError', EntityType=settings.WhoIAm) :

@@ -1,35 +1,12 @@
 #!/usr/bin/env python3
-#
-# ###############################################################
-# ##
-# ##  The gemsModules are being refactored.
-# ##  
-# ##  This file:
-# ##
-# ##      -  Will eventually hold the Transaction class
-# ##      -  Might not be in full use by all modules
-# ##
-# ##  The modules/Entities that are partially or wholly 
-# ##  changed so that they use this file are:
-# ##
-# ##      None yet.
-# ##
-# ##  Go see that module for examples, etc.
-# ##
-# ##  Please add your module to the list when you change 
-# ##  it, just to help reduce chaos.
-# ##
-# ##  Got a better accounting method?  Let's hear it!
-# ##
-# ###############################################################
 import traceback
-from enum import Enum, auto
-from typing import Dict, List, Optional, Sequence, Set, Tuple, Union, Any
-from typing import ForwardRef
-from pydantic import BaseModel, Field, Json
-from pydantic.schema import schema
+import gemsModules.common.services as commonservices
+from  gemsModules.common.entity import Entity as commonEntity
 import gemsModules.common.common_api as commonio
 import gemsModules.project.project_api as projectio
+import gemsModules.delegator.settings as delegatorsettings
+from pydantic import Field
+from typing import List
 from gemsModules.common.loggingConfig import *
 
 if loggers.get(__name__):
@@ -37,11 +14,46 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__)
 
+class DelegatorService(commonservices.Service) :
+    typename: delegatorsettings.AvailableServices = Field(
+        'Marco',
+        alias='type',
+        title='Service',
+        description='A service available from Delegator'
+    )
 
-class Entities(str, Enum):
-    commonServices = 'CommonServices'
-    delegator = 'Delegator'
-    project = 'Project'
-    sequence = 'Sequence'
 
+class DelegatorServices(commonservices.Services) :
+    __root__ : List[DelegatorService]
+
+class DelegatorEntity(commonEntity) :
+    Services : DelegatorServices
+
+
+class DelegatorAPI(commonio.TransactionSchema):
+    Entity : DelegatorEntity
+
+
+class Transaction(commonio.Transaction):
+    """
+    Storage for the input and output (the transaction) relevant to 
+    interaction via GEMS API.  Handling of the string prior to first
+    initialization of this class is usually the domain of delegator.
+    """
+    incoming_string: str = None
+    transaction_in: DelegatorAPI = None
+    transaction_out: DelegatorAPI = None
+    outgoing_string: str = None
+
+    def getEntityModuleName(self):
+        return delegatorsettings.subEntities[self.transaction_in.entity.entityType].value
+
+
+
+def generateSchema():
+    import json
+    print(Transaction.schema_json(indent=2))
+
+if __name__ == "__main__":
+    generateSchema()
 

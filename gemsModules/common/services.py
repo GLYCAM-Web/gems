@@ -4,6 +4,7 @@ from uuid import UUID
 from typing import Dict, List #, Optional, Sequence, Set, Tuple, Union, Any
 from pydantic import BaseModel, Field, Json
 from gemsModules.common.notices import Notices
+from gemsModules.common.settings import AvailableServices
 
 from gemsModules.common import loggingConfig 
 if loggingConfig.loggers.get(__name__):
