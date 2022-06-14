@@ -90,7 +90,6 @@ class Transaction:
         log.debug(self.transaction_in.json(indent=2))
 
     def process(self) :
-        print(self.transaction_in.entity.services.__root__)
         if self.transaction_in.entity.services.__root__ is None  or self.transaction_in.entity.services.__root__ == [] :
             self.doDefaultService()
         else :
