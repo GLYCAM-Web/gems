@@ -371,7 +371,7 @@ printf "WRAP_GMML: $WRAP_GMML\n\n"
 ################################################################
 
 cd gmml/
-./make.sh $CLEAN $WRAP_GMML -o $BUILD_LEVEL -j $NMP
+./make.sh $CLEAN $WRAP_GMML -o $BUILD_LEVEL -j $NMP  || { echo "ERROR BUILDING GEMS $0 FAILED, EXITING" ; exit 1; }
 cd ../
 
 ################################################################
