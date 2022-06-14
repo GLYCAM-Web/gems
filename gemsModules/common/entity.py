@@ -16,7 +16,7 @@ else:
 class Entity(BaseModel):
     """Holds information about the main object responsible for a service."""
     entityType : str = Field(
-            settings.WhoIAm,
+            ...,
             title='Type',
             alias='type'
             )

@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
+from re import A
 from typing import Dict #, List, Optional, Sequence, Set, Tuple, Union, Any
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, ValidationError, validator
 from gemsModules.project.project_api import Project as Project
 from gemsModules.common.entity import Entity
 from gemsModules.common.notices import Notices
 from gemsModules.common.services import Responses
+from gemsModules.common.options import Options
 from gemsModules.common import settings
+import traceback
 
 from gemsModules.common import loggingConfig 
 if loggingConfig.loggers.get(__name__):
@@ -14,14 +17,14 @@ else:
     log = loggingConfig.createLogger(__name__)
 
 
-class TransactionSchema(BaseModel):
+class CommonAPI(BaseModel):
     timestamp : str = None
-    entity  : Entity = None
+    entity  : Entity 
     project : Project = None
     prettyPrint : bool = False
     mdMinimize : bool = True
-    options : Dict[str,str] = Field(
-            None,
+    options : Options = Field(
+            Options(),
             description='Key-value pairs that are specific to each entity, service, etc'
             )
     notices : Notices = Notices()
@@ -35,8 +38,8 @@ class Transaction:
     initialization of this class is usually the domain of delegator.
     """
     incoming_string: str = None
-    transaction_in: TransactionSchema = None
-    transaction_out: TransactionSchema = None
+    transaction_in: CommonAPI = None
+    transaction_out: CommonAPI = None
     outgoing_string: str = None
 
     def __init__(self) :
@@ -64,7 +67,7 @@ class Transaction:
             errMsg = "problem with call to parse_raw() while instantiating transaction with: " + str(in_string)
             log.error(errMsg)
             log.error(traceback.format_exc())
-            self.generate_error_response(Brief='JsonParseEror')
+            self.generate_error_response(Brief='JsonParseEror',AdditionalInfo={'error': str(error)})
             return 1
 
     def initialize_transaction_out_from_transaction_in(self):
@@ -75,7 +78,7 @@ class Transaction:
 
     @validator('*',check_fields=False)
     def populate_transaction_in_no_check_fields(self, in_string : str):
-        self.transaction_in = TransactionSchema.parse_raw(in_string)
+        self.transaction_in = CommonAPI.parse_raw(in_string)
 
     def populate_transaction_in(self, 
         in_string : str, 
@@ -85,7 +88,7 @@ class Transaction:
         if no_check_fields:
             self.populate_transaction_in_no_check_fields(in_string)
         else: 
-            self.transaction_in = TransactionSchema.parse_raw(in_string)
+            self.transaction_in = CommonAPI.parse_raw(in_string)
         log.debug("The transaction_in is: ")
         log.debug(self.transaction_in.json(indent=2))
 
@@ -114,10 +117,9 @@ class Transaction:
                 outputs = {'payload': commonLogic.marco(self.getEntityModuleName())})
         self.build_outgoing_string()
 
-    def generate_error_response(self, Brief='UnknownError', EntityType=settings.WhoIAm) :
-        self.transaction_out = TransactionSchema()
-        sekf,transaction_out.entity.entityType = setings.WhoIAm
-        self.transaction_out.notices.addDefaultNotice(Brief=Brief)
+    def generate_error_response(self, Brief='UnknownError', EntityType=settings.WhoIAm, AdditionalInfo=None) :
+        self.transaction_out = CommonAPI.construct(entity=Entity.construct(entityType=EntityType))
+        self.transaction_out.notices.addDefaultNotice(Brief=Brief, Messenger=EntityType, AdditionalInfo=AdditionalInfo)
         self.build_outgoing_string()
 
     def getProjectIn(self):
@@ -152,11 +154,13 @@ class Transaction:
                 "There was a problem getting the project from transaction_out :  " + str(error))
             raise error
 
-    def build_outgoing_string(self):
+    def build_outgoing_string(self, prettyPrint=False, indent=2, prune_empty_values=True) :
         if self.transaction_out.prettyPrint is True:
-            self.outgoing_string = self.transaction_out.json(indent=2)
+            prettyPrint = True
+        if prettyPrint :
+            self.outgoing_string = self.transaction_out.json(indent=2,exclude_none=prune_empty_values)
         else:
-            self.outgoing_string = self.transaction_out.json()
+            self.outgoing_string = self.transaction_out.json(exclude_none=prune_empty_values)
 
     def get_outgoing_string(self):
         if self.outgoing_string is None or self.outgoing_string == "" :
@@ -165,7 +169,7 @@ class Transaction:
 
 def generateSchema():
     import json
-    print(TransactionSchema.schema_json(indent=2))
+    print(CommonAPI.schema_json(indent=2))
 
 if __name__ == "__main__":
     generateSchema()

@@ -5,10 +5,5 @@
 	 {"Marco" : { "type" : "Marco" }},
 	 {"ListEntities" : { "type" : "ListEntities" }},
 	 {"ReturnUsage" : { "type" : "ReturnUsage" }}
-  ],
-  "options" : 
-  { 
-	  "onError" : "abort" 
-  }
-  
+  ]
 }

@@ -27,10 +27,9 @@ class DelegatorServices(commonservices.Services) :
     __root__ : List[DelegatorService]
 
 class DelegatorEntity(commonEntity) :
-    Services : DelegatorServices
+    Services : DelegatorServices 
 
-
-class DelegatorAPI(commonio.TransactionSchema):
+class DelegatorAPI(commonio.CommonAPI) :
     Entity : DelegatorEntity
 
 

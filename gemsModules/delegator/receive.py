@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+from email import message_from_binary_file
+from re import A
+from pydantic import ValidationError
 import gemsModules
 from datetime import datetime
 from gemsModules import common
@@ -33,7 +36,6 @@ def receive(jsonObjectString):
     log.debug("calling commonIO.Transaction")
     try:
         log.debug("trying to instantiate Transaction")  
-        #thisTransaction = commonIO.Transaction()
         thisTransaction = delegatorIO.Transaction()
         response_code = thisTransaction.process_incoming_string(
             in_string = jsonObjectString,  
@@ -41,7 +43,8 @@ def receive(jsonObjectString):
             initialize_out = False 
             )
         if response_code != 0 :
-            thisTransaction.generate_error_response(Brief='GemsError', EntityType=settings.WhoIAm)
+            if thisTransaction.transaction_out is None:
+                thisTransaction.generate_error_response(Brief='GemsError', EntityType=settings.WhoIAm)
             return thisTransaction.get_outgoing_string()
     except Exception as error:
         errorMessage = ("problem instantiating Transaction from string: " + str(jsonObjectString))
@@ -52,17 +55,21 @@ def receive(jsonObjectString):
     if thisTransaction.transaction_in.entity.entityType == settings.WhoIAm :
         thisTransaction.process()
     else :
-        try:
-            import gemsModules.common.logic as logic_importEntity
-            theEntity = logic_importEntity(entityType)
-            log.debug("theEntity: " + str(theEntity))
-        except Exception as error:
-            error_msg = "There was a problem importing the entity: " + str(error)
-            log.error(error_msg)
-            log.error(traceback.format_exc())
-            thisTransaction.generateCommonParserNotice(messagingEntity='delegator', additionalInfo={"errorMessage":error_msg})
+        entityType = thisTransaction.transaction_in.entity.entityType
+        if entityType not in settings.KnownEntities.get_list() :
+            thisTransaction.generate_error_response(Brief='InvalidInput', EntityType=settings.WhoIAm, AdditionalInfo={'errorMessage': 'Entity type not recognized: ' + entityType})
+        else :
+            try:
+                import gemsModules.common.logic as logic_importEntity
+                theEntity = logic_importEntity(entityType)
+                log.debug("theEntity: " + str(theEntity))
+            except Exception as error:
+                error_msg = "There was a problem importing the entity: " + str(error)
+                log.error(error_msg)
+                log.error(traceback.format_exc())
+                thisTransaction.transaction_out.notices.addDefaultNotice(Messenger='Delegator', AdditionalInfo={"errorMessage":error_msg})
 
-    return thisTransaction.outgoing_string
+    return thisTransaction.get_outgoing_string()
 
 
 ##  Return the content of the current schema, as defined in CurrentStableSchema
