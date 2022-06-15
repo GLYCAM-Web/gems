@@ -1,32 +1,23 @@
 #!/usr/bin/env python3
 import traceback
-from enum import Enum
 from gemsModules.common.loggingConfig import *
+from gemsModules.common.utils import GemsStrEnum
 
 if loggers.get(__name__):
     pass
 else:
     log = createLogger(__name__)
 
-
 WhoIAm='Delegator'
 
 # Names of available services in JSON mapped to internal names
-class AvailableServices(str, Enum) :
+class AvailableServices(GemsStrEnum) :
     delegate     = 'Delegate'
     listEntities = 'ListEntities'
     marco        = 'Marco'
 
-    @classmethod
-    def get_list(self):
-        theList = []
-        for item in self :
-            theList.append(item.value)
-        return theList
-
-
 ## List of entities that the Delegator knows about
-class KnownEntities(str, Enum) :
+class KnownEntities(GemsStrEnum) :
     batchcompute  = 'BatchCompute'
     drawglycan    = 'DrawGlycan'
     glycomimetic  = 'Glycomimetic'   
@@ -37,15 +28,8 @@ class KnownEntities(str, Enum) :
     status        = 'Status'         
     structureFile = 'StructureFile'  
 
-    @classmethod
-    def get_list(self):
-        theList = []
-        for item in self :
-            theList.append(item.value)
-        return theList
-
 ## Module location for entities that the Delegator knows about
-class subEntities(str, Enum) :
+class subEntities(GemsStrEnum) :
     BatchCompute   = 'batchcompute'
     Delegator      = 'delegator'
     DrawGlycan     = 'drawglycan'
@@ -56,13 +40,6 @@ class subEntities(str, Enum) :
     Sequence       = 'sequence'
     Status         = 'status'
     StructureFile  = 'structureFile'
-
-    @classmethod
-    def get_list(self):
-        theList = []
-        for item in self :
-            theList.append(item.value)
-        return theList
 
 if __name__ == "__main__":
     print("This is my name:  " + str(WhoIAm))

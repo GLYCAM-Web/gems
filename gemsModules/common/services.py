@@ -58,7 +58,7 @@ class Response(Service):
     notices : Notices = Notices()
 
 class Services(BaseModel):
-    __root__ : List[Service] = None
+    __root__ : Dict[str,Service] = None
 
     def add_service(self,
             typename  = 'UnknownService',
@@ -86,7 +86,7 @@ class Services(BaseModel):
             return False
 
 class Responses(BaseModel):
-    __root__ : List[Response] = None
+    __root__ : Dict[str,Response] = None
 
     def add_response(self,
             typename : str = 'UnknownService',
@@ -108,8 +108,8 @@ class Responses(BaseModel):
 
 def generateSchema():
     import json
-    print(Service.schema_json(indent=2))
-    print(Response.schema_json(indent=2))
+    print(Services.schema_json(indent=2))
+#    print(Responses.schema_json(indent=2))
 
 if __name__ == "__main__":
     generateSchema()

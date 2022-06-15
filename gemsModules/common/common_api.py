@@ -42,9 +42,12 @@ class Transaction:
     transaction_out: CommonAPI = None
     outgoing_string: str = None
 
-    def __init__(self) :
-        log.info("called __init__ for Transaction")
-        pass
+#    def __init__(self) :
+#        log.info("called __init__ for Transaction")
+#        pass
+
+    def get_API_type(self):
+        return CommonAPI
 
     def process_incoming_string(self, 
             in_string : str,  # The JSON input string 
@@ -78,7 +81,8 @@ class Transaction:
 
     @validator('*',check_fields=False)
     def populate_transaction_in_no_check_fields(self, in_string : str):
-        self.transaction_in = CommonAPI.parse_raw(in_string)
+        self.transaction_in = self.get_API_type().parse_raw(in_string)
+#        self.transaction_in = CommonAPI.parse_raw(in_string)
 
     def populate_transaction_in(self, 
         in_string : str, 
@@ -88,7 +92,8 @@ class Transaction:
         if no_check_fields:
             self.populate_transaction_in_no_check_fields(in_string)
         else: 
-            self.transaction_in = CommonAPI.parse_raw(in_string)
+            self.transaction_in = self.get_API_type().parse_raw(in_string)
+#            self.transaction_in = CommonAPI.parse_raw(in_string)
         log.debug("The transaction_in is: ")
         log.debug(self.transaction_in.json(indent=2))
 

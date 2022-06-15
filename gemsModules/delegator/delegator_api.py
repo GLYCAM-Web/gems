@@ -3,10 +3,9 @@ import traceback
 import gemsModules.common.services as commonservices
 from  gemsModules.common.entity import Entity as commonEntity
 import gemsModules.common.common_api as commonio
-import gemsModules.project.project_api as projectio
 import gemsModules.delegator.settings as delegatorsettings
-from pydantic import Field
-from typing import List
+from pydantic import BaseModel,Field,Json,validator
+from typing import Dict, Optional
 from gemsModules.common.loggingConfig import *
 
 if loggers.get(__name__):
@@ -14,44 +13,59 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__)
 
-class DelegatorService(commonservices.Service) :
+class Delegator_Service(commonservices.Service) :
     typename: delegatorsettings.AvailableServices = Field(
         'Marco',
         alias='type',
         title='Service',
-        description='A service available from Delegator'
+        description='A connectivity assurance service.'
     )
 
+class Delegator_Services(commonservices.Services) :
+    __root__ : Dict[str, Delegator_Service] = None
 
-class DelegatorServices(commonservices.Services) :
-    __root__ : List[DelegatorService]
+class Delegator_Entity(commonEntity) :
+    services : Delegator_Services  = Field(
+        None,
+        description='Services available from Delegator')
 
-class DelegatorEntity(commonEntity) :
-    Services : DelegatorServices 
+class Delegator_API(commonio.CommonAPI) :
+    entity  : Delegator_Entity 
+    class Config:
+        title = 'gemsModulesDelegatorAPI'
 
-class DelegatorAPI(commonio.CommonAPI) :
-    Entity : DelegatorEntity
+class Delegator_Transaction(commonio.Transaction):
+    transaction_in: Delegator_API = None
+    transaction_out: Delegator_API = None
 
-
-class Transaction(commonio.Transaction):
-    """
-    Storage for the input and output (the transaction) relevant to 
-    interaction via GEMS API.  Handling of the string prior to first
-    initialization of this class is usually the domain of delegator.
-    """
-    incoming_string: str = None
-    transaction_in: DelegatorAPI = None
-    transaction_out: DelegatorAPI = None
-    outgoing_string: str = None
+    def get_API_type(self):
+        log.info("get_API_type was called from Delegator_Transaction")
+        return Delegator_API
 
     def getEntityModuleName(self):
         return delegatorsettings.subEntities[self.transaction_in.entity.entityType].value
 
+class Redirector_Entity(Delegator_Entity) :
+    services : Optional[Dict] = None
 
+class Redirector_API(Delegator_API):
+    entity  : Redirector_Entity 
+    project : Optional[Dict] = None
+    class Config:
+        title = 'gemsModulesDelegatorRedirectionAPI'
+
+class Redirector_Transaction(Delegator_Transaction):
+    transaction_in: Redirector_API = None
+    transaction_out: Redirector_API = None
+
+    def get_API_type(self):
+        log.info("get_API_type was called from Redirector_Transaction")
+        log.debug("the type of Redirector_API is: " + str(Redirector_API))
+        return Redirector_API
 
 def generateSchema():
     import json
-    print(Transaction.schema_json(indent=2))
+    print(Delegator_Transaction.schema_json(indent=2))
 
 if __name__ == "__main__":
     generateSchema()

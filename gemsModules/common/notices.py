@@ -17,7 +17,8 @@ class NoticeTypes(str, Enum):
     note = 'Note'
     warning = 'Warning'
     error = 'Error'
-    exit = 'Exit'
+#    exit = 'Exit'
+    fatal = 'Exit'
 
 
 class Notice(BaseModel):

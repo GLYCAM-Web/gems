@@ -7,7 +7,6 @@ from datetime import datetime
 from gemsModules import common
 import gemsModules.common.logic as commonLogic # replacing services
 from gemsModules.delegator import settings
-#import gemsModules.common.common_api as commonIO # replacing transaction
 import gemsModules.delegator.delegator_api as delegatorIO # replacing transaction
 from gemsModules.common.loggingConfig import *
 import traceback
@@ -33,13 +32,12 @@ def receive(jsonObjectString):
 
     log.info("delegate() was called.\n")
     log.debug("incoming jsonObjectString: " + jsonObjectString)   
-    log.debug("calling commonIO.Transaction")
     try:
-        log.debug("trying to instantiate Transaction")  
-        thisTransaction = delegatorIO.Transaction()
+        log.debug("trying to instantiate a Redirector_Transaction to determine where it should go.")  
+        thisTransaction = delegatorIO.Redirector_Transaction()
         response_code = thisTransaction.process_incoming_string(
             in_string = jsonObjectString,  
-            no_check_fields = True, 
+            no_check_fields = False, 
             initialize_out = False 
             )
         if response_code != 0 :
@@ -53,16 +51,23 @@ def receive(jsonObjectString):
 
     
     if thisTransaction.transaction_in.entity.entityType == settings.WhoIAm :
+        thisTransaction = delegatorIO.Delegator_Transaction()
         thisTransaction.process()
     else :
         entityType = thisTransaction.transaction_in.entity.entityType
-        if entityType not in settings.KnownEntities.get_list() :
-            thisTransaction.generate_error_response(Brief='InvalidInput', EntityType=settings.WhoIAm, AdditionalInfo={'errorMessage': 'Entity type not recognized: ' + entityType})
+        if entityType not in settings.subEntities.get_name_list() :
+            thisTransaction.generate_error_response(
+                Brief='InvalidInput', 
+                EntityType=settings.WhoIAm, 
+                AdditionalInfo={'errorMessage': 'Entity type not recognized: ' + entityType})
         else :
             try:
-                import gemsModules.common.logic as logic_importEntity
-                theEntity = logic_importEntity(entityType)
-                log.debug("theEntity: " + str(theEntity))
+                import gemsModules.common.logic as commonlogic
+                theEntityModuleName = settings.subEntities[entityType].value + '.receive.receive'
+                log.debug("theEntityModuleName: " + theEntityModuleName)
+                theEntityReceive = commonlogic.importEntity(theEntityModuleName)
+                log.debug("theEntityReceive: " + str(theEntityReceive))
+                return theEntityReceive(jsonObjectString)
             except Exception as error:
                 error_msg = "There was a problem importing the entity: " + str(error)
                 log.error(error_msg)
