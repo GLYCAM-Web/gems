@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
-from typing import Dict, List #, Optional, Sequence, Set, Tuple, Union, Any
 from pydantic import BaseModel, Field
 from gemsModules.common.notices import Notices
-from gemsModules.common import settings
 from gemsModules.common.services import Services, Responses
 from gemsModules.common.resources import Resources
 from gemsModules.common.options import Options

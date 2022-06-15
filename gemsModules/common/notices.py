@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # ###############################################################
-import traceback
-from enum import Enum, auto
+from gemsModules.common.utils import GemsStrEnum
 from typing import Dict, List
 from pydantic import BaseModel, Field, PrivateAttr
 from gemsModules.common.loggingConfig import *
@@ -13,11 +12,11 @@ else:
     log = createLogger(__name__)
 
 
-class NoticeTypes(str, Enum):
+class NoticeTypes(GemsStrEnum):
     note = 'Note'
     warning = 'Warning'
     error = 'Error'
-#    exit = 'Exit'
+#    exit = 'Exit' # can't use 'exit' as a variable name.
     fatal = 'Exit'
 
 

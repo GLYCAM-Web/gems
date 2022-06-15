@@ -1,18 +1,13 @@
 #!/usr/bin/env python3
-from enum import Enum, auto
-from typing import Dict, List, Optional, Sequence, Set, Tuple, Union, Any
-from typing import ForwardRef
+from typing import Dict, List, Any 
 from os.path import join
 from datetime import datetime
-from pydantic import BaseModel, Field, ValidationError, validator
-from pydantic.schema import schema
+from pydantic import BaseModel, Field
 from gemsModules.common.loggingConfig import *
-import gemsModules.common.jsoninterface as commonio
-import gemsModules.project.jsoninterface as projectio
+import gemsModules.common.common_api as commonio
+import gemsModules.project.project_api as projectio
 import gemsModules.project.projectUtilPydantic as projectUtils
 from gemsModules.sequence import settings
-from gemsModules.sequence import evaluate
-#from gemsModules import sequence 
 import traceback
 
 
@@ -570,9 +565,6 @@ class TheSequenceEvaluationOutput(BaseModel):
             return theVariant
 
 
-# ## These do not need to be named with 'sequence, e.g., 'sequenceService'.
-# ## Doing that just makes me feel more comfortable about referencing things.
-# ##
 # ## Regarding capitalization, my current ad-hoc convention:
 # ##    - initial is lower case = this is a child class of something else and
 # ##      the first word is the modifier.
@@ -851,7 +843,8 @@ class sequenceTransactionSchema(commonio.TransactionSchema):
                 scope='SequenceTransaction',
                 additionalInfo=thisAdditionalInfo
             )
-            raise error
+            return
+#            raise error
         self.entity.evaluateCondensedSequence()
 
 
@@ -871,10 +864,9 @@ class Transaction(commonio.Transaction):
         log.debug("The transaction_out is: ")
         log.debug(self.transaction_out.json(indent=2))
 
-    def doDefaultService():
-        from gemsModules.receive import doDefaultService
-        doDefaultService(self)
-        return self
+#    def doDefaultService(self):
+#        from gemsModules.sequence.receive import doDefaultService
+#        doDefaultService(self)
 
     def getRotamerDataIn(self):
         log.info("Transaction-Wrapper.getRotamerDataIn was called")
@@ -1083,7 +1075,8 @@ class Transaction(commonio.Transaction):
                 scope='TransactionWrapper.EvaluateCondensedSequence',
                 additionalInfo=thisAdditionalInfo
             )
-            raise error
+            return
+#            raise error
         if self.transaction_out is None:
             self.initialize_transaction_out_from_transaction_in()
         self.transaction_out.evaluateCondensedSequence()

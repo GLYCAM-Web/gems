@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from enum import Enum, auto
+from enum import Enum
 import traceback
 
 from gemsModules.common import loggingConfig 

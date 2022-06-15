@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-from re import A
-from typing import Dict #, List, Optional, Sequence, Set, Tuple, Union, Any
-from pydantic import BaseModel, Field, ValidationError, validator
+from pydantic import BaseModel, Field, validator
 from gemsModules.project.project_api import Project as Project
 from gemsModules.common.entity import Entity
 from gemsModules.common.notices import Notices

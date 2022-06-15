@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ##  Use this file to:
 ##    * Run the GEMS Delegator as a standalone script.
-import importlib.util, os, sys, getopt
+import importlib.util, os, sys
 
 USAGE="""
 USAGE:
@@ -61,25 +61,8 @@ if GEMSHOME is None or GEMSHOME == "" :  ## Fix the response object
 
 if importlib.util.find_spec("gemsModules") is None: 
     sys.path.append(GEMSHOME)
-#  this_dir, this_filename = os.path.split(__file__)
-#  sys.path.append(this_dir + "/../gemsModules/")
-#  if importlib.util.find_spec("common") is None:
-#    sys.stderr.write("Unable to locate Common Services.  Exiting.\n")
-#    sys.exit(129)
-#  else:
-#    from common import utils_pre_20220616 as utils
-#else:
 
-import gemsModules
-import gemsModules.delegator
 from gemsModules.common import utils_pre_20220616 as old_utils
-
-from datetime import datetime
-from gemsModules import common
-import gemsModules.common.logic as commonLogic # replacing services
-from gemsModules.delegator import settings
-import gemsModules.delegator.delegator_api as delegatorIO # replacing transaction
-
 jsonObjectString=old_utils.JSON_From_Command_Line(sys.argv)
 
 from gemsModules.delegator.receive import receive

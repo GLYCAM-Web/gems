@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-import traceback
 import gemsModules.common.services as commonservices
 from  gemsModules.common.entity import Entity as commonEntity
 import gemsModules.common.common_api as commonio
 import gemsModules.delegator.settings as delegatorsettings
-from pydantic import BaseModel,Field,Json,validator
+from pydantic import Field
 from typing import Dict, Optional
 from gemsModules.common.loggingConfig import *
 

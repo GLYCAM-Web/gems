@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
 import json, math, os, sys,importlib.util
-from datetime import datetime
-from gemsModules.common import settings
-#from gemsModules.common.notices import Notice
 from gemsModules.common.loggingConfig import *
 from typing import *
-from pydantic import BaseModel, ValidationError
 from pydantic.schema import schema
 from shutil import copyfile
 import traceback

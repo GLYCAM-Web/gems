@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
-from email import message_from_binary_file
-from re import A
-from pydantic import ValidationError
-import gemsModules
-from datetime import datetime
-from gemsModules import common
-import gemsModules.common.logic as commonLogic # replacing services
+import gemsModules.common.logic as commonLogic # replacing the old services
 from gemsModules.delegator import settings
 import gemsModules.delegator.delegator_api as delegatorIO # replacing transaction
 from gemsModules.common.loggingConfig import *

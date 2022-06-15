@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
-#
 import traceback
 from typing import Dict, List
-from pydantic import BaseModel, Field#, Json
-from pydantic.schema import schema
+from pydantic import BaseModel
 from gemsModules.common.loggingConfig import *
 
 if loggers.get(__name__):

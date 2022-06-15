@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-from enum import Enum, auto
+from enum import Enum
 from uuid import UUID
-from typing import Dict, List #, Optional, Sequence, Set, Tuple, Union, Any
+from typing import Dict, List 
 from pydantic import BaseModel, Field, Json
 from gemsModules.common.notices import Notices
 from gemsModules.common.settings import AvailableServices
