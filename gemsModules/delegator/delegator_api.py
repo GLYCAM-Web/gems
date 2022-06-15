@@ -26,7 +26,7 @@ class Delegator_Services(commonservices.Services) :
 
 class Delegator_Entity(commonEntity) :
     services : Delegator_Services  = Field(
-        None,
+        Delegator_Services(),
         description='Services available from Delegator')
 
 class Delegator_API(commonio.CommonAPI) :

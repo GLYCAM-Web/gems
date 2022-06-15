@@ -42,10 +42,6 @@ class Transaction:
     transaction_out: CommonAPI = None
     outgoing_string: str = None
 
-#    def __init__(self) :
-#        log.info("called __init__ for Transaction")
-#        pass
-
     def get_API_type(self):
         return CommonAPI
 
@@ -75,6 +71,7 @@ class Transaction:
 
     def initialize_transaction_out_from_transaction_in(self):
         log.info("initialize_transaction_out_from_transaction_in was called")
+        self.transaction_out = self.get_API_type() 
         self.transaction_out = self.transaction_in.copy(deep=True)
         log.debug("The transaction_out is: ")
         log.debug(self.transaction_out.json(indent=2))
@@ -82,7 +79,6 @@ class Transaction:
     @validator('*',check_fields=False)
     def populate_transaction_in_no_check_fields(self, in_string : str):
         self.transaction_in = self.get_API_type().parse_raw(in_string)
-#        self.transaction_in = CommonAPI.parse_raw(in_string)
 
     def populate_transaction_in(self, 
         in_string : str, 
@@ -93,7 +89,6 @@ class Transaction:
             self.populate_transaction_in_no_check_fields(in_string)
         else: 
             self.transaction_in = self.get_API_type().parse_raw(in_string)
-#            self.transaction_in = CommonAPI.parse_raw(in_string)
         log.debug("The transaction_in is: ")
         log.debug(self.transaction_in.json(indent=2))
 
@@ -110,7 +105,6 @@ class Transaction:
         return 'common'
 
     def marco(self) :
-        from . import logic as commonLogic
         if self.transaction_out is None :
             self.initialize_transaction_out_from_transaction_in()
         self.transaction_out.entity.responses = Responses()
@@ -119,7 +113,7 @@ class Transaction:
             self.transaction_out.entity.services.add_service(typename='Marco')
         self.transaction_out.entity.responses.add_response(
                 typename = thisEntity,
-                outputs = {'payload': commonLogic.marco(self.getEntityModuleName())})
+                outputs = {'payload': 'Polo'})
         self.build_outgoing_string()
 
     def generate_error_response(self, Brief='UnknownError', EntityType=settings.WhoIAm, AdditionalInfo=None) :

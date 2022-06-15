@@ -52,6 +52,13 @@ def receive(jsonObjectString):
     
     if thisTransaction.transaction_in.entity.entityType == settings.WhoIAm :
         thisTransaction = delegatorIO.Delegator_Transaction()
+        log.debug(str(thisTransaction))
+        print(str(thisTransaction))
+        response_code = thisTransaction.process_incoming_string( in_string = jsonObjectString,  )
+        if response_code != 0 :
+            if thisTransaction.transaction_out is None:
+                thisTransaction.generate_error_response(Brief='GemsError', EntityType=settings.WhoIAm)
+            return thisTransaction.get_outgoing_string()
         thisTransaction.process()
     else :
         entityType = thisTransaction.transaction_in.entity.entityType

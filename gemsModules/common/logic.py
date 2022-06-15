@@ -33,16 +33,6 @@ def directoryExists(directory : str) :
 def importEntity(requestedModule):
     log.info("importEntity() was called.\n")
     log.debug("requestedModule: " + requestedModule)
-#    log.debug("Entities known to Common Services: " + str(settings.subEntities))
-
-#    try:
-#        requestedModule = '.' + settings.subEntities[requestedEntity]
-#        log.debug("requestedModule: " + requestedModule)
-#    except Exception as error:
-#        log.error("There was a problem finding the requested entity. Does it exist? requestedEntity: " + requestedEntity)
-#        log.error(traceback.format_exc())
-#        raise error
-
     requestedModule = '.' + requestedModule
     try:
         module_spec = importlib.util.find_spec(requestedModule,package="gemsModules")
@@ -61,53 +51,53 @@ def importEntity(requestedModule):
     return the_module
 
 
-def getEntityTypeFromJson(jsonObjectString):
-    try:
-        temp_dict=json.loads(jsonObjectString)
-        thisEntityType = temp_dict['entity']['type']
-        return thisEntityType
-    except Exception as error:
-        error_msg = "There was a problem finding the entity type.  Here is more info: " + str(error)
-        log.error(error_msg)
-        log.error(traceback.format_exc())
-        return None
+#def getEntityTypeFromJson(jsonObjectString):
+    #try:
+        #temp_dict=json.loads(jsonObjectString)
+        #thisEntityType = temp_dict['entity']['type']
+        #return thisEntityType
+    #except Exception as error:
+        #error_msg = "There was a problem finding the entity type.  Here is more info: " + str(error)
+        #log.error(error_msg)
+        #log.error(traceback.format_exc())
+        #return None
 
 
-def getServicesFromJson(jsonObjectString):
-    try:
-        temp_dict=json.loads(jsonObjectString)
-        theServicesObject = temp_dict['entity']['services']
-        theServices=list(theServicesObject.keys())
-        return theServices
-    except Exception as error:
-        error_msg = "There was a problem finding the services.  Here is more info: " + str(error)
-        log.error(error_msg)
-        log.error(traceback.format_exc())
-        return None
+#def getServicesFromJson(jsonObjectString):
+    #try:
+        #temp_dict=json.loads(jsonObjectString)
+        #theServicesObject = temp_dict['entity']['services']
+        #theServices=list(theServicesObject.keys())
+        #return theServices
+    #except Exception as error:
+        #error_msg = "There was a problem finding the services.  Here is more info: " + str(error)
+        #log.error(error_msg)
+        #log.error(traceback.format_exc())
+        #return None
 
 
-def buildInvalidInputErrorResponse(
-        thisMessagingEntity : str = 'commonServicer',
-        message : str = 'No additional information available'):
-    responseSchema=common.io.TransactionSchema()
-    responseSchema.generateCommonParserNotice(
-        noticeBrief='InvalidInput',
-        messagingEntity=thisMessagingEntity,
-        additionalInfo={"errorMessage":message})
-    return responseSchema
+#def buildInvalidInputErrorResponse(
+        #thisMessagingEntity : str = 'commonServicer',
+        #message : str = 'No additional information available'):
+    #responseSchema=common.io.TransactionSchema()
+    #responseSchema.generateCommonParserNotice(
+        #noticeBrief='InvalidInput',
+        #messagingEntity=thisMessagingEntity,
+        #additionalInfo={"errorMessage":message})
+    #return responseSchema
 
 
-def marco(requestedEntity):
-    log.info("marco() was called.\n")
-    log.debug("The Marco method was called and is being fulfilled by CommonServices.")
-    theEntity = importEntity(requestedEntity)
-    log.debug("the returned entity is : " + str(theEntity))
-    module_spec = importlib.util.find_spec('receive',package=theEntity)
-    log.debug("module_spec is : " + str(module_spec))
-    if module_spec is None:
-        return "The entity you seek is not responding properly."
-    else:
-        return "Polo"
+#def marco(requestedEntity):
+    #log.info("marco() was called.\n")
+    #log.debug("The Marco method was called and is being fulfilled by CommonServices.")
+    #theEntity = importEntity(requestedEntity)
+    #log.debug("the returned entity is : " + str(theEntity))
+    #module_spec = importlib.util.find_spec('receive',package=theEntity)
+    #log.debug("module_spec is : " + str(module_spec))
+    #if module_spec is None:
+        #return "The entity you seek is not responding properly."
+    #else:
+        #return "Polo"
 
 def getTypesFromList(theList):
     log.info("getTypesFromList() was called.\n")
@@ -131,27 +121,27 @@ def getTypesFromList(theList):
 
 
 ## TODO make this more generic
-def listEntities(requestedEntity='Delegator'):
-  log.info("listEntities() was called.\n")
-  return list(settings.subEntities.keys())
+#def listEntities(requestedEntity='Delegator'):
+  #log.info("listEntities() was called.\n")
+  #return list(settings.subEntities.keys())
 
-def returnHelp(requestedEntity,requestedHelp):
-  log.info("returnHelp() was called.\n")
-  theEntity = importEntity(requestedEntity)
-  theHelp = entities.helpDict[requestedHelp]
-  if theHelp == 'schemaLocation':
-    schema_location = settings.getSchemaLocation()
-    return schema_location  ## TODO:  make this do something real
-  if not hasattr(theEntity, 'helpme'):
-    return "No help available for " + requestedEntity
-  helpLocation = getattr(theEntity, 'helpme')
-  if not hasattr(helpLocation,theHelp):
-    return "The requestedHelp is not available for " + requestedEntity
-  thisHelp =  getattr(helpLocation, theHelp)
-  if thisHelp is None:
-    return "Something went wrong getting the requestedHelp from " + requestedEntity
-  return thisHelp
-
+#def returnHelp(requestedEntity,requestedHelp):
+  #log.info("returnHelp() was called.\n")
+  #theEntity = importEntity(requestedEntity)
+  #theHelp = entities.helpDict[requestedHelp]
+  #if theHelp == 'schemaLocation':
+    #schema_location = settings.getSchemaLocation()
+    #return schema_location  ## TODO:  make this do something real
+  #if not hasattr(theEntity, 'helpme'):
+    #return "No help available for " + requestedEntity
+  #helpLocation = getattr(theEntity, 'helpme')
+  #if not hasattr(helpLocation,theHelp):
+    #return "The requestedHelp is not available for " + requestedEntity
+  #thisHelp =  getattr(helpLocation, theHelp)
+  #if thisHelp is None:
+    #return "Something went wrong getting the requestedHelp from " + requestedEntity
+  #return thisHelp
+#
 ##  Looks at currentStableSchema file and returns the version it finds there.
 def getCurrentStableJsonApiVersion():
     log.info("getCurrentStableJsonApiVersion() was called.\n")
@@ -202,7 +192,7 @@ def getFilesystemOutputPath() :
         log.debug("Got Filesystem Output Path from environment.  It is : " + gemsOutputPath)
         return ( 'Environment' , gemsOutputPath )
     # Currently, if not set by engironment variable, a default is used.
-    gemshome =  gemsModules.common.logic.getGemsHome()
+    gemshome =  getGemsHome()
     if gemshome is None or gemshome == "" :
         message = "Could not determine GEMSHOME.  Cannot set default filesystem output path."
         log.error(message)
@@ -236,7 +226,7 @@ def copyPathFileToPath( fromPath : str, fromName : str, toPath : str, noClobber 
             log.debug("noClobber set to True and the file already exists.  Not copying") 
             return
     sourceFile = os.path.join( fromPath, fromName )
-    desFile = os.path.join( toPath, fromName )
+    destFile = os.path.join( toPath, fromName )
     copyfile( sourceFile, destFile )
 
 ## Write a string to a file.
@@ -320,76 +310,76 @@ def make_relative_symbolic_link( path_down_to_source , path_down_to_dest_dir  , 
 
 ##  Give a transaction, return its requested entity type
 #   @param  transaction
-def getEntityType(thisTransaction):
-    log.info("getEntityType() was called.\n")
-    entity = thisTransaction.request_dict['entity']['type']
-    log.debug("entity: " + entity)
-    return entity
+#def getEntityType(thisTransaction):
+    #log.info("getEntityType() was called.\n")
+    #entity = thisTransaction.request_dict['entity']['type']
+    #log.debug("entity: " + entity)
+    #return entity
 
 ##  Send a transaction and a response. This method checks the response validity and
 #   updates the transaction with a response for you, though they may be errors.
 #   @param transaction
 #   @param responseConfig
-def appendResponse(thisTransaction, responseConfig):
-    log.info("common_logic appendResponse() was called.\n")
-    ## Check the responseConfig:
-    if 'entity' in responseConfig.keys():
-        entity = responseConfig['entity']
-        log.debug("entity: " + entity)
-    else:
-        log.error("Please add the entity type to your responseConfig object.")
-        thisTransaction.generateCommonParserNotice(noticeBrief =  'IncompleteResponseError')
-
-    if 'respondingService' in responseConfig.keys():
-        respondingService = responseConfig['respondingService']
-        log.debug("respondingService: " + respondingService)
-    else:
-        log.error("Please add a respondingService field to your responseConfig object.")
-        thisTransaction.generateCommonParserNotice(noticeBrief = 'IncompleteResponseError')
-
-    if 'responses' in responseConfig.keys():
-        responsesToWrite = responseConfig['responses']
-        if entity is not None and respondingService is not None and responsesToWrite is not None:
-            if thisTransaction.response_dict == None:
-                thisTransaction.response_dict = {}
-
-            if 'entity' not in thisTransaction.response_dict.keys():
-                thisTransaction.response_dict['entity'] = {}
-                thisTransaction.response_dict['entity']['type'] = entity
-
-            if 'timestamp' not in thisTransaction.response_dict.keys():
-                timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-                log.debug("timestamp: " + timestamp)
-                thisTransaction.response_dict['timestamp'] = timestamp
-
-            if 'responses' not in thisTransaction.response_dict['entity'].keys():
-                thisTransaction.response_dict['entity']['responses'] = []
-
-            for response in responsesToWrite:
-                resource = {respondingService : response }
-                log.debug("Adding a resource to the response: " + str(resource))
-                thisTransaction.response_dict['entity']['responses'].append(resource)
-            # if 'echoed_response' not in thisTransaction.response_dict.keys():
-            #     thisTransaction.response_dict['echoed_response'] = {}
-
-            # if 'payload' not in thisTransaction.response_dict['echoed_response']:
-            #     thisTransaction.response_dict['echoed_response']['payload'] = {}
-
-            # thisTransaction.response_dict['echoed_response']['payload'] = "echoed payload goes here"
-
-            try:
-                TransactionSchema(**thisTransaction.response_dict)
-                log.debug("Passes validation against schema.")
-            except ValidationError as e:
-                log.error("Validation Error: " + str(e))
-                log.error(traceback.format_exc())
-                thisTransaction.generateCommonParserNotice(noticeBrief = 'JsonParseEror')
-        else:
-            log.Error("Incomplete responseConfig.")
-            thisTransaction.generateCommonParserNotice(noticeBrief = 'IncompleteResponseError')
-    else:
-        log.error("Please add at a list of responses to your responseConfig object.")
-        thisTransaction.generateCommonParserNotice(noticeBrief = 'IncompleteResponseError')
+#def appendResponse(thisTransaction, responseConfig):
+    #log.info("common_logic appendResponse() was called.\n")
+    ### Check the responseConfig:
+    #if 'entity' in responseConfig.keys():
+        #entity = responseConfig['entity']
+        #log.debug("entity: " + entity)
+    #else:
+        #log.error("Please add the entity type to your responseConfig object.")
+        #thisTransaction.generateCommonParserNotice(noticeBrief =  'IncompleteResponseError')
+#
+    #if 'respondingService' in responseConfig.keys():
+        #respondingService = responseConfig['respondingService']
+        #log.debug("respondingService: " + respondingService)
+    #else:
+        #log.error("Please add a respondingService field to your responseConfig object.")
+        #thisTransaction.generateCommonParserNotice(noticeBrief = 'IncompleteResponseError')
+#
+    #if 'responses' in responseConfig.keys():
+        #responsesToWrite = responseConfig['responses']
+        #if entity is not None and respondingService is not None and responsesToWrite is not None:
+            #if thisTransaction.response_dict == None:
+                #thisTransaction.response_dict = {}
+#
+            #if 'entity' not in thisTransaction.response_dict.keys():
+                #thisTransaction.response_dict['entity'] = {}
+                #thisTransaction.response_dict['entity']['type'] = entity
+#
+            #if 'timestamp' not in thisTransaction.response_dict.keys():
+                #timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+                #log.debug("timestamp: " + timestamp)
+                #thisTransaction.response_dict['timestamp'] = timestamp
+#
+            #if 'responses' not in thisTransaction.response_dict['entity'].keys():
+                #thisTransaction.response_dict['entity']['responses'] = []
+#
+            #for response in responsesToWrite:
+                #resource = {respondingService : response }
+                #log.debug("Adding a resource to the response: " + str(resource))
+                #thisTransaction.response_dict['entity']['responses'].append(resource)
+            ## if 'echoed_response' not in thisTransaction.response_dict.keys():
+            ##     thisTransaction.response_dict['echoed_response'] = {}
+#
+            ## if 'payload' not in thisTransaction.response_dict['echoed_response']:
+            ##     thisTransaction.response_dict['echoed_response']['payload'] = {}
+#
+            ## thisTransaction.response_dict['echoed_response']['payload'] = "echoed payload goes here"
+#
+            #try:
+                #TransactionSchema(**thisTransaction.response_dict)
+                #log.debug("Passes validation against schema.")
+            #except ValidationError as e:
+                #log.error("Validation Error: " + str(e))
+                #log.error(traceback.format_exc())
+                #thisTransaction.generateCommonParserNotice(noticeBrief = 'JsonParseEror')
+        #else:
+            #log.Error("Incomplete responseConfig.")
+            #thisTransaction.generateCommonParserNotice(noticeBrief = 'IncompleteResponseError')
+    #else:
+        #log.error("Please add at a list of responses to your responseConfig object.")
+        #thisTransaction.generateCommonParserNotice(noticeBrief = 'IncompleteResponseError')
 
 
 
@@ -397,110 +387,110 @@ def appendResponse(thisTransaction, responseConfig):
 ##  @details This creates the response bits that are common to all responses.
 ##           Send one response at a time. Create the response using Pydantic-enabled classes in 
 ##           your gemsModule's io.py.
-def updateResponse(thisTransaction, serviceResponse):
-    log.info("common.logic updateResponse() was called.\n")
-    log.debug("type of serviceResponse obj: " + str(type(serviceResponse)))
-    log.debug("serviceResponse.keys: " + str(serviceResponse.keys()))
-
-    if thisTransaction.response_dict == None:
-        log.debug("No response_dict yet. Creating it now.")
-        thisTransaction.response_dict = {}
-    else:
-        log.debug("Response dict already exists")
-
-    ## Remember this could be called several times. Don't overwrite existing responses.
-    # Entity contains type, services, inputs, and responses.
-    # Type already validated if we reach this point. Copy over from request.
-    if 'entity' not in thisTransaction.response_dict.keys():
-        log.debug("No entity in the response yet. Creating it now.")
-        thisTransaction.response_dict['entity'] = {}
-        try:
-            requestedEntity = thisTransaction.request_dict['entity']['type']
-        except Exception as error:
-            log.error("There was no entity type to be found in the transaction's request_dict.")
-            log.error(traceback.format_exc())
-            thisTransaction.generateCommonParserNotice(noticeBrief = 'InvalidInput') 
-        else:
-            thisTransaction.response_dict['entity']['type'] = requestedEntity
-    else:
-        log.debug("Entity already exists.")
-
-    ## services already validated if we reach this point. Copy over from request.
-    if 'services' not in thisTransaction.response_dict['entity'].keys():
-        thisTransaction.response_dict['entity']['services'] = []
-    else:
-        log.debug("Services object already exists.")
-
-    log.debug("serviceResponse['type']: " + serviceResponse['typename'])
-
-    try:
-        serviceType = serviceResponse['type']
-        responseServices = thisTransaction.response_dict['entity']['services']
-        serviceListed = False
-        log.debug("responseServices: " + repr(responseServices))
-        #[{'Evaluate': {'type': 'Evaluate'}}, {'Build3DStructure': {'type': 'Build3DStructure'}}]
-        for service in responseServices:
-            log.debug("service keys: " + str(service.keys()))
-            if serviceType in service.keys():
-                serviceListed = True
-        if serviceListed == False:
-            requestedService = { 
-                serviceType  :  {
-                    "type" : serviceType
-                }
-            }
-            log.debug("Adding service to json response object services list: " + str(requestedService))
-            thisTransaction.response_dict['entity']['services'].append(requestedService)
-        else:
-            log.debug("Service already listed. Skipping.")
-
-    except Exception as error:
-        log.error("There was a problem adding the requested service: " + str(error))
-        log.error(traceback.format_exc())
+#def updateResponse(thisTransaction, serviceResponse):
+    #log.info("common.logic updateResponse() was called.\n")
+    #log.debug("type of serviceResponse obj: " + str(type(serviceResponse)))
+    #log.debug("serviceResponse.keys: " + str(serviceResponse.keys()))
+#
+    #if thisTransaction.response_dict == None:
+        #log.debug("No response_dict yet. Creating it now.")
+        #thisTransaction.response_dict = {}
+    #else:
+        #log.debug("Response dict already exists")
+#
+    ### Remember this could be called several times. Don't overwrite existing responses.
+    ## Entity contains type, services, inputs, and responses.
+    ## Type already validated if we reach this point. Copy over from request.
+    #if 'entity' not in thisTransaction.response_dict.keys():
+        #log.debug("No entity in the response yet. Creating it now.")
+        #thisTransaction.response_dict['entity'] = {}
+        #try:
+            #requestedEntity = thisTransaction.request_dict['entity']['type']
+        #except Exception as error:
+            #log.error("There was no entity type to be found in the transaction's request_dict.")
+            #log.error(traceback.format_exc())
+            #thisTransaction.generateCommonParserNotice(noticeBrief = 'InvalidInput') 
+        #else:
+            #thisTransaction.response_dict['entity']['type'] = requestedEntity
+    #else:
+        #log.debug("Entity already exists.")
+#
+    ### services already validated if we reach this point. Copy over from request.
+    #if 'services' not in thisTransaction.response_dict['entity'].keys():
+        #thisTransaction.response_dict['entity']['services'] = []
+    #else:
+        #log.debug("Services object already exists.")
+#
+    #log.debug("serviceResponse['type']: " + serviceResponse['typename'])
+#
+    #try:
+        #serviceType = serviceResponse['type']
+        #responseServices = thisTransaction.response_dict['entity']['services']
+        #serviceListed = False
+        #log.debug("responseServices: " + repr(responseServices))
+        ##[{'Evaluate': {'type': 'Evaluate'}}, {'Build3DStructure': {'type': 'Build3DStructure'}}]
+        #for service in responseServices:
+            #log.debug("service keys: " + str(service.keys()))
+            #if serviceType in service.keys():
+                #serviceListed = True
+        #if serviceListed == False:
+            #requestedService = { 
+                #serviceType  :  {
+                    #"type" : serviceType
+                #}
+            #}
+            #log.debug("Adding service to json response object services list: " + str(requestedService))
+            #thisTransaction.response_dict['entity']['services'].append(requestedService)
+        #else:
+            #log.debug("Service already listed. Skipping.")
+#
+    #except Exception as error:
+        #log.error("There was a problem adding the requested service: " + str(error))
+        #log.error(traceback.format_exc())
 
 
     ## inputs already validated if we reach this point. Copy over from request.
-    if 'inputs' not in thisTransaction.response_dict['entity'].keys():
-        thisTransaction.response_dict['entity']['inputs'] = []
-        try:
-            requestInputs = thisTransaction.request_dict['entity']['inputs']
-            thisTransaction.response_dict['entity']['inputs']  = requestInputs
-        except Exception as error:
-            log.error("No inputs found in request.")
-            log.error(traceback.format_exc())
-            thisTransaction.generateCommonParserNotice(noticeBrief = 'InvalidInput')
+    #if 'inputs' not in thisTransaction.response_dict['entity'].keys():
+        #thisTransaction.response_dict['entity']['inputs'] = []
+        #try:
+            #requestInputs = thisTransaction.request_dict['entity']['inputs']
+            #thisTransaction.response_dict['entity']['inputs']  = requestInputs
+        #except Exception as error:
+            #log.error("No inputs found in request.")
+            #log.error(traceback.format_exc())
+            #thisTransaction.generateCommonParserNotice(noticeBrief = 'InvalidInput')
+#
+#
+    #log.debug("responding entity: " + thisTransaction.response_dict['entity']['type'])
+#
+    ### Timestamp for the creation of this response. Overwrites if multiple responses
+    ###  are added. Represents the time of the addition of the final response.
+    #timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+    #log.debug("response_timestamp: " + timestamp)
+    #thisTransaction.response_dict['response_timestamp'] = timestamp
+#
+#
+    #####################################################################
+#
+    #if 'responses' not in thisTransaction.response_dict['entity'].keys():
+        #thisTransaction.response_dict['entity']['responses'] = []
+#
+    #thisTransaction.response_dict['entity']['responses'].append(serviceResponse)
 
-
-    log.debug("responding entity: " + thisTransaction.response_dict['entity']['type'])
-
-    ## Timestamp for the creation of this response. Overwrites if multiple responses
-    ##  are added. Represents the time of the addition of the final response.
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-    log.debug("response_timestamp: " + timestamp)
-    thisTransaction.response_dict['response_timestamp'] = timestamp
-
-
-    ####################################################################
-
-    if 'responses' not in thisTransaction.response_dict['entity'].keys():
-        thisTransaction.response_dict['entity']['responses'] = []
-
-    thisTransaction.response_dict['entity']['responses'].append(serviceResponse)
-
-    try:
-        log.debug("response_dict obj type: " + str(type(thisTransaction.response_dict)))
-        log.debug("Response_dict before validation: ")
-
-        ##Breaking here. 
-        prettyPrint(thisTransaction.response_dict)
-
-        TransactionSchema(**thisTransaction.response_dict)
-
-        log.debug("Passes validation against schema.")
-    except ValidationError as e:
-        log.error("Validation Error while responding to: " + requestedEntity + e.json())
-        log.error(traceback.format_exc())
-        thisTransaction.generateCommonParserNotice(noticeBrief = 'JsonParseEror')
+    #try:
+        #log.debug("response_dict obj type: " + str(type(thisTransaction.response_dict)))
+        #log.debug("Response_dict before validation: ")
+#
+        ###Breaking here. 
+        #prettyPrint(thisTransaction.response_dict)
+#
+        #TransactionSchema(**thisTransaction.response_dict)
+#
+        #log.debug("Passes validation against schema.")
+    #except ValidationError as e:
+        #log.error("Validation Error while responding to: " + requestedEntity + e.json())
+        #log.error(traceback.format_exc())
+        #thisTransaction.generateCommonParserNotice(noticeBrief = 'JsonParseEror')
 
 ##  @brief Convenience method for cleaning and speeding up log reading of dict objects.
 #   @detail Useful for assessing json objects.
@@ -646,7 +636,7 @@ def main():
     data=utils.JSON_From_Command_Line(sys.argv)
     print("The object is:")
     print(data)
-    from gemsModules.common.io import Transaction 
+    from gemsModules.common.common_api import Transaction 
     thisTransaction=Transaction(data)
     thisTransaction.populate_transaction_in()
     print("Finished initializing. ")

@@ -2,8 +2,6 @@
 ##  Use this file to:
 ##    * Run the GEMS Delegator as a standalone script.
 import importlib.util, os, sys, getopt
-#import faulthandler
-#faulthandler.enable()
 
 USAGE="""
 USAGE:
@@ -45,21 +43,47 @@ if len(sys.argv) > 1:
         sys.exit(1)
 
 
-if importlib.util.find_spec("gemsModules") is None:
-  this_dir, this_filename = os.path.split(__file__)
-  sys.path.append(this_dir + "/../gemsModules/")
-  if importlib.util.find_spec("common") is None:
-    sys.stderr.write("Unable to locate Common Services.  Exiting.\n")
-    sys.exit(129)
-  else:
-    from common import utils
-else:
-  from gemsModules.common import utils
-jsonObjectString=utils.JSON_From_Command_Line(sys.argv)
+GEMSHOME = os.environ.get('GEMSHOME')
+if GEMSHOME is None or GEMSHOME == "" :  ## Fix the response object
+    responseObject = { 
+            'DelegatorNotice' : { 
+                'type' : 'IndexError', 
+                'notice' : { 
+                    'code' : '500', 
+                    'brief' : 'GemshomeNotSet!',
+                    'noticeType' : 'Error',
+                    'message' : 'GEMSHOME is not set in the delegator environment.',
+                    'scope' : 'Delegator',
+                    'messenger' : 'Delegator'
+                    }
+                }
+            }
 
+if importlib.util.find_spec("gemsModules") is None: 
+    sys.path.append(GEMSHOME)
+#  this_dir, this_filename = os.path.split(__file__)
+#  sys.path.append(this_dir + "/../gemsModules/")
+#  if importlib.util.find_spec("common") is None:
+#    sys.stderr.write("Unable to locate Common Services.  Exiting.\n")
+#    sys.exit(129)
+#  else:
+#    from common import utils_pre_20220616 as utils
+#else:
 
-from gemsModules.delegator.receive import delegate
-responseObjectString=delegate(jsonObjectString)
+import gemsModules
+import gemsModules.delegator
+from gemsModules.common import utils_pre_20220616 as old_utils
+
+from datetime import datetime
+from gemsModules import common
+import gemsModules.common.logic as commonLogic # replacing services
+from gemsModules.delegator import settings
+import gemsModules.delegator.delegator_api as delegatorIO # replacing transaction
+
+jsonObjectString=old_utils.JSON_From_Command_Line(sys.argv)
+
+from gemsModules.delegator.receive import receive
+responseObjectString=receive(jsonObjectString)
 sys.stdout.write(responseObjectString)
 
 
