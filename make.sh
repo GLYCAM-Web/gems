@@ -244,8 +244,6 @@ check_pull_mdutils() {
 #########                CHECK SETTINGS                #########
 ################################################################
 
-echo "Starting installation of GEMS at `date`".
-
 gemshome=`pwd`
 check_gemshome $gemshome
 check_gmmldir $GEMSHOME/gmml
@@ -291,26 +289,36 @@ cp -r $GEMSHOME/.hooks/* $GEMSHOME/.git/hooks/
 ##########               Print help message         ############
 ################################################################
 
-if [[ "$1" == "-help" ]] || [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]]; then
-    printf "*************************************************************\n"
-    printf "Usage: $0 clean_gmml? debug_gmml wrap_gmml?\n"
-    printf "Example: $0 clean no_wrap\n"
-    printf "Default: $0 no_clean wrap\n"
-    printf "*************************************************************\n"
-    printf "If selected the options do this:\n"
-    printf "     1. Cleans gmml before making.\n"
-    printf "     2. Build gmml with debugging options.\n"
-    printf "     3. Wrap up via swig (wrapping required only for GEMS).\n"
-    printf "*************************************************************\n"
+printHelp()
+{
+    echo "*************************************************************"
+	echo "This make script will both compile and wrap GMML so it is usable."
+	echo "by GEMS (this codebase)"
+	echo ""
+	echo "This is for using GMML and GEMS in isolation! GMML will be wrapped"
+	echo "using swig by this script, how you interface with said code is up"
+	echo "to you!"
+	echo ""
+	echo "GEMSHOME should be set to the current GEMS directory."
+	printf "*************************************************************\n"
+	printf "Please note that once GEMS is built, you can test it by running:\n"
+	printf "./test_installation.bash\n"
+	printf "*************************************************************\n"
+	printf "Options are as follows:\n"
+	printf "\t-c\t\t\tClean all files from previous builds\n"
+	printf "\t-j <NUM_JOBS>\t\tBuild and wrap GMML with <NUM_JOBS>\n"
+	printf "\t-o <O0/O2/OG/debug>\tBuild and wrap GMML using no optimization, 2nd \n\t\t\t\tlevel optimization, or with debug symbols\n"
+    printf "\t-h\t\t\tPrint this help message and exit\n"
+	printf "*************************************************************\n"
     printf "These environment variables are also used:\n"
     printf "GEMSHOME: The path of the top level directory of GEMS.\n"
     printf "GEMSMAKEPROCS: The parallelism of make; optional, default is 4.\n"
     printf "PYTHON_HOME: The path of the top level directory of Python 3.\n"
     printf "PYTHON_HEADER_HOME: The path of Python.h; optional, default is PYTHON_HOME.\n"
     printf "*************************************************************\n"
-    echo "Exiting."
-    exit 1
-fi
+	echo "Exiting."
+	exit 1
+}
 
 ################################################################
 #########                SET UP DEFAULTS               #########
@@ -320,58 +328,62 @@ fi
 CLEAN=""
 BUILD_LEVEL="O2"
 TARGET_MAKE_FILE="Makefile"
-WRAP_GMML="-w"
+#This is not needed, if we are trying to use gems we HAVE to wrap gmml
+#WRAP_GMML="-w"
 
 ################################################################
 #########               COMMAND LINE INPUTS            #########
 ################################################################
-i=1
-while [ ${i} -le $# ]; do
-    argument="${!i}"
-    if [ "$argument" = "clean" ]||[ "$argument" = "no_clean" ];then
-        if [ "$argument" = "clean" ]; then
-			CLEAN="-c"
-	fi
-    elif [ "$argument" = "wrap" ]||[ "$argument" = "no_wrap" ];then
-        if [ "$argument" = "no_wrap" ]; then
-			WRAP_GMML=""
-	fi
-    elif [ "$argument" = "optimize" ]||[ "$argument" = "no_optimize" ]||[ "$argument" = "O1" ]||[ "$argument" = "O2" ]||[ "$argument" = "debug" ]||[ "$argument" = "no_debug" ];then
-
-	if [ "$argument" = "O1" ]||[ "$argument" = "O2" ]||[ "$argument" = "optimize" ]; then
-		BUILD_LEVEL=O2
-	elif [ "$argument" = "no_optimize" ]; then
-		BUILD_LEVEL=O0
-	elif [ "$argument" = "debug" ];then
-		BUILD_LEVEL=OG
-        fi
-    elif [ "$argument" = "jobs" ];then
-	i=$[$i+1]
-	NMP="${!i}"		
-    fi
-    i=$[$i+1]
+while getopts "j:o:ch" option
+do
+	case "${option}" in
+			j)
+				jIn="${OPTARG}"
+				if [[ "${jIn}" =~ ^[1-9][0-9]*$ ]]; then
+					NMP="${jIn}"
+				else
+					printHelp
+				fi
+				;;
+			o)
+				oIn="${OPTARG}"
+				if [ "${oIn}" == "O0" ] || [ "${oIn}" == "no_optimize" ]; then
+					CMAKE_BUILD_TYPE_FLAG="O0"
+				elif [ "${oIn}" == "O2" ] || [ "${oIn}" == "optimize" ]; then
+					CMAKE_BUILD_TYPE_FLAG="O2"
+				elif [ "${oIn}" == "debug" ] || [ "${oIn}" == "OG" ]; then
+					BUILD_LEVEL="OG"
+				else
+					printHelp
+				fi
+				;;
+			c)
+				CLEAN="-c"
+				;;
+            h)
+                printHelp
+                ;;
+			*)
+				printHelp
+				;;
+	esac
 done
 
-# if [[ $# -eq 1 ]]; then
-#     CLEAN="$1"
-# elif [[ $# -eq 2 ]]; then
-#     CLEAN="$1"
-#     WRAP_GMML="$2"
-# fi
+echo "Starting installation of GEMS at `date`".
 
 printf "\nBuilding with these settings:\n"
 printf "GEMSHOME: $GEMSHOME\n"
 printf "TARGET_MAKE_FILE: $TARGET_MAKE_FILE\n"
 printf "CLEAN: $CLEAN\n"
 printf "BUILD_LEVEL: $BUILD_LEVEL\n"
-printf "WRAP_GMML: $WRAP_GMML\n\n"
+printf "WRAP_GMML: TRUE\n\n"
 
 ################################################################
 #########                  COMPILE GMML                #########
 ################################################################
 
-cd gmml/
-./make.sh $CLEAN $WRAP_GMML -o $BUILD_LEVEL -j $NMP  || { echo "ERROR BUILDING GEMS $0 FAILED, EXITING" ; exit 1; }
+cd gmml/ || { echo "ERROR BUILDING GEMS $0 FAILED, CANT CD INTO GMML, EXITING" ; exit 1; }
+./make.sh $CLEAN -w -o $BUILD_LEVEL -j $NMP  || { echo "ERROR BUILDING GEMS $0 FAILED, EXITING" ; exit 1; }
 cd ../
 
 ################################################################
