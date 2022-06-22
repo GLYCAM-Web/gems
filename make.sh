@@ -379,22 +379,23 @@ cd ../
 ################################################################
 #WRAPPING DONE IN GMML! We do want to make a symlink down to our
 # wrapped gmml libraries so gems can easily handle this. 
-if [[ -f ./gmml/cmakeBuild/gmml.py && -f ./gmml/cmakeBuild/_gmml_wrapped.so ]]; then
+if [[ -f ./gmml/cmakeBuild/gmml.py && -f ./gmml/cmakeBuild/_gmml.so ]]; then
 	ln -sf ./gmml/cmakeBuild/gmml.py gmml.py
-	ln -sf ./gmml/cmakeBuild/_gmml_wrapped.so _gmml.so
+	ln -sf ./gmml/cmakeBuild/_gmml.so _gmml.so
 else
 	if [ ! -f ./gmml/cmakeBuild/gmml.py ]; then
 		printf "\n!!!WARNING, gmml.py WAS NOT GENERATED!!!\n"
 		printf "THIS IS NEEDED FOR US TO INTERACT WITH GMML USING PYTHON!\n"
 	fi
-	if [ ! -f ./gmml/cmakeBuild/_gmml_wrapped.so ]; then
-		printf "\n!!!WARNING, _gmml_wrapped.so WAS NOT GENERATED!!!\n"
+	if [ ! -f ./gmml/cmakeBuild/_gmml.so ]; then
+		printf "\n!!!WARNING, _gmml.so WAS NOT GENERATED!!!\n"
 		printf "THIS IS NEEDED FOR US TO INTERACT WITH GMML USING PYTHON!\n"
 		#Note that this can be removed once we remove the hook tests for this
 		# Will be leaving in for now, will remove when working on a branch
 		# that has a scope that includes this problem
 	fi
 	printf "\n!!!!WARNING COULD NOT PROPERLY WRAP GMML!!!!\n"
+	exit 1
 fi
 
 #if [[ "$WRAP_GMML" != "no_wrap" ]]; then
