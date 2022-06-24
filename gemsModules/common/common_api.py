@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field, validator
 from gemsModules.project.project_api import Project as Project
 from gemsModules.common.entity import Entity
 from gemsModules.common.notices import Notices
-from gemsModules.common.services import Responses
+from gemsModules.common.services_responses import Responses
 from gemsModules.common.options import Options
 from gemsModules.common import settings
 import traceback

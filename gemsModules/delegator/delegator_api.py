@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import gemsModules.common.services as commonservices
+import gemsModules.common.services_responses as commonservices
 from  gemsModules.common.entity import Entity as commonEntity
 import gemsModules.common.common_api as commonio
 import gemsModules.delegator.settings as delegatorsettings

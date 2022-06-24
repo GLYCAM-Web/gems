@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
-from enum import Enum, auto
-from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
+from typing import List
 from datetime import datetime
-from pydantic import BaseModel, Field, ValidationError
-from pydantic.schema import schema
-from gemsModules.sequence import jsoninterface as sequenceio
+from gemsModules.sequence import geometries 
 from gemsModules.sequence import projects as sequenceProjects
 from gemsModules.common.loggingConfig import *
 from gemsModules.project import projectUtilPydantic as projectUtils
-import gmml, os, sys
+import os
 import itertools
 import traceback
 
@@ -72,19 +69,17 @@ def convertDihedralNameToCode(dihedralName: str):
 # @brief  Gets the shape from the user request in transactions or returns default.
 #   @param Transaction
 #   @return String solvent_shape
-
-
-def getSolvationShape(thisTransaction):
-    log.info("getSolvationShape() was called.")
-    return "REC"
-    # This info currently lives in sequence.io.Single3DStructureBuildDetails
+#def getSolvationShape(thisTransaction):
+#    log.info("getSolvationShape() was called.")
+#    return "REC"
+#    # This info currently lives in sequence.io.Single3DStructureBuildDetails
 
 # @brief count the number of shapes
 #   @param rotamerData : sequenceio.AllLinkageRotamerInfo
 #   @return an integer
 
 
-def countNumberOfShapes(rotamerData: sequenceio.AllLinkageRotamerInfo, shapeSet: str = 'Selected'):
+def countNumberOfShapes(rotamerData: geometries.AllLinkageRotamerInfo, shapeSet: str = 'Selected'):
     log.info("countNumberOfShapes was called.")
     count = 1
     log.debug("The requested shapeSet is : " + str(shapeSet))
@@ -110,7 +105,7 @@ def countNumberOfShapes(rotamerData: sequenceio.AllLinkageRotamerInfo, shapeSet:
     return count
 
 
-def countNumberOfShapesUpToLimit(rotamerData: [], shapeSet: str = 'Selected',  hardLimit=1):
+def countNumberOfShapesUpToLimit(rotamerData: List, shapeSet: str = 'Selected',  hardLimit=1):
     log.info("countNumberOfShapesUpToLimit was called.")
     count = countNumberOfShapes(rotamerData, shapeSet)
     if hardLimit != -1:
@@ -125,7 +120,6 @@ def countNumberOfShapesUpToLimit(rotamerData: [], shapeSet: str = 'Selected',  h
 #           list of unique permutations possible for those selections.
 #   @param Transaction
 #   @TODO: Move this to a better file for this stuff.
-
 
 def buildStructureInfoOliver(thisTransaction: sequenceio.Transaction):
     log.info("buildStructureInfoOliver() was called.")
@@ -466,55 +460,6 @@ def convertStructureInfoToDict(structureInfo: sequenceio.StructureBuildInfo()):
     else:
         return structureInfo.json(indent=2)
 
-#    data = {}
-#    ## set the sequence.
-#    try:
-#        data['sequence'] = structureInfo.sequence
-#        data['buildStates'] = []
-#    except Exception as error:
-#        log.error("There was a problem finding the sequence in structureInfo: " + str(error))
-#        log.error(traceback.format_exc())
-#        raise error
-#    else:
-#        try:
-#            if structureInfo.buildStates is not None:
-#                ##Process the build states.
-#                for buildState in structureInfo.buildStates:
-#                    log.debug("buildState: \n" + repr(buildState))
-#                    state = {}
-##                    state['conformerLabel'] = buildState.conformerLabel
-#                    state['simulationPhase'] = buildState.simulationPhase
-#                    if buildState.simulationPhase == "solvent":
-#                        state['solvationShape'] = buildState.solvationShape
-#                    state['status'] = buildState.status
-#                    state['date'] = str(buildState.date)
-#                    state['addIons']  = buildState.addIons
-#                    state['energy'] = buildState.energy
-#                    state['forceField']  = buildState.forceField
-#                    state['sequenceConformation'] = []
-#                    try:
-#                        if buildState.sequenceConformation is not None:
-#                            log.debug("sequenceConformation: \n" + repr(buildState.sequenceConformation))
-#                            for rotamerConf in buildState.sequenceConformation:
-#                                log.debug("rotamerConf: \n" + repr(rotamerConf))
-#                                state['sequenceConformation'].append(rotamerConf)
-#                        else:
-#                            log.debug("No sequence conformation. Must be a request for the default structure.")
-#                    except Exception as error:
-#                        log.error("There was a problem converting the sequence conformation to dict: " + str(error))
-#                        log.error(traceback.format_exc())
-#                        raise error
-#                    else:
-#                        data['buildStates'].append(state)
-#            else:
-#                log.debug("There may be no build states in a default structure request.")
-#        except Exception as error:
-#            log.error("There was a problem building the states for this structureInfo: " + str(error))
-#            log.error(traceback.format_exc())
-#            raise error
-#        else:
-#            return data
-
 
 # @brief Checks a transaction for user requests that specify adding ions.
 #   @detail Default value is "default" - which depends on other software's defauts.
@@ -537,109 +482,108 @@ def checkForAddIons(thisTransaction: sequenceio.Transaction):
     return result
 
 
-# @brief Checks a transaction for user requests that specify simulation phase
-#   @detail Default value is gas_phase
-#   @param Transaction
-def checkForSimulationPhase(thisTransaction: sequenceio.Transaction):
-    log.info("checkForSimulationPhase() was called.")
+## @brief Checks a transaction for user requests that specify simulation phase
+##   @detail Default value is gas_phase
+##   @param Transaction
+#def checkForSimulationPhase(thisTransaction: sequenceio.Transaction):
+#    log.info("checkForSimulationPhase() was called.")
+#
+#    simulationPhase = "gas_phase"
+#    request = thisTransaction.request_dict
+#    if "project" in request.keys():
+#        if "solvation" in request['project'].keys():
+#            if request['project']['solvation'] == "yes":
+#                simulationPhase = "solvent"
+#
+#    # If both a project and options exist, let the options override the
+#    #   project.
+#    if "options" in request.keys():
+#        if "solvation" in request['options'].keys():
+#            if request['options']['solvation'] == "yes":
+#                simulationPhase = "solvent"
+#
+#    return "gas_phase"
 
-    simulationPhase = "gas_phase"
-    request = thisTransaction.request_dict
-    if "project" in request.keys():
-        if "solvation" in request['project'].keys():
-            if request['project']['solvation'] == "yes":
-                simulationPhase = "solvent"
-
-    # If both a project and options exist, let the options override the
-    #   project.
-    if "options" in request.keys():
-        if "solvation" in request['options'].keys():
-            if request['options']['solvation'] == "yes":
-                simulationPhase = "solvent"
-
-    return "gas_phase"
-
-
-# @brief Creates a record of a newly built structure in its seqID dir.
-#   @detail structureInfo.json holds the master record of all builds for a given sequence.
-#           structureInfo_status.json holds the master record of all builds for a given project.
-#           This method expects a file at a time to be passed in for updating.
-#   @param structureInfoFilename String
-def updateBuildStatus(structureInfoFilename: str, buildState: sequenceio.Single3DStructureBuildDetails, status: str):
-    log.info("updateBuildStatus() was called.")
-    log.debug("structureInfoFilename: " + structureInfoFilename)
-
-    if "status" in structureInfoFilename:
-        log.debug("Updating a project's  status file")
-    else:
-        log.debug("Updating an seqDir's structureInfo.json")
-        # Throw errors if the seqDir don't already exist.
-        seqDir = structureInfoFilename.replace("structureInfo.json", "")
-        log.debug("seqDir: " + seqDir)
-        if os.path.exists(seqDir):
-            log.debug("seqDir exists.")
-        else:
-            raise(FileNotFoundError(seqDir))
-
-    if os.path.exists(structureInfoFilename):
-        log.debug("Found the file.")
-    else:
-        raise(FileNotFoundError(structureInfoFilename))
-
-    try:
-        # Load the object from the file.
-        with open(structureInfoFilename, 'r') as inFile:
-            data = json.load(inFile)
-    except Exception as error:
-        log.error("There was a problem reading the file " + str(error))
-        log.error(traceback.format_exc())
-        raise error
-    else:
-        try:
-            log.debug("data before update:\n\n")
-            prettyPrint(data)
-
-            buildState.status = status
-            log.debug("buildState: " + str(buildState))
-
-            if len(data['buildStates']) == 0:
-                log.debug("Adding the first build state.")
-                record = prepareBuildRecord(buildState)
-                data['buildStates'].append(record)
-            else:
-                log.debug(
-                    "Builds exist. Checking if we are updating the status of an existing build.")
-                log.debug("buildState: " + str(data['buildStates']))
-                for recordedState in data['buildStates']:
-                    log.debug(
-                        "recordedState['conformerLabel']: " + recordedState['conformerLabel'])
-                    log.debug("buildState.conformerLabel: " +
-                              buildState.conformerLabel)
-                    if recordedState['conformerLabel'] == buildState.conformerLabel:
-                        log.debug(
-                            "Found the record to update. recordedState['status']: " + recordedState['status'])
-                        recordedState['status'] = status
-                        log.debug(
-                            "updated recordedState['status']: " + recordedState['status'])
-
-        except Exception as error:
-            log.error("There was a problem updating the object: " + str(error))
-            log.error(traceback.format_exc())
-            raise error
-        else:
-            try:
-                log.debug(
-                    "Attempting to write the updated structureInfo data to file.")
-                with open(structureInfoFilename, 'w') as outFile:
-                    jsonString = json.dumps(
-                        data, indent=4, sort_keys=False, default=str)
-                    log.debug("jsonString: \n" + jsonString)
-                    outFile.write(jsonString)
-            except Exception as error:
-                log.error(
-                    "There was a problem writing the structureInfo data to file: " + str(error))
-                log.error(traceback.format_exc())
-                raise error
+## @brief Creates a record of a newly built structure in its seqID dir.
+##   @detail structureInfo.json holds the master record of all builds for a given sequence.
+##           structureInfo_status.json holds the master record of all builds for a given project.
+##           This method expects a file at a time to be passed in for updating.
+##   @param structureInfoFilename String
+#def updateBuildStatus(structureInfoFilename: str, buildState: sequenceio.Single3DStructureBuildDetails, status: str):
+#    log.info("updateBuildStatus() was called.")
+#    log.debug("structureInfoFilename: " + structureInfoFilename)
+#
+#    if "status" in structureInfoFilename:
+#        log.debug("Updating a project's  status file")
+#    else:
+#        log.debug("Updating an seqDir's structureInfo.json")
+#        # Throw errors if the seqDir don't already exist.
+#        seqDir = structureInfoFilename.replace("structureInfo.json", "")
+#        log.debug("seqDir: " + seqDir)
+#        if os.path.exists(seqDir):
+#            log.debug("seqDir exists.")
+#        else:
+#            raise(FileNotFoundError(seqDir))
+#
+#    if os.path.exists(structureInfoFilename):
+#        log.debug("Found the file.")
+#    else:
+#        raise(FileNotFoundError(structureInfoFilename))
+#
+#    try:
+#        # Load the object from the file.
+#        with open(structureInfoFilename, 'r') as inFile:
+#            data = json.load(inFile)
+#    except Exception as error:
+#        log.error("There was a problem reading the file " + str(error))
+#        log.error(traceback.format_exc())
+#        raise error
+#    else:
+#        try:
+#            log.debug("data before update:\n\n")
+#            prettyPrint(data)
+#
+#            buildState.status = status
+#            log.debug("buildState: " + str(buildState))
+#
+#            if len(data['buildStates']) == 0:
+#                log.debug("Adding the first build state.")
+#                record = prepareBuildRecord(buildState)
+#                data['buildStates'].append(record)
+#            else:
+#                log.debug(
+#                    "Builds exist. Checking if we are updating the status of an existing build.")
+#                log.debug("buildState: " + str(data['buildStates']))
+#                for recordedState in data['buildStates']:
+#                    log.debug(
+#                        "recordedState['conformerLabel']: " + recordedState['conformerLabel'])
+#                    log.debug("buildState.conformerLabel: " +
+#                              buildState.conformerLabel)
+#                    if recordedState['conformerLabel'] == buildState.conformerLabel:
+#                        log.debug(
+#                            "Found the record to update. recordedState['status']: " + recordedState['status'])
+#                        recordedState['status'] = status
+#                        log.debug(
+#                            "updated recordedState['status']: " + recordedState['status'])
+#
+#        except Exception as error:
+#            log.error("There was a problem updating the object: " + str(error))
+#            log.error(traceback.format_exc())
+#            raise error
+#        else:
+#            try:
+#                log.debug(
+#                    "Attempting to write the updated structureInfo data to file.")
+#                with open(structureInfoFilename, 'w') as outFile:
+#                    jsonString = json.dumps(
+#                        data, indent=4, sort_keys=False, default=str)
+#                    log.debug("jsonString: \n" + jsonString)
+#                    outFile.write(jsonString)
+#            except Exception as error:
+#                log.error(
+#                    "There was a problem writing the structureInfo data to file: " + str(error))
+#                log.error(traceback.format_exc())
+#                raise error
 
 
 def updateStructureInfoWithUserOptions(thisTransaction: sequenceio.Transaction, structureInfo: sequenceio.StructureBuildInfo, filename: str):
@@ -677,69 +621,69 @@ def updateStructureInfoWithUserOptions(thisTransaction: sequenceio.Transaction, 
             raise error
 
 
-# @brief Converts everything to string, creating and returning a new object for storage.
-#   @detail Recursively handles the sequenceConformation too.
-#   @param buildState Single3DStructureBuildDetails
-#   @return state dict
-def prepareBuildRecord(buildState: sequenceio.Single3DStructureBuildDetails):
-    log.info("prepareBuildRecord() was called.")
-    log.debug("buildState: " + repr(buildState))
-    state = {}
-    state['conformerLabel'] = buildState.conformerLabel
-    state['simulationPhase'] = buildState.simulationPhase
-    if buildState.simulationPhase == "solvent":
-        state['solvationShape'] = buildState.solvationShape
-    state['status'] = buildState.status
-    state['date'] = str(buildState.date)
-    state['addIons'] = buildState.addIons
-    state['energy'] = buildState.energy
-    state['forceField'] = buildState.forceField
-    state['sequenceConformation'] = []
-    try:
-        if buildState.sequenceConformation is not None:
-            log.debug("sequenceConformation: " +
-                      repr(buildState.sequenceConformation))
-            for rotamerConf in buildState.sequenceConformation:
-                log.debug("rotamerConf: " + repr(rotamerConf))
-                state['sequenceConformation'].append(rotamerConf.__dict__)
-        else:
-            log.debug(
-                "No sequence conformation. Must be a request for the default structure.")
-    except Exception as error:
-        log.error(
-            "There was a problem converting the sequence conformation to dict: " + str(error))
-        log.error(traceback.format_exc())
-        raise error
-    else:
-        return state
+## @brief Converts everything to string, creating and returning a new object for storage.
+##   @detail Recursively handles the sequenceConformation too.
+##   @param buildState Single3DStructureBuildDetails
+##   @return state dict
+#def prepareBuildRecord(buildState: sequenceio.Single3DStructureBuildDetails):
+#    log.info("prepareBuildRecord() was called.")
+#    log.debug("buildState: " + repr(buildState))
+#    state = {}
+#    state['conformerLabel'] = buildState.conformerLabel
+#    state['simulationPhase'] = buildState.simulationPhase
+#    if buildState.simulationPhase == "solvent":
+#        state['solvationShape'] = buildState.solvationShape
+#    state['status'] = buildState.status
+#    state['date'] = str(buildState.date)
+#    state['addIons'] = buildState.addIons
+#    state['energy'] = buildState.energy
+#    state['forceField'] = buildState.forceField
+#    state['sequenceConformation'] = []
+#    try:
+#        if buildState.sequenceConformation is not None:
+#            log.debug("sequenceConformation: " +
+#                      repr(buildState.sequenceConformation))
+#            for rotamerConf in buildState.sequenceConformation:
+#                log.debug("rotamerConf: " + repr(rotamerConf))
+#                state['sequenceConformation'].append(rotamerConf.__dict__)
+#        else:
+#            log.debug(
+#                "No sequence conformation. Must be a request for the default structure.")
+#    except Exception as error:
+#        log.error(
+#            "There was a problem converting the sequence conformation to dict: " + str(error))
+#        log.error(traceback.format_exc())
+#        raise error
+#    else:
+#        return state
 
 
-def createSeqLog(sequence: str, seqIDPath: str):
-    log.info("createSeqLog() was called.")
-    logObj = StructureInfo()
-    logObj.sequence = sequence
-    try:
-        logObj = convertStructureInfoToDict(logObj)
-    except Exception as error:
-        log.error(
-            "There was a problem converting the object to dict: " + str(error))
-        log.error(traceback.format_exc())
-        raise error
-    else:
-        # dump to file
-        try:
-            fileName = seqIDPath + "/structureInfo.json"
-            log.debug("Attempting to write: " + fileName)
-            with open(fileName, 'w') as outFile:
-                jsonString = json.dumps(
-                    logObj, indent=4, sort_keys=False, default=str)
-                log.debug("jsonString: \n" + jsonString)
-                outFile.write(jsonString)
-        except Exception as error:
-            log.error(
-                "There was a problem writing structureInfo_request.json to file: " + str(error))
-            log.error(traceback.format_exc())
-            raise error
+#def createSeqLog(sequence: str, seqIDPath: str):
+#    log.info("createSeqLog() was called.")
+#    logObj = StructureInfo()
+#    logObj.sequence = sequence
+#    try:
+#        logObj = convertStructureInfoToDict(logObj)
+#    except Exception as error:
+#        log.error(
+#            "There was a problem converting the object to dict: " + str(error))
+#        log.error(traceback.format_exc())
+#        raise error
+#    else:
+#        # dump to file
+#        try:
+#            fileName = seqIDPath + "/structureInfo.json"
+#            log.debug("Attempting to write: " + fileName)
+#            with open(fileName, 'w') as outFile:
+#                jsonString = json.dumps(
+#                    logObj, indent=4, sort_keys=False, default=str)
+#                log.debug("jsonString: \n" + jsonString)
+#                outFile.write(jsonString)
+#        except Exception as error:
+#            log.error(
+#                "There was a problem writing structureInfo_request.json to file: " + str(error))
+#            log.error(traceback.format_exc())
+#            raise error
 
 
 # @brief Pass in a transaction, get the structureInfo.json for that sequence.

@@ -5,6 +5,8 @@ from enum import Enum
 
 from pydantic import BaseModel
 
+from gemsModules.common.utils import GemsStrEnum
+
 # Who I am
 WhoIAm = 'Sequence'
 
@@ -30,42 +32,19 @@ servicesStatus = [
     }
 ]
 
-subEntities = [
-    {
-        "subEntity": "Graph"
-    }
-]
 
 # Module names for services that this entity/module can perform.
-serviceModules = {
-    'Validate': 'validate',
-    'Evaluate': 'evaluate',
-    'Build3DStructure': 'build3Dstructure'
-}
+class subEntities(GemsStrEnum) :
+    Graph = 'graph'
 
-# ## from Lachele, 2021-04-01:
-# ##    I'm moving these here from io.py.  They don't
-# ##    have to stay here.  I was hoping to make io.py
-# ##    a little simpler.  I also have my eye on making
-# ##    a lot of the io classes be generic so that they
-# ##    need a lot less redefinition in the child classes.
-#
-# ##
-# ## Services
-# ##
-
-
-class Services(str, Enum):
+class AvailableServices(GemsStrEnum):
     build3dStructure = 'Build3DStructure'
     drawGlycan = 'DrawGlycan'
     evaluate = 'Evaluate'
     status = 'Status'
 
-# ## Environment variables
-# ##
 
-
-class Environment(str, Enum):
+class Environment(GemsStrEnum):
     # The entity itself
     sequenceentity = 'GEMS_MODULES_SEQUENCE_PATH'
     # Services for this entity, in alphabetical order
@@ -77,12 +56,12 @@ class Environment(str, Enum):
 # ##
 
 
-class Formats(str, Enum):
+class Formats(GemsStrEnum):
     """All Sequenes must be in GLYCAM Condensed notation"""
     # the basic sequence as it might arrive, unspecified order, assumed condensed glycam
     sequence = 'Sequence'
 
 
-class Locations(str, Enum):
+class Locations(GemsStrEnum):
     # < All input at this time must be internal to the JSON object(s)
     internal = 'internal'

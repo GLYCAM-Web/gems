@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
-import json, sys, os, re, importlib.util, shutil, uuid
-#import gemsModules
 import gmml
 import traceback
-import gemsModules.common.utils
 from gemsModules.common.loggingConfig import *
-from gemsModules.sequence import jsoninterface as sequenceio
+from gemsModules.sequence import sequence_self as sequence_self
+from gemsModules.sequence import geometries
 
 if loggers.get(__name__):
     pass
@@ -15,7 +13,6 @@ else:
 # I think if we got all the names to match, we could use parse_object_as instead of this. OG.
 # Probably it would fail on sub-classes though, but maybe.
 
-
 def getLinkageOptionsFromGmmlcbBuilder(sequence):
     log.info("getLinkageOptionsFromGmmlcbBuilder() was called.\n")
     log.debug("sequence: " + sequence)
@@ -24,7 +21,7 @@ def getLinkageOptionsFromGmmlcbBuilder(sequence):
     gmmllinkageOptionsVector = cbBuilder.GenerateUserOptionsDataStruct()
     log.debug("gmmllinkageOptionsVector: " + repr(gmmllinkageOptionsVector))
 
-    gemsLinkageGeometryOptions = sequenceio.AllLinkageRotamerInfo()
+    gemsLinkageGeometryOptions = geometries.AllLinkageRotamerInfo()
     gemsLinkageGeometryOptions.totalPossibleRotamers = cbBuilder.GetNumberOfShapes()
     likelyOnly = True
     gemsLinkageGeometryOptions.totalLikelyRotamers = cbBuilder.GetNumberOfShapes(
@@ -32,7 +29,7 @@ def getLinkageOptionsFromGmmlcbBuilder(sequence):
 
     for gmmlLinkageOptions in gmmllinkageOptionsVector:
 
-        gemsLinkageOptions = sequenceio.SingleLinkageRotamerData()
+        gemsLinkageOptions = geometries.SingleLinkageRotamerData()
 
         gemsLinkageOptions.indexOrderedLabel = gmmlLinkageOptions.indexOrderedLabel_
         gemsLinkageOptions.linkageName = gmmlLinkageOptions.linkageName_
@@ -41,7 +38,7 @@ def getLinkageOptionsFromGmmlcbBuilder(sequence):
 
         """ Likely Rotamers """
         for dihedralOptions in gmmlLinkageOptions.likelyRotamers_:
-            gemsRotamers = sequenceio.TheRotamerDihedralInfo()
+            gemsRotamers = geometries.TheRotamerDihedralInfo()
             gemsRotamers.dihedralName = dihedralOptions.dihedralName_
 
             for rotamer in dihedralOptions.rotamers_:
@@ -51,7 +48,7 @@ def getLinkageOptionsFromGmmlcbBuilder(sequence):
 
         """ Possible Rotamers """
         for dihedralOptions in gmmlLinkageOptions.possibleRotamers_:
-            gemsRotamers = sequenceio.TheRotamerDihedralInfo()
+            gemsRotamers = geometries.TheRotamerDihedralInfo()
             gemsRotamers.dihedralName = dihedralOptions.dihedralName_
 
             for rotamer in dihedralOptions.rotamers_:
@@ -80,7 +77,7 @@ def getSequenceVariants(validatedSequence: str):
     # ##
     # ##  This function assumes that the validity of the sequence was determined elsewhere
     # ##
-    Sequences = sequenceio.TheSequenceVariants()
+    Sequences = sequence_self.TheSequenceVariants()
 
     Sequences.userOrdered = validatedSequence
     Sequences.indexOrdered = this_sequence.BuildLabeledCondensedSequence(
@@ -135,26 +132,28 @@ def checkIsSequenceSane(sequence):
         log.error("Something went wrong while validating this sequence.")
         log.error("sequence: " + sequence)
         log.error(traceback.format_exc())
-        generateCommonParserNotice(noticeBrief='GmmlError')
         valid = False
+        raise Exception("Something went wrong while validating this sequence.")
     return valid
 
 
 def main():
-    import importlib.util
-    import os
-    import sys
-    if importlib.util.find_spec("gemsModules") is None:
-        this_dir, this_filename = os.path.split(__file__)
-        sys.path.append(this_dir + "/../")
-        if importlib.util.find_spec("common") is None:
-            print("Something went horribly wrong.  No clue what to do.")
-            return
-        else:
-            from common import utils
-    else:
-        from gemsModules.common import utils
-    data = utils.JSON_From_Command_Line(sys.argv)
+    pass
+#    import importlib.util
+#    import os
+#    import sys
+#    if importlib.util.find_spec("gemsModules") is None:
+#        this_dir, this_filename = os.path.split(__file__)
+#        sys.path.append(this_dir + "/../")
+#        if importlib.util.find_spec("common") is None:
+#            print("Something went horribly wrong.  No clue what to do.")
+#            return
+#        else:
+#            from common import utils
+#    else:
+#        from gemsModules.common import utils
+#    data = utils.JSON_From_Command_Line(sys.argv)
+
 
 
 if __name__ == "__main__":

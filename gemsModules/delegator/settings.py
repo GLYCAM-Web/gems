@@ -17,6 +17,9 @@ class AvailableServices(GemsStrEnum) :
     marco        = 'Marco'
 
 ## List of entities that the Delegator knows about
+#  Please compare to subEntities 
+#  For Pydantic, it needs to be in this key:value order
+#  If you can merge these, please do so.
 class KnownEntities(GemsStrEnum) :
     batchcompute  = 'BatchCompute'
     drawglycan    = 'DrawGlycan'
@@ -29,6 +32,9 @@ class KnownEntities(GemsStrEnum) :
     structureFile = 'StructureFile'  
 
 ## Module location for entities that the Delegator knows about
+#  Please compare to KnownEntities 
+#  For module-loading, it needs to be in this key:value order
+#  If you can merge these, please do so.
 class subEntities(GemsStrEnum) :
     BatchCompute   = 'batchcompute'
     Delegator      = 'delegator'

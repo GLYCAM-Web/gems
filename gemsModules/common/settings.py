@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from enum import Enum, auto
+from gemsModules.common.utils import GemsStrEnum
 #from typing import Dict, List #, Optional, Sequence, Set, Tuple, Union, Any
 
 from gemsModules.common import loggingConfig 
@@ -11,16 +11,8 @@ else:
 
 WhoIAm = 'CommonServicer'
 
-class AvailableServices(Enum):
+class AvailableServices(GemsStrEnum):
     marco = 'Marco'
     status = 'Status'
-
-    @classmethod
-    def get_list(self):
-        theList = []
-        for item in self :
-            theList.append(item.name)
-        return theList
-
 
 

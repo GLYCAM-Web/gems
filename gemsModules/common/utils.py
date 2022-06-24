@@ -21,7 +21,7 @@ class GemsStrEnum(str, Enum):
         return self.get_value_list()
 
     @classmethod
-    def get_pydantic_list(self):
+    def get_json_list(self):
         return self.get_value_list()
 
     @classmethod
@@ -34,6 +34,10 @@ class GemsStrEnum(str, Enum):
     @classmethod
     def get_key_list(self):
         return self.get_name_list()
+
+    @classmethod
+    def get_internal_list(self):
+        return self.get_value_list()
 
     @classmethod
     def get_name_list(self):

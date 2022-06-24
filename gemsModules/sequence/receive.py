@@ -1,14 +1,8 @@
 #!/usr/bin/env python3
-import json
-import sys
 import os
-import re
-import importlib.util
-import shutil
-import uuid
 import traceback
-from gemsModules.sequence import jsoninterface as sequenceio
-
+from gemsModules.sequence import sequence_api as sequenceio
+from gemsModules.project import project_api as projectio
 from gemsModules.common.loggingConfig import loggers, createLogger
 from gemsModules.common.logic import writeStringToFile
 if loggers.get(__name__):
@@ -23,14 +17,15 @@ else:
 
 def doDefaultService(thisTransaction: sequenceio.Transaction):
     log.info("doDefaultService() was called.\n")
-    if thisTransaction.response_dict is None:
-        thisTransaction.response_dict = {}
-    thisTransaction.response_dict['entity'] = {}
-    thisTransaction.response_dict['entity']['type'] = 'SequenceDefault'
-    thisTransaction.response_dict['responses'] = []
-    thisTransaction.response_dict['responses'].append(
-        {'DefaultTest': {'payload': marco('Sequence')}})
-    thisTransaction.build_outgoing_string()
+    pass
+#    if thisTransaction.response_dict is None:
+#        thisTransaction.response_dict = {}
+#    thisTransaction.response_dict['entity'] = {}
+#    thisTransaction.response_dict['entity']['type'] = 'SequenceDefault'
+#    thisTransaction.response_dict['responses'] = []
+#    thisTransaction.response_dict['responses'].append(
+#        {'DefaultTest': {'payload': marco('Sequence')}})
+#    thisTransaction.build_outgoing_string()
 
 
 # @brief The main way Delegator interacts with this module. Request handling.
@@ -83,7 +78,7 @@ def receive(receivedTransaction: sequenceio.Transaction):
         # ##
         if thisTransaction.transaction_out.project is None:
             log.debug("transaction_out.project is None.  Starting a new one.")
-            thisTransaction.transaction_out.project = gemsModules.project.io.CbProject()
+            thisTransaction.transaction_out.project = projectio.CbProject()
         # ##
         # ## Initialize the parts of the project that need to be done even if there is no output
         # ## to the filesystem.

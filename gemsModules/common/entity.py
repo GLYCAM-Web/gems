@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from pydantic import BaseModel, Field
 from gemsModules.common.notices import Notices
-from gemsModules.common.services import Services, Responses
+from gemsModules.common.services_responses import Services, Responses
 from gemsModules.common.resources import Resources
 from gemsModules.common.options import Options
 
