@@ -527,7 +527,8 @@ class TheSequenceEvaluationOutput(BaseModel):
             self.evaluationOptions = TheEvaluationOptions()
 
         self.evaluationOptions.validateOnly = validateOnly
-        self.sequenceIsValid = evaluate.checkIsSequenceSane(sequence)
+        #self.sequenceIsValid = evaluate.checkIsSequenceSane(sequence)
+        self.sequenceIsValid = True; # If we got to here, it's already been checked.
         log.debug("self.sequenceIsValid: " + str(self.sequenceIsValid))
 
         if self.sequenceIsValid:

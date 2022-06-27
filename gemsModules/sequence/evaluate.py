@@ -90,26 +90,25 @@ def getLinkageOptionsFromGmmlcbBuilder(sequence):
 #   @return dict sequences
 def getSequenceVariants(validatedSequence: str):
     log.info("getSequenceVariants() was called.\n")
-    this_sequence = gmml.CondensedSequence(validatedSequence)
+    #this_sequence = gmml.CondensedSequence(validatedSequence)
     # ##
     # ##  This function assumes that the validity of the sequence was determined elsewhere
     # ##
     Sequences = sequenceio.TheSequenceVariants()
+    # #Sequences.userOrdered = validatedSequence
+    this_sequence = gmml.Sequence(validatedSequence)
+    Sequences.userOrdered = this_sequence.getInterpretedSequence()
+    Sequences.indexOrdered = this_sequence.getIndexOrdered()
+    Sequences.longestChainOrdered = "Currently unavailble in gmml. Request if needed!"
+    Sequences.indexOrderedLabeled = this_sequence.getIndexLabeled()
+    log.debug("Here are the new Sequences: " + str(Sequences))
 
-    Sequences.userOrdered = validatedSequence
-    Sequences.indexOrdered = this_sequence.BuildLabeledCondensedSequence(
-        this_sequence.Reordering_Approach_LOWEST_INDEX,
-        this_sequence.Reordering_Approach_LOWEST_INDEX,
-        False)
-    Sequences.longestChainOrdered = this_sequence.BuildLabeledCondensedSequence(
-        this_sequence.Reordering_Approach_LONGEST_CHAIN,
-        this_sequence.Reordering_Approach_LONGEST_CHAIN,
-        False)
-    Sequences.indexOrderedLabeled = this_sequence.BuildLabeledCondensedSequence(
-        this_sequence.Reordering_Approach_LOWEST_INDEX,
-        this_sequence.Reordering_Approach_LOWEST_INDEX,
-        True)
-    log.debug("Here are the Sequences: " + str(Sequences))
+    # this_sequence = gmml.CondensedSequence(validatedSequence)
+    # Sequences.userOrdered = validatedSequence
+    # Sequences.indexOrdered = this_sequence.BuildLabeledCondensedSequence(this_sequence.Reordering_Approach_LOWEST_INDEX, this_sequence.Reordering_Approach_LOWEST_INDEX, False)
+    # Sequences.longestChainOrdered = this_sequence.BuildLabeledCondensedSequence(this_sequence.Reordering_Approach_LONGEST_CHAIN, this_sequence.Reordering_Approach_LONGEST_CHAIN, False)
+    # Sequences.indexOrderedLabeled = this_sequence.BuildLabeledCondensedSequence(this_sequence.Reordering_Approach_LOWEST_INDEX, this_sequence.Reordering_Approach_LOWEST_INDEX, True)
+    #log.debug("Here are the old Sequences: " + str(Sequences))
     return Sequences
 
 
