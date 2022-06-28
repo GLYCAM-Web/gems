@@ -95,42 +95,7 @@ class Single3DStructureBuildDetails(BaseModel):
         log.debug("conformerPath: " + self.conformer_path)
         log.debug("downloadUrlPath: " + self.downloadUrlPath)
 
-    # Plain setters because logic elsewhere should determine them
-
-    def setIsNewBuild(self, IsNewBuild: bool):
-        self.isNewBuild = IsNewBuild
-
-    def setEntityId(self, theEntityId: str):
-        self.entity_id = theEntityId
-
-    def setServiceId(self, theServiceId: str):
-        self.service_id = theServiceId
-
-    def setPuuid(self, thePuuid: str):
-        self.pUUID = thePuuid
-
-    def setFilesystemPath(self, thePath: str):
-        self.filesystem_path = thePath
-
-    def setHostUrlBasePath(self, thePath: str):
-        self.host_url_base_path = thePath
-
-    def setConformerLabel(self, theLabel: str):
-        self.conformerLabel = theLabel
-
-    def setConformerId(self, theId: str):
-        self.conformerID = theId
-
-    def setStructureDirectoryName(self, theStructureDirectoryName: str):
-        self.structureDirectoryName = theStructureDirectoryName
-
-    def setIndexOrderedSequence(self, theIndexOrderedSequence: str):
-        self.indexOrderedSequence = theIndexOrderedSequence
-
-    def setDownloadUrlPath(self, theDownloadUrlPath: str):
-        self.downloadUrlPath = theDownloadUrlPath
-
-    # Setters that contain logic
+    # Setters that contain logic should be built another way
 
     # theBuildDir is usually "New_Builds" or "Existing_Builds" unlesss it is the general case
     def setAbsoluteConformerPath(self, theBuildDir: str):
@@ -164,43 +129,6 @@ class Single3DStructureBuildDetails(BaseModel):
         self.seqID = projectUtils.getSeqIdForSequence(
             self.indexOrderedSequence)
 
-    # All the getters are plain so far
-
-    def getEntityId(self):
-        return self.entity_id
-
-    def getServiceId(self):
-        return self.service_id
-
-    def getConformerPath(self):
-        return self.conformer_path
-
-    def getAbsoluteConformerPath(self):
-        return self.absolute_conformer_path
-
-    def getDownloadUrlPath(self):
-        return self.downloadUrlPath
-
-    def getSeqId(self):
-        return self.seqID
-
-    def getFilesystemPath(self):
-        return self.filesystem_path
-
-    def getHostUrlBasePath(self):
-        return self.host_url_base_path
-
-    def getConformerLabel(self):
-        return self.conformerLabel
-
-    def getConformerID(self):
-        return self.conformerID
-
-    def getStructureDirectoryName(self):
-        return self.structureDirectoryName
-
-    def getIndexOrderedSequence(self):
-        return self.indexOrderedSequence
 
 # @class StructureBuildInfo
 #    @brief An object to represent the data previously held in the Structure_Mapping_Table.
@@ -221,15 +149,6 @@ class StructureBuildInfo(BaseModel):
     individualBuildDetails: List[Single3DStructureBuildDetails] = []
     buildStrategyID: str = 'buildStrategyID1'
 
-    def setIncomingSequence(self, inputSequence):
-        self.incomingSequence = inputSequence
-
-    def setIndexOrderedSequence(self, inputSequence):
-        self.indexOrderedSequence = inputSequence
-
-    def setBuildStrategyID(self, newBuildStrategyID):
-        self.buildStrategyID = newBuildStrategyID
-
     def setSeqId(self):
         if self.indexOrderedSequence == "":
             error = "Cannot derive a seqID from an empty indexOrderedSequence string"
@@ -237,19 +156,6 @@ class StructureBuildInfo(BaseModel):
             raise error
         self.seqID = projectUtils.getSeqIdForSequence(
             self.indexOrderedSequence)
-
-    def getIndividualBuildDetails(self):
-        return self.individualBuildDetails
-
-    def getBuildStrategyID(self):
-        return self.buildStrategyID
-
-    def getSequence(self):
-        return self.sequence
-
-    def getSeqId(self):
-        return self.seqID
-
 
 
 def generateSchema():

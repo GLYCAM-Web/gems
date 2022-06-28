@@ -35,10 +35,10 @@ class Transaction:
     interaction via GEMS API.  Handling of the string prior to first
     initialization of this class is usually the domain of delegator.
     """
-    incoming_string: str = None
-    transaction_in: CommonAPI = None
-    transaction_out: CommonAPI = None
-    outgoing_string: str = None
+#    incoming_string: str = None
+#    transaction_in: CommonAPI = None
+#    transaction_out: CommonAPI = None
+#    outgoing_string: str = None
 
     def get_API_type(self):
         return CommonAPI
