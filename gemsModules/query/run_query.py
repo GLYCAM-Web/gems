@@ -13,11 +13,13 @@ from gemsModules.common.services import *
 from gemsModules.common.transaction import *
 from gemsModules.common.loggingConfig import *
 from inspect import currentframe, getframeinfo
+from gemsModules.query import plotlyChiEnergy
+# from . import plotlyChiEnergy
 
-# if loggers.get(__name__):
-#     pass
-# else:
-# log = createLogger("run_query")
+if loggers.get(__name__):
+    pass
+else:
+  log = createLogger("run_query")
 
 
 exitMessages = {
@@ -34,12 +36,13 @@ if gmml is None:
     sys.exit(exitCodes["GmmlNotFound"])
 
 def buildQueryString(thisTransaction : Transaction):
-    """Build a Query String"""
+    # """Build a Query String"""
     #
     # THIS IS A KLUGE!   See the [0]?  That's ugly...  and bad.
     # And, if I knew Python better....
     #
-    log.debug("buildQueryString() was called")
+    log.info("buildQueryString() was called")
+    
     try:
         virtLocation = os.getenv('VIRTUOSO_DB') + ":" + str(8890) + "/sparql"
     except Exception as error:
@@ -52,7 +55,8 @@ def buildQueryString(thisTransaction : Transaction):
         log.error("Unable to find GEMSHOME " + str(error))
         log.error(traceback.format_exc())
         raise error
-    debugFileLocation = GemsPath + "/DebugOutput.txt"
+    
+    
     theseOptions = thisTransaction.request_dict['services'][0]['formQueryString']['options']
     if theseOptions['queryType'] == "Initial":
         log.debug(theseOptions)
@@ -86,6 +90,7 @@ def buildQueryString(thisTransaction : Transaction):
                 )
         log.debug(theQueryString)
     elif theseOptions['queryType'] == "More":
+        log.debug("More query")
         temp = gmml.Assembly()
         theQueryString = temp.MoreQuery(
                 str(theseOptions['pdb_id']),
@@ -94,6 +99,42 @@ def buildQueryString(thisTransaction : Transaction):
                 str(virtLocation),
                 str(theseOptions['output_file_type'])
                 )
+        
+    elif theseOptions['queryType'] == "plotlyCHI":
+      log.debug("plotlyCHI query")
+      log.debug("oligo: " + str(theseOptions['oligo']))
+      try:
+        theQueryString = plotlyChiEnergy.createLinkagesQuery(str(theseOptions['oligo']))
+      except Exception as error:
+        log.error("Unable to generate CHI Energy queries. " + str(error))
+        log.error(traceback.format_exc())
+        raise error       
+      # log.debug(theQueryString)
+      proc = subprocess.Popen(theQueryString, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+      (out, err) = proc.communicate()
+      out = str(out.decode('utf-8'))
+      # log.debug(out)
+      linkageJson = json.loads(out)
+      log.debug(linkageJson)
+      
+      for link in linkageJson["results"]["bindings"]:
+        cmd = "python3 " + GemsPath + "/gemsModules/query/generatePlotlyDivs.py " + str(theseOptions['oligo']) + " " + str(link["LinkageID"]["value"]) + " &"
+        log.debug(cmd)
+        try:
+          p = subprocess.run(cmd, shell=True)
+        except Exception as error:
+          log.error("Unable to generate Plotly Divs. " + str(error))
+          link["plotlyJobSubmitted"] = "False"
+        else:
+          # (out, err) = p.communicate()
+          # out = str(out.decode('utf-8'))
+          # log.debug(out)
+          link["LinkageName"]["value"] = str(link["LinkageName"]["value"]).replace('_?_?_1', '')
+          link["LinkageID"]["plotlyJobSubmitted"] = "True"
+          
+      jsonObj = linkageJson
+      
+        
     elif theseOptions['queryType'] == "Download_All":
        #Do something here
        log.debug("Running Download request for all data")
@@ -158,41 +199,34 @@ def buildQueryString(thisTransaction : Transaction):
         log.debug("Ran ontologyDownload")
         # log.debug(theQueryString)
         #Popen stays in process.  Look up sytem call instead.
+    else:
+      log.error("Unknown query type: " + str(theseOptions['queryType']))
+
 
 
 
     if ((theseOptions['queryType'] == "Download_All") or (theseOptions['queryType'] == "Download_List")):
-        #Deal with writing a file and creating/returning the PUUID
-        pUUID = str(uuid.uuid4())
-        log.debug(pUUID)
-        theQueryString = theQueryString + " > /website/userdata/tools/gf/" + pUUID + "." + theseOptions['output_file_type'] + " 2>&1 &"
-        #".out 2>&1 && cp /website/userdata/tools/gf/" + pUUID + ".out /website/userdata/tools/gf/" + pUUID + "." + theseOptions['output_file_type'] + " 2>&1 &"
-        log.debug(str(theQueryString))
-        subprocess.Popen(theQueryString, shell=True, stdin=None, stdout=None, stderr=None)
-        log.debug(pUUID)
-        pUUID_JSON = "{\"puuid\": \"" + pUUID + "\"}"
-        thisTransaction.outgoing_string = pUUID_JSON
-        jsonObj = json.loads(pUUID_JSON)
-        thisTransaction.response_dict= jsonObj
-    else:
-        proc = subprocess.Popen(theQueryString, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        log.debug("HEY LOOK AT ME")
-        log.debug(theQueryString)
-        (out, err) = proc.communicate()
-        out = str(out.decode('utf-8'))
-        log.debug(out)
-#        gmml.log(getframeinfo(currentframe()).lineno, getframeinfo(currentframe()).filename, gmml.INF, str(out), GemsPath + "/queryLog.txt")
-        # text_file = open(debugFileLocation, "a+")
-        # text_file.write(str(out))
-        # text_file.write(str(theQueryString))
-        # text_file.close()
-        #variable out contains results of curl command that returns some unnecessary information about curl version at the begginging
-        #to avoid that we consider result string starting from '{'
-        # startIndex = out.index('{')
-        # out = out[startIndex:]
-        # out = "\"" + out + "\""
-        # log.debug(out)
-
-        jsonObj = json.loads(out)
-        thisTransaction.response_dict= jsonObj
-        thisTransaction.outgoing_string= json.dumps(jsonObj)
+      #Deal with writing a file and creating/returning the PUUID
+      pUUID = str(uuid.uuid4())
+      log.debug(pUUID)
+      theQueryString = theQueryString + " > /website/userdata/tools/gf/" + pUUID + "." + theseOptions['output_file_type'] + " 2>&1 &"
+      #".out 2>&1 && cp /website/userdata/tools/gf/" + pUUID + ".out /website/userdata/tools/gf/" + pUUID + "." + theseOptions['output_file_type'] + " 2>&1 &"
+      log.debug(str(theQueryString))
+      subprocess.Popen(theQueryString, shell=True, stdin=None, stdout=None, stderr=None)
+      log.debug(pUUID)
+      pUUID_JSON = "{\"puuid\": \"" + pUUID + "\"}"
+      # thisTransaction.outgoing_string = pUUID_JSON
+      jsonObj = json.loads(pUUID_JSON)
+      # thisTransaction.response_dict= jsonObj
+    elif theseOptions['queryType'] != "plotlyCHI":
+      log.debug(theQueryString)
+      proc = subprocess.Popen(theQueryString, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+      (out, err) = proc.communicate()
+      out = str(out.decode('utf-8'))
+      log.debug(out)
+      jsonObj = json.loads(out)
+            
+      
+      
+    thisTransaction.response_dict= jsonObj
+    thisTransaction.outgoing_string= json.dumps(jsonObj)
