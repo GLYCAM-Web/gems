@@ -281,7 +281,7 @@ class Single3DStructureBuildDetails(BaseModel):
         if theSeqID is not None:
             self.seqID = theSeqID
             return
-        if self.indexOrderedSequence is "":
+        if self.indexOrderedSequence == "":
             error = "Cannot derive a seqID from an empty indexOrderedSequence string"
             log.error(error)
             raise error
@@ -355,7 +355,7 @@ class StructureBuildInfo(BaseModel):
         self.buildStrategyID = newBuildStrategyID
 
     def setSeqId(self):
-        if self.indexOrderedSequence is "":
+        if self.indexOrderedSequence == "":
             error = "Cannot derive a seqID from an empty indexOrderedSequence string"
             log.error(error)
             raise error
