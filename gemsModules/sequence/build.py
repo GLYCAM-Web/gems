@@ -177,6 +177,15 @@ def build3DStructure(buildState: sequenceio.Single3DStructureBuildDetails, thisT
             log.debug("Generating default structure in: " + outputDirPath)
             # Using multiprocessing for this function call.
             builder.GenerateSingle3DStructureDefaultFiles(outputDirPath)
+            if not builder.IsStatusOk():
+                log.error(carbBuilder.GetStatusMessage())
+                log.debug(
+                    "Just about to call generateCommonParserNotice with the outgoing project.  The transaction_out is :   ")
+                log.debug(thisTransaction.transaction_out.json(indent=2))
+                thisTransaction.generateCommonParserNotice(
+                    noticeBrief='InvalidInputPayload', exitMessage=carbBuilder.GetStatusMessage())
+                thisTransaction.build_outgoing_string()
+                return thisTransaction # do this or no?
             #p = Process(target=builder.GenerateSingle3DStructureDefaultFiles, args=(outputDirPath,))
             # p.start()
         else:
@@ -186,6 +195,15 @@ def build3DStructure(buildState: sequenceio.Single3DStructureBuildDetails, thisT
 #            gmmlConformerInfo = populateGMMLConformerInfoStruct(buildState)
             builder.GenerateSpecific3DStructure(
                 gmmlConformerInfo, outputDirPath)
+            if not builder.IsStatusOk():
+                log.error(carbBuilder.GetStatusMessage())
+                log.debug(
+                    "Just about to call generateCommonParserNotice with the outgoing project.  The transaction_out is :   ")
+                log.debug(thisTransaction.transaction_out.json(indent=2))
+                thisTransaction.generateCommonParserNotice(
+                    noticeBrief='InvalidInputPayload', exitMessage=carbBuilder.GetStatusMessage())
+                thisTransaction.build_outgoing_string()
+                return thisTransaction # do this or no?
             #p = Process(target=builder.GenerateSpecific3DStructure, args=(gmmlConformerInfo, outputDirPath,))
             # p.start()
     except Exception as error:
