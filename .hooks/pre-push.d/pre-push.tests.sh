@@ -77,12 +77,12 @@ check_website_status
 
 
 #Compile gmml if not compiled:
-echo "Pulling gems AND gmml, and then compiling gmml if necessary with ./make.sh no_clean wrap"
+echo "Pulling gems AND gmml, and then compiling gmml if necessary with ./make.sh"
 cd $GEMSHOME/gmml/
   git pull
 cd $GEMSHOME
   git pull
- ./make.sh no_clean wrap
+ ./make.sh
 cd - >> /dev/null 2>&1
 
 echo "Running mandatory tests..."
