@@ -67,24 +67,25 @@ run_newBuild_test()
 	check_json_output_test newBuild_out.json 
 	export isJsonOk=$?
 	#currentOutput=${gemsSequencePath}/${sequenceID}/current/All_Builds/${conformerID}/min-gas.pdb
+	correctNumberOfConformers=$(ls $GEMSHOME/tests/correct_outputs/008.conformers/*/min-gas.pdb | wc -l)
 	count=0
 	while [ "${count}" -lt "${maxTimeCount}" ] ; do
 		sleep ${sleepTime} # Wait for it to be generated.
 		currentNumberOfConformers=$(ls ${gemsSequencePath}/${sequenceID}/current/All_Builds/*/min-gas.pdb | wc -l)
-		if [ $currentNumberOfConformers -eq 8 ]; then
+		if [ $currentNumberOfConformers -eq $correctNumberOfConformers ]; then
 			break
 		fi
 		count=$((count+1))
 		if [ "${count}" -eq "${maxTimeCount}" ] ; then
-			echo "Output still not found after $((maxTimeCount*sleepTime)) seconds.  Aborting." | tee -a $badOutput
+			echo "The correct number of conformers were still not found after $((maxTimeCount*sleepTime)) seconds.  Aborting." | tee -a $badOutput
 			echo "The output being sought is : " | tee -a $badOutput
-			echo "${currentOutput}" | tee -a $badOutput
+			echo "$currentNumberOfConformers of $correctNumberOfConformers conformers found in ${gemsSequencePath}/${sequenceID}/current/All_Builds/"  | tee -a $badOutput
 			echo "Test 008a FAILED!" | tee -a $badOutput
 			return 1
 		fi
 		echo "Waited $((count*sleepTime)) seconds so far." | tee -a $badOutput
 	done
-	for conformerID in $(cat inputs/008.conformerIdList.txt);
+	for conformerID in $(ls $GEMSHOME/tests/correct_outputs/008.conformers/);
 	do
 		currentOutput=${gemsSequencePath}/${sequenceID}/current/All_Builds/${conformerID}/min-gas.pdb
 		correctOutput=correct_outputs/008.conformers/${conformerID}/min-gas.pdb
