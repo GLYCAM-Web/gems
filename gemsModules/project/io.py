@@ -401,9 +401,9 @@ class Project(BaseModel):
 class CbProject(Project):
     sequence_id : constr(max_length=255)=""
     sequence_path : constr(max_length=255)=""
-    indexOrderedSequence : constr(max_length=255)=""
+    indexOrderedSequence : constr(max_length=65535)=""
     seqID : constr(max_length=36)=""
-    selected_rotamers : constr(max_length=3000)=""
+    selected_rotamers : constr(max_length=65535)=""
 
     def setIndexOrderedSequence(self, theSequence : str ) :
         self.indexOrderedSequence = theSequence
