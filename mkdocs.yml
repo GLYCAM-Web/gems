@@ -4,8 +4,15 @@ nav:
   - 'Overview': 'index.md'
   - 'Building': 'building.md'
   - 'GEMS Modules': 
-    - 'About'   : 'gems_modules/about.md'
-    - 'The Modules' : 'gems_modules/the_modules.md'
-    - 'Notable Services' : 'gems_modules/notable_services.md'
+    - 'About' : 'gemsModules/about.md'
+    - 'Workflow' : 'gemsModules/workflow.md'
+    - 'The Modules' : 
+      - 'List of Modules' : 'gemsModules/the_modules.md'
+      - 'Sequence' :
+        - 'Overview' : 'gemsModules/sequence/overview.md'
+        - 'Workflow' : 'gemsModules/sequence/Overview/New_Sequence_Target_Workflow.dot'
+        - 'Services': 'gemsModules/sequence/services.md'
+  - 'Notable Services' : 'gemsModules/notable_services.md'
   - 'Examples': 'examples.md'
   - 'Testing' : 'testing.md'
+

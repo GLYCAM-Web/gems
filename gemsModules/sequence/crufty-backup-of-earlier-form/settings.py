@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-from gemsModules.common.utils import GemsStrEnum
-from sequence.build_3D_servicer import build3DStructure
-from sequence.evaluate_servicer import evaluate
-from sequence.status_servicer import get_status
-from sequence.evaluate_servicer import validate
-from sequence.status_servicer import get_status
+from gemsModules import common
+from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 from enum import Enum
+
+from pydantic import BaseModel
+
+from gemsModules.common.utils import GemsStrEnum
 
 # Who I am
 WhoIAm = 'Sequence'
@@ -32,22 +32,8 @@ servicesStatus = [
     }
 ]
 
+
 # Module names for services that this entity/module can perform.
-class ServiceModules(Enum):
-    Build3DStructure = build3DStructure 
-    Evaluate = evaluate
-    Status = get_status
-    Validate = validate
-    Default = get_status
-
-Operation_Order = [
-    'Status',
-    'Validate',
-    'Evaluate',
-    'Build3DStructure'
-]
-
-
 class subEntities(GemsStrEnum) :
     Graph = 'graph'
 

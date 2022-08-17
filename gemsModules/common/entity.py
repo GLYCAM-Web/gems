@@ -4,6 +4,7 @@ from gemsModules.common.notices import Notices
 from gemsModules.common.services_responses import Services, Responses
 from gemsModules.common.resources import Resources
 from gemsModules.common.options import Options
+from gemsModules.common import settings
 
 from gemsModules.common import loggingConfig 
 if loggingConfig.loggers.get(__name__):
@@ -28,6 +29,12 @@ class Entity(BaseModel):
     resources : Resources = Resources()
     notices : Notices = Notices()
     options : Options = Options()
+
+    @validator('entityType')
+    def checkEntityType(cls, v):
+        if v != settings.WhoIAm:
+            raise ValueError(f"In the {settings.WhoIAm} Entity, the entityType must be '{settings.WhoIAm}.")
+        return v
 
 def generateSchema():
     import json

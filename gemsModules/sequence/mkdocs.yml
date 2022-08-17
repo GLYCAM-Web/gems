@@ -1,0 +1,7 @@
+site_name: Sequence
+site_description:  Documentation for the Sequence gemsModule
+nav: 
+  - 'Overview' : 'overview.md'
+  - 'Services' : 'services.md'
+
+

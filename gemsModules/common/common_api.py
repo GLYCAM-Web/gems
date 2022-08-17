@@ -34,11 +34,12 @@ class Transaction:
     Storage for the input and output (the transaction) relevant to 
     interaction via GEMS API.  Handling of the string prior to first
     initialization of this class is usually the domain of delegator.
+
+    incoming_string: str = None
+    inputs: CommonAPI = None
+    outputs: CommonAPI = None
+    outgoing_string: str = None
     """
-#    incoming_string: str = None
-#    inputs: CommonAPI = None
-#    outputs: CommonAPI = None
-#    outgoing_string: str = None
 
     def get_API_type(self):
         return CommonAPI

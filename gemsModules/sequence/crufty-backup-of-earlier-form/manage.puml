@@ -1,0 +1,52 @@
+/' This file will contain a diagram of the file
+ _manageSequenceBuild3DStructureRequest.py '/
+ @startuml
+    title _manageSequenceBuild3DStructureRequest
+    split
+       -[hidden]->
+       :self(transaction);
+    split again
+       -[hidden]->
+       :defaultOnly;
+    split again
+       -[hidden]->
+       :bool=False;
+    end split
+    group Import 
+       :sequence.structureInfo;
+       :sequence.projects;
+       :sequence.sequence_api as sequenceio;
+       :project.projectUtilPydantic as projectUtils;
+    end group
+    group Sanity checks
+       :transaction_out != None;
+       :transaction_in != None;
+       :transaction_out.project != None;
+    end group
+    group Instantiate
+       :transaction_out.entity.outputs;
+       :transaction_out.entity.outputs.structureBuildInfo;
+    end group
+    group Build structureBuildInfo;
+       :structureInfo.buildStructureInfoOliver(self=transaction);
+    end group
+    group Save or update structureInfo\nin its output file
+        if (file exists) then
+           :update file;
+        else
+           :save new file;
+        endif
+    end group
+    :set up the project;
+    :generate the build state response;
+    :generate the default structure;
+    :Decide if we need to minimize;
+    :tell everyone if need be;
+    group Determine if blocking call
+        if (blocking) then
+           :use daemon double spawn;
+        else
+           :execute serially;
+        endif
+    end group
+@enduml

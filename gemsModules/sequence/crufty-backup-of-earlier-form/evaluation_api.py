@@ -13,6 +13,7 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__)
 
+
 class TheEvaluationOptions(BaseModel):
     """Options for sequence evaluations"""
     validateOnly: bool = False  # Stop after setting sequenceIsValid and return answer
@@ -109,9 +110,33 @@ class TheSequenceEvaluationOutput(BaseModel):
             return theVariant
 
 
+class Evaluation:
+    def __init__(self, inputs=None, outputs=None, returnStatus=False):
+        self.inputs = inputs
+        self.outputs = None
+        self.returnStatus = returnStatus
+        if self.inputs is None:
+            return self.status()  # called if only the status is requested or if the inputs are not provided
+
+    def initialize_outputs(self):
+        self.outputs = EvaluationOutputs(self.inputs)
+
+    def process(self, returnStatus=False):
+        self.initialize_outputs()
+        if returnStatus:
+            self.setStatus()
+        self.validate()
+        if not self.inputs.validateOnly:
+            self.evaluate()
+        return self.generate_outputs()
+
+    def set_Status(self): # assumes that the outputs are already initialized
+        self.outputs.status = self.status()
+
 
 def generateSchema():
     print(TheEvaluationOptions.schema_json(indent=2))
 
 if __name__ == "__main__":
     generateSchema()
+

@@ -1,0 +1,11 @@
+site_name: gemsModules
+site_description:  Documentation for the GLYCAM Extensible Modeling Scripts Modules
+nav: 
+  - 'About'   : 'about.md'
+  - 'Modules Overview' : 'the_modules.md'
+  - 'Notable Services' : 'notable_services.md'
+  - 'Module Docs' :
+     - 'Sequence' : 
+       - 'Overview' : 'sequence/overview.md'
+       - 'Services' : 'sequence/services.md'
+

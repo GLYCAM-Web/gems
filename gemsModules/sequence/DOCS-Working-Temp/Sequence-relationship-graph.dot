@@ -1,0 +1,87 @@
+digraph {
+    rankdir=LR;
+    node [shape=box];
+    edge [style=bold];
+
+    Resource -> commonioResource [style=tapered];
+    Resource -> settingsLocation;
+    Resource -> setttingsFormats;
+
+    TheSequence -> BaseModel [style=tapered];
+
+    TheSequenceVariants -> BaseModel [style=tapered];
+
+    Definitions -> BaseModel   [style=tapered];
+
+    TheSystemSolvationOptions -> BaseModel [style=tapered];
+
+    TheResidueRingPucker -> BaseModel [style=tapered];
+
+    TheRotamerDihedralInfo -> BaseModel [style=tapered];
+
+    SingleLinkageRotamerData -> BaseModel [style=tapered];
+    SingleLinkageRotamerData -> TheRotamerDihedralInfo
+
+    TheResidueGeometryOptions -> BaseModel [style=tapered];
+    TheResidueGeometryOptions -> TheResidueRingPucker;
+
+    AllLinkageRotamerInfo -> BaseModel [style=tapered];
+    AllLinkageRotamerInfo -> SingleLinkageRotamerData;
+
+    Single3DStructureBuildDetails -> BaseModel [style=tapered];
+
+
+    StructureBuildInfo -> BaseModel [style=tapered];
+    StructureBuildInfo -> Single3DStructureBuildDetails;
+
+    TheLinkageGeometryOptions -> BaseModel [style=tapered];
+    TheLinkageGeometryOptions -> AllLinkageRotamerInfo;
+
+    TheGeometryOptions -> BaseModel [style=tapered];
+    TheGeometryOptions -> TheLinkageGeometryOptions;
+    TheGeometryOptions -> TheResidueGeometryOptions;
+
+    TheBuildOptions -> BaseModel [style=tapered];
+    TheBuildOptions -> TheGeometryOptions;
+    TheBuildOptions -> TheSystemSolvationOptions;
+
+    TheDrawOptions -> BaseModel [style=tapered];
+
+    TheEvaluationOptions -> BaseModel [style=tapered];
+
+    TheSequenceEvaluationOutput -> BaseModel [style=tapered];
+    TheSequenceEvaluationOutput -> TheEvaluationOptions;
+    TheSequenceEvaluationOutput -> TheDrawOptions;
+    TheSequenceEvaluationOutput -> TheBuildOptions;
+    TheSequenceEvaluationOutput -> TheSequenceVariants;
+
+    sequenceService -> commonio_Service [style=tapered];
+    sequenceService -> settings_Service;
+
+    SequenceOutputs -> BaseModel [style=tapered];
+    SequenceOutputs -> TheSequenceEvaluationOutput;
+    SequenceOutputs -> StructureBuildInfo;
+
+    SequenceInputs -> BaseModel [style=tapered];
+    SequenceInputs -> TheSequence;
+    SequenceInputs -> TheSequenceVariants;
+    SequenceInputs -> TheSystemSolvationOptions;
+    SequenceInputs -> TheGeometryOptions;
+    SequenceInputs -> TheBuildOptions;
+    SequenceInputs -> TheDrawOptions;
+    SequenceInputs -> TheEvaluationOptions;
+
+    sequenceEntity -> commonio_Entity [style=tapered];
+    sequenceEntity -> SequenceInputs;
+    sequenceEntity -> SequenceOutputs;
+    sequenceEntity -> sequenceService;
+
+
+    sequenceTransactionSchema -> commonio_TransactionSchema [style=tapered];
+    sequenceTransactionSchema -> sequenceEntity;
+    sequenceTransactionSchema -> projectio_CbProject;
+
+    Transaction -> commonio_Transaction [style=tapered];
+    Transaction -> sequenceTransactionSchema;
+
+}
