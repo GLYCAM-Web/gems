@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 
+import gemsModules
 from gemsModules import common
+from gemsModules.common.services import *
+from gemsModules.common.transaction import *
 from gemsModules.common.loggingConfig import *
+
 #Imports for Utilities
 import json
 import csv
@@ -9,7 +13,7 @@ import re
 import os
 import subprocess
 import sys
-
+import traceback
 
 #Imports for plots
 import numpy
@@ -23,22 +27,25 @@ if loggers.get(__name__):
 else:
   log = createLogger(__name__)
   
-  
-try:
-    virtLocation = os.getenv('VIRTUOSO_DB') + ":" + str(8890) + "/sparql"
-except Exception as error:
-    log.error("Unable to find the Virtuoso Database.  Quitting. " + str(error))
-    log.error(traceback.format_exc())
-    raise error
-try:
-    GemsPath = os.environ.get('GEMSHOME')
-except Exception as error:
-    log.error("Unable to find GEMSHOME " + str(error))
-    log.error(traceback.format_exc())
-    raise error
+
 
 
 def createLinkagesQuery(oligoID):
+    
+  try:
+      virtLocation = os.getenv('VIRTUOSO_DB') + ":" + str(8890) + "/sparql"
+  except Exception as error:
+      log.error("Unable to find the Virtuoso Database.  Quitting. " + str(error))
+      log.error(traceback.format_exc())
+      raise error
+  try:
+      GemsPath = os.environ.get('GEMSHOME')
+  except Exception as error:
+      log.error("Unable to find GEMSHOME " + str(error))
+      log.error(traceback.format_exc())
+      raise error
+  
+  
   log.info("Getting all of the Linkages") 
   
   
@@ -79,6 +86,19 @@ def createLinkagesQuery(oligoID):
     
   
 def createPlotlyQuery(oligoID, linkage):
+    
+  try:
+      virtLocation = os.getenv('VIRTUOSO_DB') + ":" + str(8890) + "/sparql"
+  except Exception as error:
+      log.error("Unable to find the Virtuoso Database.  Quitting. " + str(error))
+      log.error(traceback.format_exc())
+      raise error
+  try:
+      GemsPath = os.environ.get('GEMSHOME')
+  except Exception as error:
+      log.error("Unable to find GEMSHOME " + str(error))
+      log.error(traceback.format_exc())
+      raise error
   # Create a query to get the linkages and their information
   # This query will be used to create the plotly html figures
   
