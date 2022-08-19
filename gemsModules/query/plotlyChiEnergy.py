@@ -194,7 +194,12 @@ def generatePlotlyHTML(linkageJson, linkage, writeToFile=False):
   # linkageJson should be a single linkage and its information 
   # in json format, returned by submitting the queryString from
   # createPlotlyQuery to virtuoso
-  
+  try:
+      GemsPath = os.environ.get('GEMSHOME')
+  except Exception as error:
+      log.error("Unable to find GEMSHOME " + str(error))
+      log.error(traceback.format_exc())
+      raise error
   log.info("generatePlotlyHTML() was called")
   try:
     log.debug("linkageJson")
