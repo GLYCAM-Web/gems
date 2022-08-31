@@ -11,6 +11,9 @@ if loggingConfig.loggers.get(__name__):
 else:
     log = loggingConfig.createLogger(__name__)
 
+class ServiceSet(BaseModel):
+    setID : UUID = Field(..., description="Unique ID for this set of services")
+    serviceIDs : List[UUID] = Field(..., description="Ordered list of services in this set")
 
 class Service(BaseModel):
     """
@@ -25,12 +28,21 @@ class Service(BaseModel):
     )
     givenName: str = Field(
         None,
-        title='The name given this object in the transaction'
+        title='The name given this object in the transaction',
+        description='A place for users to specify a name.'
     )
     myUuid: UUID = Field(
         None,
         title='My UUID',
         description='ID to allow correlations between services and responses.'
+    )
+    mySet : ServiceSet = Field(
+        None,
+        description="The set of services that this service is a part of."
+    )
+    mySiblings : List[UUID] = Field(
+        None,
+        description="The set of services that are siblings of this service."
     )
     inputs: Json = None
     options: Dict[str, str] = Field(
@@ -38,7 +50,7 @@ class Service(BaseModel):
         description='Key-value pairs that are specific to each entity, service, etc'
     )
 
-class Response(Service):
+class Response(BaseModel):
     """
     Holds information about a response to a service request.
     This object will have different forms in each Entity.
@@ -49,6 +61,16 @@ class Response(Service):
             alias='type',
             description='The type service that produced this response.'
             )
+    givenName: str = Field(
+        None,
+        title='The name given this object in the transaction',
+        description='A place for users to specify a name.'
+    )
+    myUuid: UUID = Field(
+        None,
+        title='My UUID',
+        description='ID to allow correlations between services and responses.'
+    )
     outputs : Json = None
     notices : Notices = Notices()
 

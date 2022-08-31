@@ -11,4 +11,5 @@ class Known_Entities(GemsStrEnumA):
     """
     The entities that Delegator knows about.
     """
-    pass
+    module = 'Module'
+    meta_module = 'Meta_Module'

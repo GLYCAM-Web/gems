@@ -21,7 +21,7 @@ Module_Service_Dependencies : Dict[str, List[str]] = {
     }
 
 class Module_Service_Modules(Enum):
-    from gemsModules.docs.microcosm.module import serviceA_servicer, serviceB1_servicer, serviceB2_servicer, serviceC_servicer
+    from gemsModules.docs.microcosm.entity import serviceA_servicer, serviceB1_servicer, serviceB2_servicer, serviceC_servicer
     ServiceA = serviceA_servicer
     ServiceB1 = serviceB1_servicer
     ServiceB2= serviceB2_servicer

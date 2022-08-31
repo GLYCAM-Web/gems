@@ -1,0 +1,57 @@
+digraph {
+    label="Serrvicer Needs and Workflow (draft)";
+
+    node [shape=box];
+
+    wait_for_it [shape=diamond];
+    do_not_wait [shape=diamond];
+
+    error [shape=diamond];
+
+    lone_service;
+
+    subgraph cluster_siblings{
+        label="Sibing Services";
+        sibling1;
+        sibling2;
+        sibling3;
+
+	{ 
+        rank=same;
+        sibling1
+        sibling2
+        sibling3
+        ;
+        }
+        
+    }
+
+    subgraph cluster_sets{
+        label="Set of Services";
+        service1;
+        service2;
+        serviceDots [label="..."];
+        serviceN;
+
+        service1 -> service2 -> serviceDots -> serviceN ;
+
+    }
+
+    subgraph cluster_sibling_sets{
+        label="Sibling Sets";
+        node [shape=box3d];
+        set_sibling1 [label="Service 1\nService 2..."];
+        set_sibling2 [label="Service 1\nService 2..."];
+        set_sibling3 [label="Service 1\nService 2..."];
+
+	{ 
+        rank=same;
+        set_sibling1
+        set_sibling2
+        set_sibling3
+        ;
+        }
+        
+
+    }
+}

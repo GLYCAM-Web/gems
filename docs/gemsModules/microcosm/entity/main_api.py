@@ -3,6 +3,7 @@ from typing import Dict
 from gemsModules.docs.microcosm.common import main_api
 from gemsModules.docs.microcosm.common import entity_api
 from gemsModules.docs.microcosm.common import services_api
+from gemsModules.docs.microcosm.module import module_api
 from gemsModules.docs.microcosm.module import settings 
 
 class Module_Service(services_api.Service):
@@ -12,14 +13,16 @@ class Module_Response(services_api.Response):
     typename: settings.All_Available_Services
 
 class Module_Services(services_api.Services):
-    __root__ : Dict[str,Module_Service ] = None
+    __root__ : Dict[str,module_api.Module_Service ] = None
 
 class Module_Responses(services_api.Responses):
-    __root__ : Dict[str,Module_Response ] = None
+    __root__ : Dict[str,module_api.Module_Response ] = None
 
 class Module_Entity(entity_api.Entity):
-    services : Module_Services = Module_Services()
+    services  : Module_Services = Module_Services()
     responses : Module_Responses = Module_Responses()
+    inputs    : module_api.Module_User_Friendliness_Inputs = None
+    outputs   : module_api.Module_User_Friendliness_Outputs = None
 
 class Module_API(main_api.Common_API):
     entity  : Module_Entity 

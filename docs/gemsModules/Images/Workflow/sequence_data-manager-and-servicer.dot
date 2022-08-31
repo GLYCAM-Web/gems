@@ -1,0 +1,92 @@
+digraph {
+    rankdir=LR;
+    node [shape=box];
+    edge [style=solid]
+
+    subgraph cluster_UserData {
+        label="User Input";
+        edge [style=invis];
+        {
+            rank=same; 
+            Draw_Options ->
+            Evaluation_Options -> 
+            Build_Options -> 
+            Geometry_Options -> 
+            Solvation_Options -> 
+            Sequence_Variants -> 
+            Sequence
+            ;
+        }
+    }
+    subgraph cluster_ServiceData {
+        label="Service Data";
+        Minimize_Data [label="*Minimization*\nJob Directory\nSubmission Script"]
+        Build_All_Rotamers_Data [label="*Build_All_Rotamers*\nBuild Directory\nList of Rotamer IDs\nBuild Options\nSolvation Options"]
+        Build_Default_Rotamer_Data [label="*Build Default*\nBuild Directory\nRotamer ID"]
+        Evaluate_Sequence_Data [label="*Evaluate*\nIndex-ordered Sequence\nEvaluation Options"]
+        Validate_Sequence_Data [label="*Validate*\nIncoming Sequence"]
+        {
+            edge [style=invis];
+            rank=same; 
+            Minimize_Data ->
+            Build_All_Rotamers_Data -> 
+            Build_Default_Rotamer_Data -> 
+            Evaluate_Sequence_Data -> 
+            Validate_Sequence_Data 
+            ;
+        }
+    }
+    subgraph cluster_Servicer {
+        Servicer [shape=ellipse];
+        edge [style=invis];
+        node [shape=point];
+        {
+            rank=same; 
+            Minimize_Servicer ->
+            Build_All_Rotamers_Servicer -> 
+            Build_Default_Rotamer_Servicer -> 
+            Evaluate_Sequence_Servicer -> 
+            Validate_Sequence_Servicer ->
+            Servicer
+            ;
+        }
+    }
+    subgraph cluster_Services {
+        label="Services";
+        edge [style=invis];
+        {
+            rank=same; 
+            Minimize ->
+            Build_All_Rotamers -> 
+            Build_Default_Rotamer -> 
+            Evaluate_Sequence -> 
+            Validate_Sequence 
+            ;
+        }
+    }
+    
+    Data_Manager [label="Data\nManager" shape=ellipse];
+//    Servicer [shape=ellipse];
+
+    Draw_Options -> Data_Manager ;
+    Evaluation_Options -> Data_Manager ;
+    Build_Options -> Data_Manager ;
+    Geometry_Options -> Data_Manager ;
+    Solvation_Options -> Data_Manager ;
+    Sequence_Variants -> Data_Manager ;
+    Sequence -> Data_Manager ;
+
+    Data_Manager -> Evaluate_Sequence_Data ;
+    Data_Manager -> Build_All_Rotamers_Data ;
+    Data_Manager -> Build_Default_Rotamer_Data ;
+    Data_Manager -> Minimize_Data ;
+    Data_Manager -> Validate_Sequence_Data ;
+
+    Minimize_Data -> Minimize_Servicer -> Minimize ;
+    Build_All_Rotamers_Data -> Build_All_Rotamers_Servicer -> Build_All_Rotamers ;
+    Build_Default_Rotamer_Data -> Build_Default_Rotamer_Servicer -> Build_Default_Rotamer ;
+    Evaluate_Sequence_Data -> Evaluate_Sequence_Servicer -> Evaluate_Sequence ;
+    Validate_Sequence_Data -> Validate_Sequence_Servicer -> Validate_Sequence ;
+
+}
+
