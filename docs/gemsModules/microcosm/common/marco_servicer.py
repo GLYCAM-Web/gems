@@ -8,9 +8,24 @@ else:
     log = loggingConfig.createLogger(__name__)
 
 ############################################################################
+##  Needs to become something like this for interface to business logic code
+############################################################################
+## 
+## class Service (Protocol) :   #### <---- redefine Service for the local need
+##     neededThingOne : type    ##  Only include here the things the service needs
+##     neededThingTwo : type 
+##     neededThingThree : type 
+##
+## class Response (Protocol) :   #### <---- redefine Response for the local need
+##     answerThingOne : type    ##  Only include here the things the service needs
+##     answerThingTwo : type    ##  Figure out how to merge that with the Pydantic Response
+##     answerThingThree : type  ## The need for notices complicates this
+##
+
+############################################################################
 ##  Needs to become, once data manager is implemented:   
 ############################################################################
-##from gemsModules.docs.microcosm.common.main_api_services import Service, Response
+###  Delete this???   ##from gemsModules.docs.microcosm.common.main_api_services import Service, Response
 ##def Serve(service : Service) -> Response:
 ##    log.info("The marco servicer was called.")
 ##    response = Response()
