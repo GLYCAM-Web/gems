@@ -1,39 +1,49 @@
 digraph {
     node [shape=box];
+    compound=True;
 
     label="Single-entity, multiple-service workflow overview.";
 
     Receiver [label="Receiver\nInstantiates Transaction\nwith incoming JSON"];
    
-    subgraph cluster_request {
-        rankdir=LR;
-        label="Request management:\nEnsures that the list of Service objects is complete.\nWorks on the Transaction.  Changes only the outputs.";
-        Request_Manager [label="Request Manager"];
-        Data_Populator [label="2. Data Populator\nEnsures that each Service object\nhas all the data it needs"];
-        Service_Organizer [label="1. Service Organizer\nEnsures that all Service objects\nare present in the right order."];
-
-        {
-        rank=same;
-        Request_Manager Service_Organizer Data_Populator;
+    subgraph cluster_transaction_manager {
+        label="Transaction manager";
+        subgraph cluster_input_parser {
+            label="Input Parser\nGenerates Service Tree &\nensures outgoing services list\nis complete and correct";
+            Service_Tree_Maker [label="Service Tree Maker\n"];
+            Data_Populator [label="Data Populator\nEnsures that each Service object\nhas all the data it needs"];
+            Service_Serializer [label="Service Serializer\nEnsures that all Service objects\nare present in serial order\nin the outgoing Transaction."];
+            { rank=same; Service_Tree_Maker -> Data_Populator; }  
+            Service_Tree_Maker -> Service_Serializer ;
         }
-    
+        subgraph cluster_response_manager {
+            label="Response Manager\nEnsures that response data is\ncomplete in the outgoing transaction";
+            Response_Summarizer [label="Response Summarizer:\nGenerates response summaries &\npopulates user-friendly outputs."];
+            Response_Serializer [label="Response Serializer\nEnsures that all Response objects\nare present in serial order."];
+
+            Response_Summarizer -> Response_Serializer ;
+        }
     }
 
-    Main_Servicer [label="Main Servicer for all Services\nRuns each service in turn"];
-    Service_Manager [label="Service Manager\nTranslates to and from\nneeds of the Service's\n business logic"];
-    Service_Logic [label="Service Logic\nData IO for the\nService's business logic"];
+    subgraph cluster_service_manager {
+        label="Services manager";
+        Main_Servicer [label="Main Servicer for all Services\nRuns each service in turn &\nStops progress if needed."];
+        Service_Interface [label="Service Interface\nTranslates to and from\nneeds of the Service's\n business logic"];
+        Service_Logic [label="Service Logic\nData IO for the\nService's business logic"];
+        Response_Filler [label="Response Filler\nEnsures there is a response for\nany services that were not run."];
+
+        Main_Servicer -> Service_Interface [label="Service Object  "];
+        Main_Servicer -> Service_Interface [label="Response Object  " dir="back"];
+        { rank=same; Main_Servicer -> Response_Filler ;}
+
+        Service_Interface -> Service_Logic [label="JSON-agnostic inputs  "];
+        Service_Interface -> Service_Logic [label="JSON-agnostic outputs  " dir="back"];
+    }
     
-    Receiver -> Request_Manager [label="Transaction object  "];
-    Request_Manager -> Receiver [label="Outgoing JSON string  " constraint=False];
+    Receiver -> Service_Tree_Maker [label="Transaction object  " lhead=cluster_input_parser];
+    Receiver -> Response_Summarizer [label="Outgoing JSON string  " dir="back" lhead=cluster_response_manager];
     
-    Request_Manager -> Main_Servicer [label="Services object  "];
-    Main_Servicer -> Request_Manager [label="Responses object  " constraint=False];
-    
-    Main_Servicer -> Service_Manager [label="Service object  "];
-    Service_Manager -> Main_Servicer [label="Response object  " constraint=False];
-    
-    Service_Manager -> Service_Logic [label="JSON-agnostic inputs  "];
-    Service_Logic -> Service_Manager [label="JSON-agnostic outputs  " constraint=False];
-    
- 
+    Service_Serializer -> Main_Servicer [label="Service Tree Object  " ltail=cluster_input_parser];
+    Response_Serializer -> Main_Servicer [label="Response Tree Object  " dir="back" ltail=cluster_response_manager];
+
 }
