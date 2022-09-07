@@ -36,14 +36,6 @@ class Service(BaseModel):
         title='My UUID',
         description='ID to allow correlations between services and responses.'
     )
-    mySet : ServiceSet = Field(
-        None,
-        description="The set of services that this service is a part of."
-    )
-    mySiblings : List[UUID] = Field(
-        None,
-        description="The set of services that are siblings of this service."
-    )
     inputs: Json = None
     options: Dict[str, str] = Field(
         None,
