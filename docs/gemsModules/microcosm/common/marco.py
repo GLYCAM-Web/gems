@@ -6,11 +6,15 @@ from docs.gemsModules.microcosm.common.main_settings import WhoIAm
 ####
 
 
+#### There is probably a better way to do this.
 from docs.gemsModules.microcosm.common import loggingConfig
 if loggingConfig.loggers.get(__name__):
     pass
 else:
     log = loggingConfig.createLogger(__name__)
+#### The following is another way, but I don't know that it is better..  It is probably worse. 
+#import os
+#exec(open(os.path.dirname(__file__) + "/../common/logger.py").read())
 
 
 ## These are a little redundant in this simple example.
@@ -37,5 +41,4 @@ class test_inputs :
 
 if __name__== "__main__":
     service_outputs = marco(test_inputs)
-#    log.info(f"service_outputs: {service_outputs}")
     print(f"service_outputs: {service_outputs}")

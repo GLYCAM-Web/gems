@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 from uuid import UUID
-from typing import Dict, List 
+from typing import Dict, List, Protocol 
 from pydantic import BaseModel, Field, Json
 from gemsModules.docs.microcosm.common.main_api_notices import Notices
 from gemsModules.docs.microcosm.common.main_settings import All_Available_Services
 
-from gemsModules.docs.microcosm.common import loggingConfig 
+from gemsModules.docs.microcosm.common import loggingConfig
+from gemsModules.docs.microcosm.common.utils import GemsStrEnum 
 if loggingConfig.loggers.get(__name__):
     pass
 else:
@@ -112,8 +113,43 @@ class Responses(BaseModel):
         self.__root__.append(thisResponse)
 
 
+class Response_To_State(GemsStrEnum) :
+    Proceed = 'Proceed'
+    StopChain = 'StopChain'
+    StopAll = 'StopAll'
 
 
+class Response_Status(GemsStrEnum) :
+    OK = 'OK'
+    ERROR = 'ERROR'
+    WARNING = 'WARNING'
+    UNKNOWN = 'UNKNOWN'
+
+
+class Response_Package() :
+    def __init__(self, 
+            keyString : str,
+            response : Response,
+            status : Response_Status = 'OK',
+            to_state : Response_To_State = 'Proceed'
+            ) :
+        self.response = response
+        self.keyString = keyString
+        self.status = status
+        self.to_state = to_state
+
+
+class Service_Package() :
+    def __init__(self,
+            keyString : str,
+            service : Service,
+            server_Module: callable
+            ) -> None :
+        self.service = service
+        self.keyString = keyString
+        self.server_Module = server_Module
+
+    
 
 def generateSchema():
     import json

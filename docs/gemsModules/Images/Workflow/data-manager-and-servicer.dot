@@ -27,7 +27,7 @@ digraph {
         }
         Response_Summarizer -> Project_Manager [ltail=cluster_response_manager];
     }
-    Service_Tree [label="Service Tree Object\nStores Service objects and info about running them.\nThis is not the JSON Object called Services.\nThis is an independent structure."];
+    Service_Tree [label="Service Tree Object\nStores Service_Package objects and info about running them.\nThis is not the JSON Object called Services.\nThis is an independent structure."];
     Service_Serializer -> Service_Tree [style=invis];
 
     subgraph cluster_service_manager {
@@ -37,8 +37,8 @@ digraph {
         Service_Logic [label="Service Logic\nData IO for the Service's business logic.\nNeeds not know about the API at all."];
         Response_Filler [label="Response Filler\nGenerates a response for\nany services that were not run."];
 
-        Main_Servicer -> Service_Interface [label="Service Object  "];
-        Main_Servicer -> Service_Interface [label="Response Object  " dir="back"];
+        Main_Servicer -> Service_Interface [label="Service_Package  "];
+        Main_Servicer -> Service_Interface [label="Response_Package  " dir="back"];
         { rank=same; Main_Servicer -> Response_Filler ;}
 
         Service_Interface -> Service_Logic [label="JSON-agnostic inputs  "];
