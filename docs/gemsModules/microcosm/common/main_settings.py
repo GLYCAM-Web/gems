@@ -2,7 +2,7 @@
 
 # As much as possible, all the specifics, the non-abstractions, should be in a settings file.
 
-from gemsModules.docs.microcosm.common.utils import GemsStrEnum
+from gemsModules.docs.microcosm.common.code_utils import GemsStrEnum
 
 from gemsModules.docs.microcosm.common import loggingConfig 
 if loggingConfig.loggers.get(__name__):

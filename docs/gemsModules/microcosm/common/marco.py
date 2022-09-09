@@ -1,21 +1,13 @@
 #!/usr/bin/env python3
 from typing import Protocol
 
+from docs.gemsModules.microcosm.common.logger import Set_Up_Logging
+log = Set_Up_Logging(__name__)
+
+
 ####  Figure out how to make this easy to change for each entity
 from docs.gemsModules.microcosm.common.main_settings import WhoIAm
 ####
-
-
-#### There is probably a better way to do this.
-from docs.gemsModules.microcosm.common import loggingConfig
-if loggingConfig.loggers.get(__name__):
-    pass
-else:
-    log = loggingConfig.createLogger(__name__)
-#### The following is another way, but I don't know that it is better..  It is probably worse. 
-#import os
-#exec(open(os.path.dirname(__file__) + "/../common/logger.py").read())
-
 
 ## These are a little redundant in this simple example.
 class serviceInputs (Protocol):

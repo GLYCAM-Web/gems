@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # ###############################################################
-from gemsModules.docs.microcosm.common.utils import GemsStrEnum
+from gemsModules.docs.microcosm.common.code_utils import GemsStrEnum
 from typing import Dict, List
 from pydantic import BaseModel, Field, PrivateAttr
 from gemsModules.docs.microcosm.common.loggingConfig import *
