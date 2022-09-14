@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from typing import List, Dict
-from gemsModules.docs.microcosm.common.main_servicer_settings import All_Available_Services as Common_Available_Services
+from gemsModules.docs.microcosm.common.main_settings import All_Available_Services as Common_Available_Services
 from gemsModules.docs.microcosm.common.main_servicer_settings import All_Service_Modules as Common_Service_Modules
-from gemsModules.docs.microcosm.common.utils import GemsStrEnum
+from gemsModules.docs.microcosm.common.code_utils import GemsStrEnum
 from enum import Enum
 
 class Module_Available_Services(GemsStrEnum):

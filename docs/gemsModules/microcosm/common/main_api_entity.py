@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, validator, Json
 from gemsModules.docs.microcosm.common.main_api_notices import Notices
 from gemsModules.docs.microcosm.common.main_api_services import Services, Responses
 from gemsModules.docs.microcosm.common.main_api_resources import Resources
@@ -19,6 +19,16 @@ class Entity(BaseModel):
             title='Type',
             alias='type'
             )
+    inputs : Json = Field(
+            None,
+            title='Inputs',
+            description='User-friendly, top-level inputs to the services.'
+    )
+    outputs : Json = Field(
+            None,
+            title='Inputs',
+            description='User-friendly, top-level outputs from the services.'
+    )
     services : Services = Services()
     responses : Responses = Responses()
     resources : Resources = Resources()
