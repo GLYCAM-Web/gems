@@ -6,7 +6,6 @@ from gemsModules.docs.microcosm.common.main_api_notices import Notices
 from gemsModules.docs.microcosm.common.main_settings import All_Available_Services
 
 from gemsModules.docs.microcosm.common import loggingConfig
-from gemsModules.docs.microcosm.common.code_utils import GemsStrEnum 
 if loggingConfig.loggers.get(__name__):
     pass
 else:

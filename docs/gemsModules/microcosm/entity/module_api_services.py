@@ -11,41 +11,31 @@ from gemsModules.docs.microcosm.entity.serviceB1_api import outputs as serviceB1
 from gemsModules.docs.microcosm.entity.serviceB2_api import outputs as serviceB2_outputs
 from gemsModules.docs.microcosm.entity.serviceC_api import outputs as serviceC_outputs
 
-#All_The_Service_Inputs = Union [ 
-        #serviceA_inputs,
-        #serviceB1_inputs,
-        #serviceB2_inputs,
-        #serviceC_inputs 
-        #]
-
-#All_The_Response_Outputs = Union [ 
-#        serviceA_outputs,
-#        serviceB1_outputs,
-#        serviceB2_outputs,
-#        serviceC_outputs 
-#        ]
-
-
-class Module_Service(services_api.Service):
-    typename : settings.All_Available_Services = None
-    inputs : Union [ 
+All_The_Service_Inputs = Union [ 
         serviceA_inputs,
         serviceB1_inputs,
         serviceB2_inputs,
         serviceC_inputs 
-        ] = None
+        ]
+
+All_The_Response_Outputs = Union [ 
+        serviceA_outputs,
+        serviceB1_outputs,
+        serviceB2_outputs,
+        serviceC_outputs 
+        ]
+
+
+class Module_Service(services_api.Service):
+    typename : settings.All_Available_Services = None
+    inputs : All_The_Service_Inputs = None
 
     class Config:
         smart_union = True
 
 class Module_Response(services_api.Response):
     typename: settings.All_Available_Services = None
-    outputs : Union [ 
-        serviceA_outputs,
-        serviceB1_outputs,
-        serviceB2_outputs,
-        serviceC_outputs 
-        ] = None
+    outputs : All_The_Response_Outputs = None
 
     class Config:
         smart_union = True
