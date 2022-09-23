@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 from typing import Protocol
-from pydantic import BaseModel
 
 from docs.gemsModules.microcosm.common.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
@@ -26,19 +25,3 @@ def marco (inputs : serviceInputs) -> serviceOutputs:
     else : 
         service_outputs["message"]="Marco request sent to wrong entity."
     return service_outputs
-
-
-class test_inputs :
-    entity : str = 'CommonServicer'
-    random_other_thing: str = 'This is irrelevant input.'
-
-class test_outputs(BaseModel) :
-    message : str = 'This is default output.'
-    other : str = 'This is irrelevant output.'
-
-
-if __name__== "__main__":
-    temp=marco(test_inputs())
-    print(temp)
-    service_outputs=test_outputs.parse_obj(temp)
-    print(f"service_outputs: {service_outputs}")

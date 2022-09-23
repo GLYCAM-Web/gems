@@ -20,8 +20,8 @@ class marco_Outputs(BaseModel) :
         description="The response to the Marco request.")
 
 class marco_Service(Service) :
-    typename = 'Marco'
-    inputs : marco_Inputs
+    typename : str  = "Marco"
+    inputs : marco_Inputs = marco_Inputs()
 
 class marco_Response(Response) :
     outputs : marco_Outputs

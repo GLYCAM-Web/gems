@@ -57,9 +57,10 @@ class Transaction(ABC):
             log.error(error)
             log.error(traceback.format_exc())
             self.generate_error_response(Brief='JsonParseEror',AdditionalInfo={'error': str(errMsg)})
+            print("problem instantiating transaction with: " + str(in_string))
             return 1
 
-    def populate_inputs(self, in_string : str):
+    def populate_inputs(self, in_string : str, no_check_fields=False):
         self.inputs = self.get_API_type().parse_raw(in_string)
         log.debug("The inputs is: ")
         log.debug(self.inputs.json(indent=2))

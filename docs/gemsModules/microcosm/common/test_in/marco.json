@@ -1,0 +1,11 @@
+{
+	"entity": {
+		"type": "CommonServicer",
+		"services": {
+			"isAnybodyHome": {
+				"type": "Marco"
+			}
+		}
+	},
+	"prettyPrint" : true
+}
