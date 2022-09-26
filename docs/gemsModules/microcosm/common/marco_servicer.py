@@ -20,6 +20,7 @@ def Serve(service : Service) -> Response:
        response.notices.addDefaultNotice(Brief='InvalidInput', Messenger='Marco Sevicer')
    else :
        from docs.gemsModules.microcosm.common.marco import marco
+       response.typename = 'Marco'
        response.outputs = marco(service.inputs)
    return response
 
