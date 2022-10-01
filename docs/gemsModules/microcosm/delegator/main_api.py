@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 from pydantic import Json,validator
-from gemsModules.docs.microcosm.common import main_api
-from gemsModules.docs.microcosm.delegator.redirector_settings import Known_Entities
+from ..common import main_api
+from .redirector_settings import Known_Entities
 
-from gemsModules.docs.microcosm.common import loggingConfig
+from ..common import loggingConfig
 if loggingConfig.loggers.get(__name__):
     pass
 else:
@@ -42,7 +42,3 @@ class Redirector_Transaction(Delegator_Transaction):
     def get_API_type(self):
         return Redirector_API
 
-
-if __name__ == "__main__":
-    transaction = Delegator_Transaction()
-    print(transaction.generate_schema())

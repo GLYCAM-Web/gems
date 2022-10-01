@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # ###############################################################
-from gemsModules.docs.microcosm.common.code_utils import GemsStrEnum
+from .code_utils import GemsStrEnum
 from typing import Dict, List
 from pydantic import BaseModel, Field, PrivateAttr
-from gemsModules.docs.microcosm.common.loggingConfig import *
+from .loggingConfig import *
 
 
 if loggers.get(__name__):
@@ -63,7 +63,7 @@ class Notice(BaseModel):
 
 
 def makeDefaultNoticesList() :
-    from gemsModules.common.noticedata import NoticeData
+    from .notice_data import NoticeData
     theNotices : List[Notice] = []
     tempNotice : Notice = Notice()   
     for noticedatum in NoticeData :
@@ -222,10 +222,4 @@ def testDefaultNoticeAddition():
     tempNotices.addDefaultNotice(Brief='GemsError')
     tempNotices.printNotices(style='terse',sendTo='stdout')
 
-
-if __name__ == "__main__":
-    generateSchema()
-    showDefaultNotices()
-    testDefaultNoticeAddition()
-    pass
 

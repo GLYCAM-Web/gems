@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from abc import ABC, abstractmethod
 
-from gemsModules.docs.microcosm.common.logger import Set_Up_Logging
+from .logger import Set_Up_Logging
 Set_Up_Logging(__name__)
 
 class Siblings(ABC) :

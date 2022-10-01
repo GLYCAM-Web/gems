@@ -2,16 +2,13 @@
 import os, sys
 import json
 import uuid
+import traceback
+from typing import Any, List
 from datetime import datetime
-#import gemsModules.docs.microcosm.common.main_settings as commonsettings
-#import gemsModules.docs.microcosm.common.logic as commonlogic
-from gemsModules.docs.microcosm.common.main_api_notices import Notice
-#from gemsModules.docs.micrososm.project import settings as project_settings
 from pydantic import BaseModel, Field, ValidationError, constr
 from pydantic.schema import schema
-from typing import Any, List
-from gemsModules.docs.microcosm.common.loggingConfig import *
-import traceback
+from ..common.main_api_notices import Notice
+from ..common.loggingConfig import *
 
 # ## TODO - a lot of this info really belongs elsewhere.  It's not really
 #    project information.  For example, 'seqID' only applies to the sequence
@@ -573,5 +570,3 @@ def generateProjectSchema():
     print(Project.schema_json(indent=2))
 
 
-if __name__ == "__main__":
-    generateProjectSchema()

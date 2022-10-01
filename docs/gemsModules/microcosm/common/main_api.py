@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 from pydantic import BaseModel
 from abc import ABC, abstractmethod
-from gemsModules.docs.microcosm.project.main_api import Project 
-from gemsModules.docs.microcosm.common.main_api_entity import Entity
-from gemsModules.docs.microcosm.common.main_api_notices import Notices
-from gemsModules.docs.microcosm.common import main_settings
+from ..project.main_api import Project 
+from .main_api_entity import Entity
+from .main_api_notices import Notices
+from . import main_settings
 import traceback
 
-from gemsModules.docs.microcosm.common import loggingConfig 
+from . import loggingConfig 
 if loggingConfig.loggers.get(__name__):
     pass
 else:
@@ -100,6 +100,3 @@ class Transaction(ABC):
 
 def generateSchema():
     print(Common_API.schema_json(indent=2))
-
-if __name__ == "__main__":
-    generateSchema()

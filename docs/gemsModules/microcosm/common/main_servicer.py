@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-from gemsModules.docs.microcosm.common.main_api import Transaction
-from gemsModules.docs.microcosm.common.main_api_services import Service, Services
-from gemsModules.docs.microcosm.common.main_settings import All_Available_Services
-from gemsModules.docs.microcosm.common.main_servicer_settings import All_Service_Modules
+from .main_api import Transaction
+from .main_api_services import Service, Services
+from .main_settings import All_Available_Services
+from .main_servicer_settings import All_Service_Modules
 
 class Servicer:
     def __init__(self, transaction : Transaction):

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 from typing import Callable, List, Union
-from gemsModules.docs.microcosm.common.main_api_services import Service, Response
-from gemsModules.docs.microcosm.common.code_utils import GemsStrEnum
-from gemsModules.docs.microcosm.common.sibling_processes import Siblings, Sibling_Tree
+from .main_api_services import Service, Response
+from .code_utils import GemsStrEnum
+from .sibling_processes import Siblings, Sibling_Tree
 
-from docs.gemsModules.microcosm.common.logger import Set_Up_Logging
+from .logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 class Response_Next_State(GemsStrEnum) :
@@ -65,5 +65,3 @@ class Sibling_Tree() :
     def add_list(self, siblings_list) :
         self.siblings_list.append(siblings_list)
 
-if __name__ == "__main__":
-    pass

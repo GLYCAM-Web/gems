@@ -9,7 +9,3 @@ class outputs (BaseModel):
     B2_bool : bool = True
 
 
-
-if __name__ == "__main__" :
-    print(inputs.schema_json(indent=2))
-    print(outputs.schema_json(indent=2))

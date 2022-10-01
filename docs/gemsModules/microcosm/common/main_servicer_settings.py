@@ -2,14 +2,14 @@
 
 from enum import Enum
 
-from gemsModules.docs.microcosm.common import loggingConfig 
+from . import loggingConfig 
 if loggingConfig.loggers.get(__name__):
     pass
 else:
     log = loggingConfig.createLogger(__name__)
 
 class Service_Modules(Enum):
-    from gemsModules.docs.microcosm.common import marco_servicer, status_servicer
+    from . import marco_servicer, status_servicer
     Default = marco_servicer 
     Marco = marco_servicer
     Status = status_servicer

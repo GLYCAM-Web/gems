@@ -2,7 +2,7 @@
 from collections import namedtuple
 from typing import List
 
-from gemsModules.docs.microcosm.common.loggingConfig import *
+from .loggingConfig import *
 if loggers.get(__name__):
     pass
 else:

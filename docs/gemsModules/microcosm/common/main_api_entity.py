@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 from pydantic import BaseModel, Field, validator, Json
-from gemsModules.docs.microcosm.common.main_api_notices import Notices
-from gemsModules.docs.microcosm.common.main_api_services import Services, Responses
-from gemsModules.docs.microcosm.common.main_api_resources import Resources
-from gemsModules.docs.microcosm.common import main_settings
+from .main_api_notices import Notices
+from .main_api_services import Services, Responses
+from .main_api_resources import Resources
+from . import main_settings
 
-from gemsModules.docs.microcosm.common import loggingConfig 
+from . import loggingConfig 
 
 if loggingConfig.loggers.get(__name__):
     pass
@@ -43,6 +43,3 @@ class Entity(BaseModel):
 
 def generateSchema():
     print(Entity.schema_json(indent=2))
-
-if __name__ == "__main__":
-    generateSchema()

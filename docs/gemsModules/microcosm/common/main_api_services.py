@@ -2,10 +2,10 @@
 from uuid import UUID
 from typing import Dict, List, Protocol 
 from pydantic import BaseModel, Field, Json
-from gemsModules.docs.microcosm.common.main_api_notices import Notices
-from gemsModules.docs.microcosm.common.main_settings import All_Available_Services
+from .main_api_notices import Notices
+from .main_settings import All_Available_Services
 
-from gemsModules.docs.microcosm.common import loggingConfig
+from . import loggingConfig
 if loggingConfig.loggers.get(__name__):
     pass
 else:
@@ -113,5 +113,3 @@ def generateSchema():
     print(Services.schema_json(indent=2))
 #    print(Responses.schema_json(indent=2))
 
-if __name__ == "__main__":
-    generateSchema()

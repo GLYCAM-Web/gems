@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from gemsModules.docs.microcosm.common import loggingConfig 
+from ..common import loggingConfig 
 if loggingConfig.loggers.get(__name__):
     pass
 else:

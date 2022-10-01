@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-from gemsModules.docs.microcosm.common.utils import GemsStrEnumA
+from ..common.code_utils import GemsStrEnum
 
-from gemsModules.docs.microcosm.common import loggingConfig
+from ..common import loggingConfig
 if loggingConfig.loggers.get(__name__):
     pass
 else:
     log = loggingConfig.createLogger(__name__)
 
-class Known_Entities(GemsStrEnumA):
+class Known_Entities(GemsStrEnum):
     """
     The entities that Delegator knows about.
     """

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from typing import Dict, List
 from pydantic import BaseModel, Field, Json
-from gemsModules.docs.microcosm.common.main_api_notices import Notices
-from gemsModules.docs.microcosm.common.loggingConfig import *
+from .main_api_notices import Notices
+from .loggingConfig import *
 
 if loggers.get(__name__):
     pass
@@ -44,7 +44,3 @@ def generateJson():
     print(thisResource.json(indent=2))
 
 
-if __name__ == "__main__":
-  generateSchema()
-#  generateJson()
-    

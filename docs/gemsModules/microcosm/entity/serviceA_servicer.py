@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from gemsModules.docs.microcosm.serviceA_api import inputs as serviceA_inputs
+from .serviceA_api import ServiceA_Service, ServiceA_Response
 
 
 def Serve(service: ServiceA_Service) -> ServiceA_Response :

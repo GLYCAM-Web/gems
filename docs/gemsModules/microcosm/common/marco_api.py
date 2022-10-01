@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from pydantic import BaseModel, Field
-from gemsModules.docs.microcosm.common.main_api_services import Service, Response
+from .main_api_services import Service, Response
 
-from gemsModules.docs.microcosm.common import loggingConfig 
+from . import loggingConfig 
 if loggingConfig.loggers.get(__name__):
     pass
 else:
@@ -13,6 +13,9 @@ class marco_Inputs(BaseModel) :
     entity : str  = Field(
         None,
         description="The entity to which the Marco request is sent.")
+    who_I_am : str = Field(
+        None,
+        description="The name of the entity receiving the Marco request.  Written by GEMS.")
     
 class marco_Outputs(BaseModel) :
     message : str  = Field(

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 from typing import Dict
-from gemsModules.docs.microcosm.common import main_api
-from gemsModules.docs.microcosm.common import entity_api
-from gemsModules.docs.microcosm.common import services_api
-from gemsModules.docs.microcosm.module import module_api
-from gemsModules.docs.microcosm.module import settings 
+from ..common import main_api
+from ..common import main_api_entity as entity_api
+from ..common import main_api_services as services_api
+from . import module_api_services, module_api
+from . import main_settings as settings
 
 class Module_Service(services_api.Service):
     typename: settings.All_Available_Services
@@ -13,10 +13,10 @@ class Module_Response(services_api.Response):
     typename: settings.All_Available_Services
 
 class Module_Services(services_api.Services):
-    __root__ : Dict[str,module_api.Module_Service ] = None
+    __root__ : Dict[str,module_api_services.Module_Service ] = None
 
 class Module_Responses(services_api.Responses):
-    __root__ : Dict[str,module_api.Module_Response ] = None
+    __root__ : Dict[str,module_api_services.Module_Response ] = None
 
 class Module_Entity(entity_api.Entity):
     services  : Module_Services = Module_Services()
@@ -40,7 +40,3 @@ class Module_Transaction(main_api.Transaction):
     def generateSchema(self):
         print(self.get_API_type().schema_json(indent=2))
 
-if __name__ == "__main__":
-    transaction = Module_Transaction()
-    print("The schema type is: " + str(transaction.get_API_type()))
-    transaction.generateSchema()

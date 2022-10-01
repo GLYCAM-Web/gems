@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-from gemsModules.docs.microcosm.common.main_api import Transaction
-from gemsModules.docs.microcosm.common.main_servicer import Servicer
-from gemsModules.docs.microcosm.common import main_settings
 from pydantic import ValidationError
 from abc import ABC, abstractmethod
+from .main_api import Transaction
+from .main_servicer import Servicer
+from . import main_settings
 
 class Receiver(ABC):
 

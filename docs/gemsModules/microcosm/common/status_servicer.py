@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-from gemsModules.docs.microcosm.common.main_api import Transaction
+from .main_api import Transaction
 
-from gemsModules.docs.microcosm.common import loggingConfig 
+from . import loggingConfig 
 if loggingConfig.loggers.get(__name__):
     pass
 else:

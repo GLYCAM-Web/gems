@@ -2,7 +2,7 @@
 from enum import Enum
 import traceback
 
-from gemsModules.docs.microcosm.common.logger import Set_Up_Logging
+from .logger import Set_Up_Logging
 Set_Up_Logging(__name__)
 
 
@@ -143,5 +143,3 @@ def main():
     print("The JSON object is:")
     print(theJsonObject)
 
-if __name__ == "__main__":
-    main() 
