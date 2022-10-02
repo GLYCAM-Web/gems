@@ -7,6 +7,8 @@ from  .serviceB1_api     import ServiceB1_Service, ServiceB1_Response
 from  .serviceB2_api     import ServiceB2_Service, ServiceB2_Response
 from  .serviceC_api      import ServiceC_Service, ServiceC_Response
 
+WhoIAm = "Module_Entity"
+
 class Module_Available_Services(GemsStrEnum):
     """
     The services that this module provides.

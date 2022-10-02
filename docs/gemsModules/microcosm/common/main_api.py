@@ -19,6 +19,7 @@ class Common_API(BaseModel):
     entity  : Entity       # The only required part of the JSON is the entity.
     project : Project = None
     notices : Notices = Notices()
+    prettyPrint : bool = False
 
 
 class Transaction(ABC):
@@ -61,12 +62,14 @@ class Transaction(ABC):
                 self.initialize_outputs_from_inputs()
             return 0
         except Exception as error:
-            errMsg = "problem instantiating transaction with: " + str(in_string)
+            errMsg = "problem processing this string: " + str(in_string)
             log.error(errMsg)
             log.error(error)
             log.error(traceback.format_exc())
             self.generate_error_response(Brief='JsonParseEror',AdditionalInfo={'error': str(errMsg)})
-            print("problem instantiating transaction with: " + str(in_string))
+            print("problem processing this string: " + str(in_string))
+            print("the error message is: ")
+            print(error)
             return 1
 
     def populate_inputs(self, in_string : str, no_check_fields=False):
@@ -80,7 +83,7 @@ class Transaction(ABC):
         self.outputs = self.inputs.copy(deep=True)
 
     # the use of EntityType here will break elsewhere, I think
-    def generate_error_response(self, Brief='UnknownError', EntityType=main_settings.WhoIAm, AdditionalInfo=None) :
+    def generate_error_response(self, Brief='UnknownError', EntityType=settings_main.WhoIAm, AdditionalInfo=None) :
         self.outputs = self.get_API_type().construct(entity=Entity.construct(entityType=EntityType))
         self.outputs.notices.addDefaultNotice(Brief=Brief, Messenger=EntityType, AdditionalInfo=AdditionalInfo)
         self.build_outgoing_string()

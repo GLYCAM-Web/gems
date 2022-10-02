@@ -9,7 +9,7 @@ class Receiver(ABC):
 
     @abstractmethod
     def get_local_entity_type(self) -> str:
-        return main_settings.WhoIAm
+        return settings_main.WhoIAm
 
     @abstractmethod
     def get_transaction_child_type(self):

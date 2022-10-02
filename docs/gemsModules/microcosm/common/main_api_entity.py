@@ -34,12 +34,13 @@ class Entity(BaseModel):
     resources : Resources = Resources()
     notices : Notices = Notices()
 
-    @validator('entityType')
-    def checkEntityType(cls, v):
-        """This will be overridden by redirector in delegator."""
-        if v != main_settings.WhoIAm:
-            raise ValueError(f"The requested entity, {v}, is not {main_settings.WhoIAm}.")
-        return v
+### This breaks because 'settings' can't be forced to change in children.... or can it?
+#    @validator('entityType')
+#    def checkEntityType(cls, v):
+#        """This will be overridden by redirector in delegator."""
+#        if v != settings_main.WhoIAm:
+#            raise ValueError(f"The requested entity, {v}, is not {settings_main.WhoIAm}.")
+#        return v
 
 def generateSchema():
     print(Entity.schema_json(indent=2))
