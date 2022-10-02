@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from ..project.main_api import Project 
 from .main_api_entity import Entity
 from .main_api_notices import Notices
-from . import main_settings
+from . import settings_main
 import traceback
 
 from . import loggingConfig 
@@ -26,6 +26,15 @@ class Transaction(ABC):
     @abstractmethod
     def get_API_type(self):  # This allows dependency injection in the children
         return Common_API
+        ## If you want to use the schema from this abstract parent without having
+        ##    to hand-code 'Common_API", you can do this:
+        ##
+        ##    return super().get_API_type()
+        ##
+        ## To check that it does what you think, you can do something like this:
+        ##
+        ##    __super__ = super().get_API_type()
+        ##    print("The api type is " + str(__super__))
 
     def __init__(self):
         self.incoming_string : str = None

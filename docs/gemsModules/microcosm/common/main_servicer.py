@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from .main_api import Transaction
 from .main_api_services import Service, Services
-from .main_settings import All_Available_Services
-from .main_servicer_settings import All_Service_Modules
+from .settings_main import All_Available_Services
+from .settings_main_servicer import All_Service_Modules
 
 class Servicer:
     def __init__(self, transaction : Transaction):

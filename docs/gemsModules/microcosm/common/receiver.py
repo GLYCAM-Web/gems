@@ -3,7 +3,7 @@ from pydantic import ValidationError
 from abc import ABC, abstractmethod
 from .main_api import Transaction
 from .main_servicer import Servicer
-from . import main_settings
+from . import settings_main
 
 class Receiver(ABC):
 

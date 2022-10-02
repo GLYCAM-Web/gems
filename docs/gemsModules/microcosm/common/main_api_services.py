@@ -3,7 +3,7 @@ from uuid import UUID
 from typing import Dict, List, Protocol 
 from pydantic import BaseModel, Field, Json
 from .main_api_notices import Notices
-from .main_settings import All_Available_Services
+from .settings_main import All_Available_Services
 
 from . import loggingConfig
 if loggingConfig.loggers.get(__name__):

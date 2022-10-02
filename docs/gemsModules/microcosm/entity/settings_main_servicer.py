@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from enum import Enum
-from ..common.main_servicer_settings import All_Service_Modules as Common_Service_Modules
+from ..common.settings_main_servicer import All_Service_Modules as Common_Service_Modules
 
 
 class Module_Service_Modules(Enum):

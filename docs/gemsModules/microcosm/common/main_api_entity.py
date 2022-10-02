@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field, validator, Json
 from .main_api_notices import Notices
 from .main_api_services import Services, Responses
 from .main_api_resources import Resources
-from . import main_settings
+from . import settings_main
 
 from . import loggingConfig 
 
