@@ -1,0 +1,59 @@
+digraph {
+    node [shape=box];
+    compound=True;
+
+    label="Single-entity, multiple-service workflow overview.";
+
+    Receiver [label="Receiver\nInstantiates Transaction\nwith incoming JSON"];
+   
+    subgraph cluster_data_manager {
+        label="Data manager";
+        subgraph cluster_input_parser {
+            label="Input Parser\nGenerates Service Tree &\nensures outgoing services list\nis complete and correct";
+            Service_Tree_Maker [label="Service Tree Maker\n"];
+            Data_Populator [label="Data Populator\nEnsures that each Service object\nhas all the data it needs" style=filled fillcolor="lightblue"];
+            Service_Serializer [label="Service Serializer\nEnsures that all Service objects\nare present in serial order\nin the outgoing Transaction."];
+            { rank=same; Service_Tree_Maker -> Data_Populator; }  
+            Service_Tree_Maker -> Service_Serializer ;
+        }
+	Project_Manager [label="Project manager\nMakes common directories\nSaves version info\nWrites JSON objects out\nWrites summary files."];
+        Data_Populator -> Project_Manager [ltail=cluster_input_parser ];
+        subgraph cluster_response_manager {
+            label="Response Manager\nEnsures that response data is\ncomplete in the outgoing transaction";
+            Response_Summarizer [label="Response Summarizer:\nGenerates response summaries &\npopulates user-friendly outputs."];
+            Response_Serializer [label="Response Serializer\nEnsures that all Response objects\nare present in serial order."];
+
+            Response_Summarizer -> Response_Serializer ;
+        }
+        Response_Summarizer -> Project_Manager [ltail=cluster_response_manager];
+    }
+    Service_Tree [label="Service Tree Object\nStores Service_Package objects and info about running them.\nThis is not the JSON Object called Services.\nThis is an independent structure."];
+    Service_Serializer -> Service_Tree [style=invis];
+    
+    Progress [label="Progress\nWorking and tested prototype." style=filled fillcolor="lightblue"];
+   // Service_Tree -> Progress [style=invis];
+
+
+    subgraph cluster_service_manager {
+        label="Services manager";
+        Main_Servicer [label="Main Servicer for all Services\nRuns each service in turn &\nStops progress if needed."];
+        Service_Interface [label="Service Interface\nTranslates to and from\nneeds of the Service's\n business logic" style=filled fillcolor="lightblue"];
+        Service_Logic [label="Service Logic\nData IO for the Service's business logic.\nNeeds not know about the API at all." style=filled fillcolor="lightblue"];
+        Response_Filler [label="Response Filler\nGenerates a response for\nany services that were not run."];
+
+        Main_Servicer -> Service_Interface [label="Service_Package  "];
+        Main_Servicer -> Service_Interface [label="Response_Package  " dir="back"];
+        { rank=same; Main_Servicer -> Response_Filler ;}
+
+        Service_Interface -> Service_Logic [label="JSON-agnostic inputs  "];
+        Service_Interface -> Service_Logic [label="JSON-agnostic outputs  " dir="back"];
+    }
+    
+    Receiver -> Service_Tree_Maker [label="Transaction object  " lhead=cluster_data_manager];
+    Receiver -> Response_Summarizer [label="Outgoing JSON string  " dir="back" lhead=cluster_data_manager];
+    
+    Service_Serializer -> Main_Servicer [label="Service Tree Object  " lhead=cluster_service_manager ltail=cluster_data_manager];
+    Response_Serializer -> Main_Servicer [label="Response Tree Object  " dir="back" lhead=cluster_service_manager ltail=cluster_data_manager];
+
+
+}
