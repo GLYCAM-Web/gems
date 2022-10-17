@@ -44,13 +44,14 @@ class GemsStrEnum(str, Enum):
             theList.append(item.name)
         return theList
 
-# The purpose of this class is to provide list metadata so that the
-# list can be ordered or unordered.  The default is ordered.
-# An unordered list might contain items that are executable and can
-# be executed in any order, or in parallel, etc.
-# If they are set as fire-and-forget, then the order is not important,
-# but they should also be executed in separate threads.
 class Annotated_List() :
+    """ The purpose of this class is to provide list metadata.
+        The list can be ordered or unordered.  The default is ordered.
+        If set to ordered, it should be assumed that the items must be
+        processed in the order they are listed.  If set to unordered,
+        items can be processed in any order, or in parallel, etc.
+        If they are set as fire-and-forget, they should be executed 
+        in separate threads. """
     def __init__(self,
             items : List = [],
             ordered  : bool   = True,
