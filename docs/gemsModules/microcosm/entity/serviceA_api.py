@@ -8,6 +8,7 @@ from ..common import main_api_services
 ## unique name for each service's inputs and outputs.  Since Pydantic
 ## uses the class name as the name for the definition in the JSON schema,
 ## these must be unique.  They probably need to be unique across entities.
+## Can possibly set the name using config.  Still has to be unique.
 
 class ServiceA_inputs (BaseModel):
     A_int : int = 0
