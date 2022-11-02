@@ -31,7 +31,7 @@ class TestModule(unittest.TestCase):
         self.assertTrue(exists)
 
     def test_prep_file_exists(self):
-        targetFile = GemsPath + "/gmml/dat/prep/GLYCAM_06j-1_GAGS.prep"
+        targetFile = GemsPath + "/gmml/dat/prep/GLYCAM_06j-1_GAGS_KDN.prep"
         exists = os.path.isfile(targetFile)
         self.assertTrue(exists)
 
