@@ -1,0 +1,94 @@
+@startuml
+!include <archimate/Archimate>
+Motivation_Stakeholder(GEMSDevelopers, "GEMS\nDevelopers") 
+Motivation_Stakeholder(SciStudent, "Natural Science\nStudents") 
+Motivation_Stakeholder(CSStudent, "Computer Science\nStudents") 
+Motivation_Constraint(LittleCS, "Little\nComputer Science")
+Motivation_Constraint(LittleNatS, "Little\nNatural Science")
+Motivation_Constraint(LittleTime, "Little\nTime")
+
+Rel_Composition_Right(SciStudent, LittleCS)
+Rel_Composition_Right(CSStudent, LittleNatS)
+Rel_Composition_Right(GEMSDevelopers, LittleTime)
+
+Grouping(Users, "Users"){
+    Motivation_Stakeholder(Website, "Website")
+    Motivation_Stakeholder(CLIUsers, "CLI\nUsers") 
+    Motivation_Stakeholder(WebAPIUsers, "Web API\nUsers")
+}
+
+Grouping(ServicesLogic, "Services Logic"){
+    Business_Product(GEMS_Code, "Other\nGEMS Code")
+    Business_Product(GMML, "GMML")
+    Business_Product(ExtApps, "External\nApplications")
+}
+Business_Interface(ServLogicInterface, "Arbitrary\nInterface")
+
+Business_Interface(UserInterface, "JSON API with\nUser Friendly\nInterface")
+Grouping(gemsModules, "GEMS Modules"){
+    Implementation_WorkPackage(Delegator, "Delegator")
+    Implementation_WorkPackage(Entity, "Entity")
+    Implementation_WorkPackage(UserDataIF, "User Data\nInterface")
+    Implementation_WorkPackage(ServiceCompleter, "1. Service\nCompleter")
+    Implementation_WorkPackage(DataCompleter, "2. Data\nCompleter")
+    Implementation_WorkPackage(ServiceManager, "3. Service\nManager")
+    Implementation_WorkPackage(ResponsePretty, "4. Response\nFriendly-Maker")
+    Implementation_WorkPackage(ServiceOrganizer, "1. Service\nOrganizer")
+    Implementation_WorkPackage(Servicer, "2. Servicer")
+    Implementation_WorkPackage(ResponseSerializer, "3. Response Package\nManager")
+    Implementation_WorkPackage(ServiceTrans, "Service\nData\nTranslator")
+
+    'Application_DataObject(Service, "Service\nObject")
+
+    Motivation_Value(ServicesDeps,"Fills in\nServices Object\nDependencies")
+    Motivation_Value(ServicesData,"Fills in Service\nand Project\nData Needs")
+    Motivation_Value(ResponseManagement,"Translatess\nResponse\nPackages")
+    Motivation_Value(ServiceOrganization,"Organizes\nServices by\nOrder of Operations")
+
+    Rel_Association(ServicesDeps, ServiceCompleter)
+    Rel_Association(ServicesData, DataCompleter)
+    'Rel_Association(ServiceCompleter,ServicesDeps)
+    'Rel_Association(DataCompleter, ServicesData)
+    Rel_Association(ResponseSerializer,ResponseManagement)
+    Rel_Association(ServiceOrganizer,ServiceOrganization)
+
+    Rel_Access_rw(Delegator, UserInterface)
+    Rel_Access_r(Delegator, Entity, "JSON API\nOut")
+    Rel_Access_w(Delegator, Entity, "JSON API\nIn")
+    Rel_Access_rw(Entity, UserDataIF, "Transaction")
+    Rel_Access_w(UserDataIF, ServiceCompleter, "Module API\nInput")
+    Rel_Access_r(UserDataIF, ServiceCompleter, "Output\nServices\nObject")
+    Rel_Access_rw(UserDataIF, DataCompleter, "Output\nServices\nObject")
+
+    Rel_Access_w(UserDataIF,ServiceManager, "Module API\nOutput")
+    Rel_Access_r(UserDataIF,ServiceManager, "Response\nObject\nOutput")
+
+    Rel_Access_rw_Right(UserDataIF,ResponsePretty, "Module API\nOutput")
+
+    Rel_Access_w(ServiceManager,ServiceOrganizer, "Module API\nObject")
+    Rel_Access_r(ServiceManager,ServiceOrganizer, "Service\nPackage\nTree")
+    Rel_Access_w(ServiceManager,ResponseSerializer, "Response\nPackage\nTree")
+    Rel_Access_r(ServiceManager,ResponseSerializer, "Responses\nObject")
+    Rel_Access_w(ServiceManager,Servicer, "Service\nPackage\nTree")
+    Rel_Access_r(ServiceManager,Servicer, "Response\nPackage\nTree")
+    'Rel_Aggregation(Servicer, Service, "1+")
+    Rel_Access_r(Servicer,ServiceTrans, "Response\nObject")
+    Rel_Access_w(Servicer,ServiceTrans, "Service\nObject")
+
+    'Rel_Flow(UserDataIF,ServiceManager)
+}
+
+'Rel_Access_rw(ServLogicInterface, ServicesLogic, "Read/Write")
+'Rel_Access_rw_Left(Users, UserInterface)
+Rel_Access_rw(Users, UserInterface)
+Rel_Composition(gemsModules, UserInterface)
+Rel_Composition(ServicesLogic, ServLogicInterface)
+Rel_Access_rw(ServiceTrans, ServLogicInterface, "Read/Write")
+
+Rel_Access_w(SciStudent, ServLogicInterface, "Write")
+Rel_Access_w(SciStudent, ServicesLogic, "Write")
+
+Rel_Access_w(GEMSDevelopers, gemsModules, "Write")
+Rel_Access_w(CSStudent, gemsModules, "Write")
+
+@enduml
