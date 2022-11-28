@@ -20,7 +20,7 @@ See also our JSON schema documentation in the Schema
 subdirectory.
 """
 from . import batchcompute
-from . import common
+#from . import common
 from . import conjugate
 from . import delegator
 from . import mmservice
@@ -31,3 +31,5 @@ from . import graph
 from . import status
 from . import structureFile
 
+## Deprecating_2022_12
+from Deprecating_2022_12 import common

@@ -1,11 +1,26 @@
 #!/usr/bin/env python3
-import gemsModules
+
+#import gemsModules
+import gemsModules.Deprecating_2022_12  #is this needed?
+
 from datetime import datetime
-from gemsModules import common
-from gemsModules.common.services import *
-from gemsModules.common.transaction import * # might need whole file...
-from gemsModules.common.loggingConfig import *
+
+# from gemsModules import common
+from gemsModules.Deprecating_2022_12 import common #is this needed?
+
+#from gemsModules.common.services import *
+from gemsModules.Deprecating_2022_12.common.services import *
+
+#from gemsModules.common.transaction import * # might need whole file...
+from gemsModules.Deprecating_2022_12.common.transaction import *
+
+#from gemsModules.common.loggingConfig import *
+from gemsModules.Deprecating_2022_12.common.loggingConfig import *
+
 import traceback
+
+
+
 
 if loggers.get(__name__):
     pass
@@ -29,7 +44,10 @@ def delegate(jsonObjectString):
     log.debug("incoming jsonObjectString: " + jsonObjectString)
 
     # Make a new Transaction object for holding I/O information.
-    from gemsModules.common.io import Transaction as ioTransaction
+    
+    #from gemsModules.common.io import Transaction as ioTransaction
+    from gemsModules.Deprecating_2022_12.common.io import Transaction as ioTransaction
+
     thisTransaction=ioTransaction(jsonObjectString)
 
 #    # If the incoming string was improperly formed, bail, but give a reason.
@@ -52,7 +70,10 @@ def delegate(jsonObjectString):
 
     ### See if it is possible to load a module for the requested Entity
     try:
-        from gemsModules.common.logic import importEntity as logic_importEntity
+
+        #from gemsModules.common.logic import importEntity as logic_importEntity
+        from gemsModules.Deprecating_2022_12.common.logic import importEntity as logic_importEntity
+        
         theEntity = logic_importEntity(entityType)
         #log.debug("theEntity: " + str(theEntity))
     except Exception as error:
@@ -213,7 +234,9 @@ def getJsonSchema():
 def main():
   import importlib.util, os, sys
   #from importlib import util
-  if importlib.util.find_spec("gemsModules") is None:
+  
+  #if importlib.util.find_spec("gemsModules") is None:
+  if importlib.util.find_spec("gemsModules/Deprecating_2022_12") is None:
     this_dir, this_filename = os.path.split(__file__)
     sys.path.append(this_dir + "/../")
     if importlib.util.find_spec("common") is None:
@@ -222,7 +245,9 @@ def main():
     else:
       from common import utils
   else:
-    from gemsModules.common import utils
+    #from gemsModules.common import utils
+    from gemsModules.Deprecating_2022_12.common import utils
+    
   jsonObjectString=utils.JSON_From_Command_Line(sys.argv)
   try:
     responseObjectString=delegate(jsonObjectString)
