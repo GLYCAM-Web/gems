@@ -1,0 +1,23 @@
+{
+    "entity": {
+        "type": "Sequence",
+        "services": 
+            {
+                "build": {
+                    "type": "Build3DStructure"
+                }
+            },
+        "inputs": 
+            {
+                "sequence": {
+                    "payload": "DGlNA. ..Cakecb1-OH"
+                },
+      "resources" :[]
+            }
+    },
+    "prettyPrint" : true,
+    "mdMinimize" : true
+}
+
+
+

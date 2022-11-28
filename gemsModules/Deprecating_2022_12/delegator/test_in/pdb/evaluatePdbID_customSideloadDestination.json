@@ -1,0 +1,18 @@
+{
+    "entity": {
+        "type": "StructureFile",
+        "services": {
+            "evaluate": {
+                "type": "Evaluate"
+            }
+        },
+        "inputs": {
+            "pdb_ID": "1BUY",
+            "sideload_file_destination" : "git-ignore-me_sideloads/"
+        }
+    },
+    "options": {
+        "targetModule": "amber"
+    },
+    "prettyPrint": "True"
+}

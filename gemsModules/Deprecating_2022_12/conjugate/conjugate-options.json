@@ -1,0 +1,27 @@
+{
+ "entity" : 
+ { 
+	 "type": "Conjugate", 
+	 "services" : 
+	 [ 
+		 { "service" :  
+			 { 
+				 "type" : "evaluate" , 
+				 "inputs" : 
+				 [ 
+					 { "resource" : 
+						 { 
+							 "payload" : "Hello,world" 
+						 } 
+					 }
+				 ] 
+			 } 
+		 } 
+	 ] 
+ }, 
+ "options" : 
+ { 
+	 "onError" : "abort", 
+	 "jsonObjectOutputFormat": "Pretty" 
+ }
+}

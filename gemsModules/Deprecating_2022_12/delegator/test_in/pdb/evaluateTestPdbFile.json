@@ -1,0 +1,17 @@
+{
+    "entity": {
+        "type": "StructureFile",
+        "services": {
+            "evaluate": {
+                "type": "Evaluate"
+            }
+        },
+        "inputs": {
+            "pdb_file_name": "/programs/gems/tests/inputs/1BUY_modified.pdb"
+        }
+    },
+    "options": {
+        "targetModule": "amber"
+    },
+    "prettyPrint": "True"
+}

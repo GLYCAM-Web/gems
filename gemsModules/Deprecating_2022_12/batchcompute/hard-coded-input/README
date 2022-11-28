@@ -1,0 +1,8 @@
+This directory contains files to be used as-is.  
+
+Currently, it contains run control information for AMBER simulations to be
+performed as part of the molecular modeling services at GLYCAM-Web.  One day, 
+these files might be automatically generated.  But, for now, the static files
+found in this directory are used.  
+
+2018-12-14 BLFoley

@@ -1,0 +1,1 @@
+{"entity": {"type": "Query", "options": {"jsonObjectOutputFormat": "Pretty"}}, "services": [{"formQueryString": {"type": "evaluate", "options": {"queryType": "plotlyCHI", "oligo": "2dw2_oligo1", "output_file_type": "json"}}}]}
