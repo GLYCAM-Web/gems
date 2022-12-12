@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 
 #import gemsModules
+import gemsModules.deprecating_20221212
 
 from datetime import datetime
 
 #from gemsModules import common
+from gemsModules.deprecating_20221212 import common
 
 #from gemsModules.common.services import *
 from gemsModules.deprecating_20221212.common.services import *
 
 #from gemsModules.common.transaction import * # might need whole file...
+from gemsModules.deprecating_20221212.common.transaction import * # might need whole file...
 
 #from gemsModules.common.loggingConfig import *
 
@@ -37,7 +40,10 @@ def delegate(jsonObjectString):
     log.debug("incoming jsonObjectString: " + jsonObjectString)
 
     # Make a new Transaction object for holding I/O information.
-    from gemsModules.common.io import Transaction as ioTransaction
+
+    #from gemsModules.common.io import Transaction as ioTransaction
+
+    from gemsModules.deprecating_20221212.common.io import Transaction as ioTransaction
     thisTransaction=ioTransaction(jsonObjectString)
 
 #    # If the incoming string was improperly formed, bail, but give a reason.
