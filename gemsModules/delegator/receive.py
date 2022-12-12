@@ -66,7 +66,8 @@ def delegate(jsonObjectString):
 
     ### See if it is possible to load a module for the requested Entity
     try:
-        from gemsModules.common.logic import importEntity as logic_importEntity
+        #from gemsModules.common.logic import importEntity as logic_importEntity
+        from gemsModules.deprecating_20221212.common.logic import importEntity as logic_importEntity
         theEntity = logic_importEntity(entityType)
         #log.debug("theEntity: " + str(theEntity))
     except Exception as error:
@@ -215,10 +216,10 @@ def receive(thisTransaction):
 ##  Return the content of the current schema, as defined in CurrentStableSchema
 def getJsonSchema():
     log.info("getJsonSchema() was called.\n")
-    versionFilename = getGemsHome() + "/gemsModules/Schema/currentStableSchema"
+    versionFilename = getGemsHome() + "/gemsModules/deprecating_20221212/Schema/currentStableSchema"
     with open(versionFilename, 'r') as versionFile:
         currentStableVersion = versionFile.read().strip()
-    schemaFileName = getGemsHome() + "/gemsModules/Schema/" + currentStableVersion + "/schema.json"
+    schemaFileName = getGemsHome() + "/gemsModules/deprecating_20221212/Schema/" + currentStableVersion + "/schema.json"
     with open(schemaFileName, 'r') as schemaFile:
         content = schemaFile.read()
     #log.debug("schema content: \n" + content )
@@ -227,16 +228,19 @@ def getJsonSchema():
 def main():
   import importlib.util, os, sys
   #from importlib import util
-  if importlib.util.find_spec("gemsModules") is None:
+  if importlib.util.find_spec("gemsModules/deprecating_20221212") is None:
     this_dir, this_filename = os.path.split(__file__)
     sys.path.append(this_dir + "/../")
     if importlib.util.find_spec("common") is None:
       print("I cannot find the Common Servicer.  No clue what to do. Exiting")
       sys.exit(1)
     else:
-      from common import utils
+      #from common import utils
+      from deprecating_20221212.common import utils
+      
   else:
-    from gemsModules.common import utils
+    #from gemsModules.common import utils
+    from gemsModules.deprecating_20221212.common import utils
   jsonObjectString=utils.JSON_From_Command_Line(sys.argv)
   try:
     responseObjectString=delegate(jsonObjectString)
