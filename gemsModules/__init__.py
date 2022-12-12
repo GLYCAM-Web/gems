@@ -19,15 +19,15 @@ services to the others.
 See also our JSON schema documentation in the Schema
 subdirectory.
 """
-from . import batchcompute
-from . import common
-from . import conjugate
-from . import delegator
-from . import mmservice
-from . import project
-from . import query
-from . import sequence
-from . import graph
-from . import status
-from . import structureFile
+# from . import batchcompute
+# from . import common
+# from . import conjugate
+# from . import delegator
+# from . import mmservice
+# from . import project
+# from . import query
+# from . import sequence
+# from . import graph
+# from . import status
+# from . import structureFile
 

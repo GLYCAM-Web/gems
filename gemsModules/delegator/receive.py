@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
-import gemsModules
+
+#import gemsModules
+
 from datetime import datetime
-from gemsModules import common
+
+#from gemsModules import common
+
 from gemsModules.common.services import *
-from gemsModules.common.transaction import * # might need whole file...
-from gemsModules.common.loggingConfig import *
+
+#from gemsModules.common.transaction import * # might need whole file...
+
+#from gemsModules.common.loggingConfig import *
+
 import traceback
 
 if loggers.get(__name__):
