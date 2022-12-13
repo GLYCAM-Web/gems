@@ -3,11 +3,11 @@ import  os, sys
 import json
 import uuid
 from datetime import datetime
-from gemsModules.common.services import *
-from gemsModules.project import settings as project_settings
+from gemsModules.deprecated.common.services import *
+from gemsModules.deprecated.project import settings as project_settings
 from pydantic import BaseModel, Field, ValidationError
 from pydantic.schema import schema
-from gemsModules.common.loggingConfig import *
+from gemsModules.deprecated.common.loggingConfig import *
 import traceback
 
 if loggers.get(__name__):
@@ -157,7 +157,7 @@ class CbProject(Project):
     def __init__(self, request_dict: dict):
         super().__init__(request_dict)
         log.info("CbProject.__init__() was called.")
-        from gemsModules.project.projectUtil import getSequenceFromTransaction, getSeqIDForSequence
+        from gemsModules.deprecated.project.projectUtil import getSequenceFromTransaction, getSeqIDForSequence
         self.project_type = "cb"
         self.has_input_files = False
         inputs = request_dict['entity']['inputs']
@@ -211,7 +211,7 @@ class PdbProject(Project):
 
     def __init__(self, request_dict: dict):
         super().__init__(request_dict)
-        from gemsModules.structureFile.amber.logic import getPdbRequestInput
+        from gemsModules.deprecated.structureFile.amber.logic import getPdbRequestInput
         log.info("PdbProject.__init__() was called.")
         self.project_type = "pdb"
         self.has_input_files = True

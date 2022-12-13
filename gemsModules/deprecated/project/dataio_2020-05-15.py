@@ -3,11 +3,11 @@ import  os, sys
 import json
 import uuid
 from datetime import datetime
-from gemsModules.common.transaction import *
-from gemsModules.project import settings as projectSettings
+from gemsModules.deprecated.common.transaction import *
+from gemsModules.deprecated.project import settings as projectSettings
 from pydantic import BaseModel, Field
 from pydantic.schema import schema
-from gemsModules.common.loggingConfig import *
+from gemsModules.deprecated.common.loggingConfig import *
 import traceback
 
 if loggers.get(__name__):

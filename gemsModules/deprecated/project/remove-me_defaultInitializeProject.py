@@ -1,12 +1,12 @@
-import gemsModules
+import gemsModules.deprecated
 #from shutil import copyfile
-from gemsModules.project import settings as projectSettings
-from gemsModules.common import logic as commonlogic
-#from gemsModules.project import io as projectio
-#from gemsModules.common import io as commonio
-#from gemsModules.common import services as commonservices
-#from gemsModules.common import utils as commonutils
-from gemsModules.common.loggingConfig import *
+from gemsModules.deprecated.project import settings as projectSettings
+from gemsModules.deprecated.common import logic as commonlogic
+#from gemsModules.deprecated.project import io as projectio
+#from gemsModules.deprecated.common import io as commonio
+#from gemsModules.deprecated.common import services as commonservices
+#from gemsModules.deprecated.common import utils as commonutils
+from gemsModules.deprecated.common.loggingConfig import *
 import traceback
 #from datetime import datetime
 

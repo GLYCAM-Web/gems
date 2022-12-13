@@ -3,15 +3,15 @@ import  os, sys
 import json
 import uuid
 from datetime import datetime
-from gemsModules.common import services as commonservices
-from gemsModules.common import settings as commonsettings
-from gemsModules.common import logic as commonlogic
-from gemsModules.common.io import Notice
-from gemsModules.project import settings as project_settings
+from gemsModules.deprecated.common import services as commonservices
+from gemsModules.deprecated.common import settings as commonsettings
+from gemsModules.deprecated.common import logic as commonlogic
+from gemsModules.deprecated.common.io import Notice
+from gemsModules.deprecated.project import settings as project_settings
 from pydantic import BaseModel, Field, ValidationError, constr
 from pydantic.schema import schema
 from typing import Any, List
-from gemsModules.common.loggingConfig import *
+from gemsModules.deprecated.common.loggingConfig import *
 import traceback
 
 # ## TODO - a lot of this info really belongs elsewhere.  It's not really
@@ -101,7 +101,7 @@ class Project(BaseModel):
 
     # In file _defaultInitializeProject.py:
     #    def defaultInitializeProject(self, referenceProject : Project = None, noClobber : bool = True):
-#    from gemsModules.project._defaultInitializeProject import defaultInitializeProject
+#    from gemsModules.deprecated.project._defaultInitializeProject import defaultInitializeProject
 
     def setFilesystemPath(self, specifiedPath : str = None, noClobber : bool = True) :
         # If a path exists, and it shouldbot be clobbered, return
@@ -124,7 +124,7 @@ class Project(BaseModel):
         except :
             message = "There was an error while asking common for the  GEMS Filesystem Output Path. \nForgins ahead with Project default anyway."
             log.error(message)
-            self.filesystem_path = gemsModules.project.settings.default_filesystem_output_path
+            self.filesystem_path = gemsModules.deprecated.project.settings.default_filesystem_output_path
             return
         # Assign the path based on the return values from common
         if source == 'Environment' :
@@ -136,7 +136,7 @@ class Project(BaseModel):
             if context == 'website' :    
                 message = "Overriding GEMS Filesystem Output Path with the default from Project." 
                 log.debug(message) 
-                self.filesystem_path = gemsModules.project.settings.default_filesystem_output_path
+                self.filesystem_path = gemsModules.deprecated.project.settings.default_filesystem_output_path
             else :
                 message = "Using the default GEMS Filesystem Output Path." 
                 log.debug(message) 
@@ -144,11 +144,11 @@ class Project(BaseModel):
         elif source == 'Error' :
             message = "Common reported an error trying to determine the GEMS Filesystem Output Path. \nForgins ahead with Project default anyway."
             log.error(message)
-            self.filesystem_path = gemsModules.project.settings.default_filesystem_output_path
+            self.filesystem_path = gemsModules.deprecated.project.settings.default_filesystem_output_path
         else :
             message = "Unknown source for GEMS Filesystem Output Path.  Using default from Project."
             log.debug(message)
-            self.filesystem_path = gemsModules.project.settings.default_filesystem_output_path
+            self.filesystem_path = gemsModules.deprecated.project.settings.default_filesystem_output_path
 
 
     def setServiceDir(self, specifiedDirectory : str = None, noClobber : bool = False) :
@@ -253,7 +253,7 @@ class Project(BaseModel):
         if self.versions_file_path is None or self.versions_file_path == "" :
             log.error("There was a problem setting the versions file path.  Cannot load versions file info")
             return
-        from gemsModules.project.projectUtilPydantic import getVersionsFileInfo
+        from gemsModules.deprecated.project.projectUtilPydantic import getVersionsFileInfo
         log.debug("About to load the version info.")
         try : 
             theDict = getVersionsFileInfo(self.versions_file_path)
@@ -310,7 +310,7 @@ class Project(BaseModel):
             if self.host_url_base_path == "" :
                 log.error("the host url base path is not set so cannot set download url path.")
                 return
-            from gemsModules.project import projectUtilPydantic as utils
+            from gemsModules.deprecated.project import projectUtilPydantic as utils
             self.download_url_path = utils.buildDownloadUrlPath( 
                     self.host_url_base_path ,
                     self.entity_id ,

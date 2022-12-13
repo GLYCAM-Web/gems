@@ -1,7 +1,7 @@
 
 def main():
   import importlib, os, sys
-  if importlib.util.find_spec("gemsModules") is None:
+  if importlib.util.find_spec("deprecated") is None:
     this_dir, this_filename = os.path.split(__file__)
     sys.path.append(this_dir + "/../")
     if importlib.util.find_spec("common") is None:
@@ -10,7 +10,7 @@ def main():
     else:
       from common import utils
   else:
-    from gemsModules.common import utils
+    from gemsModules.deprecated.common import utils
   data=utils.JSON_From_Command_Line(sys.argv)
 
 ###

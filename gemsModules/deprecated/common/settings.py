@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import os
-from gemsModules import common
-from gemsModules.common.loggingConfig import loggers, createLogger
+from gemsModules.deprecated import common
+from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 from pydantic import BaseModel
 

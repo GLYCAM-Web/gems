@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 import json, math, os, sys,importlib.util
 from datetime import datetime
-import gemsModules
-from gemsModules.common.settings import *
-from gemsModules.common.loggingConfig import loggers, createLogger
+import gemsModules.deprecated
+from gemsModules.deprecated.common.settings import *
+from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
 from pydantic import BaseModel, ValidationError
 from pydantic.schema import schema
 from shutil import copyfile
@@ -35,7 +35,7 @@ def importEntity(requestedEntity):
         raise error
     else:
         try:
-            module_spec = importlib.util.find_spec(requestedModule,package="gemsModules")
+            module_spec = importlib.util.find_spec(requestedModule,package="deprecated")
         except Exception as error:
             log.error("There was a problem importing the requested module.")
             log.error(traceback.format_exc())
@@ -47,7 +47,7 @@ def importEntity(requestedEntity):
                 raise FileNotFoundError(requestedEntity)
 
             #log.debug("module_spec: " + str(module_spec))
-            return importlib.import_module(requestedModule,package="gemsModules")
+            return importlib.import_module(requestedModule,package="deprecated")
 
 # ###  This now is part of the Transaction Class
 # ###  It is deprecated and should go away.   Lachele 2021-04-02
@@ -138,7 +138,7 @@ def returnHelp(requestedEntity,requestedHelp):
 ##  Looks at currentStableSchema file and returns the version it finds there.
 def getCurrentStableJsonApiVersion():
     log.info("getCurrentStableJsonApiVersion() was called.\n")
-    currentStableSchema = getGemsHome() + "/gemsModules/Schema/currentStableSchema"
+    currentStableSchema = getGemsHome() + "/gemsModules/deprecated/Schema/currentStableSchema"
     try:
         with open(currentStableSchema) as schemaFile:
             version = schemaFile.read().strip()
@@ -185,7 +185,7 @@ def getFilesystemOutputPath() :
         log.debug("Got Filesystem Output Path from environment.  It is : " + gemsOutputPath)
         return ( 'Environment' , gemsOutputPath )
     # Currently, if not set by engironment variable, a default is used.
-    gemshome =  gemsModules.common.logic.getGemsHome()
+    gemshome =  gemsModules.deprecated.common.logic.getGemsHome()
     if gemshome is None or gemshome == "" :
         message = "Could not determine GEMSHOME.  Cannot set default filesystem output path."
         log.error(message)
@@ -611,7 +611,7 @@ def main():
     from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
     from pydantic import BaseModel, Schema
     from pydantic.schema import schema
-    if importlib.util.find_spec("gemsModules") is None:
+    if importlib.util.find_spec("deprecated") is None:
       this_dir, this_filename = os.path.split(__file__)
       sys.path.append(this_dir + "/../")
       if importlib.util.find_spec("common") is None:
@@ -620,7 +620,7 @@ def main():
       else:
         from common import utils
     else:
-      from gemsModules.common import utils
+      from gemsModules.deprecated.common import utils
 #  utils.investigate_gems_setup(sys.argv)
 #
 #  with open(sys.argv[1], 'r') as file:

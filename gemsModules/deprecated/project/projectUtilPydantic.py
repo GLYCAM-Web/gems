@@ -1,11 +1,11 @@
-import gemsModules
+import gemsModules.deprecated
 from shutil import copyfile
-from gemsModules.project import settings as projectSettings
-from gemsModules.project import io as projectio
-from gemsModules.common import io as commonio
-from gemsModules.common import services as commonservices
-from gemsModules.common import utils as commonutils
-from gemsModules.common.loggingConfig import *
+from gemsModules.deprecated.project import settings as projectSettings
+from gemsModules.deprecated.project import io as projectio
+from gemsModules.deprecated.common import io as commonio
+from gemsModules.deprecated.common import services as commonservices
+from gemsModules.deprecated.common import utils as commonutils
+from gemsModules.deprecated.common.loggingConfig import *
 import traceback
 from datetime import datetime
 
@@ -111,7 +111,7 @@ def getProjectUploadsDir(thisTransaction):
     log.info("getProjectUploadsDir() was called.\n")
     project = getProjectFromTransaction(thisTransaction)
     
-    if str(type(project)) == "<class 'gemsModules.project.io.PdbProject'>":
+    if str(type(project)) == "<class 'gemsModules.deprecated.project.io.PdbProject'>":
         project = project.__dict__
 
     try:
@@ -134,7 +134,7 @@ def getProjectUploadsDir(thisTransaction):
 #   @param  project
 def getUploadsSourceDir(project):
     log.info("getUploadsSourceDir() was called.\n")
-    if str(type(project)) == "<class 'gemsModules.project.io.PdbProject'>":
+    if str(type(project)) == "<class 'gemsModules.deprecated.project.io.PdbProject'>":
         project = project.__dict__
 
     log.debug("project obj type: " + str(type(project)))
@@ -205,7 +205,7 @@ def getUploadsSourceDir(project):
 #   @aparam project
 def getUploadFileName(project):
     log.info("getUploadFileName() was called.\n")
-    if str(type(project)) == "<class 'gemsModules.project.io.PdbProject'>":
+    if str(type(project)) == "<class 'gemsModules.deprecated.project.io.PdbProject'>":
         project = project.__dict__
     
     uploaded_file_name = ""

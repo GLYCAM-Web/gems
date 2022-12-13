@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, ValidationError
 from pydantic.schema import schema
-from gemsModules.common.loggingConfig import *
+from gemsModules.deprecated.common.loggingConfig import *
 
 
 if loggers.get(__name__):

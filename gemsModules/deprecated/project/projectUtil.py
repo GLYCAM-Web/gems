@@ -1,11 +1,11 @@
-import gemsModules
+import gemsModules.deprecated
 from shutil import copyfile
-from gemsModules.project import settings as projectSettings
-from gemsModules.project.io import *
-from gemsModules.common.transaction import *
-from gemsModules.common.services import *
-from gemsModules.common import utils
-from gemsModules.common.loggingConfig import *
+from gemsModules.deprecated.project import settings as projectSettings
+from gemsModules.deprecated.project.io import *
+from gemsModules.deprecated.common.transaction import *
+from gemsModules.deprecated.common.services import *
+from gemsModules.deprecated.common import utils
+from gemsModules.deprecated.common.loggingConfig import *
 import traceback
 from datetime import datetime
 
@@ -203,7 +203,7 @@ def getProjectUploadsDir(thisTransaction):
     log.info("getProjectUploadsDir() was called.\n")
     project = getProjectFromTransaction(thisTransaction)
     
-    if str(type(project)) == "<class 'gemsModules.project.dataio.PdbProject'>":
+    if str(type(project)) == "<class 'gemsModules.deprecated.project.dataio.PdbProject'>":
         project = project.__dict__
 
     try:
@@ -226,7 +226,7 @@ def getProjectUploadsDir(thisTransaction):
 #   @param  project
 def getUploadsSourceDir(project):
     log.info("getUploadsSourceDir() was called.\n")
-    if str(type(project)) == "<class 'gemsModules.project.dataio.PdbProject'>":
+    if str(type(project)) == "<class 'gemsModules.deprecated.project.dataio.PdbProject'>":
         project = project.__dict__
 
     log.debug("project obj type: " + str(type(project)))
@@ -298,7 +298,7 @@ def copyUploadFilesToProject(thisTransaction : Transaction, project : Project):
 #   @aparam project
 def getUploadFileName(project):
     log.info("getUploadFileName() was called.\n")
-    if str(type(project)) == "<class 'gemsModules.project.dataio.PdbProject'>":
+    if str(type(project)) == "<class 'gemsModules.deprecated.project.dataio.PdbProject'>":
         project = project.__dict__
     
     uploaded_file_name = ""

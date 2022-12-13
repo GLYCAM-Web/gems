@@ -1,7 +1,7 @@
 import logging, os
-import gemsModules
-from gemsModules import common
-from gemsModules.common import settings
+import gemsModules.deprecated
+from gemsModules.deprecated import common
+from gemsModules.deprecated.common import settings
 
 ##TODO Create custom logging levels for critical errors to be able to specify
 ##  email recipient.
