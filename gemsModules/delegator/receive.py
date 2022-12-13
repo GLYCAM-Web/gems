@@ -228,15 +228,19 @@ def getJsonSchema():
 def main():
   import importlib.util, os, sys
   #from importlib import util
-  if importlib.util.find_spec("gemsModules/deprecating_20221212") is None:
+  if importlib.util.find_spec("gemsModules") is None:
     this_dir, this_filename = os.path.split(__file__)
     sys.path.append(this_dir + "/../")
+    if importlib.util.find_spec("deprecating_20221212") is None:
+      this_dir, this_filename = os.path.split(__file__)
+      sys.path.append(this_dir + "/../deprecating_20221212/")
+
     if importlib.util.find_spec("common") is None:
       print("I cannot find the Common Servicer.  No clue what to do. Exiting")
       sys.exit(1)
     else:
       #from common import utils
-      from deprecating_20221212.common import utils
+      from common import utils
       
   else:
     #from gemsModules.common import utils
