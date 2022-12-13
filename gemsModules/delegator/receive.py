@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 
 #import gemsModules
-import gemsModules.deprecating
+import gemsModules.deprecated
 
 from datetime import datetime
 
 #from gemsModules import common
-from gemsModules.deprecating import common
+from gemsModules.deprecated import common
 
 #from gemsModules.common.services import *
-from gemsModules.deprecating.common.services import *
+from gemsModules.deprecated.common.services import *
 
 #from gemsModules.common.transaction import * # might need whole file...
-from gemsModules.deprecating.common.transaction import * # might need whole file...
+from gemsModules.deprecated.common.transaction import * # might need whole file...
 
 #from gemsModules.common.loggingConfig import *
 
@@ -43,7 +43,7 @@ def delegate(jsonObjectString):
 
     #from gemsModules.common.io import Transaction as ioTransaction
 
-    from gemsModules.deprecating.common.io import Transaction as ioTransaction
+    from gemsModules.deprecated.common.io import Transaction as ioTransaction
     thisTransaction=ioTransaction(jsonObjectString)
 
 #    # If the incoming string was improperly formed, bail, but give a reason.
@@ -67,7 +67,7 @@ def delegate(jsonObjectString):
     ### See if it is possible to load a module for the requested Entity
     try:
         #from gemsModules.common.logic import importEntity as logic_importEntity
-        from gemsModules.deprecating.common.logic import importEntity as logic_importEntity
+        from gemsModules.deprecated.common.logic import importEntity as logic_importEntity
         theEntity = logic_importEntity(entityType)
         #log.debug("theEntity: " + str(theEntity))
     except Exception as error:
@@ -244,7 +244,7 @@ def main():
       
   else:
     #from gemsModules.common import utils
-    from gemsModules.deprecating.common import utils
+    from gemsModules.deprecated.common import utils
   jsonObjectString=utils.JSON_From_Command_Line(sys.argv)
   try:
     responseObjectString=delegate(jsonObjectString)

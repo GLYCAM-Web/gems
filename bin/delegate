@@ -49,9 +49,9 @@ if importlib.util.find_spec("gemsModules") is None:
   this_dir, this_filename = os.path.split(__file__)
   sys.path.append(this_dir + "/../gemsModules/")
 
-  if importlib.util.find_spec("deprecating") is None:
+  if importlib.util.find_spec("deprecated") is None:
     this_dir, this_filename = os.path.split(__file__)
-    sys.path.append(this_dir + "/../deprecating/")
+    sys.path.append(this_dir + "/../deprecated/")
 
   if importlib.util.find_spec("common") is None:
     sys.stderr.write("Unable to locate Common Services.  Exiting.\n")
@@ -60,7 +60,7 @@ if importlib.util.find_spec("gemsModules") is None:
     from common import utils
 else:
   #from gemsModules.common import utils
-  from gemsModules.deprecating.common import utils
+  from gemsModules.deprecated.common import utils
 jsonObjectString=utils.JSON_From_Command_Line(sys.argv)
 
 

@@ -1,0 +1,9 @@
+{
+ "entity" : {
+    "type": "Delegator"
+  },
+ "services" : [
+    { "type" : "Marco" },
+    { "type" : "ListEntities" }
+  ]
+}
