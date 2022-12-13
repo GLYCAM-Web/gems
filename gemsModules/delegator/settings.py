@@ -40,7 +40,10 @@ subEntities = {
     'StructureFile' : 'structureFile'
 }
 
-
+# subEntities and this object could be merged one day
+deprecated = [
+    'batchcompute'
+    ]
 
 
 def main():

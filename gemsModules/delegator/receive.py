@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 
 #import gemsModules
-import gemsModules.deprecating_20221212
+import gemsModules.deprecating
 
 from datetime import datetime
 
 #from gemsModules import common
-from gemsModules.deprecating_20221212 import common
+from gemsModules.deprecating import common
 
 #from gemsModules.common.services import *
-from gemsModules.deprecating_20221212.common.services import *
+from gemsModules.deprecating.common.services import *
 
 #from gemsModules.common.transaction import * # might need whole file...
-from gemsModules.deprecating_20221212.common.transaction import * # might need whole file...
+from gemsModules.deprecating.common.transaction import * # might need whole file...
 
 #from gemsModules.common.loggingConfig import *
 
@@ -43,7 +43,7 @@ def delegate(jsonObjectString):
 
     #from gemsModules.common.io import Transaction as ioTransaction
 
-    from gemsModules.deprecating_20221212.common.io import Transaction as ioTransaction
+    from gemsModules.deprecating.common.io import Transaction as ioTransaction
     thisTransaction=ioTransaction(jsonObjectString)
 
 #    # If the incoming string was improperly formed, bail, but give a reason.
@@ -67,7 +67,7 @@ def delegate(jsonObjectString):
     ### See if it is possible to load a module for the requested Entity
     try:
         #from gemsModules.common.logic import importEntity as logic_importEntity
-        from gemsModules.deprecating_20221212.common.logic import importEntity as logic_importEntity
+        from gemsModules.deprecating.common.logic import importEntity as logic_importEntity
         theEntity = logic_importEntity(entityType)
         #log.debug("theEntity: " + str(theEntity))
     except Exception as error:
@@ -216,10 +216,10 @@ def receive(thisTransaction):
 ##  Return the content of the current schema, as defined in CurrentStableSchema
 def getJsonSchema():
     log.info("getJsonSchema() was called.\n")
-    versionFilename = getGemsHome() + "/gemsModules/deprecating_20221212/Schema/currentStableSchema"
+    versionFilename = getGemsHome() + "/gemsModules/deprecating/Schema/currentStableSchema"
     with open(versionFilename, 'r') as versionFile:
         currentStableVersion = versionFile.read().strip()
-    schemaFileName = getGemsHome() + "/gemsModules/deprecating_20221212/Schema/" + currentStableVersion + "/schema.json"
+    schemaFileName = getGemsHome() + "/gemsModules/deprecating/Schema/" + currentStableVersion + "/schema.json"
     with open(schemaFileName, 'r') as schemaFile:
         content = schemaFile.read()
     #log.debug("schema content: \n" + content )
@@ -231,9 +231,9 @@ def main():
   if importlib.util.find_spec("gemsModules") is None:
     this_dir, this_filename = os.path.split(__file__)
     sys.path.append(this_dir + "/../")
-    if importlib.util.find_spec("deprecating_20221212") is None:
+    if importlib.util.find_spec("deprecating") is None:
       this_dir, this_filename = os.path.split(__file__)
-      sys.path.append(this_dir + "/../deprecating_20221212/")
+      sys.path.append(this_dir + "/../deprecating/")
 
     if importlib.util.find_spec("common") is None:
       print("I cannot find the Common Servicer.  No clue what to do. Exiting")
@@ -244,7 +244,7 @@ def main():
       
   else:
     #from gemsModules.common import utils
-    from gemsModules.deprecating_20221212.common import utils
+    from gemsModules.deprecating.common import utils
   jsonObjectString=utils.JSON_From_Command_Line(sys.argv)
   try:
     responseObjectString=delegate(jsonObjectString)
