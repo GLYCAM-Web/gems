@@ -1,6 +1,6 @@
 import os, sys
 
-from gemsModules.common.loggingConfig import loggers, createLogger
+from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
 
 from . import conf, io
 
@@ -24,7 +24,7 @@ def manageIncomingString(jsonObjectString: str):
         log.error("Could not get amber_job to work correctly.")
         raise
 
-    from gemsModules.batchcompute import batchcompute
+    from gemsModules.deprecated.batchcompute import batchcompute
     outgoing_json_dict = {}
     outgoing_json_dict["partition"] = "amber"
     outgoing_json_dict["user"] = "webdev"
@@ -36,7 +36,7 @@ def manageIncomingString(jsonObjectString: str):
 
 def main():
     import importlib.util, os, sys
-    if importlib.util.find_spec("gemsModules") is None:
+    if importlib.util.find_spec("deprecated") is None:
         this_dir, this_filename = os.path.split(__file__)
         sys.path.append(this_dir + "/../")
         if importlib.util.find_spec("common") is None:
@@ -45,7 +45,7 @@ def main():
         else:
             from common import utils
     else:
-        from gemsModules.common import utils
+        from gemsModules.deprecated.common import utils
     jsonObjectString=utils.JSON_From_Command_Line(sys.argv)
     try:
         responseObject=manageIncomingString(jsonObjectString)

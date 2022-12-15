@@ -1,7 +1,7 @@
 import os, sys, importlib.util
-from gemsModules.project.projectUtil import *
-from gemsModules.common.loggingConfig import loggers, createLogger
-import gemsModules.mmservice.settings as mmSettings
+from gemsModules.deprecated.project.projectUtil import *
+from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
+import gemsModules.deprecated.mmservice.settings as mmSettings
 import traceback
 
 if loggers.get(__name__):
@@ -90,10 +90,10 @@ def main():
             inputFile = sys.argv[1]
         else:
             #print("got an arg that is not a filename: " + sys.argv[1])
-            inputFile = GemsPath + "/gemsModules/delegator/test_in/amberMdRequest.json"
+            inputFile = GemsPath + "/gemsModules/deprecated/delegator/test_in/amberMdRequest.json"
     else:
         #print("no argv was offered.")
-        inputFile = GemsPath + "/gemsModules/delegator/test_in/amberMdRequest.json"
+        inputFile = GemsPath + "/gemsModules/deprecated/delegator/test_in/amberMdRequest.json"
 
     #print("using the default inputFile: " + inputFile)
     #print(os.listdir("../../delegator/test_in/"))

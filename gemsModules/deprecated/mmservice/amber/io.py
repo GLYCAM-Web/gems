@@ -3,10 +3,10 @@ import  os, sys, subprocess, warnings
 import json, re
 from pathlib import Path
 from datetime import datetime
-from gemsModules.common.services import *
+from gemsModules.deprecated.common.services import *
 from pydantic import BaseModel, Field, ValidationError, validator
 from pydantic.schema import schema
-from gemsModules.common.loggingConfig import loggers, createLogger
+from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
 import traceback
 
 if loggers.get(__name__):
