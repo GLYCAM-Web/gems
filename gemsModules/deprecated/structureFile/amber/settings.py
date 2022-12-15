@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-from gemsModules.common.logic import getGemsHome
-from gemsModules.common.loggingConfig import *
+from gemsModules.deprecated.common.logic import getGemsHome
+from gemsModules.deprecated.common.loggingConfig import *
 from os.path import join
 
 if loggers.get(__name__):

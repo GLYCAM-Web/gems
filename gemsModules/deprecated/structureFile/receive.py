@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 import imp
 import os, sys, importlib.util
-import gemsModules
-import gemsModules.structureFile.settings as structureFileSettings
+import gemsModules.deprecated
+import gemsModules.deprecated.structureFile.settings as structureFileSettings
 import traceback
-from gemsModules.common.services import prettyPrint, getGemsHome, parseInput
-from gemsModules.common.logic import updateResponse
-from gemsModules.common import io as commonIO
-from gemsModules.project.projectUtil import *
-from gemsModules.common.loggingConfig import loggers, createLogger
-from gemsModules.structureFile.amber.evaluate import evaluatePdb
-from gemsModules.structureFile.amber.preprocess import preprocessPdbForAmber
-from gemsModules.structureFile.amber import io as amberIO
+from gemsModules.deprecated.common.services import prettyPrint, getGemsHome, parseInput
+from gemsModules.deprecated.common.logic import updateResponse
+from gemsModules.deprecated.common import io as commonIO
+from gemsModules.deprecated.project.projectUtil import *
+from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
+from gemsModules.deprecated.structureFile.amber.evaluate import evaluatePdb
+from gemsModules.deprecated.structureFile.amber.preprocess import preprocessPdbForAmber
+from gemsModules.deprecated.structureFile.amber import io as amberIO
 
 if loggers.get(__name__):
     pass

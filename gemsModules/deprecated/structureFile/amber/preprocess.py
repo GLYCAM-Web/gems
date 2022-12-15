@@ -1,5 +1,5 @@
-from gemsModules.structureFile.amber import io as amberIO
-from gemsModules.common.loggingConfig import *
+from gemsModules.deprecated.structureFile.amber import io as amberIO
+from gemsModules.deprecated.common.loggingConfig import *
 import traceback
 
 if loggers.get(__name__):
@@ -25,7 +25,7 @@ def preprocessPdbForAmber(pdbTransaction : amberIO.PdbTransaction):
     try:
         if pdbTransaction.transaction_out.project is None:
             log.debug("Starting a new project for transaction_out.")
-            pdbTransaction.transaction_out.project = gemsModules.project.io.PdbProject()
+            pdbTransaction.transaction_out.project = gemsModules.deprecated.project.io.PdbProject()
         else:
             log.debug("pdbTransaction.transaction_out.project: " + str(pdbTransaction.transaction_out.project))
 
