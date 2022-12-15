@@ -1,12 +1,12 @@
 import sys, os, re, importlib.util
-import gemsModules
+import gemsModules.deprecated
 import gmml
 
 from . import settings
-from gemsModules.common.services import *
+from gemsModules.deprecated.common.services import *
 
-from gemsModules.common.transaction import *
-from gemsModules.common.loggingConfig import loggers, createLogger
+from gemsModules.deprecated.common.transaction import *
+from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
 
 if loggers.get(__name__):
     pass
@@ -16,7 +16,7 @@ else:
 
 def receive(thisTransaction : Transaction):
     log.info("receive() was called.\n")
-    import gemsModules.graph
+    import gemsModules.deprecated.graph
 
     if 'services' not in thisTransaction.request_dict['entity'].keys():
         doTheDefaultService(thisTransaction)

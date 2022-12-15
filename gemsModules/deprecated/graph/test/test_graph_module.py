@@ -20,17 +20,17 @@ Testing for the integrity of the graph module in general
 class TestModule(unittest.TestCase):
 
     def test_help_file_exists(self):
-        targetFile = GemsPath + "/gemsModules/graph/helpme.py"
+        targetFile = GemsPath + "/gemsModules/deprecated/graph/helpme.py"
         exists = os.path.isfile(targetFile)
         self.assertTrue(exists)
 
     def test_receive_file_exists(self):
-        targetFile = GemsPath + "/gemsModules/graph/receive.py"
+        targetFile = GemsPath + "/gemsModules/deprecated/graph/receive.py"
         exists = os.path.isfile(targetFile)
         self.assertTrue(exists)
 
     def test_settings_file_exists(self):
-        targetFile = GemsPath + "/gemsModules/graph/settings.py"
+        targetFile = GemsPath + "/gemsModules/deprecated/graph/settings.py"
         exists = os.path.isfile(targetFile)
         self.assertTrue(exists)
 
