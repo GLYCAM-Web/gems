@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import gemsModules
+import gemsModules.deprecated
 import os
 import subprocess
 import sys
@@ -8,12 +8,12 @@ import re
 import csv
 import ast
 import uuid
-from gemsModules import common
-from gemsModules.common.services import *
-from gemsModules.common.transaction import *
-from gemsModules.common.loggingConfig import *
+from gemsModules.deprecated import common
+from gemsModules.deprecated.common.services import *
+from gemsModules.deprecated.common.transaction import *
+from gemsModules.deprecated.common.loggingConfig import *
 from inspect import currentframe, getframeinfo
-from gemsModules.query import plotlyChiEnergy
+from gemsModules.deprecated.query import plotlyChiEnergy
 # from . import plotlyChiEnergy
 
 if loggers.get(__name__):
@@ -118,7 +118,7 @@ def buildQueryString(thisTransaction : Transaction):
       log.debug(linkageJson)
       
       for link in linkageJson["results"]["bindings"]:
-        cmd = "python3 " + GemsPath + "/gemsModules/query/generatePlotlyDivs.py " + str(theseOptions['oligo']) + " " + str(link["LinkageID"]["value"]) + " &"
+        cmd = "python3 " + GemsPath + "/gemsModules/deprecated/query/generatePlotlyDivs.py " + str(theseOptions['oligo']) + " " + str(link["LinkageID"]["value"]) + " &"
         log.debug(cmd)
         try:
           p = subprocess.run(cmd, shell=True)

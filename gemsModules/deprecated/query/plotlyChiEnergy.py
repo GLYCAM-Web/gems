@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
-import gemsModules
-from gemsModules import common
-from gemsModules.common.services import *
-from gemsModules.common.transaction import *
-from gemsModules.common.loggingConfig import *
+import gemsModules.deprecated
+from gemsModules.deprecated import common
+from gemsModules.deprecated.common.services import *
+from gemsModules.deprecated.common.transaction import *
+from gemsModules.deprecated.common.loggingConfig import *
 
 #Imports for Utilities
 import json
@@ -208,7 +208,7 @@ def generatePlotlyHTML(linkageJson, linkage, writeToFile=False):
     log.error("Error: " + str(error))
     raise error
   
-  plotDataFilePath = GemsPath + "/gemsModules/query/chiEnergyData/"
+  plotDataFilePath = GemsPath + "/gemsModules/deprecated/query/chiEnergyData/"
   
   #This is just one but it's easier to leave for now
   for link in linkageJson["results"]["bindings"]:

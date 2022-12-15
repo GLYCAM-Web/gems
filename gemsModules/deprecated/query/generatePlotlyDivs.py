@@ -4,13 +4,13 @@ import os
 import subprocess
 import sys
 import json
-import gemsModules
+import gemsModules.deprecated
 from inspect import currentframe, getframeinfo
-from gemsModules import common
-from gemsModules.common.services import *
-from gemsModules.common.transaction import *
-from gemsModules.common.loggingConfig import *
-from gemsModules.query import plotlyChiEnergy
+from gemsModules.deprecated import common
+from gemsModules.deprecated.common.services import *
+from gemsModules.deprecated.common.transaction import *
+from gemsModules.deprecated.common.loggingConfig import *
+from gemsModules.deprecated.query import plotlyChiEnergy
 
 if loggers.get(__name__):
     pass

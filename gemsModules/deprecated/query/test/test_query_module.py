@@ -20,22 +20,22 @@ Testing for the integrity of the query module in general
 class TestModule(unittest.TestCase):
 
     def test_help_file_exists(self):
-        targetFile = GemsPath + "/gemsModules/query/helpme.py"
+        targetFile = GemsPath + "/gemsModules/deprecated/query/helpme.py"
         exists = os.path.isfile(targetFile)
         self.assertTrue(exists)
 
     def test_receive_file_exists(self):
-        targetFile = GemsPath + "/gemsModules/query/receive.py"
+        targetFile = GemsPath + "/gemsModules/deprecated/query/receive.py"
         exists = os.path.isfile(targetFile)
         self.assertTrue(exists)
 
     def test_run_query_file_exists(self):
-        targetFile = GemsPath + "/gemsModules/query/run_query.py"
+        targetFile = GemsPath + "/gemsModules/deprecated/query/run_query.py"
         exists = os.path.isfile(targetFile)
         self.assertTrue(exists)
 
     def test_settings_file_exists(self):
-        targetFile = GemsPath + "/gemsModules/query/settings.py"
+        targetFile = GemsPath + "/gemsModules/deprecated/query/settings.py"
         exists = os.path.isfile(targetFile)
         self.assertTrue(exists)
 
