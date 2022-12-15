@@ -15,6 +15,7 @@ from gemsModules.deprecated.common.services import *
 from gemsModules.deprecated.common.transaction import * # might need whole file...
 
 #from gemsModules.common.loggingConfig import *
+from gemsModules.deprecated.common.loggingConfig import *
 
 import traceback
 
