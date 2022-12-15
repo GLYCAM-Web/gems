@@ -5,17 +5,17 @@ import gemsModules.deprecated
 
 from datetime import datetime
 
-#from gemsModules import common
-from gemsModules.deprecated import common
+from gemsModules import common
+#from gemsModules.deprecated import common
 
-#from gemsModules.common.services import *
-from gemsModules.deprecated.common.services import *
+from gemsModules.common.services import *
+#from gemsModules.deprecated.common.services import *
 
-#from gemsModules.common.transaction import * # might need whole file...
-from gemsModules.deprecated.common.transaction import * # might need whole file...
+from gemsModules.common.transaction import * # might need whole file...
+#from gemsModules.deprecated.common.transaction import * # might need whole file...
 
-#from gemsModules.common.loggingConfig import *
-from gemsModules.deprecated.common.loggingConfig import *
+from gemsModules.common.loggingConfig import *
+#from gemsModules.deprecated.common.loggingConfig import *
 
 import traceback
 
@@ -42,9 +42,9 @@ def delegate(jsonObjectString):
 
     # Make a new Transaction object for holding I/O information.
 
-    #from gemsModules.common.io import Transaction as ioTransaction
+    from gemsModules.common.io import Transaction as ioTransaction
 
-    from gemsModules.deprecated.common.io import Transaction as ioTransaction
+    #from gemsModules.deprecated.common.io import Transaction as ioTransaction
     thisTransaction=ioTransaction(jsonObjectString)
 
 #    # If the incoming string was improperly formed, bail, but give a reason.
@@ -67,8 +67,8 @@ def delegate(jsonObjectString):
 
     ### See if it is possible to load a module for the requested Entity
     try:
-        #from gemsModules.common.logic import importEntity as logic_importEntity
-        from gemsModules.deprecated.common.logic import importEntity as logic_importEntity
+        from gemsModules.common.logic import importEntity as logic_importEntity
+        #from gemsModules.deprecated.common.logic import importEntity as logic_importEntity
         theEntity = logic_importEntity(entityType)
         #log.debug("theEntity: " + str(theEntity))
     except Exception as error:
@@ -217,10 +217,10 @@ def receive(thisTransaction):
 ##  Return the content of the current schema, as defined in CurrentStableSchema
 def getJsonSchema():
     log.info("getJsonSchema() was called.\n")
-    versionFilename = getGemsHome() + "/gemsModules/deprecating/Schema/currentStableSchema"
+    versionFilename = getGemsHome() + "/gemsModules/Schema/currentStableSchema"
     with open(versionFilename, 'r') as versionFile:
         currentStableVersion = versionFile.read().strip()
-    schemaFileName = getGemsHome() + "/gemsModules/deprecating/Schema/" + currentStableVersion + "/schema.json"
+    schemaFileName = getGemsHome() + "/gemsModules/Schema/" + currentStableVersion + "/schema.json"
     with open(schemaFileName, 'r') as schemaFile:
         content = schemaFile.read()
     #log.debug("schema content: \n" + content )
@@ -232,9 +232,9 @@ def main():
   if importlib.util.find_spec("gemsModules") is None:
     this_dir, this_filename = os.path.split(__file__)
     sys.path.append(this_dir + "/../")
-    if importlib.util.find_spec("deprecating") is None:
-      this_dir, this_filename = os.path.split(__file__)
-      sys.path.append(this_dir + "/../deprecating/")
+    # if importlib.util.find_spec("deprecating") is None:
+    #   this_dir, this_filename = os.path.split(__file__)
+    #   sys.path.append(this_dir + "/../deprecating/")
 
     if importlib.util.find_spec("common") is None:
       print("I cannot find the Common Servicer.  No clue what to do. Exiting")
@@ -244,7 +244,7 @@ def main():
       from common import utils
       
   else:
-    #from gemsModules.common import utils
+    from gemsModules.common import utils
     from gemsModules.deprecated.common import utils
   jsonObjectString=utils.JSON_From_Command_Line(sys.argv)
   try:
