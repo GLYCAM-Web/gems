@@ -5,7 +5,7 @@ from typing import ForwardRef
 from pydantic import BaseModel,  Field
 from pydantic.schema import schema
 
-from gemsModules.common import transaction
+from gemsModules.deprecated.common import transaction
 
 # ##
 # ## Enums 

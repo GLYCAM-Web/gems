@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-import gemsModules
-from gemsModules import common
-from gemsModules.common.services import *
-from gemsModules.common.transaction import * # might need whole file...
+import gemsModules.deprecated
+from gemsModules.deprecated import common
+from gemsModules.deprecated.common.services import *
+from gemsModules.deprecated.common.transaction import * # might need whole file...
 import traceback
-from gemsModules.batchcompute.slurm.dataio import *
-from gemsModules.common.loggingConfig import *
+from gemsModules.deprecated.batchcompute.slurm.dataio import *
+from gemsModules.deprecated.common.loggingConfig import *
 
 if loggers.get(__name__):
     pass
@@ -164,7 +164,7 @@ def manageIncomingString(jsonObjectString):
 def main():
     import importlib.util, os, sys
     #from importlib import util
-    if importlib.util.find_spec("gemsModules") is None:
+    if importlib.util.find_spec("deprecated") is None:
         this_dir, this_filename = os.path.split(__file__)
         sys.path.append(this_dir + "/../../")
         if importlib.util.find_spec("common") is None:
@@ -173,7 +173,7 @@ def main():
         else:
           from common import utils
     else:
-        from gemsModules.common import utils
+        from gemsModules.deprecated.common import utils
     jsonObjectString=utils.JSON_From_Command_Line(sys.argv)
     try:
         thisSlurmJobInfo=manageIncomingString(jsonObjectString)

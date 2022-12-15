@@ -7,7 +7,7 @@ import subprocess
 
 def batch_compute_delegation (incoming_json_dict):
     #For right now, slurm in the only agent for batch compute to call.
-    from gemsModules.batchcompute.slurm import receive as slurm_receive
+    from gemsModules.deprecated.batchcompute.slurm import receive as slurm_receive
     slurm_basic_submission_json = {}
     workdir = incoming_json_dict["workingDirectory"]
     sbatch_argument = incoming_json_dict["sbatchArgument"]

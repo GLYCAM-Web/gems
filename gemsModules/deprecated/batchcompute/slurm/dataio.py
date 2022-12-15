@@ -5,8 +5,8 @@ from typing import ForwardRef
 from pydantic import BaseModel,  Field
 from pydantic.schema import schema
 
-from gemsModules.common import transaction
-from gemsModules.common.loggingConfig import *
+from gemsModules.deprecated.common import transaction
+from gemsModules.deprecated.common.loggingConfig import *
 
 if loggers.get(__name__):
     pass

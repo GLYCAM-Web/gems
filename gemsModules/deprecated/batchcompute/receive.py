@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-import gemsModules
-from gemsModules import common
-from gemsModules.common.services import *
-from gemsModules.common.transaction import * # might need whole file...
-from gemsModules.common.loggingConfig import *
-import gemsModules.batchcompute.settings as batchcomputeSettings
-from gemsModules.batchcompute.slurm.receive import manageIncomingString
+import gemsModules.deprecated
+from gemsModules.deprecated import common
+from gemsModules.deprecated.common.services import *
+from gemsModules.deprecated.common.transaction import * # might need whole file...
+from gemsModules.deprecated.common.loggingConfig import *
+import gemsModules.deprecated.batchcompute.settings as batchcomputeSettings
+from gemsModules.deprecated.batchcompute.slurm.receive import manageIncomingString
 import traceback
 import json
 
@@ -14,7 +14,7 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__)
 
-## File receive.py in gemsModules batchcompute
+## File receive.py in gemsModules.deprecated batchcompute
 
 ##  the receive function
 ##
@@ -109,7 +109,7 @@ def submitGpScriptToSlurm(thisTransaction, gemsProject, sbatchArg):
 def main():
   import importlib.util, os, sys
   #from importlib import util
-  if importlib.util.find_spec("gemsModules") is None:
+  if importlib.util.find_spec("deprecated") is None:
     this_dir, this_filename = os.path.split(__file__)
     sys.path.append(this_dir + "/../")
     if importlib.util.find_spec("common") is None:
@@ -118,7 +118,7 @@ def main():
     else:
       from common import utils
   else:
-    from gemsModules.common import utils
+    from gemsModules.deprecated.common import utils
   jsonObjectString=utils.JSON_From_Command_Line(sys.argv)
   try:
     responseObjectString=delegate(jsonObjectString)
