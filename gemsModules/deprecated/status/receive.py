@@ -1,9 +1,9 @@
 import sys, os, re, importlib.util
-import gemsModules
+import gemsModules.deprecated
 import gmml
-from gemsModules.common.services import *
-from gemsModules.common.transaction import * # might need whole file...
-from gemsModules.common.loggingConfig import *
+from gemsModules.deprecated.common.services import *
+from gemsModules.deprecated.common.transaction import * # might need whole file...
+from gemsModules.deprecated.common.loggingConfig import *
 from . import settings
 from . import statusResponse
 import traceback
@@ -164,10 +164,10 @@ def main():
             inputFile = sys.argv[1]
         else:
             #print("got an arg that is not a filename: " + sys.argv[1])
-            inputFile = GemsPath + "/gemsModules/delegator/test_in/status/statusReport_All.json"
+            inputFile = GemsPath + "/gemsModules/deprecated/delegator/test_in/status/statusReport_All.json"
     else:
         #print("no argv was offered.")
-        inputFile = GemsPath + "/gemsModules/delegator/test_in/status/statusReport_All.json"
+        inputFile = GemsPath + "/gemsModules/deprecated/delegator/test_in/status/statusReport_All.json"
 
     #print("using the default inputFile: " + inputFile)
     #print(os.listdir("../../delegator/test_in/"))
