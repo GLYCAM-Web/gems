@@ -20,17 +20,17 @@ Testing for the integrity of the delgator module in general
 class TestModule(unittest.TestCase):
 
     def test_help_file_exists(self):
-        targetFile = GemsPath + "/gemsModules/conjugate/helpme.py"
+        targetFile = GemsPath + "/gemsModules/deprecated/conjugate/helpme.py"
         exists = os.path.isfile(targetFile)
         self.assertTrue(exists)
 
     def test_receive_file_exists(self):
-        targetFile = GemsPath + "/gemsModules/conjugate/receive.py"
+        targetFile = GemsPath + "/gemsModules/deprecated/conjugate/receive.py"
         exists = os.path.isfile(targetFile)
         self.assertTrue(exists)
 
     def test_settings_file_exists(self):
-        targetFile = GemsPath + "/gemsModules/conjugate/settings.py"
+        targetFile = GemsPath + "/gemsModules/deprecated/conjugate/settings.py"
         exists = os.path.isfile(targetFile)
         self.assertTrue(exists)
 

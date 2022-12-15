@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-import gemsModules
-from gemsModules.batchcompute.receive import *
-from gemsModules import common
-from gemsModules.common.services import *
-from gemsModules.common.transaction import * # might need whole file...
-from gemsModules.common.loggingConfig import *
-from gemsModules.project.projectUtil import *
-from gemsModules.structureFile.amber.preprocess import preprocessPdbForAmber
-import gemsModules.conjugate.settings as conjugateSettings
+import gemsModules.deprecated
+from gemsModules.deprecated.batchcompute.receive import *
+from gemsModules.deprecated import common
+from gemsModules.deprecated.common.services import *
+from gemsModules.deprecated.common.transaction import * # might need whole file...
+from gemsModules.deprecated.common.loggingConfig import *
+from gemsModules.deprecated.project.projectUtil import *
+from gemsModules.deprecated.structureFile.amber.preprocess import preprocessPdbForAmber
+import gemsModules.deprecated.conjugate.settings as conjugateSettings
 import subprocess
 import urllib.request
 
@@ -222,7 +222,7 @@ def getAttachmentSitesFromTransaction(thisTransaction):
 def main():
   import importlib.util, os, sys
   #from importlib import util
-  if importlib.util.find_spec("gemsModules") is None:
+  if importlib.util.find_spec("deprecated") is None:
     this_dir, this_filename = os.path.split(__file__)
     sys.path.append(this_dir + "/../")
     if importlib.util.find_spec("common") is None:
@@ -231,7 +231,7 @@ def main():
     else:
       from common import utils
   else:
-    from gemsModules.common import utils
+    from gemsModules.deprecated.common import utils
 
   jsonObjectString=utils.JSON_From_Command_Line(sys.argv)
   responseObjectString=delegate(jsonObjectString)
