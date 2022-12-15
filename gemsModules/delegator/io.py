@@ -28,9 +28,9 @@ from typing import Dict, List, Optional, Sequence, Set, Tuple, Union, Any
 from typing import ForwardRef
 from pydantic import BaseModel, Field, Json
 from pydantic.schema import schema
-from gemsModules.common import io as commonio
-from gemsModules.project import dataio as projectio
-from gemsModules.common.loggingConfig import *
+from gemsModules.deprecated.common import io as commonio
+from gemsModules.deprecated.project import dataio as projectio
+from gemsModules.deprecated.common.loggingConfig import *
 
 if loggers.get(__name__):
     pass
