@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-from gemsModules.common.loggingConfig import loggers, createLogger
-from gemsModules.common import io as commonIO
-import gemsModules
+from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
+from gemsModules.deprecated.common import io as commonIO
+import gemsModules.deprecated
 
 if loggers.get(__name__):
     pass
