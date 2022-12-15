@@ -6,20 +6,20 @@ import re
 import importlib.util
 import shutil
 import uuid
-import gemsModules
+import gemsModules.deprecated
 import gmml
 import traceback
-import gemsModules.common.utils
-from gemsModules.project import projectUtilPydantic as projectUtils
-from gemsModules.project import settings as projectSettings
-from gemsModules.common import io as commonio
-from gemsModules.common import logic as commonlogic
-from gemsModules.common import services as commonservices
-from gemsModules.common.loggingConfig import loggers, createLogger
-from gemsModules.common.settings import generateCommonParserNotice
-from gemsModules.sequence import io as sequenceio
-from gemsModules.sequence import settings as sequenceSettings
-from gemsModules.sequence import io as sequencelogic
+import gemsModules.deprecated.common.utils
+from gemsModules.deprecated.project import projectUtilPydantic as projectUtils
+from gemsModules.deprecated.project import settings as projectSettings
+from gemsModules.deprecated.common import io as commonio
+from gemsModules.deprecated.common import logic as commonlogic
+from gemsModules.deprecated.common import services as commonservices
+from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
+from gemsModules.deprecated.common.settings import generateCommonParserNotice
+from gemsModules.deprecated.sequence import io as sequenceio
+from gemsModules.deprecated.sequence import settings as sequenceSettings
+from gemsModules.deprecated.sequence import io as sequencelogic
 
 if loggers.get(__name__):
     pass
@@ -33,7 +33,7 @@ else:
 def getLinkageOptionsFromGmmlcbBuilder(sequence):
     log.info("getLinkageOptionsFromGmmlcbBuilder() was called.\n")
     log.debug("sequence: " + sequence)
-    from gemsModules.sequence import build
+    from gemsModules.deprecated.sequence import build
     cbBuilder = build.getCbBuilderForSequence(sequence)
     gmmllinkageOptionsVector = cbBuilder.GenerateUserOptionsDataStruct()
     log.debug("gmmllinkageOptionsVector: " + repr(gmmllinkageOptionsVector))
@@ -157,7 +157,7 @@ def main():
     import importlib.util
     import os
     import sys
-    if importlib.util.find_spec("gemsModules") is None:
+    if importlib.util.find_spec("deprecated") is None:
         this_dir, this_filename = os.path.split(__file__)
         sys.path.append(this_dir + "/../")
         if importlib.util.find_spec("common") is None:
@@ -166,7 +166,7 @@ def main():
         else:
             from common import utils
     else:
-        from gemsModules.common import utils
+        from gemsModules.deprecated.common import utils
     data = utils.JSON_From_Command_Line(sys.argv)
 
 

@@ -7,25 +7,25 @@ import importlib.util
 import shutil
 import uuid
 import traceback
-import gemsModules
-import gemsModules.sequence
+import gemsModules.deprecated
+import gemsModules.deprecated.sequence
 
-# for key, val in gemsModules.delegator.settings.subEntities:
-#     if val in gemsModules.delegator.settings.deprecated:
+# for key, val in gemsModules.deprecated.delegator.settings.subEntities:
+#     if val in gemsModules.deprecated.delegator.settings.deprecated:
 #         pass
 # prototype: need to build import statement
-# from gemsModules.deprecated_20221212. + val + import         
+# from gemsModules.deprecated.deprecated_20221212. + val + import         
     
 
 
-from gemsModules.common import io as commonio
-from gemsModules.common import logic as commonlogic
-from gemsModules.common import services as commonservices
-from gemsModules.sequence import settings as sequenceSettings
-from gemsModules.sequence import io as sequenceio
+from gemsModules.deprecated.common import io as commonio
+from gemsModules.deprecated.common import logic as commonlogic
+from gemsModules.deprecated.common import services as commonservices
+from gemsModules.deprecated.sequence import settings as sequenceSettings
+from gemsModules.deprecated.sequence import io as sequenceio
 
-from gemsModules.common.loggingConfig import loggers, createLogger
-from gemsModules.common.logic import writeStringToFile
+from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
+from gemsModules.deprecated.common.logic import writeStringToFile
 if loggers.get(__name__):
     pass
 else:
@@ -98,7 +98,7 @@ def receive(receivedTransaction: sequenceio.Transaction):
         # ##
         if thisTransaction.transaction_out.project is None:
             log.debug("transaction_out.project is None.  Starting a new one.")
-            thisTransaction.transaction_out.project = gemsModules.project.io.CbProject()
+            thisTransaction.transaction_out.project = gemsModules.deprecated.project.io.CbProject()
         # ##
         # ## Initialize the parts of the project that need to be done even if there is no output
         # ## to the filesystem.
@@ -210,7 +210,7 @@ def receive(receivedTransaction: sequenceio.Transaction):
         # Instantiating carbBuilder in multiple places isn't great design.
         # Wrapping just the new condensedSequence class wasn't possible for Oliver's poor brain.
         # doing thisTransaction.generateCommonParserNotice before the "for currentService ..." loop causes a "doesn't exist" fault
-        from gemsModules.sequence import build
+        from gemsModules.deprecated.sequence import build
         carbBuilder = build.getCbBuilderForSequence(
             thisSequence.inputs.sequence.payload)
         valid = carbBuilder.IsStatusOk()
@@ -229,13 +229,13 @@ def receive(receivedTransaction: sequenceio.Transaction):
         # End OGNov21 edit.
         if 'Evaluate' in thisService.typename:
             log.debug("Evaluate service requested from sequence entity.")
-            from gemsModules.sequence import evaluate
+            from gemsModules.deprecated.sequence import evaluate
             try:
                 thisTransaction.evaluateCondensedSequence()
                 if thisTransaction.transaction_out.entity.inputs.evaluationOptions is not None:
                     if thisTransaction.transaction_out.entity.inputs.evaluationOptions.noBuild is False:
                         # Build the Default structure.
-                        from gemsModules.sequence import logic
+                        from gemsModules.deprecated.sequence import logic
                         thisTransaction.manageSequenceBuild3DStructureRequest(
                             defaultOnly=True)
             except Exception as error:
@@ -248,7 +248,7 @@ def receive(receivedTransaction: sequenceio.Transaction):
             log.debug("Build3DStructure service requested from sequence entity.")
             try:
                 # first evaluate the requested structure. Only build if valid.
-                from gemsModules.sequence import evaluate
+                from gemsModules.deprecated.sequence import evaluate
                 thisTransaction.evaluateCondensedSequence()
                 valid = thisTransaction.transaction_out.entity.outputs.sequenceEvaluationOutput.sequenceIsValid
                 thisTransaction.setIsEvaluationForBuild(True)
@@ -262,7 +262,7 @@ def receive(receivedTransaction: sequenceio.Transaction):
                 if valid:
                     log.debug("Valid sequence.")
                     try:
-                        from gemsModules.sequence import logic
+                        from gemsModules.deprecated.sequence import logic
                         thisTransaction.manageSequenceBuild3DStructureRequest()
 
                     except Exception as error:
@@ -277,7 +277,7 @@ def receive(receivedTransaction: sequenceio.Transaction):
                         noticeBrief='InvalidInputPayload', additionalInfo={"hint": "Sequence is invalid"})
         elif "Validate" in thisService.typename:
             log.debug("Validate service requested from sequence entity.")
-            from gemsModules.sequence import evaluate
+            from gemsModules.deprecated.sequence import evaluate
             try:
                 thisTransaction.evaluateCondensedSequence(validateOnly=True)
             except Exception as error:

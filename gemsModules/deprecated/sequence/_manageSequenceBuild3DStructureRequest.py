@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from gemsModules.common.loggingConfig import loggers, createLogger
+from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
 import traceback
 import os
 import sys
@@ -13,11 +13,11 @@ else:
 def manageSequenceBuild3DStructureRequest(self, defaultOnly: bool = False):
     log.info("manageSequenceBuild3DStructureRequest was called ")
     from typing import List
-    from gemsModules.sequence import structureInfo, projects, logic, build
-    from gemsModules.sequence import io as sequenceio
-    from gemsModules.project import projectUtilPydantic as projectUtils
-    from gemsModules.project.io import CbProject
-    from gemsModules.common import services as commonservices
+    from gemsModules.deprecated.sequence import structureInfo, projects, logic, build
+    from gemsModules.deprecated.sequence import io as sequenceio
+    from gemsModules.deprecated.project import projectUtilPydantic as projectUtils
+    from gemsModules.deprecated.project.io import CbProject
+    from gemsModules.deprecated.common import services as commonservices
     #
     # Do some sanity checks
     if self.transaction_out is None or self.transaction_in is None or self.transaction_out.project is None:
@@ -146,11 +146,11 @@ def manageSequenceBuild3DStructureRequest(self, defaultOnly: bool = False):
         log.debug("GEMS_FORCE_SERIAL_EXECUTION: " +
                   str(GEMS_FORCE_SERIAL_EXECUTION))
         # Now start the build process
-        from gemsModules.sequence.build import buildEach3DStructureInStructureInfo
+        from gemsModules.deprecated.sequence.build import buildEach3DStructureInStructureInfo
         if GEMS_FORCE_SERIAL_EXECUTION == 'True':
             buildEach3DStructureInStructureInfo(self)
         else:
-            from gemsModules.common import logic as commonlogic
+            from gemsModules.deprecated.common import logic as commonlogic
             def buildArgs() : # This merely simplifies the multiprocessing.Process call below
                 buildEach3DStructureInStructureInfo(self)
             import multiprocessing

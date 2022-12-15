@@ -8,18 +8,18 @@ import shutil
 import uuid
 import pathlib
 from datetime import datetime
-#import gemsModules
+#import gemsModules.deprecated
 import gmml
 import traceback
-import gemsModules.common.utils
-from gemsModules.project import projectUtilPydantic as projectUtils
-from gemsModules.project import settings as projectSettings
-from gemsModules.common import io as commonio
-from gemsModules.common import logic as commonlogic
-from gemsModules.common.loggingConfig import loggers, createLogger
-from gemsModules.sequence import io as sequenceio
-from gemsModules.sequence import settings as sequenceSettings
-from gemsModules.sequence import structureInfo
+import gemsModules.deprecated.common.utils
+from gemsModules.deprecated.project import projectUtilPydantic as projectUtils
+from gemsModules.deprecated.project import settings as projectSettings
+from gemsModules.deprecated.common import io as commonio
+from gemsModules.deprecated.common import logic as commonlogic
+from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
+from gemsModules.deprecated.sequence import io as sequenceio
+from gemsModules.deprecated.sequence import settings as sequenceSettings
+from gemsModules.deprecated.sequence import structureInfo
 
 if loggers.get(__name__):
     pass

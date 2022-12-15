@@ -6,23 +6,23 @@ import re
 import importlib.util
 import shutil
 import uuid
-import gemsModules
+import gemsModules.deprecated
 import gmml
 import traceback
-import gemsModules.common.utils
+import gemsModules.deprecated.common.utils
 from multiprocessing import Process
-from gemsModules.project import projectUtilPydantic as projectUtils
-from gemsModules.project import settings as projectSettings
-from gemsModules.sequence import io as sequenceio
-from gemsModules.common import io as commonio
-from gemsModules.common import logic as commonLogic
-from gemsModules.common import services as commonservices
+from gemsModules.deprecated.project import projectUtilPydantic as projectUtils
+from gemsModules.deprecated.project import settings as projectSettings
+from gemsModules.deprecated.sequence import io as sequenceio
+from gemsModules.deprecated.common import io as commonio
+from gemsModules.deprecated.common import logic as commonLogic
+from gemsModules.deprecated.common import services as commonservices
 
-from gemsModules.common.logic import writeStringToFile
-from gemsModules.common.loggingConfig import loggers, createLogger
+from gemsModules.deprecated.common.logic import writeStringToFile
+from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
 
-from gemsModules.sequence import projects as sequenceProjects
-from gemsModules.sequence import settings as sequenceSettings
+from gemsModules.deprecated.sequence import projects as sequenceProjects
+from gemsModules.deprecated.sequence import settings as sequenceSettings
 
 if loggers.get(__name__):
     pass
@@ -224,7 +224,7 @@ def build3DStructure(buildState: sequenceio.Single3DStructureBuildDetails, thisT
     "comment":"initiated by gemsModules/sequence"\
     }'
     log.debug(amberSubmissionJson)
-    from gemsModules.mmservice.amber.amber import manageIncomingString
+    from gemsModules.deprecated.mmservice.amber.amber import manageIncomingString
     # Using multiprocessing for this function call.
     manageIncomingString(amberSubmissionJson)
     return gmmlConformerInfo

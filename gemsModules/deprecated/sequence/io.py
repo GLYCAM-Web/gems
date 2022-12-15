@@ -6,13 +6,13 @@ from os.path import join
 from datetime import datetime
 from pydantic import BaseModel, Field, ValidationError, validator
 from pydantic.schema import schema
-from gemsModules.common.loggingConfig import loggers, createLogger
-from gemsModules.common import io as commonio
-from gemsModules.project import io as projectio
-from gemsModules.project import projectUtilPydantic as projectUtils
-from gemsModules.sequence import settings
-from gemsModules.sequence import evaluate
-from gemsModules import sequence
+from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
+from gemsModules.deprecated.common import io as commonio
+from gemsModules.deprecated.project import io as projectio
+from gemsModules.deprecated.project import projectUtilPydantic as projectUtils
+from gemsModules.deprecated.sequence import settings
+from gemsModules.deprecated.sequence import evaluate
+from gemsModules.deprecated import sequence
 import traceback
 
 
@@ -124,7 +124,7 @@ class AllLinkageRotamerInfo(BaseModel):
         super().__init__(**data)
 
         if self.singleLinkageRotamerDataList != []:
-            from gemsModules.sequence import structureInfo
+            from gemsModules.deprecated.sequence import structureInfo
             if self.totalSelectedRotamers == 0:
                 self.totalSelectedRotamers = structureInfo.countNumberOfShapes(
                     self, 'Selected')
@@ -392,7 +392,7 @@ class TheLinkageGeometryOptions(BaseModel):
         self.linkageRotamerInfo.createRotamerData()
 
     def setLinkageRotamerInfo(self, validatedSequence: str):
-        from gemsModules.sequence import evaluate
+        from gemsModules.deprecated.sequence import evaluate
         self.linkageRotamerInfo = evaluate.getLinkageOptionsFromGmmlcbBuilder(
             validatedSequence)
         log.debug(self.linkageRotamerInfo.json())
@@ -429,7 +429,7 @@ class TheGeometryOptions(BaseModel):
         if self.linkages is None:
             self.linkages = TheLinkageGeometryOptions()
         self.linkages.setLinkageRotamerInfo(validatedSequence)
-#        from gemsModules.sequence import evaluate
+#        from gemsModules.deprecated.sequence import evaluate
 #        self.linkages = evaluate.getLinkageOptionsFromGmmlcbBuilder(validatedSequence)
 #        log.debug(self.linkages.json())
 
@@ -521,7 +521,7 @@ class TheSequenceEvaluationOutput(BaseModel):
         log.debug("sequence: " + repr(sequence))
         log.debug("validateOnly: " + repr(validateOnly))
 
-        from gemsModules.sequence import evaluate
+        from gemsModules.deprecated.sequence import evaluate
 
         if self.evaluationOptions is None:
             self.evaluationOptions = TheEvaluationOptions()
@@ -873,7 +873,7 @@ class Transaction(commonio.Transaction):
         log.debug(self.transaction_out.json(indent=2))
 
     def doDefaultService():
-        from gemsModules.receive import doDefaultService
+        from gemsModules.deprecated.receive import doDefaultService
         doDefaultService(self)
         return self
 
@@ -1091,7 +1091,7 @@ class Transaction(commonio.Transaction):
 
 # In file _manageSequenceBuild3DStructureRequest.py:
 #    def manageSequenceBuild3DStructureRequest(self, defaultOnly : bool = False)
-    from gemsModules.sequence._manageSequenceBuild3DStructureRequest import manageSequenceBuild3DStructureRequest
+    from gemsModules.deprecated.sequence._manageSequenceBuild3DStructureRequest import manageSequenceBuild3DStructureRequest
 
     def build_outgoing_string(self):
         if self.transaction_out.prettyPrint is True:

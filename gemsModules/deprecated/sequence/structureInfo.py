@@ -4,13 +4,13 @@ from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 from datetime import datetime
 from pydantic import BaseModel, Field, ValidationError
 from pydantic.schema import schema
-from gemsModules.sequence import io as sequenceio
-from gemsModules.sequence import projects as sequenceProjects
-from gemsModules.common import io as commonio
-from gemsModules.common import logic as commonlogic
-from gemsModules.common.loggingConfig import loggers, createLogger
-from gemsModules.project import projectUtilPydantic as projectUtils
-from gemsModules.project import settings as projectSettings
+from gemsModules.deprecated.sequence import io as sequenceio
+from gemsModules.deprecated.sequence import projects as sequenceProjects
+from gemsModules.deprecated.common import io as commonio
+from gemsModules.deprecated.common import logic as commonlogic
+from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
+from gemsModules.deprecated.project import projectUtilPydantic as projectUtils
+from gemsModules.deprecated.project import settings as projectSettings
 import gmml
 import os
 import sys
