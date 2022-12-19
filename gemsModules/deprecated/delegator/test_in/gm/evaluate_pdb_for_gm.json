@@ -1,0 +1,17 @@
+{
+    "entity": {
+        "type": "Complex",
+        "services": {
+            "evaluate": {
+                "type": "Evaluate"
+            }
+        },
+        "inputs": {
+            "pdb_file_name": "/website/TESTS/pdb/test_in/options/1BUY.pdb"
+        }
+    },
+    "options": {
+        "targetModule": "glycomimetics"
+    },
+    "prettyPrint": "True"
+}

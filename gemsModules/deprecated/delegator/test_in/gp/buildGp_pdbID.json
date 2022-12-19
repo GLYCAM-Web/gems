@@ -1,0 +1,50 @@
+ {
+ 	"entity": {
+ 		"type": "Conjugate",
+ 		"services": [{
+ 			"Build": {
+ 				"type": "BuildGlycoprotein"
+ 			}
+ 		}],
+ 		"inputs": [{
+ 			"pdb_ID": "2V95"
+ 		}, {
+ 			"attachments": [{
+ 				"glycan": "Man9",
+ 				"site" : "A_66"
+ 			}, {
+ 				"glycan": "Man9",
+ 				"site" : "A_194"
+
+ 			}, {
+ 				"glycan": "Man9",
+ 				"site" : "A_230"
+ 			}]
+ 		}]
+ 	},
+ 	"options": {
+ 		"json_api_version": "0.0.1"
+ 	},
+ 	"project": {
+ 		"_state": "<django.db.models.base.ModelState object at 0x7f31ac8ed590>",
+ 		"user_id": "1",
+ 		"title": "Untitled project",
+ 		"timestamp": "2020-02-12 14:38:16.243805+00:00",
+ 		"id": "dc48450c-705c-4255-96a0-11442161cf47",
+ 		"comment": " ",
+ 		"type": "gp",
+ 		"email": "",
+ 		"gems_version": "default_gems_version_set_me",
+ 		"gmml_version": "default_gmml_version_set_me",
+ 		"ff_version": "default_gmml_version_set_me",
+ 		"parameter_version": "2014",
+ 		"amber_version": "default_amber_version_set_me",
+ 		"json_api_version": "0.0.1",
+ 		"requesting_agent": "json_api",
+ 		"root": " ",
+ 		"project_ptr_id": "dc48450c-705c-4255-96a0-11442161cf47",
+ 		"uploaded_file_name": "/website/uploads/tools/gp/git-ignore-me_userdata/dbf0a340-1185-4f13-9d72-a50cd18f8a0f/",
+ 		"u_uuid": "dbf0a340-1185-4f13-9d72-a50cd18f8a0f",
+ 		"upload_path": "/website/uploads/tools/gp/git-ignore-me_userdata/dbf0a340-1185-4f13-9d72-a50cd18f8a0f/"
+ 	}
+ }
