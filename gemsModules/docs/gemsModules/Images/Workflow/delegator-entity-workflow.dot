@@ -1,0 +1,34 @@
+digraph {
+//    rankdir=LR;
+    node [shape=box];
+
+    label="Single-entity, single-service workflow overview.";
+  
+    JSON_Input [shape=ellipse label="JSON input\nfrom user"];
+    Delegator [label="Delegator\nDetermines Entity ID\nHands off to Entity"];
+    
+    JSON_Input -> Delegator;
+
+    subgraph cluster_0 {
+        label="Entity";
+//        { rank=same; Evaluate_Sequence -> Validate_Sequence ; }
+	Receiver [label="Receiver\nInstantiates Transaction\nwith incoming JSON"];
+	Data_Manager [label="Data Manager for all Services\nEnsures each Service has all it needs"];
+	Main_Servicer [label="Main Servicer for all Services\nRuns each service in turn"];
+	Service_Servicer [label="Servicer for the Service\nPerforms the service"];
+
+	Receiver -> Data_Manager [label="Transaction object  "];
+	Data_Manager -> Receiver [label="Outgoing JSON string  " constraint=False];
+
+	Data_Manager -> Main_Servicer [label="Services object  "];
+	Main_Servicer -> Data_Manager [label="Responses object  " constraint=False];
+
+	Main_Servicer -> Service_Servicer [label="Service object  "];
+	Service_Servicer -> Main_Servicer [label="Response object  " constraint=False];
+
+    }
+   
+    Delegator -> Receiver [label="Incoming JSON string.  " ];
+    Receiver -> Delegator [label="Outgoing JSON string.  " constraint=False];
+ 
+}

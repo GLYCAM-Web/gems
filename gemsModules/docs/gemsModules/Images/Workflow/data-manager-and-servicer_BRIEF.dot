@@ -1,0 +1,35 @@
+digraph {
+    node [shape=box];
+    compound=True;
+
+    label="Single-entity, multiple-service workflow brief.";
+
+    Receiver [label="Receiver\nHandles incoming JSON"];
+
+    subgraph cluster_data_manager {
+        label="Data manager";
+        cluster_input_parser [ label="Input Parser\nTurns user-friendly input into\ninput for the services."]; 
+	Project_Manager [label="Project manager\nHandles file and session I/O."];
+        cluster_response_manager [ label="Response Manager\nTurns outgoing data into\nuser-friendly output."]; 
+    }
+
+    subgraph cluster_service_manager {
+        label="Services manager";
+        Main_Servicer [label="Main Servicer\nRuns each service &\ncollects responses."];
+        Service_Interface [label="Service Interface\nTranslates to and from low-level code I/O."];
+        Service_Logic [label="The service code."];
+
+        Main_Servicer -> Service_Interface [label="Request  "];
+        Main_Servicer -> Service_Interface [label="Response  " dir="back"];
+
+        Service_Interface -> Service_Logic [label="Input "];
+        Service_Interface -> Service_Logic [label="Output  " dir="back"];
+    }
+    
+    Receiver -> cluster_input_parser [label="Input  " lhead=cluster_data_manager];
+    Receiver -> cluster_response_manager [label="Output  " dir="back" lhead=cluster_data_manager];
+    
+    cluster_input_parser -> Main_Servicer [label="Services to run  " lhead=cluster_service_manager ltail=cluster_data_manager];
+    cluster_response_manager -> Main_Servicer [label="Responses  " dir="back" lhead=cluster_service_manager ltail=cluster_data_manager];
+
+}

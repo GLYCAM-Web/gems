@@ -1,0 +1,41 @@
+digraph {
+    label="Servicer Needs for Sequence:\nWhat to do if something fails.";
+
+    node [shape=box];
+
+    validate;
+    err_val [label="Fail?" shape=diamond];
+    die_val [label="Stop"  shape=ellipse];
+
+    validate -> err_val;
+    err_val -> die_val [label="Yes"];
+
+    evaluate;
+    err_eval [label="Fail?" shape=diamond];
+    die_eval [label="Stop"  shape=ellipse];
+
+    err_val -> evaluate [label="No"];
+
+    evaluate -> err_eval;
+    err_eval -> die_eval [label="Yes"];
+
+    build_default;
+    err_def [label="Fail?" shape=diamond];
+    die_def [label="Stop"  shape=ellipse];
+
+    err_eval -> build_default [label="No"];
+
+    build_default -> err_def;
+
+    err_def -> die_def [label="Yes"];
+
+    err_def -> build_rotamer_1 [label="No"];
+    err_br1 [label="Fail?" shape=diamond];
+
+    build_rotamer_1 -> err_br1;
+
+    err_br1 -> build_rotamer_2 [label=" Yes "];
+    err_br1 -> build_rotamer_2 [label=" No "];
+        
+
+}
