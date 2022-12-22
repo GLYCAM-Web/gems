@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 from typing import Callable
-from .main_api_services import Service, Response
-from .code_utils import Annotated_List, GemsStrEnum
 
-from .logger import Set_Up_Logging
+from gemsModules.common.main_api_services import Service, Response
+from gemsModules.common.code_utils import Annotated_List, GemsStrEnum
+from gemsModules.common.logger import Set_Up_Logging
+
 log = Set_Up_Logging(__name__)
 
 class Service_Package :

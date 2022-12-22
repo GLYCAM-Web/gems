@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 from pydantic import ValidationError
 from abc import ABC, abstractmethod
-from .main_api import Transaction
-from .main_servicer import Servicer
-from . import settings_main
+
+from gemsModules.common.main_api import Transaction
+from gemsModules.common.main_servicer import Servicer
+from gemsModules.common import settings_main
 
 class Receiver(ABC):
 

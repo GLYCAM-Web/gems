@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 from abc import ABC
 from typing import Callable, List
-from microcosm.common.code_utils import Annotated_List
-from microcosm.common.logger import Set_Up_Logging
+
+from gemsModules.common.code_utils import Annotated_List
+from gemsModules.common.logger import Set_Up_Logging
 
 log = Set_Up_Logging(__name__)
 

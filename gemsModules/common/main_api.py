@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 from pydantic import BaseModel
 from abc import ABC, abstractmethod
-from ..project.main_api import Project 
-from .main_api_entity import Entity
-from .main_api_notices import Notices
-from . import settings_main
+
+from gemsModules.project.main_api import Project 
+from gemsModules.common.main_api_entity import Entity
+from gemsModules.common.main_api_notices import Notices
+from gemsModules.common import settings_main
+
 import traceback
 
 from . import loggingConfig 

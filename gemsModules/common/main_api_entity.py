@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 from pydantic import BaseModel, Field, validator, Json
-from .main_api_notices import Notices
-from .main_api_services import Services, Responses
-from .main_api_resources import Resources
-from . import settings_main
+
+from gemsModules.common.main_api_notices import Notices
+from gemsModules.common.main_api_services import Services, Responses
+from gemsModules.common.main_api_resources import Resources
+from gemsModules.common import settings_main
 
 from . import loggingConfig 
 

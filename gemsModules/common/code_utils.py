@@ -2,8 +2,9 @@
 from enum import Enum
 from typing import  List
 
-from .logger import Set_Up_Logging
-Set_Up_Logging(__name__)
+from gemsModules.common.logger import Set_Up_Logging
+
+log = Set_Up_Logging(__name__)
 
 
 class GemsStrEnum(str, Enum):

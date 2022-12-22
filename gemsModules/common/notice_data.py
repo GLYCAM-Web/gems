@@ -2,7 +2,7 @@
 from collections import namedtuple
 from typing import List
 
-from .loggingConfig import *
+from gemsModules.common.loggingConfig import *
 if loggers.get(__name__):
     pass
 else:

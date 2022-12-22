@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-from .main_api import Transaction
+from gemsModules.common.main_api import Transaction
+from gemsModules.common import loggingConfig 
 
-from . import loggingConfig 
 if loggingConfig.loggers.get(__name__):
     pass
 else:

@@ -4,9 +4,9 @@
 ## Many things need to be moved to other places and such.
 ## But, it gives an overview of the workflow.
 
-from docs.gemsModules.microcosm.common.main_api import Common_API, Transaction
-from docs.gemsModules.microcosm.common.marco_servicer import Serve
-from docs.gemsModules.microcosm.common.marco_data_translator import input_translator
+from gemsModules.common.main_api import Common_API, Transaction
+from gemsModules.common.marco_servicer import Serve
+from gemsModules.common.marco_data_translator import input_translator
 
 json_Input = '''
 {

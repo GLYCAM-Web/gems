@@ -2,7 +2,8 @@
 
 from enum import Enum
 
-from . import loggingConfig 
+from gemsModules.common import loggingConfig 
+
 if loggingConfig.loggers.get(__name__):
     pass
 else:

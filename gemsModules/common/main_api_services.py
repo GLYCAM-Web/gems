@@ -2,8 +2,9 @@
 from uuid import UUID
 from typing import Dict, List, Protocol 
 from pydantic import BaseModel, Field, Json
-from .main_api_notices import Notices
-from .settings_main import All_Available_Services
+
+from gemsModules.common.main_api_notices import Notices
+from gemsModules.common.settings_main import All_Available_Services
 
 from . import loggingConfig
 if loggingConfig.loggers.get(__name__):

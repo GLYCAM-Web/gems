@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 from pydantic import BaseModel, Field
-from .main_api_services import Service, Response
 
-from . import loggingConfig 
+from gemsModules.common.main_api_services import Service, Response
+from gemsModules.common import loggingConfig 
+
 if loggingConfig.loggers.get(__name__):
     pass
 else:

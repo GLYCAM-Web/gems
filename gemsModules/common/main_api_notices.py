@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # ###############################################################
-from .code_utils import GemsStrEnum
 from typing import Dict, List
 from pydantic import BaseModel, Field, PrivateAttr
-from .loggingConfig import *
+
+from gemsModules.common.loggingConfig import *
+from gemsModules.common.code_utils import GemsStrEnum
 
 
 if loggers.get(__name__):

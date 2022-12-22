@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-from .main_api import Transaction
-from .main_api_services import Service, Services
-from .settings_main import All_Available_Services
-from .settings_main_servicer import All_Service_Modules
+from gemsModules.common.main_api import Transaction
+from gemsModules.common.main_api_services import Service, Services
+from gemsModules.common.settings_main import All_Available_Services
+from gemsModules.common.settings_main_servicer import All_Service_Modules
 
 ## This is all wrong?  Wrong ish?  I have made changes.
 class Servicer:

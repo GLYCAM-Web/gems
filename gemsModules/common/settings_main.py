@@ -2,9 +2,9 @@
 
 # As much as possible, all the specifics, the non-abstractions, should be in a settings file.
 
-from .code_utils import GemsStrEnum
+from gemsModules.common.code_utils import GemsStrEnum
+from gemsModules.common import loggingConfig 
 
-from . import loggingConfig 
 if loggingConfig.loggers.get(__name__):
     pass
 else:

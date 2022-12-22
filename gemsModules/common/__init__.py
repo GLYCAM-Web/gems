@@ -1,3 +1,3 @@
-from . import logger 
+from gemsModules.common import logger
 #from .logger import Set_Up_Logging
 #log = Set_Up_Logging()

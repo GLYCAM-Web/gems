@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 from typing import Dict, List
 from pydantic import BaseModel, Field, Json
-from .main_api_notices import Notices
-from .loggingConfig import *
+
+from gemsModules.common.main_api_notices import Notices
+from gemsModules.common.loggingConfig import *
 
 if loggers.get(__name__):
     pass

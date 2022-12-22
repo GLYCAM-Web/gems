@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 from abc import ABC, abstractmethod
-from .main_api import Transaction
-from .marco_api import marco_Service as Service 
 
-from . import loggingConfig
+from gemsModules.common.main_api import Transaction
+from gemsModules.common.marco_api import marco_Service as Service 
+from gemsModules.common import loggingConfig
+
 if loggingConfig.loggers.get(__name__):
     pass
 else:
