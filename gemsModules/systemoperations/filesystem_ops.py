@@ -33,11 +33,11 @@ def make_directory( Dir_Path : str ):
 
 def check_make_directory( Dir_Path : str ):
     Path( Dir_Path ).mkdir( parents=True, exist_ok=True )
-#    if directory_exists( Dir_Path) :
-#        return
-#    else :
-#        make_directory( Dir_Path )
-#        return
+
+def separate_path_and_name_for_file( File_Path : str ) -> ( str , str ) :
+    this_dir, this_filename = os.path.split(__file__)
+    return this_dir , this_filename
+
 
 def copy_all_files_from_dir_A_to_dir_B(A : str, B : str, follow_symlinks=True, copymode=shutil.copy) :
     log.info("copy_all_files_from_dir_A_to_dir_B was called.")

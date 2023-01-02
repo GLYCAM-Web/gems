@@ -45,23 +45,35 @@ if len(sys.argv) > 1:
         sys.exit(1)
 
 
+#if importlib.util.find_spec("gemsModules") is None:
+#  this_dir, this_filename = os.path.split(__file__)
+#  sys.path.append(this_dir + "/../gemsModules/")
+#
+#  # if importlib.util.find_spec("deprecated") is None:
+#  #   this_dir, this_filename = os.path.split(__file__)
+#  #   sys.path.append(this_dir + "/../deprecated/")
+#
+#  if importlib.util.find_spec("common") is None:
+#    sys.stderr.write("Unable to locate Common Services.  Exiting.\n")
+#    sys.exit(129)
+#  else:
+#    from common import utils
+#else:
+#  from gemsModules.common import utils
+#  #from gemsModules.deprecated.common import utils
+#jsonObjectString=utils.JSON_From_Command_Line(sys.argv)
+
 if importlib.util.find_spec("gemsModules") is None:
   this_dir, this_filename = os.path.split(__file__)
   sys.path.append(this_dir + "/../gemsModules/")
-
-  # if importlib.util.find_spec("deprecated") is None:
-  #   this_dir, this_filename = os.path.split(__file__)
-  #   sys.path.append(this_dir + "/../deprecated/")
-
-  if importlib.util.find_spec("common") is None:
-    sys.stderr.write("Unable to locate Common Services.  Exiting.\n")
+  if importlib.util.find_spec("systemoperations") is None:
+    sys.stderr.write("Unable to locate systemoperations.  Exiting.\n")
     sys.exit(129)
   else:
-    from common import utils
+    from systemoperations.command_line_utils import JSON_From_Command_Line
 else:
-  from gemsModules.common import utils
-  #from gemsModules.deprecated.common import utils
-jsonObjectString=utils.JSON_From_Command_Line(sys.argv)
+  from gemsModules.systemoperations.command_line_utils import JSON_From_Command_Line
+jsonObjectString=JSON_From_Command_Line(sys.argv)
 
 
 from gemsModules.delegator.receive import delegate
