@@ -1,85 +1,49 @@
 #!/usr/bin/env python3
-from enum import Enum
+import json
+import os
+import sys
 import traceback
 
-from gemsModules.common.logger import Set_Up_Logging
+from gemsModules.status.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
-
-def JSON_from_stdin(command_line):
-    import sys, select, json
-    # check if there is standard input 
+def STRING_from_stdin(command_line) -> str :
+    import select
     if select.select([sys.stdin,],[],[],0.0)[0]:
-        jsonObjectString = sys.stdin.read().replace('\n', '')
-        # check that it contains a json object 
-        try:
-            testString = json.loads(jsonObjectString)
-        except ValueError:
-            log.debug("The content of stdin appears not to be in JSON format.  Exiting.")
+        return sys.stdin.read()
     else:
-        jsonObjectString = None
-    return jsonObjectString
+        return None
 
 
-def JSON_from_filename_on_command_line(command_line):
-    import sys, os, json
-    from io import StringIO
-    # check the command line
-    if len(command_line) != 2:
-        print('When reading JSON from a file, you must supply exactly 1 filename as argument.')
-        print('%d arguments are supplied'%(len(command_line)-1) )
-        ###   return something instead of this:   sys.exit(1)
-    # check that the argument is a file
+def STRING_from_filename_on_command_line(command_line):
+    #    from io import StringIO
+    if len(command_line) < 2:
+        return None
     if not os.path.isfile(sys.argv[1]):
-        print("The given argument is not a file.  Exiting.")
+        return None
     else:
-        #jsonObjectString = open(sys.argv[1],'r')
         with open(sys.argv[1], 'r') as content_file:
-            jsonObjectString = content_file.read()
-        # check that it contains a json object 
-        try:
-            testString = json.loads(jsonObjectString)
-        except ValueError:
-            print("The given file appears not to be in JSON format.  Exiting.")
-    return jsonObjectString
+            return content_file.read()
 
 
-def JSON_From_Command_Line(command_line):
-    import sys
-    exitcode=check_gems_home()
-    if exitcode != 0 :  # if there was some low-level issue with GEMS or Python
-        print("could not read json from command line")
-        ###   return something instead of this:   sys.exit(1)
+def build_error_response_bad_JSON() -> str :
+    return "This is a returned error response string.\n"
+
+
+def JSON_From_Command_Line(command_line) -> (str, int):
     # Try first to see if there is a JSON object in stdin
-    jsonObjectString=JSON_from_stdin(command_line)
+    jsonObjectString=STRING_from_stdin(command_line)
     if jsonObjectString is not None:   # there was some stdin
-        # Check if the stdin was bad by seeing if the function returned an integer
         try:   
-            jsonObjectString = int(str(jsonObjectString)) 
-        except ValueError:  # if the response wasn't an error integer...
-            # assume it is probably valid JSON and return it
-            return jsonObjectString  
-        # if the last try/except didn't get us out of here, we have an integer
-        # make an error report and return
-        print("The content of stdin appears not to be in JSON format.  Exiting.")
-    # Still here?  There was no stdin.
+            jsonObjectDict = json.loads(jsonObjectString)
+        except:  
+            return build_error_response_bad_JSON(), 129
+        return jsonObjectString, 0
     # Try to get the JSON from the command line
-    jsonObjectString=JSON_from_filename_on_command_line(command_line)
-    # The last function shouldn't return 'None', but check anyway
-    if jsonObjectString is None:   # something has gone horribly wrong
-        print("The content of stdin appears not to be in JSON format.  Exiting.")
-    try:   # again, check to see if the function returned an integer
-        jsonObjectString = int(str(jsonObjectString)) 
-    except ValueError:  # if the response wasn't an error integer...
-        # assume it is probably valid JSON and return it
-        return jsonObjectString  
-    # Still here?  Return the error 
-    print("The content of stdin appears not to be in JSON format.  Exiting.")
-
-### finish writing the new version
-def main():
-    import sys
-    theJsonObject = JSON_From_Command_Line(sys.argv)
-    print("The JSON object is:")
-    print(theJsonObject)
+    jsonObjectString=STRING_from_filename_on_command_line(command_line)
+    try:   
+        jsonObjectDict = json.loads(jsonObjectString)
+    except:  
+        return build_error_response_bad_JSON(), 129
+    return jsonObjectString, 0
 
