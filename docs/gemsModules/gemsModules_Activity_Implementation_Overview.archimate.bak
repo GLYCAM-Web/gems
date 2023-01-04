@@ -348,7 +348,6 @@ For example, once the Service Package Tree is completed, with all needed informa
     <element xsi:type="archimate:AggregationRelationship" id="id-8590882881fc422ca6da35ec2b4069f8" source="id-30d89b8017d04e938999446a210de5e0" target="id-1f12fab15f914776a4a0c0b236a2853b"/>
     <element xsi:type="archimate:AggregationRelationship" id="id-f7404fbf89b74e0d90f01c7d57fa36dc" source="id-30d89b8017d04e938999446a210de5e0" target="id-78367624529f465f9742dfb639392a23"/>
     <element xsi:type="archimate:AggregationRelationship" id="id-23de317703cd4153853f0b9e09b77b04" source="id-30d89b8017d04e938999446a210de5e0" target="id-9b581b62d7714f4791450b5199e69919"/>
-    <element xsi:type="archimate:ServingRelationship" id="id-5577b967f2364eeba707d81a924346b3" source="id-46fca231059d42f494fe7f44817d4e4c" target="id-a30c3981037d42428bd853e50d5054db"/>
     <element xsi:type="archimate:ServingRelationship" id="id-46bfce309d2e4c51a1a400cbbb2b4358" source="id-6f6e5e0db1fd494c9ae0057acaad86ac" target="id-92516d86bfeb40eb9e44913b5882ac15"/>
     <element xsi:type="archimate:ServingRelationship" id="id-82cbf72425c64ef388758b9fd4c76dce" source="id-c7a1dd13e5c34b38b3bc946b8f9d5b70" target="id-0665ca55d6f74a609169ba3fea34e6c3"/>
     <element xsi:type="archimate:ServingRelationship" id="id-ebff8548863e45978296415caab96316" source="id-c3bb4696226b4f4e80f02f613d56c0f3" target="id-6eb7c6e0fe3f432e8bb84c9de66d8e78"/>
@@ -518,6 +517,9 @@ For example, once the Service Package Tree is completed, with all needed informa
     <element xsi:type="archimate:ServingRelationship" id="id-ac6c08a8c00a4227a347e43d144c51a8" source="id-47521843f6ec494798a2d6fca8b51331" target="id-dbbf5d84fae54397bae8a9fafc7b0454"/>
     <element xsi:type="archimate:ServingRelationship" id="id-9ff73dd78564461082e842de175bad4e" source="id-123806182ffe4132914217fbf016c47d" target="id-dbbf5d84fae54397bae8a9fafc7b0454"/>
     <element xsi:type="archimate:SpecializationRelationship" id="id-d88db74db3914152be4d5a511305d353" source="id-d7304b7921484145b14cf78df163f8d7" target="id-afa284cec65f4a3eac6346baf1013dbf"/>
+    <element xsi:type="archimate:SpecializationRelationship" id="id-860784efe0a9499dba4d9695dbcdd771" source="id-7b6a8665ca4c4a68b27bf7a3f62113b1" target="id-afa284cec65f4a3eac6346baf1013dbf"/>
+    <element xsi:type="archimate:SpecializationRelationship" id="id-2e0b308eb2a148cfb4b463da22883ea1" source="id-45b5e29e83754d42b860763883f36589" target="id-afa284cec65f4a3eac6346baf1013dbf"/>
+    <element xsi:type="archimate:ServingRelationship" id="id-4041551e7b0e4f218ab383a38ca5b051" source="id-a30c3981037d42428bd853e50d5054db" target="id-46fca231059d42f494fe7f44817d4e4c"/>
   </folder>
   <folder name="Views" id="id-379933235f764cf1933ac71acdc87b77" type="diagrams">
     <element xsi:type="archimate:ArchimateDiagramModel" name="Application_Flow_View with links out" id="id-a4daa650a0494afd98a39f9b824610dc">
@@ -938,10 +940,11 @@ For example, once the Service Package Tree is completed, with all needed informa
       <child xsi:type="archimate:DiagramObject" id="id-ac217b9e895c40669310c94afb44e89c" targetConnections="id-9ef2bdca960f409d9fcd488fed147a09 id-fde564c2b36b4152ba9895aea13ea127 id-c7dacb4accec40a49afb0e151fdf392f" archimateElement="id-9b581b62d7714f4791450b5199e69919">
         <bounds x="780" y="216" width="217" height="40"/>
       </child>
-      <child xsi:type="archimate:DiagramObject" id="id-4ca2e84fc46e46c6ae25b705bfe68ae1" targetConnections="id-f35d0377dfeb413390bd3adb0372935e" archimateElement="id-a30c3981037d42428bd853e50d5054db">
+      <child xsi:type="archimate:DiagramObject" id="id-4ca2e84fc46e46c6ae25b705bfe68ae1" archimateElement="id-a30c3981037d42428bd853e50d5054db">
         <bounds x="960" y="328" width="104" height="38"/>
         <sourceConnection xsi:type="archimate:Connection" id="id-4357149828cc4238a74a9abc9cb489b3" source="id-4ca2e84fc46e46c6ae25b705bfe68ae1" target="id-2b8cda57b5ed4541b062709944d01936" archimateRelationship="id-7c7f744a6b9f4b9296d2bc6a76afe1a3"/>
         <sourceConnection xsi:type="archimate:Connection" id="id-7dd8a129930c4fa7b316f457a947a50d" source="id-4ca2e84fc46e46c6ae25b705bfe68ae1" target="id-7434053aafc24934860a739e4bc6ea8b" archimateRelationship="id-5dfb30864c794350a6a9640ce9c6cade"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-626923d968d64119954a0062bcca4a4a" source="id-4ca2e84fc46e46c6ae25b705bfe68ae1" target="id-73b1f515454e4a848b23237be8db4368" archimateRelationship="id-4041551e7b0e4f218ab383a38ca5b051"/>
       </child>
       <child xsi:type="archimate:DiagramObject" id="id-adf040c7070d4d7c8cffe6ad3c4bd7ce" archimateElement="id-6f6e5e0db1fd494c9ae0057acaad86ac">
         <bounds x="1048" y="412" width="104" height="42"/>
@@ -1009,9 +1012,8 @@ For example, once the Service Package Tree is completed, with all needed informa
           <bounds x="746" y="29" width="92" height="31"/>
           <sourceConnection xsi:type="archimate:Connection" id="id-679fe6d49b1a4e43b104e8bb642ae83d" source="id-2db11e99160d4a93b10f486a89f8e662" target="id-1a0c8a3e56a2445182af4ea3eefc670e" archimateRelationship="id-87039adc1ebf4977953ef3ad81088ee1"/>
         </child>
-        <child xsi:type="archimate:DiagramObject" id="id-73b1f515454e4a848b23237be8db4368" archimateElement="id-46fca231059d42f494fe7f44817d4e4c">
+        <child xsi:type="archimate:DiagramObject" id="id-73b1f515454e4a848b23237be8db4368" targetConnections="id-626923d968d64119954a0062bcca4a4a" archimateElement="id-46fca231059d42f494fe7f44817d4e4c">
           <bounds x="936" y="156" width="109" height="38"/>
-          <sourceConnection xsi:type="archimate:Connection" id="id-f35d0377dfeb413390bd3adb0372935e" source="id-73b1f515454e4a848b23237be8db4368" target="id-4ca2e84fc46e46c6ae25b705bfe68ae1" archimateRelationship="id-5577b967f2364eeba707d81a924346b3"/>
           <sourceConnection xsi:type="archimate:Connection" id="id-aced41dc48fa4688b80f1813efa841f0" source="id-73b1f515454e4a848b23237be8db4368" target="id-1a0c8a3e56a2445182af4ea3eefc670e" archimateRelationship="id-13f4e41307ee4fe9b68eab4ae537374f"/>
           <sourceConnection xsi:type="archimate:Connection" id="id-ef81961e37bc4548b7b88b0625f23cff" source="id-73b1f515454e4a848b23237be8db4368" target="id-5058fa26f0fa4ff3bbfbb69da0c4c8d1" archimateRelationship="id-315051e0084f4586b293a82959cb74c7"/>
           <sourceConnection xsi:type="archimate:Connection" id="id-1acaaea1b5894d108f3984557427e4a3" source="id-73b1f515454e4a848b23237be8db4368" target="id-2b8cda57b5ed4541b062709944d01936" archimateRelationship="id-0ffb1bb95a1044b583fe32be4ae8852f"/>
@@ -1412,16 +1414,18 @@ For example, once the Service Package Tree is completed, with all needed informa
         <sourceConnection xsi:type="archimate:Connection" id="id-b19df2afa60848cab07789928a8c9e9a" source="id-fba947f71b7a42d0bbe6e851f309c08a" target="id-3cf55b49e8da42f896f1f6b2af2898ea" archimateRelationship="id-c793e40f3e094eb1a02e446940782327"/>
         <sourceConnection xsi:type="archimate:Connection" id="id-283bd39527f0481ab43db66d1e2302e1" source="id-fba947f71b7a42d0bbe6e851f309c08a" target="id-f3f246354c2c44a58e5eaeb5d8cef073" archimateRelationship="id-ab3df69677c74325af041d64c27d0ec7"/>
         <child xsi:type="archimate:DiagramObject" id="id-4d48a75e30ec4e068723dfa5b41824e0" targetConnections="id-994d8215ebb24a2c8f4b195ad170ffec id-3d51d301936945fcbcb632d23fbcc676" archimateElement="id-fd16d851502f4961b5fa2480318759f5">
-          <bounds x="180" y="300" width="120" height="55"/>
+          <bounds x="180" y="324" width="120" height="55"/>
         </child>
-        <child xsi:type="archimate:DiagramObject" id="id-a294409831584bb19714a256dc9b083b" targetConnections="id-10a69b9a45de4bbab2f2fd60f7399355 id-cfd4a7e695754c05b334778f82f8c86a" archimateElement="id-afa284cec65f4a3eac6346baf1013dbf">
+        <child xsi:type="archimate:DiagramObject" id="id-a294409831584bb19714a256dc9b083b" targetConnections="id-10a69b9a45de4bbab2f2fd60f7399355 id-cfd4a7e695754c05b334778f82f8c86a id-ae8305e64a8047b3994773cdb68b69a9 id-c2df9974002d462fbb90eaa25823a984" archimateElement="id-afa284cec65f4a3eac6346baf1013dbf">
           <bounds x="24" y="228" width="120" height="55"/>
         </child>
         <child xsi:type="archimate:DiagramObject" id="id-3cf55b49e8da42f896f1f6b2af2898ea" targetConnections="id-a7701f18363843a3a4d27b7ece48f388 id-b19df2afa60848cab07789928a8c9e9a" archimateElement="id-45b5e29e83754d42b860763883f36589">
           <bounds x="24" y="48" width="120" height="55"/>
+          <sourceConnection xsi:type="archimate:Connection" id="id-c2df9974002d462fbb90eaa25823a984" source="id-3cf55b49e8da42f896f1f6b2af2898ea" target="id-a294409831584bb19714a256dc9b083b" archimateRelationship="id-2e0b308eb2a148cfb4b463da22883ea1"/>
         </child>
         <child xsi:type="archimate:DiagramObject" id="id-f3f246354c2c44a58e5eaeb5d8cef073" targetConnections="id-b1a964d18eab428ab80d67654acd4119 id-283bd39527f0481ab43db66d1e2302e1" archimateElement="id-7b6a8665ca4c4a68b27bf7a3f62113b1">
           <bounds x="24" y="444" width="120" height="55"/>
+          <sourceConnection xsi:type="archimate:Connection" id="id-ae8305e64a8047b3994773cdb68b69a9" source="id-f3f246354c2c44a58e5eaeb5d8cef073" target="id-a294409831584bb19714a256dc9b083b" archimateRelationship="id-860784efe0a9499dba4d9695dbcdd771"/>
         </child>
         <child xsi:type="archimate:DiagramObject" id="id-6ea1fad58c154ac3a0c976eeb71aae70" targetConnections="id-8257a134133544a686c4a786117afc54" archimateElement="id-d7304b7921484145b14cf78df163f8d7">
           <bounds x="180" y="228" width="120" height="55"/>
