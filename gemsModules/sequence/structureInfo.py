@@ -220,7 +220,9 @@ def buildStructureInfoOliver(thisTransaction: sequenceio.Transaction):
 
     log.debug("The max number structs to build (3) is :  " +
               str(maxNumberOfStructuresToBuild))
+    log.debug(" ROTAMER DATA IS " + str(rotamerData) )
     if rotamerData is None:
+        log.error("the rotamerData object in None, and that is not expected.")
         rotamerData = AllLinkageRotamerData()
         rotamerData.totalPossibleRotamers = 1
         rotamerData.totalLikelyRotamers = 1
@@ -244,11 +246,13 @@ def buildStructureInfoOliver(thisTransaction: sequenceio.Transaction):
     log.debug("The max number structs to build (4) is :  " +
               str(maxNumberOfStructuresToBuild))
     if rotamerData.totalPossibleRotamers == 1:
-        log.debug("totalPossibleRotamers: 1")
+        rotamerData.totalLikelyRotamers = 1
+        rotamerData.totalSelectedRotamers = 1
         # there is probably a better way than the following, but....
         buildState = sequenceio.Single3DStructureBuildDetails()
         buildState.conformerLabel = "structure"
         buildState.structureDirectoryName = "structure"
+        log.debug("buildState.conformerLabel (1) = " + buildState.conformerLabel)
         buildState.conformerID = buildState.structureDirectoryName
         buildState.isDefaultStructure = True
         buildState.date = datetime.now()
