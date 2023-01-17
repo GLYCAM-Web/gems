@@ -39,10 +39,10 @@ def getLinkageOptionsFromGmmlcbBuilder(sequence):
     log.debug("gmmllinkageOptionsVector: " + repr(gmmllinkageOptionsVector))
 
     gemsLinkageGeometryOptions = sequenceio.AllLinkageRotamerInfo()
-    gemsLinkageGeometryOptions.totalPossibleRotamers = cbBuilder.GetNumberOfShapes()
+    gemsLinkageGeometryOptions.totalPossibleRotamers = int(cbBuilder.GetNumberOfShapes())
     likelyOnly = True
-    gemsLinkageGeometryOptions.totalLikelyRotamers = cbBuilder.GetNumberOfShapes(
-        likelyOnly)
+    gemsLinkageGeometryOptions.totalLikelyRotamers = int(cbBuilder.GetNumberOfShapes(
+        likelyOnly))
 
     for gmmlLinkageOptions in gmmllinkageOptionsVector:
 
