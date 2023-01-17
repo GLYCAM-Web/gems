@@ -5,8 +5,10 @@ import importlib
 from gemsModules.status.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
+
 def get_gems_path() -> str :
     return os.environ.get('GEMSHOME')
+
 
 def gemsModules_is_findable() -> bool :
     if importlib.util.find_spec("gemsModules") is None :
@@ -14,79 +16,12 @@ def gemsModules_is_findable() -> bool :
     else :
         return False
 
+
 def add_gems_to_python_path() -> None :
     GemsPath = get_gems_path()
     sys.path.append(GemsPath)
 
 
-def check_gems_home() -> int:
-
-def check_gems_home():
-    import sys, os
-    import importlib
-    returnCode = 0
-    verbosity=gems_environment_verbosity()
-    # check the paths and modules
-    if importlib.util.find_spec("common") is None:
-        if verbosity >= 0:
-            print("""
-Something is wrong in your Setup.  Investigating.
-
-""")
-        GemsPath = os.environ.get('GEMSHOME')
-        if GemsPath == None:
-            this_dir, this_filename = os.path.split(__file__)
-            if verbosity >= 0:
-                print("""
-
-    GEMSHOME environment variable is not set.
-
-    Set it using somthing like:
-
-      BASH:  export GEMSHOME=/path/to/gems
-      SH:    setenv GEMSHOME /path/to/gems
-
-   I'll exit now.
-
-""")
-                sys.exit(brief_to_code['GemsHomeNotSet']+128)
-            else:
-                returnCode = brief_to_code['GemsHomeNotSet']
-        else:
-            if verbosity >= 1:
-                print("""
-GEMSHOME is set.  This is good.
-Trying now to see if adding it to your PYTHONPATH will help.
-Also importing gemsModules.
-""")
-            sys.path.append(GemsPath)
-            import gemsModules.deprecated
-            if importlib.util.find_spec("deprecated") is None:
-                if verbosity >= 0:
-                    print("""
-That didn't seem to work, so I'm not sure what to do.  Exiting.
-                                                                  """)
-                    sys.exit(brief_to_code['PythonPathHasNoGemsModules']+128)
-                else:
-                    returnCode = brief_to_code['PythonPathHasNoGemsModules']
-            else:
-                if verbosity >= 1:
-                    print("""
-That seems to have worked, so I'm sending you on your way.
-
-In the future, set your PYTHONPATH to include GEMSHOME to
-avoid seeing this message.
-
-Bt the way, if your PYTHONPATH contains GEMSHOME, you might not
-need GEMSHOME to also be set.
-
-""")
-    return returnCode
-
-
-
-##### Decide what to do with these....
-##### Ideally they use the Notices class...
 
 ## Return Codes and their associated briefs and messages
 ## If returning to a shell, we add 128 because the error is fatal

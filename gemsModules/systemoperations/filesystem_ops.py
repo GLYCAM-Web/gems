@@ -34,8 +34,8 @@ def make_directory( Dir_Path : str ):
 def check_make_directory( Dir_Path : str ):
     Path( Dir_Path ).mkdir( parents=True, exist_ok=True )
 
-def separate_path_and_name_for_file( File_Path : str ) -> ( str , str ) :
-    this_dir, this_filename = os.path.split(__file__)
+def separate_path_and_filename( File_Path : str ) -> tuple[str,str]:
+    this_dir, this_filename = os.path.split(File_Path)
     return this_dir , this_filename
 
 

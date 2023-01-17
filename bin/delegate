@@ -115,17 +115,13 @@ except :
             sys.exit(129)
         else :
             from gemsModules.systemoperations.command_line_utils import JSON_From_Command_Line
-#finally :
-#    sys.stdout.write(Emergency_Response)
-#    sys.exit(129)
-
 
 ##  Get the JSON from the command line
-jsonObjectResponse, return_code = JSON_From_Command_Line(sys.argv)
+jsonObjectResponse, return_code = JSON_From_Command_Line(sys.argv, sys.stdin)
 
 if return_code != 0 :
     sys.stdout.write(jsonObjectResponse)
-    sys.exit(129)
+    sys.exit(return_code)
 else:
     jsonObjectString = jsonObjectResponse
 
