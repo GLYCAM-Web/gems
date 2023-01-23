@@ -39,10 +39,10 @@ def getLinkageOptionsFromGmmlcbBuilder(sequence):
     log.debug("gmmllinkageOptionsVector: " + repr(gmmllinkageOptionsVector))
 
     gemsLinkageGeometryOptions = sequenceio.AllLinkageRotamerInfo()
-    gemsLinkageGeometryOptions.totalPossibleRotamers = cbBuilder.GetNumberOfShapes()
+    gemsLinkageGeometryOptions.totalPossibleRotamers = int(cbBuilder.GetNumberOfShapes())
     likelyOnly = True
-    gemsLinkageGeometryOptions.totalLikelyRotamers = cbBuilder.GetNumberOfShapes(
-        likelyOnly)
+    gemsLinkageGeometryOptions.totalLikelyRotamers = int(cbBuilder.GetNumberOfShapes(
+        likelyOnly))
 
     for gmmlLinkageOptions in gmmllinkageOptionsVector:
 
@@ -157,14 +157,14 @@ def main():
     import importlib.util
     import os
     import sys
-    if importlib.util.find_spec("deprecated") is None:
+    if importlib.util.find_spec("gemsModules") is None:
         this_dir, this_filename = os.path.split(__file__)
         sys.path.append(this_dir + "/../")
-        if importlib.util.find_spec("common") is None:
+        if importlib.util.find_spec("deprecated.common") is None:
             print("Something went horribly wrong.  No clue what to do.")
             return
         else:
-            from common import utils
+            from deprecated.common import utils
     else:
         from gemsModules.deprecated.common import utils
     data = utils.JSON_From_Command_Line(sys.argv)
