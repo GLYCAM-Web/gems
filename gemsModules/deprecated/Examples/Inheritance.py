@@ -13,7 +13,7 @@ class Foo(BaseModel):
         print("dumClass was called")
         super().__init__(**data)
         print("dumClass was initialized")
-        if self.A is "Hello" : 
+        if self.A == "Hello" : 
             self.B = "Goodbye"
 
     def saySomething(self):

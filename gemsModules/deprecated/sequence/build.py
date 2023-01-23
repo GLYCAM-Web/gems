@@ -41,7 +41,7 @@ def buildEach3DStructureInStructureInfo(thisTransaction: sequenceio.Transaction)
     theseBuildStates = thisTransaction.getIndividualBuildDetailsOut()
     if theseBuildStates is None:
         buildStatesOK = False
-    if theseBuildStates is []:
+    if theseBuildStates == []:
         buildStatesOK = False
     if buildStatesOK is False:
         log.error(

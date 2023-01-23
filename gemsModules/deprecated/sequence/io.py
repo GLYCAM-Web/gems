@@ -1042,7 +1042,7 @@ class Transaction(commonio.Transaction):
             return None
         if self.transaction_out.entity.outputs.structureBuildInfo.individualBuildDetails is None:
             return None
-        if self.transaction_out.entity.outputs.structureBuildInfo.individualBuildDetails is []:
+        if self.transaction_out.entity.outputs.structureBuildInfo.individualBuildDetails == []:
             return None
         else:
             return self.transaction_out.entity.outputs.structureBuildInfo.individualBuildDetails

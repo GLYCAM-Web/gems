@@ -465,7 +465,7 @@ def convertStructureInfoToDict(structureInfo: sequenceio.StructureBuildInfo()):
     inputIsGood = True
     if structureInfo is None:
         inputIsGood = False
-    if structureInfo is "":
+    if structureInfo == "":
         inputIsGood = False
     if inputIsGood is False:
         error = "Bad data passed to convertStructureInfoToDict : " + \
