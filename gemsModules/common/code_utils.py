@@ -2,8 +2,7 @@
 from enum import Enum
 from typing import  List
 
-from gemsModules.common.logger import Set_Up_Logging
-
+from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 

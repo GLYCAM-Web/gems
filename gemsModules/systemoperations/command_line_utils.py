@@ -4,7 +4,7 @@ import os
 import sys
 import traceback
 
-from gemsModules.status.logger import Set_Up_Logging
+from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 

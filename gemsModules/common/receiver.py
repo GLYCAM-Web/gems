@@ -6,6 +6,9 @@ from gemsModules.common.main_api import Transaction
 from gemsModules.common.main_servicer import Servicer
 from gemsModules.common import settings_main
 
+from gemsModules.logging.logger import Set_Up_Logging
+log = Set_Up_Logging(__name__)
+
 class Receiver(ABC):
 
     @abstractmethod
@@ -16,31 +19,26 @@ class Receiver(ABC):
     def get_transaction_child_type(self):
         return Transaction
 
-    @abstractmethod
-    def get_servicer_child_type(self):
-        return Servicer
-
-    def __init__(self, incoming_string: str):
+    def receive(self, incoming_string: str):
         try: 
             self.transaction = self.get_transaction_child_type()
-            self.transaction.process_incoming_string(incoming_string, initialize_out=False)
+            self.transaction.process_incoming_string(self.transaction, in_string=incoming_string, initialize_out=False)
+        except ValueError as e:
+            self.transaction.generate_error_response(self.transaction, Brief='EntityNotKnown', AdditionalInfo={'error': str(e)})
+            return self.transaction.get_outgoing_string()
         except ValidationError as e:
-            self.transaction.generate_error_response(Brief='InvalidInput', AdditionalInfo={'error': str(e)})
+            self.transaction.generate_error_response(self.transaction, Brief='InvalidInput', AdditionalInfo={'error': str(e)})
+            return self.transaction.get_outgoing_string()
         except Exception as e:
-            self.transaction.generate_error_response(Brief='UnknownError', AdditionalInfo={'error': str(e)})
-        return self.transaction.get_outgoing_string()
+            self.transaction.generate_error_response(self.transaction, Brief='UnknownError', AdditionalInfo={'error': str(e)})
+            return self.transaction.get_outgoing_string()
 
-    def receive(self) -> str:
-        self.check_entity()
-        self.hand_off_to_servicer()
-        return self.transaction.get_outgoing_string()
 
-    def check_entity(self):   #  Override this function in delegator
-        this_api : self.get_api_child_type = self.transaction.inputs
-        this_entity : self.get_entity_child_type = this_api.entity
-        if this_entity.entity_type != self.get_local_entity_type():
-            self.transaction.generate_error_response(Brief='InvalidEntity', AdditionalInfo={'error': 'Entity type was not valid'})
+    def get_incoming_entity_type(self):
+        return self.transaction.inputs.entity.entityType
 
-    def hand_off_to_servicer(self):  #  Override this function in delegator
-        servicer = self.get_servicer_child_type(self.transaction)
-        servicer.delegate_services()
+    def get_incoming_services_types(self):
+        pass
+
+    def process(self):
+        pass

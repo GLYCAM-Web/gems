@@ -3,8 +3,8 @@ from abc import ABC
 from typing import Callable, List
 
 from gemsModules.common.code_utils import Annotated_List
-from gemsModules.common.logger import Set_Up_Logging
 
+from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 class AAOP_Tree(ABC) :

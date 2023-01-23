@@ -2,18 +2,16 @@
 
 from enum import Enum
 
-from gemsModules.common import loggingConfig 
-
-if loggingConfig.loggers.get(__name__):
-    pass
-else:
-    log = loggingConfig.createLogger(__name__)
+from gemsModules.logging.logger import Set_Up_Logging
+log = Set_Up_Logging(__name__)
 
 class Service_Modules(Enum):
-    from . import marco_servicer, status_servicer
-    Default = marco_servicer 
-    Marco = marco_servicer
-    Status = status_servicer
+    from gemsModules.common.services import marco
+    from gemsModules.common.services import status
+    from gemsModules.common.services import aww_snap
+    Default = aww_snap
+    Marco = marco
+    Status = status
 
 # In this module, this is superfluous, but they ensure that this service uses
 # the same names as other modules.  They also provide partial examples of how 

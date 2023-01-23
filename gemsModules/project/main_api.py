@@ -7,19 +7,15 @@ from typing import Any, List
 from datetime import datetime
 from pydantic import BaseModel, Field, ValidationError, constr
 from pydantic.schema import schema
-from ..common.main_api_notices import Notice
-from ..common.loggingConfig import *
+from gemsModules.common.main_api_notices import Notice
 
 # ## TODO - a lot of this info really belongs elsewhere.  It's not really
 #    project information.  For example, 'seqID' only applies to the sequence
 #    entity.  In the GP builder, there might be many sequences, but still 
 #    only one overall project.  So, one day, clean this up.
 
-
-if loggers.get(__name__):
-    pass
-else:
-    log = createLogger(__name__)
+from gemsModules.logging.logger import Set_Up_Logging
+log = Set_Up_Logging(__name__)
 
 ##TODO It makes sense that the length of things like a git hash won't change often. System-wide vars could 
 ##  provide constants or single-points-of-edit for types of max-length values. 

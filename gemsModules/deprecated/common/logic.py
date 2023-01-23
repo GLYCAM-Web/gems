@@ -35,7 +35,7 @@ def importEntity(requestedEntity):
         raise error
     else:
         try:
-            module_spec = importlib.util.find_spec(requestedModule,package="deprecated")
+            module_spec = importlib.util.find_spec(requestedModule,package="gemsModules.deprecated")
         except Exception as error:
             log.error("There was a problem importing the requested module.")
             log.error(traceback.format_exc())
@@ -43,11 +43,11 @@ def importEntity(requestedEntity):
         else:
 
             if module_spec is None:
-                log.error("The module spec returned None for rquestedEntity: " + requestedEntity)
+                log.error("The module spec returned None for requestedEntity: " + requestedEntity)
                 raise FileNotFoundError(requestedEntity)
 
             #log.debug("module_spec: " + str(module_spec))
-            return importlib.import_module(requestedModule,package="deprecated")
+            return importlib.import_module(requestedModule,package="gemsModules.deprecated")
 
 # ###  This now is part of the Transaction Class
 # ###  It is deprecated and should go away.   Lachele 2021-04-02

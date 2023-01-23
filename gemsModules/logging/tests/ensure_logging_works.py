@@ -1,4 +1,4 @@
-from gemsModules.status.logger import Set_Up_Logging
+from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 log.debug("The logging tester posts this message in the DEBUG log.")

@@ -9,12 +9,8 @@ from gemsModules.common import settings_main
 
 import traceback
 
-from . import loggingConfig 
-if loggingConfig.loggers.get(__name__):
-    pass
-else:
-    log = loggingConfig.createLogger(__name__)
-
+from gemsModules.logging.logger import Set_Up_Logging
+log = Set_Up_Logging(__name__)
 
 class Common_API(BaseModel):
     timestamp : str = None
@@ -59,7 +55,7 @@ class Transaction(ABC):
                 log.error("incoming string was empty")
                 self.generate_error_response(Brief='InvalidInput')
                 return 1
-            self.populate_inputs(self.incoming_string, no_check_fields)
+            self.populate_inputs(self, self.incoming_string, no_check_fields)
             if initialize_out :
                 self.initialize_outputs_from_inputs()
             return 0
@@ -68,14 +64,14 @@ class Transaction(ABC):
             log.error(errMsg)
             log.error(error)
             log.error(traceback.format_exc())
-            self.generate_error_response(Brief='JsonParseEror',AdditionalInfo={'error': str(errMsg)})
+            self.generate_error_response(self, Brief='JsonParseEror',AdditionalInfo={'error': str(errMsg)})
             print("problem processing this string: " + str(in_string))
             print("the error message is: ")
             print(error)
             return 1
 
     def populate_inputs(self, in_string : str, no_check_fields=False):
-        self.inputs = self.get_API_type().parse_raw(in_string)
+        self.inputs = self.get_API_type(self).parse_raw(in_string)
         log.debug("The inputs is: ")
         log.debug(self.inputs.json(indent=2))
 
@@ -86,9 +82,9 @@ class Transaction(ABC):
 
     # the use of EntityType here will break elsewhere, I think
     def generate_error_response(self, Brief='UnknownError', EntityType=settings_main.WhoIAm, AdditionalInfo=None) :
-        self.outputs = self.get_API_type().construct(entity=Entity.construct(entityType=EntityType))
-        self.outputs.notices.addDefaultNotice(Brief=Brief, Messenger=EntityType, AdditionalInfo=AdditionalInfo)
-        self.build_outgoing_string()
+        self.outputs = self.get_API_type(self).construct(entity=Entity.construct(entityType=EntityType))
+        self.outputs.notices.addDefaultNotice(self, Brief=Brief, Messenger=EntityType, AdditionalInfo=AdditionalInfo)
+        self.build_outgoing_string(self)
 
     def build_outgoing_string(self, prettyPrint=False, indent=2, prune_empty_values=True) :
         if self.outputs.prettyPrint is True:  # In case outputs.prettyPrint is None or something else that isn't useful

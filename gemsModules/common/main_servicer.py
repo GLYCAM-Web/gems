@@ -4,6 +4,9 @@ from gemsModules.common.main_api_services import Service, Services
 from gemsModules.common.settings_main import All_Available_Services
 from gemsModules.common.settings_main_servicer import All_Service_Modules
 
+from gemsModules.logging.logger import Set_Up_Logging
+log = Set_Up_Logging(__name__)
+
 ## This is all wrong?  Wrong ish?  I have made changes.
 class Servicer:
     def __init__(self, transaction : Transaction):

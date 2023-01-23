@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-from ..common import loggingConfig 
-if loggingConfig.loggers.get(__name__):
-    pass
-else:
-    log = loggingConfig.createLogger(__name__)
+from gemsModules.logging.logger import Set_Up_Logging
+log = Set_Up_Logging(__name__)
 
 WhoIAm = 'Delegator'

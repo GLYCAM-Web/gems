@@ -2,7 +2,7 @@ import os, glob, shutil
 from pathlib import Path
 
 
-from gemsModules.status.logger import Set_Up_Logging
+from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 def get_current_working_directory() -> str :

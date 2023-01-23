@@ -3,8 +3,8 @@ from typing import Callable
 
 from gemsModules.common.main_api_services import Service, Response
 from gemsModules.common.code_utils import Annotated_List, GemsStrEnum
-from gemsModules.common.logger import Set_Up_Logging
 
+from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 class Service_Package :

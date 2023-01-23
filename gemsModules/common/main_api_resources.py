@@ -3,12 +3,9 @@ from typing import Dict, List
 from pydantic import BaseModel, Field, Json
 
 from gemsModules.common.main_api_notices import Notices
-from gemsModules.common.loggingConfig import *
 
-if loggers.get(__name__):
-    pass
-else:
-    log = createLogger(__name__)
+from gemsModules.logging.logger import Set_Up_Logging
+log = Set_Up_Logging(__name__)
 
 class Resource(BaseModel):
     """Information describing a resource containing data."""

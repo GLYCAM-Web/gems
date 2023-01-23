@@ -2,11 +2,8 @@
 from collections import namedtuple
 from typing import List
 
-from gemsModules.common.loggingConfig import *
-if loggers.get(__name__):
-    pass
-else:
-    log = createLogger(__name__)
+from gemsModules.logging.logger import Set_Up_Logging
+log = Set_Up_Logging(__name__)
 
 
 NoticeDatum = namedtuple(

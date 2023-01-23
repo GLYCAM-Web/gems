@@ -3,14 +3,10 @@
 from typing import Dict, List
 from pydantic import BaseModel, Field, PrivateAttr
 
-from gemsModules.common.loggingConfig import *
 from gemsModules.common.code_utils import GemsStrEnum
 
-
-if loggers.get(__name__):
-    pass
-else:
-    log = createLogger(__name__)
+from gemsModules.logging.logger import Set_Up_Logging
+log = Set_Up_Logging(__name__)
 
 
 class NoticeTypes(GemsStrEnum):

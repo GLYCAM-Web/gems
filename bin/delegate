@@ -135,8 +135,8 @@ else:
 ################################################################################
 
 
-from gemsModules.delegator.receive import delegate
-responseObjectString=delegate(jsonObjectString)
+from gemsModules.delegator.receive import receive
+responseObjectString=receive(jsonObjectString)
 sys.stdout.write(responseObjectString)
 
 

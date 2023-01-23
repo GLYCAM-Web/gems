@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
 from uuid import UUID
-from typing import Dict, List, Protocol 
+from typing import Dict, List
 from pydantic import BaseModel, Field, Json
 
 from gemsModules.common.main_api_notices import Notices
 from gemsModules.common.settings_main import All_Available_Services
 
-from . import loggingConfig
-if loggingConfig.loggers.get(__name__):
-    pass
-else:
-    log = loggingConfig.createLogger(__name__)
+from gemsModules.logging.logger import Set_Up_Logging
+log = Set_Up_Logging(__name__)
 
 class Service(BaseModel):
     """

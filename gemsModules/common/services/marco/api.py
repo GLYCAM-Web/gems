@@ -2,13 +2,9 @@
 from pydantic import BaseModel, Field
 
 from gemsModules.common.main_api_services import Service, Response
-from gemsModules.common import loggingConfig 
+from gemsModules.logging.logger import Set_Up_Logging 
 
-if loggingConfig.loggers.get(__name__):
-    pass
-else:
-    log = loggingConfig.createLogger(__name__)
-
+log = Set_Up_Logging(__name__)
 
 class marco_Inputs(BaseModel) :
     entity : str  = Field(
@@ -28,4 +24,5 @@ class marco_Service(Service) :
     inputs : marco_Inputs = marco_Inputs()
 
 class marco_Response(Response) :
-    outputs : marco_Outputs
+    typename : str  = "Marco"
+    outputs : marco_Outputs = marco_Outputs()

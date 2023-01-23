@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from abc import abstractmethod
 from pydantic import BaseModel, Field, validator, Json
 
 from gemsModules.common.main_api_notices import Notices
@@ -6,12 +7,8 @@ from gemsModules.common.main_api_services import Services, Responses
 from gemsModules.common.main_api_resources import Resources
 from gemsModules.common import settings_main
 
-from . import loggingConfig 
-
-if loggingConfig.loggers.get(__name__):
-    pass
-else:
-    log = loggingConfig.createLogger(__name__)
+from gemsModules.logging.logger import Set_Up_Logging
+log = Set_Up_Logging(__name__)
 
 class Entity(BaseModel):
     """Holds information about the main object responsible for a service."""
@@ -35,13 +32,16 @@ class Entity(BaseModel):
     resources : Resources = Resources()
     notices : Notices = Notices()
 
-### This breaks because 'settings' can't be forced to change in children.... or can it?
-#    @validator('entityType')
-#    def checkEntityType(cls, v):
-#        """This will be overridden by redirector in delegator."""
-#        if v != settings_main.WhoIAm:
-#            raise ValueError(f"The requested entity, {v}, is not {settings_main.WhoIAm}.")
-#        return v
+    @abstractmethod
+    def getEntityType(self):
+        return settings_main.WhoIAm
+
+    @validator('entityType') # Override this as needed
+    def checkEntityType(cls, v):
+        I_am = cls.getEntityType()
+        if v != I_am:
+            raise ValueError(f"The requested entity, {v}, is not known to {I_am}.")
+        return v
 
 def generateSchema():
     print(Entity.schema_json(indent=2))

@@ -1,7 +1,7 @@
 import os
 import unittest
 import gemsModules
-from gemsModules import status
+from gemsModules import logging
 
 GemsPath = os.environ.get('GEMSHOME')
 if GemsPath == None:
@@ -44,7 +44,7 @@ class TestReportGeneration(unittest.TestCase):
 
     """main() must always return a string"""
     def test_main_returns_string(self):
-        response = status.receive.main()
+        response = logging.receive.main()
         self.assertIsInstance(response, str)
 
 if __name__ == '__main__':
