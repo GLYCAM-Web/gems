@@ -43,14 +43,14 @@ def importEntity(requestedEntity):
     log.debug("Entities known to Common Services: " + str(subEntities))
 
     try:
-        requestedModule = '.' + subEntities[requestedEntity]
+        requestedModule = '.deprecated.' + subEntities[requestedEntity]
         log.debug("requestedModule: " + requestedModule)
     except Exception as error:
         log.error("There was a problem finding the requested entity. Does it exist? requestedEntity: " + requestedEntity)
         raise error
     else:
         try:
-            module_spec = importlib.util.find_spec(requestedModule,package="deprecated")
+            module_spec = importlib.util.find_spec(requestedModule,package="gemsModules")
         except Exception as error:
             log.error("There was a problem importing the requested module.")
             raise error
@@ -61,7 +61,7 @@ def importEntity(requestedEntity):
                 raise FileNotFoundError(requestedEntity)
 
             log.debug("module_spec: " + str(module_spec))
-            return importlib.import_module(requestedModule,package="deprecated")
+            return importlib.import_module(requestedModule,package="gemsModules")
 
 def parseInput(thisTransaction):
     log.info("parseInput() was called.\n")

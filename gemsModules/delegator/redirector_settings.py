@@ -9,6 +9,7 @@ class Known_Entities(GemsStrEnum):
     """
     The entities that Delegator knows about.
     """
+    Delegator = 'Delegator'
     DeprecatedDelegator = 'DeprecatedDelegator'
     MDaaS = 'MDaaS'
     Status = 'Status'
@@ -34,6 +35,7 @@ Known_Entity_Reception_Modules={
     'MmService' : mmservice,
     # Deprecated
     'Conjugate' : deprecated_delegator,
+    'Delegator' : deprecated_delegator,
     'DeprecatedDelegator' : deprecated_delegator,
     'DrawGlycan' : deprecated_delegator,
     'Query' : deprecated_delegator,
