@@ -210,7 +210,7 @@ def createConformerDirectoryInBuildsDirectory(
         return
     try:
         log.debug("Trying to create conformerDirPath: " + conformerDirPath)
-        os.makedirs(conformerDirPath)
+        os.makedirs(conformerDirPath,mode=0o755)
     except Exception as error:
         log.error("Could not create conformerDirPath: " + conformerDirPath)
         log.error(traceback.format_exc())
