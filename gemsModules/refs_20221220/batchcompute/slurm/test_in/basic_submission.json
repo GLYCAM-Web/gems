@@ -1,7 +1,0 @@
-{
-	"partition"        : "amber",
-	"user"             : "webdev",
-	"name"             : "testMin",
-	"workingDirectory" : "/website/TESTS/build-minimize",
-	"sbatchArgument"   : "run.bash"
-}

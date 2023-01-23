@@ -1,8 +1,0 @@
-{"entity": {"type": "Query"}, "services": [{"formQueryString": {"options": {"queryType": "Initial", "b_factor_min":
- -1, "sortBy": "pdb", "searchType": "Oligo_REGEX", "isGlycomimetic": -1,
- "b_factor_max": -1, "isNucleotide": -1, "resultsPerPage": 25,
- "resolution_max": -1, "isComment": 0, "searchTerm": ".*DMan.*",
- "resolution_min": -1, "isError": 0, "count" : "FALSE", "page": 1, "oligo_b_factor_min": -1, 
- "isWarning": 0, "isLigand": -1, "aglycon": "", "oligo_b_factor_max": -1,
- "output_file_type": "json"}, "type": "evaluate"}}], "options":
- {"jsonObjectOutputFormat": "Pretty"}}
