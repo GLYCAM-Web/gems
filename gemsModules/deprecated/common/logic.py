@@ -27,7 +27,7 @@ def importEntity(requestedEntity):
     #log.debug("Entities known to Common Services: " + str(subEntities))
 
     try:
-        requestedModule = '.' + subEntities[requestedEntity]
+        requestedModule = '.deprecated.' + subEntities[requestedEntity]
         log.debug("requestedModule: " + requestedModule)
     except Exception as error:
         log.error("There was a problem finding the requested entity. Does it exist? requestedEntity: " + requestedEntity)
@@ -35,7 +35,7 @@ def importEntity(requestedEntity):
         raise error
     else:
         try:
-            module_spec = importlib.util.find_spec(requestedModule,package="gemsModules.deprecated")
+            module_spec = importlib.util.find_spec(requestedModule,package="gemsModules")
         except Exception as error:
             log.error("There was a problem importing the requested module.")
             log.error(traceback.format_exc())
@@ -47,7 +47,7 @@ def importEntity(requestedEntity):
                 raise FileNotFoundError(requestedEntity)
 
             #log.debug("module_spec: " + str(module_spec))
-            return importlib.import_module(requestedModule,package="gemsModules.deprecated")
+            return importlib.import_module(requestedModule,package="gemsModules")
 
 # ###  This now is part of the Transaction Class
 # ###  It is deprecated and should go away.   Lachele 2021-04-02
