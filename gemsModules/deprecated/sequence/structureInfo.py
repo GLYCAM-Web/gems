@@ -11,7 +11,7 @@ from gemsModules.deprecated.common import logic as commonlogic
 from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
 from gemsModules.deprecated.project import projectUtilPydantic as projectUtils
 from gemsModules.deprecated.project import settings as projectSettings
-import gmml
+#import gmml
 import os
 import sys
 import itertools
