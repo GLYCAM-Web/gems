@@ -29,11 +29,12 @@ from gemsModules.batchcompute.receive import receive as batchcompute
 from gemsModules.common.receive import receive as common
 from gemsModules.mmservice.receive import receive as mmservice
 Known_Entity_Reception_Modules={
-    'BatchCompute' : batchcompute,
+#    'BatchCompute' : batchcompute,  for now, still deprecated
     'CommonServices' : common,
     'MDaaS' : mmservice,
     'MmService' : mmservice,
     # Deprecated
+    'BatchCompute' : deprecated_delegator,
     'Conjugate' : deprecated_delegator,
     'Delegator' : deprecated_delegator,
     'DeprecatedDelegator' : deprecated_delegator,

@@ -68,7 +68,7 @@ def check_gems_home():
     returnCode = 0
     verbosity=gems_environment_verbosity()
     # check the paths and modules
-    if importlib.util.find_spec("deprecated") is None:
+    if importlib.util.find_spec("gemsModules") is None:
         if verbosity >= 0:
             print("""
 Something is wrong in your Setup.  Investigating.
@@ -102,7 +102,7 @@ Also importing gemsModules.
 """)
             sys.path.append(GemsPath)
             import gemsModules.deprecated
-            if importlib.util.find_spec("deprecated") is None:
+            if importlib.util.find_spec("gemsModules") is None:
                 if verbosity >= 0:
                     print("""
 That didn't seem to work, so I'm not sure what to do.  Exiting.

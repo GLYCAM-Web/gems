@@ -44,7 +44,7 @@ class TestReportGeneration(unittest.TestCase):
 
     """main() must always return a string"""
     def test_main_returns_string(self):
-        response = logging.receive.main()
+        response = status.receive.main()
         self.assertIsInstance(response, str)
 
 if __name__ == '__main__':

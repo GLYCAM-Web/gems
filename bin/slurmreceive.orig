@@ -1,0 +1,66 @@
+#!/usr/bin/env python3
+##  Use this file to:
+##    * Submit a job to a Slurm cluster served by gRPC
+import importlib.util, os, sys, getopt
+
+USAGE="""
+USAGE:
+
+    This script takes in a JSON object and returns a JSON object.  
+    The object can be specified as a filename or piped from standard input.
+
+    Examples:
+
+        Using a pipe from standard input:
+
+            echo <json string> | slurmreceive
+            cat /path/to/file | slurmreceive
+
+        Using a filename (with path as appropriate):
+        
+            slurmreceive /path/to/file
+
+    If you are having trouble, you can set the verbosity up.  This will write 
+    messages mostly to standard error, but some might come to standard out. 
+    We recommend doing this only for debugging purposes.
+
+    Verbosity values:
+        -1        (default) Print only the JSON object.  This will return the 
+                  first fatal error (if any) in a JSON object.
+         0-2      These will all exit on fatal errors.
+         0        Print very important messages only.
+         1        Print a little more information.
+         2        Print lots of detail.
+
+    To set the verbosity, set GEMS_DEBUG_VERBOSITY to one of the values above.  
+    For example:
+        (bash)  export GEMS_DEBUG_VERBOSITY=1
+        (csh)   setenv GEMS_DEBUG_VERBOSITY 1
+
+\n"""
+
+if len(sys.argv) > 1:
+    if sys.argv[1] in ( "-h", "--help") :
+        sys.stderr.write(USAGE)
+        sys.exit(1)
+
+
+if importlib.util.find_spec("gemsModules") is None:
+  this_dir, this_filename = os.path.split(__file__)
+  sys.path.append(this_dir + "/../gemsModules/")
+  if importlib.util.find_spec("common") is None:
+    sys.stderr.write("Unable to locate Common Services.  Exiting.\n")
+    sys.exit(129)
+  else:
+    from common import utils
+else:
+  from gemsModules.common import utils
+jsonObjectString=utils.JSON_From_Command_Line(sys.argv)
+
+
+from gemsModules.batchcompute.slurm.receive import manageIncomingString
+responseObjectString=manageIncomingString(jsonObjectString)
+sys.stdout.write(str(responseObjectString))
+
+
+

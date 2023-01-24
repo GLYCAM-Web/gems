@@ -11,12 +11,8 @@ from subprocess import *
 import gems_grpc_slurm_pb2
 import gems_grpc_slurm_pb2_grpc
 
-from gemsModules.common.loggingConfig import *
-
-if loggers.get(__name__):
-    pass
-else:
-    log = createLogger(__name__)
+from gemsModules.logging.logger import Set_Up_Logging
+log = Set_Up_Logging(__name__)
 
 
 brief_to_code = {
@@ -77,7 +73,7 @@ def JSON_Error_Response(theBrief,theExitCode,theStdout,theStderr,theExceptionErr
 
     return thereturn
 
-_ONE_DAY_IN_SECONDS = 60 * 60 * 24
+ONE_DAY_IN_SECONDS = 60 * 60 * 24
 log.info("Hello from gems_grpc_slurm_server.py")
 
 class GemsGrpcSlurmReceiver(gems_grpc_slurm_pb2_grpc.GemsGrpcSlurmServicer):
@@ -142,7 +138,7 @@ def serve():
     try:
         while True:
             log.info("Starting sleepytime.")
-            time.sleep(_ONE_DAY_IN_SECONDS)
+            time.sleep(ONE_DAY_IN_SECONDS)
     except KeyboardInterrupt:
         log.info("Caught keyboard interrupt")
         server.stop(0)
