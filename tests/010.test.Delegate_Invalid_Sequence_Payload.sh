@@ -18,7 +18,7 @@ runInvalidSequenceInputTest()
 }
 
 inputs=$GEMSHOME/tests/inputs/010.input.txt
-# E.g. invalidSequence=gemsModules/delegator/test_in/sequence/minimal_invalid_payload.json
+# E.g. invalidSequence=gemsModules/deprecated/delegator/test_in/sequence/minimal_invalid_payload.json
 #for input in `cat $inputs` 
 while IFS= read -r line;
 do

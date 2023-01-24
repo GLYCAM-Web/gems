@@ -3,7 +3,7 @@
 # Tests should be about passing invalid inputs to the delegator
 
 # JSON INPUTS
-invalid_Json=$GEMSHOME/gemsModules/delegator/test_in/sequence/invalid_json.json
+invalid_Json=$GEMSHOME/gemsModules/deprecated/delegator/test_in/sequence/invalid_json.json
 
 # invoke delegator script with an invalid json object string
 # response should be a valid json object with an error message

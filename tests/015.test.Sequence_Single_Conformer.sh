@@ -10,7 +10,7 @@ gemsSequencePath=${GEMS_OUTPUT_PATH}/sequence/cb/Sequences
 gemsBuildPath=${GEMS_OUTPUT_PATH}/sequence/cb/Builds
 
 ## Inputs
-inputJson=$GEMSHOME/gemsModules/delegator/test_in/sequence/minimal.json
+inputJson=$GEMSHOME/gemsModules/deprecated/delegator/test_in/sequence/minimal.json
 sequenceID='fc6085c0-822c-5655-b5be-88da496814cb'
 now=$(date "+%Y-%m-%d-%H-%M-%S")
 
@@ -41,7 +41,7 @@ Testing delegator using a sequence request with a single conformer.
 # See if a returned object is proper JSON and no other data
 check_json_output_test() 
 {
-	commonServicerResponse="$(cat ${1} | python ../gemsModules/common/utils.py)"
+	commonServicerResponse="$(cat ${1} | python ../gemsModules/deprecated/common/utils.py)"
 	if ( echo ${commonServicerResponse} | grep -q CommonServices ) ; then
 		echo ""
 		echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
