@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from uuid import UUID
-from typing import Dict, List
+from typing import Any, Dict, List
 from pydantic import BaseModel, Field, Json
 
 from gemsModules.common.main_api_notices import Notices
@@ -30,7 +30,7 @@ class Service(BaseModel):
         title='My UUID',
         description='ID to allow correlations between services and responses.'
     )
-    inputs: Json = None
+    inputs: Json[Any] = None
     options: Dict[str, str] = Field(
         None,
         description='Key-value pairs that are specific to each entity, service, etc'
@@ -57,7 +57,7 @@ class Response(BaseModel):
         title='My UUID',
         description='ID to allow correlations between services and responses.'
     )
-    outputs : Json = None
+    outputs : Json[Any] = None
     notices : Notices = Notices()
 
 class Services(BaseModel):
@@ -93,7 +93,7 @@ class Responses(BaseModel):
 
     def add_response(self,
             typename : str = 'UnknownService',
-            outputs : Json = {'message': 'A response was requested, but GEMS does not know why.'},
+            outputs : Json[Any] = {'message': 'A response was requested, but GEMS does not know why.'},
             notices : Notices = None
             ):
         thisResponse = Response()

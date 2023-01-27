@@ -12,9 +12,8 @@ def process(incomingString: str) -> str:
     if receiver_string is not None:
         log.debug("The incoming string is not valid")
         return receiver_string
-    else:
-        log.debug("The incoming string is valid")
-        return receiver.process()
+    log.debug("The incoming string is valid")
+    
 
 
 def receive(incomingString: str) -> str:
@@ -32,17 +31,17 @@ def receive(incomingString: str) -> str:
 ########## 
 ## NOTE!!!
 ## this is temporary until Delegator's Marco and known Entities services work
-        log.debug("Delegating incoming string to entity: " + requested_entity)
-        from gemsModules.delegator import redirector_settings 
-        entity_module = redirector_settings.Known_Entity_Reception_Modules[requested_entity]
-        return entity_module(incomingString)
+#        log.debug("Delegating incoming string to entity: " + requested_entity)
+#        from gemsModules.delegator import redirector_settings 
+#        entity_module = redirector_settings.Known_Entity_Reception_Modules[requested_entity]
+#        return entity_module(incomingString)
 ##
 ## This is how it should eventually work:
-#        if requested_entity != WhoIAm:
-#            log.debug("Delegating incoming string to entity: " + requested_entity)
-#            from gemsModules.delegator import redirector_settings 
-#            entity_module = redirector_settings.Known_Entity_Reception_Modules[requested_entity]
-#            return entity_module(incomingString)
-#        else:
-#            log.debug("Delegating incoming string to self")
-#            return process(incomingString)
+        if requested_entity != WhoIAm:
+            log.debug("Delegating incoming string to entity: " + requested_entity)
+            from gemsModules.delegator import redirector_settings 
+            entity_module = redirector_settings.Known_Entity_Reception_Modules[requested_entity]
+            return entity_module(incomingString)
+        else:
+            log.debug("Delegating incoming string to self")
+            return process(incomingString)

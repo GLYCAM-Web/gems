@@ -1,0 +1,9 @@
+{
+ "entity" : {
+    "type": "Delegator",
+    "inputs" : { 
+	    "cake" : "true", 
+	    "color" : "bandearg" 
+    }
+  }
+}

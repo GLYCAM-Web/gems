@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from abc import abstractmethod
 from pydantic import BaseModel, Field, validator, Json
+from typing import Any
 
 from gemsModules.common.main_api_notices import Notices
 from gemsModules.common.main_api_services import Services, Responses
@@ -17,12 +18,12 @@ class Entity(BaseModel):
             title='Type',
             alias='type'
             )
-    inputs : Json = Field(
+    inputs : Json[Any] = Field(
             None,
             title='Inputs',
             description='User-friendly, top-level inputs to the services.'
     )
-    outputs : Json = Field(
+    outputs : Json[Any] = Field(
             None,
             title='Inputs',
             description='User-friendly, top-level outputs from the services.'

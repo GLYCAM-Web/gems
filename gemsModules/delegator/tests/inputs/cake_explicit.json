@@ -1,0 +1,19 @@
+{
+ "entity" : {
+    "type": "Delegator",
+    "services" :
+    [
+        { "cakeMarco" :
+                {
+			"type" : "Marco" ,
+			"options" : { 
+				"cake" : "true", 
+				"color" : "pink" 
+			}
+		 
+		}
+        }
+    ]
+
+  }
+}

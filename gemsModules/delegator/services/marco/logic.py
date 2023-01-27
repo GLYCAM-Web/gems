@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from typing import Protocol
 
-from gemsModules.common.logger import Set_Up_Logging
-log = Set_Up_Logging(__name__)  ## will this break?
+from gemsModules.logging.logger import Set_Up_Logging 
+log = Set_Up_Logging(__name__)
 
 ## These are a little redundant in this simple example.
 class serviceInputs (Protocol):
