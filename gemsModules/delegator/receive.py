@@ -13,8 +13,7 @@ def process(incomingString: str) -> str:
         log.debug("The incoming string is not valid")
         return receiver_string
     log.debug("The incoming string is valid")
-    
-
+    from gemsModules.delegator import main_servicer
 
 def receive(incomingString: str) -> str:
     log.info("Delegator's redirect was called")
