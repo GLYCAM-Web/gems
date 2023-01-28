@@ -3,7 +3,7 @@ from pydantic import ValidationError
 from abc import ABC, abstractmethod
 
 from gemsModules.common.main_api import Transaction
-from gemsModules.common.main_servicer import Servicer
+#from gemsModules.common.servicer import Servicer
 from gemsModules.common import settings_main
 
 from gemsModules.logging.logger import Set_Up_Logging

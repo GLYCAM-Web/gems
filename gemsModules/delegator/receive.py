@@ -13,10 +13,16 @@ def process(incomingString: str) -> str:
         log.debug("The incoming string is not valid")
         return receiver_string
     log.debug("The incoming string is valid")
-    from gemsModules.common.service_manager import Service_Manager
-    manager = Service_Manager(receiver.get_transaction())
-    transaction = manager.process()
-    return transaction.get_outgoing_string()
+
+    this_transaction= receiver.get_transaction()
+    from gemsModules.delegator.inputs_translator import input_translator
+    this_translator = input_translator(this_transaction.inputs)
+    this_translator.translate()
+
+#    from gemsModules.common.service_manager import Service_Manager
+#    manager = Service_Manager(receiver.get_transaction())
+#    transaction = manager.process()
+#    return transaction.get_outgoing_string()
 
 
 def receive(incomingString: str) -> str:

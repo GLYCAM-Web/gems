@@ -10,6 +10,7 @@ log = Set_Up_Logging(__name__)
 
 
 class Delegator_Entity(main_api_entity.Entity) :
+    inputs    : typing.Any = None
 
     def getEntityType(self):
         return WhoIAm

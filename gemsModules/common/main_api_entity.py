@@ -39,7 +39,7 @@ class Entity(BaseModel):
 
     @validator('entityType') # Override this as needed
     def checkEntityType(cls, v):
-        I_am = cls.getEntityType()
+        I_am = cls.getEntityType(cls)
         if v != I_am:
             raise ValueError(f"The requested entity, {v}, is not known to {I_am}.")
         return v
