@@ -7,53 +7,13 @@ from gemsModules.common.code_utils import Annotated_List
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
-class AAOP_Tree(ABC) :
-    """Tree of Action_Associated_Object_Packages
-       The lists are the AAO packages associated with
-       the action.
-    """
-    def __init__(self,
-            packages : Annotated_List = None
-            ) -> None :
-        self.packages = packages
-
-    def _get_next_AAOP (self, allow_parallel : bool = False) :
-        """Get the next AAOP in the tree"""
-        pass    
-
-    def get_AAOP_by_ID (ID_String) :
-        """Get the AAOP by ID"""
-        pass
-
-    def write_to_next_AAOP (AAOP) :
-        """Write the AAOP to the next AAOP in the tree"""
-        pass
-
-    def make_skeleton_copy(self) :
-        """Make a skeleton copy of the tree"""
-        pass
-
-    def make_deep_copy(self) :  
-        """Make a deep copy of the tree"""
-        pass
-
-    def make_linear_list(self) :
-        """Make a linear list of AAOPs in the tree"""
-        pass
-
-    # need dunder method for '+' operator
-    def __add__(self, other) :
-        """Add two AAOP_Trees"""
-        pass
-
-
 class Action_Associated_Object_Package (ABC):
     """Package for an Action_Associated_Object (AAO)
         This class is abbreviated AAOP.
 
         An AAO is any object that is associated with some action.  For example,
-            both Service objects and Response objects are objects that are 
-            associated with an action.  The AAO package contains the
+            both Service Request objects and Response objects are objects that 
+            are associated with an action.  The AAO package contains the
             object and metadata about the object.
 
        If the AAO_Type is 'AAOP_Tree', then The_AAO will remain none and the only
@@ -71,21 +31,85 @@ class Action_Associated_Object_Package (ABC):
         self.The_AAO = The_AAO
         self.Dependencies = Dependencies
 
+    def create_child_package_list(self,  
+            items : List = [],
+            ordered  : bool   = True,):
+        self.child_packages = Annotated_List(items, ordered)
+
     def add_child_package(self, child_package) :
-        if self.child_packages is None : 
-            self.child_packages = AAOP_Tree()
-        self.child_packages.write_to_next_AAOP(child_package)
+        if self.child_packages is None:
+            self.create_child_package_list(self)
+        self.child_packages.append(child_package)
 
     def get_child_packages(self) :
         return self.child_packages
 
-    def add_package_tree(self, package_tree : AAOP_Tree) :
-        if self.child_packages is None : 
-            self.child_packages = package_tree 
-        else :
-            self.child_packages = self.child_packages + package_tree # this probably needs mods
 
 AAOP = Action_Associated_Object_Package
 
 
+class AAOP_Tree(ABC) :
+    """Tree of Action_Associated_Object_Packages
+       The lists are the AAO packages associated with
+       the action.
+
+       packages = the complete list of packages
+    """
+    def __init__(self, packages : Annotated_List = None) -> None :
+        self.packages = packages
+
+    def _next_AAOP(self):
+        """Get the next AAOP in the tree"""
+        pass # might need special iterator, eventually.  Need depth-first-ish search.
+
+    def get_next_AAOP (self, allow_parallel : bool = False) :
+        """Return the next AAOP in the tree.  Set that as current."""
+        self._current_AAOP = self._next_AAOP(self)
+        return self.current_AAOP
+
+    def put_current_AAOP (self, incoming_aaop) :
+        """Write the AAOP to the next AAOP in the tree"""
+        self._current_AAOP = incoming_aaop
+
+#    def get_AAOP_by_ID (ID_String: str) :
+#        """Get an AAOP by ID"""
+#        #return self._temporary_AAOP
+#        pass
+#
+#    def put_AAOP_by_ID (ID_String: str, incoming_aaop: AAOP) :
+#        """Overwrite an AAOP by ID"""
+#        #return self._temporary_AAOP
+#        pass
+
+    def make_skeleton_copy(self):
+        """Make a skeleton copy of the tree"""
+        pass
+
+    def make_deep_copy(self):  
+        """Make a deep copy of the tree"""
+        pass
+
+    def make_linear_list(self) -> List:
+        """Make a linear list of AAOPs in the tree"""
+        pass
+
+
+class AAOP_Tree_Pair(ABC):
+    """Holds a pair of AAOP Trees.  
+       Typically one tree is input and the other is output.
+       """
+    input_tree : AAOP_Tree  # input tree
+    output_tree : AAOP_Tree # output tree
+
+    def __init__(self, input_tree: AAOP_Tree, output_tree: AAOP_Tree):
+        self.input_tree = input_tree
+        self.output_tree = output_tree
+
+    def get_next_AAOP_pair(self):
+        self.input_current = self.input_tree.get_next_AAOP()
+        self.output_current = self.output_tree.get_next_AAOP()
+        return self.input_current, self.output_current
+
+    def put_output_current_AAOP(self, incoming_aaop: AAOP):
+        self.output_tree.put_current_AAOP(incoming_aaop)
 

@@ -13,7 +13,7 @@ class Servicer:
     def __init__(self, incoming_tree: AAOP_Tree):
         self.incoming_tree = incoming_tree
 
-    def invoke_servicer(self):
+    def serve(self):
 ##  Move all this to a servicer - let services fill in prereqs (service chain??  sigh...)
         self.instantiate_AAOP_Tree_Set(self)
         self.merge_explicit_and_implicit(self) # Logic should live in service management

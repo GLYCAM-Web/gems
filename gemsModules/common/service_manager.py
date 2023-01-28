@@ -1,4 +1,6 @@
-from gemsModules.common.action_associated_objects import AAOP_Tree
+from gemsModules.common.main_api import Transaction
+from gemsModules.common.main_api_services import Services
+from gemsModules.common.main_api_notices import Notices
 from gemsModules.common.transaction_data_translation import Transaction_Input_Translator
 from gemsModules.common.servicer import Servicer
 from gemsModules.common.transaction_data_translation import Transaction_Output_Translator
@@ -21,18 +23,20 @@ class Service_Manager():
         self.input_translator = Transaction_Input_Translator(transaction = self.transaction)
         self.input_translator.translate()
         self.input_translator.fill_transaction_service_requests()
-        self.incoming_tree : AAOP_Tree = self.input_translator.get_incoming_tree()
+        self.incoming_list : Services = self.input_translator.get_incoming_list()
 
     def invoke_servicer(self):
-        self.servicer = Servicer(self.incoming_tree)
+        self.servicer = Servicer(self.incoming_list)
         self.servicer.serve()
-        self.outgoing_tree : AAOP_Tree = self.servicer.get_outgoing_tree()
+        self.transaction.outputs.entity.services : Services = self.servicer.get_services_request_list()
+        self.transaction.outputs.entity.responses : Services = self.servicer.get_services_response_list()
+        self.temp_notices : Notices = self.servicer.get_services_notices()
+        self.transaction.outputs.entity.notices.append(self.temp_notices)
 
     def manage_outputs(self):
         self.output_translator = Transaction_Output_Translator(
-                transaction = self.transaction
-                outgoing_tree = self.outgoing_tree)
-        self.output_translator.build_transaction_outputs()
+            transaction : Transaction = self.transaction)
+        self.output_translator.process()
         self.transaction : Transaction = self.output_translator.get_transaction()
 
     def get_transaction(self):

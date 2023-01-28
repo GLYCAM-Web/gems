@@ -40,5 +40,5 @@ class Receiver(ABC):
     def get_incoming_services_types(self):
         pass
 
-    def process(self):
-        pass
+    def get_transaction(self):
+        return self.transaction

@@ -64,27 +64,20 @@ class Services(BaseModel):
     __root__ : Dict[str,Service] = None
 
     def add_service(self,
-            typename : str ,
-            inputs  = None,
-            givenName = None,
-            myUuid = None,
-            options = None
+            key_string : str ,
+            service : Service
             ):
-        thisService = Service()
-        thisService.typename = typename
-        thisService.givenName = givenName
-        thisService.myUuid = myUuid
-        thisService.inputs = inputs
-        thisService.options = options
         if self.__root__ is None :
-            self.__root__ : List[Service] = []
-        self.__root__.append(thisService)
+            self.__root__ : Dict[str,Service] = {}
+        self.__root__[key_string]=service
     
     def is_present(self, typename : str) :
-        if self.__root__  is None or self.__root__ == [] :
+        if self.__root__  is None or self.__root__ == {} :
             return False
-        if typename in self.__root__ :
-            return True
+        the_services = self.__root__.values()
+        for service in the_services :
+            if service.typename == typename :
+                return True
         else :
             return False
 
@@ -92,18 +85,12 @@ class Responses(BaseModel):
     __root__ : Dict[str,Response] = None
 
     def add_response(self,
-            typename : str = 'UnknownService',
-            outputs : Json[Any] = {'message': 'A response was requested, but GEMS does not know why.'},
-            notices : Notices = None
+            key_string : str,
+            response : Response
             ):
-        thisResponse = Response()
-        thisResponse.typename = typename
-        thisResponse.outputs = outputs
-        if notices is not None :
-            thisResponse.notices = notices
         if self.__root__ is None :
-            self.__root__ : List[Response] = []
-        self.__root__.append(thisResponse)
+            self.__root__ : Dict[str,Response] = {}
+        self.__root__.append(key_string,response)
 
 
 def generateSchema():
