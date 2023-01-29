@@ -38,7 +38,7 @@ NoticeData.append(NoticeDatum(
     'Common Servicer', 
     'error', 
     '304', 
-    'There was an unknown error parsing the JSON Object.'))
+    'There was an error parsing the JSON Object.'))
 NoticeData.append(NoticeDatum(
     'ServiceNotKnownToEntity', 
     'Service', 

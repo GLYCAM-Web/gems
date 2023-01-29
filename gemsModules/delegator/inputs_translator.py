@@ -22,3 +22,6 @@ class input_translator:
 
             print("The implied services are:")
             print(self.implied_services)
+
+            import os
+            os.sys.exit(0)

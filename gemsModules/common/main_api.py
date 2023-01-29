@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-from pydantic import BaseModel
 from abc import ABC, abstractmethod
+from pydantic import BaseModel
+from typing import Callable, Type
 
 from gemsModules.project.main_api import Project 
 from gemsModules.common.main_api_entity import Entity
@@ -12,12 +13,13 @@ import traceback
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
-class Common_API(BaseModel):
+class Common_API(ABC, BaseModel):
     timestamp : str = None
     entity  : Entity       # The only required part of the JSON is the entity.
     project : Project = None
     notices : Notices = Notices()
     prettyPrint : bool = False
+
 
 
 class Transaction(ABC):
@@ -64,10 +66,10 @@ class Transaction(ABC):
             log.error(errMsg)
             log.error(error)
             log.error(traceback.format_exc())
-            self.generate_error_response(self, Brief='JsonParseEror',AdditionalInfo={'error': str(errMsg)})
-            print("problem processing this string: " + str(in_string))
-            print("the error message is: ")
-            print(error)
+            log.debug("problem processing this string: " + str(in_string))
+            log.debug("the error message is: ")
+            log.debug(error)
+            self.generate_error_response(self, Brief='JsonParseEror',AdditionalInfo={'error': str(error)})
             return 1
 
     def populate_inputs(self, in_string : str, no_check_fields=False):
@@ -82,8 +84,10 @@ class Transaction(ABC):
 
     # the use of EntityType here will break elsewhere, I think
     def generate_error_response(self, Brief='UnknownError', EntityType=settings_main.WhoIAm, AdditionalInfo=None) :
-        self.outputs = self.get_API_type(self).construct(entity=Entity.construct(entityType=EntityType))
-        self.outputs.notices.addDefaultNotice(self, Brief=Brief, Messenger=EntityType, AdditionalInfo=AdditionalInfo)
+        self.outputs = self.get_API_type(self).construct(entity=Entity.construct(entityType=settings_main.WhoIAm))
+        if self.outputs.notices is None:
+            self.outputs.notices = Notices()
+        self.outputs.notices.addDefaultNotice(Brief=Brief, Messenger=settings_main.WhoIAm, AdditionalInfo=AdditionalInfo)
         self.build_outgoing_string(self)
 
     def build_outgoing_string(self, prettyPrint=False, indent=2, prune_empty_values=True) :

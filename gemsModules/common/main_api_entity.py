@@ -1,29 +1,29 @@
 #!/usr/bin/env python3
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from pydantic import BaseModel, Field, validator, Json
-from typing import Any
+from typing import Any, Dict, List, Union
 
 from gemsModules.common.main_api_notices import Notices
 from gemsModules.common.main_api_services import Services, Responses
-from gemsModules.common.main_api_resources import Resources
+from gemsModules.common.main_api_resources import Resource, Resources
 from gemsModules.common import settings_main
 
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
-class Entity(BaseModel):
+class Entity(ABC, BaseModel):
     """Holds information about the main object responsible for a service."""
     entityType : str = Field(  # This is the only required field in all of the API
             ...,
             title='Type',
             alias='type'
             )
-    inputs : Json[Any] = Field(
+    inputs : Union[Dict,Resource,Resources] = Field(
             None,
             title='Inputs',
             description='User-friendly, top-level inputs to the services.'
     )
-    outputs : Json[Any] = Field(
+    outputs : Union[Dict,Resource,Resources] = Field(
             None,
             title='Inputs',
             description='User-friendly, top-level outputs from the services.'
@@ -33,16 +33,6 @@ class Entity(BaseModel):
     resources : Resources = Resources()
     notices : Notices = Notices()
 
-    @abstractmethod
-    def getEntityType(self):
-        return settings_main.WhoIAm
-
-    @validator('entityType') # Override this as needed
-    def checkEntityType(cls, v):
-        I_am = cls.getEntityType(cls)
-        if v != I_am:
-            raise ValueError(f"The requested entity, {v}, is not known to {I_am}.")
-        return v
 
 def generateSchema():
     print(Entity.schema_json(indent=2))

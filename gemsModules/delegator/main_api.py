@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-from pydantic import validator,typing
+from pydantic import validator, typing, Field
+from typing import Literal
 from gemsModules.common import main_api
 from gemsModules.common import main_api_entity
 from gemsModules.delegator.redirector_settings import Known_Entities
@@ -10,15 +11,19 @@ log = Set_Up_Logging(__name__)
 
 
 class Delegator_Entity(main_api_entity.Entity) :
-    inputs    : typing.Any = None
 
-    def getEntityType(self):
-        return WhoIAm
+    entityType : Literal['Delegator'] = Field(  # This is the only required field in all of the API
+            ...,
+            title='Type',
+            alias='type'
+            )
+
 
 # The Delegator uses the main_api.Transaction class to define the transaction
 # It should also define more services that are specific to the delegator
 class Delegator_API(main_api.Common_API):
     entity : Delegator_Entity 
+
 
 class Delegator_Transaction(main_api.Transaction):
     
@@ -27,14 +32,13 @@ class Delegator_Transaction(main_api.Transaction):
 
 # The Redirector just redirects the transaction to the appropriate service module
 class Redirector_Entity(main_api_entity.Entity) :
-    inputs    : typing.Any = None
-    services  : typing.Any = None
-    responses : typing.Any = None
-    resources : typing.Any = None
-    notices   : typing.Any = None
 
-    def getEntityType(self):
-        return WhoIAm
+    inputs     : typing.Any = None
+    services   : typing.Any = None
+    responses  : typing.Any = None
+    resources  : typing.Any = None
+    notices    : typing.Any = None
+
 
     @validator('entityType')
     def checkEntityType(cls, v):
@@ -43,9 +47,10 @@ class Redirector_Entity(main_api_entity.Entity) :
         return v
 
 class Redirector_API(main_api.Common_API):
-    entity  : Redirector_Entity       
+    entity  : Redirector_Entity 
     project : typing.Any = None
     notices : typing.Any = None
+
 
 class Redirector_Transaction(Delegator_Transaction):
     
