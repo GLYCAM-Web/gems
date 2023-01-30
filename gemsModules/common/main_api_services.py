@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from uuid import UUID
-from typing import Any, Dict, List
-from pydantic import BaseModel, Field, Json
+from typing import Dict
+from pydantic import BaseModel, Field, typing
 
 from gemsModules.common.main_api_notices import Notices
 from gemsModules.common.settings_main import All_Available_Services
@@ -30,7 +30,7 @@ class Service(BaseModel):
         title='My UUID',
         description='ID to allow correlations between services and responses.'
     )
-    inputs: Json[Any] = None
+    inputs: typing.Any = None
     options: Dict[str, str] = Field(
         None,
         description='Key-value pairs that are specific to each entity, service, etc'
@@ -57,7 +57,7 @@ class Response(BaseModel):
         title='My UUID',
         description='ID to allow correlations between services and responses.'
     )
-    outputs : Json[Any] = None
+    outputs : typing.Any = None
     notices : Notices = Notices()
 
 class Services(BaseModel):

@@ -3,7 +3,6 @@ from pydantic import ValidationError
 from abc import ABC, abstractmethod
 
 from gemsModules.common.main_api import Transaction
-#from gemsModules.common.servicer import Servicer
 from gemsModules.common import settings_main
 
 from gemsModules.logging.logger import Set_Up_Logging
@@ -33,7 +32,7 @@ class Receiver(ABC):
         except Exception as e:
             self.transaction.generate_error_response(self.transaction, EntityType=self.entityType, Brief='UnknownError', AdditionalInfo={'error': str(e)})
             return self.transaction.get_outgoing_string(self.transaction)
-        if return_value != 0:
+        if return_value is not None and return_value != 0:
             return self.transaction.get_outgoing_string(self.transaction)
 
 

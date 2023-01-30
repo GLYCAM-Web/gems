@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from abc import ABC, abstractmethod
-from pydantic import BaseModel
-from typing import Callable, Type
+from pydantic import BaseModel, Field
+from typing import Dict
 
 from gemsModules.project.main_api import Project 
 from gemsModules.common.main_api_entity import Entity
@@ -19,6 +19,10 @@ class Common_API(ABC, BaseModel):
     project : Project = None
     notices : Notices = Notices()
     prettyPrint : bool = False
+    options : Dict[str,str] = Field(
+            None,
+            description='Key-value pairs that are specific to each entity, service, etc'
+            )
 
 
 
@@ -60,7 +64,7 @@ class Transaction(ABC):
             self.populate_inputs(self, self.incoming_string, no_check_fields)
             if initialize_out :
                 self.initialize_outputs_from_inputs()
-            return 0
+            return None
         except Exception as error:
             errMsg = "problem processing this string: " + str(in_string)
             log.error(errMsg)
@@ -70,7 +74,8 @@ class Transaction(ABC):
             log.debug("the error message is: ")
             log.debug(error)
             self.generate_error_response(self, Brief='JsonParseEror',AdditionalInfo={'error': str(error)})
-            return 1
+#            return 1
+            raise  
 
     def populate_inputs(self, in_string : str, no_check_fields=False):
         self.inputs = self.get_API_type(self).parse_raw(in_string)

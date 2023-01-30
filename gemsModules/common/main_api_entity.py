@@ -32,6 +32,10 @@ class Entity(ABC, BaseModel):
     responses : Responses = Responses()
     resources : Resources = Resources()
     notices : Notices = Notices()
+    options : Dict[str,str] = Field(
+            None,
+            description='Key-value pairs that are specific to each entity, service, etc'
+            )
 
 
 def generateSchema():
