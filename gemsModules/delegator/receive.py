@@ -15,8 +15,8 @@ def process(incomingString: str) -> str:
     log.debug("The incoming string is valid")
 
     this_transaction= receiver.get_transaction()
-    from gemsModules.delegator.inputs_translator import input_translator
-    this_translator = input_translator(this_transaction.inputs)
+    from gemsModules.delegator.inputs_translator import JSON_input_translator
+    this_translator = JSON_input_translator(this_transaction.inputs)
     this_translator.translate()
 
 #    from gemsModules.common.service_manager import Service_Manager

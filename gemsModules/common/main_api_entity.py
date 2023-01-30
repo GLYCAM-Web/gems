@@ -18,19 +18,18 @@ class Entity(ABC, BaseModel):
             title='Type',
             alias='type'
             )
-    inputs : Union[Dict,Resource,Resources] = Field(
+    inputs : Union[Dict,Resource] = Field(
             None,
             title='Inputs',
             description='User-friendly, top-level inputs to the services.'
     )
-    outputs : Union[Dict,Resource,Resources] = Field(
+    outputs : Union[Dict,Resource] = Field(
             None,
             title='Inputs',
             description='User-friendly, top-level outputs from the services.'
     )
     services : Services = Services()
     responses : Responses = Responses()
-    resources : Resources = Resources()
     notices : Notices = Notices()
     options : Dict[str,str] = Field(
             None,
