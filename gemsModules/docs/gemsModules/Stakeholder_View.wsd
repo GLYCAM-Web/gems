@@ -1,0 +1,48 @@
+@startuml
+!include <archimate/Archimate>
+Motivation_Stakeholder(GrantAgencies, "Grant\nAgencies") 
+Motivation_Stakeholder(GrantRecipients, "Grant\nRecipients") 
+Motivation_Stakeholder(HumanWebUsers, "Human\nWeb Users") 
+Motivation_Stakeholder(HumanCLIUsers, "Human\nCLI Users") 
+Motivation_Stakeholder(WebAPIUsers, "Web API\nUsers")
+Motivation_Stakeholder(WebUXProg, "Website UX\nProgrammer") 
+Motivation_Stakeholder(GEMSDevelopers, "GEMS\nDevelopers") 
+Motivation_Stakeholder(GMMLDevelopers, "GMML\nDevelopers") 
+Motivation_Stakeholder(DevOpsEngineers, "DevOps\nEngineers") 
+Motivation_Stakeholder(SystemsEngineers, "Systems\nEngineers") 
+'Grouping(Students, "Students"){
+Motivation_Stakeholder(SciStudent, "Natural Science\nStudents") 
+Motivation_Stakeholder(CSStudent, "Computer Science\nStudents") 
+'}
+
+Business_Product(Website, "Website")
+Business_Product(GEMS, "GEMS")
+Business_Product(GMML, "GMML")
+Business_Product(ForceField, "Force\nField")
+Business_Product(SciApps, "Scientific\nApplications")
+
+Physical_Equipment(Hardware, "Hardware")
+Technology_SystemSoftware(DevEnv, "Development\nEnvironment")
+Technology_SystemSoftware(Databases, "Databases")
+Application_DataObject(FixtureData, "Fixture\nData")
+Application_DataObject(UserData, "User\nData")
+Application_DataObject(SimulationData, "Simulation\nData")
+Application_DataObject(GlyfinderData, "Glyfinder\nData")
+Application_DataObject(ForceFieldData, "Force Field\nData")
+
+Rel_Realization(ForceFieldData, ForceField, "Realizes")
+Rel_Realization(DevEnv, Website, "Realizes")
+
+Rel_Serving(GEMS,Website, "JSON\nAPI")
+Rel_Serving(GMML,GEMS)
+Rel_Serving(SciApps,GEMS)
+Rel_Access_r(GMML, ForceField)
+Rel_Access_r(Website, ForceField)
+
+Rel_Access_w(SciStudent, SciApps, "Write")
+Rel_Access_w(SciStudent, ForceFieldData, "Generate")
+
+Rel_Access_r(GMMLDevelopers, SciApps, "Read")
+Rel_Access_w(GMMLDevelopers, GMML, "Write")
+
+@enduml

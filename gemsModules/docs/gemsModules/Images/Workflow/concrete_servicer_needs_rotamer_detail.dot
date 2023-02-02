@@ -1,0 +1,113 @@
+digraph {
+    label="Servicer Needs for Sequence:\nWhat to do if something fails.";
+
+    node [shape=box];
+
+    validate;
+    err_val [label="Fail?" shape=diamond];
+    die_val [label="Stop"  shape=ellipse];
+
+    validate -> err_val;
+    err_val -> die_val [label="Yes"];
+
+    evaluate;
+    err_eval [label="Fail?" shape=diamond];
+    die_eval [label="Stop"  shape=ellipse];
+
+    err_val -> evaluate [label="No"];
+
+    evaluate -> err_eval;
+    err_eval -> die_eval [label="Yes"];
+
+    build_default;
+    err_def [label="Fail?" shape=diamond];
+    die_def [label="Stop"  shape=ellipse];
+
+    err_eval -> build_default [label="No"];
+
+    build_default -> err_def;
+
+    subgraph cluster_1 {
+        label="Rotamer One"
+        build_rotamer_1 [label="Build Gas Phase"];
+        err_br1 [label="Fail?" shape=diamond];
+        die_br1 [label="Stop"  shape=ellipse];
+
+
+        build_rotamer_1 -> err_br1;
+        err_br1 -> die_br1 [label="Yes"];
+
+        minimize_rotamer_1 [label="Minimize Gas Phase"];
+        err_mr1 [label="Fail?" shape=diamond];
+        die_mr1 [label="Stop"  shape=ellipse];
+
+        err_br1 -> minimize_rotamer_1 [label="No"];
+
+        minimize_rotamer_1 -> err_mr1;
+        err_mr1 -> die_mr1 [label="Yes"];
+
+        solvate_rotamer_1 [label="Solvate Gas Phase"];
+        err_sr1 [label="Fail?" shape=diamond];
+        die_sr1 [label="Stop"  shape=ellipse];
+
+        err_mr1 -> solvate_rotamer_1 [label="No"];
+
+        solvate_rotamer_1 -> err_sr1;
+        err_sr1 -> die_sr1 [label="Yes"];
+
+        minimize_solvated_rotamer_1 [label="Minimize Solvated"];
+        err_msr1 [label="Fail?" shape=diamond];
+        die_msr1 [label="????"  shape=ellipse];
+
+        err_sr1 -> minimize_solvated_rotamer_1 [label="No"];
+
+        minimize_solvated_rotamer_1 -> err_msr1;
+        err_msr1 -> die_msr1 [label="Yes"];
+
+    }
+//    err_r1 [label="Fail?" shape=diamond];
+
+    subgraph cluster_2 {
+        label="Rotamer Two"
+        build_rotamer_2 [label="Build Gas Phase"];
+        err_br2 [label="Fail?" shape=diamond];
+        die_br2 [label="Stop"  shape=ellipse];
+
+        build_rotamer_2 -> err_br2;
+        err_br2 -> die_br2 [label="Yes"];
+
+        minimize_rotamer_2 [label="Minimize Gas Phase"];
+        err_mr2 [label="Fail?" shape=diamond];
+        die_mr2 [label="Stop"  shape=ellipse];
+
+        err_br2 -> minimize_rotamer_2 [label="No"];
+
+        minimize_rotamer_2 -> err_mr2;
+        err_mr2 -> die_mr2 [label="Yes"];
+
+        solvate_rotamer_2 [label="Solvate Gas Phase"];
+        err_sr2 [label="Fail?" shape=diamond];
+        die_sr2 [label="Stop"  shape=ellipse];
+
+        err_mr2 -> solvate_rotamer_2 [label="No"];
+
+        solvate_rotamer_2 -> err_sr2;
+        err_sr2 -> die_sr2 [label="Yes"];
+
+        minimize_solvated_rotamer_2 [label="Minimize Solvated"];
+        err_msr2 [label="Fail?" shape=diamond];
+        die_msr2 [label="????"  shape=ellipse];
+
+        err_sr2 -> minimize_solvated_rotamer_2 [label="No"];
+
+        minimize_solvated_rotamer_2 -> err_msr2;
+        err_msr2 -> die_msr2 [label="Yes"];
+
+    }
+
+    err_def -> die_def [label="Yes"];
+    err_def -> build_rotamer_1 [label="No"];
+    err_def -> build_rotamer_2 [label="No"];
+        
+
+}

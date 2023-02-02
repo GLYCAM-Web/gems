@@ -1,0 +1,70 @@
+@startuml
+!include <archimate/Archimate>
+
+Business_Interface(ServLogicInterface, "Arbitrary\nInterface")
+Business_Interface(UserInterface, "JSON API with\nUser Friendly\nInterface")
+
+Implementation_WorkPackage(Delegator, "Delegator")
+
+Grouping(Entity, "Entity"){
+    Implementation_WorkPackage(Receiver, "Receiver")
+    Grouping(DataManagement,"Data Management"){
+        Implementation_WorkPackage(UserDataIF, "Data Interface")
+        Grouping(ServiceCompletion, "1. Service Completion"){
+            Implementation_WorkPackage(AddImpliedServices, "Adds Services implied\nby friendly JSON input") 
+            Implementation_WorkPackage(AddServices, "Adds Dependencies and\nExternal Services\nto Services Object") 
+            Rel_Flow(AddImpliedServices, AddServices, "and then")
+        }
+        Rel_Access_w(UserDataIF, ServiceCompletion, "Input\nJSON API")
+        Rel_Access_r(UserDataIF, ServiceCompletion, "Services\nobject in\noutput")
+        Grouping(DataCompletion, "2. Data Completion"){
+            Implementation_WorkPackage(DataCompleter, "Adds to each Service object\nany data it needs,\nincluding Project Data")
+        }
+        rectangle "3" as rect3
+        Rel_Access_w(UserDataIF,rect3, "JSON API\noutput\nso far")
+        Rel_Access_r(UserDataIF,rect3, "Responses\nobject\nfor output")
+        Grouping(ResponsePretty, "4. Fill Response"){
+            Implementation_WorkPackage(FillResponse, "Fills friendly part of JSON response with\nwith data from Responses")
+        }
+        Implementation_WorkPackage(ResponseSerializer, "3. Response Package\nManager")
+        Motivation_Value(ResponseManagement,"Translatess\nResponse\nPackages")
+        Rel_Association(ResponseSerializer,ResponseManagement)
+        Implementation_WorkPackage(ServiceOrganizer, "1. Service\nOrganizer")
+        Motivation_Value(ServiceOrganization,"Organizes\nServices by\nOrder of Operations")
+        Rel_Association(ServiceOrganizer,ServiceOrganization)
+        Rel_Access_rw(UserDataIF, DataCompletion, "Services Object\nin JSON out")
+        Rel_Access_rw_Right(UserDataIF,ResponsePretty, "JSON API\nfor output")
+    }
+    Grouping(ServiceManager, "Service Management"){
+        Implementation_WorkPackage(ServiceMgrIF, "Service Manager\nInterface")
+        Implementation_WorkPackage(Servicer, "2. Servicer")
+        Implementation_WorkPackage(ServiceTrans, "Service\nData\nTranslator")
+        'Rel_Access_w(ServiceMgrIF,ServiceOrganizer, "Module API\nObject")
+        'Rel_Access_r(ServiceMgrIF,ServiceOrganizer, "Service\nPackage\nTree")
+        'Rel_Access_w(ServiceMgrIF,ResponseSerializer, "Response\nPackage\nTree")
+        'Rel_Access_r(ServiceMgrIF,ResponseSerializer, "Responses\nObject")
+        Rel_Access_w(ServiceMgrIF,Servicer, "Service\nPackage\nTree")
+        Rel_Access_r(ServiceMgrIF,Servicer, "Response\nPackage\nTree")
+        Rel_Access_r(Servicer,ServiceTrans, "Response\nObject")
+        Rel_Access_w(Servicer,ServiceTrans, "Service\nObject")
+    }
+    Rel_Association(rect3, ServiceMgrIF )
+}
+
+'Rel_Flow(UserInterface, Delegator, "JSON API")
+'Rel_Flow(Delegator, Receiver, "JSON String")
+'Rel_Flow(Receiver, UserDataIF, "Transaction")
+'Rel_Flow(UserDataIF, ServiceManager, "API Output")
+'Rel_Flow(ServiceManager, Servicer, "Service Data")
+
+
+
+Rel_Access_rw(UserInterface, Delegator)
+Rel_Access_r(Delegator, Receiver, "JSON API\nOut")
+Rel_Access_w(Delegator, Receiver, "JSON API\nIn")
+Rel_Access_rw(Receiver, UserDataIF, "Transaction")
+
+Rel_Access_rw(ServiceTrans, ServLogicInterface, "Read/Write")
+
+
+@enduml

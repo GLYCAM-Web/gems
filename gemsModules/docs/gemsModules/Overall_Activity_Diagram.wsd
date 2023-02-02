@@ -1,0 +1,88 @@
+@startuml
+:**Sending Agent**
+could be a person or a website;
+-> sends string;
+partition "Delegator" {
+  if (JSON?) then (No)
+    #pink:return error response;
+    end
+  endif
+  #palegreen:determine Entity;
+  if (Entity is Delegator?) then (Yes)
+    :send to Delegator as an Entity;
+  endif
+  :send to Entity;
+  }
+partition "Entity" {
+  :process incoming string
+  (includes validating the services);
+  if (Validated JSON?) then (No)
+    #pink:return error response;
+    end
+  endif
+  #palegreen:send to Data Manager;
+  }
+partition "Data Manager" {
+  partition "Service Migrator" {
+    :translate top-level 
+    transaction requests 
+    to Services;
+    :arrange services in order;
+    :add any services that 
+    are dependencies;
+    :create a project if needed;
+  }
+  partition "Data Translator" {
+    :translate top-level 
+    data to the format 
+    needed by each service;
+    :ensure each service has 
+    all the data it needs;
+  }
+  partition "Project Data Management" {
+    :ensure that each service has
+    all the project data it needs;
+  }
+  partition "Service Serializer" {
+    :serialize the services
+    for inclusion in outgoing JSON;
+    :add the Services to the outgoing JSON;
+  }
+  partition "Service Tree Generator" {
+    :generate a tree of services
+    for use by the Service Manager;
+    :generate an empty, parallel tree of 
+    Responses to be returned from the Service Manager;
+  }
+  :send Service and Response Trees to Service Manager;
+}
+partition "Service Manager" {
+  :read list type; as ListType;
+  if (list type is "unordered") then (Yes)
+    :run all services in any order,
+    in parallel if possible;
+  else (No)
+    :run services in order;
+  endif
+  repeat :for each service;
+    if (service is a list) then (Yes)
+      -> ListType;
+    endif
+    :send each service to its Servicer;
+    :Servicer translates Service data to low-level format;
+    :Servicer runs the service;
+    :Servicer translates low-level output to a Response;
+    :Servicer sends Response to Service Manager;
+    :Service Manager puts Response in Response Tree;
+    :Service Manager reads response message;
+    if (response message is "Stop All") then (Yes)
+      :stop all services;
+      end
+    elseif (response message is "Stop List") then (Yes)
+      :stop running services in this list;
+      stop
+    endif
+  repeat while (more services);
+  :send Response Tree to the Data Manager;
+}
+@enduml

@@ -1,0 +1,46 @@
+digraph {
+    rankdir=LR;
+    node [shape=box];
+
+    subgraph cluster_0 {
+        label="User Input";
+        edge [style=invis];
+        {
+            rank=same; 
+            Draw_Options ->
+            Evaluation_Options -> 
+            Build_Options -> 
+            Geometry_Options -> 
+            Solvation_Options -> 
+            Sequence_Variants -> 
+            Sequence
+            ;
+        }
+    }
+    subgraph cluster_1 {
+        label="Services";
+        edge [style=invis];
+        {
+            rank=same; 
+            Minimize ->
+            Build_All_Rotamers -> 
+            Build_Default_Rotamer -> 
+            Evaluate_Sequence -> 
+            Validate_Sequence 
+            ;
+        }
+    }
+    
+    Sequence -> Validate_Sequence [style=solid];
+    Draw_Options -> Evaluate_Sequence [style=solid];
+    Evaluation_Options -> Evaluate_Sequence [style=solid];
+    Sequence -> Evaluate_Sequence [style=solid];
+    Build_Options -> Build_Default_Rotamer [style=solid];
+    Geometry_Options -> Build_Default_Rotamer [style=solid];
+    Sequence_Variants -> Build_Default_Rotamer [style=solid];
+    Build_Options -> Build_All_Rotamers [style=solid];
+    Geometry_Options -> Build_All_Rotamers [style=solid];
+    Solvation_Options -> Build_All_Rotamers [style=solid];
+    Sequence_Variants -> Build_All_Rotamers [style=solid];
+    Solvation_Options -> Minimize [style=solid];
+}

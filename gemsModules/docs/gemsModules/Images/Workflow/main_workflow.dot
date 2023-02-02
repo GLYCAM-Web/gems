@@ -1,0 +1,20 @@
+digraph {
+    rankdir=LR;
+    //node [shape=box];
+    //Servicer [shape=ellipse];
+
+    apiRequest [shape=box];
+    apiResponse [shape=box];
+
+    apiRequest -> delegator;
+    delegator -> apiResponse [constraint=false, style=dashed];
+
+    delegator -> entity1;
+    entity1 -> service1_1;
+    entity1 -> service1_2;
+    entity1 -> service1_3;
+    delegator -> entity2;
+    entity2 -> service2_1;
+    entity2 -> service2_2;
+    
+}

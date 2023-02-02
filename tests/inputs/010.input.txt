@@ -1,2 +1,2 @@
-gemsModules/delegator/test_in/sequence/minimal_invalid_payload.json,"Cannot create 3D structure as no GLYCAM residue code was found in the GMML metadata for residue: DGlNAcb"
-gemsModules/delegator/test_in/sequence/minimal_invalid_payload_B.json,"Error: sequence contains a space:>>>DGlNA. ..Cakecb1-OH<<<"
+gemsModules/deprecated/delegator/test_in/sequence/minimal_invalid_payload.json,"Cannot create 3D structure as no GLYCAM residue code was found in the GMML metadata for residue: DGlNAcb"
+gemsModules/deprecated/delegator/test_in/sequence/minimal_invalid_payload_B.json,"Error: sequence contains a space:>>>DGlNA. ..Cakecb1-OH<<<"

@@ -1,9 +1,27 @@
 #!/usr/bin/env python3
 ##  Use this file to:
 ##    * Run the GEMS Delegator as a standalone script.
+
+################################################################################
+##
+##                         Preamble
+##
+##  These parts will be common to the scripts an can be copied in from a 
+##  common location.
+##
+##  Please update the lines just below to match your script.
+##
+##  There must be a better way to do this, but Lachele doesn't know it.  
+##  Feel free to improve upon it.
+##
+################################################################################
+
+########  Please change these values as needed
+WhoIAm="GEMSHOME.bin.delegate"
+Executable='delegate'
+########  End of values to change
+
 import importlib.util, os, sys, getopt
-#import faulthandler
-#faulthandler.enable()
 
 USAGE="""
 USAGE:
@@ -13,54 +31,112 @@ USAGE:
 
     Examples:
 
-        Using a pipe from standard input:
+        - Using a pipe from standard input:
+""" + \
+f"\n" \
+f"              echo <json string> | {Executable} \n"  \
+f"              cat /path/to/file | {Executable} \n"  \
+f"\n" \
+f"        - Using a filename (with path as appropriate): \n" \
+f"\n" \
+f"              {Executable} /path/to/file \n" \
+"""
+    TROUBLESHOOTING: 
 
-            echo <json string> | delegate
-            cat /path/to/file | delegate
+    If your usage is correct but you are still having trouble, the most
+    likely issue is that the script cannot find gemsModules.
 
-        Using a filename (with path as appropriate):
-        
-            delegate /path/to/file
+    Check that:
 
-    If you are having trouble, you can set the verbosity up.  This will write 
-    messages mostly to standard error, but some might come to standard out. 
-    We recommend doing this only for debugging purposes.
+        - GEMSHOME is set to the correct path
+        - GEMSHOME is in your PYTHONPATH
+        - This script is located in GEMSHOME/bin
 
-    Verbosity values:
-        error       Only Fatal errors are logged. (Default)
-        info        Log statements that track what methods are called, plus errors.
-        debug       Log lots of detail. For detailed debugging.
-        none        No logging.
+    If you still cannot get it to work, submit a ticket at:
 
-    To set the verbosity, set GEMS_LOGGING_LEVEL to one of the values above.  
-    For example:
-        (bash)  export GEMS_LOGGING_LEVEL=debug
-        (csh)   setenv GEMS_LOGGING_LEVEL debug
-
+        https://github.com/GLYCAM-Web/gems/issues
 \n"""
 
+
+
+Emergency_Response="{\n\
+    \"entity\" :\n\
+    {\n\
+        \"type\": \"" + WhoIAm + "\",\n\
+        \"responses\" :\n\
+        [\n\
+            { \"fatalError\" :\n\
+                { \n\
+                                    \"respondingService\" : \"Emergency\",\n\
+                                    \"notice\" : \n\
+                                    {\n\
+                                        \"type\" : \"Exit\",\n\
+                                        \"code\" : \" 132 \",\n\
+                                        \"brief\" : \"UnknownError\",\n\
+                                        \"message\" : \"Unable to initialize the " + WhoIAm + " script. \"\n\
+                                    }\n\
+                                }\n\
+            }\n\
+            { \"usage\" :\n\
+                { \n\
+                                    \"respondingService\" : \"" + Executable + "\",\n\
+                                    \"notice\" : \n\
+                                    {\n\
+                                        \"type\" : \"Exit\",\n\
+                                        \"code\" : \" 132 \",\n\
+                                        \"brief\" : \"UsageStatement\",\n\
+                                        \"message\" : \"" + USAGE + "\"\n\
+                                    }\n\
+                                }\n\
+            }\n\
+        ]\n\
+    }\n\
+}"
+
+
+##  Allow command line users to get a help statement 
 if len(sys.argv) > 1:
-    if sys.argv[1] in ( "-h", "--help") :
+    if sys.argv[1] in ( "-h", "-help", "help", "--help", "HELP") :
         sys.stderr.write(USAGE)
         sys.exit(1)
 
+##  Ensure that the JSON-CLI utilities in gemsModules can be loaded
+try :
+    from gemsModules.systemoperations.command_line_utils import JSON_From_Command_Line
+except :
+    GemsHome = os.environ.get('GEMSHOME')
+    if GemsHome is None : 
+        sys.stdout.write(Emergency_Response)
+        sys.exit(129)
+    else : 
+        sys.path.append(GemsHome) 
+        if importlib.util.find_spec("gemsModules") is None:
+            sys.stdout.write(Emergency_Response)
+            sys.exit(129)
+        else :
+            from gemsModules.systemoperations.command_line_utils import JSON_From_Command_Line
 
-if importlib.util.find_spec("gemsModules") is None:
-  this_dir, this_filename = os.path.split(__file__)
-  sys.path.append(this_dir + "/../gemsModules/")
-  if importlib.util.find_spec("common") is None:
-    sys.stderr.write("Unable to locate Common Services.  Exiting.\n")
-    sys.exit(129)
-  else:
-    from common import utils
+##  Get the JSON from the command line
+jsonObjectResponse, return_code = JSON_From_Command_Line(sys.argv, sys.stdin)
+
+if return_code != 0 :
+    sys.stdout.write(jsonObjectResponse)
+    sys.exit(return_code)
 else:
-  from gemsModules.common import utils
-jsonObjectString=utils.JSON_From_Command_Line(sys.argv)
+    jsonObjectString = jsonObjectResponse
 
 
-from gemsModules.delegator.receive import delegate
-responseObjectString=delegate(jsonObjectString)
+################################################################################
+##
+##                       End of Preamble
+##
+##  Everything after this should be specific to your script.
+##
+################################################################################
+
+
+from gemsModules.delegator.receive import receive
+responseObjectString=receive(jsonObjectString)
 sys.stdout.write(responseObjectString)
-
 
 

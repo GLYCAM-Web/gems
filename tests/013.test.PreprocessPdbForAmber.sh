@@ -15,7 +15,7 @@ echo "
 runTest()
 {
 	# JSON INPUTS
-    jsonInputFile=$GEMSHOME/gemsModules/delegator/test_in/pdb/preprocessPdbForAmber_file.json
+    jsonInputFile=$GEMSHOME/gemsModules/deprecated/delegator/test_in/pdb/preprocessPdbForAmber_file.json
     if [ -f "$jsonInputFile" ]; then 
         echo "Found test input: $jsonInputFile"
     else
