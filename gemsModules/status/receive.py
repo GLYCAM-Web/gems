@@ -1,5 +1,2 @@
-#!/usr/bin/env python3
-#from gemsModules.status.main_settings import WhoIAm
-
-def receive():
-    pass
+def receive(jsonObjectString: str) -> str:
+    return "I have received a string and am returning one."
