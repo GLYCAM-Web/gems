@@ -245,7 +245,8 @@ def buildStructureInfoOliver(thisTransaction: sequenceio.Transaction):
 
     log.debug("The max number structs to build (4) is :  " +
               str(maxNumberOfStructuresToBuild))
-    if rotamerData.totalPossibleRotamers == 1:
+    if rotamerData.totalPossibleRotamers == 1 or rotamerData.totalPossibleRotamers == "1":
+        rotamerData.totalPossibleRotamers = 1
         rotamerData.totalLikelyRotamers = 1
         rotamerData.totalSelectedRotamers = 1
         # there is probably a better way than the following, but....
