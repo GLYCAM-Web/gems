@@ -6,7 +6,6 @@
 	    "color" : "pink" 
     },
     "services" :
-    [
         { "cakeMarco" :
                 {
 			"type" : "Marco" ,
@@ -17,7 +16,5 @@
 		 
 		}
         }
-    ]
-
   }
 }

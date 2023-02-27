@@ -30,11 +30,11 @@ def receive(incomingString: str) -> str:
 
     receiver = Redirector_Receiver()
 
-    receiver_string = receiver.receive(incoming_string = incomingString)
+    receiver_error_response_string = receiver.receive(incoming_string = incomingString)
 
-    if receiver_string is not None:
+    if receiver_error_response_string is not None:
         log.debug("The incoming string is not valid")
-        return receiver_string
+        return receiver_error_response_string
 
     log.debug("The incoming string is valid")
     requested_entity=receiver.get_incoming_entity_type()
@@ -47,11 +47,11 @@ def receive(incomingString: str) -> str:
 #        return entity_module(incomingString)
 ##
 ## This is how it should eventually work:
-    if requested_entity != WhoIAm:
+    if requested_entity == WhoIAm:
+        log.debug("Delegating incoming string to self")
+        return process(incomingString)
+    else:
         log.debug("Delegating incoming string to entity: " + requested_entity)
         from gemsModules.delegator import redirector_settings 
         entity_module = redirector_settings.Known_Entity_Reception_Modules[requested_entity]
         return entity_module(incomingString)
-    else:
-        log.debug("Delegating incoming string to self")
-        return process(incomingString)

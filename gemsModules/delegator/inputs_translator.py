@@ -20,6 +20,9 @@ class JSON_input_translator():
 
 
     def translate(self):
+        if self.inputs.entity.inputs is None:
+            return
+
         self.implied_services : Services = Services()
 
         Jmap = JSON_to_Service_Request_mapping
