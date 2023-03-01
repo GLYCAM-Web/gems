@@ -1,0 +1,8 @@
+{
+"entity" : {
+    "type": "Status",
+    "inputs" : { 
+	    "marco" : "polo" 
+    }
+  }
+}
