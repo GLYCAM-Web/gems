@@ -19,11 +19,6 @@ def process(incomingString: str) -> str:
     this_translator = JSON_input_translator(this_transaction.inputs)
     this_translator.translate()
 
-#    from gemsModules.common.service_manager import Service_Manager
-#    manager = Service_Manager(receiver.get_transaction())
-#    transaction = manager.process()
-#    return transaction.get_outgoing_string()
-
 
 def receive(incomingString: str) -> str:
     log.info("Delegator's redirect was called")
@@ -34,6 +29,10 @@ def receive(incomingString: str) -> str:
 
     if receiver_error_response_string is not None:
         log.debug("The incoming string is not valid")
+        log.debug("The incoming string (incomingString) is: ")
+        log.debug(incomingString)
+        log.debug("The error response string (receiver_error_response_string) is: ")
+        log.debug(receiver_error_response_string)
         return receiver_error_response_string
 
     log.debug("The incoming string is valid")

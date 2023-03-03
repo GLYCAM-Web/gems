@@ -20,7 +20,7 @@ class JSON_input_translator():
 
 
     def translate(self):
-        if self.inputs.entity.inputs is None:
+        if self.inputs.entity.inputs is None:  # make me smarter....
             return
 
         self.implied_services : Services = Services()
