@@ -18,7 +18,7 @@ class TestStatusModule(unittest.TestCase):
     #@brief
     # assert receive() returns a str
     def test_receive_returns_string(self):
-        assert isinstance(_get_string_from_receive(_default_in), str)
+        assert isinstance(_get_string_from_receive(input=_default_in), str)
     
     ##
     #@detail
@@ -26,6 +26,6 @@ class TestStatusModule(unittest.TestCase):
     # assert receive() returns a .json formatted str
     def test_receive_returns_json_formatted_string(self):        
         assert isinstance(json.loads(_default_in), object) #prove default_in is valud .json
-        assert isinstance(json.loads(_get_string_from_receive(_default_in)), object)
+        assert isinstance(json.loads(_get_string_from_receive(input=_default_in)), object)
         
         
