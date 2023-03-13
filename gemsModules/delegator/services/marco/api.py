@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from pydantic import BaseModel, Field
 
-from gemsModules.common.main_api_services import Service, Response
+from gemsModules.common.main_api_services import Service_Request, Service_Response
 
 from gemsModules.logging.logger import Set_Up_Logging 
 log = Set_Up_Logging(__name__)
@@ -22,10 +22,10 @@ class marco_Outputs(BaseModel) :
         None,
         description="The response to the Marco request.")
 
-class marco_Service(Service) :
+class marco_Request(Service_Request) :
     typename : str  = "Marco"
     inputs : marco_Inputs = marco_Inputs()
 
-class marco_Response(Response) :
+class marco_Response(Service_Response) :
     typename : str  = "Marco"
     outputs : marco_Outputs = marco_Outputs()

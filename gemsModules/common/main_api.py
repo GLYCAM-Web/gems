@@ -61,7 +61,7 @@ class Transaction(ABC):
                 log.error("incoming string was empty")
                 self.generate_error_response(Brief='InvalidInput')
                 return 1
-            self.populate_inputs(self, self.incoming_string, no_check_fields)
+            self.populate_inputs(in_string = in_string, no_check_fields = no_check_fields)
             if initialize_out :
                 self.initialize_outputs_from_inputs()
             return None
@@ -73,12 +73,12 @@ class Transaction(ABC):
             log.debug("problem processing this string: " + str(in_string))
             log.debug("the error message is: ")
             log.debug(error)
-            self.generate_error_response(self, Brief='JsonParseEror',AdditionalInfo={'error': str(error)})
+            self.generate_error_response(Brief='JsonParseEror',AdditionalInfo={'error': str(error)})
 #            return 1
             raise  
 
     def populate_inputs(self, in_string : str, no_check_fields=False):
-        self.inputs = self.get_API_type(self).parse_raw(in_string)
+        self.inputs = self.get_API_type().parse_raw(in_string)
         log.debug("The inputs is: ")
         log.debug(self.inputs.json(indent=2))
 
@@ -89,11 +89,11 @@ class Transaction(ABC):
 
     # the use of EntityType here will break elsewhere, I think
     def generate_error_response(self, Brief='UnknownError', EntityType=settings_main.WhoIAm, AdditionalInfo=None) :
-        self.outputs = self.get_API_type(self).construct(entity=Entity.construct(entityType=settings_main.WhoIAm))
+        self.outputs = self.get_API_type().construct(entity=Entity.construct(entityType=settings_main.WhoIAm))
         if self.outputs.notices is None:
             self.outputs.notices = Notices()
         self.outputs.notices.addDefaultNotice(Brief=Brief, Messenger=settings_main.WhoIAm, AdditionalInfo=AdditionalInfo)
-        self.build_outgoing_string(self)
+        self.build_outgoing_string()
 
     def build_outgoing_string(self, prettyPrint=False, indent=2, prune_empty_values=True) :
         if self.outputs.prettyPrint is True:  # In case outputs.prettyPrint is None or something else that isn't useful

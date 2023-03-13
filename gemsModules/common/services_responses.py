@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 from typing import Callable
 
-from gemsModules.common.main_api_services import Service, Response
+from gemsModules.common.main_api_services import Service_Request, Service_Response
 from gemsModules.common.code_utils import Annotated_List, GemsStrEnum
 
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
-class Service_Package :
+class Service_Request_Package :
     def __init__(self,
             keyString : str,
             service_Callable : Callable,
-            service : Service,
+            service : Service_Request,
             server_Module: Callable,
             child_packages : Annotated_List = Annotated_List()
             ) -> None :
@@ -25,25 +25,25 @@ class Service_Package :
         self.child_packages.add_item(child_package)
 
 
-class Response_Next_State(GemsStrEnum) :
+class Service_Response_Next_State(GemsStrEnum) :
     Proceed = 'Proceed'
     StopChain = 'StopChain'
     StopAll = 'StopAll'
 
 
-class Response_Status(GemsStrEnum) :
+class Service_Response_Status(GemsStrEnum) :
     OK = 'OK'
     ERROR = 'ERROR'
     WARNING = 'WARNING'
     UNKNOWN = 'UNKNOWN'
 
 
-class Response_Package() :
+class Service_Response_Package() :
     def __init__(self, 
             keyString : str,
-            response : Response,
-            status : Response_Status = 'OK',
-            next_state : Response_Next_State = 'Proceed',
+            response : Service_Response,
+            status : Service_Response_Status = 'OK',
+            next_state : Service_Response_Next_State = 'Proceed',
             child_packages : Annotated_List = Annotated_List()
             ) :
         self.response = response
@@ -53,9 +53,9 @@ class Response_Package() :
         self.child_packages = child_packages
 
 
-class Service_Package_Tree(Annotated_List) :
+class Service_Request_Package_Tree(Annotated_List) :
     ...
 
-class Response_Package_Tree(Annotated_List) :
+class Service_Response_Package_Tree(Annotated_List) :
     ...
 

@@ -9,7 +9,7 @@ from gemsModules.common.settings_main import All_Available_Services
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
-class Service(BaseModel):
+class Service_Request(BaseModel):
     """
     Holds information about a requested Service.
     This object will have different forms in each Entity.
@@ -36,7 +36,10 @@ class Service(BaseModel):
         description='Key-value pairs that are specific to each entity, service, etc'
     )
 
-class Response(BaseModel):
+    class Config:
+        title = 'Service'
+
+class Service_Response(BaseModel):
     """
     Holds information about a response to a service request.
     This object will have different forms in each Entity.
@@ -60,15 +63,18 @@ class Response(BaseModel):
     outputs : typing.Any = None
     notices : Notices = Notices()
 
-class Services(BaseModel):
-    __root__ : Dict[str,Service] = None
+    class Config:
+        title = 'Response'
+
+class Service_Requests(BaseModel):
+    __root__ : Dict[str,Service_Request] = None
 
     def add_service(self,
             key_string : str ,
-            service : Service
+            service : Service_Request
             ):
         if self.__root__ is None :
-            self.__root__ : Dict[str,Service] = {}
+            self.__root__ : Dict[str,Service_Request] = {}
         self.__root__[key_string]=service
     
     def is_present(self, typename : str) :
@@ -81,16 +87,22 @@ class Services(BaseModel):
         else :
             return False
 
-class Responses(BaseModel):
-    __root__ : Dict[str,Response] = None
+    class Config:
+        title = 'Services'
+
+class Service_Responses(BaseModel):
+    __root__ : Dict[str,Service_Response] = None
 
     def add_response(self,
             key_string : str,
-            response : Response
+            response : Service_Response
             ):
         if self.__root__ is None :
-            self.__root__ : Dict[str,Response] = {}
+            self.__root__ : Dict[str,Service_Response] = {}
         self.__root__.append(key_string,response)
+
+    class Config:
+        title = 'Responses'
 
 
 def generateSchema():

@@ -4,8 +4,8 @@ from pydantic import BaseModel, Field, validator, Json
 from typing import Any, Dict, List, Union
 
 from gemsModules.common.main_api_notices import Notices
-from gemsModules.common.main_api_services import Services, Responses
-from gemsModules.common.main_api_resources import Resource, Resources
+from gemsModules.common.main_api_services import Service_Requests, Service_Responses
+from gemsModules.common.main_api_resources import Resource
 from gemsModules.common import settings_main
 
 from gemsModules.logging.logger import Set_Up_Logging
@@ -28,8 +28,8 @@ class Entity(ABC, BaseModel):
             title='Inputs',
             description='User-friendly, top-level outputs from the services.'
     )
-    services : Services = Services()
-    responses : Responses = Responses()
+    services : Service_Requests = Service_Requests()
+    responses : Service_Responses = Service_Responses()
     notices : Notices = Notices()
     options : Dict[str,str] = Field(
             None,

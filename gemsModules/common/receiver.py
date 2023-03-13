@@ -18,22 +18,25 @@ class Receiver(ABC):
     def get_transaction_child_type(self):
         return Transaction
 
+    def __init__(self):
+        pass
+
     def receive(self, incoming_string: str):
         try: 
-            self.transaction = self.get_transaction_child_type()
+            self.transaction = self.get_transaction_child_type()()
             self.entityType=self.get_local_entity_type()
-            return_value=self.transaction.process_incoming_string(self.transaction, in_string=incoming_string, initialize_out=False)
+            return_value=self.transaction.process_incoming_string(in_string=incoming_string, initialize_out=False)
         except ValueError as e:
-            self.transaction.generate_error_response(self.transaction, EntityType=self.entityType, Brief='EntityNotKnown', AdditionalInfo={'error': str(e)})
-            return self.transaction.get_outgoing_string(self.transaction)
+            self.transaction.generate_error_response(EntityType=self.entityType, Brief='EntityNotKnown', AdditionalInfo={'error': str(e)})
+            return self.transaction.get_outgoing_string()
         except ValidationError as e:
-            self.transaction.generate_error_response(self.transaction, EntityType=self.entityType, Brief='InvalidInput', AdditionalInfo={'error': str(e)})
-            return self.transaction.get_outgoing_string(self.transaction)
+            self.transaction.generate_error_response(EntityType=self.entityType, Brief='InvalidInput', AdditionalInfo={'error': str(e)})
+            return self.transaction.get_outgoing_string()
         except Exception as e:
-            self.transaction.generate_error_response(self.transaction, EntityType=self.entityType, Brief='UnknownError', AdditionalInfo={'error': str(e)})
-            return self.transaction.get_outgoing_string(self.transaction)
+            self.transaction.generate_error_response(EntityType=self.entityType, Brief='UnknownError', AdditionalInfo={'error': str(e)})
+            return self.transaction.get_outgoing_string()
         if return_value is not None and return_value != 0:
-            return self.transaction.get_outgoing_string(self.transaction)
+            return self.transaction.get_outgoing_string()
 
 
     def get_incoming_entity_type(self):

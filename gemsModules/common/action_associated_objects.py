@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 from abc import ABC
 from typing import Callable, List
+import uuid
+
 
 from gemsModules.common.code_utils import Annotated_List
 
@@ -21,15 +23,29 @@ class Action_Associated_Object_Package (ABC):
        for easy and annotated nesting of the AAOP Trees within each other. 
     """
     def __init__(self,
-            ID_String : str = None, # free-form internal identifier
-            AAO_type : str = 'Service', # free-form type identifier
+            ID_String : str = uuid.uuid4(), # free-form internal identifier, by default a UUID
+            AAO_Type : str = 'Service', # type identifier, for convenience
+            Dictionary_Name : str = None, # name given in the dictionary, if this came from one
             The_AAO : Callable = None,
             Dependencies : List[str] = None, # list of ID_Strings for AAOPs that must be executed before this one
             ) -> None :
-        self.AAO_type = AAO_type
+        self.AAO_Type = AAO_Type
         self.ID_String = ID_String
         self.The_AAO = The_AAO
+        self.Dictionary_Name = Dictionary_Name
         self.Dependencies = Dependencies
+
+    def __str__(self):
+        out_string = (f'ID_String = {self.ID_String}\n'
+                f'AAO_Type = {self.AAO_Type}\n'
+                f'Dictionary_Name = {self.Dictionary_Name}\n'
+                f'The_AAO = {self.The_AAO!r}\n'
+                f'Dependencies = {self.Dependencies!r}\n'
+                )
+        return out_string
+
+#    def __print__(self):
+#        print(repr(self))
 
     def create_child_package_list(self,  
             items : List = [],

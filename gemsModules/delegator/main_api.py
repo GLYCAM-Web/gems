@@ -22,7 +22,7 @@ class Delegator_Entity(main_api_entity.Entity) :
 # The Delegator uses the main_api.Transaction class to define the transaction
 # It should also define more services that are specific to the delegator
 class Delegator_API(main_api.Common_API):
-    entity : Delegator_Entity 
+    entity : Delegator_Entity
 
 
 class Delegator_Transaction(main_api.Transaction):
