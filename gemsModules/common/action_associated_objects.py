@@ -44,8 +44,6 @@ class Action_Associated_Object_Package (ABC):
                 )
         return out_string
 
-#    def __print__(self):
-#        print(repr(self))
 
     def create_child_package_list(self,  
             items : List = [],

@@ -32,6 +32,10 @@ def translate_incoming_JSON_into_a_service_request_package_tree(
             print(this_aaop)
             aaop_list.append(this_aaop)
 
+    # See if there are duplicates and if duplicates are allowed
+
+    # Next scan the implicit service info
+
 
 template_API = Delegator_API.construct(entity=Delegator_Entity.construct(entityType='Delegator'))
 #self.outputs = self.get_API_type(self).construct(entity=Entity.construct(entityType=settings_main.WhoIAm))
