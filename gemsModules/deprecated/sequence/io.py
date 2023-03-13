@@ -116,9 +116,9 @@ class TheResidueGeometryOptions(BaseModel):
 class AllLinkageRotamerInfo(BaseModel):
     """Geometry options for linkages"""
     singleLinkageRotamerDataList: List[SingleLinkageRotamerData] = []
-    totalLikelyRotamers: int = 0
-    totalPossibleRotamers: int = 0
-    totalSelectedRotamers: int = 0
+    totalLikelyRotamers: Union[int, str] = 0
+    totalPossibleRotamers: Union[int, str] = 0
+    totalSelectedRotamers: Union[int, str] = 0
 
     def __init__(self, **data: Any):
         super().__init__(**data)
