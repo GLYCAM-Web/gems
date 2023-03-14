@@ -1,10 +1,13 @@
-from gemsModules.delegator.services.services_settings import Available_Services
+from gemsModules.delegator.services.settings import Available_Services
 from typing import List
 
+
 def execute() -> List:
-    """ Return a list of entities known to the Delegator
+    """ Return a list of available services
+
     >>> print(execute())
-    ['Marco', 'Known Entities', 'List Services']
+    ['Marco', 'Status', 'ListServices', 'KnownEntities']
+
     """
 
     return Available_Services.get_json_list()

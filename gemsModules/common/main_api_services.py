@@ -4,7 +4,7 @@ from typing import Dict
 from pydantic import BaseModel, Field, typing
 
 from gemsModules.common.main_api_notices import Notices
-from gemsModules.common.settings_main import All_Available_Services
+from gemsModules.common.settings_main import Available_Services
 
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
@@ -14,7 +14,7 @@ class Service_Request(BaseModel):
     Holds information about a requested Service.
     This object will have different forms in each Entity.
     """
-    typename: All_Available_Services = Field(
+    typename: Available_Services = Field(
         'Status',
         alias='type',
         title='Common Services',

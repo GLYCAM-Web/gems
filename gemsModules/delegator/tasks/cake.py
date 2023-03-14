@@ -1,14 +1,34 @@
-def execute(cake: bool, color: None) -> str:
+from typing import Protocol
+from typing import Union
+
+class cake_data(Protocol):
+    cake : bool
+    color : Union[str,None]
+
+def execute(cake_data) -> str:
     """ Return info about a cake
-    >>> print(execute(cake=True,color='ban dearg'))
+    >>> class cake():
+    ...     cake : bool = True
+    ...     color : str = 'ban dearg'
+    >>> the_cake = cake()
+    >>> print(execute(the_cake))
     Tá cáca milis bándearg agat!
-    >>> print(execute(cake=False,color='bandearg'))
+    >>> the_cake.cake = False
+    >>> the_cake.color = 'bandearg'
+    >>> print(execute(the_cake))
     Is bréag é an cáca milis bándearg!
-    >>> print(execute(cake=True,color='purple'))
+    >>> the_cake.cake = True
+    >>> the_cake.color = 'purple'
+    >>> print(execute(the_cake))
     You have a purple cake!
-    >>> print(execute(cake=False,color='exploding'))
+    >>> the_cake.cake = False
+    >>> the_cake.color = 'exploding'
+    >>> print(execute(the_cake))
     The exploding cake is a lie!
     """
+
+    color = cake_data.color
+    cake = cake_data.cake
     if color is None:
         if cake == True:
             return "You have cake!"

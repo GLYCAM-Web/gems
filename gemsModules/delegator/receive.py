@@ -8,7 +8,7 @@ log = Set_Up_Logging(__name__)
 def process(incomingString: str) -> str:
     log.info("Delegator was called as an entity.  Processing.")
     delegator_receiver = Delegator_Receiver()
-    delegator_receiver_error_response = delegator_receiver.receive(in_string = incomingString)
+    delegator_receiver_error_response = delegator_receiver.receive(incoming_string = incomingString)
     if delegator_receiver_error_response is not None:
         log.debug("The incoming string is not valid")
         return delegator_receiver_error_response
