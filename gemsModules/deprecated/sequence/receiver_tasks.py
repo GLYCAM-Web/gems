@@ -1,34 +1,80 @@
 #!/usr/bin/env python3
-import json
-import sys
-import os
-import re
-#import importlib.util
-import shutil
-import uuid
-import traceback
-import gemsModules.deprecated
-import gemsModules.deprecated.sequence
+""" Utilities needed by receive.py in the sequence entity """
+#import json
+#import sys
+#import os
+#import re
+##import importlib.util
+#import shutil
+#import uuid
+#import traceback
+#import gemsModules.deprecated
+#import gemsModules.deprecated.sequence
 
 # for key, val in gemsModules.deprecated.delegator.settings.subEntities:
 #     if val in gemsModules.deprecated.delegator.settings.deprecated:
 #         pass
 # prototype: need to build import statement
 # from gemsModules.deprecated.deprecated_20221212. + val + import         
+    
 
-from gemsModules.deprecated.common import io as commonio
-from gemsModules.deprecated.common import logic as commonlogic
-from gemsModules.deprecated.common import services as commonservices
-from gemsModules.deprecated.sequence import settings as sequenceSettings
+
+#from gemsModules.deprecated.common import io as commonio
+#from gemsModules.deprecated.common import logic as commonlogic
+#from gemsModules.deprecated.common import services as commonservices
+#from gemsModules.deprecated.sequence import settings as sequenceSettings
 from gemsModules.deprecated.sequence import io as sequenceio
-from gemsModules.deprecated.sequence import receiver_tasks 
+#from gemsModules.deprecated.common.logic import writeStringToFile
+#
 
 from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
-from gemsModules.deprecated.common.logic import writeStringToFile
 if loggers.get(__name__):
     pass
 else:
     log = createLogger(__name__)
+
+# @brief Default service is marco polo. Can change if needed later.
+#   @param Transaction thisTransaction
+#   @TODO: write this to use transaction_in and transaction_out
+def doDefaultService(thisTransaction: sequenceio.Transaction) -> sequenceio.Transaction:
+    log.info("doDefaultService() was called.\n")
+    if thisTransaction.response_dict is None:
+        thisTransaction.response_dict = {}
+    thisTransaction.response_dict['entity'] = {}
+    thisTransaction.response_dict['entity']['type'] = 'SequenceDefault'
+    thisTransaction.response_dict['responses'] = []
+    thisTransaction.response_dict['responses'].append(
+        {'DefaultTest': {'payload': marco('Sequence')}})
+    thisTransaction.build_outgoing_string()
+    return thisTransaction
+
+def do_marco(thisTransaction: sequenceio.Transaction) -> sequenceio.Transaction:
+    pass
+
+def do_status(thisTransaction: sequenceio.Transaction) -> sequenceio.Transaction:
+    pass
+
+def get_sequence(thisTransaction: sequenceio.Transaction)->str:
+    """ Get the sequence from the transaction. """
+    pass
+
+def we_should_build_the_default_sequence(thisTransaction: sequenceio.Transaction)->bool::
+    """ Determine whether or not to build the default sequence. """
+    build_default_structure = True
+
+??????????????????
+    # Check whether we are in a website execution environment (there must be a better way)
+    if not receiver_tasks.is_website_environment:
+        build_default_structure = False
+    # Check to see if the default built has been explicitly set (to true or false)
+    if thisTransaction.transaction_in.entity.inputs.evaluationOptions is not None:
+        if thisTransaction.transaction_in.entity.inputs.evaluationOptions.noBuild is True:
+            build_default_structure = False
+        if thisTransaction.transaction_in.entity.inputs.evaluationOptions.noBuild is False:
+            build_default_structure = True
+
+
+
 
 # @brief The main way Delegator interacts with this module. Request handling.
 #   @param Transaction receivedTransactrion
@@ -39,37 +85,6 @@ def receive(receivedTransaction: sequenceio.Transaction):
     log.debug("request dict: ")
     log.debug(receivedTransaction.request_dict)
 
-    # ##
-    # ## Initialize the transaction
-    # ##
-    # ## This should not need to be done anywhere else in the module.
-    # ##
-    # ## Ensure that our Transacation is the Sequence variety
-    thisTransaction = sequenceio.Transaction(
-        receivedTransaction.incoming_string)
-    from pydantic import BaseModel, ValidationError
-    try:
-        # ## Fill out the incoming transaction based on the incoming JSON object
-        thisTransaction.populate_transaction_in()
-    except ValidationError as e:
-        log.error(e)
-        log.error(traceback.format_exc())
-        thisTransaction.generateCommonParserNotice(
-            noticeBrief='JsonParseEror',
-            additionalInfo={'hint': str(e)})
-        return thisTransaction
-    try:
-        # ## Initialize the outgoing transaction by copying the incoming transaction
-        thisTransaction.initialize_transaction_out_from_transaction_in()
-        # For convenience, make a short alias for the entity in the transaction_in
-        thisSequence = thisTransaction.transaction_out.entity
-    except Exception as error:
-        log.error(
-            "There was a problem initializing the outgoing transaction : " + str(error))
-        log.error(traceback.format_exc())
-        raise error  # not sure if this will work as desired - BLFoley 2023-03-15
-                     # it might be necessary to generate a transaction to return and
-                     # populate it with an error message.
     # ##
     # ## Initialize the project
     # ##
@@ -174,19 +189,29 @@ def receive(receivedTransaction: sequenceio.Transaction):
     log.debug(thisSequence.inputs.sequence.payload)
     ###################################################################
 
-    # First figure out if there are any explicit services
+    # First figure out the names of each of the requested services
     if thisSequence.services == []:
         log.debug("'services' was not present in the request. Do the default.")
-        thisTransaction = receiver_tasks.doDefaultService(thisTransaction)
-        return thisTransaction
+        doDefaultService(thisTransaction)
+        # TODO: write the following properly
+        thisTransaction.doDefaultService()
+        return
 
-    ## See if a sequence is present in the transaction (if just marco or status, then no sequence)
-    ## If there is a sequence, ensure that it is valid
-    ## If a default built is indicated, do the default build
-    the_sequence = receiver_tasks.get_sequence(thisTransaction)
-    if the_sequence is not None:
+    log.info("Sequence has been validated. Thank you.")
+    # for each requested service:
+    for currentService in thisSequence.services:
+        log.debug("service, currentService: " + str(currentService))
+        thisService = thisSequence.services[currentService]
+
+        # OGNov21: Always validate the sequence. If not valid, always stop.
+        # Can remove all other sequence validation checks from sequence code.
+        # Note that "payload" is used above, no need to check here.
+        # Instantiating carbBuilder in multiple places isn't great design.
+        # Wrapping just the new condensedSequence class wasn't possible for Oliver's poor brain.
+        # doing thisTransaction.generateCommonParserNotice before the "for currentService ..." loop causes a "doesn't exist" fault
         from gemsModules.deprecated.sequence import build
-        carbBuilder = build.getCbBuilderForSequence(the_sequence)
+        carbBuilder = build.getCbBuilderForSequence(
+            thisSequence.inputs.sequence.payload)
         valid = carbBuilder.IsStatusOk()
         if not valid:
             # Is incorrect user input an error?
@@ -200,23 +225,39 @@ def receive(receivedTransaction: sequenceio.Transaction):
             # NOTE!!! This uses the child method in sequence.io - a better method!
             thisTransaction.build_outgoing_string()
             return thisTransaction
-        log.info("Sequence has been validated. Thank you.")
-        if receiver_tasks.we_should_build_the_default_sequence(thisTransaction): 
-            thisTransaction.evaluateCondensedSequence()
-#            from gemsModules.deprecated.sequence import logic
-            thisTransaction.manageSequenceBuild3DStructureRequest(defaultOnly=True)
+        # End OGNov21 edit.
 
 
-    # for each requested service:
-    for currentService in thisSequence.services:
-        log.debug("service, currentService: " + str(currentService))
-        thisService = thisSequence.services[currentService]
+        ## BLFoley 2023-03-15
+        ## If we are in a website-relevant execution context, then
+        ## we will always build and minimize the default structure. 
+        ## This will happen regardless what Service was called.
+        ## 
+        ## This can be overridden as follows:
+        ## 
+        ##   - it will not happen for invalid sequences - and should not reach this code
+        ##   - if the 'noBuild' option is set in the inputs
+        build_default_structure = True
+        if thisTransaction.transaction_in.entity.inputs.evaluationOptions is not None:
+            if thisTransaction.transaction_in.entity.inputs.evaluationOptions.noBuild is True:
+                build_default_structure = False
+        if build_default_structure:
+
+
+        ## End BLFoley edits 2023-03-15
+
 
         if 'Evaluate' in thisService.typename:
             log.debug("Evaluate service requested from sequence entity.")
             from gemsModules.deprecated.sequence import evaluate
             try:
                 thisTransaction.evaluateCondensedSequence()
+                if thisTransaction.transaction_out.entity.inputs.evaluationOptions is not None:
+                    if thisTransaction.transaction_out.entity.inputs.evaluationOptions.noBuild is False:
+                        # Build the Default structure.
+                        from gemsModules.deprecated.sequence import logic
+                        thisTransaction.manageSequenceBuild3DStructureRequest(
+                            defaultOnly=True)
             except Exception as error:
                 log.error(
                     "There was a problem evaluating the condensed sequence: " + str(error))
@@ -255,7 +296,6 @@ def receive(receivedTransaction: sequenceio.Transaction):
                     thisTransaction.generateCommonParserNotice(
                         noticeBrief='InvalidInputPayload', additionalInfo={"hint": "Sequence is invalid"})
         elif "Validate" in thisService.typename:
-            # this should be able to become part of previous validation, but leaving in for now
             log.debug("Validate service requested from sequence entity.")
             from gemsModules.deprecated.sequence import evaluate
             try:

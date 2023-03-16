@@ -872,10 +872,10 @@ class Transaction(commonio.Transaction):
         log.debug("The transaction_out is: ")
         log.debug(self.transaction_out.json(indent=2))
 
-    def doDefaultService():
-        from gemsModules.deprecated.receive import doDefaultService
-        doDefaultService(self)
-        return self
+#    def doDefaultService():
+#        from gemsModules.deprecated.receive import doDefaultService
+#        doDefaultService(self)
+#        return self
 
     def getRotamerDataIn(self):
         log.info("Transaction-Wrapper.getRotamerDataIn was called")
