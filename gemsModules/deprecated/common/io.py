@@ -166,7 +166,7 @@ class Response(Service):
         alias='type',
         description='The type service that produced this response.'
     )
-    outputs: Json = None
+    outputs: Any = None
     notices: List[Notice] = None
 
     def generateCommonParserNotice(self, *args, **kwargs):

@@ -33,11 +33,9 @@ if loggers.get(__name__):
 else:
     log = createLogger(__name__)
 
-# @brief Default service is marco polo. Can change if needed later.
-#   @param Transaction thisTransaction
-#   @TODO: write this to use transaction_in and transaction_out
-def doDefaultService(thisTransaction: sequenceio.Transaction) -> sequenceio.Transaction:
-    log.info("doDefaultService() was called.\n")
+
+def do_marco(thisTransaction: sequenceio.Transaction) -> sequenceio.Transaction:
+    log.info("do_marco() was called.\n")
     if thisTransaction.response_dict is None:
         thisTransaction.response_dict = {}
     thisTransaction.response_dict['entity'] = {}
@@ -48,281 +46,91 @@ def doDefaultService(thisTransaction: sequenceio.Transaction) -> sequenceio.Tran
     thisTransaction.build_outgoing_string()
     return thisTransaction
 
-def do_marco(thisTransaction: sequenceio.Transaction) -> sequenceio.Transaction:
-    pass
+# @brief Default service is marco polo. Can change if needed later.
+#   @param Transaction thisTransaction
+#   @TODO: write this to use transaction_in and transaction_out
+def doDefaultService(thisTransaction: sequenceio.Transaction) -> sequenceio.Transaction:
+    log.info("doDefaultService() was called.\n")
+    return do_marco(thisTransaction) 
 
 def do_status(thisTransaction: sequenceio.Transaction) -> sequenceio.Transaction:
-    pass
+    if thisTransaction.transaction_out.entity.responses is None:
+        thisTransaction.transaction_out.entity.responses = {}
+        thisTransaction.transaction_out.entity.responses['Get Status']=Response()
+        theResponse=thisTransaction.transaction_out.entity.responses['Get Status']
+        theResponse.typename='Status'
+        theResponse.outputs={'Message':'I am fine.  I hope you are well, too!'}
+        thisTransaction.transaction_out.entity.responses['Get Status']=theResponse
+    return thisTransaction
 
-def get_sequence(thisTransaction: sequenceio.Transaction)->str:
+def get_sequence(thisSequenceEntity: sequenceio.SequenceEntity)->str:
     """ Get the sequence from the transaction. """
-    pass
+    log.info("get_sequence was called.")
+    if thisSequenceEntity.inputs is None:
+        return None
+    if thisSequenceEntity.inputs.sequence is None: 
+        return None
+    return thisSequenceEntity.inputs.sequence.payload
 
-def we_should_build_the_default_sequence(thisTransaction: sequenceio.Transaction)->bool::
+def we_should_build_the_default_structure(thisTransaction: sequenceio.Transaction)->bool::
     """ Determine whether or not to build the default sequence. """
     build_default_structure = True
-
-??????????????????
-    # Check whether we are in a website execution environment (there must be a better way)
-    if not receiver_tasks.is_website_environment:
+    # See if we are in a situation where we normally need to build the default
+    from gemsModules.deprecated.common.logic import getGemsExecutionContext
+    the_context = getGemsExecutionContext()
+    if the_context == "default": # this is a normal user, so the user decides
         build_default_structure = False
-    # Check to see if the default built has been explicitly set (to true or false)
+    # Check to see if the default build has been explicitly set (to true or false)
     if thisTransaction.transaction_in.entity.inputs.evaluationOptions is not None:
         if thisTransaction.transaction_in.entity.inputs.evaluationOptions.noBuild is True:
             build_default_structure = False
         if thisTransaction.transaction_in.entity.inputs.evaluationOptions.noBuild is False:
             build_default_structure = True
+    return build_default_structure
+
+def we_need_filesystem_writes(thisSequenceEntity : sequenceio.SequenceEntity) -> bool:
+    # check to see if filesystem writes are needed
+    # Other parts of the code might make decisions based on other criteria
+    theseNeedFilesystemWrites = ['Build3DStructure', 'DrawGlycan']
+    needFilesystemWrites = False
+    for service in thisSequenceEntity.services:
+        thisService = thisSequenceEntity.services[service]
+        if thisService.typename in theseNeedFilesystemWrites:
+            log.debug("Found service - " + thisService.typename +
+                      " - that needs filesystem writes.")
+            needFilesystemWrites = True
+    return needFilesystemWrites
 
 
 
-
-# @brief The main way Delegator interacts with this module. Request handling.
-#   @param Transaction receivedTransactrion
-def receive(receivedTransaction: sequenceio.Transaction):
-    log.info("sequence.receive() was called:\n")
-    log.debug("The received transaction contains this incoming string: ")
-    log.debug(receivedTransaction.incoming_string)
-    log.debug("request dict: ")
-    log.debug(receivedTransaction.request_dict)
-
+#### START HERE
+def set_up_filesystem_for_writing(thisTransaction: sequenceio.SequenceTransaction) -> int:
     # ##
-    # ## Initialize the project
-    # ##
-    # ## There should not be many alterations required elsewhere.
-    # ##
-    # ## Because our transacation is the Sequence variety, the project will be CbProject
-    try:
-        # ##
-        # ## If the outgoing project is None, a new project is needed
-        # ##
-        if thisTransaction.transaction_out.project is None:
-            log.debug("transaction_out.project is None.  Starting a new one.")
-            thisTransaction.transaction_out.project = gemsModules.deprecated.project.io.CbProject()
-        # ##
-        # ## Initialize the parts of the project that need to be done even if there is no output
-        # ## to the filesystem.
-        # ##
-        log.debug("Initializing the non-filesystem parts of the outgoing project")
+    # Set the project directory
+    # ## TODO - this next is why it might fail.  I wasn't sure what better to do (BLF)
+    thisProject.requested_service = "Build3DStructure"
+    thisProject.setServiceDir()
+    thisProjectDir = os.path.join(
+        thisProject.service_dir,
+        'Builds',
+        thisProject.pUUID)
+    thisProject.setProjectDir(
+        specifiedDirectory=thisProjectDir, noClobber=False)
 
-        thisProject = thisTransaction.transaction_out.project
+    thisProject.setHostUrlBasePath()
+    thisProject.setDownloadUrlPath()
 
-        thisProject.setFilesystemPath()
+    # Create the needed initial directories including a logs directory
+    thisProject.createDirectories()
 
-        log.debug("About to load the version info")
-        thisProject.loadVersionsFileInfo()
-        # ##
-        # ## Initialize the parts of the project that are written to the filesystem.
-        # ## Also write initialization info to the filesystem.
-        # ##
-        log.debug(
-            "Initializing the filesystem parts of the outgoing project, if any")
+    thisProject.writeInitialLogs
 
-        # ##
-        # ## TODO - this might fail if more than one service needs filesystem access
-        # ##        see next todo for more.
-        # ##
-        # check to see if filesystem writes are needed
-        theseNeedFilesystemWrites = ['Build3DStructure', 'DrawGlycan']
-        needFilesystemWrites = False
-        for service in thisSequence.services:
-            thisService = thisSequence.services[service]
-            if thisService.typename in theseNeedFilesystemWrites:
-                log.debug("Found service - " + thisService.typename +
-                          " - that needs filesystem writes.")
-                needFilesystemWrites = True
-
-        if needFilesystemWrites:
-            # Set the project directory
-            # ## TODO - this next is why it might fail.  I wasn't sure what better to do (BLF)
-            thisProject.requested_service = "Build3DStructure"
-            thisProject.setServiceDir()
-            thisProjectDir = os.path.join(
-                thisProject.service_dir,
-                'Builds',
-                thisProject.pUUID)
-            thisProject.setProjectDir(
-                specifiedDirectory=thisProjectDir, noClobber=False)
-
-            thisProject.setHostUrlBasePath()
-            thisProject.setDownloadUrlPath()
-
-            # Create the needed initial directories including a logs directory
-            thisProject.createDirectories()
-
-            thisProject.writeInitialLogs
-
-            # Generate the complete incoming JSON object, including all defaults
-            incomingString = thisTransaction.incoming_string
-            incomingRequest = thisTransaction.transaction_in.json(indent=2)
-            writeStringToFile(incomingString, os.path.join(
-                thisProject.logs_dir, "request-raw.json"))
-            writeStringToFile(incomingRequest, os.path.join(
-                thisProject.logs_dir, "request-initialized.json"))
-    except Exception as error:
-        log.error(
-            "There was a problem initializing the outgoing project: " + str(error))
-        log.error(traceback.format_exc())
-        raise error
-    log.debug("Just initialized the outgoing project.  The transaction_out is :   ")
-    log.debug(thisTransaction.transaction_out.json(indent=2))
-
-    ###################################################################
-    #
-    # these are for logging/debugging and can go if they get heavy
-    #
-    log.debug("The entity type is : " + thisSequence.entityType)
-    log.debug("The services are: ")
-    log.debug(thisSequence.services)
-    vals = thisSequence.services.values()
-    for j in vals:
-        if 'Build3DStructure' in j.typename:
-            log.debug("Found a build 3d request.")
-        elif 'Evaluate' in j.typename:
-            log.debug("Found an evaluation request.")
-        elif 'Validate' in j.typename:
-            log.debug("Found a validation request.")
-        else:
-            log.debug("Found an unknown service: '" + str(j.typename))
-    log.debug("The Seqence Entity's inputs looks like:")
-    log.debug(thisSequence.inputs)
-    log.debug("The Seqence Entity's inputs.Sequence looks like:")
-    log.debug(thisSequence.inputs.sequence.payload)
-    ###################################################################
-
-    # First figure out the names of each of the requested services
-    if thisSequence.services == []:
-        log.debug("'services' was not present in the request. Do the default.")
-        doDefaultService(thisTransaction)
-        # TODO: write the following properly
-        thisTransaction.doDefaultService()
-        return
-
-    log.info("Sequence has been validated. Thank you.")
-    # for each requested service:
-    for currentService in thisSequence.services:
-        log.debug("service, currentService: " + str(currentService))
-        thisService = thisSequence.services[currentService]
-
-        # OGNov21: Always validate the sequence. If not valid, always stop.
-        # Can remove all other sequence validation checks from sequence code.
-        # Note that "payload" is used above, no need to check here.
-        # Instantiating carbBuilder in multiple places isn't great design.
-        # Wrapping just the new condensedSequence class wasn't possible for Oliver's poor brain.
-        # doing thisTransaction.generateCommonParserNotice before the "for currentService ..." loop causes a "doesn't exist" fault
-        from gemsModules.deprecated.sequence import build
-        carbBuilder = build.getCbBuilderForSequence(
-            thisSequence.inputs.sequence.payload)
-        valid = carbBuilder.IsStatusOk()
-        if not valid:
-            # Is incorrect user input an error?
-            log.error(carbBuilder.GetStatusMessage())
-            log.debug(
-                "Just about to call generateCommonParserNotice with the outgoing project.  The transaction_out is :   ")
-            log.debug(thisTransaction.transaction_out.json(indent=2))
-            thisTransaction.generateCommonParserNotice(
-                noticeBrief='InvalidInputPayload', exitMessage=carbBuilder.GetStatusMessage())
-            # prepares the transaction for return to the requestor, success or fail.
-            # NOTE!!! This uses the child method in sequence.io - a better method!
-            thisTransaction.build_outgoing_string()
-            return thisTransaction
-        # End OGNov21 edit.
+    # Generate the complete incoming JSON object, including all defaults
+    incomingString = thisTransaction.incoming_string
+    incomingRequest = thisTransaction.transaction_in.json(indent=2)
+    writeStringToFile(incomingString, os.path.join(
+        thisProject.logs_dir, "request-raw.json"))
+    writeStringToFile(incomingRequest, os.path.join(
+        thisProject.logs_dir, "request-initialized.json"))
 
 
-        ## BLFoley 2023-03-15
-        ## If we are in a website-relevant execution context, then
-        ## we will always build and minimize the default structure. 
-        ## This will happen regardless what Service was called.
-        ## 
-        ## This can be overridden as follows:
-        ## 
-        ##   - it will not happen for invalid sequences - and should not reach this code
-        ##   - if the 'noBuild' option is set in the inputs
-        build_default_structure = True
-        if thisTransaction.transaction_in.entity.inputs.evaluationOptions is not None:
-            if thisTransaction.transaction_in.entity.inputs.evaluationOptions.noBuild is True:
-                build_default_structure = False
-        if build_default_structure:
-
-
-        ## End BLFoley edits 2023-03-15
-
-
-        if 'Evaluate' in thisService.typename:
-            log.debug("Evaluate service requested from sequence entity.")
-            from gemsModules.deprecated.sequence import evaluate
-            try:
-                thisTransaction.evaluateCondensedSequence()
-                if thisTransaction.transaction_out.entity.inputs.evaluationOptions is not None:
-                    if thisTransaction.transaction_out.entity.inputs.evaluationOptions.noBuild is False:
-                        # Build the Default structure.
-                        from gemsModules.deprecated.sequence import logic
-                        thisTransaction.manageSequenceBuild3DStructureRequest(
-                            defaultOnly=True)
-            except Exception as error:
-                log.error(
-                    "There was a problem evaluating the condensed sequence: " + str(error))
-                log.error(traceback.format_exc())
-                thisTransaction.generateCommonParserNotice(
-                    noticeBrief='InvalidInputPayload')
-        elif 'Build3DStructure' in thisService.typename:
-            log.debug("Build3DStructure service requested from sequence entity.")
-            try:
-                # first evaluate the requested structure. Only build if valid.
-                from gemsModules.deprecated.sequence import evaluate
-                thisTransaction.evaluateCondensedSequence()
-                valid = thisTransaction.transaction_out.entity.outputs.sequenceEvaluationOutput.sequenceIsValid
-                thisTransaction.setIsEvaluationForBuild(True)
-            except Exception as error:
-                log.error(
-                    "There was a problem evaluating the condensed sequence: " + str(error))
-                log.error(traceback.format_exc())
-                thisTransaction.generateCommonParserNotice(
-                    noticeBrief='InvalidInputPayload')
-            else:
-                if valid:
-                    log.debug("Valid sequence.")
-                    try:
-                        from gemsModules.deprecated.sequence import logic
-                        thisTransaction.manageSequenceBuild3DStructureRequest()
-
-                    except Exception as error:
-                        log.error(
-                            "There was a problem with manageSequenceBuild3DStructureRequest(): " + str(error))
-                        raise error
-                else:
-                    log.error("Invalid Sequence. Cannot build.")
-                    print("the transaction is : ")
-                    print(thisTransaction)
-                    thisTransaction.generateCommonParserNotice(
-                        noticeBrief='InvalidInputPayload', additionalInfo={"hint": "Sequence is invalid"})
-        elif "Validate" in thisService.typename:
-            log.debug("Validate service requested from sequence entity.")
-            from gemsModules.deprecated.sequence import evaluate
-            try:
-                thisTransaction.evaluateCondensedSequence(validateOnly=True)
-            except Exception as error:
-                log.error(
-                    "There was a problem validating the condensed sequence: " + str(error))
-                thisTransaction.generateCommonParserNotice(
-                    noticeBrief='InvalidInputPayload')
-        else:
-            log.error("got to the else, so something is wrong")
-            thisTransaction.generateCommonParserNotice(
-                noticeBrief='ServiceNotKnownToEntity')
-
-    # prepares the transaction for return to the requestor, success or fail.
-    # NOTE!!! This uses the child method in sequence.io - a better method!
-    thisTransaction.build_outgoing_string()
-    if needFilesystemWrites:
-        outgoingResponse = thisTransaction.transaction_out.json(indent=2)
-        writeStringToFile(outgoingResponse, os.path.join(
-            thisProject.logs_dir, "response.json"))
-    return thisTransaction
-
-
-def main():
-    log.info("main() was called.\n")
-
-
-if __name__ == "__main__":
-    main()

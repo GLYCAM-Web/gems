@@ -1,25 +1,14 @@
 #!/usr/bin/env python3
-import json
-import sys
 import os
-import re
-#import importlib.util
-import shutil
-import uuid
 import traceback
-import gemsModules.deprecated
-import gemsModules.deprecated.sequence
 
+## Not sure what this was originally intended for.  Leaving for now.  BLF
 # for key, val in gemsModules.deprecated.delegator.settings.subEntities:
 #     if val in gemsModules.deprecated.delegator.settings.deprecated:
 #         pass
 # prototype: need to build import statement
 # from gemsModules.deprecated.deprecated_20221212. + val + import         
 
-from gemsModules.deprecated.common import io as commonio
-from gemsModules.deprecated.common import logic as commonlogic
-from gemsModules.deprecated.common import services as commonservices
-from gemsModules.deprecated.sequence import settings as sequenceSettings
 from gemsModules.deprecated.sequence import io as sequenceio
 from gemsModules.deprecated.sequence import receiver_tasks 
 
@@ -32,24 +21,17 @@ else:
 
 # @brief The main way Delegator interacts with this module. Request handling.
 #   @param Transaction receivedTransactrion
-def receive(receivedTransaction: sequenceio.Transaction):
+def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transaction:
     log.info("sequence.receive() was called:\n")
     log.debug("The received transaction contains this incoming string: ")
     log.debug(receivedTransaction.incoming_string)
     log.debug("request dict: ")
     log.debug(receivedTransaction.request_dict)
 
-    # ##
     # ## Initialize the transaction
-    # ##
-    # ## This should not need to be done anywhere else in the module.
-    # ##
-    # ## Ensure that our Transacation is the Sequence variety
-    thisTransaction = sequenceio.Transaction(
-        receivedTransaction.incoming_string)
-    from pydantic import BaseModel, ValidationError
+    from pydantic import ValidationError
+    thisTransaction = sequenceio.Transaction(receivedTransaction.incoming_string)
     try:
-        # ## Fill out the incoming transaction based on the incoming JSON object
         thisTransaction.populate_transaction_in()
     except ValidationError as e:
         log.error(e)
@@ -59,95 +41,87 @@ def receive(receivedTransaction: sequenceio.Transaction):
             additionalInfo={'hint': str(e)})
         return thisTransaction
     try:
-        # ## Initialize the outgoing transaction by copying the incoming transaction
         thisTransaction.initialize_transaction_out_from_transaction_in()
         # For convenience, make a short alias for the entity in the transaction_in
-        thisSequence = thisTransaction.transaction_out.entity
+        thisSequenceEntity = thisTransaction.transaction_out.entity
     except Exception as error:
         log.error(
             "There was a problem initializing the outgoing transaction : " + str(error))
         log.error(traceback.format_exc())
-        raise error  # not sure if this will work as desired - BLFoley 2023-03-15
-                     # it might be necessary to generate a transaction to return and
-                     # populate it with an error message.
-    # ##
+        raise Exception  # not sure if this will work as desired - BLFoley 2023-03-15
+                         # it might be necessary to generate a transaction to return and
+                         # populate it with an error message.
+   
+
+
+    ## If there is a sequence, ensure that it is valid
+    build_the_default = False
+    the_sequence = receiver_tasks.get_sequence(thisSequenceEntity)
+    if the_sequence is not None:
+        from gemsModules.deprecated.sequence import build
+        carbBuilder = build.getCbBuilderForSequence(the_sequence)
+        valid = carbBuilder.IsStatusOk()
+        if not valid:
+            log.error(carbBuilder.GetStatusMessage())
+            log.debug(
+                "About to call generateCommonParserNotice with the outgoing project.  The transaction_out is :   ")
+            log.debug(thisTransaction.transaction_out.json(indent=2))
+            thisTransaction.generateCommonParserNotice(
+                noticeBrief='InvalidInputPayload', 
+                exitMessage=carbBuilder.GetStatusMessage())
+            thisTransaction.build_outgoing_string()
+            return thisTransaction
+        log.info("Sequence has been validated. Thank you.")
+
+########
+
+## Work on logic here....  
+
+    ## Sequence is valid... yay... so....
+    ## Is there already a default structure?  If so, register it and be done.
+    ## Else....
+    ## Is it a single conforer or multiple conformers?
+        ## Single?  only one project is needed - write to the filesystem
+        ## Multiple?  Make a project for the default structure and start the build
+
+        ## If a default built is indicated, set up to do a default build below
+        if receiver_tasks.we_should_build_the_default_structure(thisTransaction): 
+            build_the_default = True
+
+    # If we still need to build the default structure, do it now
+    if build_the_default:
+        thisTransaction.evaluateCondensedSequence()
+        thisTransaction.manageSequenceBuild3DStructureRequest(defaultOnly=True)
+
+########
+
     # ## Initialize the project
-    # ##
-    # ## There should not be many alterations required elsewhere.
-    # ##
-    # ## Because our transacation is the Sequence variety, the project will be CbProject
     try:
-        # ##
-        # ## If the outgoing project is None, a new project is needed
-        # ##
         if thisTransaction.transaction_out.project is None:
             log.debug("transaction_out.project is None.  Starting a new one.")
             thisTransaction.transaction_out.project = gemsModules.deprecated.project.io.CbProject()
-        # ##
-        # ## Initialize the parts of the project that need to be done even if there is no output
-        # ## to the filesystem.
-        # ##
-        log.debug("Initializing the non-filesystem parts of the outgoing project")
 
+        log.debug("Initializing the non-filesystem-writing parts of the outgoing project")
         thisProject = thisTransaction.transaction_out.project
-
         thisProject.setFilesystemPath()
-
         log.debug("About to load the version info")
         thisProject.loadVersionsFileInfo()
-        # ##
-        # ## Initialize the parts of the project that are written to the filesystem.
-        # ## Also write initialization info to the filesystem.
-        # ##
-        log.debug(
-            "Initializing the filesystem parts of the outgoing project, if any")
+        thisTransaction.transaction_out.project=thisProject
 
-        # ##
-        # ## TODO - this might fail if more than one service needs filesystem access
-        # ##        see next todo for more.
-        # ##
-        # check to see if filesystem writes are needed
-        theseNeedFilesystemWrites = ['Build3DStructure', 'DrawGlycan']
-        needFilesystemWrites = False
-        for service in thisSequence.services:
-            thisService = thisSequence.services[service]
-            if thisService.typename in theseNeedFilesystemWrites:
-                log.debug("Found service - " + thisService.typename +
-                          " - that needs filesystem writes.")
-                needFilesystemWrites = True
+        log.debug("Initializing the filesystem parts of the outgoing project, if any")
+        if build_the_default or receiver_tasks.we_need_filesystem_writes(thisSequenceEntity):
+            # ## TODO - this might fail if more than one service needs filesystem access
+            return_value = receiver_tasks.set_up_filesystem_for_writing(thisTransaction)
+            if return_value != 0:
+                thisTransaction.generateCommonParserNotice(
+                    noticeBrief='GemsEror',
+                    additionalInfo={'Message': 'Something went wrong while setting up the filesystem.'})
 
-        if needFilesystemWrites:
-            # Set the project directory
-            # ## TODO - this next is why it might fail.  I wasn't sure what better to do (BLF)
-            thisProject.requested_service = "Build3DStructure"
-            thisProject.setServiceDir()
-            thisProjectDir = os.path.join(
-                thisProject.service_dir,
-                'Builds',
-                thisProject.pUUID)
-            thisProject.setProjectDir(
-                specifiedDirectory=thisProjectDir, noClobber=False)
-
-            thisProject.setHostUrlBasePath()
-            thisProject.setDownloadUrlPath()
-
-            # Create the needed initial directories including a logs directory
-            thisProject.createDirectories()
-
-            thisProject.writeInitialLogs
-
-            # Generate the complete incoming JSON object, including all defaults
-            incomingString = thisTransaction.incoming_string
-            incomingRequest = thisTransaction.transaction_in.json(indent=2)
-            writeStringToFile(incomingString, os.path.join(
-                thisProject.logs_dir, "request-raw.json"))
-            writeStringToFile(incomingRequest, os.path.join(
-                thisProject.logs_dir, "request-initialized.json"))
     except Exception as error:
         log.error(
             "There was a problem initializing the outgoing project: " + str(error))
         log.error(traceback.format_exc())
-        raise error
+        raise Exception
     log.debug("Just initialized the outgoing project.  The transaction_out is :   ")
     log.debug(thisTransaction.transaction_out.json(indent=2))
 
@@ -155,10 +129,10 @@ def receive(receivedTransaction: sequenceio.Transaction):
     #
     # these are for logging/debugging and can go if they get heavy
     #
-    log.debug("The entity type is : " + thisSequence.entityType)
+    log.debug("The entity type is : " + thisSequenceEntity.entityType)
     log.debug("The services are: ")
-    log.debug(thisSequence.services)
-    vals = thisSequence.services.values()
+    log.debug(thisSequenceEntity.services)
+    vals = thisSequenceEntity.services.values()
     for j in vals:
         if 'Build3DStructure' in j.typename:
             log.debug("Found a build 3d request.")
@@ -166,51 +140,37 @@ def receive(receivedTransaction: sequenceio.Transaction):
             log.debug("Found an evaluation request.")
         elif 'Validate' in j.typename:
             log.debug("Found a validation request.")
+        elif 'Status' in j.typename:
+            log.debug("Found a status request.")
+        elif 'Marco' in j.typename:
+            log.debug("Found a marco request.")
         else:
             log.debug("Found an unknown service: '" + str(j.typename))
     log.debug("The Seqence Entity's inputs looks like:")
-    log.debug(thisSequence.inputs)
+    log.debug(thisSequenceEntity.inputs)
     log.debug("The Seqence Entity's inputs.Sequence looks like:")
-    log.debug(thisSequence.inputs.sequence.payload)
+    log.debug(thisSequenceEntity.inputs.sequence.payload)
     ###################################################################
 
-    # First figure out if there are any explicit services
-    if thisSequence.services == []:
+
+
+    # If we still need to build the default structure, do it now
+    if build_the_default:
+        thisTransaction.evaluateCondensedSequence()
+        thisTransaction.manageSequenceBuild3DStructureRequest(defaultOnly=True)
+
+
+
+    # Figure out if there are any explicit services
+    if thisSequenceEntity.services == []:
         log.debug("'services' was not present in the request. Do the default.")
         thisTransaction = receiver_tasks.doDefaultService(thisTransaction)
         return thisTransaction
 
-    ## See if a sequence is present in the transaction (if just marco or status, then no sequence)
-    ## If there is a sequence, ensure that it is valid
-    ## If a default built is indicated, do the default build
-    the_sequence = receiver_tasks.get_sequence(thisTransaction)
-    if the_sequence is not None:
-        from gemsModules.deprecated.sequence import build
-        carbBuilder = build.getCbBuilderForSequence(the_sequence)
-        valid = carbBuilder.IsStatusOk()
-        if not valid:
-            # Is incorrect user input an error?
-            log.error(carbBuilder.GetStatusMessage())
-            log.debug(
-                "Just about to call generateCommonParserNotice with the outgoing project.  The transaction_out is :   ")
-            log.debug(thisTransaction.transaction_out.json(indent=2))
-            thisTransaction.generateCommonParserNotice(
-                noticeBrief='InvalidInputPayload', exitMessage=carbBuilder.GetStatusMessage())
-            # prepares the transaction for return to the requestor, success or fail.
-            # NOTE!!! This uses the child method in sequence.io - a better method!
-            thisTransaction.build_outgoing_string()
-            return thisTransaction
-        log.info("Sequence has been validated. Thank you.")
-        if receiver_tasks.we_should_build_the_default_sequence(thisTransaction): 
-            thisTransaction.evaluateCondensedSequence()
-#            from gemsModules.deprecated.sequence import logic
-            thisTransaction.manageSequenceBuild3DStructureRequest(defaultOnly=True)
-
-
-    # for each requested service:
-    for currentService in thisSequence.services:
+    # for each explicit service:
+    for currentService in thisSequenceEntity.services:
         log.debug("service, currentService: " + str(currentService))
-        thisService = thisSequence.services[currentService]
+        thisService = thisSequenceEntity.services[currentService]
 
         if 'Evaluate' in thisService.typename:
             log.debug("Evaluate service requested from sequence entity.")
@@ -263,6 +223,26 @@ def receive(receivedTransaction: sequenceio.Transaction):
             except Exception as error:
                 log.error(
                     "There was a problem validating the condensed sequence: " + str(error))
+                thisTransaction.generateCommonParserNotice(
+                    noticeBrief='InvalidInputPayload')
+        elif "Status" in thisService.typename:
+            # this should be able to become part of previous validation, but leaving in for now
+            log.debug("Status service requested from sequence entity.")
+            try:
+                thisTransaction = receiver_tasks.do_status(thisTransaction)
+            except Exception as error:
+                log.error(
+                    "There was a problem getting status for sequence: " + str(error))
+                thisTransaction.generateCommonParserNotice(
+                    noticeBrief='InvalidInputPayload')
+        elif "Marco" in thisService.typename:
+            # this should be able to become part of previous validation, but leaving in for now
+            log.debug("Marco service requested from sequence entity.")
+            try:
+                thisTransaction = receiver_tasks.do_marco(thisTransaction)
+            except Exception as error:
+                log.error(
+                    "There was a problem running marco for sequence: " + str(error))
                 thisTransaction.generateCommonParserNotice(
                     noticeBrief='InvalidInputPayload')
         else:
