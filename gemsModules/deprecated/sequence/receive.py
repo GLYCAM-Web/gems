@@ -57,6 +57,7 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
     ## If there is a sequence, ensure that it is valid
     build_the_default = False
     the_sequence = receiver_tasks.get_sequence(thisSequenceEntity)
+    number_of_structures = -1
     if the_sequence is not None:
         from gemsModules.deprecated.sequence import build
         carbBuilder = build.getCbBuilderForSequence(the_sequence)
@@ -72,6 +73,20 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
             thisTransaction.build_outgoing_string()
             return thisTransaction
         log.info("Sequence has been validated. Thank you.")
+        number_of_structures = carbBuilder.GetNumberOfShapes()
+        if number_of_structures == -1:
+            log.error("Number of shapes returned -1")
+            log.debug("The sequence is:  ")
+            log.debug(str(the_sequence))
+            thisTransaction.generateCommonParserNotice(
+                noticeBrief='InvalidInputPayload', 
+                exitMessage=carbBuilder.GetStatusMessage()
+                additionalInfo={'Message': 'Something went wrong determining the number of conformers.'})
+                )
+            thisTransaction.build_outgoing_string()
+            return thisTransaction
+        if int(number_of_shapes)
+
 
 ########
 
@@ -84,7 +99,31 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
         ## Single?  only one project is needed - write to the filesystem
         ## Multiple?  Make a project for the default structure and start the build
 
-        ## If a default built is indicated, set up to do a default build below
+
+
+##  ok... do this.
+##  
+##  If there is a single structure, just do what has been done all along
+##  
+##  If there are multiple structures, after Evaluation: 
+##      -  The default build will use a separate project made just for that. 
+##      -  The evaluation that is returned will include, for the default:
+##          - pUUID 
+##          - SeqID 
+##          - ConformerID 
+##          - Download paths for minimized and unminimized.  
+##  
+##  When the Build request comes:
+##      -  The Build request might contain the pUUID for the default
+##          - Or any other pUUID.  Doesn't matter.
+##      -  If all conformers in the incoming pUUID are part of the 
+##          build request, then the pUUID will be retained.
+##      -  If not, then a new project will be started.
+##  
+
+
+
+        ## If a default build is indicated, set up to do a default build below
         if receiver_tasks.we_should_build_the_default_structure(thisTransaction): 
             build_the_default = True
 

@@ -75,6 +75,18 @@ def registerBuild(buildState: sequenceio.Single3DStructureBuildDetails, thisTran
         raise error
 
 
+def get_all_conformerIDs_in_project_dir(project_path : str) -> List[str]:
+    # Assume that conformers in "Requested" are all of them
+    from os import listdir, path
+    return listdir(path.join(project_path, "Requested_Builds"))
+
+def conformerIDs_A_are_part_of_conformerIDs_B(A : List[str], B : List[str]) -> bool:
+    for conformerID in A:
+        if not conformerID in B:
+            return False
+    return True
+
+
 # @brief Return true if this structure has been built previously, otherwise false.
 #   @oaram
 #   @return
