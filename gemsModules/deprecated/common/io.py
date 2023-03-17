@@ -120,7 +120,7 @@ class Resource(BaseModel):
 # ##
 
 
-class Services(str, Enum):
+class Available_Services(str, Enum):
     errorNotification = 'ErrorNotification'
     status = 'Status'
 
@@ -130,7 +130,7 @@ class Service(BaseModel):
     Holds information about a requested Service.
     This object will have different forms in each Entity.
     """
-    typename: Services = Field(
+    typename: Available_Services = Field(
         'Status',
         alias='type',
         title='Common Services',
