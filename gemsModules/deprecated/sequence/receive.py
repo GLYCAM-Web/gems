@@ -153,8 +153,9 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
         thisProject.loadVersionsFileInfo()
         thisTransaction.transaction_out.project=thisProject
 
+        need_filesystem_writes = receiver_tasks.we_need_filesystem_writes(thisSequenceEntity)
         log.debug("Initializing the filesystem parts of the outgoing project, if any")
-        if build_the_default or receiver_tasks.we_need_filesystem_writes(thisSequenceEntity):
+        if build_the_default or need_filesystem_writes:
             # ## TODO - this might fail if more than one service needs filesystem access
             return_value = receiver_tasks.set_up_filesystem_for_writing(thisTransaction)
             if return_value != 0:
@@ -298,7 +299,7 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
     # prepares the transaction for return to the requestor, success or fail.
     # NOTE!!! This uses the child method in sequence.io - a better method!
     thisTransaction.build_outgoing_string()
-    if needFilesystemWrites:
+    if need_filesystem_writes:
         outgoingResponse = thisTransaction.transaction_out.json(indent=2)
         writeStringToFile(outgoingResponse, os.path.join(
             thisProject.logs_dir, "response.json"))

@@ -173,6 +173,7 @@ def build3DStructure(buildState: sequenceio.Single3DStructureBuildDetails, thisT
     gmmlConformerInfo = populateGMMLConformerInfoStruct(buildState)
     try:
         # If this is default, set the output path, otherwise use what was passed in.
+        carbBuilder = getCbBuilderForSequence(thisTransaction.getSequenceVariantOut('indexOrdered'))
         if buildState.isDefaultStructure:
             log.debug("Generating default structure in: " + outputDirPath)
             # Using multiprocessing for this function call.

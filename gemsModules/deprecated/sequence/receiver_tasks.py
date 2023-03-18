@@ -2,7 +2,7 @@
 """ Utilities needed by receive.py in the sequence entity """
 #import json
 #import sys
-#import os
+import os
 #import re
 ##import importlib.util
 #import shutil
@@ -20,11 +20,10 @@
 
 
 #from gemsModules.deprecated.common import io as commonio
-#from gemsModules.deprecated.common import logic as commonlogic
+from gemsModules.deprecated.common import logic as commonlogic
 #from gemsModules.deprecated.common import services as commonservices
 #from gemsModules.deprecated.sequence import settings as sequenceSettings
 from gemsModules.deprecated.sequence import io as sequenceio
-#from gemsModules.deprecated.common.logic import writeStringToFile
 #
 
 from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
@@ -42,7 +41,7 @@ def do_marco(thisTransaction: sequenceio.Transaction) -> sequenceio.Transaction:
     thisTransaction.response_dict['entity']['type'] = 'SequenceDefault'
     thisTransaction.response_dict['responses'] = []
     thisTransaction.response_dict['responses'].append(
-        {'DefaultTest': {'payload': marco('Sequence')}})
+        {'DefaultTest': {'payload': commonlogic.marco('Sequence')}})
     thisTransaction.build_outgoing_string()
     return thisTransaction
 
@@ -56,7 +55,7 @@ def doDefaultService(thisTransaction: sequenceio.Transaction) -> sequenceio.Tran
 def do_status(thisTransaction: sequenceio.Transaction) -> sequenceio.Transaction:
     if thisTransaction.transaction_out.entity.responses is None:
         thisTransaction.transaction_out.entity.responses = {}
-        thisTransaction.transaction_out.entity.responses['Get Status']=Response()
+        thisTransaction.transaction_out.entity.responses['Get Status']=sequenceio.Response()
         theResponse=thisTransaction.transaction_out.entity.responses['Get Status']
         theResponse.typename='Status'
         theResponse.outputs={'Message':'I am fine.  I hope you are well, too!'}
@@ -114,6 +113,8 @@ def set_up_filesystem_for_writing(thisTransaction: sequenceio.SequenceTransactio
     # ##
     # Set the project directory
     # ## TODO - this next is why it might fail.  I wasn't sure what better to do (BLF)
+    from gemsModules.deprecated.common.logic import writeStringToFile
+    thisProject = thisTransaction.transaction_out.project
     thisProject.requested_service = "Build3DStructure"
     thisProject.setServiceDir()
     thisProjectDir = os.path.join(
