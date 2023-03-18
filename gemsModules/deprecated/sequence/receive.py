@@ -160,7 +160,7 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
             return_value = receiver_tasks.set_up_filesystem_for_writing(thisTransaction)
             if return_value != 0:
                 thisTransaction.generateCommonParserNotice(
-                    noticeBrief='GemsEror',
+                    noticeBrief='GemsError',
                     additionalInfo={'Message': 'Something went wrong while setting up the filesystem.'})
 
     except Exception as error:

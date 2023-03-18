@@ -62,7 +62,7 @@ def do_status(thisTransaction: sequenceio.Transaction) -> sequenceio.Transaction
         thisTransaction.transaction_out.entity.responses['Get Status']=theResponse
     return thisTransaction
 
-def get_sequence(thisSequenceEntity: sequenceio.SequenceEntity)->str:
+def get_sequence(thisSequenceEntity: sequenceio.sequenceEntity)->str:
     """ Get the sequence from the transaction. """
     log.info("get_sequence was called.")
     if thisSequenceEntity.inputs is None:
@@ -93,7 +93,7 @@ def we_should_build_the_default_structure(thisTransaction: sequenceio.Transactio
             build_default_structure = True
     return build_default_structure
 
-def we_need_filesystem_writes(thisSequenceEntity : sequenceio.SequenceEntity) -> bool:
+def we_need_filesystem_writes(thisSequenceEntity : sequenceio.sequenceEntity) -> bool:
     # check to see if filesystem writes are needed
     # Other parts of the code might make decisions based on other criteria
     theseNeedFilesystemWrites = ['Build3DStructure', 'DrawGlycan']
@@ -109,7 +109,7 @@ def we_need_filesystem_writes(thisSequenceEntity : sequenceio.SequenceEntity) ->
 
 
 #### START HERE
-def set_up_filesystem_for_writing(thisTransaction: sequenceio.SequenceTransaction) -> int:
+def set_up_filesystem_for_writing(thisTransaction: sequenceio.Transaction) -> int:
     # ##
     # Set the project directory
     # ## TODO - this next is why it might fail.  I wasn't sure what better to do (BLF)
@@ -140,4 +140,5 @@ def set_up_filesystem_for_writing(thisTransaction: sequenceio.SequenceTransactio
     writeStringToFile(incomingRequest, os.path.join(
         thisProject.logs_dir, "request-initialized.json"))
 
+    return 0
 
