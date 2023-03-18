@@ -1,28 +1,28 @@
 #!/usr/bin/env python3
-import json
-import sys
+#import json
+#import sys
 import os
-import re
+#import re
 #import importlib.util
-import shutil
-import uuid
-import gemsModules.deprecated
+#import shutil
+#import uuid
+#import gemsModules.deprecated
 import gmml
-import traceback
-import gemsModules.deprecated.common.utils
-from multiprocessing import Process
+#import traceback
+#import gemsModules.deprecated.common.utils
+#from multiprocessing import Process
 from gemsModules.deprecated.project import projectUtilPydantic as projectUtils
-from gemsModules.deprecated.project import settings as projectSettings
+#from gemsModules.deprecated.project import settings as projectSettings
 from gemsModules.deprecated.sequence import io as sequenceio
-from gemsModules.deprecated.common import io as commonio
-from gemsModules.deprecated.common import logic as commonLogic
+#from gemsModules.deprecated.common import io as commonio
+#from gemsModules.deprecated.common import logic as commonLogic
 from gemsModules.deprecated.common import services as commonservices
 
 from gemsModules.deprecated.common.logic import writeStringToFile
 from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
 
 from gemsModules.deprecated.sequence import projects as sequenceProjects
-from gemsModules.deprecated.sequence import settings as sequenceSettings
+#from gemsModules.deprecated.sequence import settings as sequenceSettings
 
 if loggers.get(__name__):
     pass
@@ -33,7 +33,7 @@ else:
 def buildEach3DStructureInStructureInfo(thisTransaction: sequenceio.Transaction):
     log.info("buildEach3DStructureInStructureInfo() was called.")
     needToInstantiateCarbohydrateBuilder = True
-    from multiprocessing import Process
+#    from multiprocessing import Process
     # get info from the transaction and check sanity
     log.debug("About to get build informaion from the transaction")
     log.debug("Working on the Build States now.")

@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
-from enum import Enum, auto
-from typing import Dict, List, Optional, Sequence, Set, Tuple, Union, Any
-from typing import ForwardRef
+#from enum import Enum, auto
+from typing import Dict, List, Any, Union
+#from typing import ForwardRef
 from os.path import join
 from datetime import datetime
-from pydantic import BaseModel, Field, ValidationError, validator
-from pydantic.schema import schema
+from pydantic import BaseModel, Field
+#from pydantic.schema import schema
 from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
 from gemsModules.deprecated.common import io as commonio
 from gemsModules.deprecated.project import io as projectio
 from gemsModules.deprecated.project import projectUtilPydantic as projectUtils
 from gemsModules.deprecated.sequence import settings
-from gemsModules.deprecated.sequence import evaluate
-from gemsModules.deprecated import sequence
-import traceback
+#from gemsModules.deprecated.sequence import evaluate
+#from gemsModules.deprecated import sequence
+#import traceback
 
 
 if loggers.get(__name__):
@@ -844,15 +844,6 @@ class sequenceTransactionSchema(commonio.TransactionSchema):
             return self.entity.getSequenceVariantOut(variant)
 
     def evaluateCondensedSequence(self):
-        if self.entity is None:
-            thisAdditionalInfo = {
-                'hint': 'The transaction has no defined entity.'}
-            self.generateCommonParserNotice(
-                noticeBrief='GemsError',
-                scope='SequenceTransaction',
-                additionalInfo=thisAdditionalInfo
-            )
-            raise error
         self.entity.evaluateCondensedSequence()
 
 
@@ -1084,7 +1075,7 @@ class Transaction(commonio.Transaction):
                 scope='TransactionWrapper.EvaluateCondensedSequence',
                 additionalInfo=thisAdditionalInfo
             )
-            raise error
+            raise 
         if self.transaction_out is None:
             self.initialize_transaction_out_from_transaction_in()
         self.transaction_out.evaluateCondensedSequence()
@@ -1101,8 +1092,8 @@ class Transaction(commonio.Transaction):
 
 
 def generateSchema():
-    import json
- #   print(Entity.schema_json(indent=2))
+#   import json
+#   print(Entity.schema_json(indent=2))
     print(sequenceTransactionSchema.schema_json(indent=2))
 
 

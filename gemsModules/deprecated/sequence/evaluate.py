@@ -1,25 +1,25 @@
 #!/usr/bin/env python3
-import json
-import sys
-import os
-import re
-import importlib.util
-import shutil
-import uuid
-import gemsModules.deprecated
+#import json
+#import sys
+#import os
+#import re
+#import importlib.util
+#import shutil
+#import uuid
+#import gemsModules.deprecated
 import gmml
-import traceback
-import gemsModules.deprecated.common.utils
-from gemsModules.deprecated.project import projectUtilPydantic as projectUtils
-from gemsModules.deprecated.project import settings as projectSettings
-from gemsModules.deprecated.common import io as commonio
-from gemsModules.deprecated.common import logic as commonlogic
-from gemsModules.deprecated.common import services as commonservices
+#import traceback
+#import gemsModules.deprecated.common.utils
+#from gemsModules.deprecated.project import projectUtilPydantic as projectUtils
+#from gemsModules.deprecated.project import settings as projectSettings
+#from gemsModules.deprecated.common import io as commonio
+#from gemsModules.deprecated.common import logic as commonlogic
+#from gemsModules.deprecated.common import services as commonservices
 from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
 from gemsModules.deprecated.common.settings import generateCommonParserNotice
 from gemsModules.deprecated.sequence import io as sequenceio
-from gemsModules.deprecated.sequence import settings as sequenceSettings
-from gemsModules.deprecated.sequence import io as sequencelogic
+#from gemsModules.deprecated.sequence import settings as sequenceSettings
+#from gemsModules.deprecated.sequence import io as sequencelogic
 
 if loggers.get(__name__):
     pass
@@ -112,45 +112,46 @@ def getSequenceVariants(validatedSequence: str):
     return Sequences
 
 
-# @brief Determine if a sequence is valid
-#   @param  sequence - a string
-#   @return boolean valid
-def checkIsSequenceSane(sequence):
-    log.info("~~~ checkIsSequenceSane was called.\n")
-    # ## TODO:  This try-except is a total kluge.
-    # ##  Without it, there is a problem in gmml/swig for bad sequences like:  DManpa1-6-DManpa1-OH
-    # ##  The std error:
-    # ##        Exception thrown in condensedSequence constructor. Look in the response object.
-    # ##  This also goes to std out:
-    # ##        swig/python detected a memory leak of type 'InputOutput::Response *', no destructor found.
-    try:
-        this_sequence = gmml.CondensedSequence(sequence)
-        valid = this_sequence.GetIsSequenceOkay()
-    except:
-        the_response = this_sequence.GetResponse()
-        log.error("Seq is NOT valid.  The following is the response object:")
-        log.error(the_response)
-        valid = False
-    if not valid:
-        return valid
-    log.debug("getting prepResidues.")
-    # Get prep residues
-    prepResidues = gmml.condensedsequence_glycam06_residue_tree()
-    log.debug("Instantiating an assembly.")
-    # Create an assembly
-    assembly = gmml.Assembly()
-    try:
-        log.debug("Checking sequence sanity.")
-        # Call assembly.CheckCondensed sequence sanity.
-        valid = assembly.CheckCondensedSequenceSanity(sequence, prepResidues)
-        log.debug("validation result: " + str(valid))
-    except:
-        log.error("Something went wrong while validating this sequence.")
-        log.error("sequence: " + sequence)
-        log.error(traceback.format_exc())
-        generateCommonParserNotice(noticeBrief='GmmlError')
-        valid = False
-    return valid
+## This is no longer used.  If I were a better person, I would delete it.
+## @brief Determine if a sequence is valid
+##   @param  sequence - a string
+##   @return boolean valid
+#def checkIsSequenceSane(sequence):
+#    log.info("~~~ checkIsSequenceSane was called.\n")
+#    # ## TODO:  This try-except is a total kluge.
+#    # ##  Without it, there is a problem in gmml/swig for bad sequences like:  DManpa1-6-DManpa1-OH
+#    # ##  The std error:
+#    # ##        Exception thrown in condensedSequence constructor. Look in the response object.
+#    # ##  This also goes to std out:
+#    # ##        swig/python detected a memory leak of type 'InputOutput::Response *', no destructor found.
+#    try:
+#        this_sequence = gmml.CondensedSequence(sequence)
+#        valid = this_sequence.GetIsSequenceOkay()
+#    except:
+#        the_response = this_sequence.GetResponse()
+#        log.error("Seq is NOT valid.  The following is the response object:")
+#        log.error(the_response)
+#        valid = False
+#    if not valid:
+#        return valid
+#    log.debug("getting prepResidues.")
+#    # Get prep residues
+#    prepResidues = gmml.condensedsequence_glycam06_residue_tree()
+#    log.debug("Instantiating an assembly.")
+#    # Create an assembly
+#    assembly = gmml.Assembly()
+#    try:
+#        log.debug("Checking sequence sanity.")
+#        # Call assembly.CheckCondensed sequence sanity.
+#        valid = assembly.CheckCondensedSequenceSanity(sequence, prepResidues)
+#        log.debug("validation result: " + str(valid))
+#    except:
+#        log.error("Something went wrong while validating this sequence.")
+#        log.error("sequence: " + sequence)
+#        log.error(traceback.format_exc())
+#        generateCommonParserNotice(noticeBrief='GmmlError')
+#        valid = False
+#    return valid
 
 
 def main():

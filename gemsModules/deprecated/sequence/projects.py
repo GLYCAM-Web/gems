@@ -90,6 +90,7 @@ def conformerIDs_A_are_part_of_conformerIDs_B(A : List[str], B : List[str]) -> b
 # @brief Return true if this structure has been built previously, otherwise false.
 #   @oaram
 #   @return
+##### FIX ME
 def structureExists(buildState: sequenceio.Single3DStructureBuildDetails, thisTransaction: sequenceio.Transaction, buildStrategyID: str):
     log.info("structureExists() was called.")
     if not sequenceExists(buildState, thisTransaction):
@@ -279,6 +280,7 @@ def addBuildFolderSymLinkToExistingConformer(servicePath: str, sequenceID: str, 
 #           reused via symlink.
 #   @detail Still being worked on, but works for default structures.
 #   @param  Transaction
+###########  FIX ME
 def setupInitialSequenceFolders(servicePath: str, sequenceID: str, projectID: str, buildStrategyID: str):
     log.info("setupInitialSequenceFolders() was called.")
     # Some of the folders in Sequence may already exist via a previous project, those in Builds should not.

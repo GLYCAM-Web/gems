@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import traceback
+#import traceback
 from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
 if loggers.get(__name__):
     pass

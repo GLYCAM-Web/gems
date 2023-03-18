@@ -72,7 +72,13 @@ def get_sequence(thisSequenceEntity: sequenceio.SequenceEntity)->str:
         return None
     return thisSequenceEntity.inputs.sequence.payload
 
-def we_should_build_the_default_structure(thisTransaction: sequenceio.Transaction)->bool::
+def default_structure_exists(thisTransaction: sequenceio.Transaction)-> bool:
+    pass
+
+def default_structure_details(thisTransaction: sequenceio.Transaction)-> sequenceio.Single3DStructureBuildDetails:
+    pass
+
+def we_should_build_the_default_structure(thisTransaction: sequenceio.Transaction)->bool:
     """ Determine whether or not to build the default sequence. """
     build_default_structure = True
     # See if we are in a situation where we normally need to build the default

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-from gemsModules.deprecated import common
-from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
+#from gemsModules.deprecated import common
+#from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 from enum import Enum
 
-from pydantic import BaseModel
+#from pydantic import BaseModel
 
 # Who I am
 WhoIAm = 'Sequence'

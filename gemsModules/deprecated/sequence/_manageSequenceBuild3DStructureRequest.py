@@ -2,7 +2,7 @@
 from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
 import traceback
 import os
-import sys
+#import sys
 
 if loggers.get(__name__):
     pass
@@ -12,12 +12,12 @@ else:
 
 def manageSequenceBuild3DStructureRequest(self, defaultOnly: bool = False):
     log.info("manageSequenceBuild3DStructureRequest was called ")
-    from typing import List
-    from gemsModules.deprecated.sequence import structureInfo, projects, logic, build
+#    from typing import List
+    from gemsModules.deprecated.sequence import structureInfo, projects
     from gemsModules.deprecated.sequence import io as sequenceio
     from gemsModules.deprecated.project import projectUtilPydantic as projectUtils
-    from gemsModules.deprecated.project.io import CbProject
-    from gemsModules.deprecated.common import services as commonservices
+#    from gemsModules.deprecated.project.io import CbProject
+#    from gemsModules.deprecated.common import services as commonservices
     #
     # Do some sanity checks
     if self.transaction_out is None or self.transaction_in is None or self.transaction_out.project is None:

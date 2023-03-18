@@ -1,19 +1,20 @@
 #!/usr/bin/env python3
-from enum import Enum, auto
-from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
+#from enum import Enum, auto
+from typing import List
 from datetime import datetime
-from pydantic import BaseModel, Field, ValidationError
-from pydantic.schema import schema
+#from pydantic import BaseModel, Field, ValidationError
+#from pydantic.schema import schema
 from gemsModules.deprecated.sequence import io as sequenceio
 from gemsModules.deprecated.sequence import projects as sequenceProjects
-from gemsModules.deprecated.common import io as commonio
+#from gemsModules.deprecated.common import io as commonio
 from gemsModules.deprecated.common import logic as commonlogic
 from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
 from gemsModules.deprecated.project import projectUtilPydantic as projectUtils
-from gemsModules.deprecated.project import settings as projectSettings
+#from gemsModules.deprecated.project import settings as projectSettings
 #import gmml
 import os
-import sys
+import json
+#import sys
 import itertools
 import traceback
 
@@ -115,7 +116,7 @@ def countNumberOfShapes(rotamerData: sequenceio.AllLinkageRotamerInfo, shapeSet:
     return count
 
 
-def countNumberOfShapesUpToLimit(rotamerData: [], shapeSet: str = 'Selected',  hardLimit=1):
+def countNumberOfShapesUpToLimit(rotamerData: List, shapeSet: str = 'Selected',  hardLimit=1):
     log.info("countNumberOfShapesUpToLimit was called.")
     count = countNumberOfShapes(rotamerData, shapeSet)
     if hardLimit != -1:
@@ -142,7 +143,7 @@ def buildStructureInfoOliver(thisTransaction: sequenceio.Transaction):
             'indexOrdered')
         if structureInfo.indexOrderedSequence is None:
             error = "Unable to find indexOrderedSequence.  Was the sequence evaluated?"
-            log.error(errof)
+            log.error(error)
             thisTransaction.generateCommonParserNotice(
                 noticeBrief='GemsError',
                 additionalInfo={"hint": error})
@@ -223,7 +224,7 @@ def buildStructureInfoOliver(thisTransaction: sequenceio.Transaction):
     log.debug(" ROTAMER DATA IS " + str(rotamerData) )
     if rotamerData is None:
         log.error("the rotamerData object in None, and that is not expected.")
-        rotamerData = AllLinkageRotamerData()
+        rotamerData = sequenceio.AllLinkageRotamerData()
         rotamerData.totalPossibleRotamers = 1
         rotamerData.totalLikelyRotamers = 1
         rotamerData.totalSelectedRotamers = 1
@@ -418,7 +419,7 @@ def saveRequestInfo(structureInfo, projectDir):
             data = convertStructureInfoToDict(structureInfo)
             log.debug("structureInfo as dict: \n\n")
 
-        prettyPrint(data)
+        commonlogic.prettyPrint(data)
 
     except Exception as error:
         log.error(
@@ -607,7 +608,7 @@ def updateBuildStatus(structureInfoFilename: str, buildState: sequenceio.Single3
     else:
         try:
             log.debug("data before update:\n\n")
-            prettyPrint(data)
+            commonlogic.prettyPrint(data)
 
             buildState.status = status
             log.debug("buildState: " + str(buildState))
@@ -666,13 +667,13 @@ def updateStructureInfoWithUserOptions(thisTransaction: sequenceio.Transaction, 
 
     else:
         log.debug("old data: \n\n")
-        prettyPrint(data)
+        commonlogic.prettyPrint(data)
         for newState in structureInfo.buildStates:
             log.debug("New build state: " + str(newState))
             data['buildStates'].append(newState.__dict__)
 
         log.debug("updated data: \n\n")
-        prettyPrint(data)
+        commonlogic.prettyPrint(data)
         try:
             with open(filename, 'w') as outFile:
                 jsonString = json.dumps(
@@ -723,33 +724,33 @@ def prepareBuildRecord(buildState: sequenceio.Single3DStructureBuildDetails):
     else:
         return state
 
-
-def createSeqLog(sequence: str, seqIDPath: str):
-    log.info("createSeqLog() was called.")
-    logObj = StructureInfo()
-    logObj.sequence = sequence
-    try:
-        logObj = convertStructureInfoToDict(logObj)
-    except Exception as error:
-        log.error(
-            "There was a problem converting the object to dict: " + str(error))
-        log.error(traceback.format_exc())
-        raise error
-    else:
-        # dump to file
-        try:
-            fileName = seqIDPath + "/structureInfo.json"
-            log.debug("Attempting to write: " + fileName)
-            with open(fileName, 'w') as outFile:
-                jsonString = json.dumps(
-                    logObj, indent=4, sort_keys=False, default=str)
-                log.debug("jsonString: \n" + jsonString)
-                outFile.write(jsonString)
-        except Exception as error:
-            log.error(
-                "There was a problem writing structureInfo_request.json to file: " + str(error))
-            log.error(traceback.format_exc())
-            raise error
+## This never gets called
+#def createSeqLog(sequence: str, seqIDPath: str):
+#    log.info("createSeqLog() was called.")
+#    logObj = StructureInfo()
+#    logObj.sequence = sequence
+#    try:
+#        logObj = convertStructureInfoToDict(logObj)
+#    except Exception as error:
+#        log.error(
+#            "There was a problem converting the object to dict: " + str(error))
+#        log.error(traceback.format_exc())
+#        raise error
+#    else:
+#        # dump to file
+#        try:
+#            fileName = seqIDPath + "/structureInfo.json"
+#            log.debug("Attempting to write: " + fileName)
+#            with open(fileName, 'w') as outFile:
+#                jsonString = json.dumps(
+#                    logObj, indent=4, sort_keys=False, default=str)
+#                log.debug("jsonString: \n" + jsonString)
+#                outFile.write(jsonString)
+#        except Exception as error:
+#            log.error(
+#                "There was a problem writing structureInfo_request.json to file: " + str(error))
+#            log.error(traceback.format_exc())
+#            raise error
 
 
 # @brief Pass in a transaction, get the structureInfo.json for that sequence.

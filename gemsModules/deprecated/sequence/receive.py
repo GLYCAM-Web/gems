@@ -54,11 +54,14 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
    
 
 
-    ## If there is a sequence, ensure that it is valid
+    has_a_sequence = False
     build_the_default = False
-    the_sequence = receiver_tasks.get_sequence(thisSequenceEntity)
     number_of_structures = -1
+
+    ## If there is a sequence, ensure that it is valid
+    the_sequence = receiver_tasks.get_sequence(thisSequenceEntity)
     if the_sequence is not None:
+        has_a_sequence = True
         from gemsModules.deprecated.sequence import build
         carbBuilder = build.getCbBuilderForSequence(the_sequence)
         valid = carbBuilder.IsStatusOk()
@@ -72,21 +75,8 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
                 exitMessage=carbBuilder.GetStatusMessage())
             thisTransaction.build_outgoing_string()
             return thisTransaction
+        build_the_default = True
         log.info("Sequence has been validated. Thank you.")
-        number_of_structures = carbBuilder.GetNumberOfShapes()
-        if number_of_structures == -1:
-            log.error("Number of shapes returned -1")
-            log.debug("The sequence is:  ")
-            log.debug(str(the_sequence))
-            thisTransaction.generateCommonParserNotice(
-                noticeBrief='InvalidInputPayload', 
-                exitMessage=carbBuilder.GetStatusMessage()
-                additionalInfo={'Message': 'Something went wrong determining the number of conformers.'})
-                )
-            thisTransaction.build_outgoing_string()
-            return thisTransaction
-        if int(number_of_shapes)
-
 
 ########
 
@@ -100,37 +90,52 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
         ## Multiple?  Make a project for the default structure and start the build
 
 
+    # Get number of possible structures.
+#    if has_a_sequence:
+#        number_of_structures = carbBuilder.GetNumberOfShapes()
+#        if number_of_structures == -1:
+#            log.error("Number of shapes is still -1")
+#            log.debug("The sequence is:  ")
+#            log.debug(str(the_sequence))
+#            thisTransaction.generateCommonParserNotice(
+#                noticeBrief='InvalidInputPayload', 
+#                exitMessage=carbBuilder.GetStatusMessage()
+#                additionalInfo={'Message': 'Something went wrong determining the number of conformers.'})
+#                )
+#            thisTransaction.build_outgoing_string()
+#            return thisTransaction
+#        if int(number_of_structures) > 1 :
 
-##  ok... do this.
-##  
-##  If there is a single structure, just do what has been done all along
-##  
-##  If there are multiple structures, after Evaluation: 
-##      -  The default build will use a separate project made just for that. 
-##      -  The evaluation that is returned will include, for the default:
-##          - pUUID 
-##          - SeqID 
-##          - ConformerID 
-##          - Download paths for minimized and unminimized.  
-##  
-##  When the Build request comes:
-##      -  The Build request might contain the pUUID for the default
-##          - Or any other pUUID.  Doesn't matter.
-##      -  If all conformers in the incoming pUUID are part of the 
-##          build request, then the pUUID will be retained.
-##      -  If not, then a new project will be started.
-##  
 
+##  Upon Validation, if valid: 
+##  
+##      If the default structure has not previously been made
+##          - Set up for filesystem writes (not here????!!!!)
+##          - Fire off the default structure in background
+##          - Register it in the Sequence directory as 'default'
+##          - Send back single structure info to website
+##  
+##      If it HAS been made: 
+##          - Send back single structure info to website
+##          - Also send it as an option or resource or such
+##  
+##      If a build comes in with Project Info 
+##          - If there is at most one structure there
+##          - If the structure was requested
+##          - Then keep same pUUID
+##          - Else, make a new pUUID and do the build(s) there
+##  
+##  
 
 
         ## If a default build is indicated, set up to do a default build below
-        if receiver_tasks.we_should_build_the_default_structure(thisTransaction): 
-            build_the_default = True
+#        if receiver_tasks.we_should_build_the_default_structure(thisTransaction): 
+#            build_the_default = True
 
     # If we still need to build the default structure, do it now
-    if build_the_default:
-        thisTransaction.evaluateCondensedSequence()
-        thisTransaction.manageSequenceBuild3DStructureRequest(defaultOnly=True)
+#    if build_the_default:
+#        thisTransaction.evaluateCondensedSequence()
+#        thisTransaction.manageSequenceBuild3DStructureRequest(defaultOnly=True)
 
 ########
 
@@ -138,7 +143,8 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
     try:
         if thisTransaction.transaction_out.project is None:
             log.debug("transaction_out.project is None.  Starting a new one.")
-            thisTransaction.transaction_out.project = gemsModules.deprecated.project.io.CbProject()
+            from gemsModules.deprecated.project import io as projectio
+            thisTransaction.transaction_out.project = projectio.CbProject()
 
         log.debug("Initializing the non-filesystem-writing parts of the outgoing project")
         thisProject = thisTransaction.transaction_out.project
