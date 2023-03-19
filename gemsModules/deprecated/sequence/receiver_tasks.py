@@ -45,6 +45,7 @@ def do_marco(thisTransaction: sequenceio.Transaction) -> sequenceio.Transaction:
     thisTransaction.build_outgoing_string()
     return thisTransaction
 
+
 # @brief Default service is marco polo. Can change if needed later.
 #   @param Transaction thisTransaction
 #   @TODO: write this to use transaction_in and transaction_out
@@ -52,7 +53,9 @@ def doDefaultService(thisTransaction: sequenceio.Transaction) -> sequenceio.Tran
     log.info("doDefaultService() was called.\n")
     return do_marco(thisTransaction) 
 
+
 def do_status(thisTransaction: sequenceio.Transaction) -> sequenceio.Transaction:
+    log.info("do_status() was called.\n")
     if thisTransaction.transaction_out.entity.responses is None:
         thisTransaction.transaction_out.entity.responses = {}
         thisTransaction.transaction_out.entity.responses['Get Status']=sequenceio.Response()
@@ -61,6 +64,7 @@ def do_status(thisTransaction: sequenceio.Transaction) -> sequenceio.Transaction
         theResponse.outputs={'Message':'I am fine.  I hope you are well, too!'}
         thisTransaction.transaction_out.entity.responses['Get Status']=theResponse
     return thisTransaction
+
 
 def get_sequence(thisSequenceEntity: sequenceio.sequenceEntity)->str:
     """ Get the sequence from the transaction. """
@@ -71,20 +75,28 @@ def get_sequence(thisSequenceEntity: sequenceio.sequenceEntity)->str:
         return None
     return thisSequenceEntity.inputs.sequence.payload
 
-def default_structure_exists(thisTransaction: sequenceio.Transaction)-> bool:
-    pass
 
-def default_structure_details(thisTransaction: sequenceio.Transaction)-> sequenceio.Single3DStructureBuildDetails:
-    pass
-
-def we_should_build_the_default_structure(thisTransaction: sequenceio.Transaction)->bool:
-    """ Determine whether or not to build the default sequence. """
+def we_should_build_the_default_structure_on_validation(thisTransaction: sequenceio.Transaction)->bool:
+    """ Determine whether or not to build the default sequence once valid. """
+    log.info("we_should_build_the_default_structure_on_validation() was called.\n")
     build_default_structure = True
-    # See if we are in a situation where we normally need to build the default
+    # See if we are not in a situation where we normally need to build the default
     from gemsModules.deprecated.common.logic import getGemsExecutionContext
     the_context = getGemsExecutionContext()
     if the_context == "default": # this is a normal user, so the user decides
         build_default_structure = False
+    # If there are services defined, and if Validate or Evaluate is defined as well as
+    #     Build3DStructure are defined, then we should not build the default structure
+    if thisTransaction.transaction_in.entity.services is not None:
+        for currentService in thisTransaction.transaction_in.entity.services:
+            log.debug("service, currentService: " + str(currentService))
+            thisService = thisTransaction.transaction_in.entity.services[currentService]
+            if thisService.typename == 'Validate' or thisService.typename == 'Evaluate':
+                have_validate_or_evaluate = True
+            if thisService.typename == 'Build3DStructure':
+                have_build_3d_structure = True
+        if have_validate_or_evaluate and have_build_3d_structure:
+            build_default_structure = False
     # Check to see if the default build has been explicitly set (to true or false)
     if thisTransaction.transaction_in.entity.inputs.evaluationOptions is not None:
         if thisTransaction.transaction_in.entity.inputs.evaluationOptions.noBuild is True:
@@ -93,9 +105,36 @@ def we_should_build_the_default_structure(thisTransaction: sequenceio.Transactio
             build_default_structure = True
     return build_default_structure
 
+def multistructure_build_needs_new_project(thisTransaction: sequenceio.Transaction)->bool:
+    log.info("multistructure_build_needs_new_project() was called.\n")
+    # Get list of existing structures in the project
+    from gemsModules.deprecated.sequence.projects import get_all_conformerIDs_in_project_dir
+    existing_structures = get_all_conformerIDs_in_project_dir(thisTransaction.transaction_out.project.project_dir)
+    # If existing_structures is empty, then we do not need a new project
+    if len(existing_structures) == 0:
+        return False
+    # Get list of structures to be built
+    from gemsModules.deprecated.sequence.structureInfo import generateCombinationsFromRotamerData
+    from gemsModules.deprecated.sequence.structureInfo import getStructureDirectoryName
+    from gemsModules.deprecated.sequence.structureInfo import buildConformerLabel
+    structures_to_build = []
+    rotamerData = thisTransaction.getRotamerDataOut()
+    maxNumberOfStructuresToBuild = thisTransaction.getNumberStructuresHardLimitIn()
+    sequenceRotamerCombos = generateCombinationsFromRotamerData(
+            rotamerData,
+            maxNumberCombos=maxNumberOfStructuresToBuild)
+    for sequenceRotamerCombo in sequenceRotamerCombos:
+        conformerLabel = buildConformerLabel(sequenceRotamerCombo)
+        structures_to_build.append(getStructureDirectoryName(conformerLabel))
+    # If existing_structures is not a subset of structures_to_build, then we need a new project
+    if not set(existing_structures).issubset(set(structures_to_build)):
+        return True
+    return False
+
 def we_need_filesystem_writes(thisSequenceEntity : sequenceio.sequenceEntity) -> bool:
     # check to see if filesystem writes are needed
     # Other parts of the code might make decisions based on other criteria
+    log.info("we_need_filesystem_writes() was called.\n")
     theseNeedFilesystemWrites = ['Build3DStructure', 'DrawGlycan']
     needFilesystemWrites = False
     for service in thisSequenceEntity.services:
@@ -107,12 +146,11 @@ def we_need_filesystem_writes(thisSequenceEntity : sequenceio.sequenceEntity) ->
     return needFilesystemWrites
 
 
-
-#### START HERE
 def set_up_filesystem_for_writing(thisTransaction: sequenceio.Transaction) -> int:
     # ##
     # Set the project directory
     # ## TODO - this next is why it might fail.  I wasn't sure what better to do (BLF)
+    log.info("set_up_filesystem_for_writing() was called.\n")
     from gemsModules.deprecated.common.logic import writeStringToFile
     thisProject = thisTransaction.transaction_out.project
     thisProject.requested_service = "Build3DStructure"

@@ -124,6 +124,22 @@ def countNumberOfShapesUpToLimit(rotamerData: List, shapeSet: str = 'Selected', 
             return hardLimit
     return count
 
+def getStructureDirectoryName(conformerLabel : str) -> str:
+    if len(conformerLabel) > 32:
+        log.debug(
+            "conformerLabel is long so building a UUID for structureDirectoryName")
+        structureDirectoryName = projectUtils.getUuidForString(
+            conformerLabel)
+        log.debug("The structureDirectoryName/UUID is : " +
+                  structureDirectoryName)
+    else:
+        log.debug(
+            "conformerLabel is short so using it for structureDirectoryName")
+        tructureDirectoryName = conformerLabel
+        log.debug("The structureDirectoryName is : " +
+                  structureDirectoryName)
+                
+
 # @brief Parses user's selected rotamers (rotamerData) into a list of
 #           structures to request.
 #   @detail With a limit of 64 structures to request at a time, users select
@@ -330,19 +346,21 @@ def buildStructureInfoOliver(thisTransaction: sequenceio.Transaction):
             if firstStructure is True:
                 buildState.isDefaultStructure = True
                 firstStructure = False
-            if len(buildState.conformerLabel) > 32:
-                log.debug(
-                    "conformerLabel is long so building a UUID for structureDirectoryName")
-                buildState.structureDirectoryName = projectUtils.getUuidForString(
-                    buildState.conformerLabel)
-                log.debug("The structureDirectoryName/UUID is : " +
-                          buildState.structureDirectoryName)
-            else:
-                log.debug(
-                    "conformerLabel is short so using it for structureDirectoryName")
-                buildState.structureDirectoryName = buildState.conformerLabel
-                log.debug("The structureDirectoryName is : " +
-                          buildState.structureDirectoryName)
+            buildState.structureDirectoryName = getStructureDirectoryName(buildState.conformerLabel)
+            log.debug("The structureDirectoryName is : " + buildState.structureDirectoryName)
+            # if len(buildState.conformerLabel) > 32:
+            #     log.debug(
+            #         "conformerLabel is long so building a UUID for structureDirectoryName")
+            #     buildState.structureDirectoryName = projectUtils.getUuidForString(
+            #         buildState.conformerLabel)
+            #     log.debug("The structureDirectoryName/UUID is : " +
+            #               buildState.structureDirectoryName)
+            # else:
+            #     log.debug(
+            #         "conformerLabel is short so using it for structureDirectoryName")
+            #     buildState.structureDirectoryName = buildState.conformerLabel
+            #     log.debug("The structureDirectoryName is : " +
+            #               buildState.structureDirectoryName)
             buildState.setConformerId(buildState.getStructureDirectoryName())
             buildState.date = date
             buildState.setDownloadUrlPath(projectUtils.buildDownloadUrlPath(
