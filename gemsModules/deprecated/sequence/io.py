@@ -385,11 +385,11 @@ class TheLinkageGeometryOptions(BaseModel):
         else:
             return self.linkageRotamerInfo
 
-    def createRotamerData(self):
-        log.info("Linkage geometry options.createRotamerDataOut was called")
-        if self.linkageRotamerInfo is None:
-            self.linkageRotamerInfo = AllLinkageRotamerInfo()
-        self.linkageRotamerInfo.createRotamerData()
+#    def createRotamerData(self):
+#        log.info("Linkage geometry options.createRotamerDataOut was called")
+#        if self.linkageRotamerInfo is None:
+#            self.linkageRotamerInfo = AllLinkageRotamerInfo()
+#        self.linkageRotamerInfo.createRotamerData()
 
     def setLinkageRotamerInfo(self, validatedSequence: str):
         from gemsModules.deprecated.sequence import evaluate
@@ -980,6 +980,32 @@ class Transaction(commonio.Transaction):
         else:
             return None
 
+    def getNumberStructuresHardLimitOut(self):
+        if all(v is not None for v in [
+            self.transaction_out,
+            self.transaction_out.entity,
+            self.transaction_out.entity.outputs,
+            self.transaction_out.entity.outputs.sequenceEvaluationOutput,
+            self.transaction_out.entity.outputs.sequenceEvaluationOutput.buildOptions
+        ]):
+            return self.transaction_out.entity.outputs.sequenceEvaluationOutput.buildOptions.numberStructuresHardLimit
+        else:
+            return None
+
+    def setNumberStructuresHardLimitIn(self, value):
+        if all(v is not None for v in [
+            self.transaction_in,
+            self.transaction_in.entity,
+            self.transaction_in.entity.inputs,
+            self.transaction_in.entity.inputs.buildOptions
+        ]):
+            self.transaction_in.entity.inputs.buildOptions.numberStructuresHardLimit = value
+        else:
+            self.generateCommonParserNotice(
+                noticeBrief='GemsError',
+                additionalInfo={"hint": "cannot set limit for number of structure input"})
+            return None
+
     def setNumberStructuresHardLimitOut(self, value):
         if all(v is not None for v in [
             self.transaction_out,
@@ -992,7 +1018,7 @@ class Transaction(commonio.Transaction):
         else:
             self.generateCommonParserNotice(
                 noticeBrief='GemsError',
-                additionalInfo={"hint": "cannot set limit for number of structures"})
+                additionalInfo={"hint": "cannot set limit for number of structures output"})
             return None
     # TODO - write all these if-not-None-return recursions to look like the ones above.
 

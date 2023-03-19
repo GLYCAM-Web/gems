@@ -80,34 +80,39 @@ def we_should_build_the_default_structure_on_validation(thisTransaction: sequenc
     """ Determine whether or not to build the default sequence once valid. """
     log.info("we_should_build_the_default_structure_on_validation() was called.\n")
     build_default_structure = True
+##  The following would be true if the evaluation were being requested with
+##    an "Evaluate" service.  
+#    # If there are services defined, and if Build3DStructure is defined, 
+#    # then we should not build the default structure because the user has already
+#    # defined which structures to build.
+#    if thisTransaction.transaction_in.entity.services is not None:
+#        for currentService in thisTransaction.transaction_in.entity.services:
+#            log.debug("service, currentService: " + str(currentService))
+#            thisService = thisTransaction.transaction_in.entity.services[currentService]
+#            if thisService.typename == 'Build3DStructure':
+#                build_default_structure = False
+##  In the meantime, the following should work with what the front end is doing:
+    if thisTransaction.transaction_in.mdMinimize == "false":
+        build_default_structure = True
     # See if we are not in a situation where we normally need to build the default
     from gemsModules.deprecated.common.logic import getGemsExecutionContext
     the_context = getGemsExecutionContext()
     if the_context == "default": # this is a normal user, so the user decides
         build_default_structure = False
-    # If there are services defined, and if Validate or Evaluate is defined as well as
-    #     Build3DStructure are defined, then we should not build the default structure
-    if thisTransaction.transaction_in.entity.services is not None:
-        for currentService in thisTransaction.transaction_in.entity.services:
-            log.debug("service, currentService: " + str(currentService))
-            thisService = thisTransaction.transaction_in.entity.services[currentService]
-            if thisService.typename == 'Validate' or thisService.typename == 'Evaluate':
-                have_validate_or_evaluate = True
-            if thisService.typename == 'Build3DStructure':
-                have_build_3d_structure = True
-        if have_validate_or_evaluate and have_build_3d_structure:
-            build_default_structure = False
     # Check to see if the default build has been explicitly set (to true or false)
     if thisTransaction.transaction_in.entity.inputs.evaluationOptions is not None:
         if thisTransaction.transaction_in.entity.inputs.evaluationOptions.noBuild is True:
             build_default_structure = False
         if thisTransaction.transaction_in.entity.inputs.evaluationOptions.noBuild is False:
             build_default_structure = True
+    log.debug("build_default_structure: " + str(build_default_structure))
     return build_default_structure
 
 def multistructure_build_needs_new_project(thisTransaction: sequenceio.Transaction)->bool:
     log.info("multistructure_build_needs_new_project() was called.\n")
     # Get list of existing structures in the project
+    if thisTransaction.transaction_out.project is None:
+        return True
     from gemsModules.deprecated.sequence.projects import get_all_conformerIDs_in_project_dir
     existing_structures = get_all_conformerIDs_in_project_dir(thisTransaction.transaction_out.project.project_dir)
     # If existing_structures is empty, then we do not need a new project
@@ -118,8 +123,15 @@ def multistructure_build_needs_new_project(thisTransaction: sequenceio.Transacti
     from gemsModules.deprecated.sequence.structureInfo import getStructureDirectoryName
     from gemsModules.deprecated.sequence.structureInfo import buildConformerLabel
     structures_to_build = []
-    rotamerData = thisTransaction.getRotamerDataOut()
+    thisTransaction.evaluateCondensedSequence()
+    rotamerData = thisTransaction.getRotamerDataIn()
+    if rotamerData is None:
+        return True
     maxNumberOfStructuresToBuild = thisTransaction.getNumberStructuresHardLimitIn()
+    if maxNumberOfStructuresToBuild is None:
+        maxNumberOfStructuresToBuild = thisTransaction.getNumberStructuresHardLimitOut()
+    if maxNumberOfStructuresToBuild is None:
+        maxNumberOfStructuresToBuild = 64  # please let this not break before we rewrite this code
     sequenceRotamerCombos = generateCombinationsFromRotamerData(
             rotamerData,
             maxNumberCombos=maxNumberOfStructuresToBuild)

@@ -130,14 +130,13 @@ def getStructureDirectoryName(conformerLabel : str) -> str:
             "conformerLabel is long so building a UUID for structureDirectoryName")
         structureDirectoryName = projectUtils.getUuidForString(
             conformerLabel)
-        log.debug("The structureDirectoryName/UUID is : " +
-                  structureDirectoryName)
+        log.debug("The structureDirectoryName/UUID is : " + structureDirectoryName)
     else:
         log.debug(
             "conformerLabel is short so using it for structureDirectoryName")
-        tructureDirectoryName = conformerLabel
-        log.debug("The structureDirectoryName is : " +
-                  structureDirectoryName)
+        structureDirectoryName = conformerLabel
+        log.debug("The structureDirectoryName is : " + structureDirectoryName)
+    return structureDirectoryName
                 
 
 # @brief Parses user's selected rotamers (rotamerData) into a list of
@@ -199,6 +198,8 @@ def buildStructureInfoOliver(thisTransaction: sequenceio.Transaction):
     doSingleDefaultOnly = False  # this is probably not needed
     maxNumberOfStructuresToBuild = thisTransaction.getNumberStructuresHardLimitIn()
     if maxNumberOfStructuresToBuild is None:
+        maxNumberOfStructuresToBuild = thisTransaction.getNumberStructuresHardLimitOut()
+    if maxNumberOfStructuresToBuild is None:
         maxNumberOfStructuresToBuild = -1
     if thisTransaction.getIsEvaluationForBuild() is False:
         log.debug("transaction says this is not an evaluation for a build")
@@ -218,13 +219,15 @@ def buildStructureInfoOliver(thisTransaction: sequenceio.Transaction):
     log.debug("The max number structs to build (1) is :  " +
               str(maxNumberOfStructuresToBuild))
     log.debug("The max hard limit (1) is :  " + str(maxHardLimit))
-    thisTransaction.setNumberStructuresHardLimitOut(maxHardLimit)
+#    thisTransaction.setNumberStructuresHardLimitOut(maxHardLimit)
 
     if maxHardLimit != -1:
         if maxHardLimit < maxNumberOfStructuresToBuild:
             maxNumberOfStructuresToBuild = maxHardLimit
         if maxNumberOfStructuresToBuild == -1:
             maxNumberOfStructuresToBuild = maxHardLimit
+
+    thisTransaction.setNumberStructuresHardLimitOut(maxNumberOfStructuresToBuild)
 
     log.debug("The max number structs to build (2) is :  " +
               str(maxNumberOfStructuresToBuild))

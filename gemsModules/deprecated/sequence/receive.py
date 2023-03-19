@@ -167,16 +167,28 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
     ###################################################################
 
 
-    # If we need to build the default structure, do it now
-    if build_default_structure:
-        thisTransaction.evaluateCondensedSequence()
-        ## Override any mdMiniize directives in the incoming JSON
-        thisTransaction.transaction_out.mdMinimize = True
-        try:
-            thisTransaction.transaction_out.entity.inputs.buildOptions.mdMinimize = True
-        except:
-            pass
-        thisTransaction.manageSequenceBuild3DStructureRequest(defaultOnly=True)
+###  New logic to consider...
+###
+###  Dan is always requesting Build3DStructure.
+###  The only way to know if this is an evaluation is to... 
+###  I'm not sure... look for mdMinimize=false?
+###  Maybe the presence or absence of a project?
+###
+
+    # If we need to build only the default structure, do it now
+#    if build_default_structure:
+#        thisTransaction.evaluateCondensedSequence()
+#        ## Override any mdMiniize directives in the incoming JSON
+#        thisTransaction.transaction_in.mdMinimize = True
+#        thisTransaction.transaction_out.mdMinimize = True
+#        try:
+#            thisTransaction.transaction_in.entity.inputs.buildOptions.mdMinimize = True
+#            thisTransaction.transaction_out.entity.inputs.buildOptions.mdMinimize = True
+#        except:
+#            pass
+#        ## Ensure that the max number of structures is 1
+#        thisTransaction.setNumberStructuresHardLimitOut(1)
+#        thisTransaction.manageSequenceBuild3DStructureRequest(defaultOnly=True)
 
 
 
@@ -214,9 +226,27 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
                 if valid:
                     log.debug("Valid sequence.")
                     try:
-#                        from gemsModules.deprecated.sequence import logic
-                        thisTransaction.manageSequenceBuild3DStructureRequest()
-
+                        # If we need to build only the default structure, do it now
+                        if build_default_structure:
+                            thisTransaction.evaluateCondensedSequence()
+                            ## Override any mdMiniize directives in the incoming JSON
+                            thisTransaction.transaction_in.mdMinimize = True
+                            thisTransaction.transaction_out.mdMinimize = True
+                            try:
+                                thisTransaction.transaction_in.entity.inputs.buildOptions.mdMinimize = True
+                                thisTransaction.transaction_out.entity.inputs.buildOptions.mdMinimize = True
+                            except:
+                                pass
+                            ## Ensure that the max number of structures is 1
+                            #thisTransaction.setNumberStructuresHardLimitIn(1)
+                            thisTransaction.setNumberStructuresHardLimitOut(1)
+                            #log.debug("the max number of structures IN is (1): " + str(thisTransaction.getNumberStructuresHardLimitIn()))
+                            log.debug("the max number of structures OUT is (1): " + str(thisTransaction.getNumberStructuresHardLimitOut()))
+                            thisTransaction.manageSequenceBuild3DStructureRequest(defaultOnly=True)
+                            #log.debug("the max number of structures IN is (2): " + str(thisTransaction.getNumberStructuresHardLimitIn()))
+                            log.debug("the max number of structures OUT is (2): " + str(thisTransaction.getNumberStructuresHardLimitOut()))
+                        else:
+                            thisTransaction.manageSequenceBuild3DStructureRequest()
                     except Exception as error:
                         log.error(
                             "There was a problem with manageSequenceBuild3DStructureRequest(): " + str(error))
