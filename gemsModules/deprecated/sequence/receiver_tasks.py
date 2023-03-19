@@ -76,10 +76,10 @@ def get_sequence(thisSequenceEntity: sequenceio.sequenceEntity)->str:
     return thisSequenceEntity.inputs.sequence.payload
 
 
-def we_should_build_the_default_structure_on_validation(thisTransaction: sequenceio.Transaction)->bool:
-    """ Determine whether or not to build the default sequence once valid. """
+def we_should_only_build_the_default_structure(thisTransaction: sequenceio.Transaction)->bool:
+    """ Determine whether or not to build the default sequence once valid. 
+    """
     log.info("we_should_build_the_default_structure_on_validation() was called.\n")
-    build_default_structure = True
 ##  The following would be true if the evaluation were being requested with
 ##    an "Evaluate" service.  
 #    # If there are services defined, and if Build3DStructure is defined, 
@@ -94,11 +94,18 @@ def we_should_build_the_default_structure_on_validation(thisTransaction: sequenc
 ##  In the meantime, the following should work with what the front end is doing:
     if thisTransaction.transaction_in.mdMinimize == "false":
         build_default_structure = True
+    else:
+        build_default_structure = False
     # See if we are not in a situation where we normally need to build the default
     from gemsModules.deprecated.common.logic import getGemsExecutionContext
     the_context = getGemsExecutionContext()
     if the_context == "default": # this is a normal user, so the user decides
         build_default_structure = False
+    else:
+        if thisTransaction.transaction_in.project is None:
+            build_default_structure = True
+        else:
+            build_default_structure = False
     # Check to see if the default build has been explicitly set (to true or false)
     if thisTransaction.transaction_in.entity.inputs.evaluationOptions is not None:
         if thisTransaction.transaction_in.entity.inputs.evaluationOptions.noBuild is True:
@@ -112,11 +119,14 @@ def multistructure_build_needs_new_project(thisTransaction: sequenceio.Transacti
     log.info("multistructure_build_needs_new_project() was called.\n")
     # Get list of existing structures in the project
     if thisTransaction.transaction_out.project is None:
+        log.debug("returning true because thisTransaction.transaction_out.project is None")
         return True
     from gemsModules.deprecated.sequence.projects import get_all_conformerIDs_in_project_dir
     existing_structures = get_all_conformerIDs_in_project_dir(thisTransaction.transaction_out.project.project_dir)
+    log.debug("existing_structures: " + str(existing_structures))
     # If existing_structures is empty, then we do not need a new project
     if len(existing_structures) == 0:
+        log.debug("returning false because len(existing_structures) == 0")
         return False
     # Get list of structures to be built
     from gemsModules.deprecated.sequence.structureInfo import generateCombinationsFromRotamerData
@@ -126,6 +136,7 @@ def multistructure_build_needs_new_project(thisTransaction: sequenceio.Transacti
     thisTransaction.evaluateCondensedSequence()
     rotamerData = thisTransaction.getRotamerDataIn()
     if rotamerData is None:
+        log.debug("returning true because rotamerData is None")
         return True
     maxNumberOfStructuresToBuild = thisTransaction.getNumberStructuresHardLimitIn()
     if maxNumberOfStructuresToBuild is None:
@@ -138,9 +149,12 @@ def multistructure_build_needs_new_project(thisTransaction: sequenceio.Transacti
     for sequenceRotamerCombo in sequenceRotamerCombos:
         conformerLabel = buildConformerLabel(sequenceRotamerCombo)
         structures_to_build.append(getStructureDirectoryName(conformerLabel))
+    log.debug("structures_to_build: " + str(structures_to_build))
     # If existing_structures is not a subset of structures_to_build, then we need a new project
     if not set(existing_structures).issubset(set(structures_to_build)):
+        log.debug("returning true because not set(existing_structures).issubset(set(structures_to_build))")
         return True
+    log.debug("returning false because we did not find any reason to return true")
     return False
 
 def we_need_filesystem_writes(thisSequenceEntity : sequenceio.sequenceEntity) -> bool:

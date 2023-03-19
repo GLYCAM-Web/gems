@@ -76,7 +76,8 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
             thisTransaction.build_outgoing_string()
             return thisTransaction
         log.debug("Sequence is valid.")
-        if receiver_tasks.we_should_build_the_default_structure_on_validation(thisTransaction=thisTransaction):
+        thisTransaction.evaluateCondensedSequence()
+        if receiver_tasks.we_should_only_build_the_default_structure(thisTransaction=thisTransaction):
             build_default_structure = True
         number_of_structures = carbBuilder.GetNumberOfShapes()
         log.info("Sequence has been validated. Thank you.")
