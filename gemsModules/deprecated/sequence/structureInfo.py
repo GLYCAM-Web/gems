@@ -1,20 +1,13 @@
 #!/usr/bin/env python3
-#from enum import Enum, auto
 from typing import List
 from datetime import datetime
-#from pydantic import BaseModel, Field, ValidationError
-#from pydantic.schema import schema
 from gemsModules.deprecated.sequence import io as sequenceio
 from gemsModules.deprecated.sequence import projects as sequenceProjects
-#from gemsModules.deprecated.common import io as commonio
 from gemsModules.deprecated.common import logic as commonlogic
 from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
 from gemsModules.deprecated.project import projectUtilPydantic as projectUtils
-#from gemsModules.deprecated.project import settings as projectSettings
-#import gmml
 import os
 import json
-#import sys
 import itertools
 import traceback
 
@@ -162,7 +155,7 @@ def buildStructureInfoOliver(thisTransaction: sequenceio.Transaction):
             thisTransaction.generateCommonParserNotice(
                 noticeBrief='GemsError',
                 additionalInfo={"hint": error})
-            return
+            return thisTransaction
         log.debug("indexOrderedSequence: " +
                   str(structureInfo.indexOrderedSequence))
         structureInfo.setSeqId()
@@ -195,13 +188,18 @@ def buildStructureInfoOliver(thisTransaction: sequenceio.Transaction):
     # incoming request, then do whatever was requested - UNLESS
     # this is being run from the website.  In that case, enforce a
     # hard limit of 64 onto the number of structures.
-    doSingleDefaultOnly = False  # this is probably not needed
+
+    doSingleDefaultOnly = False  
+
     maxNumberOfStructuresToBuild = thisTransaction.getNumberStructuresHardLimitIn()
     if maxNumberOfStructuresToBuild is None:
+        log.debug("maxNumberOfStructuresToBuild is None (1)")
         maxNumberOfStructuresToBuild = thisTransaction.getNumberStructuresHardLimitOut()
     if maxNumberOfStructuresToBuild is None:
+        log.debug("maxNumberOfStructuresToBuild is None (2)")
         maxNumberOfStructuresToBuild = -1
     if thisTransaction.getIsEvaluationForBuild() is False:
+        log.debug("Build Evaluation is false")
         log.debug("transaction says this is not an evaluation for a build")
         maxNumberOfStructuresToBuild = 1
         doSingleDefaultOnly = True
@@ -219,7 +217,6 @@ def buildStructureInfoOliver(thisTransaction: sequenceio.Transaction):
     log.debug("The max number structs to build (1) is :  " +
               str(maxNumberOfStructuresToBuild))
     log.debug("The max hard limit (1) is :  " + str(maxHardLimit))
-#    thisTransaction.setNumberStructuresHardLimitOut(maxHardLimit)
 
     if maxHardLimit != -1:
         if maxHardLimit < maxNumberOfStructuresToBuild:
@@ -349,21 +346,10 @@ def buildStructureInfoOliver(thisTransaction: sequenceio.Transaction):
             if firstStructure is True:
                 buildState.isDefaultStructure = True
                 firstStructure = False
+            if doSingleDefaultOnly is True:
+                buildState.isGlobalDefaultStructure = True
             buildState.structureDirectoryName = getStructureDirectoryName(buildState.conformerLabel)
             log.debug("The structureDirectoryName is : " + buildState.structureDirectoryName)
-            # if len(buildState.conformerLabel) > 32:
-            #     log.debug(
-            #         "conformerLabel is long so building a UUID for structureDirectoryName")
-            #     buildState.structureDirectoryName = projectUtils.getUuidForString(
-            #         buildState.conformerLabel)
-            #     log.debug("The structureDirectoryName/UUID is : " +
-            #               buildState.structureDirectoryName)
-            # else:
-            #     log.debug(
-            #         "conformerLabel is short so using it for structureDirectoryName")
-            #     buildState.structureDirectoryName = buildState.conformerLabel
-            #     log.debug("The structureDirectoryName is : " +
-            #               buildState.structureDirectoryName)
             buildState.setConformerId(buildState.getStructureDirectoryName())
             buildState.date = date
             buildState.setDownloadUrlPath(projectUtils.buildDownloadUrlPath(

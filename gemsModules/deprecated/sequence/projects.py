@@ -1,25 +1,12 @@
 #!/usr/bin/env python3
-#import json
-#import sys
 import os
-#import re
-#import importlib.util
-#import shutil
-#import uuid
 import pathlib
-#from datetime import datetime
-#import gemsModules.deprecated
-#import gmml
 import traceback
 from typing import List
-#import gemsModules.deprecated.common.utils
 from gemsModules.deprecated.project import projectUtilPydantic as projectUtils
-#from gemsModules.deprecated.project import settings as projectSettings
-#from gemsModules.deprecated.common import io as commonio
 from gemsModules.deprecated.common import logic as commonlogic
 from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
 from gemsModules.deprecated.sequence import io as sequenceio
-#from gemsModules.deprecated.sequence import settings as sequenceSettings
 from gemsModules.deprecated.sequence import structureInfo
 
 if loggers.get(__name__):

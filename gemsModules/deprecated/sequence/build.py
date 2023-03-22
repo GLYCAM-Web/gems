@@ -1,28 +1,14 @@
 #!/usr/bin/env python3
-#import json
-#import sys
 import os
-#import re
-#import importlib.util
-#import shutil
-#import uuid
-#import gemsModules.deprecated
 import gmml
-#import traceback
-#import gemsModules.deprecated.common.utils
-#from multiprocessing import Process
 from gemsModules.deprecated.project import projectUtilPydantic as projectUtils
-#from gemsModules.deprecated.project import settings as projectSettings
 from gemsModules.deprecated.sequence import io as sequenceio
-#from gemsModules.deprecated.common import io as commonio
-#from gemsModules.deprecated.common import logic as commonLogic
 from gemsModules.deprecated.common import services as commonservices
 
 from gemsModules.deprecated.common.logic import writeStringToFile
 from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
 
 from gemsModules.deprecated.sequence import projects as sequenceProjects
-#from gemsModules.deprecated.sequence import settings as sequenceSettings
 
 if loggers.get(__name__):
     pass
@@ -33,7 +19,6 @@ else:
 def buildEach3DStructureInStructureInfo(thisTransaction: sequenceio.Transaction):
     log.info("buildEach3DStructureInStructureInfo() was called.")
     needToInstantiateCarbohydrateBuilder = True
-#    from multiprocessing import Process
     # get info from the transaction and check sanity
     log.debug("About to get build informaion from the transaction")
     log.debug("Working on the Build States now.")
@@ -83,7 +68,7 @@ def buildEach3DStructureInStructureInfo(thisTransaction: sequenceio.Transaction)
         log.debug("Checking if a structure has been built in this buildState: ")
         log.debug("buildState: ")
         log.debug(buildState.json(indent=2))
-        # May return "default" or a conformerID
+        # May return "default" or a conformerID ## should only return conformerID?
         subDirectory = buildState.structureDirectoryName
 
         if sequenceProjects.structureExists(buildState, thisTransaction, thisBuildStrategyID):
@@ -190,7 +175,7 @@ def build3DStructure(buildState: sequenceio.Single3DStructureBuildDetails, thisT
                 thisTransaction.generateCommonParserNotice(
                     noticeBrief='InvalidInputPayload', exitMessage=carbBuilder.GetStatusMessage())
                 thisTransaction.build_outgoing_string()
-                return thisTransaction # do this or no?
+                return thisTransaction # do this or no?  # if the process has altered this Transaction, then yes
             #p = Process(target=builder.GenerateSingle3DStructureDefaultFiles, args=(outputDirPath,))
             # p.start()
         else:
@@ -199,7 +184,7 @@ def build3DStructure(buildState: sequenceio.Single3DStructureBuildDetails, thisT
             # Need to put the info into the GMML struct: SingleRotamerInfoVector
 #            gmmlConformerInfo = populateGMMLConformerInfoStruct(buildState)
             if not builder.IsStatusOk():
-                log.debug("builder sayd it is not ok")
+                log.debug("builder says it is not ok")
             log.debug("Here is the input to the builder.")
             log.debug("NOT DEFAULT: Here is the buildState):")
             log.debug(buildState)

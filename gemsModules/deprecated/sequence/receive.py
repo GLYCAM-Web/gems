@@ -153,12 +153,10 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
             log.debug("Evaluate service requested from sequence entity.")
             try:
                 thisTransaction.evaluateCondensedSequence()
+                thisTransaction.setIsEvaluationForBuild=False
                 if thisTransaction.transaction_in.entity.inputs.evaluationOptions is not None:
                     if not thisTransaction.transaction_in.entity.inputs.evaluationOptions.buildDefaultStructure:
                         continue
-                # If still here, then we need to build the default structure
-                thisTransaction.setNumberStructuresHardLimitOut(1) # because see next comment
-                # The 'defaultOnly=True' part might not be working
                 thisTransaction.manageSequenceBuild3DStructureRequest(defaultOnly=True)
             except Exception as error:
                 log.error(
@@ -169,9 +167,11 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
         elif 'Build3DStructure' in thisService.typename:
             log.debug("Build3DStructure service requested from sequence entity.")
             # Sequence was validated above.  Should not be needed again.
+            # An evaluation is needed for checking other things.
             try:
-                else:
-                    thisTransaction.manageSequenceBuild3DStructureRequest()
+                thisTransaction.evaluateCondensedSequence()
+                thisTransaction.setIsEvaluationForBuild(True)
+                thisTransaction.manageSequenceBuild3DStructureRequest()
             except Exception as error:
                 log.error(
                     "There was a problem with manageSequenceBuild3DStructureRequest(): " + str(error))

@@ -188,7 +188,10 @@ class Single3DStructureBuildDetails(BaseModel):
     #      gmmlConformerInfo : gmml.single_rotamer_info_vector = None
     sequenceConformation: List = []
     #  When there are multiple structures, one is chosen for the default.
+    #  The very first combination (typically the all-gg, all-t structure) 
+    #        is chosen as the global default
     isDefaultStructure: bool = False
+    isGlobalDefaultStructure: bool = False
     isNewBuild: bool = False
     # The following are locations needed by builders and/or retrievers.
     structureDirectoryName: str = ""

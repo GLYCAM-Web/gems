@@ -2,7 +2,6 @@
 from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
 import traceback
 import os
-#import sys
 
 if loggers.get(__name__):
     pass
@@ -12,12 +11,9 @@ else:
 
 def manageSequenceBuild3DStructureRequest(self, defaultOnly: bool = False):
     log.info("manageSequenceBuild3DStructureRequest was called ")
-#    from typing import List
     from gemsModules.deprecated.sequence import structureInfo, projects
     from gemsModules.deprecated.sequence import io as sequenceio
     from gemsModules.deprecated.project import projectUtilPydantic as projectUtils
-#    from gemsModules.deprecated.project.io import CbProject
-#    from gemsModules.deprecated.common import services as commonservices
     #
     # Do some sanity checks
     if self.transaction_out is None or self.transaction_in is None or self.transaction_out.project is None:
@@ -104,10 +100,17 @@ def manageSequenceBuild3DStructureRequest(self, defaultOnly: bool = False):
             conformerID = buildState.structureDirectoryName
             projects.addResponse(
                 buildState, self, conformerID, buildState.conformerLabel)
+
         # Regardless if requesting default or not, I think I need to generate a default. Otherwise I get into madness
         # with figuring out exist status and which conformerID to use in place of default. Then when a default
         # request does come, should it overwrite previous default for old projects?
         # A default request is always first, this is now implemented in buildStructureInfo
+        #
+        ## 2023-03-22 BLF:  Changing now to always build ONE default structure 
+        ##    upon evaluation.  This is the default behavior, but it can be
+        ##    turned off.  
+
+        ##  This chunk-o-code needs to be a separate thing elsewhere.
         # Decide if we need to minimize or not and tell everyone if need be
         mdMinimize = True
         # Check the outgoing transaction to see if it got set
