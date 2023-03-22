@@ -1,0 +1,22 @@
+{
+	"entity": 
+	{
+		"type": "Sequence", 
+		"services": 
+		{
+			"serviceABC": 
+			{
+				"type": "Evaluate"
+			}
+		}, 
+		"inputs": 
+		{
+			"sequence": 
+			{
+				"payload": "DManpa1-6[DManpa1-3]DManpa1-6[DNeup5Aca2-6DGalpb1-4DGlcpNAcb1-2DManpa1-3]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH"
+			}
+		}
+	}, 
+	"prettyPrint": "true", 
+	"mdMinimize": "true"
+}
