@@ -128,6 +128,8 @@ def buildEach3DStructureInStructureInfo(thisTransaction: sequenceio.Transaction)
                 raise error
             build3DStructure(buildState, thisTransaction,
                              outputDirPath, builder)
+            log.debug("just wrote info.json.")
+            log.debug("The value of mdMinimise in transaction_in is: " + str(thisTransaction.transaction_in.mdMinimize))
             if thisTransaction.transaction_in.mdMinimize is True:
                 sequenceProjects.addSequenceFolderSymLinkToNewBuild(
                     thisServiceDir, thisSeqID, thisBuildStrategyID, thisPuuID, subDirectory)
@@ -176,6 +178,8 @@ def build3DStructure(buildState: sequenceio.Single3DStructureBuildDetails, thisT
         carbBuilder = getCbBuilderForSequence(thisTransaction.getSequenceVariantOut('indexOrdered'))
         if buildState.isDefaultStructure:
             log.debug("Generating default structure in: " + outputDirPath)
+            log.debug("IS THE DEFAULT: Here is the buildState):")
+            log.debug(buildState)
             # Using multiprocessing for this function call.
             builder.GenerateSingle3DStructureDefaultFiles(outputDirPath)
             if not builder.IsStatusOk():
@@ -194,8 +198,20 @@ def build3DStructure(buildState: sequenceio.Single3DStructureBuildDetails, thisT
                 "The request is for a conformer with outputDirPath: " + outputDirPath)
             # Need to put the info into the GMML struct: SingleRotamerInfoVector
 #            gmmlConformerInfo = populateGMMLConformerInfoStruct(buildState)
+            if not builder.IsStatusOk():
+                log.debug("builder sayd it is not ok")
+            log.debug("Here is the input to the builder.")
+            log.debug("NOT DEFAULT: Here is the buildState):")
+            log.debug(buildState)
+            log.debug("gmmlConformerInfo:")
+            log.debug(gmmlConformerInfo)
+            log.debug("outputDirPath : ")
+            log.debug(outputDirPath)
+            import sys
+            sys.exit(0)
             builder.GenerateSpecific3DStructure(
                 gmmlConformerInfo, outputDirPath)
+            log.debug("just did builder.GenerateSpecific3DStructure")
             if not builder.IsStatusOk():
                 log.error(carbBuilder.GetStatusMessage())
                 log.debug(
