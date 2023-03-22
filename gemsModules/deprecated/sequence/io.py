@@ -479,7 +479,8 @@ class TheEvaluationOptions(BaseModel):
     validateOnly: bool = False  # Stop after setting sequenceIsValid and return answer
     # Is this an evaluation as part of an explicit build request?
     evaluateForBuild: bool = False
-    noBuild: bool = False  # Just do a full evaluation ; don't do the default example build
+    noBuild: bool = False  # deprecating in favor of buildDefaultStructure
+    buildDefaultStructure: bool = True  # set to false if you don't want this
 
 
 class TheSequenceEvaluationOutput(BaseModel):

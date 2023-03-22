@@ -1,30 +1,9 @@
 #!/usr/bin/env python3
 """ Utilities needed by receive.py in the sequence entity """
-#import json
-#import sys
 import os
-#import re
-##import importlib.util
-#import shutil
-#import uuid
-#import traceback
-#import gemsModules.deprecated
-#import gemsModules.deprecated.sequence
 
-# for key, val in gemsModules.deprecated.delegator.settings.subEntities:
-#     if val in gemsModules.deprecated.delegator.settings.deprecated:
-#         pass
-# prototype: need to build import statement
-# from gemsModules.deprecated.deprecated_20221212. + val + import         
-    
-
-
-#from gemsModules.deprecated.common import io as commonio
 from gemsModules.deprecated.common import logic as commonlogic
-#from gemsModules.deprecated.common import services as commonservices
-#from gemsModules.deprecated.sequence import settings as sequenceSettings
 from gemsModules.deprecated.sequence import io as sequenceio
-#
 
 from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
 if loggers.get(__name__):
@@ -76,90 +55,17 @@ def get_sequence(thisSequenceEntity: sequenceio.sequenceEntity)->str:
     return thisSequenceEntity.inputs.sequence.payload
 
 
-def we_should_only_build_the_default_structure(thisTransaction: sequenceio.Transaction)->bool:
-    """ Determine whether or not to build the default sequence once valid. 
-    """
-    log.info("we_should_build_the_default_structure_on_validation() was called.\n")
-##  The following would be true if the evaluation were being requested with
-##    an "Evaluate" service.  
-#    # If there are services defined, and if Build3DStructure is defined, 
-#    # then we should not build the default structure because the user has already
-#    # defined which structures to build.
-#    if thisTransaction.transaction_in.entity.services is not None:
-#        for currentService in thisTransaction.transaction_in.entity.services:
-#            log.debug("service, currentService: " + str(currentService))
-#            thisService = thisTransaction.transaction_in.entity.services[currentService]
-#            if thisService.typename == 'Build3DStructure':
-#                build_default_structure = False
-##  In the meantime, the following should work with what the front end is doing:
-    if thisTransaction.transaction_in.mdMinimize == "false":
-        build_default_structure = True
-    else:
-        build_default_structure = False
-    # See if we are not in a situation where we normally need to build the default
-    from gemsModules.deprecated.common.logic import getGemsExecutionContext
-    the_context = getGemsExecutionContext()
-    if the_context == "default": # this is a normal user, so the user decides
-        build_default_structure = False
-    else:
-        if thisTransaction.transaction_in.project is None:
-            build_default_structure = True
-        else:
-            build_default_structure = False
-    # Check to see if the default build has been explicitly set (to true or false)
-    if thisTransaction.transaction_in.entity.inputs.evaluationOptions is not None:
-        if thisTransaction.transaction_in.entity.inputs.evaluationOptions.noBuild is True:
-            build_default_structure = False
-        if thisTransaction.transaction_in.entity.inputs.evaluationOptions.noBuild is False:
-            build_default_structure = True
-    log.debug("build_default_structure: " + str(build_default_structure))
-    return build_default_structure
-
-def multistructure_build_needs_new_project(thisTransaction: sequenceio.Transaction)->bool:
-    log.info("multistructure_build_needs_new_project() was called.\n")
-    # Get list of existing structures in the project
-    if thisTransaction.transaction_out.project is None:
-        log.debug("returning true because thisTransaction.transaction_out.project is None")
+def we_should_start_new_project(thisTransaction: sequenceio.Transaction)->bool:
+    log.info("we_should_start_new_project() was called.\n")
+    if thisTransaction.transaction_in.project is None:
+        log.debug("returning true because thisTransaction.transaction_in.project is None")
         return True
-    from gemsModules.deprecated.sequence.projects import get_all_conformerIDs_in_project_dir
-    existing_structures = get_all_conformerIDs_in_project_dir(thisTransaction.transaction_out.project.project_dir)
-    log.debug("existing_structures: " + str(existing_structures))
-    # If existing_structures is empty, then we do not need a new project
-    if len(existing_structures) == 0:
-        log.debug("returning false because len(existing_structures) == 0")
+    if thisTransaction.transaction_in.project.force_use_this_project:
         return False
-    # Get list of structures to be built
-    from gemsModules.deprecated.sequence.structureInfo import generateCombinationsFromRotamerData
-    from gemsModules.deprecated.sequence.structureInfo import getStructureDirectoryName
-    from gemsModules.deprecated.sequence.structureInfo import buildConformerLabel
-    structures_to_build = []
-    thisTransaction.evaluateCondensedSequence()
-    rotamerData = thisTransaction.getRotamerDataIn()
-    if rotamerData is None:
-        log.debug("returning true because rotamerData is None")
-        return True
-    maxNumberOfStructuresToBuild = thisTransaction.getNumberStructuresHardLimitIn()
-    if maxNumberOfStructuresToBuild is None:
-        maxNumberOfStructuresToBuild = thisTransaction.getNumberStructuresHardLimitOut()
-    if maxNumberOfStructuresToBuild is None:
-        maxNumberOfStructuresToBuild = 64  # please let this not break before we rewrite this code
-    sequenceRotamerCombos = generateCombinationsFromRotamerData(
-            rotamerData,
-            maxNumberCombos=maxNumberOfStructuresToBuild)
-    for sequenceRotamerCombo in sequenceRotamerCombos:
-        conformerLabel = buildConformerLabel(sequenceRotamerCombo)
-        structures_to_build.append(getStructureDirectoryName(conformerLabel))
-    log.debug("structures_to_build: " + str(structures_to_build))
-    # If existing_structures is not a subset of structures_to_build, then we need a new project
-    if not set(existing_structures).issubset(set(structures_to_build)):
-        log.debug("returning true because not set(existing_structures).issubset(set(structures_to_build))")
-        return True
-    log.debug("returning false because we did not find any reason to return true")
-    return False
+    return True
 
 def we_need_filesystem_writes(thisSequenceEntity : sequenceio.sequenceEntity) -> bool:
-    # check to see if filesystem writes are needed
-    # Other parts of the code might make decisions based on other criteria
+    # check to see if filesystem writes are needed based on API inspection
     log.info("we_need_filesystem_writes() was called.\n")
     theseNeedFilesystemWrites = ['Build3DStructure', 'DrawGlycan']
     needFilesystemWrites = False
@@ -169,6 +75,14 @@ def we_need_filesystem_writes(thisSequenceEntity : sequenceio.sequenceEntity) ->
             log.debug("Found service - " + thisService.typename +
                       " - that needs filesystem writes.")
             needFilesystemWrites = True
+        if thisService.typename == 'Evaluate':
+            if thisSequenceEntity.inputs.evaluationOptions is None:
+                needFilesystemWrites=True
+            else:
+                if thisSequenceEntity.inputs.evaluationOptions.buildDefaultStructure:
+                    needFilesystemWrites=True
+                else:
+                    needFilesystemWrites=False
     return needFilesystemWrites
 
 

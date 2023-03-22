@@ -48,15 +48,12 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
         log.error(
             "There was a problem initializing the outgoing transaction : " + str(error))
         log.error(traceback.format_exc())
-        raise Exception  # not sure if this will work as desired - BLFoley 2023-03-15
-                         # it might be necessary to generate a transaction to return and
-                         # populate it with an error message.
+        raise  # not sure if this will work as desired - BLFoley 2023-03-15
+               # it might be necessary to generate a transaction to return and
+               # populate it with an error message.
    
 
-
     has_a_sequence = False
-    build_default_structure = False
-    number_of_structures = -1
 
     ## If there is a sequence, ensure that it is valid
     the_sequence = receiver_tasks.get_sequence(thisSequenceEntity)
@@ -76,40 +73,18 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
             thisTransaction.build_outgoing_string()
             return thisTransaction
         log.debug("Sequence is valid.")
-        thisTransaction.evaluateCondensedSequence()
-        if receiver_tasks.we_should_only_build_the_default_structure(thisTransaction=thisTransaction):
-            build_default_structure = True
-        number_of_structures = carbBuilder.GetNumberOfShapes()
-        log.info("Sequence has been validated. Thank you.")
 
 
     # If there are no explicit services
     if thisSequenceEntity.services == []:
         log.debug("'services' was not present in the request. Do the default.")
-        if has_a_sequence:
-            build_default_structure = True
-        else:
-            thisTransaction = receiver_tasks.doDefaultService(thisTransaction)
-            return thisTransaction
+        thisTransaction = receiver_tasks.doDefaultService(thisTransaction)
+        return thisTransaction
 
-
-########
-##      If a build comes in with Project Info 
-##          - If there is at most one structure there
-##          - If the structure was requested
-##          - Then keep same pUUID
-##          - Else, make a new pUUID and do the build(s) there
-##  
-##  
 
     # ## Initialize the project
     try:
-        need_new_project = False
-        if thisTransaction.transaction_out.project is None:
-            need_new_project = True
-        if int(number_of_structures) > 1 :
-            log.debug("More than one structure possible.  Checking if we need a new project.")
-            need_new_project = receiver_tasks.multistructure_build_needs_new_project(thisTransaction)
+        need_new_project = receiver_tasks.we_should_start_new_project(thisTransaction)
         if need_new_project:
             log.debug("We need a new project.  Starting a new one.")
             from gemsModules.deprecated.project import io as projectio
@@ -124,7 +99,7 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
 
         need_filesystem_writes = receiver_tasks.we_need_filesystem_writes(thisSequenceEntity)
         log.debug("Initializing the filesystem parts of the outgoing project, if any")
-        if build_default_structure or need_filesystem_writes:
+        if need_filesystem_writes:
             # ## TODO - this might fail if more than one service needs filesystem access
             return_value = receiver_tasks.set_up_filesystem_for_writing(thisTransaction)
             if return_value != 0:
@@ -168,30 +143,6 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
     ###################################################################
 
 
-###  New logic to consider...
-###
-###  Dan is always requesting Build3DStructure.
-###  The only way to know if this is an evaluation is to... 
-###  I'm not sure... look for mdMinimize=false?
-###  Maybe the presence or absence of a project?
-###
-
-    # If we need to build only the default structure, do it now
-#    if build_default_structure:
-#        thisTransaction.evaluateCondensedSequence()
-#        ## Override any mdMiniize directives in the incoming JSON
-#        thisTransaction.transaction_in.mdMinimize = True
-#        thisTransaction.transaction_out.mdMinimize = True
-#        try:
-#            thisTransaction.transaction_in.entity.inputs.buildOptions.mdMinimize = True
-#            thisTransaction.transaction_out.entity.inputs.buildOptions.mdMinimize = True
-#        except:
-#            pass
-#        ## Ensure that the max number of structures is 1
-#        thisTransaction.setNumberStructuresHardLimitOut(1)
-#        thisTransaction.manageSequenceBuild3DStructureRequest(defaultOnly=True)
-
-
 
     # for each explicit service:
     for currentService in thisSequenceEntity.services:
@@ -200,9 +151,15 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
 
         if 'Evaluate' in thisService.typename:
             log.debug("Evaluate service requested from sequence entity.")
-#            from gemsModules.deprecated.sequence import evaluate
             try:
                 thisTransaction.evaluateCondensedSequence()
+                if thisTransaction.transaction_in.entity.inputs.evaluationOptions is not None:
+                    if not thisTransaction.transaction_in.entity.inputs.evaluationOptions.buildDefaultStructure:
+                        continue
+                # If still here, then we need to build the default structure
+                thisTransaction.setNumberStructuresHardLimitOut(1) # because see next comment
+                # The 'defaultOnly=True' part might not be working
+                thisTransaction.manageSequenceBuild3DStructureRequest(defaultOnly=True)
             except Exception as error:
                 log.error(
                     "There was a problem evaluating the condensed sequence: " + str(error))
@@ -211,57 +168,17 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
                     noticeBrief='InvalidInputPayload')
         elif 'Build3DStructure' in thisService.typename:
             log.debug("Build3DStructure service requested from sequence entity.")
+            # Sequence was validated above.  Should not be needed again.
             try:
-                # first evaluate the requested structure. Only build if valid.
-#                from gemsModules.deprecated.sequence import evaluate
-                thisTransaction.evaluateCondensedSequence()
-                valid = thisTransaction.transaction_out.entity.outputs.sequenceEvaluationOutput.sequenceIsValid
-                thisTransaction.setIsEvaluationForBuild(True)
+                else:
+                    thisTransaction.manageSequenceBuild3DStructureRequest()
             except Exception as error:
                 log.error(
-                    "There was a problem evaluating the condensed sequence: " + str(error))
-                log.error(traceback.format_exc())
-                thisTransaction.generateCommonParserNotice(
-                    noticeBrief='InvalidInputPayload')
-            else:
-                if valid:
-                    log.debug("Valid sequence.")
-                    try:
-                        # If we need to build only the default structure, do it now
-                        if build_default_structure:
-                            thisTransaction.evaluateCondensedSequence()
-                            ## Override any mdMiniize directives in the incoming JSON
-                            thisTransaction.transaction_in.mdMinimize = True
-                            thisTransaction.transaction_out.mdMinimize = True
-                            try:
-                                thisTransaction.transaction_in.entity.inputs.buildOptions.mdMinimize = True
-                                thisTransaction.transaction_out.entity.inputs.buildOptions.mdMinimize = True
-                            except:
-                                pass
-                            ## Ensure that the max number of structures is 1
-                            #thisTransaction.setNumberStructuresHardLimitIn(1)
-                            thisTransaction.setNumberStructuresHardLimitOut(1)
-                            #log.debug("the max number of structures IN is (1): " + str(thisTransaction.getNumberStructuresHardLimitIn()))
-                            log.debug("the max number of structures OUT is (1): " + str(thisTransaction.getNumberStructuresHardLimitOut()))
-                            thisTransaction.manageSequenceBuild3DStructureRequest(defaultOnly=True)
-                            #log.debug("the max number of structures IN is (2): " + str(thisTransaction.getNumberStructuresHardLimitIn()))
-                            log.debug("the max number of structures OUT is (2): " + str(thisTransaction.getNumberStructuresHardLimitOut()))
-                        else:
-                            thisTransaction.manageSequenceBuild3DStructureRequest()
-                    except Exception as error:
-                        log.error(
-                            "There was a problem with manageSequenceBuild3DStructureRequest(): " + str(error))
-                        raise error
-                else:
-                    log.error("Invalid Sequence. Cannot build.")
-                    print("the transaction is : ")
-                    print(thisTransaction)
-                    thisTransaction.generateCommonParserNotice(
-                        noticeBrief='InvalidInputPayload', additionalInfo={"hint": "Sequence is invalid"})
+                    "There was a problem with manageSequenceBuild3DStructureRequest(): " + str(error))
+                raise error
         elif "Validate" in thisService.typename:
             # this should be able to become part of previous validation, but leaving in for now
             log.debug("Validate service requested from sequence entity.")
-#            from gemsModules.deprecated.sequence import evaluate
             try:
                 thisTransaction.evaluateCondensedSequence(validateOnly=True)
             except Exception as error:
