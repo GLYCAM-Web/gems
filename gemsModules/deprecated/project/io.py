@@ -85,6 +85,13 @@ class Project(BaseModel):
     django_project_id : constr(max_length=36)=""
     app : constr(max_length=25)="project"
   
+    
+    ## In some cases, GEMS will choose to start a new project 
+    ## even if one is provided.  If you don't want to force
+    ## GEMS to use this project, set this to True.
+    force_use_this_project : bool = False
+
+
     notices : List[Notice] = []
 
 
