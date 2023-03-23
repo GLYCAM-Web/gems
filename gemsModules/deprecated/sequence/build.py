@@ -192,8 +192,8 @@ def build3DStructure(buildState: sequenceio.Single3DStructureBuildDetails, thisT
             log.debug(gmmlConformerInfo)
             log.debug("outputDirPath : ")
             log.debug(outputDirPath)
-            import sys
-            sys.exit(0)
+#            import sys  ## REMOVE ME
+#            sys.exit(0)  ## REMOVE ME
             builder.GenerateSpecific3DStructure(
                 gmmlConformerInfo, outputDirPath)
             log.debug("just did builder.GenerateSpecific3DStructure")
