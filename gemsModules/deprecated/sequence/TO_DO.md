@@ -1,3 +1,10 @@
+Test this sequence:
+
+DNeup5Aca2-6DGalpb1-4DGlcpNAcb1-2[DNeup5Aca2-6DGalpb1-4DGlcpNAcb1-4]DManpa1-3[DNeup5Aca2-6DGalpb1-4DGlcpNAcb1-2[DNeup5Aca2-6DGalpb1-4DGlcpNAcb1-6]DManpa1-6]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH
+
+
+
+
 
 - [x] When requesting an evaluation, call it that.  Stop calling it a build. 
 
@@ -27,5 +34,4 @@
 
 
 - [ ] Figure out why structures that are not "defaults" aren't being built.
-
 
