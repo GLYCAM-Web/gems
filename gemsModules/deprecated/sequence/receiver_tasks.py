@@ -83,17 +83,21 @@ def we_need_filesystem_writes(thisSequenceEntity : sequenceio.sequenceEntity) ->
                     needFilesystemWrites=True
                 else:
                     needFilesystemWrites=False
+    log.debug("returning that needFilesystemWrites is : "  + str(needFilesystemWrites))
     return needFilesystemWrites
 
 
 def set_up_filesystem_for_writing(thisTransaction: sequenceio.Transaction) -> int:
     # ##
     # Set the project directory
-    # ## TODO - this next is why it might fail.  I wasn't sure what better to do (BLF)
     log.info("set_up_filesystem_for_writing() was called.\n")
+    log.debug("and a debug statement was written.\n")
     from gemsModules.deprecated.common.logic import writeStringToFile
     thisProject = thisTransaction.transaction_out.project
-    thisProject.requested_service = "Build3DStructure"
+    ## CHANGEME ? because could be Evaluate and an associated default build
+    ##          the default build is technically a separate service and
+    ##          should probably be treated as such.
+    thisProject.requested_service = "Build3DStructure" # maybe move setting this and read it here.  Alternate is "EvaluationDefaultBuild"
     thisProject.setServiceDir()
     thisProjectDir = os.path.join(
         thisProject.service_dir,
@@ -108,15 +112,25 @@ def set_up_filesystem_for_writing(thisTransaction: sequenceio.Transaction) -> in
     # Create the needed initial directories including a logs directory
     thisProject.createDirectories()
 
-    thisProject.writeInitialLogs
+    log.debug("About to write initial logs")
+    thisProject.writeInitialLogs()
+    log.debug("Just wrote write initial logs")
 
     # Generate the complete incoming JSON object, including all defaults
     incomingString = thisTransaction.incoming_string
-    incomingRequest = thisTransaction.transaction_in.json(indent=2)
+    incomingRequest = thisTransaction.transaction_in.json(indent=2, by_alias=True)
     writeStringToFile(incomingString, os.path.join(
         thisProject.logs_dir, "request-raw.json"))
     writeStringToFile(incomingRequest, os.path.join(
         thisProject.logs_dir, "request-initialized.json"))
 
+    log.debug("set_up_filesystem_for_writing() is returning.\n")
     return 0
+
+def default_structure_exists(transaction_out: sequenceio.sequenceTransactionSchema) -> bool:
+    pass
+
+def set_this_build_as_default(transaction_out: sequenceio.sequenceTransactionSchema) -> int:
+    pass
+
 

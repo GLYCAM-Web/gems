@@ -100,7 +100,10 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
         need_filesystem_writes = receiver_tasks.we_need_filesystem_writes(thisSequenceEntity)
         log.debug("Initializing the filesystem parts of the outgoing project, if any")
         if need_filesystem_writes:
-            # ## TODO - this might fail if more than one service needs filesystem access
+            # ## TODO - this will probably fail if more than one service needs filesystem 
+            # ##        access ~AND~ each service needs a different location.  
+            # ##        Project generation / filling needs to be put down into the
+            # ##        services.  The new design will facilitate this fix.
             return_value = receiver_tasks.set_up_filesystem_for_writing(thisTransaction)
             if return_value != 0:
                 thisTransaction.generateCommonParserNotice(
@@ -152,18 +155,35 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
         if 'Evaluate' in thisService.typename:
             log.debug("Evaluate service requested from sequence entity.")
             try:
+                build_the_default=False
+
+                if receiver_tasks.default_structure_exists(thisTransaction.transaction_out):
+                    log.debug("The default structure already exists.")
+                    receiver_tasks.load_evaluation_output(thisTransaction.transaction_out)
+                    continue
+
                 thisTransaction.evaluateCondensedSequence()
-                thisTransaction.setIsEvaluationForBuild=False
+                thisTransaction.setIsEvaluationForBuild(False)
                 if thisTransaction.transaction_in.entity.inputs.evaluationOptions is not None:
+                    log.debug("Evaluation options were found in the input..")
                     if not thisTransaction.transaction_in.entity.inputs.evaluationOptions.buildDefaultStructure:
+                        log.debug("buildDefaultStructure was explicitly set to false.")
                         continue
+                build_the_default=True
                 thisTransaction.manageSequenceBuild3DStructureRequest(defaultOnly=True)
+                receiver_tasks.set_this_build_as_default(thisTransaction.transaction_out)
+
+
+
+
             except Exception as error:
                 log.error(
                     "There was a problem evaluating the condensed sequence: " + str(error))
                 log.error(traceback.format_exc())
+                noticeMsg="There was a problem evaluating the condensed sequence. Was a default build attempted? " + str(build_the_default)
                 thisTransaction.generateCommonParserNotice(
-                    noticeBrief='InvalidInputPayload')
+                    noticeBrief='InvalidInputPayload',
+                    additionalInfo={'hint': noticeMsg})
         elif 'Build3DStructure' in thisService.typename:
             log.debug("Build3DStructure service requested from sequence entity.")
             # Sequence was validated above.  Should not be needed again.
@@ -215,7 +235,7 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
     # NOTE!!! This uses the child method in sequence.io - a better method!
     thisTransaction.build_outgoing_string()
     if need_filesystem_writes:
-        outgoingResponse = thisTransaction.transaction_out.json(indent=2)
+        outgoingResponse = thisTransaction.transaction_out.json(indent=2, by_alias=True)
         writeStringToFile(outgoingResponse, os.path.join(
             thisProject.logs_dir, "response.json"))
     return thisTransaction

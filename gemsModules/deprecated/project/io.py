@@ -370,8 +370,10 @@ class Project(BaseModel):
     def writeInitialLogs(self) :
         try:
             log.info("About to write initial logs entry from Project.\n")
-            with open(os.path.join( self.logs_dir, 'ProjectLog.json'), 'w', encoding='utf-8') as file:
-                jsonString = self.json(indent=4, sort_keys=False)
+            filename=os.path.join( self.logs_dir, 'ProjectLog.json')
+            log.debug("The filename is: " + str(filename))
+            with open(filename, 'w', encoding='utf-8') as file:
+                jsonString = self.json(indent=4, sort_keys=False, by_alias=True)
                 log.debug("jsonString: \n" + jsonString )
                 file.write(jsonString)
         except Exception as error:

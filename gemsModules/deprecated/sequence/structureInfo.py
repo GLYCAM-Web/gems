@@ -300,7 +300,7 @@ def buildStructureInfoOliver(thisTransaction: sequenceio.Transaction):
             buildDir = "New_Builds/"
             buildState.setIsNewBuild(True)
         buildState.setAbsoluteConformerPath(buildDir)
-        theJsonObject = buildState.json(indent=2)
+        theJsonObject = buildState.json(indent=2, by_alias=True)
         log.debug("The build state after initializing is  ")
         log.debug(theJsonObject)
         structureInfo.individualBuildDetails.append(buildState)
@@ -482,7 +482,7 @@ def convertStructureInfoToDict(structureInfo: sequenceio.StructureBuildInfo()):
         log.error(error)
         raise error
     else:
-        return structureInfo.json(indent=2)
+        return structureInfo.json(indent=2, by_alias=True)
 
 #    data = {}
 #    ## set the sequence.
@@ -795,7 +795,7 @@ def getStatusFilename(thisTransaction: sequenceio.Transaction):
         log.error(traceback.format_exc())
         raise error
     else:
-        statusFilename = projectDir + "logs/structureInfo_status.json"
+        statusFilename = os.path.join(projectDir, "logs", "structureInfo_status.json")
 
         return statusFilename
 

@@ -1116,9 +1116,9 @@ class Transaction(commonio.Transaction):
 
     def build_outgoing_string(self):
         if self.transaction_out.prettyPrint is True:
-            self.outgoing_string = self.transaction_out.json(indent=2)
+            self.outgoing_string = self.transaction_out.json(indent=2, by_alias=True)
         else:
-            self.outgoing_string = self.transaction_out.json()
+            self.outgoing_string = self.transaction_out.json(by_alias=True)
 
 
 def generateSchema():

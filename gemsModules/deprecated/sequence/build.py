@@ -96,7 +96,7 @@ def buildEach3DStructureInStructureInfo(thisTransaction: sequenceio.Transaction)
             # TODO - one day, the path on a compute node might differ from the website path
             log.debug("Absolute Conformer Path for this New Build: " +
                       buildState.getAbsoluteConformerPath())
-            theJsonObject = buildState.json(indent=2)
+            theJsonObject = buildState.json(indent=2, by_alias=True)
             log.debug(
                 "The build state for this New Build, after initializing, is  ")
             log.debug(theJsonObject)
