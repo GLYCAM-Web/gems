@@ -14,7 +14,7 @@ class Status_Receiver(Receiver):
     ##
     #@detail 
     # write me
-    def get_incoming_entity_type(self) -> str:
+    def get_local_entity_type(self) -> str:
         return WhoIAm
     
     ##
