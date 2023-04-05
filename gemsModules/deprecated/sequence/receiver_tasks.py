@@ -127,10 +127,4 @@ def set_up_filesystem_for_writing(thisTransaction: sequenceio.Transaction) -> in
     log.debug("set_up_filesystem_for_writing() is returning.\n")
     return 0
 
-def default_structure_exists(transaction_out: sequenceio.sequenceTransactionSchema) -> bool:
-    pass
-
-def set_this_build_as_default(transaction_out: sequenceio.sequenceTransactionSchema) -> int:
-    pass
-
 

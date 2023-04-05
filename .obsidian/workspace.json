@@ -148,17 +148,17 @@
   },
   "active": "61a0973f6b4ed831",
   "lastOpenFiles": [
+    "gemsModules/deprecated/sequence/structureInfo.py~",
+    "gemsModules/deprecated/common/io.py~",
+    "gemsModules/deprecated/sequence/io.py~",
+    "gemsModules/deprecated/sequence/receive.py~",
+    "gemsModules/deprecated/common/logic.py~",
+    "gemsModules/deprecated/sequence/evaluate.py~",
+    "gemsModules/deprecated/sequence/projects.py~",
+    "gemsModules/deprecated/sequence/build.py~",
+    "gemsModules/deprecated/sequence/receiver_tasks.py~",
     "gemsModules/deprecated/project/projectUtilPydantic.py~",
     "gemsModules/deprecated/project/io.py~",
-    "gemsModules/deprecated/sequence/structureInfo.py~",
-    "gemsModules/deprecated/sequence/receiver_tasks.py~",
-    "gemsModules/deprecated/sequence/receive.py~",
-    "gemsModules/deprecated/sequence/io.py~",
-    "gemsModules/deprecated/sequence/build.py~",
-    "tests/inputs/016.evaluation-request.json~",
-    "tests/inputs/016_try-again.json~",
-    "tests/inputs/016_try-again.json",
-    "tests/inputs/016.evaluation-request.json",
     "gemsModules/deprecated/sequence/TO_DO.md"
   ]
 }

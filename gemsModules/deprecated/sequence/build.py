@@ -71,7 +71,8 @@ def buildEach3DStructureInStructureInfo(thisTransaction: sequenceio.Transaction)
         # May return "default" or a conformerID ## should only return conformerID?
         subDirectory = buildState.structureDirectoryName
 
-        if sequenceProjects.structureExists(buildState, thisTransaction, thisBuildStrategyID):
+        if sequenceProjects.currentBuildStructureExists(buildState, thisTransaction):
+#        if sequenceProjects.structureExists(buildState, thisTransaction, thisBuildStrategyID):
             # Nothing in Sequence/ needs to change. In Builds/ProjectID/
             # add symLink in Existing to Sequences/SequenceID/defaults/All_builds/conformerID.
             log.debug("Found an existing structure for " + subDirectory)

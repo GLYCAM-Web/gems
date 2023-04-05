@@ -4,6 +4,7 @@ import pathlib
 import traceback
 from typing import List
 from gemsModules.deprecated.project import projectUtilPydantic as projectUtils
+from gemsModules.deprecated.project.io import CbProject 
 from gemsModules.deprecated.common import logic as commonlogic
 from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
 from gemsModules.deprecated.sequence import io as sequenceio
@@ -73,9 +74,9 @@ def get_all_conformerIDs_in_project_dir(project_path : str) -> List[str]:
 #   @oaram
 #   @return
 ##### FIX ME
-def structureExists(buildState: sequenceio.Single3DStructureBuildDetails, thisTransaction: sequenceio.Transaction, buildStrategyID: str):
-    log.info("structureExists() was called.")
-    if not sequenceExists(buildState, thisTransaction):
+def currentBuildStructureExists(buildState: sequenceio.Single3DStructureBuildDetails, thisTransaction: sequenceio.Transaction):
+    log.info("currentBuildStructureExists() was called.")
+    if not currentBuildSequenceExists(thisTransaction):
         log.debug("Sequence has never been built before; a new sequence is born!")
         return False
     else:
@@ -102,13 +103,21 @@ def structureExists(buildState: sequenceio.Single3DStructureBuildDetails, thisTr
             )
             return
 
-        servicePath = os.path.join(thisProject.getFilesystemPath(
-        ), thisProject.getEntityId(), thisProject.getServiceId())
-        sequencePath = os.path.join(servicePath, "Sequences")
-        seqID = projectUtils.getSeqIdForSequence(indexOrderedSequence)
+
+#        servicePath = os.path.join(thisProject.getFilesystemPath(
+#        ), thisProject.getEntityId(), thisProject.getServiceId())
+#        sequencePath = os.path.join(servicePath, "Sequences")
+#        seqID = projectUtils.getSeqIdForSequence(indexOrderedSequence)
+#        sequenceDir = os.path.join(
+#            sequencePath, seqID, thisSequence.outputs.getBuildStrategyID())
+#        log.debug("sequenceDir: " + sequenceDir)
+
+        # get the directory for this sequence with the specified build strategy
         sequenceDir = os.path.join(
-            sequencePath, seqID, thisSequence.outputs.getBuildStrategyID())
+            get_sequence_base_directory(indexOrderedSequence, thisProject),
+            thisSequence.outputs.getBuildStrategyID())
         log.debug("sequenceDir: " + sequenceDir)
+
         log.debug("buildState.conformerLabel: " + buildState.conformerLabel)
         structureLinkInSequenceDir = os.path.join(
             sequenceDir, "All_Builds", buildState.structureDirectoryName)
@@ -131,11 +140,46 @@ def structureExists(buildState: sequenceio.Single3DStructureBuildDetails, thisTr
             # Oliver: Not sure what this comment wants exactly, or if what I have done covers it.
 
 
-# @brief Return true if this sequence has been built previously, otherwise false.
+def get_sequence_base_directory(sequence: str, thisProject: CbProject) -> str:
+    servicePath = os.path.join(
+            thisProject.getFilesystemPath(), 
+            thisProject.getEntityId(), 
+            thisProject.getServiceId())
+    sequence_base_dir = os.path.join(servicePath, "Sequences", get_seqID(sequence))
+    log.debug("sequence base dir: " + sequence_base_dir)
+    return sequence_base_dir
+
+
+def get_seqID(sequence: str) -> str:
+    return projectUtils.getSeqIdForSequence(sequence)
+
+
+def sequence_default_structure_exists(thisTransaction: sequenceio.Transaction) -> bool:
+    sequence = thisTransaction.getSequenceVariantOut(indexOrdered)
+    if sequence is None:
+        return False
+    thisProject = thisTransaction.transaction_out.project
+    sequence_base_dir = get_sequence_base_directory(sequence, thisProject)
+    sequence_default_link = os.path.join(sequence_base_dir, "default")
+    from pathlib import Path
+    the_path = Path(sequence_default_link)
+    try:
+        the_real_path = the_path.resolve(strict=True)
+    except FileNotFoundError:
+        return False
+    if Path(os.path.join(the_real_path, 'min-gas.pdb')).exists():
+        return True
+    if Path(os.path.join(the_real_path, 'structure.pdb')).exists():
+        return True
+    return False
+
+
+
+# @brief Return true if this sequence has been built previously using the current build strategy, otherwise false.
 #   @oaram
 #   @return
-def sequenceExists(buildState: sequenceio.Single3DStructureBuildDetails, thisTransaction: sequenceio.Transaction):
-    log.info("sequenceExists() was called.")
+def currentBuildSequenceExists(thisTransaction: sequenceio.Transaction):
+    log.info("currentBuildSequenceExists() was called.")
     try:
         sequence = thisTransaction.getSequenceVariantOut('indexOrdered')
     except Exception as error:

@@ -11,6 +11,7 @@ else:
 
 # I think if we got all the names to match, we could use parse_object_as instead of this. OG.
 # Probably it would fail on sub-classes though, but maybe.
+##  BLF is uncertain what this comment means.  
 
 
 def getLinkageOptionsFromGmmlcbBuilder(sequence):
@@ -68,50 +69,31 @@ def getLinkageOptionsFromGmmlcbBuilder(sequence):
     return gemsLinkageGeometryOptions
 
 
+def get_index_ordered_sequene(validatedSequence: str):
+    log.info("get_index_ordered_sequence() was called.\n")
+    # ##
+    # ##  This function assumes that the validity of the sequence was determined elsewhere
+    # ##
+    this_sequence = gmml.Sequence(validatedSequence)
+    return this_sequence.getIndexOrdered()
+
+
 # @brief Pass a sequence, get linkage options.
 #   @param  str sequence
 #   @return dict sequences
 def getSequenceVariants(validatedSequence: str):
     log.info("getSequenceVariants() was called.\n")
-    #this_sequence = gmml.CondensedSequence(validatedSequence)
     # ##
     # ##  This function assumes that the validity of the sequence was determined elsewhere
     # ##
     Sequences = sequenceio.TheSequenceVariants()
-    # #Sequences.userOrdered = validatedSequence
     this_sequence = gmml.Sequence(validatedSequence)
     Sequences.userOrdered = this_sequence.getInterpretedSequence()
     Sequences.indexOrdered = this_sequence.getIndexOrdered()
     Sequences.longestChainOrdered = "Currently unavailble in gmml. Request if needed!"
     Sequences.indexOrderedLabeled = this_sequence.getIndexLabeled()
     log.debug("Here are the new Sequences: " + str(Sequences))
-
-    # this_sequence = gmml.CondensedSequence(validatedSequence)
-    # Sequences.userOrdered = validatedSequence
-    # Sequences.indexOrdered = this_sequence.BuildLabeledCondensedSequence(this_sequence.Reordering_Approach_LOWEST_INDEX, this_sequence.Reordering_Approach_LOWEST_INDEX, False)
-    # Sequences.longestChainOrdered = this_sequence.BuildLabeledCondensedSequence(this_sequence.Reordering_Approach_LONGEST_CHAIN, this_sequence.Reordering_Approach_LONGEST_CHAIN, False)
-    # Sequences.indexOrderedLabeled = this_sequence.BuildLabeledCondensedSequence(this_sequence.Reordering_Approach_LOWEST_INDEX, this_sequence.Reordering_Approach_LOWEST_INDEX, True)
-    #log.debug("Here are the old Sequences: " + str(Sequences))
     return Sequences
 
 
 
-def main():
-    import importlib.util
-    import os
-    import sys
-    if importlib.util.find_spec("gemsModules") is None:
-        this_dir, this_filename = os.path.split(__file__)
-        sys.path.append(this_dir + "/../")
-        if importlib.util.find_spec("deprecated.common") is None:
-            print("Something went horribly wrong.  No clue what to do.")
-            return
-        else:
-            from deprecated.common import utils
-    else:
-        from gemsModules.deprecated.common import utils
-    data = utils.JSON_From_Command_Line(sys.argv)
-
-
-if __name__ == "__main__":
-    main()

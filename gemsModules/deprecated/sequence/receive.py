@@ -43,6 +43,9 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
     try:
         thisTransaction.initialize_transaction_out_from_transaction_in()
         # For convenience, make a short alias for the entity in the transaction_in
+        if thisTransaction.transaction_out.timestamp is None:
+            from datetime import datetime
+            thisTransaction.transaction_out.timestamp=datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
         thisSequenceEntity = thisTransaction.transaction_out.entity
     except Exception as error:
         log.error(
@@ -155,6 +158,21 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
         if 'Evaluate' in thisService.typename:
             log.debug("Evaluate service requested from sequence entity.")
             try:
+
+
+###### Ideally, something else should do all of this
+
+########  Try splitting the evaluation code so validate can be called, then checks
+########  can be made.  
+##              splitting is done.  Checks need to be written.
+##If there is no previous evaluation, then evaluate is called.
+########  Otherwise, the previous evaluation is read in and returned.
+########  The transaction level evaluate will do this, and will check to see if a
+########  build should be made.  The low-level evaluate will still do what it does
+########  except that it can be split as described above.
+
+                thisTransaction.evaluateCondensedSequence()
+
                 build_the_default=False
 
                 if receiver_tasks.default_structure_exists(thisTransaction.transaction_out):
@@ -162,7 +180,6 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
                     receiver_tasks.load_evaluation_output(thisTransaction.transaction_out)
                     continue
 
-                thisTransaction.evaluateCondensedSequence()
                 thisTransaction.setIsEvaluationForBuild(False)
                 if thisTransaction.transaction_in.entity.inputs.evaluationOptions is not None:
                     log.debug("Evaluation options were found in the input..")
@@ -172,7 +189,7 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
                 build_the_default=True
                 thisTransaction.manageSequenceBuild3DStructureRequest(defaultOnly=True)
                 receiver_tasks.set_this_build_as_default(thisTransaction.transaction_out)
-
+################
 
 
 

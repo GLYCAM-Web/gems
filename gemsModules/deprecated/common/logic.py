@@ -210,6 +210,17 @@ def getGemsExecutionContext() :
         log.debug("GW_LIVE_SWARM is NOT defined in the current environment.  Assuming this is not a website.")
         return 'default'
    
+def getGemsEnvironmentForceSerialExecution() :
+    log.info("getGemsExecutionContext was called.")
+    # Currently, if this variable is set to anything at all, GEMS is
+    # probably operating in support of a wabsite.
+    if 'GEMS_FORCE_SERIAL_EXECUTION' in os.environ :
+        log.debug("GEMS_FORCE_SERIAL_EXECUTION is defined in the current environment.")
+        return os.environ.get('GEMS_FORCE_SERIAL_EXECUTION')
+    else :
+        log.debug("GEMS_FORCE_SERIAL_EXECUTION is NOT defined in the current environment.")
+        return 'unset'
+   
 ## @brief Copy a file in a given path to some other path with option not to overwrite
 def copyPathFileToPath( fromPath : str, fromName : str, toPath : str, noClobber : bool = False ) :
     # If noClobber is True, check to be sure file doesn't already exist.

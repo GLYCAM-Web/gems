@@ -141,7 +141,7 @@ def getStructureDirectoryName(conformerLabel : str) -> str:
 #   @TODO: Move this to a better file for this stuff.
 
 
-def buildStructureInfoOliver(thisTransaction: sequenceio.Transaction):
+def buildStructureInfoOliver(thisTransaction: sequenceio.Transaction, defaultOnly=False):
     log.info("buildStructureInfoOliver() was called.")
 
     structureInfo = sequenceio.StructureBuildInfo()
@@ -183,13 +183,15 @@ def buildStructureInfoOliver(thisTransaction: sequenceio.Transaction):
     # ... so it needs rotamerData.
     # Oliver has decided to always request a default for symlinking ease.
     # Lachele sees this decision and raises an explicit conformer
-    ##
+
     # If there was an explicit request for multiple builds in the
     # incoming request, then do whatever was requested - UNLESS
     # this is being run from the website.  In that case, enforce a
-    # hard limit of 64 onto the number of structures.
+    # hard limit onto the number of structures. The limit might vary.
+    # See entity.procedural_options.
 
-    doSingleDefaultOnly = False  
+    doSingleDefaultOnly = defaultOnly
+
 
     maxNumberOfStructuresToBuild = thisTransaction.getNumberStructuresHardLimitIn()
     if maxNumberOfStructuresToBuild is None:
@@ -198,22 +200,26 @@ def buildStructureInfoOliver(thisTransaction: sequenceio.Transaction):
     if maxNumberOfStructuresToBuild is None:
         log.debug("maxNumberOfStructuresToBuild is None (2)")
         maxNumberOfStructuresToBuild = -1
-    if thisTransaction.getIsEvaluationForBuild() is False:
-        log.debug("Build Evaluation is false")
-        log.debug("transaction says this is not an evaluation for a build")
+    if doSingleDefaultOnly:
         maxNumberOfStructuresToBuild = 1
-        doSingleDefaultOnly = True
 
-    maxHardLimit = -1
-    transactionContext = os.environ.get('GW_GRPC_ROLE')
-    log.debug("transactionContext is : " + str(transactionContext))
-    # TODO - make these limits configurable via environment variable
-    # TODO - This impacts the frontend. Make an appropriate plan. FE devs need to know this too.
-    if transactionContext == 'Developer':
-        maxHardLimit = 8
-    if transactionContext == 'Swarm':
-        maxHardLimit = 64
+#    if thisTransaction.getIsEvaluationForBuild() is False:
+#        log.debug("Build Evaluation is false")
+#        log.debug("transaction says this is not an evaluation for a build")
+#        maxNumberOfStructuresToBuild = 1
+#        doSingleDefaultOnly = True
 
+    maxHardLimit = thisTransaction.transaction_out.entity.procecural_options.number_structures_hard_limit
+    ## The following has all moved to the procedural_options validation
+#    transactionContext = os.environ.get('GW_GRPC_ROLE')
+##    log.debug("transactionContext is : " + str(transactionContext))
+#    # TODO - make these limits configurable via environment variable
+#    # TODO - This impacts the frontend. Make an appropriate plan. FE devs need to know this too.
+#    if transactionContext == 'Developer':
+#        maxHardLimit = 8
+#    if transactionContext == 'Swarm':
+#        maxHardLimit = 64
+#
     log.debug("The max number structs to build (1) is :  " +
               str(maxNumberOfStructuresToBuild))
     log.debug("The max hard limit (1) is :  " + str(maxHardLimit))
@@ -290,7 +296,8 @@ def buildStructureInfoOliver(thisTransaction: sequenceio.Transaction):
                 buildState.pUUID,
                 buildState.structureDirectoryName))
         buildState.setConformerPath()
-        if sequenceProjects.structureExists(buildState, thisTransaction, thisBuildStrategyID):
+        if sequenceProjects.currentBuildStructureExists(buildState, thisTransaction):
+#        if sequenceProjects.structureExists(buildState, thisTransaction, thisBuildStrategyID):
             log.debug("Found an existing structure for " +
                       buildState.structureDirectoryName)
             buildDir = "Existing_Builds/"
@@ -359,7 +366,8 @@ def buildStructureInfoOliver(thisTransaction: sequenceio.Transaction):
                 buildState.pUUID,
                 buildState.structureDirectoryName))
             buildState.setConformerPath()
-            if sequenceProjects.structureExists(buildState, thisTransaction, thisBuildStrategyID):
+            if sequenceProjects.currentBuildStructureExists(buildState, thisTransaction):
+#            if sequenceProjects.structureExists(buildState, thisTransaction, thisBuildStrategyID):
                 log.debug("Found an existing structure for " +
                           buildState.structureDirectoryName)
                 buildDir = "Existing_Builds/"
