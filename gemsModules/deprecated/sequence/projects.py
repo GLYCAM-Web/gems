@@ -275,8 +275,37 @@ def createSymLinkInRequestedStructures(projectDir: str, buildDir: str, conformer
         raise error
 
 
+def addSequenceFolderSymLinkToDefaultBuild(servicePath: str, sequenceID: str, buildStrategyID: str, conformerID: str):
+    log.info("addSequenceFolderSymLinkToDefaultBuild() was called.")
+    # Add a symlink pointing from Sequences/sequenceID/default
+    #                          to Sequences/sequenceID/buildStrategyID/All_Builds/conformerID
+    path_to_new_link = os.path.join('Sequences' , sequenceID)
+    path_to_existing_path = os.path.join('Sequences' , sequenceID ,  buildStrategyID , 'All_Builds' , conformerID)
+    log.debug("Creating symlink with toolPath " + servicePath + " called " + conformerID +
+              " from " + path_to_new_link + " pointing to " + path_to_existing_path)
+    commonlogic.make_relative_symbolic_link(
+            path_down_to_source = path_to_existing_path,
+            path_down_to_dest_dir = path_to_new_link, 
+            dest_link_label = 'default', 
+            parent_directory = servicePath)
+
+def addSequenceBuildStrategyFolderSymLinkToDefaultBuild(servicePath: str, sequenceID: str, buildStrategyID: str,  conformerID: str):
+    log.info("addSequenceBuildStrategyFolderSymLinkToDefaultBuild() was called.")
+    # Add a symlink from Sequences/sequenceID/buildStrategyID/default
+    #                 to Sequences/sequenceID/buildStrategyID/All_Builds/conformerID
+    path_to_new_link = os.path.join('Sequences' , sequenceID , buildStrategyID)
+    path_to_existing_path = os.path.join('Sequences' , sequenceID ,  buildStrategyID , 'All_Builds' , conformerID)
+    log.debug("Creating symlink with toolPath " + servicePath + " called " + conformerID +
+              " from " + path_to_new_link + " pointing to " + path_to_existing_path)
+    commonlogic.make_relative_symbolic_link(
+            path_down_to_source = path_to_existing_path,
+            path_down_to_dest_dir = path_to_new_link, 
+            dest_link_label = 'default', 
+            parent_directory = servicePath)
+
+
 def addSequenceFolderSymLinkToNewBuild(servicePath: str, sequenceID: str, buildStrategyID: str, projectID: str, conformerID: str):
-    log.info("addSequenceFolderSymLinkForConformer() was called.")
+    log.info("addSequenceFolderSymLinkToNewBuild() was called.")
     # Add a symlink from Sequences/sequenceID/buildStrategyID/All_Builds/conformerID
     #                 to Builds/projectID/New_Builds/conformerID
     # Don't want to call this function for Existing_Builds, as they should already be linked from All_Builds.
