@@ -267,6 +267,7 @@ def buildStructureInfoOliver(thisTransaction: sequenceio.Transaction, defaultOnl
         log.debug("buildState.conformerLabel (1) = " + buildState.conformerLabel)
         buildState.conformerID = buildState.structureDirectoryName
         buildState.isDefaultStructure = True
+        buildState.isGlobalDefaultStructure = True
         buildState.date = datetime.now()
         buildState.setEntityId(entity_id)
         buildState.setServiceId(service_id)
