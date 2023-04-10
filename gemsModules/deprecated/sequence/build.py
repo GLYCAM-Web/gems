@@ -123,6 +123,28 @@ def buildEach3DStructureInStructureInfo(thisTransaction: sequenceio.Transaction)
         # buildDir is either New_Builds/ or Existing_Builds/
         sequenceProjects.createSymLinkInRequestedStructures(
             thisProjectDir, buildDir, subDirectory)
+
+        if buildState.isDefaultStructure:
+
+            sequenceProjects.addBuildFolderSymLinkForDefaultConformer( 
+                    thisProjectDir, 
+                    buildDir, 
+                    subDirectory )
+
+        if buildState.isGlobalDefaultStructure:
+
+            sequenceProjects.addSequenceFolderSymLinkToDefaultBuild(
+                    thisServiceDir, 
+                    thisSeqID, 
+                    thisBuildStrategyID, 
+                    subDirectory)
+
+            sequenceProjects.addSequenceBuildStrategyFolderSymLinkToDefaultBuild(
+                    thisServiceDir, 
+                    thisSeqID, 
+                    thisBuildStrategyID,  
+                    subDirectory)
+
         # Needs to be Requested_Structres/. Need to add conformerID separately.
         # sequenceProjects.addResponse(buildState, thisTransaction, conformerID, buildState.conformerLabel)
         # This probably needs work

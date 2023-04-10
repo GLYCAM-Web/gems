@@ -11,6 +11,7 @@ else:
 
 def manageSequenceBuild3DStructureRequest(self, defaultOnly: bool = False):
     log.info("manageSequenceBuild3DStructureRequest was called ")
+    log.debug("defaultonly = " + str(defaultOnly))
     from gemsModules.deprecated.sequence import structureInfo, projects
     from gemsModules.deprecated.sequence import io as sequenceio
     from gemsModules.deprecated.project import projectUtilPydantic as projectUtils
@@ -36,7 +37,8 @@ def manageSequenceBuild3DStructureRequest(self, defaultOnly: bool = False):
         log.debug("structureBuildInfo: " +
                   str(self.transaction_out.entity.outputs.structureBuildInfo))
     try:
-        thisStructureInfo = structureInfo.buildStructureInfoOliver(self)
+        log.debug(" about to build structure info and defaultonly = " + str(defaultOnly))
+        thisStructureInfo = structureInfo.buildStructureInfoOliver(self, defaultOnly=defaultOnly)
         self.transaction_out.entity.outputs.structureBuildInfo = thisStructureInfo
         # thisStructureInfo.buildStates[0].energy=8.8888  # to test change-making
         log.debug("structureInfo: " + thisStructureInfo.json(indent=2))

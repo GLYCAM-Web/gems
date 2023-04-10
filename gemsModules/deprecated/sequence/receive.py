@@ -157,43 +157,13 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
 
         if 'Evaluate' in thisService.typename:
             log.debug("Evaluate service requested from sequence entity.")
+
             try:
-
-
-###### Ideally, something else should do all of this
-
-########  Try splitting the evaluation code so validate can be called, then checks
-########  can be made.  
-##              splitting is done.  Checks need to be written.
-##If there is no previous evaluation, then evaluate is called.
-########  Otherwise, the previous evaluation is read in and returned.
-########  The transaction level evaluate will do this, and will check to see if a
-########  build should be made.  The low-level evaluate will still do what it does
-########  except that it can be split as described above.
 
                 thisTransaction.evaluateCondensedSequence()
 
-                build_the_default=False
-
-                if receiver_tasks.default_structure_exists(thisTransaction.transaction_out):
-                    log.debug("The default structure already exists.")
-                    receiver_tasks.load_evaluation_output(thisTransaction.transaction_out)
-                    continue
-
-                thisTransaction.setIsEvaluationForBuild(False)
-                if thisTransaction.transaction_in.entity.inputs.evaluationOptions is not None:
-                    log.debug("Evaluation options were found in the input..")
-                    if not thisTransaction.transaction_in.entity.inputs.evaluationOptions.buildDefaultStructure:
-                        log.debug("buildDefaultStructure was explicitly set to false.")
-                        continue
-                build_the_default=True
-                thisTransaction.manageSequenceBuild3DStructureRequest(defaultOnly=True)
-                receiver_tasks.set_this_build_as_default(thisTransaction.transaction_out)
-################
-
-
-
             except Exception as error:
+
                 log.error(
                     "There was a problem evaluating the condensed sequence: " + str(error))
                 log.error(traceback.format_exc())

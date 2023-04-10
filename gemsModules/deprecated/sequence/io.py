@@ -2,9 +2,9 @@
 #from enum import Enum, auto
 from typing import Dict, List, Any, Union
 #from typing import ForwardRef
-from os.path import join
+import os
 from datetime import datetime
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 #from pydantic.schema import schema
 from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
 from gemsModules.deprecated.common import io as commonio
@@ -261,7 +261,7 @@ class Single3DStructureBuildDetails(BaseModel):
 
     # theBuildDir is usually "New_Builds" or "Existing_Builds" unlesss it is the general case
     def setAbsoluteConformerPath(self, theBuildDir: str):
-        self.absolute_conformer_path = join(
+        self.absolute_conformer_path = os.path.join(
             self.filesystem_path,
             self.entity_id,
             self.service_id,
@@ -271,7 +271,7 @@ class Single3DStructureBuildDetails(BaseModel):
             self.structureDirectoryName)
 
     def setConformerPath(self):
-        self.conformer_path = join(
+        self.conformer_path = os.path.join(
             self.filesystem_path,
             self.entity_id,
             self.service_id,
@@ -694,13 +694,13 @@ class sequenceProceduralOptions(commonio.ProceduralOptions):
             log.debug("transactionContext, per GW_GRPC_ROLE, is : " + str(transactionContext))
             if transactionContext == 'Developer': 
                 return 8 
-            else if transactionContext == 'Swarm': 
+            elif transactionContext == 'Swarm': 
                 return 64
             else:
                 return 1  # if you only get one structure, check your GRPC Role
         if 'GEMS_MAX_STRUCTURES' in os.environ :
             the_max = os.environ.get('GEMS_MAX_STRUCTURES')
-            log.debug("per GEMS_MAX_STRUCTURES, the max structures is to be set to : " str(the_max))
+            log.debug("per GEMS_MAX_STRUCTURES, the max structures is to be set to : " + str(the_max))
             try: 
                 max_int = int(the_max)
             except ValueError: 
@@ -1154,7 +1154,8 @@ class Transaction(commonio.Transaction):
     def evaluateCondensedSequence(self, validateOnly : bool = False):
         ## If we got to here, there should be valid inputs including a valid sequence
         if self.transaction_out is None and self.transaction_in is None:
-            raise ValueError "No transaction, incoming or outgoing, could not be found."
+            raise ValueError("No transaction, incoming or outgoing, could not be found.")
+
         ## Ensure that the output spaces are ready to go
         if self.transaction_out is None:
             self.initialize_transaction_out_from_transaction_in()
@@ -1164,57 +1165,83 @@ class Transaction(commonio.Transaction):
             self.transaction_out.entity.outputs.sequenceEvaluationOutput = TheSequenceEvaluationOutput()
         if self.transaction_out.entity.outputs.sequenceEvaluationOutput.evaluationOptions is None:
             self.transaction_out.entity.outputs.sequenceEvaluationOutput.evaluationOptions = TheEvaluationOptions()
+
         ## For validateOnly requests, we just need to say "True" and be done
         if validateOnly:
             self.transaction_out.entity.outputs.sequenceEvaluationOutput.evaluationOptions.validateOnly = validateOnly
             self.transaction_out.entity.outputs.sequenceEvaluationOutput.sequenceIsValid=True
             return
+
         ## If we are still here, we are doing a proper evaluation
         this_entity = self.transaction_out.entity
+
         ## Copy down the directive for md minimization
-        this_entity.procedural_options.md_minimize = self.mdMinimize
+        this_entity.procedural_options.md_minimize = self.transaction_in.mdMinimize
+
         ## Do the basic validation - we need the index ordered sequence to check for existing builds
-        the_sequence = this_entity.outputs.sequence.payload
+        the_sequence = this_entity.inputs.sequence.payload
         this_entity.outputs.sequenceEvaluationOutput.getBasicEvaluation(the_sequence)
+
+        ##########
+        ##########
+        ### The idea with this block is to be able to return an existing evaluation
+        ##  This can totally work.  But, I don't have time to figure out how to deal
+        ##  with needed updates to the project and such.
+        ##  This code is incomplete and is not expected to work yet.
+        ##  Commenting it out for now.  There will be an evaluation every time.
+        ##  But, the first time, a sym link will be set so that it can be found easily
+        ##  in the future.  BLF.
+        ##
         ## See if there is existing output and if we should return it
-        the_ordered_sequence = self.getSequenceVariantOut('indexOrdered')
-        ## The following will return None if the options say not to use it, and in some other cases,
-        ## including the case where there are no previous builds
-        from gemsModules.deprecated.sequence.projects import get_existing_default_evaluation_path
-        the_existing_file_path = get_existing_default_evaluation_path(  ## this is probably not designed yet.
-                sequence = the_ordered_sequence, 
-                options = this_entity.procedural_options
-                project = self.transaction_out.project))
-        if the_existing_file_path is not None:
-            temp_outputs = SequenceOutputs()
-            try:
-                temp_outputs.parse_file(the_existing_file_path)
-            except Exception as error:
-                log.error("Problem reading in existing evaluation output file.")
-                log.error("The file path is:")
-                log.error(the_existing_file_path)
-                log.error("The exception had the following to say:")
-                log.error(error)
-            ## do we need to update any values?
-            ## if not, just do this:
-            this_sequence.outputs = temp_outputs.copy(deep=True)
-        else:
-            this_entity.outputs.sequenceEvaluationOutput.getBuildEvaluation(the_sequence)
+#        the_ordered_sequence = self.getSequenceVariantOut('indexOrdered')
+#        from gemsModules.deprecated.sequence.projects import get_existing_default_evaluation_path
+#        the_existing_evaluation_path = get_existing_default_evaluation_path(self)
+#
+#        if the_existing_evaluation_path is not None:
+#            try:
+#                temp_transaction_out = sequenceTransactionSchema.parse_file(the_existing_evaluation_path)
+#            except Exception as error:
+#                log.error("Problem reading in existing evaluation output file.")
+#                log.error("The file path is:")
+#                log.error(the_existing_file_path)
+#                log.error("The exception had the following to say:")
+#                log.error(error)
+#            def make_changes_to_the_transaction_to_return():
+#                pass
+#            self.transaction_out = temp_transaction_out.copy(deep=True)
+#            return
+        ##########
+        ##########
+
+        this_entity.outputs.sequenceEvaluationOutput.getBuildEvaluation(the_sequence)
+        log.debug("called this_entity.outputs.sequenceEvaluationOutput.getBuildEvaluation(the_sequence)")
+
         ## If we need to do a default build, then do it now
         if this_entity.procedural_options.build_default_on_evaluation:
+            log.debug("this_entity.procedural_options.build_default_on_evaluation is true")
             if this_entity.outputs.structureBuildInfo is None: 
+                log.debug("this_entity.outputs.structureBuildInfo is None")
+                from gemsModules.deprecated.sequence.projects import get_default_evaluation_path_from_sequence
+                the_path = get_default_evaluation_path_from_sequence(self)
+                log.debug("The path returned was : " + str(the_path))
+                if the_path is not None:
+                    return
+                log.debug("the path was None so we are going to do a default build")
                 self.manageSequenceBuild3DStructureRequest(defaultOnly=True)
-                if this_entity.procedural_options.use_library
-                    self.setThisBuildAsDefault()
+                ## If we're doing this, then ensure that the default evaluation path is made
+                from gemsModules.deprecated.sequence.projects import set_default_evaluation_symlink_in_sequence
+                path_setting_errors = set_default_evaluation_symlink_in_sequence(self)
+                if path_setting_errors is not None:
+                    self.generateCommonParserNotice(
+                        noticeBrief='GemsError',
+                        additionalInfo={"hint": path_setting_errors})
+
+
 
 
 # In file _manageSequenceBuild3DStructureRequest.py:
 #    def manageSequenceBuild3DStructureRequest(self, defaultOnly : bool = False)
     from gemsModules.deprecated.sequence._manageSequenceBuild3DStructureRequest import manageSequenceBuild3DStructureRequest
-
-# In file _setThisBuildAsDefault.py:
-#    def manageSequenceBuild3DStructureRequest(self, defaultOnly : bool = False)
-    from gemsModules.deprecated.sequence._setThisBuildAsDefault import setThisBuildAsDefault
 
     def build_outgoing_string(self):
         if self.transaction_out.prettyPrint is True:

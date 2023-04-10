@@ -23,7 +23,7 @@ import traceback
 from enum import Enum, auto
 from uuid import UUID
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union, Any
-from pydantic import BaseModel, Field, Json
+from pydantic import BaseModel, Field, Json, validator
 from pydantic.schema import schema
 from gemsModules.deprecated.project import dataio as projectio
 from gemsModules.deprecated.common import settings
@@ -201,11 +201,11 @@ class ProceduralOptions(BaseModel):
         the_flag : str =getGemsEnvironmentForceSerialExecution()
         if the_flag == 'unset':
             return v
-        if lower(the_flag) == 'true':
+        if the_flag.lower() == 'true':
             return True
-        else if lower(the_flag) == 'false':
+        elif the_flag.lower() == 'false':
             return False
-        raise ValueError "Cannot interpret value set for GEMS_FORCE_SERIAL_EXECUTION from the environment." 
+        raise ValueError ("Cannot interpret value set for GEMS_FORCE_SERIAL_EXECUTION from the environment.")
 
 
 class Entity(BaseModel):

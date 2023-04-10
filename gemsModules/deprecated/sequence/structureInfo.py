@@ -190,8 +190,10 @@ def buildStructureInfoOliver(thisTransaction: sequenceio.Transaction, defaultOnl
     # hard limit onto the number of structures. The limit might vary.
     # See entity.procedural_options.
 
+
     doSingleDefaultOnly = defaultOnly
 
+    log.debug("doSingleDefaultOnly is : " + str(doSingleDefaultOnly))
 
     maxNumberOfStructuresToBuild = thisTransaction.getNumberStructuresHardLimitIn()
     if maxNumberOfStructuresToBuild is None:
@@ -200,26 +202,12 @@ def buildStructureInfoOliver(thisTransaction: sequenceio.Transaction, defaultOnl
     if maxNumberOfStructuresToBuild is None:
         log.debug("maxNumberOfStructuresToBuild is None (2)")
         maxNumberOfStructuresToBuild = -1
-    if doSingleDefaultOnly:
+    if doSingleDefaultOnly == True:
         maxNumberOfStructuresToBuild = 1
 
-#    if thisTransaction.getIsEvaluationForBuild() is False:
-#        log.debug("Build Evaluation is false")
-#        log.debug("transaction says this is not an evaluation for a build")
-#        maxNumberOfStructuresToBuild = 1
-#        doSingleDefaultOnly = True
 
-    maxHardLimit = thisTransaction.transaction_out.entity.procecural_options.number_structures_hard_limit
-    ## The following has all moved to the procedural_options validation
-#    transactionContext = os.environ.get('GW_GRPC_ROLE')
-##    log.debug("transactionContext is : " + str(transactionContext))
-#    # TODO - make these limits configurable via environment variable
-#    # TODO - This impacts the frontend. Make an appropriate plan. FE devs need to know this too.
-#    if transactionContext == 'Developer':
-#        maxHardLimit = 8
-#    if transactionContext == 'Swarm':
-#        maxHardLimit = 64
-#
+    maxHardLimit = thisTransaction.transaction_out.entity.procedural_options.number_structures_hard_limit
+
     log.debug("The max number structs to build (1) is :  " +
               str(maxNumberOfStructuresToBuild))
     log.debug("The max hard limit (1) is :  " + str(maxHardLimit))

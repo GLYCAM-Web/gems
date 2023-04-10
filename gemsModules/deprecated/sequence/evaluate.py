@@ -11,7 +11,7 @@ else:
 
 # I think if we got all the names to match, we could use parse_object_as instead of this. OG.
 # Probably it would fail on sub-classes though, but maybe.
-##  BLF is uncertain what this comment means.  
+## if gmml returned a properly json-formatted string it should all work fine.  BLF.
 
 
 def getLinkageOptionsFromGmmlcbBuilder(sequence):
@@ -92,6 +92,8 @@ def getSequenceVariants(validatedSequence: str):
     Sequences.indexOrdered = this_sequence.getIndexOrdered()
     Sequences.longestChainOrdered = "Currently unavailble in gmml. Request if needed!"
     Sequences.indexOrderedLabeled = this_sequence.getIndexLabeled()
+    from gemsModules.deprecated.project.projectUtilPydantic import getSeqIdForSequence
+    Sequences.suuid = getSeqIdForSequence(Sequences.indexOrdered)
     log.debug("Here are the new Sequences: " + str(Sequences))
     return Sequences
 
