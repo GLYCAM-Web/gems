@@ -1,5 +1,7 @@
 #!/bin/bash
 
+## This file should be sourced from the tests directory.
+
 remove_file_if_found()
 {
 	if [ -f ${1} ] ; then
@@ -34,6 +36,11 @@ check_output_is_only_json()
 		echo "The data response appears to be ok"
 		return 0
 	fi
+}
+get_seqID_from_json() 
+{
+	seqID=$(grep -m 1  seqID ${1} | cut -d '"' -f4)
+	return seqID
 }
 get_pUUID_from_json() 
 {

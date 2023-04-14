@@ -1,32 +1,53 @@
 #!/usr/bin/env bash
 
-## Shortens time spent minimizing
-export GEMS_MD_TEST_WORKFLOW=True
+. utilities/common_environment.bash
 
-## A place for testing output. Separated so it is safe to delete.
-export GEMS_OUTPUT_PATH='/website/TESTS/git-ignore-me/pre-push'
-gemsServicePath=${GEMS_OUTPUT_PATH}/sequence/cb
-gemsSequencePath=${GEMS_OUTPUT_PATH}/sequence/cb/Sequences
-gemsBuildPath=${GEMS_OUTPUT_PATH}/sequence/cb/Builds
+## The variable badOutDir should be defined in the script that calls this one.
+outputFilePrefix='git-ignore-me_test008'
+badOutputPrefix="${badOutDir}/${now}_${outputFilename}"
+badOutput="${badOutputPrefix}.txt"
 
-## Inputs
-inputJson=$GEMSHOME/gemsModules/deprecated/delegator/test_in/sequence/build_sequence_with_selected_rotamers.json
-sequenceID='00e7d454-06dd-5067-b6c9-441dd52db586'
-now=$(date "+%Y-%m-%d-%H-%M-%S")
+ALL_JSON_ARE_GOOD='true'
+ALL_SEQID_ARE_GOOD='true'
 
-## Outputs
-## The variable badOutDir should be defined in the calling directory.
-filename=git-ignore-me_test08_out.txt
-badOutput="${badOutDir}/${now}_${filename}"
+theCorrectSequenceID='00e7d454-06dd-5067-b6c9-441dd52db586'
+defaultStructureConformationID='e6c2e2e8-758b-58b8-b5ff-d138da38dd22'
 
-## Edit if your machine needs more time for minimization to finish
-maxTimeCount=40
-sleepTime=10
+
+do_the_common_tasks()
+{	
+	jsonInFile="${1}"
+	outFilePrefix="${2}"
+
+	# Delegate the json input
+
+	theJsonOut="$(cat ${jsonInFile} | $GEMSHOME/bin/delegate | tee ${outFilePrefix}.json)"
+
+	check_output_is_only_json ${outFilePrefix}.json
+	
+	isJsonOk=$?
+	
+	if [ "${isJsonok}" != 0 ] ; then
+		ALL_JSON_ARE_GOOD='false'
+		echo "FAILURE:  ${1} got a non-purely-json response from delegator." | tee -a ${badOutput}
+		echo "Check ${outFilePrefix}.json for more information." | tee -a ${badOutput}
+	fi
+
+	theseqID="$(get_seqID_from_json ${theJsonout})"
+	if [ "${theseqID}" != "${theCorrectSequenceID}" ] ; then
+		ALL_SEQID_ARE_GOOD='false'
+		echo "FAILURE:  got seqID of ${theseqID} which shouldbe ${theCorrectSequenceID}." | tee -a ${badOutput}
+	fi
+
+	thepUUID="$(get_pUUID_from_json ${theJsonout})"
+	return thepUUID
+}
+
+
 
 ## run the evaluation
 ## check:
 
-##        -  the output is only proper json
 
 ##        -  tree Sequences/00e7d454-06dd-5067-b6c9-441dd52db586/
 """
