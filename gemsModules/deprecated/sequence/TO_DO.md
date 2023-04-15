@@ -24,15 +24,18 @@ Test this sequence:
 - [x] Also ensure that MD Minimize can be turned off.
 - [x] See if we care about structureInfoFilename being written
 	- [x] Apparently, manageSequenceBuild3DStructureRequest looks for it
-- [ ] See if we care about statusFilename being written
+- [ ] DEFERRED: See if we care about statusFilename being written
+	- [ ] See if anything uses it 
+	- [ ] If not, then see if there is any reason it might be useful
+	- [ ] if not, remove it from the code
 - [x] Generate a test input for this.  This test input will replace test 008.  And, test 008 does not need to make so many structures anyhow.
 	- [x] Add an `008_references` directory to the `correct_outputs` directory.  
 		- [x] Add the final tree of `cb` at the end of the test sequence
 		- [x] Add a readme file so folks can make sense of it
 		- [x] Add tree output for the directories after each of the sub-tests
-- [ ] Fix all the JSON that gets output so that it uses aliases always and not the variable names in the classes
-	- [ ] Update tests that are affected by this
-- [ ] Make it possible to read in the evaluation.json file rather than having to do the entire evaluation each time.  The main complication to this lies in deciding which parts of the project need to be updated and how they should be updated.  Doing this needs some design work first.
+- [x] Fix all the JSON that gets output so that it uses aliases always and not the variable names in the classes
+	- [x] Update tests that are affected by this
+- [ ] DEFERRED: Make it possible to read in the evaluation.json file rather than having to do the entire evaluation each time.  The main complication to this lies in deciding which parts of the project need to be updated and how they should be updated.  Doing this needs some design work first.
 - [ ] DEFERRED, and probably not needed.  Should just refactor instead:  Make the next set of to-do items for the builds...
 - [x] Set a sybolic link inside the Sequence directory to the default structure's directory
 - [x] Figure out why structures that are not "defaults" aren't being built.
