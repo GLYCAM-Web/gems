@@ -32,7 +32,7 @@ Test this sequence:
 		- [ ] Add tree output for the directories after each of the sub-tests
 - [ ] Fix all the JSON that gets output so that it uses aliases always and not the variable names in the classes
 	- [ ] Update tests that are affected by this
-- [ ] 
+- [ ] Make it possible to read in the evaluation.json file rather than having to do the entire evaluation each time.  The main complication to this lies in deciding which parts of the project need to be updated and how they should be updated.  Doing this needs some design work first.
 - [ ] DEFERRED, and probably not needed.  Should just refactor instead:  Make the next set of to-do items for the builds...
 - [x] Set a sybolic link inside the Sequence directory to the default structure's directory
 - [x] Figure out why structures that are not "defaults" aren't being built.

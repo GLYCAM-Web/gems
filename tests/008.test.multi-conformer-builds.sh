@@ -49,44 +49,29 @@ do_the_common_tasks()
 }
 
 
-
 ### REMOVE ME - temporary while designing test
 GEMS_OUTPUT_PATH='/website/userdata'
 sequenceServicePath=${GEMS_OUTPUT_PATH}/sequence/cb
 sequenceSequencesPath=${GEMS_OUTPUT_PATH}/sequence/cb/Sequences
 sequenceBuildsPath=${GEMS_OUTPUT_PATH}/sequence/cb/Builds
-evaluation_pUUID='bce53e74-78b9-4a7e-b460-f10a0935f165'
+evaluation_pUUID='3037036a-0516-4ede-a79c-1537f87c1a31'
+build_1_pUUID='140b63e5-e57a-4578-8c37-6eac6607b5c0'
+build_2_pUUID='8dada2cb-582d-4cc4-b8ff-eb03242efa51'
+build_3_pUUID='7eae9c9d-974c-48c1-83ec-1e5b8c94b869'
 ### END remove me
 
-###########################################
-##         Evaluation                    ##
-###########################################
-evaluation_prefix="${badOutputPrefix}_0.evaluation"
-## UNCOMMENT once test is ready to run
-#evaluation_pUUID="$(do_the_common_tasks ${evaluation_input} ${evaluation_prefix})"
+##  Sub test 0 - evaluation
+source ./sub_parts/008.0.sub-test.bash
 
-source "correct_outputs/008.0.testing-arrays.bash"
-all_evaluation_passed='true'
-echo "Running ${#EvaluationTests[@]} sub-tests for the evaluation"
-for t in ${EvaluationTests[@]} ; do 
-	echo "Running the following command for test ${t}: "  >> ${badOutput}
-	echo "    ${EvaluationCommands[${t}]}"  >> ${badOutput}
-	the_answer="$(eval ${EvaluationCommands[${t}]})"
-	echo "the answer is : " >> ${badOutput}
-	echo ">>>${the_answer}<<<" >> ${badOutput}
-	echo "the CORRECT answer is : " >> ${badOutput}
-	echo ">>>${EvaluationCorrectOutputs[${t}]}<<<" >> ${badOutput}
-	if [ "${the_answer}" != "${EvaluationCorrectOutputs[${t}]}" ] ; then
-		echo "The ${t} test FAILED" | tee -a ${badOutput}
-		all_evaluation_passed='false'
-	fi
-done
-if [ "${all_evaluation_passed}" == "true" ] ; then
-	echo "The evaluation sub-tests passed." | tee -a ${badOutput}
-else
-	echo "One or more of the evaluation sub-tests FAILED." | tee -a ${badOutput}
-	ALL_TESTS_PASSED='false'
-fi
+## Sub test 1 - build the default and one other
+source ./sub_parts/008.1.sub-test.bash
+
+## Sub test 2 - build two non-default conformers
+source ./sub_parts/008.2.sub-test.bash
+
+## Sub test 3 - build four conformers, two existing and two new
+source ./sub_parts/008.3.sub-test.bash
+
 
 #ALL_TESTS_PASSED='test'
 

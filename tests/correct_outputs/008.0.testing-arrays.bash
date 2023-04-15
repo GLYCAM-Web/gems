@@ -13,19 +13,19 @@ declare -A EvaluationCommands=(
 	[MinGasPdb]="md5sum ${sequenceBuildsPath}/${evaluation_pUUID}/New_Builds/${defaultStructureConformationID}/min-gas.pdb | cut -d ' ' -f1"
 )
 declare -A EvaluationCorrectOutputs=(
-	[ListRSeqsSeqID]="""/website/userdata/sequence/cb/Sequences/00e7d454-06dd-5067-b6c9-441dd52db586:
+	[ListRSeqsSeqID]="""${sequenceSequencesPath}/00e7d454-06dd-5067-b6c9-441dd52db586:
 buildStrategyID1
 current
 default
 evaluation.json
 
-/website/userdata/sequence/cb/Sequences/00e7d454-06dd-5067-b6c9-441dd52db586/buildStrategyID1:
+${sequenceSequencesPath}/00e7d454-06dd-5067-b6c9-441dd52db586/buildStrategyID1:
 All_Builds
 default
 
-/website/userdata/sequence/cb/Sequences/00e7d454-06dd-5067-b6c9-441dd52db586/buildStrategyID1/All_Builds:
+${sequenceSequencesPath}/00e7d454-06dd-5067-b6c9-441dd52db586/buildStrategyID1/All_Builds:
 e6c2e2e8-758b-58b8-b5ff-d138da38dd22"""
-	[DefaultSymlink]="""/website/userdata/sequence/cb/Sequences/00e7d454-06dd-5067-b6c9-441dd52db586/buildStrategyID1/All_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22: symbolic link to ../../../../Builds/${evaluation_pUUID}/New_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22"""
+	[DefaultSymlink]="""${sequenceSequencesPath}/00e7d454-06dd-5067-b6c9-441dd52db586/buildStrategyID1/All_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22: symbolic link to ../../../../Builds/${evaluation_pUUID}/New_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22"""
 	[EvalJsonOutput]="00e7d454-06dd-5067-b6c9-441dd52db586"
 	[MinGasPdb]="d30c4c5c2c080545e24a11c6a808558b"
 )
