@@ -6,10 +6,23 @@
 ##   008.1 - Build first two             ##
 ###########################################
 build_1_prefix="${badOutputPrefix}_1.build"
-## UNCOMMENT once test is ready to run
-#build_1_pUUID="$(do_the_common_tasks ${build_1_input} ${build_1_prefix})"
+do_the_common_tasks ${build_1_input} ${build_1_prefix}
+build_1_pUUID=${thepUUID}
 
 source "correct_outputs/008.1.testing-arrays.bash"
+
+check_file="${sequenceBuildsPath}/${build_1_pUUID}/New_Builds/${new_conformer_id}/min-gas.pdb"
+echo "About to wait for output files to appear." | tee -a ${badOutput}
+echo "the file(s) we await : ${check_file}" >> ${badOutput}
+wait_for_files ${check_file}
+result=$?
+if [ "${result}" -ne "0" ] ; then
+	echo "Timed out before files appeared.  Test FAILED." | tee -a ${badOutput}
+	all_build_1_passed='false'
+	ALL_TESTS_PASSED='false'
+	return 1
+fi
+
 all_build_1_passed='true'
 echo "Running ${#Build1Tests[@]} sub-tests for the first build of two structures"
 for t in ${Build1Tests[@]} ; do 

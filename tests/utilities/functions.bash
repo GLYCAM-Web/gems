@@ -39,24 +39,44 @@ check_output_is_only_json()
 }
 get_seqID_from_json() 
 {
-	seqID=$(grep -m 1  seqID ${1} | cut -d '"' -f4)
-	return seqID
+	theseqID=$(grep -m 1  seqID ${1} | cut -d '"' -f4)
+	export theseqID
 }
 get_pUUID_from_json() 
 {
-	pUUID=$(grep -m 1  pUUID ${1} | cut -d '"' -f4)
-	return pUUID
+	thepUUID=$(grep -m 1  pUUID ${1} | cut -d '"' -f4)
+	export thepUUID
 }
-check_string_against_standard()
+do_files_exist()
 {
-	test_string="${1}"
-	standard="${2}"
-
+	files=${1}
+	#echo "checking on the file(s): ${files}"
+	result=0
+	for file in ${files} ; do
+		if [ ! -e ${file} ] ; then
+			result=1
+		fi
+	done
+	#echo "returning ${result}"
+	return ${result}
 }
-check_file_contents_against_standard()
+wait_for_files()
 {
-	test_contents="${1}"
-	standard="${2}"
-	cmp ${test_content} ${standard} > /dev/null 2>&1;
+	### the sleep duration info is in common_environment.bash and that should be included before this file
+	files=${1}
+	#echo "waiting for the file(s): ${files}"
+	count=0
+	while ! do_files_exist ${files}
+       	do
+                echo "about to sleep"
+                sleep ${oneSleepTimeDuration} 
+                count=$((count+1))
+                echo "Waited $((count*oneSleepTimeDuration)) seconds so far. Still missing one or more files."
+                if [ "${count}" -eq "${maxSleepTimeCount}" ] ; then
+                        echo "Waited $((count*oneSleepTimeDuration)) seconds so far. One or more files missing." 
+                        return 1
+                fi
+        done
+	return 0
 }
 
