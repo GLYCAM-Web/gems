@@ -349,7 +349,7 @@ class Transaction:
                 "There was a problem getting the project from transaction_out :  " + str(error))
             raise error
 
-    def getSchemaLocation():
+    def getSchemaLocation(self):
         thisProject = self.getProjectOut()
         return thisProject.getFilesystemPath()
 
