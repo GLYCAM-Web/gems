@@ -102,7 +102,6 @@ if [ "${ALL_TESTS_PASSED}" == "true" ] ; then
 	source './sub_parts/008.3.sub-test.bash'
 fi
 
-exit 0
 
 if [ "${ALL_JSON_ARE_GOOD}" == "false" ] ; then
         echo "The builds worked, but one or more JSON delegations FAILED."
