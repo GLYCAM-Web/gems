@@ -262,10 +262,10 @@ class TransactionSchema(BaseModel):
 class Transaction:
     """Holds information relevant to a delegated transaction"""
     incoming_string: str = None
-    request_dict: {} = None
+    request_dict: Dict = None
     transaction_in: TransactionSchema
     transaction_out: TransactionSchema
-    response_dict: {} = None
+    response_dict: Dict = None
     outgoing_string: str = None
 
     def __init__(self, in_string):
