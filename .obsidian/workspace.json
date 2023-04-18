@@ -1,0 +1,177 @@
+{
+  "main": {
+    "id": "a41b68c3880d82f1",
+    "type": "split",
+    "children": [
+      {
+        "id": "5b78760675548806",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "61a0973f6b4ed831",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "gemsModules/deprecated/sequence/TO_DO.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "2a0322381c5352b0",
+    "type": "split",
+    "children": [
+      {
+        "id": "a465f82f707d74c6",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "a041601163d67aaf",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "92fd7e964568a4ef",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "ab9451182b242f99",
+            "type": "leaf",
+            "state": {
+              "type": "starred",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "5468528cfb984212",
+    "type": "split",
+    "children": [
+      {
+        "id": "8dc7cbe853b2f837",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "dde2110212c1f26b",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "gemsModules/deprecated/sequence/TO_DO.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "bf9c69fcb576d18d",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "gemsModules/deprecated/sequence/TO_DO.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "d42ff762e8707755",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
+          },
+          {
+            "id": "acfe8e293d38451d",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "gemsModules/deprecated/sequence/TO_DO.md"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false
+    }
+  },
+  "active": "61a0973f6b4ed831",
+  "lastOpenFiles": [
+    "tests/bad_outputs/2023-04-15-01-12-25_git-ignore-me_test008_2.build.json",
+    "tests/bad_outputs/2023-04-15-01-12-25_git-ignore-me_test008_1.build.json",
+    "tests/bad_outputs/2023-04-15-01-12-25_git-ignore-me_test008_0.evaluation.json",
+    "tests/bad_outputs/2023-04-15-01-12-25_git-ignore-me_test008.txt",
+    "tests/oligosaccharide.dot",
+    "tests/test4_output",
+    "testing.error",
+    "testing.log",
+    "tests/test3_output",
+    "tests/bad_outputs",
+    "gmml/cmakeBuild/CMakeFiles/Progress/4",
+    "tests/correct_outputs/008_reference/cb_final_state/Builds/8dada2cb-582d-4cc4-b8ff-eb03242efa51/New_Builds/ce32017d-6663-5ecc-b282-9e9812986d1c/Readme-Stopgap.md",
+    "tests/correct_outputs/008_reference/cb_final_state/Builds/8dada2cb-582d-4cc4-b8ff-eb03242efa51/New_Builds/ce32017d-6663-5ecc-b282-9e9812986d1c/README.md",
+    "tests/correct_outputs/008_reference/cb_final_state/Builds/8dada2cb-582d-4cc4-b8ff-eb03242efa51/New_Builds/8ddcc916-47db-5426-828c-fc24aae19d39/Readme-Stopgap.md",
+    "tests/correct_outputs/008_reference/cb_final_state/Builds/8dada2cb-582d-4cc4-b8ff-eb03242efa51/New_Builds/8ddcc916-47db-5426-828c-fc24aae19d39/README.md",
+    "tests/correct_outputs/008_reference/cb_final_state/Builds/3037036a-0516-4ede-a79c-1537f87c1a31/New_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/Readme-Stopgap.md",
+    "tests/correct_outputs/008_reference/cb_final_state/Builds/3037036a-0516-4ede-a79c-1537f87c1a31/New_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/README.md",
+    "tests/correct_outputs/008_reference/cb_final_state/Builds/7eae9c9d-974c-48c1-83ec-1e5b8c94b869/New_Builds/c408f40d-28e0-5e8d-86a3-221b74da42f7/Readme-Stopgap.md",
+    "tests/correct_outputs/008_reference/cb_final_state/Builds/7eae9c9d-974c-48c1-83ec-1e5b8c94b869/New_Builds/c408f40d-28e0-5e8d-86a3-221b74da42f7/README.md",
+    "tests/correct_outputs/008_reference/cb_final_state/Builds/7eae9c9d-974c-48c1-83ec-1e5b8c94b869/New_Builds/b90a4d30-822c-5aba-ae5a-10a9ddb1a227/Readme-Stopgap.md",
+    "tests/correct_outputs/008_reference/cb_final_state/Builds/7eae9c9d-974c-48c1-83ec-1e5b8c94b869/New_Builds/b90a4d30-822c-5aba-ae5a-10a9ddb1a227/README.md",
+    "tests/correct_outputs/008_reference/cb_final_state/Builds/140b63e5-e57a-4578-8c37-6eac6607b5c0/New_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/Readme-Stopgap.md",
+    "tests/correct_outputs/008_reference/cb_final_state/Builds/140b63e5-e57a-4578-8c37-6eac6607b5c0/New_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/README.md",
+    "tests/correct_outputs/008_reference/README.md",
+    "gemsModules/deprecated/sequence/TO_DO.md"
+  ]
+}

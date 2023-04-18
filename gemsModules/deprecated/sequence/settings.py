@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-from gemsModules.deprecated import common
-from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
+#from gemsModules.deprecated import common
+#from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 from enum import Enum
 
-from pydantic import BaseModel
+#from pydantic import BaseModel
 
 # Who I am
 WhoIAm = 'Sequence'
@@ -46,7 +46,7 @@ serviceModules = {
 # ## from Lachele, 2021-04-01:
 # ##    I'm moving these here from io.py.  They don't
 # ##    have to stay here.  I was hoping to make io.py
-# ##    a little sipler.  I also have my eye on making
+# ##    a little simpler.  I also have my eye on making
 # ##    a lot of the io classes be generic so that they
 # ##    need a lot less redefinition in the child classes.
 #
@@ -60,6 +60,8 @@ class Services(str, Enum):
     drawGlycan = 'DrawGlycan'
     evaluate = 'Evaluate'
     status = 'Status'
+    validate = 'Validate'
+    marco = 'Marco'
 
 # ## Environment variables
 # ##

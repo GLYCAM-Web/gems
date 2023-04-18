@@ -973,9 +973,9 @@ class PdbTransaction(commonIO.Transaction):
         log.info("build_outgoing_string() was called.")
         
         if self.transaction_out.prettyPrint is True : 
-            self.outgoing_string = self.transaction_out.json(indent=2)
+            self.outgoing_string = self.transaction_out.json(indent=2, by_alias=True)
         else :
-            self.outgoing_string = self.transaction_out.json()
+            self.outgoing_string = self.transaction_out.json(by_alias=True)
 
         log.debug("self.outgoing_string: " + self.outgoing_string)
 

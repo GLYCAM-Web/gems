@@ -1,24 +1,13 @@
 #!/usr/bin/env python3
-import json
-import sys
 import os
-import re
-#import importlib.util
-import shutil
-import uuid
 import pathlib
-from datetime import datetime
-#import gemsModules.deprecated
-#import gmml
 import traceback
-import gemsModules.deprecated.common.utils
+from typing import List
 from gemsModules.deprecated.project import projectUtilPydantic as projectUtils
-from gemsModules.deprecated.project import settings as projectSettings
-from gemsModules.deprecated.common import io as commonio
+from gemsModules.deprecated.project.io import CbProject 
 from gemsModules.deprecated.common import logic as commonlogic
 from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
 from gemsModules.deprecated.sequence import io as sequenceio
-from gemsModules.deprecated.sequence import settings as sequenceSettings
 from gemsModules.deprecated.sequence import structureInfo
 
 if loggers.get(__name__):
@@ -75,12 +64,19 @@ def registerBuild(buildState: sequenceio.Single3DStructureBuildDetails, thisTran
         raise error
 
 
+def get_all_conformerIDs_in_project_dir(project_path : str) -> List[str]:
+    # Assume that conformers in "Requested" are all of them
+    from os import listdir, path
+    return listdir(path.join(project_path, "Requested_Builds"))
+
+
 # @brief Return true if this structure has been built previously, otherwise false.
 #   @oaram
 #   @return
-def structureExists(buildState: sequenceio.Single3DStructureBuildDetails, thisTransaction: sequenceio.Transaction, buildStrategyID: str):
-    log.info("structureExists() was called.")
-    if not sequenceExists(buildState, thisTransaction):
+##### FIX ME
+def currentBuildStructureExists(buildState: sequenceio.Single3DStructureBuildDetails, thisTransaction: sequenceio.Transaction):
+    log.info("currentBuildStructureExists() was called.")
+    if not currentBuildSequenceExists(thisTransaction):
         log.debug("Sequence has never been built before; a new sequence is born!")
         return False
     else:
@@ -107,13 +103,21 @@ def structureExists(buildState: sequenceio.Single3DStructureBuildDetails, thisTr
             )
             return
 
-        servicePath = os.path.join(thisProject.getFilesystemPath(
-        ), thisProject.getEntityId(), thisProject.getServiceId())
-        sequencePath = os.path.join(servicePath, "Sequences")
-        seqID = projectUtils.getSeqIdForSequence(indexOrderedSequence)
+
+#        servicePath = os.path.join(thisProject.getFilesystemPath(
+#        ), thisProject.getEntityId(), thisProject.getServiceId())
+#        sequencePath = os.path.join(servicePath, "Sequences")
+#        seqID = projectUtils.getSeqIdForSequence(indexOrderedSequence)
+#        sequenceDir = os.path.join(
+#            sequencePath, seqID, thisSequence.outputs.getBuildStrategyID())
+#        log.debug("sequenceDir: " + sequenceDir)
+
+        # get the directory for this sequence with the specified build strategy
         sequenceDir = os.path.join(
-            sequencePath, seqID, thisSequence.outputs.getBuildStrategyID())
+            get_sequence_base_directory(indexOrderedSequence, thisProject),
+            thisSequence.outputs.getBuildStrategyID())
         log.debug("sequenceDir: " + sequenceDir)
+
         log.debug("buildState.conformerLabel: " + buildState.conformerLabel)
         structureLinkInSequenceDir = os.path.join(
             sequenceDir, "All_Builds", buildState.structureDirectoryName)
@@ -136,11 +140,50 @@ def structureExists(buildState: sequenceio.Single3DStructureBuildDetails, thisTr
             # Oliver: Not sure what this comment wants exactly, or if what I have done covers it.
 
 
-# @brief Return true if this sequence has been built previously, otherwise false.
+def get_sequence_base_directory(sequence: str, thisProject: CbProject) -> str:
+    servicePath = os.path.join(
+            thisProject.getFilesystemPath(), 
+            thisProject.getEntityId(), 
+            thisProject.getServiceId())
+    sequence_base_dir = os.path.join(servicePath, "Sequences", get_seqID(sequence))
+    log.debug("sequence base dir: " + sequence_base_dir)
+    return sequence_base_dir
+
+
+def get_seqID(sequence: str) -> str:
+    return projectUtils.getSeqIdForSequence(sequence)
+
+
+def sequence_default_structure_exists(the_path : str) -> bool:
+    if Path(os.path.join(the_path, 'min-gas.pdb')).exists():
+        return True
+    if Path(os.path.join(the_path, 'structure.pdb')).exists():
+        return True
+
+
+def get_existing_default_evaluation_path(thisTransaction: sequenceio.Transaction) -> str:
+    sequence = thisTransaction.getSequenceVariantOut('indexOrdered')
+    if sequence is None:
+        return None
+    thisProject = thisTransaction.transaction_out.project
+    sequence_base_dir = get_sequence_base_directory(sequence, thisProject)
+    sequence_default_link = os.path.join(sequence_base_dir, "evaluation.json")
+    from pathlib import Path
+    the_path = Path(sequence_default_link)
+    try:
+        the_real_path = the_path.resolve(strict=True)
+    except FileNotFoundError:
+        return None
+    return the_real_path
+
+
+
+
+# @brief Return true if this sequence has been built previously using the current build strategy, otherwise false.
 #   @oaram
 #   @return
-def sequenceExists(buildState: sequenceio.Single3DStructureBuildDetails, thisTransaction: sequenceio.Transaction):
-    log.info("sequenceExists() was called.")
+def currentBuildSequenceExists(thisTransaction: sequenceio.Transaction):
+    log.info("currentBuildSequenceExists() was called.")
     try:
         sequence = thisTransaction.getSequenceVariantOut('indexOrdered')
     except Exception as error:
@@ -236,8 +279,75 @@ def createSymLinkInRequestedStructures(projectDir: str, buildDir: str, conformer
         raise error
 
 
+def get_default_evaluation_path_from_sequence(thisTransaction: sequenceio.Transaction) -> str:
+    thisProject = thisTransaction.transaction_out.project
+    service_dir = thisProject.service_dir
+    sequence_ID = thisTransaction.getSequenceVariantOut('suuid')
+    sequence_default_link = os.path.join(service_dir, "Sequences", sequence_ID, "evaluation.json")
+    from pathlib import Path
+    the_path = Path(sequence_default_link)
+    log.debug("The expected path for the sequence default evaluation json follows.")
+    log.debug(sequence_default_link)
+    try:
+        the_real_path = the_path.resolve(strict=True)
+    except FileNotFoundError as error:
+        log.debug("could not get the real path to the evaluation json.  Error follows;")
+        log.debug(error)
+        return None
+    return the_real_path
+
+
+def set_default_evaluation_symlink_in_sequence(thisTransaction: sequenceio.Transaction) -> str:
+    if get_default_evaluation_path_from_sequence(thisTransaction) is not None:
+        return
+    try: 
+        thisProject = thisTransaction.transaction_out.project
+        path_to_new_link = thisProject.sequence_path
+        path_to_existing_path = os.path.join(thisProject.logs_dir, 'response.json')
+        commonlogic.make_relative_symbolic_link(
+                path_down_to_source = path_to_existing_path,
+                path_down_to_dest_dir = path_to_new_link, 
+                dest_link_label = 'evaluation.json', 
+                parent_directory = thisProject.service_dir)
+        return None
+    except Exception as error:
+        message =  "Something went wrong setting the evaluation sym link in the sequence directory."
+        log.error(message)
+        log.debug(error)
+        return message
+
+
+def addSequenceFolderSymLinkToDefaultBuild(servicePath: str, sequenceID: str, buildStrategyID: str, conformerID: str):
+    log.info("addSequenceFolderSymLinkToDefaultBuild() was called.")
+    # Add a symlink pointing from Sequences/sequenceID/default
+    #                          to Sequences/sequenceID/buildStrategyID/All_Builds/conformerID
+    path_to_new_link = os.path.join('Sequences' , sequenceID)
+    path_to_existing_path = os.path.join('Sequences' , sequenceID ,  buildStrategyID , 'All_Builds' , conformerID)
+    log.debug("Creating symlink with toolPath " + servicePath + " called " + conformerID +
+              " from " + path_to_new_link + " pointing to " + path_to_existing_path)
+    commonlogic.make_relative_symbolic_link(
+            path_down_to_source = path_to_existing_path,
+            path_down_to_dest_dir = path_to_new_link, 
+            dest_link_label = 'default', 
+            parent_directory = servicePath)
+
+def addSequenceBuildStrategyFolderSymLinkToDefaultBuild(servicePath: str, sequenceID: str, buildStrategyID: str,  conformerID: str):
+    log.info("addSequenceBuildStrategyFolderSymLinkToDefaultBuild() was called.")
+    # Add a symlink from Sequences/sequenceID/buildStrategyID/default
+    #                 to Sequences/sequenceID/buildStrategyID/All_Builds/conformerID
+    path_to_new_link = os.path.join('Sequences' , sequenceID , buildStrategyID)
+    path_to_existing_path = os.path.join('Sequences' , sequenceID ,  buildStrategyID , 'All_Builds' , conformerID)
+    log.debug("Creating symlink with toolPath " + servicePath + " called " + conformerID +
+              " from " + path_to_new_link + " pointing to " + path_to_existing_path)
+    commonlogic.make_relative_symbolic_link(
+            path_down_to_source = path_to_existing_path,
+            path_down_to_dest_dir = path_to_new_link, 
+            dest_link_label = 'default', 
+            parent_directory = servicePath)
+
+
 def addSequenceFolderSymLinkToNewBuild(servicePath: str, sequenceID: str, buildStrategyID: str, projectID: str, conformerID: str):
-    log.info("addSequenceFolderSymLinkForConformer() was called.")
+    log.info("addSequenceFolderSymLinkToNewBuild() was called.")
     # Add a symlink from Sequences/sequenceID/buildStrategyID/All_Builds/conformerID
     #                 to Builds/projectID/New_Builds/conformerID
     # Don't want to call this function for Existing_Builds, as they should already be linked from All_Builds.
@@ -262,11 +372,29 @@ def addBuildFolderSymLinkToExistingConformer(servicePath: str, sequenceID: str, 
     commonlogic.make_relative_symbolic_link(
         path_down_to_source, path_down_to_dest_dir, conformerID, servicePath)
 
+def addBuildFolderSymLinkForDefaultConformer(projectDir: str, buildDir: str, conformerID: str):
+    log.info("addBuildFolderSymLinkForDefaultConformer() was called.")
+    try:
+        path_to_existing_path = os.path.join(buildDir, conformerID)
+        path_to_new_link = projectDir
+        commonlogic.make_relative_symbolic_link(
+                path_down_to_source = path_to_existing_path,
+                path_down_to_dest_dir = path_to_new_link, 
+                dest_link_label = 'default', 
+                parent_directory = projectDir)
+    except Exception as error:
+        log.error(
+            "Could not create default link in Builds/projectID/: " + str(error))
+        log.error(traceback.format_exc())
+        raise error
+
+
 
 # @brief  Creates the directories and files needed to store a file that can be
 #           reused via symlink.
 #   @detail Still being worked on, but works for default structures.
 #   @param  Transaction
+###########  FIX ME
 def setupInitialSequenceFolders(servicePath: str, sequenceID: str, projectID: str, buildStrategyID: str):
     log.info("setupInitialSequenceFolders() was called.")
     # Some of the folders in Sequence may already exist via a previous project, those in Builds should not.

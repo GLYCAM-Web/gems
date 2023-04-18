@@ -85,6 +85,13 @@ class Project(BaseModel):
     django_project_id : constr(max_length=36)=""
     app : constr(max_length=25)="project"
   
+    
+    ## In some cases, GEMS will choose to start a new project 
+    ## even if one is provided.  If you don't want to force
+    ## GEMS to use this project, set this to True.
+    force_use_this_project : bool = False
+
+
     notices : List[Notice] = []
 
 
@@ -113,10 +120,12 @@ class Project(BaseModel):
                 message = "Filesystem Output Path already exists in Project and cannot be clobbered.  It is:\n" + str(self.filesystem_path)
                 log.debug(message)
                 return
-        # If a path was specified, set it and return
+        context = commonlogic.getGemsExecutionContext()
+        # If a path was specified, set it, if allowed, and return
         if specifiedPath is not None :
-            self.filesystem_path = specifiedPath
-            return
+            if context != 'website' :
+              self.filesystem_path = specifiedPath
+              return
         # Still here?  Try to determine the path using internal logic
         try :
             ## this is the userdata dir.
@@ -132,11 +141,19 @@ class Project(BaseModel):
             log.debug(message)
             self.filesystem_path = path
         elif source == 'Default':
-            context = commonlogic.getGemsExecutionContext()
             if context == 'website' :    
-                message = "Overriding GEMS Filesystem Output Path with the default from Project." 
-                log.debug(message) 
-                self.filesystem_path = gemsModules.deprecated.project.settings.default_filesystem_output_path
+                if specifiedPath is not None :
+                    log.debug("An output path is specified in website context.  Checking to see if it is allowed." )
+                    if specifiedPath not in gemsModules.deprecated.project.settings.allowed_website_filesystem_paths :
+                        message = "The specified output path is not allowed.  Using default instead."
+                        log.error(message)
+                        self.filesystem_path = gemsModules.deprecated.project.settings.default_filesystem_output_path
+                    else:
+                        message = "The specified output path is allowed.  Using it."
+                        log.debug(message)
+                        self.filesystem_path = specifiedPath
+                else:
+                    self.filesystem_path = gemsModules.deprecated.project.settings.default_filesystem_output_path
             else :
                 message = "Using the default GEMS Filesystem Output Path." 
                 log.debug(message) 
@@ -363,8 +380,10 @@ class Project(BaseModel):
     def writeInitialLogs(self) :
         try:
             log.info("About to write initial logs entry from Project.\n")
-            with open(os.path.join( self.logs_dir, 'ProjectLog.json'), 'w', encoding='utf-8') as file:
-                jsonString = self.json(indent=4, sort_keys=False)
+            filename=os.path.join( self.logs_dir, 'ProjectLog.json')
+            log.debug("The filename is: " + str(filename))
+            with open(filename, 'w', encoding='utf-8') as file:
+                jsonString = self.json(indent=4, sort_keys=False, by_alias=True)
                 log.debug("jsonString: \n" + jsonString )
                 file.write(jsonString)
         except Exception as error:

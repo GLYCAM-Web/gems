@@ -90,7 +90,7 @@ def preprocessPdbForAmber(pdbTransaction : amberIO.PdbTransaction):
         responses.append(responseObj)
         pdbTransaction.transaction_out.entity.responses = responses
         pdbTransaction.build_outgoing_string()
-        outgoingResponse = pdbTransaction.transaction_out.json(indent=2)
+        outgoingResponse = pdbTransaction.transaction_out.json(indent=2, by_alias=True)
         common.logic.writeStringToFile(outgoingResponse, os.path.join(pdbProject.project_dir, "response.json"))
     except Exception as error:
         log.error("There was a problem generating the output after preprocessing the pdb: " + str(error))

@@ -6,7 +6,7 @@ runInvalidSequenceInputTest()
 	invalidSequenceJson=$1
 	expectedOutput="$2"
 	cat $invalidSequenceJson | $GEMSHOME/bin/delegate > 010.output.json 
-	noticeMessage=\"$(grep "noticeMessage" 010.output.json | cut -d \" -f4)\"
+	noticeMessage=\"$(grep "message" 010.output.json | cut -d \" -f4)\"
 	if [ "$expectedOutput" = "$noticeMessage" ]; then
 		rm 010.output.json
 	    return 0
