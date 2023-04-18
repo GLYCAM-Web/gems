@@ -36,7 +36,7 @@ now=$(date "+%Y-%m-%d-%H-%M-%S")
 
 ######## Sequence-specific defines
 
-sequenceServicePath=${GEMS_OUTPUT_PATH}/sequence/cb
-sequenceSequencesPath=${GEMS_OUTPUT_PATH}/sequence/cb/Sequences
-sequenceBuildsPath=${GEMS_OUTPUT_PATH}/sequence/cb/Builds
+export sequenceServicePath=${GEMS_OUTPUT_PATH}/sequence/cb
+export sequenceSequencesPath=${GEMS_OUTPUT_PATH}/sequence/cb/Sequences
+export sequenceBuildsPath=${GEMS_OUTPUT_PATH}/sequence/cb/Builds
 

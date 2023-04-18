@@ -56,12 +56,10 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
                # populate it with an error message.
    
 
-    has_a_sequence = False
 
     ## If there is a sequence, ensure that it is valid
     the_sequence = receiver_tasks.get_sequence(thisSequenceEntity)
     if the_sequence is not None:
-        has_a_sequence = True
         from gemsModules.deprecated.sequence import build
         carbBuilder = build.getCbBuilderForSequence(the_sequence)
         valid = carbBuilder.IsStatusOk()
@@ -91,14 +89,17 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
         if need_new_project:
             log.debug("We need a new project.  Starting a new one.")
             from gemsModules.deprecated.project import io as projectio
-            thisTransaction.transaction_out.project = projectio.CbProject()
+            thisProject = projectio.CbProject()
 
         log.debug("Initializing the non-filesystem-writing parts of the outgoing project")
-        thisProject = thisTransaction.transaction_out.project
-        thisProject.setFilesystemPath()
+        if thisTransaction.transaction_in.project is not None:
+            if thisTransaction.transaction_in.project.filesystem_path is not None:
+                thisProject.setFilesystemPath(thisTransaction.transaction_in.project.filesystem_path, noClobber=False)
+        else:
+            thisProject.setFilesystemPath()
         log.debug("About to load the version info")
         thisProject.loadVersionsFileInfo()
-        thisTransaction.transaction_out.project=thisProject
+        thisTransaction.transaction_out.project=thisProject.copy(deep=True)
 
         need_filesystem_writes = receiver_tasks.we_need_filesystem_writes(thisSequenceEntity)
         log.debug("Initializing the filesystem parts of the outgoing project, if any")
@@ -167,7 +168,7 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
                 log.error(
                     "There was a problem evaluating the condensed sequence: " + str(error))
                 log.error(traceback.format_exc())
-                noticeMsg="There was a problem evaluating the condensed sequence. Was a default build attempted? " + str(build_the_default)
+                noticeMsg="There was a problem evaluating the condensed sequence. Was a default build attempted? " 
                 thisTransaction.generateCommonParserNotice(
                     noticeBrief='InvalidInputPayload',
                     additionalInfo={'hint': noticeMsg})
@@ -222,9 +223,11 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
     # NOTE!!! This uses the child method in sequence.io - a better method!
     thisTransaction.build_outgoing_string()
     if need_filesystem_writes:
+        thisProject=thisTransaction.transaction_out.project
         outgoingResponse = thisTransaction.transaction_out.json(indent=2, by_alias=True)
-        writeStringToFile(outgoingResponse, os.path.join(
-            thisProject.logs_dir, "response.json"))
+        outgoingPath = os.path.join(thisProject.logs_dir, "response.json")
+        log.debug("Writing the outgoing response to: " + outgoingPath)
+        writeStringToFile(outgoingResponse, outgoingPath)
     return thisTransaction
 
 

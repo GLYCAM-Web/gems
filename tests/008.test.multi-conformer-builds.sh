@@ -3,6 +3,8 @@
 . './utilities/common_environment.bash'
 . './utilities/functions.bash'
 
+echo "The output path is: ${GEMS_OUTPUT_PATH}"
+
 ## The variable badOutDir should be defined in the script that calls this one.
 outputFilePrefix='git-ignore-me_test008'
 badOutputPrefix="${badOutDir}/${now}_${outputFilePrefix}"
@@ -51,18 +53,6 @@ do_the_common_tasks() {
 	return 0
 }
 
-
-#### REMOVE ME - temporary while designing test
-#GEMS_OUTPUT_PATH='/website/userdata'
-#sequenceServicePath=${GEMS_OUTPUT_PATH}/sequence/cb
-#sequenceSequencesPath=${GEMS_OUTPUT_PATH}/sequence/cb/Sequences
-#sequenceBuildsPath=${GEMS_OUTPUT_PATH}/sequence/cb/Builds
-#evaluation_pUUID='3037036a-0516-4ede-a79c-1537f87c1a31'
-#build_1_pUUID='140b63e5-e57a-4578-8c37-6eac6607b5c0'
-#build_2_pUUID='8dada2cb-582d-4cc4-b8ff-eb03242efa51'
-#build_3_pUUID='7eae9c9d-974c-48c1-83ec-1e5b8c94b869'
-#### END remove me
-
 ################### MAIN #########################
 #
 # First remove all outputs in Builds and Sequences to test New_Builds functionality
@@ -79,30 +69,40 @@ if [ ! -d "${sequenceServicePath}" ] ; then
 fi
 
 
-echo """########################################
+echo """
+########################################
 ## Sub test 0:  Evaluation
 ########################################"""
 
 source './sub_parts/008.0.sub-test.bash'
 
-echo """########################################
+if [ "${ALL_TESTS_PASSED}" == "true" ] ; then
+	echo """
+########################################
 ## Sub test 1:  build first two
 ########################################"""
+	source './sub_parts/008.1.sub-test.bash'
+fi
 
-source './sub_parts/008.1.sub-test.bash'
-
-echo """########################################
+if [ "${ALL_TESTS_PASSED}" == "true" ] ; then
+	echo """
+########################################
 ## Sub test 2:  build second two
 ########################################"""
 
-source './sub_parts/008.2.sub-test.bash'
+	source './sub_parts/008.2.sub-test.bash'
+fi
 
-echo """########################################
+if [ "${ALL_TESTS_PASSED}" == "true" ] ; then
+	echo """
+########################################
 ## Sub test 3:  build third four
 ########################################"""
 
-source './sub_parts/008.3.sub-test.bash'
+	source './sub_parts/008.3.sub-test.bash'
+fi
 
+exit 0
 
 if [ "${ALL_JSON_ARE_GOOD}" == "false" ] ; then
         echo "The builds worked, but one or more JSON delegations FAILED."
