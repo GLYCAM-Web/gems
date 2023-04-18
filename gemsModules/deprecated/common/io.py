@@ -23,7 +23,7 @@ import traceback
 from enum import Enum, auto
 from uuid import UUID
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union, Any
-from pydantic import BaseModel, Field, Json
+from pydantic import BaseModel, Field, Json, validator
 from pydantic.schema import schema
 from gemsModules.deprecated.project import dataio as projectio
 from gemsModules.deprecated.common import settings
@@ -120,7 +120,7 @@ class Resource(BaseModel):
 # ##
 
 
-class Services(str, Enum):
+class Available_Services(str, Enum):
     errorNotification = 'ErrorNotification'
     status = 'Status'
 
@@ -130,7 +130,7 @@ class Service(BaseModel):
     Holds information about a requested Service.
     This object will have different forms in each Entity.
     """
-    typename: Services = Field(
+    typename: Available_Services = Field(
         'Status',
         alias='type',
         title='Common Services',
@@ -166,12 +166,46 @@ class Response(Service):
         alias='type',
         description='The type service that produced this response.'
     )
-    outputs: Json = None
+    outputs: Any = None
     notices: List[Notice] = None
 
     def generateCommonParserNotice(self, *args, **kwargs):
         self.notices.append(
             settings.generateCommonParserNotice(*args, **kwargs))
+
+class ProceduralOptions(BaseModel):
+    context : str = Field(
+            "unset",
+            description="Is the user a normal user (default) or a website?  Is set automatically but can be overridden in some contextx."
+            )
+    force_serial_execution : bool = Field(
+            False,
+            description="Should GEMS execute serially (no daemons, no parallel)?  Note that this only affects GEMS, not any programs called by GEMS."
+            )
+
+    @validator('context', pre=True, always=True)
+    def enforce_website_context(cls, v, values, **kwargs):
+        from gemsModules.deprecated.common.logic import getGemsExecutionContext
+        apparent_context : str = getGemsExecutionContext()
+        if 'context' not in values :
+            return apparent_context
+        if apparent_context == 'website':
+            if values['context'] != apparent_context :
+                log.debug("Incoming context does not match environment.  Setting to 'website'.")
+                return apparent_context
+        return v
+
+    @validator('force_serial_execution', pre=True, always=True)
+    def enforce_environment_serial_execution_flag(cls, v, values, **kwargs):
+        from gemsModules.deprecated.common.logic import getGemsEnvironmentForceSerialExecution
+        the_flag : str =getGemsEnvironmentForceSerialExecution()
+        if the_flag == 'unset':
+            return v
+        if the_flag.lower() == 'true':
+            return True
+        elif the_flag.lower() == 'false':
+            return False
+        raise ValueError ("Cannot interpret value set for GEMS_FORCE_SERIAL_EXECUTION from the environment.")
 
 
 class Entity(BaseModel):
@@ -190,6 +224,7 @@ class Entity(BaseModel):
     responses: Dict[str, Response] = None
     resources: List[Resource] = None
     notices: List[Notice] = None
+    procedural_options : ProceduralOptions = ProceduralOptions()
     options: Dict[str, str] = Field(
         None,
         description='Key-value pairs that are specific to each entity, service, etc'
@@ -227,10 +262,10 @@ class TransactionSchema(BaseModel):
 class Transaction:
     """Holds information relevant to a delegated transaction"""
     incoming_string: str = None
-    request_dict: {} = None
+    request_dict: Dict = None
     transaction_in: TransactionSchema
     transaction_out: TransactionSchema
-    response_dict: {} = None
+    response_dict: Dict = None
     outgoing_string: str = None
 
     def __init__(self, in_string):
@@ -314,7 +349,7 @@ class Transaction:
                 "There was a problem getting the project from transaction_out :  " + str(error))
             raise error
 
-    def getSchemaLocation():
+    def getSchemaLocation(self):
         thisProject = self.getProjectOut()
         return thisProject.getFilesystemPath()
 

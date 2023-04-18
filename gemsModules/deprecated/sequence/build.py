@@ -1,28 +1,14 @@
 #!/usr/bin/env python3
-import json
-import sys
 import os
-import re
-#import importlib.util
-import shutil
-import uuid
-import gemsModules.deprecated
 import gmml
-import traceback
-import gemsModules.deprecated.common.utils
-from multiprocessing import Process
 from gemsModules.deprecated.project import projectUtilPydantic as projectUtils
-from gemsModules.deprecated.project import settings as projectSettings
 from gemsModules.deprecated.sequence import io as sequenceio
-from gemsModules.deprecated.common import io as commonio
-from gemsModules.deprecated.common import logic as commonLogic
 from gemsModules.deprecated.common import services as commonservices
 
 from gemsModules.deprecated.common.logic import writeStringToFile
 from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
 
 from gemsModules.deprecated.sequence import projects as sequenceProjects
-from gemsModules.deprecated.sequence import settings as sequenceSettings
 
 if loggers.get(__name__):
     pass
@@ -33,7 +19,6 @@ else:
 def buildEach3DStructureInStructureInfo(thisTransaction: sequenceio.Transaction):
     log.info("buildEach3DStructureInStructureInfo() was called.")
     needToInstantiateCarbohydrateBuilder = True
-    from multiprocessing import Process
     # get info from the transaction and check sanity
     log.debug("About to get build informaion from the transaction")
     log.debug("Working on the Build States now.")
@@ -83,10 +68,11 @@ def buildEach3DStructureInStructureInfo(thisTransaction: sequenceio.Transaction)
         log.debug("Checking if a structure has been built in this buildState: ")
         log.debug("buildState: ")
         log.debug(buildState.json(indent=2))
-        # May return "default" or a conformerID
+        # May return "default" or a conformerID ## should only return conformerID?
         subDirectory = buildState.structureDirectoryName
 
-        if sequenceProjects.structureExists(buildState, thisTransaction, thisBuildStrategyID):
+        if sequenceProjects.currentBuildStructureExists(buildState, thisTransaction):
+#        if sequenceProjects.structureExists(buildState, thisTransaction, thisBuildStrategyID):
             # Nothing in Sequence/ needs to change. In Builds/ProjectID/
             # add symLink in Existing to Sequences/SequenceID/defaults/All_builds/conformerID.
             log.debug("Found an existing structure for " + subDirectory)
@@ -111,7 +97,7 @@ def buildEach3DStructureInStructureInfo(thisTransaction: sequenceio.Transaction)
             # TODO - one day, the path on a compute node might differ from the website path
             log.debug("Absolute Conformer Path for this New Build: " +
                       buildState.getAbsoluteConformerPath())
-            theJsonObject = buildState.json(indent=2)
+            theJsonObject = buildState.json(indent=2, by_alias=True)
             log.debug(
                 "The build state for this New Build, after initializing, is  ")
             log.debug(theJsonObject)
@@ -128,6 +114,8 @@ def buildEach3DStructureInStructureInfo(thisTransaction: sequenceio.Transaction)
                 raise error
             build3DStructure(buildState, thisTransaction,
                              outputDirPath, builder)
+            log.debug("just wrote info.json.")
+            log.debug("The value of mdMinimise in transaction_in is: " + str(thisTransaction.transaction_in.mdMinimize))
             if thisTransaction.transaction_in.mdMinimize is True:
                 sequenceProjects.addSequenceFolderSymLinkToNewBuild(
                     thisServiceDir, thisSeqID, thisBuildStrategyID, thisPuuID, subDirectory)
@@ -135,6 +123,28 @@ def buildEach3DStructureInStructureInfo(thisTransaction: sequenceio.Transaction)
         # buildDir is either New_Builds/ or Existing_Builds/
         sequenceProjects.createSymLinkInRequestedStructures(
             thisProjectDir, buildDir, subDirectory)
+
+        if buildState.isDefaultStructure:
+
+            sequenceProjects.addBuildFolderSymLinkForDefaultConformer( 
+                    thisProjectDir, 
+                    buildDir, 
+                    subDirectory )
+
+        if buildState.isGlobalDefaultStructure:
+
+            sequenceProjects.addSequenceFolderSymLinkToDefaultBuild(
+                    thisServiceDir, 
+                    thisSeqID, 
+                    thisBuildStrategyID, 
+                    subDirectory)
+
+            sequenceProjects.addSequenceBuildStrategyFolderSymLinkToDefaultBuild(
+                    thisServiceDir, 
+                    thisSeqID, 
+                    thisBuildStrategyID,  
+                    subDirectory)
+
         # Needs to be Requested_Structres/. Need to add conformerID separately.
         # sequenceProjects.addResponse(buildState, thisTransaction, conformerID, buildState.conformerLabel)
         # This probably needs work
@@ -173,8 +183,11 @@ def build3DStructure(buildState: sequenceio.Single3DStructureBuildDetails, thisT
     gmmlConformerInfo = populateGMMLConformerInfoStruct(buildState)
     try:
         # If this is default, set the output path, otherwise use what was passed in.
+        carbBuilder = getCbBuilderForSequence(thisTransaction.getSequenceVariantOut('indexOrdered'))
         if buildState.isDefaultStructure:
             log.debug("Generating default structure in: " + outputDirPath)
+            log.debug("IS THE DEFAULT: Here is the buildState):")
+            log.debug(buildState)
             # Using multiprocessing for this function call.
             builder.GenerateSingle3DStructureDefaultFiles(outputDirPath)
             if not builder.IsStatusOk():
@@ -185,7 +198,7 @@ def build3DStructure(buildState: sequenceio.Single3DStructureBuildDetails, thisT
                 thisTransaction.generateCommonParserNotice(
                     noticeBrief='InvalidInputPayload', exitMessage=carbBuilder.GetStatusMessage())
                 thisTransaction.build_outgoing_string()
-                return thisTransaction # do this or no?
+                return thisTransaction # do this or no?  # if the process has altered this Transaction, then yes
             #p = Process(target=builder.GenerateSingle3DStructureDefaultFiles, args=(outputDirPath,))
             # p.start()
         else:
@@ -193,8 +206,20 @@ def build3DStructure(buildState: sequenceio.Single3DStructureBuildDetails, thisT
                 "The request is for a conformer with outputDirPath: " + outputDirPath)
             # Need to put the info into the GMML struct: SingleRotamerInfoVector
 #            gmmlConformerInfo = populateGMMLConformerInfoStruct(buildState)
+            if not builder.IsStatusOk():
+                log.debug("builder says it is not ok")
+            log.debug("Here is the input to the builder.")
+            log.debug("NOT DEFAULT: Here is the buildState):")
+            log.debug(buildState)
+            log.debug("gmmlConformerInfo:")
+            log.debug(gmmlConformerInfo)
+            log.debug("outputDirPath : ")
+            log.debug(outputDirPath)
+#            import sys  ## REMOVE ME
+#            sys.exit(0)  ## REMOVE ME
             builder.GenerateSpecific3DStructure(
                 gmmlConformerInfo, outputDirPath)
+            log.debug("just did builder.GenerateSpecific3DStructure")
             if not builder.IsStatusOk():
                 log.error(carbBuilder.GetStatusMessage())
                 log.debug(
@@ -276,7 +301,7 @@ def getCbBuilderForSequence(sequence: str):
     GemsPath = commonservices.getGemsHome()
     log.debug("GemsPath: " + GemsPath)
 
-    prepfile = GemsPath + "/gmml/dat/prep/GLYCAM_06j-1_GAGS.prep"
+    prepfile = GemsPath + "/gmml/dat/prep/GLYCAM_06j-1_GAGS_KDN.prep"
     if os.path.exists(prepfile):
         log.debug("Instantiating the carbohydrateBuilder.")
         builder = gmml.carbohydrateBuilder(sequence, prepfile)

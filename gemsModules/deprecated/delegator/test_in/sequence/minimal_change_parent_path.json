@@ -4,19 +4,19 @@
         "services": 
             {
                 "build": {
-                    "type": "Build3DStructure"
+                    "type": "Evaluate"
                 }
             },
         "inputs": 
             {
                 "sequence": {
-                    "payload": "DManpa1-OH"
+                    "payload": "DGlcpa1-OH"
                 },
 		"resources" :[]
             }
     },
     "project" : {
-	    "filesystem_path" : "/website/TESTS/git-ignore-me/temp"
+	    "filesystem_path" : "/website/TESTS/"
     },
     "prettyPrint" : true,
     "mdMinimize" : true

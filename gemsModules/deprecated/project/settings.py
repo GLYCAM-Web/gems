@@ -20,6 +20,7 @@ serviceModules = {
 }
 
 
+
 ###  Filesystem Paths Information
 ###  
 ###  The format for the path is : 
@@ -52,8 +53,14 @@ serviceModules = {
 # Default filesystem path
 output_data_dir = '/website/userdata/'  ## Being deprecated
 default_filesystem_output_path = '/website/userdata/' ## Use this instead of output_data_dir
+default_filesystem_testing_path = '/website/TESTS/'
+default_filesystem_prepush_testing_path = '/website/TESTS/git-ignore-me/pre-push/'
 default_versions_file_path = default_filesystem_output_path
 default_versions_file_name = "VERSIONS.sh"
+
+allowed_website_filesystem_paths = [default_filesystem_output_path,
+                            default_filesystem_testing_path,
+                            default_filesystem_prepush_testing_path]
 
 # Default subdirectories per project type.  Typically, these go
 # under whatever is defined for project_path

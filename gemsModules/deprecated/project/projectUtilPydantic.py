@@ -64,34 +64,6 @@ def setupProjectDirs(projectDir):
         raise error
 
 
-
-### Write the original request to file.
-##   @param request
-##   @param logsDir
-#def writeRequestToFile(request, logsDir):
-#    log.info("writeRequestToFile() was called.\n")
-#    requestFileName = os.path.join(logsDir,"request.json")
-#    log.debug("requestFileName: " + requestFileName)
-#    try:
-#        with open(requestFileName, 'w', encoding='utf-8') as file:
-#            json.dump(request, file, ensure_ascii=False, indent=4)
-#    except Exception as error:
-#        log.error("There was a problem writing the request to file.")
-#        raise error
-
-### Writes the project to file in json format.
-##   @param project
-##   @param logsDir
-#def writeProjectLogFile(project, logsDir):
-#    log.info("writeProjectLogFile() was called.\n")
-#    logFileName = project.project_type + "ProjectLog.json"
-#    project_log_file = os.path.join(logsDir, logFileName)
-#    log.debug("project_log_file: " + project_log_file)
-#    with open(project_log_file, 'w', encoding='utf-8') as file:
-#        jsonString = json.dumps(project.__dict__, indent=4, sort_keys=False, default=str)
-#        log.debug("jsonString: \n" + jsonString )
-#        file.write(jsonString)
-
 def updateCbProject(thisTransaction, structureInfo):
     log.info("updateCbProject was called")
     log.debug("Requested service: " )

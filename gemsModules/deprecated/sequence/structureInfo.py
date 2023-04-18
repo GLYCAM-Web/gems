@@ -1,19 +1,13 @@
 #!/usr/bin/env python3
-from enum import Enum, auto
-from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
+from typing import List
 from datetime import datetime
-from pydantic import BaseModel, Field, ValidationError
-from pydantic.schema import schema
 from gemsModules.deprecated.sequence import io as sequenceio
 from gemsModules.deprecated.sequence import projects as sequenceProjects
-from gemsModules.deprecated.common import io as commonio
 from gemsModules.deprecated.common import logic as commonlogic
 from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
 from gemsModules.deprecated.project import projectUtilPydantic as projectUtils
-from gemsModules.deprecated.project import settings as projectSettings
-#import gmml
 import os
-import sys
+import json
 import itertools
 import traceback
 
@@ -115,13 +109,28 @@ def countNumberOfShapes(rotamerData: sequenceio.AllLinkageRotamerInfo, shapeSet:
     return count
 
 
-def countNumberOfShapesUpToLimit(rotamerData: [], shapeSet: str = 'Selected',  hardLimit=1):
+def countNumberOfShapesUpToLimit(rotamerData: List, shapeSet: str = 'Selected',  hardLimit=1):
     log.info("countNumberOfShapesUpToLimit was called.")
     count = countNumberOfShapes(rotamerData, shapeSet)
     if hardLimit != -1:
         if count >= hardLimit:
             return hardLimit
     return count
+
+def getStructureDirectoryName(conformerLabel : str) -> str:
+    if len(conformerLabel) > 32:
+        log.debug(
+            "conformerLabel is long so building a UUID for structureDirectoryName")
+        structureDirectoryName = projectUtils.getUuidForString(
+            conformerLabel)
+        log.debug("The structureDirectoryName/UUID is : " + structureDirectoryName)
+    else:
+        log.debug(
+            "conformerLabel is short so using it for structureDirectoryName")
+        structureDirectoryName = conformerLabel
+        log.debug("The structureDirectoryName is : " + structureDirectoryName)
+    return structureDirectoryName
+                
 
 # @brief Parses user's selected rotamers (rotamerData) into a list of
 #           structures to request.
@@ -132,7 +141,7 @@ def countNumberOfShapesUpToLimit(rotamerData: [], shapeSet: str = 'Selected',  h
 #   @TODO: Move this to a better file for this stuff.
 
 
-def buildStructureInfoOliver(thisTransaction: sequenceio.Transaction):
+def buildStructureInfoOliver(thisTransaction: sequenceio.Transaction, defaultOnly=False):
     log.info("buildStructureInfoOliver() was called.")
 
     structureInfo = sequenceio.StructureBuildInfo()
@@ -142,11 +151,11 @@ def buildStructureInfoOliver(thisTransaction: sequenceio.Transaction):
             'indexOrdered')
         if structureInfo.indexOrderedSequence is None:
             error = "Unable to find indexOrderedSequence.  Was the sequence evaluated?"
-            log.error(errof)
+            log.error(error)
             thisTransaction.generateCommonParserNotice(
                 noticeBrief='GemsError',
                 additionalInfo={"hint": error})
-            return
+            return thisTransaction
         log.debug("indexOrderedSequence: " +
                   str(structureInfo.indexOrderedSequence))
         structureInfo.setSeqId()
@@ -174,40 +183,42 @@ def buildStructureInfoOliver(thisTransaction: sequenceio.Transaction):
     # ... so it needs rotamerData.
     # Oliver has decided to always request a default for symlinking ease.
     # Lachele sees this decision and raises an explicit conformer
-    ##
+
     # If there was an explicit request for multiple builds in the
     # incoming request, then do whatever was requested - UNLESS
     # this is being run from the website.  In that case, enforce a
-    # hard limit of 64 onto the number of structures.
-    doSingleDefaultOnly = False  # this is probably not needed
+    # hard limit onto the number of structures. The limit might vary.
+    # See entity.procedural_options.
+
+
+    doSingleDefaultOnly = defaultOnly
+
+    log.debug("doSingleDefaultOnly is : " + str(doSingleDefaultOnly))
+
     maxNumberOfStructuresToBuild = thisTransaction.getNumberStructuresHardLimitIn()
     if maxNumberOfStructuresToBuild is None:
+        log.debug("maxNumberOfStructuresToBuild is None (1)")
+        maxNumberOfStructuresToBuild = thisTransaction.getNumberStructuresHardLimitOut()
+    if maxNumberOfStructuresToBuild is None:
+        log.debug("maxNumberOfStructuresToBuild is None (2)")
         maxNumberOfStructuresToBuild = -1
-    if thisTransaction.getIsEvaluationForBuild() is False:
-        log.debug("transaction says this is not an evaluation for a build")
+    if doSingleDefaultOnly == True:
         maxNumberOfStructuresToBuild = 1
-        doSingleDefaultOnly = True
 
-    maxHardLimit = -1
-    transactionContext = os.environ.get('GW_GRPC_ROLE')
-    log.debug("transactionContext is : " + str(transactionContext))
-    # TODO - make these limits configurable via environment variable
-    # TODO - This impacts the frontend. Make an appropriate plan. FE devs need to know this too.
-    if transactionContext == 'Developer':
-        maxHardLimit = 8
-    if transactionContext == 'Swarm':
-        maxHardLimit = 64
+
+    maxHardLimit = thisTransaction.transaction_out.entity.procedural_options.number_structures_hard_limit
 
     log.debug("The max number structs to build (1) is :  " +
               str(maxNumberOfStructuresToBuild))
     log.debug("The max hard limit (1) is :  " + str(maxHardLimit))
-    thisTransaction.setNumberStructuresHardLimitOut(maxHardLimit)
 
     if maxHardLimit != -1:
         if maxHardLimit < maxNumberOfStructuresToBuild:
             maxNumberOfStructuresToBuild = maxHardLimit
         if maxNumberOfStructuresToBuild == -1:
             maxNumberOfStructuresToBuild = maxHardLimit
+
+    thisTransaction.setNumberStructuresHardLimitOut(maxNumberOfStructuresToBuild)
 
     log.debug("The max number structs to build (2) is :  " +
               str(maxNumberOfStructuresToBuild))
@@ -223,7 +234,7 @@ def buildStructureInfoOliver(thisTransaction: sequenceio.Transaction):
     log.debug(" ROTAMER DATA IS " + str(rotamerData) )
     if rotamerData is None:
         log.error("the rotamerData object in None, and that is not expected.")
-        rotamerData = AllLinkageRotamerData()
+        rotamerData = sequenceio.AllLinkageRotamerData()
         rotamerData.totalPossibleRotamers = 1
         rotamerData.totalLikelyRotamers = 1
         rotamerData.totalSelectedRotamers = 1
@@ -245,7 +256,8 @@ def buildStructureInfoOliver(thisTransaction: sequenceio.Transaction):
 
     log.debug("The max number structs to build (4) is :  " +
               str(maxNumberOfStructuresToBuild))
-    if rotamerData.totalPossibleRotamers == 1:
+    if rotamerData.totalPossibleRotamers == 1 or rotamerData.totalPossibleRotamers == "1":
+        rotamerData.totalPossibleRotamers = 1
         rotamerData.totalLikelyRotamers = 1
         rotamerData.totalSelectedRotamers = 1
         # there is probably a better way than the following, but....
@@ -255,6 +267,7 @@ def buildStructureInfoOliver(thisTransaction: sequenceio.Transaction):
         log.debug("buildState.conformerLabel (1) = " + buildState.conformerLabel)
         buildState.conformerID = buildState.structureDirectoryName
         buildState.isDefaultStructure = True
+        buildState.isGlobalDefaultStructure = True
         buildState.date = datetime.now()
         buildState.setEntityId(entity_id)
         buildState.setServiceId(service_id)
@@ -272,7 +285,8 @@ def buildStructureInfoOliver(thisTransaction: sequenceio.Transaction):
                 buildState.pUUID,
                 buildState.structureDirectoryName))
         buildState.setConformerPath()
-        if sequenceProjects.structureExists(buildState, thisTransaction, thisBuildStrategyID):
+        if sequenceProjects.currentBuildStructureExists(buildState, thisTransaction):
+#        if sequenceProjects.structureExists(buildState, thisTransaction, thisBuildStrategyID):
             log.debug("Found an existing structure for " +
                       buildState.structureDirectoryName)
             buildDir = "Existing_Builds/"
@@ -282,7 +296,7 @@ def buildStructureInfoOliver(thisTransaction: sequenceio.Transaction):
             buildDir = "New_Builds/"
             buildState.setIsNewBuild(True)
         buildState.setAbsoluteConformerPath(buildDir)
-        theJsonObject = buildState.json(indent=2)
+        theJsonObject = buildState.json(indent=2, by_alias=True)
         log.debug("The build state after initializing is  ")
         log.debug(theJsonObject)
         structureInfo.individualBuildDetails.append(buildState)
@@ -328,19 +342,10 @@ def buildStructureInfoOliver(thisTransaction: sequenceio.Transaction):
             if firstStructure is True:
                 buildState.isDefaultStructure = True
                 firstStructure = False
-            if len(buildState.conformerLabel) > 32:
-                log.debug(
-                    "conformerLabel is long so building a UUID for structureDirectoryName")
-                buildState.structureDirectoryName = projectUtils.getUuidForString(
-                    buildState.conformerLabel)
-                log.debug("The structureDirectoryName/UUID is : " +
-                          buildState.structureDirectoryName)
-            else:
-                log.debug(
-                    "conformerLabel is short so using it for structureDirectoryName")
-                buildState.structureDirectoryName = buildState.conformerLabel
-                log.debug("The structureDirectoryName is : " +
-                          buildState.structureDirectoryName)
+            if doSingleDefaultOnly is True:
+                buildState.isGlobalDefaultStructure = True
+            buildState.structureDirectoryName = getStructureDirectoryName(buildState.conformerLabel)
+            log.debug("The structureDirectoryName is : " + buildState.structureDirectoryName)
             buildState.setConformerId(buildState.getStructureDirectoryName())
             buildState.date = date
             buildState.setDownloadUrlPath(projectUtils.buildDownloadUrlPath(
@@ -350,7 +355,8 @@ def buildStructureInfoOliver(thisTransaction: sequenceio.Transaction):
                 buildState.pUUID,
                 buildState.structureDirectoryName))
             buildState.setConformerPath()
-            if sequenceProjects.structureExists(buildState, thisTransaction, thisBuildStrategyID):
+            if sequenceProjects.currentBuildStructureExists(buildState, thisTransaction):
+#            if sequenceProjects.structureExists(buildState, thisTransaction, thisBuildStrategyID):
                 log.debug("Found an existing structure for " +
                           buildState.structureDirectoryName)
                 buildDir = "Existing_Builds/"
@@ -417,7 +423,7 @@ def saveRequestInfo(structureInfo, projectDir):
             data = convertStructureInfoToDict(structureInfo)
             log.debug("structureInfo as dict: \n\n")
 
-        prettyPrint(data)
+        commonlogic.prettyPrint(data)
 
     except Exception as error:
         log.error(
@@ -473,7 +479,7 @@ def convertStructureInfoToDict(structureInfo: sequenceio.StructureBuildInfo()):
         log.error(error)
         raise error
     else:
-        return structureInfo.json(indent=2)
+        return structureInfo.json(indent=2, by_alias=True)
 
 #    data = {}
 #    ## set the sequence.
@@ -606,7 +612,7 @@ def updateBuildStatus(structureInfoFilename: str, buildState: sequenceio.Single3
     else:
         try:
             log.debug("data before update:\n\n")
-            prettyPrint(data)
+            commonlogic.prettyPrint(data)
 
             buildState.status = status
             log.debug("buildState: " + str(buildState))
@@ -665,13 +671,13 @@ def updateStructureInfoWithUserOptions(thisTransaction: sequenceio.Transaction, 
 
     else:
         log.debug("old data: \n\n")
-        prettyPrint(data)
+        commonlogic.prettyPrint(data)
         for newState in structureInfo.buildStates:
             log.debug("New build state: " + str(newState))
             data['buildStates'].append(newState.__dict__)
 
         log.debug("updated data: \n\n")
-        prettyPrint(data)
+        commonlogic.prettyPrint(data)
         try:
             with open(filename, 'w') as outFile:
                 jsonString = json.dumps(
@@ -722,33 +728,33 @@ def prepareBuildRecord(buildState: sequenceio.Single3DStructureBuildDetails):
     else:
         return state
 
-
-def createSeqLog(sequence: str, seqIDPath: str):
-    log.info("createSeqLog() was called.")
-    logObj = StructureInfo()
-    logObj.sequence = sequence
-    try:
-        logObj = convertStructureInfoToDict(logObj)
-    except Exception as error:
-        log.error(
-            "There was a problem converting the object to dict: " + str(error))
-        log.error(traceback.format_exc())
-        raise error
-    else:
-        # dump to file
-        try:
-            fileName = seqIDPath + "/structureInfo.json"
-            log.debug("Attempting to write: " + fileName)
-            with open(fileName, 'w') as outFile:
-                jsonString = json.dumps(
-                    logObj, indent=4, sort_keys=False, default=str)
-                log.debug("jsonString: \n" + jsonString)
-                outFile.write(jsonString)
-        except Exception as error:
-            log.error(
-                "There was a problem writing structureInfo_request.json to file: " + str(error))
-            log.error(traceback.format_exc())
-            raise error
+## This never gets called
+#def createSeqLog(sequence: str, seqIDPath: str):
+#    log.info("createSeqLog() was called.")
+#    logObj = StructureInfo()
+#    logObj.sequence = sequence
+#    try:
+#        logObj = convertStructureInfoToDict(logObj)
+#    except Exception as error:
+#        log.error(
+#            "There was a problem converting the object to dict: " + str(error))
+#        log.error(traceback.format_exc())
+#        raise error
+#    else:
+#        # dump to file
+#        try:
+#            fileName = seqIDPath + "/structureInfo.json"
+#            log.debug("Attempting to write: " + fileName)
+#            with open(fileName, 'w') as outFile:
+#                jsonString = json.dumps(
+#                    logObj, indent=4, sort_keys=False, default=str)
+#                log.debug("jsonString: \n" + jsonString)
+#                outFile.write(jsonString)
+#        except Exception as error:
+#            log.error(
+#                "There was a problem writing structureInfo_request.json to file: " + str(error))
+#            log.error(traceback.format_exc())
+#            raise error
 
 
 # @brief Pass in a transaction, get the structureInfo.json for that sequence.
@@ -786,7 +792,7 @@ def getStatusFilename(thisTransaction: sequenceio.Transaction):
         log.error(traceback.format_exc())
         raise error
     else:
-        statusFilename = projectDir + "logs/structureInfo_status.json"
+        statusFilename = os.path.join(projectDir, "logs", "structureInfo_status.json")
 
         return statusFilename
 

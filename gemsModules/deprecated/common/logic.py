@@ -210,6 +210,17 @@ def getGemsExecutionContext() :
         log.debug("GW_LIVE_SWARM is NOT defined in the current environment.  Assuming this is not a website.")
         return 'default'
    
+def getGemsEnvironmentForceSerialExecution() :
+    log.info("getGemsExecutionContext was called.")
+    # Currently, if this variable is set to anything at all, GEMS is
+    # probably operating in support of a wabsite.
+    if 'GEMS_FORCE_SERIAL_EXECUTION' in os.environ :
+        log.debug("GEMS_FORCE_SERIAL_EXECUTION is defined in the current environment.")
+        return os.environ.get('GEMS_FORCE_SERIAL_EXECUTION')
+    else :
+        log.debug("GEMS_FORCE_SERIAL_EXECUTION is NOT defined in the current environment.")
+        return 'unset'
+   
 ## @brief Copy a file in a given path to some other path with option not to overwrite
 def copyPathFileToPath( fromPath : str, fromName : str, toPath : str, noClobber : bool = False ) :
     # If noClobber is True, check to be sure file doesn't already exist.
@@ -241,13 +252,17 @@ def writeStringToFile(theString, filePath, writeMode : str = 'w'):
 def make_relative_symbolic_link( path_down_to_source , path_down_to_dest_dir  , dest_link_label , parent_directory ) :
 #def make_relative_symbolic_link( path_down_to_source : str, path_down_to_dest_dir : str , dest_link_label : str, parent_directory : str) :
     #  path_down_to_source      Path, relative to parent_directory, to the source of the link
+    #      (existing path)
+    #
     #  path_down_to_dest_dir    Path, relative to parent_directory, where the link will be placed
-    #                           If None, it will be the current working directory
+    #      (new link to make)   If None, it will be the current working directory
+    #
     #  dest_link_label          The lable to place in path_down_to_dest.
     #                           That is, the sym link will be path_down_to_dest/dest_link_label
     #                           If None - then the last part of the path_down_to_source will be used.
     #                           That is, if path_down_to_source is path/down/to/source, then 
     #                           the sym link will be path_down_to_dest/source
+    #
     #  parent_directory         The parent where the two paths down exist.
     #                           If None, it will use the current working directory
     #                           Unless you know you are in a shell, you probably want to set this

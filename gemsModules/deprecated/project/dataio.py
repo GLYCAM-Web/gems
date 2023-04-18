@@ -44,6 +44,11 @@ class Project(BaseModel):
     json_api_version : str = ""
     _django_version : str = ""
     django_project_id : str = ""
+
+    ## In some cases, GEMS will choose to start a new project 
+    ## even if one is provided in the input.  If you don't want
+    ## that to happen, set this to True.
+    force_use_this_project : bool = False
     
 
     def __init__(self, request_dict : dict):

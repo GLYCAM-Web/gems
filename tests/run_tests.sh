@@ -14,7 +14,8 @@ export badOutDir='bad_outputs'
 START=$SECONDS
 run_test() 
 {
-    sh $1
+#    sh $1
+    source $1
     return $?
 }
 if [ ! -d ${badOutDir} ] ; then

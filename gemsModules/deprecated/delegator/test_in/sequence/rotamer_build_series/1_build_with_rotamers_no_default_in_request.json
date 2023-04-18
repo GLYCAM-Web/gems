@@ -1,0 +1,136 @@
+{
+	"entity": 
+	{
+		"type": "Sequence", 
+		"services": 
+		{
+			"service123": 
+			{
+				"type": "Build3DStructure"
+			}
+		}, 
+		"inputs": 
+		{
+			"sequence": 
+			{
+				"payload": "DManpa1-6[DManpa1-3]DManpa1-6[DNeup5Aca2-6DGalpb1-4DGlcpNAcb1-2DManpa1-3]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH"
+			}, 
+			"geometryOptions": 
+			{
+				"linkages": 
+				{
+					"linkageRotamerInfo": 
+					{
+						"singleLinkageRotamerDataList": 
+						[
+							{
+								"indexOrderedLabel": "3", 
+								"linkageLabel": "3", 
+								"selectedRotamers": 
+								[
+									{
+										"dihedralName": "omg", 
+										"dihedralValues": 
+										[
+											"gt"
+										]
+									}
+								]
+							}, 
+							{
+								"indexOrderedLabel": "4", 
+								"linkageLabel": "4", 
+								"selectedRotamers": 
+								[
+									{
+										"dihedralName": "omg", 
+										"dihedralValues": 
+										[
+											"gt"
+										]
+									}
+								]
+							}, 
+							{
+								"indexOrderedLabel": "9", 
+								"linkageLabel": "9", 
+								"selectedRotamers": 
+								[
+									{
+										"dihedralName": "phi", 
+										"dihedralValues": 
+										[
+											"t"
+										]
+									}, 
+									{
+										"dihedralName": "omg", 
+										"dihedralValues": 
+										[
+											"gt", 
+											"tg"
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			}, 
+			"buildOptions": 
+			{
+				"mdMinimize": "True"
+			}
+		}
+	}, 
+	"project": 
+	{
+		"pUUID": "2c613df2-6d29-464d-9921-018fb0e76f27", 
+		"title": "", 
+		"comment": "", 
+		"timestamp": "2023-03-21T12:51:51.779495", 
+		"gems_timestamp": "2023-03-21T12:51:51.779495", 
+		"project_type": "cb", 
+		"parent_entity": "Sequence", 
+		"requested_service": "Build3DStructure", 
+		"entity_id": "sequence", 
+		"service_id": "cb", 
+		"filesystem_path": "/website/userdata/", 
+		"compute_cluster_filesystem_path": "", 
+		"service_dir": "/website/userdata/sequence/cb", 
+		"project_dir": "/website/userdata/sequence/cb/Builds/2c613df2-6d29-464d-9921-018fb0e76f27", 
+		"logs_dir": "/website/userdata/sequence/cb/Builds/2c613df2-6d29-464d-9921-018fb0e76f27/logs", 
+		"requesting_agent": "", 
+		"has_input_files": "False", 
+		"site_version": "39450be4d265493f63e1544368cb6e3c722ec90a", 
+		"site_branch": "web-test", 
+		"site_code_name": "Developer-Environment", 
+		"gems_version": "ef7a81f6049b7e94dcba9d3b5c7ac181a2bda3d0", 
+		"gems_branch": "fix-multi-structure-bug", 
+		"md_utils_version": "dd4b5c57d82c89f438477987252f90ce63db7ff8", 
+		"md_utils_branch": "md-test", 
+		"gmml_version": "4d3118dcb6a6b736daa754b79f5ba7eb94a3442f", 
+		"gmml_branch": "gmml-test", 
+		"gp_version": "", 
+		"gp_branch": "", 
+		"site_mode": "CONTAINERS", 
+		"site_host_name": "172.31.0.2", 
+		"versions_file_path": "/website/userdata/VERSIONS.sh", 
+		"host_url_base_path": "https://172.31.0.2", 
+		"download_url_path": "https://172.31.0.2/json/download/sequence/cb/2c613df2-6d29-464d-9921-018fb0e76f27/", 
+		"force_field": "default", 
+		"parameter_version": "default", 
+		"amber_version": "default", 
+		"json_api_version": "0.0.1", 
+		"django_project_id": "", 
+		"app": "project", 
+		"id": "414334d0-3388-4a31-96b8-d66ffdd5b2ac", 
+		"sequence_id": "6b00ef37-e14c-5e8c-9fe5-8fc359b441d6", 
+		"sequence_path": "/website/userdata/sequence/cb/Sequences/6b00ef37-e14c-5e8c-9fe5-8fc359b441d6", 
+		"indexOrderedSequence": "DNeup5Aca2-6DGalpb1-4DGlcpNAcb1-2DManpa1-3[DManpa1-3[DManpa1-6]DManpa1-6]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH", 
+		"seqID": "6b00ef37-e14c-5e8c-9fe5-8fc359b441d6", 
+		"selected_rotamers": "['3_omg_gt', '4_omg_gt', '9_phi_t', '9_omg_gt', '9_omg_tg']"
+	}, 
+	"prettyPrint": "True", 
+	"mdMinimize": "True"
+}

@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
-from enum import Enum, auto
-from typing import Dict, List, Optional, Sequence, Set, Tuple, Union, Any
-from typing import ForwardRef
-from os.path import join
+#from enum import Enum, auto
+from typing import Dict, List, Any, Union
+#from typing import ForwardRef
+import os
 from datetime import datetime
-from pydantic import BaseModel, Field, ValidationError, validator
-from pydantic.schema import schema
+from pydantic import BaseModel, Field, validator
+#from pydantic.schema import schema
 from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
 from gemsModules.deprecated.common import io as commonio
 from gemsModules.deprecated.project import io as projectio
 from gemsModules.deprecated.project import projectUtilPydantic as projectUtils
 from gemsModules.deprecated.sequence import settings
-from gemsModules.deprecated.sequence import evaluate
-from gemsModules.deprecated import sequence
-import traceback
+#from gemsModules.deprecated.sequence import evaluate
+#from gemsModules.deprecated import sequence
+#import traceback
 
 
 if loggers.get(__name__):
@@ -116,9 +116,9 @@ class TheResidueGeometryOptions(BaseModel):
 class AllLinkageRotamerInfo(BaseModel):
     """Geometry options for linkages"""
     singleLinkageRotamerDataList: List[SingleLinkageRotamerData] = []
-    totalLikelyRotamers: int = 0
-    totalPossibleRotamers: int = 0
-    totalSelectedRotamers: int = 0
+    totalLikelyRotamers: Union[int, str] = 0
+    totalPossibleRotamers: Union[int, str] = 0
+    totalSelectedRotamers: Union[int, str] = 0
 
     def __init__(self, **data: Any):
         super().__init__(**data)
@@ -188,7 +188,10 @@ class Single3DStructureBuildDetails(BaseModel):
     #      gmmlConformerInfo : gmml.single_rotamer_info_vector = None
     sequenceConformation: List = []
     #  When there are multiple structures, one is chosen for the default.
+    #  The very first combination (typically the all-gg, all-t structure) 
+    #        is chosen as the global default
     isDefaultStructure: bool = False
+    isGlobalDefaultStructure: bool = False
     isNewBuild: bool = False
     # The following are locations needed by builders and/or retrievers.
     structureDirectoryName: str = ""
@@ -258,7 +261,7 @@ class Single3DStructureBuildDetails(BaseModel):
 
     # theBuildDir is usually "New_Builds" or "Existing_Builds" unlesss it is the general case
     def setAbsoluteConformerPath(self, theBuildDir: str):
-        self.absolute_conformer_path = join(
+        self.absolute_conformer_path = os.path.join(
             self.filesystem_path,
             self.entity_id,
             self.service_id,
@@ -268,7 +271,7 @@ class Single3DStructureBuildDetails(BaseModel):
             self.structureDirectoryName)
 
     def setConformerPath(self):
-        self.conformer_path = join(
+        self.conformer_path = os.path.join(
             self.filesystem_path,
             self.entity_id,
             self.service_id,
@@ -358,7 +361,7 @@ class StructureBuildInfo(BaseModel):
         if self.indexOrderedSequence == "":
             error = "Cannot derive a seqID from an empty indexOrderedSequence string"
             log.error(error)
-            raise error
+            raise ValueError 
         self.seqID = projectUtils.getSeqIdForSequence(
             self.indexOrderedSequence)
 
@@ -385,11 +388,11 @@ class TheLinkageGeometryOptions(BaseModel):
         else:
             return self.linkageRotamerInfo
 
-    def createRotamerData(self):
-        log.info("Linkage geometry options.createRotamerDataOut was called")
-        if self.linkageRotamerInfo is None:
-            self.linkageRotamerInfo = AllLinkageRotamerInfo()
-        self.linkageRotamerInfo.createRotamerData()
+#    def createRotamerData(self):
+#        log.info("Linkage geometry options.createRotamerDataOut was called")
+#        if self.linkageRotamerInfo is None:
+#            self.linkageRotamerInfo = AllLinkageRotamerInfo()
+#        self.linkageRotamerInfo.createRotamerData()
 
     def setLinkageRotamerInfo(self, validatedSequence: str):
         from gemsModules.deprecated.sequence import evaluate
@@ -479,8 +482,13 @@ class TheEvaluationOptions(BaseModel):
     validateOnly: bool = False  # Stop after setting sequenceIsValid and return answer
     # Is this an evaluation as part of an explicit build request?
     evaluateForBuild: bool = False
-    noBuild: bool = False  # Just do a full evaluation ; don't do the default example build
-
+    #### 
+    #### The evaluation should not be responsible for making a build happen, 
+    #### even if the evaluation is what triggers the build. To do a build, 
+    #### the evaluation needs info from too many other places.  So, this 
+    #### needs to not be here.  BLF 
+    ####
+    noBuild: bool = False  # deprecating in favor of  build_default_on_evaluation in ProceduralOptions
 
 class TheSequenceEvaluationOutput(BaseModel):
     # Determine if the sequence has proper syntax, etc.
@@ -515,50 +523,62 @@ class TheSequenceEvaluationOutput(BaseModel):
             self.buildOptions = TheBuildOptions()
         self.buildOptions.createRotamerData()
 
+    def getBasicEvaluation(self, sequence: str):
+        self.sequenceIsValid = True; # If we got to here, it's already been checked.
+        if self.evaluationOptions is None:
+            self.evaluationOptions = TheEvaluationOptions()
+        self.sequenceVariants = TheSequenceVariants()
+        from gemsModules.deprecated.sequence import evaluate
+        self.sequenceVariants = evaluate.getSequenceVariants(sequence)
+
+        ## This block is just for troubleshooting / logging
+        log.debug("Just got sequence variants.  They are:")
+        log.debug(str(self.sequenceVariants))
+        log.debug("indexOrdered: " +
+                  str(self.sequenceVariants.indexOrdered))
+        reducingSuffix = self.sequenceVariants.indexOrdered[-7:]
+        log.debug("reducingSuffix: " + reducingSuffix)
+        log.debug("# of '-': " + str(reducingSuffix.count('-')))
+
+    def getBuildEvaluation(self, sequence: str):
+        self.buildOptions = TheBuildOptions()
+        self.buildOptions.setGeometryOptions(sequence)
+
     def getEvaluation(self, sequence: str, validateOnly):
         log.info("Getting the Evaluation for SequenceEvaluationOutput.")
 
         log.debug("sequence: " + repr(sequence))
         log.debug("validateOnly: " + repr(validateOnly))
 
-        from gemsModules.deprecated.sequence import evaluate
+        self.getBasicEvaluation(sequence)
 
-        if self.evaluationOptions is None:
-            self.evaluationOptions = TheEvaluationOptions()
+        self.getBuildEvaluationOnly(sequence)
 
-        self.evaluationOptions.validateOnly = validateOnly
-        #self.sequenceIsValid = evaluate.checkIsSequenceSane(sequence)
-        self.sequenceIsValid = True; # If we got to here, it's already been checked.
-        log.debug("self.sequenceIsValid: " + str(self.sequenceIsValid))
+#        from gemsModules.deprecated.sequence import evaluate
+#
+## #        if self.evaluationOptions is None:
+## #            self.evaluationOptions = TheEvaluationOptions()
+#
+## #        self.evaluationOptions.validateOnly = validateOnly
+## #        self.sequenceIsValid = True; # If we got to here, it's already been checked.
+#        log.debug("self.sequenceIsValid: " + str(self.sequenceIsValid))
+#
+## #        self.sequenceVariants = TheSequenceVariants()
+## #        self.sequenceVariants = evaluate.getSequenceVariants(sequence)
+#
+## #        ## This block is just for troubleshooting / logging
+## #        log.debug("Just got sequence variants.  They are:")
+## #        log.debug(str(self.sequenceVariants))
+## #        log.debug("indexOrdered: " +
+## #                  str(self.sequenceVariants.indexOrdered))
+## #        reducingSuffix = self.sequenceVariants.indexOrdered[-7:]
+## #        log.debug("reducingSuffix: " + reducingSuffix)
+## #        log.debug("# of '-': " + str(reducingSuffix.count('-')))
+#
+#        if not self.evaluationOptions.validateOnly:
+## #            self.buildOptions = TheBuildOptions()
+## #            self.buildOptions.setGeometryOptions(sequence)
 
-        if self.sequenceIsValid:
-            self.sequenceVariants = TheSequenceVariants()
-            self.sequenceVariants = evaluate.getSequenceVariants(sequence)
-            log.debug("Just got sequence variants.  They are:")
-            log.debug(str(self.sequenceVariants))
-###
-# I think these are no longer needed.
-###
-            #log.debug("indexOrdered: " + str(self.sequenceVariants['indexOrdered']))
-            #reducingSuffix = self.sequenceVariants['indexOrdered'][-7:]
-            log.debug("indexOrdered: " +
-                      str(self.sequenceVariants.indexOrdered))
-            reducingSuffix = self.sequenceVariants.indexOrdered[-7:]
-            log.debug("reducingSuffix: " + reducingSuffix)
-            log.debug("# of '-': " + str(reducingSuffix.count('-')))
-#            if 2 == reducingSuffix.count('-'):
-#                lastIndex = self.sequenceVariants['indexOrdered'].rfind('-')
-#                log.debug("lastIndex of '-': " + str(lastIndex))
-#                self.sequenceVariants['indexOrdered'] = self.sequenceVariants['indexOrdered'][:lastIndex - 2] + self.sequenceVariants['indexOrdered'][lastIndex:]
-#                log.debug("indexOrdered: " + self.sequenceVariants['indexOrdered'])
-            # DGlcpNAcb1-1-OH
-
-        if self.sequenceIsValid and not self.evaluationOptions.validateOnly:
-            self.buildOptions = TheBuildOptions()
-            self.buildOptions.setGeometryOptions(sequence)
-
-       # self.defaultStructure
-        # drawOptions to be developed later.
 
     # ## I'm certain there is a better way to do this.  - Lachele
     def getSequenceVariant(self, variant):
@@ -644,6 +664,51 @@ class SequenceInputs(BaseModel):
     evaluationOptions: TheEvaluationOptions = None
     drawOptions: TheDrawOptions = None
 
+class sequenceProceduralOptions(commonio.ProceduralOptions):
+    use_library : bool = Field(
+            True,
+            description="If desired information is contained in an existing library, should that information be used?"
+            )
+    strict_library : bool = Field(
+            True,
+            description="Must retrieved library entries strictly match input specifications (build strategy, force field, etc.)?"
+            )
+    build_default_on_evaluation : bool = Field(
+            True,
+            description="If a sequence is valid, and an evaluation is requested, should that evaluation include a build of the default structure?"
+            )
+    md_minimize : bool = Field(
+            True,
+            description="Flag to turn off MD Minimization if the minimization is not desired."
+            )
+    number_structures_hard_limit : int = Field(
+            None,
+            description="Max number of structures to build.  If =0, then unlimited."
+            )
+
+    @validator('number_structures_hard_limit', pre=True, always=True)
+    def enforce_number_structures_limits(cls, v, values, **kwargs):
+        log.info('enforce_number_structures_limits was called')
+        if 'GW_GRPC_ROLE' in os.environ :
+            transactionContext = os.environ.get('GW_GRPC_ROLE')
+            log.debug("transactionContext, per GW_GRPC_ROLE, is : " + str(transactionContext))
+            if transactionContext == 'Developer': 
+                return 8 
+            elif transactionContext == 'Swarm': 
+                return 64
+            else:
+                return 1  # if you only get one structure, check your GRPC Role
+        if 'GEMS_MAX_STRUCTURES' in os.environ :
+            the_max = os.environ.get('GEMS_MAX_STRUCTURES')
+            log.debug("per GEMS_MAX_STRUCTURES, the max structures is to be set to : " + str(the_max))
+            try: 
+                max_int = int(the_max)
+            except ValueError: 
+                return 1  # if you only get one structure, your int might be bad
+            else:
+                return max_int
+        return v or 0
+
 
 class sequenceEntity(commonio.Entity):
     """Holds information about the main object responsible for a service."""
@@ -655,6 +720,7 @@ class sequenceEntity(commonio.Entity):
     services: Dict[str, sequenceService] = {}
     inputs: SequenceInputs = None
     outputs: SequenceOutputs = None
+    procedural_options : sequenceProceduralOptions = sequenceProceduralOptions()
 
     def __init__(self, **data: Any):
         super().__init__(**data)
@@ -734,43 +800,43 @@ class sequenceEntity(commonio.Entity):
                 "sequenceEntity.getSequenceVariantOut attempting to return variant.")
             return self.outputs.sequenceEvaluationOutput.getSequenceVariant(variant)
 
-    def validateCondensedSequence(self, validateOnly: bool = False):
-        self.evaluateCondensedSequence(validateOnly=True)
-
-    def evaluateCondensedSequence(self, validateOnly: bool = False):
-        if self.inputs is None:
-            thisAdditionalInfo = {'hint', 'The entity has no defined inputs.'}
-            self.generateCommonParserNotice(
-                noticeBrief='EmptyPayload',
-                scope='SequenceEntity',
-                additionalInfo=thisAdditionalInfo
-            )
-            raise
-        if self.inputs.sequence is None:
-            thisAdditionalInfo = {
-                'hint': 'The entity has inputs but cannot find Sequence Payload.'}
-            self.generateCommonParserNotice(
-                noticeBrief='EmptyPayload',
-                scope='SequenceEntityInputs',
-                additionalInfo=thisAdditionalInfo
-            )
-            raise
-        sequence = self.inputs.sequence.payload
-        if sequence is None or "":
-            thisAdditionalInfo = {
-                'hint': 'The entity a Sequence but cannot find Sequence Payload.'}
-            self.generateCommonParserNotice(
-                noticeBrief='EmptyPayload',
-                scope='SequenceEntityInputSequence',
-                additionalInfo=thisAdditionalInfo
-            )
-            raise
-        if self.outputs is None:
-            self.outputs = SequenceOutputs()
-        if self.outputs.sequenceEvaluationOutput is None:
-            self.outputs.sequenceEvaluationOutput = TheSequenceEvaluationOutput()
-        self.outputs.sequenceEvaluationOutput.getEvaluation(
-            sequence, validateOnly)
+#    def validateCondensedSequence(self, validateOnly: bool = False):
+#        self.evaluateCondensedSequence(validateOnly=True)
+#
+#    def evaluateCondensedSequence(self, validateOnly: bool = False):
+#        if self.inputs is None:
+#            thisAdditionalInfo = {'hint', 'The entity has no defined inputs.'}
+#            self.generateCommonParserNotice(
+#                noticeBrief='EmptyPayload',
+#                scope='SequenceEntity',
+#                additionalInfo=thisAdditionalInfo
+#            )
+#            raise
+#        if self.inputs.sequence is None:
+#            thisAdditionalInfo = {
+#                'hint': 'The entity has inputs but cannot find Sequence Payload.'}
+#            self.generateCommonParserNotice(
+#                noticeBrief='EmptyPayload',
+#                scope='SequenceEntityInputs',
+#                additionalInfo=thisAdditionalInfo
+#            )
+#            raise
+#        sequence = self.inputs.sequence.payload
+#        if sequence is None or "":
+#            thisAdditionalInfo = {
+#                'hint': 'The entity a Sequence but cannot find Sequence Payload.'}
+#            self.generateCommonParserNotice(
+#                noticeBrief='EmptyPayload',
+#                scope='SequenceEntityInputSequence',
+#                additionalInfo=thisAdditionalInfo
+#            )
+#            raise
+#        if self.outputs is None:
+#            self.outputs = SequenceOutputs()
+#        if self.outputs.sequenceEvaluationOutput is None:
+#            self.outputs.sequenceEvaluationOutput = TheSequenceEvaluationOutput()
+#        self.outputs.sequenceEvaluationOutput.getEvaluation(
+#            sequence, validateOnly)
 
 
 class sequenceTransactionSchema(commonio.TransactionSchema):
@@ -843,17 +909,6 @@ class sequenceTransactionSchema(commonio.TransactionSchema):
         else:
             return self.entity.getSequenceVariantOut(variant)
 
-    def evaluateCondensedSequence(self):
-        if self.entity is None:
-            thisAdditionalInfo = {
-                'hint': 'The transaction has no defined entity.'}
-            self.generateCommonParserNotice(
-                noticeBrief='GemsError',
-                scope='SequenceTransaction',
-                additionalInfo=thisAdditionalInfo
-            )
-            raise error
-        self.entity.evaluateCondensedSequence()
 
 
 class Transaction(commonio.Transaction):
@@ -871,11 +926,6 @@ class Transaction(commonio.Transaction):
         self.transaction_out = self.transaction_in.copy(deep=True)
         log.debug("The transaction_out is: ")
         log.debug(self.transaction_out.json(indent=2))
-
-    def doDefaultService():
-        from gemsModules.deprecated.receive import doDefaultService
-        doDefaultService(self)
-        return self
 
     def getRotamerDataIn(self):
         log.info("Transaction-Wrapper.getRotamerDataIn was called")
@@ -989,6 +1039,32 @@ class Transaction(commonio.Transaction):
         else:
             return None
 
+    def getNumberStructuresHardLimitOut(self):
+        if all(v is not None for v in [
+            self.transaction_out,
+            self.transaction_out.entity,
+            self.transaction_out.entity.outputs,
+            self.transaction_out.entity.outputs.sequenceEvaluationOutput,
+            self.transaction_out.entity.outputs.sequenceEvaluationOutput.buildOptions
+        ]):
+            return self.transaction_out.entity.outputs.sequenceEvaluationOutput.buildOptions.numberStructuresHardLimit
+        else:
+            return None
+
+    def setNumberStructuresHardLimitIn(self, value):
+        if all(v is not None for v in [
+            self.transaction_in,
+            self.transaction_in.entity,
+            self.transaction_in.entity.inputs,
+            self.transaction_in.entity.inputs.buildOptions
+        ]):
+            self.transaction_in.entity.inputs.buildOptions.numberStructuresHardLimit = value
+        else:
+            self.generateCommonParserNotice(
+                noticeBrief='GemsError',
+                additionalInfo={"hint": "cannot set limit for number of structure input"})
+            return None
+
     def setNumberStructuresHardLimitOut(self, value):
         if all(v is not None for v in [
             self.transaction_out,
@@ -1001,7 +1077,7 @@ class Transaction(commonio.Transaction):
         else:
             self.generateCommonParserNotice(
                 noticeBrief='GemsError',
-                additionalInfo={"hint": "cannot set limit for number of structures"})
+                additionalInfo={"hint": "cannot set limit for number of structures output"})
             return None
     # TODO - write all these if-not-None-return recursions to look like the ones above.
 
@@ -1075,19 +1151,93 @@ class Transaction(commonio.Transaction):
         else:
             return self.transaction_out.getSequenceVariantOut(variant)
 
-    def evaluateCondensedSequence(self):
+    def evaluateCondensedSequence(self, validateOnly : bool = False):
+        ## If we got to here, there should be valid inputs including a valid sequence
         if self.transaction_out is None and self.transaction_in is None:
-            thisAdditionalInfo = {
-                'hint': 'Neither the transaction_in nor the transaction_out are populated.'}
-            self.generateCommonParserNotice(
-                noticeBrief='NoInputPayloadDefined',
-                scope='TransactionWrapper.EvaluateCondensedSequence',
-                additionalInfo=thisAdditionalInfo
-            )
-            raise error
+            raise ValueError("No transaction, incoming or outgoing, could not be found.")
+
+        ## Ensure that the output spaces are ready to go
         if self.transaction_out is None:
             self.initialize_transaction_out_from_transaction_in()
-        self.transaction_out.evaluateCondensedSequence()
+        if self.transaction_out.entity.outputs is None:
+            self.transaction_out.entity.outputs = SequenceOutputs()
+        if self.transaction_out.entity.outputs.sequenceEvaluationOutput is None:
+            self.transaction_out.entity.outputs.sequenceEvaluationOutput = TheSequenceEvaluationOutput()
+        if self.transaction_out.entity.outputs.sequenceEvaluationOutput.evaluationOptions is None:
+            self.transaction_out.entity.outputs.sequenceEvaluationOutput.evaluationOptions = TheEvaluationOptions()
+
+        ## For validateOnly requests, we just need to say "True" and be done
+        if validateOnly:
+            self.transaction_out.entity.outputs.sequenceEvaluationOutput.evaluationOptions.validateOnly = validateOnly
+            self.transaction_out.entity.outputs.sequenceEvaluationOutput.sequenceIsValid=True
+            return
+
+        ## If we are still here, we are doing a proper evaluation
+        this_entity = self.transaction_out.entity
+
+        ## Copy down the directive for md minimization
+        this_entity.procedural_options.md_minimize = self.transaction_in.mdMinimize
+
+        ## Do the basic validation - we need the index ordered sequence to check for existing builds
+        the_sequence = this_entity.inputs.sequence.payload
+        this_entity.outputs.sequenceEvaluationOutput.getBasicEvaluation(the_sequence)
+
+        ##########
+        ##########
+        ### The idea with this block is to be able to return an existing evaluation
+        ##  This can totally work.  But, I don't have time to figure out how to deal
+        ##  with needed updates to the project and such.
+        ##  This code is incomplete and is not expected to work yet.
+        ##  Commenting it out for now.  There will be an evaluation every time.
+        ##  But, the first time, a sym link will be set so that it can be found easily
+        ##  in the future.  BLF.
+        ##
+        ## See if there is existing output and if we should return it
+#        the_ordered_sequence = self.getSequenceVariantOut('indexOrdered')
+#        from gemsModules.deprecated.sequence.projects import get_existing_default_evaluation_path
+#        the_existing_evaluation_path = get_existing_default_evaluation_path(self)
+#
+#        if the_existing_evaluation_path is not None:
+#            try:
+#                temp_transaction_out = sequenceTransactionSchema.parse_file(the_existing_evaluation_path)
+#            except Exception as error:
+#                log.error("Problem reading in existing evaluation output file.")
+#                log.error("The file path is:")
+#                log.error(the_existing_file_path)
+#                log.error("The exception had the following to say:")
+#                log.error(error)
+#            def make_changes_to_the_transaction_to_return():
+#                pass
+#            self.transaction_out = temp_transaction_out.copy(deep=True)
+#            return
+        ##########
+        ##########
+
+        this_entity.outputs.sequenceEvaluationOutput.getBuildEvaluation(the_sequence)
+        log.debug("called this_entity.outputs.sequenceEvaluationOutput.getBuildEvaluation(the_sequence)")
+
+        ## If we need to do a default build, then do it now
+        if this_entity.procedural_options.build_default_on_evaluation:
+            log.debug("this_entity.procedural_options.build_default_on_evaluation is true")
+            if this_entity.outputs.structureBuildInfo is None: 
+                log.debug("this_entity.outputs.structureBuildInfo is None")
+                from gemsModules.deprecated.sequence.projects import get_default_evaluation_path_from_sequence
+                the_path = get_default_evaluation_path_from_sequence(self)
+                log.debug("The path returned was : " + str(the_path))
+                if the_path is not None:
+                    return
+                log.debug("the path was None so we are going to do a default build")
+                self.manageSequenceBuild3DStructureRequest(defaultOnly=True)
+                ## If we're doing this, then ensure that the default evaluation path is made
+                from gemsModules.deprecated.sequence.projects import set_default_evaluation_symlink_in_sequence
+                path_setting_errors = set_default_evaluation_symlink_in_sequence(self)
+                if path_setting_errors is not None:
+                    self.generateCommonParserNotice(
+                        noticeBrief='GemsError',
+                        additionalInfo={"hint": path_setting_errors})
+
+
+
 
 # In file _manageSequenceBuild3DStructureRequest.py:
 #    def manageSequenceBuild3DStructureRequest(self, defaultOnly : bool = False)
@@ -1095,14 +1245,14 @@ class Transaction(commonio.Transaction):
 
     def build_outgoing_string(self):
         if self.transaction_out.prettyPrint is True:
-            self.outgoing_string = self.transaction_out.json(indent=2)
+            self.outgoing_string = self.transaction_out.json(indent=2, by_alias=True)
         else:
-            self.outgoing_string = self.transaction_out.json()
+            self.outgoing_string = self.transaction_out.json(by_alias=True)
 
 
 def generateSchema():
-    import json
- #   print(Entity.schema_json(indent=2))
+#   import json
+#   print(Entity.schema_json(indent=2))
     print(sequenceTransactionSchema.schema_json(indent=2))
 
 
