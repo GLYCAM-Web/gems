@@ -8,30 +8,28 @@ log = Set_Up_Logging(__name__)
 
 # I'm writing this non-abstractly in delegator first.  After I get it working, I'll
 #    move it to common and make it abstract.
+### This particular service - 'error' - must live in common bc everything needs it
 
-class marco_Inputs(BaseModel) :
+class error_Inputs(BaseModel) :
     entity : str  = Field(
         'Delegator',
-        description="The entity to which the Marco request is sent.")
-    who_I_am : str = Field(
-        'Delegator',
-        description="The name of the entity receiving the Marco request.  Written by GEMS.")
+        description="The entity finding the error.")
     
-class marco_Outputs(BaseModel) :
+class error_Outputs(BaseModel) :
     message : str  = Field(
         None,
-        description="The response to the Marco request.")
+        description="A response to an error in a request.")
 
-class marco_Request(Service_Request) :
+class error_Request(Service_Request) :
     typename : str  = Field(
-        "Marco",   
+        "Error",   
         alias='type'
     )
-    inputs : marco_Inputs = marco_Inputs()
+    inputs : error_Inputs = error_Inputs()
 
-class marco_Response(Service_Response) :
+class error_Response(Service_Response) :
     typename : str  = Field(
-        "Marco",   
+        "Error",   
         alias='type'
     )
-    outputs : marco_Outputs = marco_Outputs()
+    outputs : error_Outputs = error_Outputs()

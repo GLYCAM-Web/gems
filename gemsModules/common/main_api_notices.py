@@ -60,7 +60,7 @@ class Notice(BaseModel):
 
 
 def makeDefaultNoticesList() :
-    from .notice_data import NoticeData
+    from gemsModules.common.notice_data import NoticeData
     theNotices : List[Notice] = []
     tempNotice : Notice = Notice()   
     for noticedatum in NoticeData :

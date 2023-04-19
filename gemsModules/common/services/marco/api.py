@@ -20,9 +20,13 @@ class marco_Outputs(BaseModel) :
         description="The response to the Marco request.")
 
 class marco_Service(Service) :
-    typename : str  = "Marco"
+    typename : str  = Field(
+        "Marco",
+        alias="type")
     inputs : marco_Inputs = marco_Inputs()
 
 class marco_Response(Response) :
-    typename : str  = "Marco"
+    typename : str  = Field(
+        "Marco",
+        alias="type")
     outputs : marco_Outputs = marco_Outputs()
