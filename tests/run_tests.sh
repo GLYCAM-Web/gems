@@ -15,6 +15,7 @@ START=$SECONDS
 run_test() 
 {
 #    sh $1
+# shellcheck source=008.test.multi-conformer-builds.sh
     source $1
     return $?
 }
