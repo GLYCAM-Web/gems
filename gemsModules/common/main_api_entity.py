@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field, validator, Json
 from typing import Any, Dict, List, Union
 
 from gemsModules.common.main_api_notices import Notices
+from gemsModules.common.main_api_procedural_options import Procedural_Options
 from gemsModules.common.main_api_services import Service_Requests, Service_Responses
 from gemsModules.common.main_api_resources import Resource
 from gemsModules.common import settings_main
@@ -31,6 +32,7 @@ class Entity(ABC, BaseModel):
     services : Service_Requests = Service_Requests()
     responses : Service_Responses = Service_Responses()
     notices : Notices = Notices()
+    procedural_options : Procedural_Options = Procedural_Options()
     options : Dict[str,str] = Field(
             None,
             description='Key-value pairs that are specific to each entity, service, etc'
