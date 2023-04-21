@@ -4,7 +4,7 @@ from typing import Dict
 from pydantic import BaseModel, Field, typing
 
 from gemsModules.common.main_api_notices import Notices
-from gemsModules.common.settings_main import Available_Services
+from gemsModules.common.services.settings import Available_Services
 
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
@@ -107,6 +107,6 @@ class Service_Responses(BaseModel):
 
 def generateSchema():
     import json
-    print(Services.schema_json(indent=2))
-#    print(Responses.schema_json(indent=2))
+    print(Service_Requests.schema_json(indent=2))
+#    print(Service_Responses.schema_json(indent=2))
 

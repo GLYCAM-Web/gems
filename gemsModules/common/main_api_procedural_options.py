@@ -17,6 +17,14 @@ class Procedural_Options(ABC, BaseModel):
             False,
             description="Should GEMS execute serially (no daemons, no parallel)?  Note that this only affects GEMS, not any programs called by GEMS."
             )
+    pretty_print : bool = Field(
+            False, 
+            description="Should the output be pretty-printed?  Default is False."
+            )
+    md_minimize : bool = Field(
+            False, 
+            description="Should generated structures be minimized, if available?  Default is False."
+            )
 
     @validator('context', pre=True, always=True)
     def enforce_website_context(cls, v, values, **kwargs):

@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-from typing import Union, List
+from typing import Union, List, Protocol
 import uuid
 
 from gemsModules.delegator.main_api import Delegator_Transaction
 from gemsModules.delegator.services.marco.api import marco_Request
-from gemsModules.delegator.main_settings import WhoIAm
 from gemsModules.common.action_associated_objects import AAOP
 
 from gemsModules.logging.logger import Set_Up_Logging

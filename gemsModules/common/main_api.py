@@ -18,11 +18,18 @@ class Common_API(ABC, BaseModel):
     entity  : Entity       # The only required part of the JSON is the entity.
     project : Project = None
     notices : Notices = Notices()
-    prettyPrint : bool = False
+    prettyPrint : bool = None ## this is a change from the original
+    mdMinimize : bool = None ## this is a change from the original
     options : Dict[str,str] = Field(
             None,
-            description='Key-value pairs that are specific to each entity, service, etc'
+            description='Key-value pairs that apply to the entire transaction.'
             )
+
+    def copy_procedural_options_to_entity(self):
+        if self.prettyPrint is not None:
+            self.entity.procedural_options.pretty_print = self.prettyPrint
+        if self.mdMinimize is not None:
+            self.entity.procedural_options.md_minimize = self.mdMinimize
 
 
 
