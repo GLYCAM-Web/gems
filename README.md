@@ -8,7 +8,7 @@ file as input to the bin/delegate script.
 
 We need more docs.  Would you like to help?
 
-# Used by [GLYCAM-Web](https/glycam.org)
+# Used by [GLYCAM-Web](https://glycam.org)
 
 This code also serves as the main interface to GLYCAM-Web.  Use of 
 this interface ensures that the services provided by the website give

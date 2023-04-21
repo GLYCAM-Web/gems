@@ -178,6 +178,7 @@
   },
   "active": "ae69f8c8c9e49c63",
   "lastOpenFiles": [
+    "README.md~",
     "gemsModules/common/tasks/__init__.py",
     "gemsModules/common/services/services_responses.py",
     "gemsModules/common/services/servicer.py",
@@ -188,7 +189,6 @@
     "gemsModules/common/tasks/get_services_list.py",
     "gemsModules/common/tasks",
     "gemsModules/common/services/service_manager.py",
-    "gemsModules/common/services/duplicate_services.py",
     "project_management/Rewrite_Kanban.md",
     "project_management/kanban_notes/Draft complete Services pipeline using Delegator as the Entity.md",
     "project_management/kanban_notes/Little Things.md",
