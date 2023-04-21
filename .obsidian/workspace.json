@@ -8,18 +8,6 @@
         "type": "tabs",
         "children": [
           {
-            "id": "61a0973f6b4ed831",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "gemsModules/deprecated/sequence/TO_DO.md",
-                "mode": "source",
-                "source": false
-              }
-            }
-          },
-          {
             "id": "ae69f8c8c9e49c63",
             "type": "leaf",
             "state": {
@@ -28,9 +16,20 @@
                 "file": "project_management/Rewrite_Kanban.md"
               }
             }
+          },
+          {
+            "id": "b9effec33d5c9d53",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "gemsModules/delegator/README.md",
+                "mode": "source",
+                "source": false
+              }
+            }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -159,9 +158,13 @@
   },
   "active": "ae69f8c8c9e49c63",
   "lastOpenFiles": [
-    "project_management/kanban_notes",
     "gemsModules/delegator/README.md",
     "project_management/Rewrite_Kanban.md",
+    "project_management/kanban_notes/Draft complete Services pipeline using Delegator as the Entity.md",
+    "project_management/kanban_notes/Move abstractables to common.md",
+    "project_management/kanban_notes/Populate systemoperations and networkconnections.md",
+    "gemsModules/deprecated/sequence/TO_DO.md",
+    "project_management/kanban_notes",
     "gemsModules/common/__pycache__/main_api_procedural_options.cpython-39.pyc",
     "gemsModules/common/main_api_procedural_options.py~",
     "gemsModules/common/main_api_entity.py~",
@@ -171,8 +174,6 @@
     "gemsModules/delegator/services/request_translator.py~",
     "gemsModules/delegator/services/error/__pycache__/api.cpython-39.pyc",
     "gemsModules/delegator/services/error/__pycache__/__init__.cpython-39.pyc",
-    "gemsModules/delegator/services/error/__pycache__",
-    "gemsModules/deprecated/sequence/TO_DO.md",
     "tests/correct_outputs/008_reference/cb_final_state/Builds/8dada2cb-582d-4cc4-b8ff-eb03242efa51/New_Builds/ce32017d-6663-5ecc-b282-9e9812986d1c/Readme-Stopgap.md",
     "tests/correct_outputs/008_reference/cb_final_state/Builds/8dada2cb-582d-4cc4-b8ff-eb03242efa51/New_Builds/ce32017d-6663-5ecc-b282-9e9812986d1c/README.md",
     "tests/correct_outputs/008_reference/cb_final_state/Builds/8dada2cb-582d-4cc4-b8ff-eb03242efa51/New_Builds/8ddcc916-47db-5426-828c-fc24aae19d39/Readme-Stopgap.md",
