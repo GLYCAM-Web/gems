@@ -6,7 +6,7 @@ kanban-plugin: basic
 
 ## Backlog
 
-- [ ] Remove all references to the deprecated code from the new code.
+- [ ] [[Remove refs to deprecated code]]
 - [ ] [[Move abstractables to common]]
 - [ ] [[Populate systemoperations and networkconnections]] ^golpwj
 
@@ -22,7 +22,8 @@ kanban-plugin: basic
 ## In Focus
 
 - [ ] [[Draft complete Services pipeline using Delegator as the Entity]]
-- [ ] Add a proof-of-concept call to another entity from inside Delegator (Status or Project, maybe?)
+- [ ] Add a proof-of-concept call to another entity from inside Delegator (Status maybe?)
+- [ ] [[Little Things]]
 
 
 ## For Review

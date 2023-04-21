@@ -1,9 +1,9 @@
 Currently working on this workflow:
 - [x] Entity receives incoming JSON string
 - [x] Entity transforms it into a transaction
-- [ ] Entity translates top-level directives into Procedural Options
+- [x] Transaction translates top-level directives into Entity's Procedural Options
 - [ ] Entity sends only the Entity portion of the transaction to each Service
-- [ ] Each Service inspects the requested services, the inputs, and the Procedural Options.  From these, the Service generates a big list of all service requests that are explicit or implied.
+- [ ] Each Service inspects the requested services, the inputs, and the Procedural Options.  From these, the Service generates a list of all service requests that are explicit or implied.
 - [ ] Each Service then generates a list of pre-requisite service requests, if any.  This step considers only service needs provided by the current entity - services requested from other entities get handled down in the tasks.
 - [ ] Each service request is placed into an AAOP (this can happen at service request creation or later, depending on which is simpler.  At this moment, I think at creation time is easier.)
 - [ ] Each Service sends back to the Entity the list of AAOPs that it generated.

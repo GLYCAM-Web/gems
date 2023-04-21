@@ -1,0 +1,1 @@
+To expedite completion of the first version of the new design, I (BLF) am reusing a lot of code still in the deprecated folder.  Most of it will be things like symbolic links, but some entities might be used in their old form.   Once things settle, the new code should be completely decoupled from the old.

@@ -18,6 +18,7 @@ site
 *.pyo
 *.swp
 *~
+*.vscode
 *git-ignore-me*
 Doxygen/html
 Doxygen/docs_build.log
