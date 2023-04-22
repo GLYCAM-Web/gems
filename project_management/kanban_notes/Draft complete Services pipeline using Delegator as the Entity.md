@@ -2,16 +2,25 @@ Currently working on this workflow:
 - [x] Entity receives incoming JSON string
 - [x] Entity transforms it into a transaction
 - [x] Transaction translates top-level directives into Entity's Procedural Options
-- [ ] Entity sends only the Entity portion of the transaction to each Service
-- [ ] Each Service inspects the requested services, the inputs, and the Procedural Options.  From these, the Service generates a list of all service requests that are explicit or implied.
+- [ ] Entity passes Entity portion of transaction to the Service Manager
+- [ ] Service manager extracts all explicit services into an AAOP list 
+	- [ ] DRAFTED
+- [ ] Service manager collapses all unknown services into an error service 
+	- [ ] DRAFTED
+- [ ] Service manager sends the Entity info to each Service 
+	- [ ] draft in flux
+- [ ] Each Service inspects the requested services, the inputs, and the Procedural Options.  From these, the Service generates a list of all service requests that are implied and packs them into a list of AAOPs and returns them to the Service Manager 
+	- [ ] prior code exists, needs to be moved / rewritten / expanded /wrapped
+- [ ] Service manager collects all AAOPs for a specific service, explicit or implicit, and sends those to the service so the service can manage initial duplicates (merge, allow, error, etc.) 
+	- [ ] prior code exists, needs to be moved / expanded / wrapped
 - [ ] Each Service then generates a list of pre-requisite service requests, if any.  This step considers only service needs provided by the current entity - services requested from other entities get handled down in the tasks.
-- [ ] Each service request is placed into an AAOP (this can happen at service request creation or later, depending on which is simpler.  At this moment, I think at creation time is easier.)
-- [ ] Each Service sends back to the Entity the list of AAOPs that it generated.
-- [ ] Entity collects together all AAOPs relevant to each Service and sends only that group back to the Service.  
-- [ ]  This time, the service inspects the multiple service requests.  Based on its rules for service requests, it might merge some (or all), might keep them all as individual services, or it might return a special "error" service request that contains options to be later turned into Notices.
+	- [ ] some settings info exists somewhere
+- [ ] The service manager collects all the resulting service requests and sends them back to the services for a final merge.
+- [ ] During merges, the service inspects the multiple service requests.  Based on its rules for service requests, it might merge some (or all), might keep them all as individual services, or it might return a special "error" service request that contains options to be later turned into Notices.
+	- [ ] This is gonna be a hack for now
 - [ ]  Service returns the resulting AAOP list.
 
-So far, I drafted code for doing part of the above.  I need to move it to better places.
+So far, I drafted code for doing part of the above.  I need to move it to better places.  I keep changing my mind about where the better places are, but that is happening less often.
 
 After this workflow is done, the following should happen:
 - [ ] Entity sends the AAOP list and any Project info to each Service.

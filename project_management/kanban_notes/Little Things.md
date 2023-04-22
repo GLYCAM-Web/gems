@@ -9,4 +9,5 @@ Some of these might be great things to give new folks.
 	- [ ] If it is to be kept, then add code for moving the options set at that level closer to whatever part of the code actually uses the option(s).
 - [ ] Change name of 'logger' module so that it doesn't clash with other names in Python space
 - [ ] Periodically do a sweep to ensure no collisions with common Python libraries
+- [ ] (ABC, BaseModel) or (BaseModel, ABC)?
 - [ ] 

@@ -115,7 +115,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "project_management/kanban_notes/Little Things.md",
+                "file": "project_management/kanban_notes/Draft complete Services pipeline using Delegator as the Entity.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -132,7 +132,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "project_management/kanban_notes/Little Things.md",
+                "file": "project_management/kanban_notes/Draft complete Services pipeline using Delegator as the Entity.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -155,7 +155,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "project_management/kanban_notes/Little Things.md"
+                "file": "project_management/kanban_notes/Draft complete Services pipeline using Delegator as the Entity.md"
               }
             }
           }
@@ -176,22 +176,22 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "ae69f8c8c9e49c63",
+  "active": "ba0864e8cfb93b1b",
   "lastOpenFiles": [
-    "README.md~",
-    "gemsModules/common/tasks/__init__.py",
-    "gemsModules/common/services/services_responses.py",
-    "gemsModules/common/services/servicer.py",
-    "gemsModules/common/services/settings_main_servicer.py",
-    "gemsModules/common/services/service_tree_manager.py",
-    "gemsModules/common/services/settings.py",
-    "gemsModules/common/tasks/get_services_list.py~",
-    "gemsModules/common/tasks/get_services_list.py",
-    "gemsModules/common/tasks",
-    "gemsModules/common/services/service_manager.py",
+    "gemsModules/delegator/tests/marco-variants.py~",
+    "gemsModules/delegator/services/service_manager.py~",
+    "gemsModules/delegator/services/service_packages_list.py",
+    "gemsModules/delegator/services/service_manager.py",
+    "gemsModules/common/services/duplicate_requests.py",
+    "gemsModules/common/services/implied_requests.py",
+    "gemsModules/common/services/default_requests.py",
+    "gemsModules/common/services/explicit_requests.py",
+    "project_management/kanban_notes/Little Things.md",
+    "gemsModules/delegator/tests/inputs/__pycache__/temporary_json_strings_list.cpython-39.pyc",
+    "gemsModules/delegator/tests/inputs/__pycache__",
+    "gemsModules/delegator/tests/inputs/temporary_json_strings_list.py~",
     "project_management/Rewrite_Kanban.md",
     "project_management/kanban_notes/Draft complete Services pipeline using Delegator as the Entity.md",
-    "project_management/kanban_notes/Little Things.md",
     "project_management/kanban_notes/Remove refs to deprecated code.md",
     "gemsModules/delegator/README.md",
     "project_management/kanban_notes/Move abstractables to common.md",
