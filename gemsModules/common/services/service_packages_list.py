@@ -43,4 +43,5 @@ class Services_Package_List_Manager(ABC):
                     The_AAO=this_request,
                     AAO_Type='Error')
             self.aaop_list.append(this_aaop)
+        return self.aaop_list
 

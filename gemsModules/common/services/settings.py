@@ -7,7 +7,6 @@ from gemsModules.common.code_utils import GemsStrEnum
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
-WhoIAm = 'CommonServicer'
 
 class Module_Available_Services(GemsStrEnum):
     """

@@ -6,7 +6,7 @@ from typing import Dict
 from gemsModules.project.main_api import Project 
 from gemsModules.common.main_api_entity import Entity
 from gemsModules.common.main_api_notices import Notices
-from gemsModules.common import settings_main
+from gemsModules.common import settings as settings_main
 
 import traceback
 
