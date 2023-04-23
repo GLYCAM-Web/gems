@@ -2,33 +2,46 @@ Currently working on this workflow:
 - [x] Entity receives incoming JSON string
 - [x] Entity transforms it into a transaction
 - [x] Transaction translates top-level directives into Entity's Procedural Options
-- [ ] Entity passes Entity portion of transaction to the Service Manager
-- [ ] Service manager extracts all explicit services into an AAOP list 
+- [ ] Need a transaction manager.  Receiver hands transaction off to transaction manager
+- [ ] Transaction manager passes Entity portion of transaction to the  Request Manager
+- [ ] Request manager extracts all explicit services into an AAOP list 
 	- [ ] DRAFTED
-- [ ] Service manager collapses all unknown services into an error service 
+- [ ] Request manager collapses all unknown services into an error service 
 	- [ ] DRAFTED
-- [ ] Service manager sends the Entity info to each Service 
+- [ ] Request manager sends the Entity info to each Service 
 	- [ ] draft in flux
-- [ ] Each Service inspects the requested services, the inputs, and the Procedural Options.  From these, the Service generates a list of all service requests that are implied and packs them into a list of AAOPs and returns them to the Service Manager 
+- [ ] Each Service inspects the requested services, the inputs, and the Procedural Options.  From these, the Service generates a list of all service requests that are implied and packs them into a list of AAOPs and returns them to the Request Manager 
 	- [ ] prior code exists, needs to be moved / rewritten / expanded /wrapped
-- [ ] Service manager collects all AAOPs for a specific service, explicit or implicit, and sends those to the service so the service can manage initial duplicates (merge, allow, error, etc.) 
+- [ ] NOT NOW.  Request manager collects all AAOPs for a specific service, explicit or implicit, and sends those to the service so the service can manage initial duplicates (merge, allow, error, etc.) 
 	- [ ] prior code exists, needs to be moved / expanded / wrapped
+	- [ ] THIS STEP IS NOT NEEDED IMMEDIATELY.  It might never be needed.  
 - [ ] Each Service then generates a list of pre-requisite service requests, if any.  This step considers only service needs provided by the current entity - services requested from other entities get handled down in the tasks.
 	- [ ] some settings info exists somewhere
-- [ ] The service manager collects all the resulting service requests and sends them back to the services for a final merge.
+- [ ] The request manager collects all the resulting service requests and sends them back to the services for a merge of any duplicates.
 - [ ] During merges, the service inspects the multiple service requests.  Based on its rules for service requests, it might merge some (or all), might keep them all as individual services, or it might return a special "error" service request that contains options to be later turned into Notices.
 	- [ ] This is gonna be a hack for now
-- [ ]  Service returns the resulting AAOP list.
-
-So far, I drafted code for doing part of the above.  I need to move it to better places.  I keep changing my mind about where the better places are, but that is happening less often.
-
-After this workflow is done, the following should happen:
-- [ ] Entity sends the AAOP list and any Project info to each Service.
+- [ ] Service returns the resulting AAOP list.
+- [ ] Request manager sends the AAOP list and Project info to each Service.
 - [ ] Each Service fills in each service_request with all the information that the service request needs.
-- [ ] The AAOP list is returned to Entity.
-- [ ] Entity collects together all the AAOP lists from the Services into a single list.
-- [ ] Entity sends the list to the Workflow Manager.  Workflow Manager arranges AAOP objects into an AAOP Tree and instantiates an AAOP Tree Pair object.
-- [ ] Figure out how the tree pair object will be managed and some hack way to make it work quickly.
+- [ ] The AAOP list is returned to Request manager.
+- [ ] Request manager collects together all the AAOP lists from the Services into a single list.
+- [ ] Request manager returns AAOP request list to the transaction manager 
+- [ ] Transaction manager sends the AAOP list to the Workflow Manager.  Workflow Manager arranges AAOP objects into an AAOP Tree and instantiates an AAOP Tree Pair object.
+- [ ] Workflow manager returns Tree Pair to transaction manager.
+- [ ] Transaction manager sends Tree Pair to Servicer.
+- [ ] Servicer runs services and collects responses
+- [ ] Servicer returns Tree Pair to transaction manager
+- [ ] Transaction manager sends Tree Pair to the response manager
+- [ ] Response manager instantiates an Entity to be returned.
+- [ ] Response manager generates list of services that were actually run and puts that info into its return entity.
+	- [ ] Note that "error requests" are not added to this list.   They are returned as responses only.
+- [ ] Response manager adds the list of responses - including error responses - to the return entity.
+- [ ] Response manager adds top-level outputs and notices, as needed, to the return entity.
+- [ ] Response manager returns entity to transaction manager.
+- [ ] Transaction manager sends Project and outgoing entity to Project manager.
+- [ ] Project manager instantiates a new project, generates whatever outgoing project info is needed, and returns the project to transaction manager.
+- [ ] Transaction manager generates outgoing string and returns that to receiver.
+- [ ] 
 
 This old list is probably redundant, but check it:
 
