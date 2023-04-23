@@ -15,23 +15,23 @@ Currently working on this workflow:
 - [ ] Implied Service Manager then generates a list of pre-requisite service requests, if any.  This step considers only service needs provided by the current entity - services requested from other entities get handled down in the tasks.
 	- [ ] some settings info exists somewhere 
 - [x] Implied servicecs manager returns the AAOP list to the Request Manager 
-- [ ] The request manager collects all the resulting service requests 
-- [ ] Request Manager sends them back to the services for a merge of any duplicates.
+- [x] The request manager collects all the resulting service requests 
+- [x] Request Manager sends them back to the services for a merge of any duplicates.
 - [ ] During merges, the service inspects the multiple service requests.  Based on its rules for service requests, it might merge some (or all), might keep them all as individual services, or it might return a special "error" service request that contains options to be later turned into Notices.
 	- [ ] This is gonna be a hack for now
 - [ ] Service returns the resulting AAOP list.
-- [ ] Request manager sends the AAOP list and Project info to each Service.
+- [x] Request manager sends the AAOP list and Project info  and Entity's Inputs to each Service.
 - [ ] Each Service fills in each service_request with all the information that the service request needs.
 - [ ] The AAOP list is returned to Request manager.
-- [ ] Request manager collects together all the AAOP lists from the Services into a single list.
+- [x] Request manager collects together all the AAOP lists from the Services into a single list.
 - [x] Request manager returns AAOP request list to the transaction manager 
 - [x] Transaction manager sends the AAOP list to the AAOP Tree Manager.  
 - [ ] AAOP Tree Manager arranges AAOP objects into an AAOP Tree and instantiates an AAOP Tree Pair object.
 - [x] AAOP Tree manager returns Tree Pair to transaction manager.
-- [ ] Transaction manager sends Tree Pair to Servicer.
+- [x] Transaction manager sends Tree Pair to Servicer.
 - [ ] Servicer runs services and collects responses
-- [ ] Servicer returns Tree Pair to transaction manager
-- [ ] Transaction manager sends Tree Pair to the response manager
+- [x] Servicer returns Tree Pair to transaction manager
+- [x] Transaction manager sends Tree Pair to the response manager
 - [ ] Response manager instantiates an Entity to be returned.
 - [ ] Response manager generates list of services that were actually run and puts that info into its return entity.
 	- [ ] Note that "error requests" are not added to this list.   They are returned as responses only.
