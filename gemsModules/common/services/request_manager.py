@@ -9,6 +9,7 @@ from gemsModules.common.services.service_packages_list import Services_Package_L
 from gemsModules.common.services.implied_requests import Implicit_Services_Request_Manager 
 from gemsModules.common.services.default_requests import Default_Service_Request_Manager
 from gemsModules.common.services.duplicate_requests import Duplicate_Requests_Manager
+from gemsModules.common.services.request_data_filler import Request_Data_Filler
 from gemsModules.project.main_api import Project
 
 from gemsModules.logging.logger import Set_Up_Logging
@@ -26,9 +27,10 @@ class Request_Manager(ABC):
         self.gather_implicit_services()
         self.aaop_list = self.managed_explicit_aaops + self.implicit_aaops
         self.manage_duplicates()
-        if self.return_aaop_list == []:
-            return self.get_default_aaops()
-        return self.return_aaop_list
+        if self.aaop_list == []:
+            self.aaop_list = self.get_default_aaops()
+        self.fill_request_data_needs()
+        return self.aaop_list
 
     def set_explicit_aaops(self):
         explicit_manager = Explicit_Service_Request_Manager(entity=self.entity)
@@ -54,3 +56,8 @@ class Request_Manager(ABC):
         default_manager = Default_Service_Request_Manager()
         self.default_aaops : List[AAOP] = default_manager.get_default_services_aaops()
         return self.default_aaops
+    
+    @abstractmethod
+    def fill_request_data_needs(self):
+        data_filler = Request_Data_Filler(aaop_list=self.aaop_list, entity=self.entity, project=self.project)
+        self.aaop_list = data_filler.process()

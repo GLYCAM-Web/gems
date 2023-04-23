@@ -39,7 +39,7 @@ class Implicit_Services_Request_Manager(ABC):
         """
         for service in self.get_available_services():
             this_service_manager = self.get_implicit_service_manager(service)
-            this_service_manager.process()
+            this_service_manager.process(input_object=self.input_object)
             self.aaop_list.extend(this_service_manager.get_aaop_list())
         return self.aaop_list
 

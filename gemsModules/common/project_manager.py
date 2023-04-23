@@ -6,6 +6,9 @@ from abc import ABC, abstractmethod
 from gemsModules.common.main_api_entity import Entity
 from gemsModules.project.main_api import Project
 
+from gemsModules.logging.logger import Set_Up_Logging
+log = Set_Up_Logging(__name__)
+
 class Project_Manager(ABC):
     
     def __init__(self, entity : Entity, project : Project = None):

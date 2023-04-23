@@ -22,7 +22,7 @@ class Transaction_Manager(ABC):
 
     def process(self):
         self.manage_requests()
-        self.generate_workflow()
+        self.generate_aaop_tree_pair()
         self.invoke_servicer()
         self.manage_responses()
         self.manage_project()

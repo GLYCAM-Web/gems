@@ -5,6 +5,9 @@ from abc import ABC, abstractmethod
 from gemsModules.common.action_associated_objects import AAOP
 from gemsModules.common.action_associated_objects import AAOP_Tree_Pair
 
+from gemsModules.logging.logger import Set_Up_Logging
+log = Set_Up_Logging(__name__)
+
 class AAOP_Tree_Pair_Manager(ABC):
     def __init__(self, aaop_request_list : List[AAOP]):
         self.aaop_request_list = aaop_request_list
