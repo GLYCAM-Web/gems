@@ -10,13 +10,16 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
+# The following are the required inputs.  They are satisfied by an Entity.
+# Using a protocol means that it need not be an Entity, but it must have
+# the same attributes.
 class Implied_Services_Inputs(Protocol):
     inputs : Union[Dict,Resource] 
     procedural_options : Procedural_Options
     options : Dict[str,str]
 
 
-class Implicit_Services_Request_Manager(ABC):
+class Implied_Services_Request_Manager(ABC):
     """ Inspect the incoming JSON object to figure out which services need 
         to be run.  Bundle these into a service request package list.
     """
@@ -41,7 +44,7 @@ class Implicit_Services_Request_Manager(ABC):
             this_service_manager = self.get_implicit_service_manager(service)
             this_service_manager.process(input_object=self.input_object)
             self.aaop_list.extend(this_service_manager.get_aaop_list())
-        return self.aaop_list
+        return self.get_aaop_list()
 
     def get_aaop_list(self):
         return self.aaop_list

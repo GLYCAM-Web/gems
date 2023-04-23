@@ -10,4 +10,5 @@ Some of these might be great things to give new folks.
 - [ ] Change name of 'logger' module so that it doesn't clash with other names in Python space
 - [ ] Periodically do a sweep to ensure no collisions with common Python libraries
 - [ ] (ABC, BaseModel) or (BaseModel, ABC)?
+- [ ] Make it easier for Entities to use services defined in Common.  Right now, my (BLF) hack will make each Entity have to define, import, etc., each service from Common.  If there is time, i will fix this, but it's not an onerous task at the moment to copy-paste the few from Common that probably won't need mods.
 - [ ] 

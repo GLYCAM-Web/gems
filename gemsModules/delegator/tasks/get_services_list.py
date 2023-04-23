@@ -1,4 +1,4 @@
-from gemsModules.delegator.services.settings import Available_Services
+from gemsModules.delegator.services.settings.known_available import Available_Services
 from typing import List
 
 

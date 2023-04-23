@@ -10,17 +10,17 @@ Currently working on this workflow:
 	- [x] DRAFTED
 - [x] Request manager sends the Entity info to each Service's implied service manager 
 	- [x] draft in flux
-- [ ] Implied Services Manager inspects the requested services, the inputs, and the Procedural Options.  From these, the Service generates a list of all service requests that are implied and packs them into a list of AAOPs 
-	- [ ] prior code exists, needs to be moved / rewritten / expanded /wrapped
-- [ ] Implied Service Manager then generates a list of pre-requisite service requests, if any.  This step considers only service needs provided by the current entity - services requested from other entities get handled down in the tasks.
-	- [ ] some settings info exists somewhere 
+- [x] Within each Service, the Implied Services Manager inspects the inputs, Options and the Procedural Options.  From these, the Service generates a list of all service requests that are implied and packs them into a list of AAOPs 
+	- [x] prior code exists, needs to be moved / rewritten / expanded /wrapped
+- [x] Implied Service Manager then generates a list of pre-requisite service requests, if any.  This step considers only service needs provided by the current entity - services requested from other entities get handled down in the tasks.
+	- [x] some settings info exists somewhere 
 - [x] Implied servicecs manager returns the AAOP list to the Request Manager 
 - [x] The request manager collects all the resulting service requests 
 - [x] Request Manager sends them back to the services for a merge of any duplicates.
 - [ ] During merges, the service inspects the multiple service requests.  Based on its rules for service requests, it might merge some (or all), might keep them all as individual services, or it might return a special "error" service request that contains options to be later turned into Notices.
 	- [ ] This is gonna be a hack for now
 - [ ] Service returns the resulting AAOP list.
-- [x] Request manager sends the AAOP list and Project info  and Entity's Inputs to each Service.
+- [x] Request manager sends the AAOP list and Project info  and Entity to each Service.
 - [ ] Each Service fills in each service_request with all the information that the service request needs.
 - [ ] The AAOP list is returned to Request manager.
 - [x] Request manager collects together all the AAOP lists from the Services into a single list.
