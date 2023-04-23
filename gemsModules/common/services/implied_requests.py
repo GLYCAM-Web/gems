@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from typing import Union, List, Protocol, Dict
+from typing import Union, List, Protocol, Dict, Callable
 from abc import ABC, abstractmethod
 
 from gemsModules.common.main_api_resources import Resource
@@ -16,15 +16,32 @@ class Implied_Services_Inputs(Protocol):
     options : Dict[str,str]
 
 
-class Implicit_Service_Request_Manager(ABC):
+class Implicit_Services_Request_Manager(ABC):
     """ Inspect the incoming JSON object to figure out which services need 
         to be run.  Bundle these into a service request package list.
     """
 
+    def __init__(self, input_object : Implied_Services_Inputs):
+        self.aaop_list : List[AAOP] = []
+        self.input_object = input_object
+
     @abstractmethod
-    def add_implicit_services(self, 
-            implied_services_inputs : Implied_Services_Inputs) -> List[AAOP]:
+    def get_available_services(self) -> List[str]:
         pass
+
+    @abstractmethod
+    def get_implicit_service_manager(self, service : str) -> Callable:
+        pass
+
+    def process(self) -> List[AAOP]:  
+        """ Process the incoming JSON object to figure out which services 
+            need to be run.  Bundle these into a service request package list.
+        """
+        for service in self.get_available_services():
+            this_service_manager = self.get_implicit_service_manager(service)
+            this_service_manager.process()
+            self.aaop_list.extend(this_service_manager.get_aaop_list())
+        return self.aaop_list
 
     def get_aaop_list(self):
         return self.aaop_list

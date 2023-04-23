@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from typing import Union, List, Dict
+from typing import Union, List, Callable
 from abc import ABC, abstractmethod
 
 from gemsModules.common.action_associated_objects import AAOP
@@ -17,9 +17,11 @@ class Services_Package_List_Manager(ABC):
 
     @abstractmethod
     def get_available_services(self) -> List[str]:
-        from gemsModules.common.tasks import get_services_list
-        self.available_services = get_services_list.execute()
-        return self.available_services
+        pass
+
+    # @abstractmethod
+    # def get_service_module(self, service_type : str) -> Callable:
+    #     pass
 
     def get_all_of_type_in_AAOP_list(self, AAO_Type : str) -> List[AAOP]:
         aaop_type_list : List[AAOP] = []

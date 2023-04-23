@@ -14,14 +14,15 @@ def process(incomingString: str) -> str:
         return delegator_receiver_error_response
     log.debug("The incoming string is valid")
 
-    this_transaction= delegator_receiver.get_transaction()
-    from gemsModules.delegator.inputs_translator import JSON_input_translator
-    this_translator = JSON_input_translator(this_transaction.inputs)
-    this_translator.translate()
+    ## Grab the incoming Entity
+
+    ## Hand the entity off to the service manager
+
+    ## Generate and return outgoing string
 
 
 def receive(incomingString: str) -> str:
-    log.info("Delegator's redirect was called")
+    log.info("Delegator's receive was called")
 
     receiver = Redirector_Receiver()
 
@@ -39,7 +40,7 @@ def receive(incomingString: str) -> str:
     requested_entity=receiver.get_incoming_entity_type()
 ########## 
 ## NOTE!!!
-## this is temporary until Delegator's Marco and known Entities services work
+## this is temporary until Delegator's services work
 #        log.debug("Delegating incoming string to entity: " + requested_entity)
 #        from gemsModules.delegator import redirector_settings 
 #        entity_module = redirector_settings.Known_Entity_Reception_Modules[requested_entity]
