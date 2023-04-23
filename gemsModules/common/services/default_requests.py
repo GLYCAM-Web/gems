@@ -12,7 +12,7 @@ class Default_Service_Request_Manager(ABC):
         explicit and implicit services have been considered."""
 
     @abstractmethod
-    def add_default_services(self) -> List[AAOP]:
+    def get_default_services_aaops(self) -> List[AAOP]:
         pass
 
     def get_aaop_list(self):

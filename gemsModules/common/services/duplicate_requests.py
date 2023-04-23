@@ -8,7 +8,7 @@ from gemsModules.common.main_api_services import Service_Request
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
-class Duplicate_Services_Manager(ABC):
+class Duplicate_Requests_Manager(ABC):
 
     def __init__(self, aaop_list : List[AAOP], service_type : str):
         self.incoming_aaop_list = aaop_list

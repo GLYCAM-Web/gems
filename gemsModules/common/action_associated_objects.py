@@ -44,6 +44,8 @@ class Action_Associated_Object_Package (ABC):
                 )
         return out_string
 
+    def get_callable(self):
+        return self.The_AAO
 
     def create_child_package_list(self,  
             items : List = [],
@@ -76,14 +78,14 @@ class AAOP_Tree(ABC) :
         """Get the next AAOP in the tree"""
         pass # might need special iterator, eventually.  Need depth-first-ish search.
 
-    def get_next_AAOP (self, allow_parallel : bool = False) :
+    def get_next_AAOP (self) :
         """Return the next AAOP in the tree.  Set that as current."""
         self._current_AAOP = self._next_AAOP(self)
         return self.current_AAOP
 
-    def put_current_AAOP (self, incoming_aaop) :
+    def put_next_AAOP (self, incoming_aaop) :
         """Write the AAOP to the next AAOP in the tree"""
-        self._current_AAOP = incoming_aaop
+        self._next_AAOP = incoming_aaop
 
 #    def get_AAOP_by_ID (ID_String: str) :
 #        """Get an AAOP by ID"""
@@ -119,11 +121,11 @@ class AAOP_Tree_Pair(ABC):
         self.input_tree = input_tree
         self.output_tree = output_tree
 
-    def get_next_AAOP_pair(self):
+    def get_next_AAOP_incoming(self):
         self.input_current = self.input_tree.get_next_AAOP()
-        self.output_current = self.output_tree.get_next_AAOP()
-        return self.input_current, self.output_current
+        return self.input_current
+    
+    def put_next_AAOP_outgoing(self, outgoing_aaop : AAOP):
+        self.output_tree.put_next_AAOP(outgoing_aaop)
 
-    def put_output_current_AAOP(self, incoming_aaop: AAOP):
-        self.output_tree.put_current_AAOP(incoming_aaop)
 
