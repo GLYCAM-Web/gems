@@ -13,7 +13,7 @@ import traceback
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
-class Common_API(ABC, BaseModel):
+class Common_API(BaseModel):
     timestamp : str = None
     entity  : Entity       # The only required part of the JSON is the entity.
     project : Project = None
@@ -126,3 +126,8 @@ class Transaction(ABC):
 
 def generateSchema():
     print(Common_API.schema_json(indent=2))
+
+
+class common_Transaction(Transaction):
+    def get_API_type(self):
+        return Common_API

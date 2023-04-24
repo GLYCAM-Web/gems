@@ -41,11 +41,22 @@ class Implied_Services_Request_Manager(ABC):
             need to be run.  Bundle these into a service request package list.
         """
         for service in self.get_available_services():
-            this_service_manager = self.get_implicit_service_manager(service)
+            this_service_manager = self.get_implicit_service_manager(service)()
+            log.debug("the services is: " + str(service))
+            log.debug("is this where the prodess thing is?")
             this_service_manager.process(input_object=self.input_object)
+            log.debug("did we get here?")
             self.aaop_list.extend(this_service_manager.get_aaop_list())
         return self.get_aaop_list()
 
     def get_aaop_list(self):
         return self.aaop_list
 
+
+class common_Implied_Services_Request_Manager(Implied_Services_Request_Manager):
+
+    def get_available_services(self) -> List[str]:
+        return ["common"]
+    
+    def get_implicit_service_manager(self, service: str) -> Callable:
+        pass

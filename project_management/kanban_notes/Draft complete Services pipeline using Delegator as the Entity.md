@@ -21,11 +21,11 @@ Currently working on this workflow:
 	- [x] This is gonna be a hack for now (actually... not too bad a hack)
 - [x] Service returns the resulting AAOP list.
 - [x] Request manager sends the AAOP list and Project info  and Entity to each Service.
-- [ ] Each Service fills in each service_request with all the information that the service request needs. 
+- [x] Each Service fills in each service_request with all the information that the service request needs. 
 	- [x] Delegator needs no data to be filled....  
 	- [x] But there is infrastructure
-	- [ ] Need function that does nothing and just returns the AAOP list.
-- [ ] The AAOP list is returned to Request manager.
+	- [x] Need function that does nothing and just returns the AAOP list.
+- [x] The AAOP list is returned to Request manager.
 - [x] Request manager collects together all the AAOP lists from the Services into a single list.
 - [x] Request manager returns AAOP request list to the transaction manager 
 - [x] Transaction manager sends the AAOP list to the AAOP Tree Manager.  
@@ -46,6 +46,11 @@ Currently working on this workflow:
 - [x] Project manager returns the project to transaction manager.
 - [x] Transaction manager returns the transaction.
 - [ ] The 'Error' AAOP is gonna gause trouble until I figure out a way to fix it.
+- [ ] There will be work to do in the Request Manager
+	- [ ] Also with transaction manager
+	- [x] I made a hack.  
+		- [ ] Maybe ok for now?  We will see.  
+- [ ] 
 
 This old list is probably redundant, but check it:
 

@@ -18,9 +18,9 @@ class Implied_Translator(ABC):
         self.aaop_list : List[AAOP] = []
 
     @abstractmethod
-    def process(self, inputs : Implied_Services_Inputs) -> List[AAOP]:
+    def process(self, input_object : Implied_Services_Inputs) -> List[AAOP]:
         return self.get_aaop_list()
 
     def get_aaop_list(self) -> List[AAOP]:
-        return self.aaop_list()
+        return self.aaop_list
 

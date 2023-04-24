@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from abc import ABC, abstractmethod
+from typing import List
 
 from gemsModules.common.action_associated_objects import AAOP
 from gemsModules.common.main_api_entity import Entity
@@ -19,3 +20,9 @@ class Request_Data_Filler(ABC):
     def process(self) -> List[AAOP]:
         pass
         
+
+class common_Request_Data_Filler(Request_Data_Filler):
+        
+    def process(self) -> List[AAOP]:
+        log.debug("common_Request_Data_Filler.process() called.")
+        return self.aaop_list

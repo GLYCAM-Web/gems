@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from typing import Union, List, Callable
+from typing import Union, List
 
 from gemsModules.common.action_associated_objects import AAOP
 from gemsModules.common.services.error.api import error_Request
@@ -12,7 +12,6 @@ class Services_Package_List_Utilities():
 
     def __init__(self, aaop_list : List[AAOP]):
         self.aaop_list = aaop_list
-        self.available_services : List[str] = self.get_available_services()
 
     def get_all_of_type_in_AAOP_list(self, AAO_Type : str) -> List[AAOP]:
         aaop_type_list : List[AAOP] = []

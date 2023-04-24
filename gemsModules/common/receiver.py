@@ -2,26 +2,29 @@
 from pydantic import ValidationError
 from abc import ABC, abstractmethod
 
-from gemsModules.common import settings_main
-from gemsModules.common.main_api import Transaction
+from gemsModules.common import settings
+from gemsModules.common.main_api import common_Transaction
 from gemsModules.common.transaction_manager import Transaction_Manager
 
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
+class common_Transaction_Manager(Transaction_Manager):
+
+    def set_local_modules(self):
+        super().set_local_modules()
+
 class Receiver(ABC):
 
-    @abstractmethod
-    def get_local_entity_type(self) -> str:
-        return settings_main.WhoIAm
-
-    @abstractmethod
-    def get_transaction_child_type(self):
-        return Transaction
-
     def __init__(self):
-        self.transaction = self.get_transaction_child_type()()
-        self.entityType=self.get_local_entity_type()
+        self.get_local_components()
+
+    @abstractmethod
+    def get_local_components(self):
+        self.transaction = common_Transaction()
+        self.entityType = settings.WhoIAm
+        self.transaction_manager_type = common_Transaction_Manager
+
 
     def receive(self, incoming_string: str):
         try: 
@@ -38,9 +41,9 @@ class Receiver(ABC):
         if return_value is not None and return_value != 0:
             return self.transaction.get_outgoing_string()
 
-        transaction_manager = Transaction_Manager(self.transaction)
         try:
-            self.transaction = transaction_manager.process()
+            self.transaction_manager = self.transaction_manager_type(self.transaction)
+            self.transaction = self.transaction_manager.process()
             return self.transaction.get_outgoing_string()
         except Exception as e:
             self.transaction.generate_error_response(EntityType=self.entityType, Brief='UnknownError', AdditionalInfo={'error': str(e)})

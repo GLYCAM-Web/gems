@@ -28,3 +28,15 @@ class Project_Manager(ABC):
     @abstractmethod
     def fill_response_project_from_response_entity(self):
         pass
+
+class common_Project_Manager(Project_Manager):
+        
+        def __init__(self, entity : Entity, project : Project = None):
+            super().__init__(entity, project)
+    
+        def fill_response_project_from_incoming_project(self):
+            if self.incoming_project is not None:
+                self.response_project = self.incoming_project
+    
+        def fill_response_project_from_response_entity(self):
+            pass

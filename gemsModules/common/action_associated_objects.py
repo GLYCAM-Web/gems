@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-from abc import ABC
 from typing import Callable, List
 import uuid
 
@@ -8,7 +7,7 @@ from gemsModules.common.code_utils import Annotated_List
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
-class Action_Associated_Object_Package (ABC):
+class Action_Associated_Object_Package ():
     """Package for an Action_Associated_Object (AAO)
         This class is abbreviated AAOP.
 
@@ -63,7 +62,7 @@ class Action_Associated_Object_Package (ABC):
 AAOP = Action_Associated_Object_Package
 
 
-class AAOP_Tree(ABC) :
+class AAOP_Tree() :
     """Tree of Action_Associated_Object_Packages
        The lists are the AAO packages associated with
        the action.
@@ -109,7 +108,7 @@ class AAOP_Tree(ABC) :
         pass
 
 
-class AAOP_Tree_Pair(ABC):
+class AAOP_Tree_Pair():
     """Holds a pair of AAOP Trees.  
        Typically one tree is input and the other is output.
        """

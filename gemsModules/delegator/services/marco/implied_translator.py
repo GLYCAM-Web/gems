@@ -16,23 +16,21 @@ class marco_Implied_Translator(Implied_Translator):
         Bundle resulting services into a service request package list (List[AAOP]).
     """
 
-    def process(self, inputs : Implied_Services_Inputs) -> List[str]:
-        if inputs is not None:  
-#            print("it is not none")
-#            this_dict = self.transaction.inputs.entity.inputs
-#            print("here is the dict")
-#            print(this_dict)
-            if 'cake' in inputs.keys() or 'color' in inputs.keys() :
+    def process(self, input_object : Implied_Services_Inputs) -> List[AAOP]:
+        if input_object is not None and input_object.options is not None:
+            the_options = input_object.options
+            if 'cake' in the_options.keys() or 'color' in the_options.keys() :
 #                print("found cake or color")
                 service_request = marco_Request()
                 service_request.options = {}
-                if 'cake' in inputs.keys() :
-                    service_request.options["cake"]=inputs["cake"]
-                if 'color' in inputs.keys() :
-                    service_request.options["color"]=inputs["color"]
+                if 'cake' in the_options.keys() :
+                    service_request.options["cake"]=the_options["cake"]
+                if 'color' in the_options.key_object() :
+                    service_request.options["color"]=the_options["color"]
                 this_aaop = AAOP(Dictionary_Name='implied_cake_marco', 
                         ID_String=uuid.uuid4(),
                         The_AAO=service_request,
                         AAO_Type='Marco')
                 self.aaop_list.append(this_aaop)
+        return self.get_aaop_list()
 

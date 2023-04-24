@@ -8,7 +8,6 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
-
 class Response_Manager(ABC):
     
     def __init__(self, aaop_tree_pair : AAOP_Tree_Pair):
@@ -18,5 +17,6 @@ class Response_Manager(ABC):
         self.generate_response_entity()
         return self.response_entity
 
+    @abstractmethod
     def generate_response_entity(self):
         pass

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from typing import List
+from typing import List, Callable
 from abc import ABC, abstractmethod
 
 from gemsModules.common.action_associated_objects import AAOP
@@ -44,5 +44,11 @@ class Duplicate_Requests_Manager(ABC):
         return self.new_aaop_list
 
 
+class common_Duplicate_Requests_Manager(Duplicate_Requests_Manager):
 
+    def get_available_services(self) -> List[str]:
+        return super().get_available_services()
+    
+    def get_duplicates_manager(self, service : str) -> Callable:
+        pass
 
