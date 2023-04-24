@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 from typing import Union, List, Callable
-from abc import ABC, abstractmethod
 
 from gemsModules.common.action_associated_objects import AAOP
 from gemsModules.common.services.error.api import error_Request
@@ -9,19 +8,11 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
-class Services_Package_List_Manager(ABC):
+class Services_Package_List_Utilities():
 
     def __init__(self, aaop_list : List[AAOP]):
         self.aaop_list = aaop_list
         self.available_services : List[str] = self.get_available_services()
-
-    @abstractmethod
-    def get_available_services(self) -> List[str]:
-        pass
-
-    # @abstractmethod
-    # def get_service_module(self, service_type : str) -> Callable:
-    #     pass
 
     def get_all_of_type_in_AAOP_list(self, AAO_Type : str) -> List[AAOP]:
         aaop_type_list : List[AAOP] = []
@@ -30,10 +21,10 @@ class Services_Package_List_Manager(ABC):
                 aaop_type_list.append(item)
         return aaop_type_list
 
-    def manage_unknown_services(self):
+    def manage_unknown_services(self, available_services : List[str]):
         unknown_services : List[str]  = []
         for item in self.aaop_list :
-            if item.AAO_Type not in Union [ self.available_services, 'Error' ] :
+            if item.AAO_Type not in Union [ available_services, 'Error' ] :
                 unknown_services.append(item.AAO_Type)
                 self.aaop_list.remove(item)
         if len(unknown_services) != 0 :

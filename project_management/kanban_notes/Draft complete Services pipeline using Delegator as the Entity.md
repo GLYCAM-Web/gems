@@ -17,11 +17,14 @@ Currently working on this workflow:
 - [x] Implied servicecs manager returns the AAOP list to the Request Manager 
 - [x] The request manager collects all the resulting service requests 
 - [x] Request Manager sends them back to the services for a merge of any duplicates.
-- [ ] During merges, the service inspects the multiple service requests.  Based on its rules for service requests, it might merge some (or all), might keep them all as individual services, or it might return a special "error" service request that contains options to be later turned into Notices.
-	- [ ] This is gonna be a hack for now
-- [ ] Service returns the resulting AAOP list.
+- [x] During merges, the service inspects the multiple service requests.  Based on its rules for service requests, it might merge some (or all), might keep them all as individual services, or it might return a special "error" service request that contains options to be later turned into Notices.
+	- [x] This is gonna be a hack for now (actually... not too bad a hack)
+- [x] Service returns the resulting AAOP list.
 - [x] Request manager sends the AAOP list and Project info  and Entity to each Service.
-- [ ] Each Service fills in each service_request with all the information that the service request needs.
+- [ ] Each Service fills in each service_request with all the information that the service request needs. 
+	- [x] Delegator needs no data to be filled....  
+	- [x] But there is infrastructure
+	- [ ] Need function that does nothing and just returns the AAOP list.
 - [ ] The AAOP list is returned to Request manager.
 - [x] Request manager collects together all the AAOP lists from the Services into a single list.
 - [x] Request manager returns AAOP request list to the transaction manager 
@@ -42,7 +45,7 @@ Currently working on this workflow:
 - [ ] Project manager instantiates a new project, generates whatever outgoing project info is needed, 
 - [x] Project manager returns the project to transaction manager.
 - [x] Transaction manager returns the transaction.
-- [ ] 
+- [ ] The 'Error' AAOP is gonna gause trouble until I figure out a way to fix it.
 
 This old list is probably redundant, but check it:
 
