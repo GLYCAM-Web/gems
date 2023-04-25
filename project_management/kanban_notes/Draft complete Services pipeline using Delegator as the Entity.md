@@ -42,9 +42,9 @@ Currently working on this workflow:
 - [x] Request manager collects together all the AAOP lists from the Services into a single list.
 - [x] Request manager returns AAOP request list to the transaction manager 
 - [x] Transaction manager sends the AAOP list to the AAOP Tree Manager.  
-- [ ] AAOP Tree Manager arranges AAOP objects into an AAOP Tree and instantiates an AAOP Tree Pair object.
-	- [ ] This is mostly done.
-	- [ ] Need to add a stop iteration condition
+- [x] AAOP Tree Manager arranges AAOP objects into an AAOP Tree and instantiates an AAOP Tree Pair object.
+	- [x] This is mostly done.
+	- [x] Need to add a stop iteration condition
 - [x] AAOP Tree manager returns Tree Pair to transaction manager.
 - [x] Transaction manager sends Tree Pair to Servicer.
 - [ ] Servicer runs services and collects responses
@@ -62,8 +62,8 @@ Currently working on this workflow:
 	- [ ] The hack here might be just to make a default project and copy in any info that needs to be returned. 
 - [x] Project manager returns the project to transaction manager.
 - [x] Transaction manager returns the transaction.
-- [ ] The 'Error' AAOP is gonna gause trouble until I figure out a way to fix it.
-	- [ ] Make it a proper Service.  If someone wants to call the "Error" service, let them.   They will get their options echoed back as respoonses with notices or whatever.
+- [x] The 'Error' AAOP is gonna gause trouble until I figure out a way to fix it.
+	- [x] Make it a proper Service.  If someone wants to call the "Error" service, let them.   They will get their options echoed back as respoonses with notices or whatever.
 - [x] There will be work to do in the Request Manager
 	- [x] Also with transaction manager
 	- [x] I made a hack.  

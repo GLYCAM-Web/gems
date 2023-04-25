@@ -57,6 +57,12 @@ class Annotated_List() :
             ) -> None :
         self.items : List = items
         self.ordered  : bool = ordered
+    
+    def __repr__(self):
+        out_string = (f'items = {self.items!r}\n'
+                f'ordered = {self.ordered!r}\n'
+                )
+        return out_string
 
     def add_item(self, item) :
         self.items.append(item)

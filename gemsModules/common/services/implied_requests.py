@@ -25,6 +25,7 @@ class Implied_Services_Request_Manager(ABC):
     """
 
     def __init__(self, input_object : Implied_Services_Inputs):
+        log.info("In Implied_Services_Request_Manager, init")
         self.aaop_list : List[AAOP] = []
         self.input_object = input_object
 
@@ -40,6 +41,7 @@ class Implied_Services_Request_Manager(ABC):
         """ Process the incoming JSON object to figure out which services 
             need to be run.  Bundle these into a service request package list.
         """
+        log.debug("In Implied_Services_Request_Manager, process")
         for service in self.get_available_services():
             this_service_manager = self.get_implicit_service_manager(service)()
             log.debug("Processing the following service for implied requests: " + str(service))

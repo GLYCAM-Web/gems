@@ -13,11 +13,11 @@ log = Set_Up_Logging(__name__)
 class delegator_Transaction_Manager(Transaction_Manager):
 
     def set_local_modules(self):
-        self.request_manager =  delegator_Request_Manager(entity=self.incoming_entity, project=self.incoming_project)
-        self.aaop_tree_pair_manager = AAOP_Tree_Pair_Generator()
+        self.request_manager_type =  delegator_Request_Manager
+        self.aaop_tree_pair_manager_type = AAOP_Tree_Pair_Generator
         self.this_servicer_type = Servicer
-        self.response_manager = delegator_Response_Manager(aaop_tree_pair=self.aaop_tree_pair)
-        self.project_manager = delegator_Project_Manager(project=self.incoming_project, entity=self.response_entity)
+        self.response_manager_type = delegator_Response_Manager
+        self.project_manager_type = delegator_Project_Manager
    
 
 

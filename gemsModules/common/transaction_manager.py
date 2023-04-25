@@ -42,21 +42,29 @@ class Transaction_Manager(ABC):
     
     @abstractmethod
     def set_local_modules(self):
-        self.request_manager =  common_Request_Manager(entity=self.incoming_entity, project=self.incoming_project)
-        self.aaop_tree_pair_manager = AAOP_Tree_Pair_Generator(aaop_request_list=self.aaop_request_list)
+        self.request_manager_type =  common_Request_Manager
+        self.aaop_tree_pair_manager_type = AAOP_Tree_Pair_Generator
         self.this_servicer_type = Servicer
         self.response_manager_type = Response_Manager
         self.project_manager_type = common_Project_Manager
     
     def manage_requests(self):
+        self.request_manager = self.request_manager_type(entity=self.incoming_entity, project=self.incoming_project)
         self.aaop_request_list : List[AAOP] = self.request_manager.process()
+        log.debug("the aaop request list is: ")
+        log.debug(self.aaop_request_list)
 
     def generate_aaop_tree_pair(self):
+        self.aaop_tree_pair_manager=self.aaop_tree_pair_manager_type(aaop_request_list=self.aaop_request_list)
         self.aaop_tree_pair : AAOP_Tree_Pair = self.aaop_tree_pair_manager.process()
-        print("the tree pair is: " + str(self.aaop_tree_pair))
+        log.debug("the tree pair is: ")
+        log.debug(self.aaop_tree_pair)
 
     def invoke_servicer(self): 
+        log.debug("about to invoke the following servicer")
+        log.debug(self.this_servicer_type)
         self.this_servicer = self.this_servicer_type(tree_pair=self.aaop_tree_pair)
+        log.debug("about to serve")
         self.aaop_tree_pair = self.this_servicer.serve()
 
     def manage_responses(self):

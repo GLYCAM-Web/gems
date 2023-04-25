@@ -13,6 +13,7 @@ class Module_Available_Services(GemsStrEnum):
     The services that this module provides.
     These should be listed in the order that they are expected to be used.
     """
+    error = 'Error'
     marco = 'Marco'
     status = 'Status'
     list_services = 'ListServices'
@@ -25,6 +26,7 @@ Multiples_Action={
 ##  All = Process each request (multiples are allowed).
 ##
 ##  In all cases, an informative Notice should be returned.
+    'Error' : 'All',
     'Marco' : 'Merge',
     'Status' : 'Merge',
     'ListServices' :  'Merge'
@@ -38,6 +40,7 @@ Request_Conflict_Action={
 ##  FirstIn = Act on the first conflicted setting
 ##
 ##  In all cases, an informative Notice should be returned.
+    'Error' : 'FirstIn',
     'Marco' : 'Fail',
     'Status' : 'LastIn',
     'ListServices' :  'LastIn'

@@ -23,7 +23,7 @@ class Services_Package_List_Utilities():
     def manage_unknown_services(self, available_services : List[str]):
         unknown_services : List[str]  = []
         for item in self.aaop_list :
-            if item.AAO_Type not in Union [ available_services, 'Error' ] :
+            if item.AAO_Type not in available_services :
                 unknown_services.append(item.AAO_Type)
                 self.aaop_list.remove(item)
         if len(unknown_services) != 0 :

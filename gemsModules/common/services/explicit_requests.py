@@ -18,22 +18,36 @@ class Explicit_Service_Request_Manager():
         self.aaop_list : List[AAOP] = []
 
     def process(self):
+        log.debug("In Explicit_Service_Request_Manager, process")
         if self.entity.services.__root__ is None:
+            log.debug("In Explicit_Service_Request_Manager, process, no services")
             return []
         else: 
             self.copy_explicit_services()
-            return self.get_aaop_list()
+            the_aaop_list=self.get_aaop_list()
+            log.debug("In Explicit_Service_Request_Manager, process, returning aaop list:")
+            for item in the_aaop_list:
+                log.debug(item)
+            return the_aaop_list
 
     def copy_explicit_services(self):
-        if self.entity.services.__root__ is not None:
-            the_root = self.entity.services.__root__ 
-            for supplied_name in the_root:
-                service_request = the_root[supplied_name]
-                this_aaop = AAOP(Dictionary_Name=supplied_name, 
-                        ID_String=uuid.uuid4(),
-                        The_AAO=service_request,
-                        AAO_Type=service_request.typename)
-                self.aaop_list.append(this_aaop)
+        the_root = self.entity.services.__root__ 
+        log.debug("In Explicit_Service_Request_Manager, copy_explicit_services")
+        log.debug("the_root is: ")
+        log.debug(the_root)
+        for supplied_name in the_root:
+            log.debug("the supplied name is: " + supplied_name)
+            service_request = the_root[supplied_name]
+            log.debug("the service request is: ")
+            log.debug(service_request)
+            this_aaop = AAOP(Dictionary_Name=supplied_name, 
+                    ID_String=uuid.uuid4(),
+                    The_AAO=service_request.copy(deep=True),
+                    AAO_Type=service_request.typename)
+            log.debug("the aaop is: ")
+            log.debug(this_aaop)
+            log.debug("done printing the aaop")
+            self.aaop_list.append(this_aaop)
 
 
     def get_aaop_list(self):

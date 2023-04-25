@@ -16,9 +16,11 @@ class AAOP_Tree_Pair_Generator():
 
     def process(self) -> AAOP_Tree_Pair:
         self.incoming_aaop_tree=self.transform_aaop_list_to_aaop_tree(the_list=self.aaop_request_list)
-        print("incoming_aaop_tree", self.incoming_aaop_tree)
+        log.debug("incoming_aaop_tree")
+        log.debug(self.incoming_aaop_tree)
         self.aaop_tree_pair=self.generate_tree_pair()
-        print("aaop_tree_pair", self.aaop_tree_pair)
+        log.debug("aaop_tree_pair")
+        log.debug(self.aaop_tree_pair)
         return self.aaop_tree_pair
 
     def transform_aaop_list_to_aaop_tree(self, the_list : List[AAOP]):

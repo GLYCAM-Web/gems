@@ -115,7 +115,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "project_management/kanban_notes/Draft complete Services pipeline using Delegator as the Entity.md",
+                "file": "project_management/kanban_notes/Little Things.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -132,7 +132,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "project_management/kanban_notes/Draft complete Services pipeline using Delegator as the Entity.md",
+                "file": "project_management/kanban_notes/Little Things.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -155,7 +155,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "project_management/kanban_notes/Draft complete Services pipeline using Delegator as the Entity.md"
+                "file": "project_management/kanban_notes/Little Things.md"
               }
             }
           }
@@ -176,21 +176,20 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "ba0864e8cfb93b1b",
+  "active": "ae69f8c8c9e49c63",
   "lastOpenFiles": [
-    "gemsModules/common/services/orders_dependencies.py~",
-    "gemsModules/delegator/services/work_flows.py~",
-    "gemsModules/common/services/implied_requests.py~",
-    "gemsModules/delegator/services/status/implied_translator.py~",
-    "gemsModules/delegator/services/list_services/implied_translator.py~",
-    "gemsModules/delegator/services/known_entities/implied_translator.py~",
-    "gemsModules/delegator/services/__pycache__/response_manager.cpython-39.pyc",
-    "gemsModules/delegator/services/__pycache__/request_data_filler.cpython-39.pyc",
-    "gemsModules/delegator/services/request_data_filler.py~",
-    "gemsModules/delegator/services/request_data_filler.py",
-    "gemsModules/delegator/services/status/__pycache__/manage_multiples.cpython-39.pyc",
-    "project_management/kanban_notes/Little Things.md",
     "project_management/kanban_notes/Draft complete Services pipeline using Delegator as the Entity.md",
+    "project_management/kanban_notes/Little Things.md",
+    "gemsModules/delegator/services/error/__pycache__/implied_translator.cpython-39.pyc",
+    "gemsModules/delegator/services/error/__pycache__",
+    "gemsModules/delegator/services/error/implied_translator.py~",
+    "gemsModules/delegator/services/error/implied_translator.py",
+    "gemsModules/delegator/services/error",
+    "gemsModules/delegator/services/request_manager.py~",
+    "gemsModules/common/services/request_manager.py~",
+    "gemsModules/delegator/transaction_manager.py~",
+    "gemsModules/common/transaction_manager.py~",
+    "gemsModules/common/services/orders_dependencies.py~",
     "project_management/Rewrite_Kanban.md",
     "project_management/kanban_notes/Remove refs to deprecated code.md",
     "gemsModules/delegator/README.md",

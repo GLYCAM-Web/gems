@@ -32,14 +32,17 @@ class Action_Associated_Object_Package ():
         self.The_AAO = The_AAO
         self.Dictionary_Name = Dictionary_Name
         self.Dependencies = Dependencies
+        self.child_packages = None
 
-    def __str__(self):
+    def __repr__(self):
         out_string = (f'ID_String = {self.ID_String}\n'
                 f'AAO_Type = {self.AAO_Type}\n'
                 f'Dictionary_Name = {self.Dictionary_Name}\n'
                 f'The_AAO = {self.The_AAO!r}\n'
                 f'Dependencies = {self.Dependencies!r}\n'
                 )
+        if self.child_packages is not None:
+            out_string += f'child_packages = {self.child_packages!r}\n'
         return out_string
 
     def get_callable(self):
@@ -125,19 +128,27 @@ class AAOP_Tree() :
         self.packages = packages
         self._current_AAOP_index = -1
 
-    def _next_AAOP(self, appendme=None): 
+    def __repr__(self):
+        return f'packages = {self.packages!r}\n'
+
+    def _next_AAOP(self, putme : AAOP = None): 
         """Get the next AAOP in the tree"""
         # For now we assume there is only a linear list of packages.
         # We will need special iterator, eventually.  
         # Need depth-first search, but each AAOP should be able to override that.
+        print("in _next_AAOP.  appendme = ", putme)
+        print("self.packages.items = ", self.packages.items)
         self._current_AAOP_index += 1
-        if appendme is not None:
-            self.packages.items[self._current_AAOP_index].append(appendme)
+        if self._current_AAOP_index >= len(self.packages.items):
+            raise StopIteration
+        if putme is not None:
+            self.packages.items[self._current_AAOP_index]=putme.copy(deep=True)
         else:
             return self.packages.items[self._current_AAOP_index]
 
     def get_next_AAOP (self) :
         """Return the next AAOP in the tree.  Set that as current."""
+        print('about to get_next_AAOP')
         return self._next_AAOP(self)
 
     def put_next_AAOP (self, putme : AAOP) :
@@ -194,6 +205,9 @@ class AAOP_Tree_Pair():
         self.input_tree = input_tree
         self.output_tree = output_tree
 
+    def __repr__(self):
+        return f'input_tree = {self.input_tree!r}\noutput_tree = {self.output_tree!r}\n'
+
     def generate_output_tree(self, deep_copy : bool = False):
         """Generate the output tree from the input tree"""
         if deep_copy == True:
@@ -202,10 +216,13 @@ class AAOP_Tree_Pair():
             self.output_tree = self.input_tree.make_skeleton_copy()
 
     def get_next_AAOP_incoming(self):
+        print("about to get_next_AAOP_incoming")
         self.input_current = self.input_tree.get_next_AAOP()
+        print("got next AAOP incoming it is:")
+        print(self.input_current)
         return self.input_current
     
-    def put_next_AAOP_outgoing(self, putme : AAOP):
+    def put_next_AAOP_outgoing(self, putme : AAOP) -> None:
         self.output_tree.put_next_AAOP(putme)
 
 

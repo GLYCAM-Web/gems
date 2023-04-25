@@ -9,12 +9,23 @@ class Servicer:
    
     def __init__(self, tree_pair: AAOP_Tree_Pair):
         self.tree_pair = tree_pair
+        log.debug(f'In servicer, tree_pair = {tree_pair}')
 
     def serve(self) -> AAOP_Tree_Pair:
-        this_request_aaop : AAOP = self.tree_pair.get_next_AAOP_incoming()
-        while this_request_aaop is not None :
+        I_am_done = False
+        while I_am_done == False :
+            log.debug("In servicer, about to serve")
+            try: 
+                this_request_aaop : AAOP = self.tree_pair.get_next_AAOP_incoming()
+            except StopIteration:
+                I_am_done = True
+                break
+            log.debug(f'In servicer, this_request_aaop = {this_request_aaop}')
             this_callable = this_request_aaop.get_callable()
             this_response_aaop = this_callable(this_request_aaop)
+            log.debug(f'In servicer, this_response_aaop = {this_response_aaop}')
+            log.debug("In servicer, the response aaop type is" + str(type(this_response_aaop)))
             self.tree_pair.put_next_AAOP_outoing(this_response_aaop)
-            this_request_aaop = self.tree_pair.get_next_AAOP_incoming()
-
+        log.debug("In servicer, about to return this tree_pair:")
+        log.debug(self.tree_pair)
+        return self.tree_pair
