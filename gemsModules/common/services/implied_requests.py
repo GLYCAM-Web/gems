@@ -42,10 +42,8 @@ class Implied_Services_Request_Manager(ABC):
         """
         for service in self.get_available_services():
             this_service_manager = self.get_implicit_service_manager(service)()
-            log.debug("the services is: " + str(service))
-            log.debug("is this where the prodess thing is?")
+            log.debug("Processing the following service for implied requests: " + str(service))
             this_service_manager.process(input_object=self.input_object)
-            log.debug("did we get here?")
             self.aaop_list.extend(this_service_manager.get_aaop_list())
         return self.get_aaop_list()
 

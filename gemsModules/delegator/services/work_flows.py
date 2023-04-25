@@ -20,10 +20,6 @@ def get_Service_Work_Flows() -> Service_Work_Flows_template:
     Service_Work_Flows = Service_Work_Flows_template
     
     Service_Work_Flows.append(Service_Work_Flow_Order_template(
-        "default", 
-        marco_list
-            ))
-    Service_Work_Flows.append(Service_Work_Flow_Order_template(
         "marco", 
         marco_list
             ))
@@ -45,10 +41,6 @@ def testme() :
     -------------------------------------------------------------------------------
     -------------------------------------------------------------------------------
     The service work flows follow.
-    -------------------------------------------------------------------------------
-    Workflow type: default
-    Modules to call (services to run) :
-        1 :  <module 'gemsModules.delegator.services.marco' 
     -------------------------------------------------------------------------------
     Workflow type: marco
     Modules to call (services to run) :

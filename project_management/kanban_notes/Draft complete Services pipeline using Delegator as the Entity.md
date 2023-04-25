@@ -12,8 +12,20 @@ Currently working on this workflow:
 	- [x] draft in flux
 - [x] Within each Service, the Implied Services Manager inspects the inputs, Options and the Procedural Options.  From these, the Service generates a list of all service requests that are implied and packs them into a list of AAOPs 
 	- [x] prior code exists, needs to be moved / rewritten / expanded /wrapped
-- [x] Implied Service Manager then generates a list of pre-requisite service requests, if any.  This step considers only service needs provided by the current entity - services requested from other entities get handled down in the tasks.
+- [ ] NOT YET:  Implied Service Manager then generates a list of pre-requisite service requests, if any.  This step considers only service needs provided by the current entity - services requested from other entities get handled down in the tasks.
+	- [ ] Not going to write this in just now.  The infrastructure exists.  
+		- [ ] See delegator/services/work_flows.py for an example.
+		- [ ] See common/services/orders-dependencies.py for the template definitions.
+	- [ ] Service_Work_Flow_Order_template lists the services that are required for a specific service to happen.  In other words, it lists the service itself at the end of a list that includes all the prerequisite services.
+	- [ ] Service_Work_Flows_template specifies a reasonable order in which the services should be run, in general.  But, unless a Work Flow specifies an order, there really isn't one.
+		- [ ] Only the Service_Work_Flow_Order_template objects specify actual orders of operations.  Unless one of those specifies an order, it should be assumed that the work flows template is a suggestion.  
+			- [ ] Example:  Marco might come before List_Services in the Work Flows template, but since the Work_Flow_Order_template does not list Marco as a prerequisite to List_Services, then there is no real order between the two..
 	- [x] some settings info exists somewhere 
+- [ ] DO NOW:  Make an ABC in common for managing these workflows.
+	- [ ] Each entity should inherit from it.
+	- [ ] It should contain management for the prereq lists.
+	- [ ] This includes making a grand linear list of orders of operations.
+		- [ ] For now, this will return a hard-coded list.
 - [x] Implied servicecs manager returns the AAOP list to the Request Manager 
 - [x] The request manager collects all the resulting service requests 
 - [x] Request Manager sends them back to the services for a merge of any duplicates.
@@ -40,16 +52,20 @@ Currently working on this workflow:
 	- [ ] Note that "error requests" are not added to this list.   They are returned as responses only.
 - [ ] Response manager adds the list of responses - including error responses - to the return entity.
 - [ ] Response manager adds top-level outputs and notices, as needed, to the return entity.
+	- [ ] I'm considering making this a hack, but it might be just as simple to do it right.  That is, I can't think of a hack that will be faster to write or debug.
 - [x] Response manager returns entity to transaction manager.
 - [x] Transaction manager sends Project and outgoing entity to Project manager.
 - [ ] Project manager instantiates a new project, generates whatever outgoing project info is needed, 
+	- [ ] The hack here might be just to make a default project and copy in any info that needs to be returned. 
 - [x] Project manager returns the project to transaction manager.
 - [x] Transaction manager returns the transaction.
 - [ ] The 'Error' AAOP is gonna gause trouble until I figure out a way to fix it.
-- [ ] There will be work to do in the Request Manager
-	- [ ] Also with transaction manager
+	- [ ] Make it a proper Service.  If someone wants to call the "Error" service, let them.   They will get their options echoed back as respoonses with notices or whatever.
+- [x] There will be work to do in the Request Manager
+	- [x] Also with transaction manager
 	- [x] I made a hack.  
-		- [ ] Maybe ok for now?  We will see.  
+		- [x] Maybe ok for now?  We will see.  
+	- [x] Assuming ok for now.
 - [ ] 
 
 This old list is probably redundant, but check it:
