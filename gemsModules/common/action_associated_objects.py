@@ -38,10 +38,12 @@ class Action_Associated_Object_Package ():
         out_string = (f'ID_String = {self.ID_String}\n'
                 f'AAO_Type = {self.AAO_Type}\n'
                 f'Dictionary_Name = {self.Dictionary_Name}\n'
-                f'The_AAO = {self.The_AAO!r}\n'
+                f'The_AAO = AAO callable (see below)\n'
                 f'Dependencies = {self.Dependencies!r}\n'
                 )
+        out_string += "The_AAO callable = " + str(self.The_AAO) + "\n"
         if self.child_packages is not None:
+            #print("child_packages = " + str(self.child_packages))
             out_string += f'child_packages = {self.child_packages!r}\n'
         return out_string
 
@@ -136,24 +138,29 @@ class AAOP_Tree() :
         # For now we assume there is only a linear list of packages.
         # We will need special iterator, eventually.  
         # Need depth-first search, but each AAOP should be able to override that.
-        print("in _next_AAOP.  appendme = ", putme)
-        print("self.packages.items = ", self.packages.items)
+        log.debug("in _next_AAOP. putme  = >>>>" + str(putme) + "<<<")
+        log.debug("self.packages.items = " )
+        log.debug(self.packages.items)
         self._current_AAOP_index += 1
         if self._current_AAOP_index >= len(self.packages.items):
+            log.debug("raising StopIteration")
             raise StopIteration
         if putme is not None:
-            self.packages.items[self._current_AAOP_index]=putme.copy(deep=True)
+            log.debug("putting putme")
+            self.packages.items[self._current_AAOP_index]=putme
         else:
+            log.debug("returning self.packages.items[self._current_AAOP_index]")
             return self.packages.items[self._current_AAOP_index]
 
-    def get_next_AAOP (self) :
+    def get_next_AAOP(self) :
         """Return the next AAOP in the tree.  Set that as current."""
-        print('about to get_next_AAOP')
-        return self._next_AAOP(self)
+        log.debug('about to get_next_AAOP')
+        return self._next_AAOP()
 
     def put_next_AAOP (self, putme : AAOP) :
         """Write the AAOP to the next AAOP in the tree"""
-        self._next_AAOP(appendme=putme)
+        log.debug('about to put_next_AAOP')
+        self._next_AAOP(putme=putme)
 
 #    def get_AAOP_by_ID (ID_String: str) :
 #        """Get an AAOP by ID"""
@@ -216,10 +223,10 @@ class AAOP_Tree_Pair():
             self.output_tree = self.input_tree.make_skeleton_copy()
 
     def get_next_AAOP_incoming(self):
-        print("about to get_next_AAOP_incoming")
+        log.debug("about to get_next_AAOP_incoming")
         self.input_current = self.input_tree.get_next_AAOP()
-        print("got next AAOP incoming it is:")
-        print(self.input_current)
+        log.debug("got next AAOP incoming it is:")
+        log.debug(self.input_current)
         return self.input_current
     
     def put_next_AAOP_outgoing(self, putme : AAOP) -> None:

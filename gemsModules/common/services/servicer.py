@@ -16,7 +16,9 @@ class Servicer:
         while I_am_done == False :
             log.debug("In servicer, about to serve")
             try: 
+                log.debug("In servicer, about to get next AAOP")
                 this_request_aaop : AAOP = self.tree_pair.get_next_AAOP_incoming()
+                log.debug(f'In servicer, this_request_aaop = {this_request_aaop}')
             except StopIteration:
                 I_am_done = True
                 break
