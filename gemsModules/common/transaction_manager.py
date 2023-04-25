@@ -8,7 +8,7 @@ from gemsModules.common.main_api import Transaction
 from gemsModules.common.project_manager import common_Project_Manager
 from gemsModules.common.services.request_manager import common_Request_Manager
 from gemsModules.common.services.response_manager import Response_Manager
-from gemsModules.common.services.aaop_tree_pair_manager import AAOP_Tree_Pair_Manager
+from gemsModules.common.services.aaop_tree_pair_manager import AAOP_Tree_Pair_Generator
 from gemsModules.common.services.servicer import Servicer
 
 from gemsModules.logging.logger import Set_Up_Logging 
@@ -43,24 +43,28 @@ class Transaction_Manager(ABC):
     @abstractmethod
     def set_local_modules(self):
         self.request_manager =  common_Request_Manager(entity=self.incoming_entity, project=self.incoming_project)
-        self.aaop_tree_pair_manager = AAOP_Tree_Pair_Manager()
-        self.this_servicer = Servicer(tree_pair=self.aaop_tree_pair)
-        self.response_manager = Response_Manager(aaop_tree_pair=self.aaop_tree_pair)
-        self.project_manager = common_Project_Manager(project=self.incoming_project, entity=self.response_entity)
+        self.aaop_tree_pair_manager = AAOP_Tree_Pair_Generator(aaop_request_list=self.aaop_request_list)
+        self.this_servicer_type = Servicer
+        self.response_manager_type = Response_Manager
+        self.project_manager_type = common_Project_Manager
     
     def manage_requests(self):
         self.aaop_request_list : List[AAOP] = self.request_manager.process()
 
     def generate_aaop_tree_pair(self):
         self.aaop_tree_pair : AAOP_Tree_Pair = self.aaop_tree_pair_manager.process()
+        print("the tree pair is: " + str(self.aaop_tree_pair))
 
     def invoke_servicer(self): 
+        self.this_servicer = self.this_servicer_type(tree_pair=self.aaop_tree_pair)
         self.aaop_tree_pair = self.this_servicer.serve()
 
     def manage_responses(self):
+        self.response_manager = self.response_manager_type(aaop_tree_pair=self.aaop_tree_pair)
         self.response_entity = self.response_manager.process()
 
     def manage_project(self):
+        self.project_manager = self.project_manager_type(project=self.incoming_project, entity=self.response_entity)
         self.response_project = self.project_manager.process()
         
     def update_transaction(self):

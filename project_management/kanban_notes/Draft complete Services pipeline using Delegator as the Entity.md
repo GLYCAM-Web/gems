@@ -26,6 +26,7 @@ Currently working on this workflow:
 	- [ ] It should contain management for the prereq lists.
 	- [ ] This includes making a grand linear list of orders of operations.
 		- [ ] For now, this will return a hard-coded list.
+	- [ ] ACTUALLY - the services should already be in order because of "for service in services".
 - [x] Implied servicecs manager returns the AAOP list to the Request Manager 
 - [x] The request manager collects all the resulting service requests 
 - [x] Request Manager sends them back to the services for a merge of any duplicates.
@@ -42,6 +43,8 @@ Currently working on this workflow:
 - [x] Request manager returns AAOP request list to the transaction manager 
 - [x] Transaction manager sends the AAOP list to the AAOP Tree Manager.  
 - [ ] AAOP Tree Manager arranges AAOP objects into an AAOP Tree and instantiates an AAOP Tree Pair object.
+	- [ ] This is mostly done.
+	- [ ] Need to add a stop iteration condition
 - [x] AAOP Tree manager returns Tree Pair to transaction manager.
 - [x] Transaction manager sends Tree Pair to Servicer.
 - [ ] Servicer runs services and collects responses
