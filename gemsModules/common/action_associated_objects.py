@@ -47,8 +47,13 @@ class Action_Associated_Object_Package ():
             out_string += f'child_packages = {self.child_packages!r}\n'
         return out_string
 
-    def get_callable(self):
+    # right now, the AAOs are all Pydantic Models, so they need to be copied using the copy() method
+    # I'll try handling this in the Servicer
+    def get_The_AAO(self):
         return self.The_AAO
+
+    def put_The_AAO(self, new_AAO : Callable):
+        self.The_AAO = new_AAO
 
     def create_child_package_list(self,  
             items : List = [],

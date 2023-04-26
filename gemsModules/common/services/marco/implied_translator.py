@@ -6,7 +6,7 @@ from gemsModules.common.action_associated_objects import AAOP
 from gemsModules.common.services.implied_requests import Implied_Services_Inputs
 from gemsModules.common.services.each_service.implied_translator import Implied_Translator
 
-from gemsModules.delegator.services.marco.api import marco_Request
+from gemsModules.common.services.marco.api import marco_Request
 
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
