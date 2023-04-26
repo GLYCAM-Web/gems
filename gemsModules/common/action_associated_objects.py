@@ -181,23 +181,25 @@ class AAOP_Tree() :
         """Make a skeleton copy of the tree"""
         new_tree = AAOP_Tree(packages=Annotated_List())
         new_tree.packages.ordered = self.packages.ordered
-        for package in self.packages:
-            new_tree.packages.append(package.make_skeleton_copy())
+        for package in self.packages.items:
+            new_tree.packages.items.append(package.make_skeleton_copy())
+        return new_tree
 
     def make_deep_copy(self):  
         """Make a deep copy of the tree"""
         new_tree = AAOP_Tree(packages=Annotated_List())
         new_tree.packages.ordered = self.packages.ordered
-        for package in self.packages:
-            new_tree.packages.append(package.make_deep_copy())
+        for package in self.packages.items:
+            new_tree.packages.items.append(package.make_deep_copy())
+        return new_tree
 
     def make_linear_list(self) -> List:
         """Make a linear list of AAOPs in the tree"""
         new_list : List[AAOP] = []
-        for package in self.packages:
+        for package in self.packages.items:
             new_list.append(package)
             if package.child_packages is not None:
-                for child_package in package.child_packages:
+                for child_package in package.child_packages.items:
                     new_list.append(child_package)
 
 
@@ -215,7 +217,13 @@ class AAOP_Tree_Pair():
 
     def __init__(self, input_tree: AAOP_Tree, output_tree: AAOP_Tree = None):
         self.input_tree = input_tree
+        if self.input_tree is None:
+            raise ValueError("input_tree is None")
         self.output_tree = output_tree
+        if self.output_tree is None:
+            self.generate_output_tree()
+        if self.output_tree is None:
+            raise ValueError("output_tree is None")
 
     def __repr__(self):
         return f'input_tree = {self.input_tree!r}\noutput_tree = {self.output_tree!r}\n'
@@ -223,9 +231,15 @@ class AAOP_Tree_Pair():
     def generate_output_tree(self, deep_copy : bool = False):
         """Generate the output tree from the input tree"""
         if deep_copy == True:
+            log.debug("deep_copy is True")
             self.output_tree = self.input_tree.make_deep_copy()
+            log.debug("self.output_tree is:")
+            log.debug(self.output_tree)
         else:
+            log.debug("deep_copy is False")
             self.output_tree = self.input_tree.make_skeleton_copy()
+            log.debug("self.output_tree is:")
+            log.debug(self.output_tree)
 
     def get_next_AAOP_incoming(self):
         log.debug("about to get_next_AAOP_incoming")

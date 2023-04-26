@@ -1,9 +1,11 @@
 from typing import Dict, Callable
 
+from gemsModules.common.services.error.manage_multiples import error_Multiples_Manager 
+from gemsModules.common.services.marco.manage_multiples import marco_Multiples_Manager 
+from gemsModules.common.services.status.manage_multiples import status_Multiples_Manager
+
 from gemsModules.delegator.services.list_services.manage_multiples import list_services_Multiples_Manager
 from gemsModules.delegator.services.known_entities.manage_multiples import known_entities_Multiples_Manager 
-from gemsModules.delegator.services.marco.manage_multiples import marco_Multiples_Manager 
-from gemsModules.delegator.services.status.manage_multiples import status_Multiples_Manager
 
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)

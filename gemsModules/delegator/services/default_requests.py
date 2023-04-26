@@ -5,7 +5,7 @@ import uuid
 from gemsModules.common.action_associated_objects import AAOP
 from gemsModules.common.services.default_requests import Default_Service_Request_Manager
 
-from gemsModules.delegator.services.marco.api import marco_Request
+from gemsModules.common.services.marco.api import marco_Request
 
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)

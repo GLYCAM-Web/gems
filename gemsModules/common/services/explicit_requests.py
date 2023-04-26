@@ -3,6 +3,7 @@ from typing import List
 import uuid
 
 from gemsModules.common.main_api_entity import Entity
+from gemsModules.common.main_api_services import Service_Request
 from gemsModules.common.action_associated_objects import AAOP
 
 from gemsModules.logging.logger import Set_Up_Logging
@@ -37,7 +38,7 @@ class Explicit_Service_Request_Manager():
         log.debug(the_root)
         for supplied_name in the_root:
             log.debug("the supplied name is: " + supplied_name)
-            service_request = the_root[supplied_name]
+            service_request : Service_Request = the_root[supplied_name].copy(deep=True)
             log.debug("the service request is: ")
             log.debug(service_request)
             this_aaop = AAOP(Dictionary_Name=supplied_name, 

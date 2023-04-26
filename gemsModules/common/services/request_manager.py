@@ -10,7 +10,7 @@ from gemsModules.common.services.implied_requests import common_Implied_Services
 from gemsModules.common.services.default_requests import common_Default_Service_Request_Manager
 from gemsModules.common.services.duplicate_requests import common_Duplicate_Requests_Manager
 from gemsModules.common.services.request_data_filler import common_Request_Data_Filler
-from gemsModules.common.services.settings import Available_Services
+from gemsModules.common.services.settings.known_available import Available_Services
 from gemsModules.project.main_api import Project
 
 from gemsModules.logging.logger import Set_Up_Logging

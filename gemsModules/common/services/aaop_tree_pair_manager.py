@@ -29,6 +29,9 @@ class AAOP_Tree_Pair_Generator():
         return the_tree
 
     def generate_tree_pair(self):
+        log.debug("generating tree pair")
         the_tree_pair = AAOP_Tree_Pair(input_tree=self.incoming_aaop_tree)
+        log.debug("the tree pair is: ")
+        log.debug(the_tree_pair)
         return the_tree_pair
 

@@ -19,10 +19,10 @@ class marco_Inputs(ABC, BaseModel) :
         None,
         description="The name of the entity receiving the Marco request.  Written by GEMS.")
     
-    @validator('entity', pre=True, always=True)
-    @abstractmethod
-    def set_entity(cls, v):
-        return 'CommonServicer'
+    # @validator('entity', pre=True, always=True)
+    # @abstractmethod
+    # def set_entity(cls, v):
+    #     return 'CommonServicer'
 
     
 class marco_Outputs(BaseModel) :

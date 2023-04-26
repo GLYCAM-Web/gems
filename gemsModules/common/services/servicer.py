@@ -16,7 +16,8 @@ class Servicer(ABC):
 
     @abstractmethod
     def get_module_for_this_request(self, this_request_aaop : AAOP) -> Callable:
-        pass
+        from gemsModules.common.services.settings.service_modules import service_modules
+        return service_modules[this_request_aaop.AAO_Type]
 
     def serve(self) -> AAOP_Tree_Pair:
         I_am_done = False
@@ -30,21 +31,23 @@ class Servicer(ABC):
                 I_am_done = True
                 break
             log.debug(f'In servicer, this_request_aaop = {this_request_aaop}')
-            this_callable = None 
+            this_callable = self.get_module_for_this_request(this_request_aaop)
             this_request=this_request_aaop.The_AAO.copy(deep=True)
             this_response_aaop : AAOP = this_request_aaop.make_skeleton_copy()
             this_response = this_callable(this_request)
             this_response_aaop.The_AAO = this_response.copy(deep=True)
             log.debug(f'In servicer, this_response_aaop = {this_response_aaop}')
-            self.tree_pair.put_next_AAOP_outoing(this_response_aaop)
+            self.tree_pair.put_next_AAOP_outgoing(this_response_aaop)
         log.debug("In servicer, about to return this tree_pair:")
         log.debug(self.tree_pair)
         return self.tree_pair
 
-class commonServicer(Servicer):
+class commonservices_Servicer(Servicer):
 
-    def __init__(self, tree_pair: AAOP_Tree_Pair):
-        super().__init__(tree_pair)
+    # def __init__(self, tree_pair: AAOP_Tree_Pair):
+    #     super().__init__(tree_pair)
 
     def get_module_for_this_request(self, this_request_aaop: AAOP) -> Callable:
-       return super().get_module_for_this_request(this_request_aaop) 
+        from gemsModules.common.services.settings.service_modules import service_modules
+        return service_modules[this_request_aaop.AAO_Type]
+       
