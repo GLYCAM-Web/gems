@@ -29,8 +29,9 @@ class Duplicate_Requests_Manager(ABC):
         for service in self.get_available_services():
             this_aaop_list = self.package_utils.get_all_of_type_in_AAOP_list(service)
             if len(this_aaop_list) > 1 :
-                this_manager = self.get_duplicates_manager(service)
-                this_manager.process(aaop_list = this_aaop_list)
+                this_manager_type = self.get_duplicates_manager(service)
+                this_manager= this_manager_type(aaop_list = this_aaop_list)
+                this_manager.process_multiples()
                 self.new_aaop_list.extend(this_manager.get_aaop_list())
             else:
                 self.new_aaop_list.extend(this_aaop_list)

@@ -42,5 +42,6 @@ class Multiples_Manager(ABC):
         """
         raise NotImplementedError
 
-
+    def get_aaop_list(self) -> List[AAOP]:
+        return self.processed_aaop_list
 

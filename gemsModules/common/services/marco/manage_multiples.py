@@ -18,9 +18,10 @@ class marco_Multiples_Manager(Multiples_Manager):
 
     def process_multiples_action_Merge(self):
         merge_conflict = False
-        first_aaop = self.aaop_list[0]
-        for aaop in self.aaop_list[1:]:
+        first_aaop = self.incoming_aaop_list[0]
+        for aaop in self.incoming_aaop_list[1:]:
             merged_aaop = self.merge_aaop(first_aaop, aaop)
+            log.debug("merged_aaop is" + str(merged_aaop))
             if merged_aaop is None:
                 merge_conflict = True
                 self.processed_aaop_list.extend(self.process_conflicted_merge())
@@ -44,12 +45,17 @@ class marco_Multiples_Manager(Multiples_Manager):
 
 
     def merge_aaop(self, aaop1, aaop2):
+        log.debug("Merging aaop1 and aaop2")
         request1 = aaop1.The_AAO
         request2 = aaop2.The_AAO
-        if request1.inputs.entity != request2.inputs.entity:
-            return None
-        if request1.inputs.who_I_am != request2.inputs.who_I_am:
-            return None
+        log.debug("request1 is " + str(request1))
+        log.debug("request2 is " + str(request2))
+        # if request1.inputs.entity != request2.inputs.entity:
+        #     print("entities are different")
+        #     return None
+        # print("about to check who_I_am")
+        # if request1.inputs.who_I_am != request2.inputs.who_I_am:
+        #     return None
         if "cake" in request1.options and "cake" in request2.options:
             if request1.options["cake"] != request2.options["cake"]:
                 return None
