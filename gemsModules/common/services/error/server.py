@@ -9,16 +9,16 @@ log = Set_Up_Logging(__name__)
 
 def Serve(request : Service_Request) -> Service_Response:
     pass
-#   log.info("The marco server was called.")
-#   response = Service_Response()
-#   if request.typename != 'Marco' :
-#       response.typename = request.typename
-#       response.outputs = { 'message' : 'Incorrect typename sent to Marco Servicer.' }
-#       response.notices = Notices()
-#       response.notices.addDefaultNotice(Brief='InvalidInput', Messenger='Marco Sevicer')
-#   else :
-#       response.typename = 'Marco'
-#       response.outputs = marco(request)
-#   return response
+   log.info("The error server was called.")
+   response = Service_Response()
+   response.typename = 'Error'
+   response.typename = request.typename
+       response.outputs = { 'message' : 'Incorrect typename sent to Marco Servicer.' }
+       response.notices = Notices()
+       response.notices.addDefaultNotice(Brief='InvalidInput', Messenger='Marco Sevicer')
+   else :
+       response.typename = 'Marco'
+       response.outputs = marco(request)
+   return response
 
 

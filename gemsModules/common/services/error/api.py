@@ -6,14 +6,14 @@ from gemsModules.common.main_api_services import Service_Request, Service_Respon
 from gemsModules.logging.logger import Set_Up_Logging 
 log = Set_Up_Logging(__name__)
 
-# I'm writing this non-abstractly in delegator first.  After I get it working, I'll
-#    move it to common and make it abstract.
-### This particular service - 'error' - must live in common bc everything needs it
 
 class error_Inputs(BaseModel) :
     entity : str  = Field(
         'Delegator',
         description="The entity finding the error.")
+    service : str = Field(
+            None,
+            description="The service, if applicable, relevant to the error.")
     
 class error_Outputs(BaseModel) :
     message : str  = Field(

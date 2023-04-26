@@ -25,8 +25,10 @@ class marco_Multiples_Manager(Multiples_Manager):
             if merged_aaop is None:
                 merge_conflict = True
                 self.processed_aaop_list.extend(self.process_conflicted_merge())
+                log.debug("self.processed_aaop_list is " + str(self.processed_aaop_list))
                 break
-        if not merge_conflict:
+        if merge_conflict == False:
+            log.debug("no merge conflict")
             self.processed_aaop_list.extend(merged_aaop)
         return self.processed_aaop_list
 
@@ -38,9 +40,9 @@ class marco_Multiples_Manager(Multiples_Manager):
         this_request.options['merge_conflict'] = 'Merge conflict'
         this_request.options['info'] = ['Conflicting information was sent to Marco']
         this_aaop = AAOP(ID_String=str(uuid.uuid4()),
-                Dictionary_Name='Marco', 
+                Dictionary_Name='Marco-Error', 
                 The_AAO=this_request,
-                AAO_Type='Marco')
+                AAO_Type='Error')
         return [this_aaop]
 
 

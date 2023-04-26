@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-## This is probably close to a realistic method for making this abstract.
-## I don't have time to complete it. 
-
 from abc import ABC, abstractmethod
 from pydantic import BaseModel, Field, validator
 

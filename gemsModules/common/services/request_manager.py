@@ -55,14 +55,14 @@ class Request_Manager(ABC):
         log.debug("about to manage duplicates")
         self.manage_duplicates()
         log.debug("the current aaop list is: ")
-        log.debug(self.aaop_list)
-        if self.aaop_list == []:
-            self.aaop_list = self.get_default_aaops()
+        log.debug(self.deduplicated_aaop_list)
+        if self.deduplicated_aaop_list == []:
+            self.deduplicated_aaop_list = self.get_default_aaops()
         log.debug("about to fill request data needs")
         self.fill_request_data_needs()
         log.debug("the current aaop list is: ")
-        log.debug(self.aaop_list)
-        return self.aaop_list
+        log.debug(self.deduplicated_aaop_list)
+        return self.deduplicated_aaop_list
 
     def set_explicit_aaops(self):
         self.explicit_manager = self.explicit_manager_type(entity=self.entity)
@@ -79,7 +79,7 @@ class Request_Manager(ABC):
 
     def manage_duplicates(self):
         self.duplicate_manager = self.duplicate_manager_type(aaop_list=self.aaop_list)
-        self.return_aaop_list : List[AAOP] = self.duplicate_manager.process()
+        self.deduplicated_aaop_list : List[AAOP] = self.duplicate_manager.process()
 
     def get_default_aaops(self) -> List[AAOP]:
         self.default_manager = self.default_manager_type()
