@@ -106,15 +106,17 @@ class Transaction(ABC):
         if self.outputs.prettyPrint is True:  # In case outputs.prettyPrint is None or something else that isn't useful
             prettyPrint = True
         if prettyPrint :
-            self.outgoing_string = self.outputs.json(indent=2,exclude_none=prune_empty_values)
+            self.outgoing_string = self.outputs.json(indent=2,exclude_none=prune_empty_values,by_alias=True)
         else:
-            self.outgoing_string = self.outputs.json(exclude_none=prune_empty_values)
+            self.outgoing_string = self.outputs.json(exclude_none=prune_empty_values,by_alias=True)
 
     def get_outgoing_string(self, prettyPrint=False, indent=2, prune_empty_values=True) :
         if self.outgoing_string is None or self.outgoing_string == "" :
             try:
-                self.build_outgoing_string(self, prettyPrint, indent, prune_empty_values) 
+                self.build_outgoing_string(prettyPrint, indent, prune_empty_values) 
             except Exception as error:
+                log.debug("There was an error building the outgoing string")
+                log.debug(error)
                 self.generate_error_response()
         return self.outgoing_string
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from uuid import UUID
-from typing import Dict
+from typing import Dict, Optional
 from pydantic import BaseModel, Field, typing
 
 from gemsModules.common.main_api_notices import Notices
@@ -61,7 +61,7 @@ class Service_Response(BaseModel):
         description='ID to allow correlations between services and responses.'
     )
     outputs : typing.Any = None
-    notices : Notices = Notices()
+    notices : Optional[Notices] = Notices()
 
     class Config:
         title = 'Response'
@@ -99,7 +99,7 @@ class Service_Responses(BaseModel):
             ):
         if self.__root__ is None :
             self.__root__ : Dict[str,Service_Response] = {}
-        self.__root__.append(key_string,response)
+        self.__root__[key_string]=response
 
     class Config:
         title = 'Responses'

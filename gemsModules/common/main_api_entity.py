@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from abc import ABC
 from pydantic import BaseModel, Field
-from typing import Dict, Union
+from typing import Dict, Union, Optional
 
 from gemsModules.common.main_api_notices import Notices
 from gemsModules.common.main_api_procedural_options import Procedural_Options
@@ -30,7 +30,7 @@ class Entity(ABC, BaseModel):
     )
     services : Service_Requests = Service_Requests()
     responses : Service_Responses = Service_Responses()
-    notices : Notices = Notices()
+    notices : Optional[Notices] = Notices()
     procedural_options : Procedural_Options = Procedural_Options()
     options : Dict[str,str] = Field(
             None,

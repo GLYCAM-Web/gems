@@ -11,10 +11,13 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 class delegator_Project_Manager(Project_Manager):
-    
+
+    def process(self) -> Project:
+        return None
+
     def fill_response_project_from_incoming_project(self):
-        pass
+        return None
 
     def fill_response_project_from_response_entity(self):
-        pass
+        return None
 

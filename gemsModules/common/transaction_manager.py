@@ -66,6 +66,8 @@ class Transaction_Manager(ABC):
         self.this_servicer = self.this_servicer_type(tree_pair=self.aaop_tree_pair)
         log.debug("about to serve")
         self.aaop_tree_pair = self.this_servicer.serve()
+        log.debug("after serving, the tree pair is: ")
+        log.debug(self.aaop_tree_pair)
 
     def manage_responses(self):
         self.response_manager = self.response_manager_type(aaop_tree_pair=self.aaop_tree_pair)
@@ -76,5 +78,12 @@ class Transaction_Manager(ABC):
         self.response_project = self.project_manager.process()
         
     def update_transaction(self):
-        self.transaction.outputs.entity = self.response_entity
-        self.transaction.outputs.project = self.response_project
+        this_transaction_type = self.transaction.get_API_type()
+        entity_json = self.response_entity.dict(by_alias=True)
+        this_json={}
+        this_json["entity"] = entity_json
+        self.transaction.outputs=this_transaction_type.parse_obj(this_json)
+        log.debug("the transaction outputs are: ")
+        log.debug(self.transaction.outputs.json(indent=2, by_alias=True))
+        if self.response_project is not None:
+            self.transaction.outputs=this_transaction_type(project = self.response_project.copy(deep=True))

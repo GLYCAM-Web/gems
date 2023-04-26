@@ -201,6 +201,7 @@ class AAOP_Tree() :
             if package.child_packages is not None:
                 for child_package in package.child_packages.items:
                     new_list.append(child_package)
+        return new_list
 
 
 class AAOP_Tree_Pair():
