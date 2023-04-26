@@ -50,16 +50,19 @@ Currently working on this workflow:
 - [ ] Servicer runs services and collects responses
 - [x] Servicer returns Tree Pair to transaction manager
 - [x] Transaction manager sends Tree Pair to the response manager
-- [ ] Response manager instantiates an Entity to be returned.
-- [ ] Response manager generates list of services that were actually run and puts that info into its return entity.
-	- [ ] Note that "error requests" are not added to this list.   They are returned as responses only.
-- [ ] Response manager adds the list of responses - including error responses - to the return entity.
+- [x] Response manager instantiates an Entity to be returned.
+- [x] Response manager generates list of services that were actually run and puts that info into its return entity.
+	- [ ] Note that "error requests" are treated just like regular requests.
+	- [ ] BUT ... they don't work yet..
+- [x] Response manager adds the list of responses - including error responses - to the return entity.
 - [ ] Response manager adds top-level outputs and notices, as needed, to the return entity.
 	- [ ] I'm considering making this a hack, but it might be just as simple to do it right.  That is, I can't think of a hack that will be faster to write or debug.
+	- [ ] This is currently the "doesn't exist at all" hack.
 - [x] Response manager returns entity to transaction manager.
 - [x] Transaction manager sends Project and outgoing entity to Project manager.
 - [ ] Project manager instantiates a new project, generates whatever outgoing project info is needed, 
 	- [ ] The hack here might be just to make a default project and copy in any info that needs to be returned. 
+	- [ ] I'm not sure it even does that yet.  Make it do at least that.  Or something intelligent.
 - [x] Project manager returns the project to transaction manager.
 - [x] Transaction manager returns the transaction.
 - [x] The 'Error' AAOP is gonna gause trouble until I figure out a way to fix it.

@@ -115,7 +115,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "project_management/kanban_notes/Little Things.md",
+                "file": "project_management/kanban_notes/Draft complete Services pipeline using Delegator as the Entity.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -132,7 +132,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "project_management/kanban_notes/Little Things.md",
+                "file": "project_management/kanban_notes/Draft complete Services pipeline using Delegator as the Entity.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -155,7 +155,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "project_management/kanban_notes/Little Things.md"
+                "file": "project_management/kanban_notes/Draft complete Services pipeline using Delegator as the Entity.md"
               }
             }
           }
@@ -176,8 +176,10 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "ae69f8c8c9e49c63",
+  "active": "ba0864e8cfb93b1b",
   "lastOpenFiles": [
+    "project_management/kanban_notes/Little Things.md",
+    "dum.diff",
     "gemsModules/common/services/status/__pycache__/server.cpython-39.pyc",
     "gemsModules/common/services/marco/logic.py~",
     "gemsModules/common/services/marco/__pycache__/server.cpython-39.pyc",
@@ -187,10 +189,7 @@
     "gemsModules/common/services/list_services/server.py",
     "gemsModules/common/services/error/server.py~",
     "gemsModules/common/services/error/__pycache__/server.cpython-39.pyc",
-    "gemsModules/common/services/error/server.py",
-    "gemsModules/common/services/settings/__pycache__/service_modules.cpython-39.pyc",
     "project_management/kanban_notes/Draft complete Services pipeline using Delegator as the Entity.md",
-    "project_management/kanban_notes/Little Things.md",
     "project_management/Rewrite_Kanban.md",
     "project_management/kanban_notes/Remove refs to deprecated code.md",
     "gemsModules/delegator/README.md",
