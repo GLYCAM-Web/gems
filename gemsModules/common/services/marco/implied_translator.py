@@ -17,16 +17,19 @@ class marco_Implied_Translator(Implied_Translator):
     """
 
     def process(self, input_object : Implied_Services_Inputs) -> List[AAOP]:
-        if input_object is not None and input_object.options is not None:
-            the_options = input_object.options
-            if 'cake' in the_options.keys() or 'color' in the_options.keys() :
+        log.debug("In marco_Implied_Translator, process")
+        log.debug("input_object: " + str(input_object))
+        log.debug("input_object.options: " + str(input_object.options))
+        if input_object is not None and input_object.inputs is not None:
+            the_inputs = input_object.inputs
+            if 'cake' in the_inputs.keys() or 'color' in the_inputs.keys() :
 #                print("found cake or color")
                 service_request = marco_Request()
                 service_request.options = {}
-                if 'cake' in the_options.keys() :
-                    service_request.options["cake"]=the_options["cake"]
-                if 'color' in the_options.key_object() :
-                    service_request.options["color"]=the_options["color"]
+                if 'cake' in the_inputs.keys() :
+                    service_request.options["cake"]=the_inputs["cake"]
+                if 'color' in the_inputs.keys() :
+                    service_request.options["color"]=the_inputs["color"]
                 this_aaop = AAOP(Dictionary_Name='implied_cake_marco', 
                         ID_String=uuid.uuid4(),
                         The_AAO=service_request,

@@ -11,7 +11,7 @@ log = Set_Up_Logging(__name__)
 
 service_modules : Dict[str, Callable] = {
     'Error' : serve_error,
-    'KnownEntities' : serve_known_entities
+    'KnownEntities' : serve_known_entities,
     'ListServices': serve_list_services, 
     'Marco': serve_marco, 
     'Status': serve_status

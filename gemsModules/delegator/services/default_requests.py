@@ -15,6 +15,7 @@ class delegator_Default_Service_Request_Manager(Default_Service_Request_Manager)
     def get_default_services_aaops(self) -> List[AAOP]:
         this_service = marco_Request()
         this_aaop = AAOP(
+            AAO_Type="Marco",
             The_AAO=this_service,
             ID_String=uuid.uuid4(),
             Dictionary_Name="Default_Marco"

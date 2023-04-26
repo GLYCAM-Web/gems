@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from pydantic import ValidationError
 from gemsModules.common.receiver import Receiver
 from gemsModules.delegator.main_settings import WhoIAm
 from gemsModules.delegator.main_api import Delegator_Transaction

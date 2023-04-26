@@ -56,7 +56,10 @@ class Implied_Services_Request_Manager(ABC):
 class common_Implied_Services_Request_Manager(Implied_Services_Request_Manager):
 
     def get_available_services(self) -> List[str]:
-        return ["common"]
+        from gemsModules.common.tasks import get_services_list
+        return get_services_list.execute()
     
     def get_implicit_service_manager(self, service: str) -> Callable:
-        pass
+        log.debug("In common_Implied_Services_Request_Manager, get_implicit_service_manager")
+        from gemsModules.common.services.settings.implied_modules import implied_modules 
+        return implied_modules[service]
