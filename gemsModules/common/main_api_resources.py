@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from typing import Dict, List
+from typing import Dict, List, Any
 from pydantic import BaseModel, Field, Json
 
 from gemsModules.common.main_api_notices import Notices
@@ -9,17 +9,17 @@ log = Set_Up_Logging(__name__)
 
 class Resource(BaseModel):
     """Information describing a resource containing data."""
-    locationType: Json[str] = Field(
+    locationType: str = Field(
             None,
             title='Location Type',
             description='Supported locations will vary with each Entity.'
             )
-    resourceFormat: Json[str] = Field(
+    resourceFormat: str = Field(
             None,
             title='Resource Format',
             description='Supported formats will varu with each Entity.',
             )
-    payload : Json[str] = Field(
+    payload : Union[str,int,float] = Field(
         None,
         description='The thing that is described by the location and format'
         )
