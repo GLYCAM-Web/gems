@@ -38,9 +38,9 @@ class marco_Multiples_Manager(Multiples_Manager):
         this_request.inputs.who_I_am = 'Delegator'
         this_request.options = {}
         this_request.options['merge_conflict'] = 'Merge conflict'
-        this_request.options['info'] = ['Conflicting information was sent to Marco']
+        this_request.options['info'] = 'Conflicting information was sent to Marco'
         this_aaop = AAOP(ID_String=str(uuid.uuid4()),
-                Dictionary_Name='Marco-Error', 
+                Dictionary_Name='Marco_Error', 
                 The_AAO=this_request,
                 AAO_Type='Error')
         return [this_aaop]

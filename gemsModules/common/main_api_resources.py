@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-from typing import Dict, List, Any
-from pydantic import BaseModel, Field, Json
+from typing import Dict, List, Union
+from pydantic import BaseModel, Field
 
 from gemsModules.common.main_api_notices import Notices
 
@@ -20,9 +20,9 @@ class Resource(BaseModel):
             description='Supported formats will varu with each Entity.',
             )
     payload : Union[str,int,float] = Field(
-        None,
-        description='The thing that is described by the location and format'
-        )
+            None,
+            description='The thing that is described by the location and format'
+            )
     notices : Notices = Notices()  
     options : Dict[str,str] = Field(
             None,
