@@ -49,7 +49,8 @@ class Transaction(ABC):
             initialize_out=True # Initialize an outgoing transaction from the incoming one
             ):
         try:
-            log.debug("incoming string is: " + str(in_string))
+            log.debug("incoming string is: \n~~~") 
+            log.debug(in_string + "\n~~~")
             self.incoming_string = in_string
             if self.incoming_string is None or self.incoming_string == '':
                 log.error("incoming string was empty")

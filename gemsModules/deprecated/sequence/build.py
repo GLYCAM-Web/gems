@@ -297,10 +297,9 @@ def divideListIntoChunks(l, n):
 
 
 def getCbBuilderForSequence(sequence: str):
-    log.info("getCbBuilderForSequence() was called.\n")
+    # log.info("getCbBuilderForSequence() was called.\n")
     GemsPath = commonservices.getGemsHome()
     log.debug("GemsPath: " + GemsPath)
-
     prepfile = GemsPath + "/gmml/dat/prep/GLYCAM_06j-1_GAGS_KDN.prep"
     if os.path.exists(prepfile):
         log.debug("Instantiating the carbohydrateBuilder.")

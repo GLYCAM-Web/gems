@@ -36,14 +36,11 @@ def createLogger(name):
         log.debug("logger already exists with name: " + name)
     else:
         log = logging.getLogger(name)
-
         log.setLevel(LOGGING_LEVEL)
-
         ##File Handlers
         logsDir = getLogsDir()
         errorFileHandler = logging.FileHandler(logsDir + "git-ignore-me_gemsError.log")
         errorFileHandler.setLevel(logging.ERROR)
-        
         if LOGGING_LEVEL > 10:
             infoFileHandler = logging.FileHandler(logsDir + "/git-ignore-me_gemsInfo.log")
             infoFileHandler.setLevel(logging.INFO)
@@ -55,21 +52,19 @@ def createLogger(name):
         ##Formatters
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s',  datefmt='%Y-%m-%d %I:%M:%S %p')
         errorFileHandler.setFormatter(formatter)
-        
+    
         if LOGGING_LEVEL > 10:
             infoFileHandler.setFormatter(formatter)
         if LOGGING_LEVEL > 0:
             debugFileHandler.setFormatter(formatter)
-
         #log.addHandler(streamHandler)
         log.addHandler(errorFileHandler)
         if LOGGING_LEVEL > 10:
             log.addHandler(infoFileHandler)
         if LOGGING_LEVEL > 0:
             log.addHandler(debugFileHandler)
-
         loggers[name] = log
-        log.debug("created a new logger for: " + name + ", LOGGING_LEVEL: " + str(LOGGING_LEVEL))
+        # log.debug("created a new logger for: " + name + ", LOGGING_LEVEL: " + str(LOGGING_LEVEL))
     return log
 
 

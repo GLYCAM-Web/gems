@@ -47,7 +47,7 @@ def do_status(thisTransaction: sequenceio.Transaction) -> sequenceio.Transaction
 
 def get_sequence(thisSequenceEntity: sequenceio.sequenceEntity)->str:
     """ Get the sequence from the transaction. """
-    log.info("get_sequence was called.")
+    # log.info("get_sequence was called.")
     if thisSequenceEntity.inputs is None:
         return None
     if thisSequenceEntity.inputs.sequence is None: 
@@ -66,7 +66,7 @@ def we_should_start_new_project(thisTransaction: sequenceio.Transaction)->bool:
 
 def we_need_filesystem_writes(thisSequenceEntity : sequenceio.sequenceEntity) -> bool:
     # check to see if filesystem writes are needed based on API inspection
-    log.info("we_need_filesystem_writes() was called.\n")
+    # log.info("we_need_filesystem_writes() was called.\n")
     theseNeedFilesystemWrites = ['Build3DStructure', 'DrawGlycan']
     needFilesystemWrites = False
     for service in thisSequenceEntity.services:
@@ -83,7 +83,7 @@ def we_need_filesystem_writes(thisSequenceEntity : sequenceio.sequenceEntity) ->
                     needFilesystemWrites=True
                 else:
                     needFilesystemWrites=False
-    log.debug("returning that needFilesystemWrites is : "  + str(needFilesystemWrites))
+    # log.debug("returning that needFilesystemWrites is : "  + str(needFilesystemWrites))
     return needFilesystemWrites
 
 
@@ -91,7 +91,6 @@ def set_up_filesystem_for_writing(thisTransaction: sequenceio.Transaction) -> in
     # ##
     # Set the project directory
     log.info("set_up_filesystem_for_writing() was called.\n")
-    log.debug("and a debug statement was written.\n")
     from gemsModules.deprecated.common.logic import writeStringToFile
     thisProject = thisTransaction.transaction_out.project
     ## CHANGEME ? because could be Evaluate and an associated default build
@@ -112,9 +111,9 @@ def set_up_filesystem_for_writing(thisTransaction: sequenceio.Transaction) -> in
     # Create the needed initial directories including a logs directory
     thisProject.createDirectories()
 
-    log.debug("About to write initial logs")
+    # log.debug("About to write initial logs")
     thisProject.writeInitialLogs()
-    log.debug("Just wrote write initial logs")
+    # log.debug("Just wrote write initial logs")
 
     # Generate the complete incoming JSON object, including all defaults
     incomingString = thisTransaction.incoming_string
@@ -124,7 +123,7 @@ def set_up_filesystem_for_writing(thisTransaction: sequenceio.Transaction) -> in
     writeStringToFile(incomingRequest, os.path.join(
         thisProject.logs_dir, "request-initialized.json"))
 
-    log.debug("set_up_filesystem_for_writing() is returning.\n")
+    # log.debug("set_up_filesystem_for_writing() is returning.\n")
     return 0
 
 
