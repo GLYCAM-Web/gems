@@ -83,7 +83,7 @@ class Transaction_Manager(ABC):
         this_json={}
         this_json["entity"] = entity_json
         self.transaction.outputs=this_transaction_type.parse_obj(this_json)
-        log.debug("the transaction outputs are: ")
-        log.debug(self.transaction.outputs.json(indent=2, by_alias=True))
         if self.response_project is not None:
             self.transaction.outputs.project=self.response_project.copy(deep=True)
+        log.debug("the transaction outputs are: ")
+        log.debug(self.transaction.outputs.json(indent=2, by_alias=True))

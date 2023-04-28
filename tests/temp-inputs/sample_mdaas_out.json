@@ -1,0 +1,102 @@
+{
+  "timestamp": null,
+  "entity": {
+    "type": "MDaaS",
+    "inputs": null,
+    "outputs": null,
+    "services": {
+      "run_md_at_all": {
+        "type": "RunMD",
+        "givenName": null,
+        "myUuid": "e64e00ad-6655-412a-81d5-a8df13d707a0",
+        "inputs": {
+          "amber_parm7": "DGlcpa1-OH.parm7",
+          "amber_rst7": "DGlcpa1-OH.rst7",
+          "pUUID": "99fccd8f-1f88-470d-8244-7b66253b33cf",
+          "outputDirPath": "/website/userdata/mmservice/md/99fccd8f-1f88-470d-8244-7b66253b33cf",
+          "inputFilesPath": "/programs/gems/tests/temp-inputs/mdinput",
+          "protocolFilesPath": "/programs/gems/tests/temp-inputs/RoeProtocol/",
+          "use_serial": false,
+          "control_script": "Run_Protocol.bash",
+          "resources": null
+        },
+        "options": null
+      }
+    },
+    "responses": {
+      "run_md_at_all": {
+        "type": "RunMD",
+        "givenName": null,
+        "myUuid": "e64e00ad-6655-412a-81d5-a8df13d707a0",
+        "outputs": {
+          "outputDirPath": "/website/userdata/mmservice/md/99fccd8f-1f88-470d-8244-7b66253b33cf",
+          "resources": null
+        },
+        "notices": null
+      }
+    },
+    "notices": null,
+    "procedural_options": {
+      "context": "website",
+      "force_serial_execution": false,
+      "pretty_print": false,
+      "md_minimize": false
+    },
+    "options": null
+  },
+  "project": {
+    "pUUID": "99fccd8f-1f88-470d-8244-7b66253b33cf",
+    "title": "very hacky initial MDaaS service",
+    "comment": "",
+    "timestamp": "2023-04-28T04:08:26.403910",
+    "gems_timestamp": "2023-04-28T04:08:26.403910",
+    "type": "md",
+    "parent_entity": "mmservice",
+    "requested_service": "mdaas",
+    "entity_id": "MDaaS",
+    "service_id": "RunMD",
+    "filesystem_path": "/website/userdata/",
+    "compute_cluster_filesystem_path": "/website/userdata/mmservice/md/99fccd8f-1f88-470d-8244-7b66253b33cf",
+    "service_dir": "mmservice",
+    "project_dir": "/website/userdata/mmservice/md/99fccd8f-1f88-470d-8244-7b66253b33cf",
+    "logs_dir": "/website/userdata/mmservice/md/99fccd8f-1f88-470d-8244-7b66253b33cf/logs",
+    "requesting_agent": "tester",
+    "has_input_files": true,
+    "site_version": "",
+    "site_branch": "",
+    "site_code_name": "",
+    "gems_version": "",
+    "gems_branch": "",
+    "md_utils_version": "",
+    "md_utils_branch": "",
+    "gmml_version": "",
+    "gmml_branch": "",
+    "gp_version": "",
+    "gp_branch": "",
+    "site_mode": "proof-of-concept",
+    "site_host_name": "",
+    "versions_file_path": "/website/userdata/mmservice/md/99fccd8f-1f88-470d-8244-7b66253b33cf/VERSIONS.sh",
+    "host_url_base_path": "",
+    "download_url_path": "",
+    "force_field": "default",
+    "parameter_version": "default",
+    "amber_version": "default",
+    "json_api_version": "0.0.1",
+    "django_project_id": "",
+    "app": "md",
+    "force_use_this_project": false,
+    "notices": [],
+    "system_phase": "In solvent",
+    "input_type": "Amber-prmtop & inpcrd",
+    "parm7_file_name": "DGlcpa1-OH.parm7",
+    "rst7_file_name": "DGlcpa1-OH.rst7",
+    "u_uuid": " ",
+    "sim_length": "100",
+    "notify": false,
+    "upload_path": "/programs/gems/tests/temp-inputs/mdinput"
+  },
+  "notices": null,
+  "prettyPrint": null,
+  "mdMinimize": null,
+  "options": null
+}
