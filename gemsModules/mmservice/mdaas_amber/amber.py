@@ -17,7 +17,7 @@ def manageIncomingString(jsonObjectString: str):
         amber_job.copy_protocol_files()
     except:
         log.error("Could not get amber_job to work correctly.")
-        raise
+        raise ValueError ("MDaaS had trouble getting the amber job to run.")
 
     from gemsModules.deprecated.batchcompute import batchcompute
     outgoing_json_dict = {}

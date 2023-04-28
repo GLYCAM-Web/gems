@@ -14,6 +14,6 @@ duplicates_modules : Dict[str, Callable] = {
     'Error': error_Multiples_Manager, 
     'ListServices': list_services_Multiples_Manager, 
     'Marco': marco_Multiples_Manager, 
-    'Status': status_Multiples_Manager
+    'Status': status_Multiples_Manager,
     'RunMD': run_md_Multiples_Manager
     }

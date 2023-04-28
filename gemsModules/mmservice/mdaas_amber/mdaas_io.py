@@ -20,7 +20,7 @@ class amberProject(BaseModel):
         description = 'The name of the source for this protocol.'
         )
     protocolSourceLocation : str = Field(
-        None,
+        "/website/programs/gems/tests/temp-inputs/RoeProtocol",
         title = 'Protocol Source Location',
         description = 'The path to the source for this protocol.'
         )
@@ -30,7 +30,7 @@ class amberProject(BaseModel):
         description = 'The path to the source for this protocol.'
         )
     protocolSourceVersion : str = Field(
-        None,
+        "temporary hack in gems",
         title = 'Protocol Source Version',
         description = 'Version designation for the source for this protocol.'
         )
@@ -70,7 +70,7 @@ class amberProject(BaseModel):
         description = 'The type of molecular modeling to perform.'
         )
     jobID : str = Field(
-        "amberJob",
+        "runMdJob",
         title = "The Job's ID",
         description = "Generally, this is the pUUID.  Must be valid as a directory name."
         )

@@ -1,4 +1,4 @@
-from gemsModules.delegator.services.settings.known_available import Available_Services
+from gemsModules.mmservice.mdaas.services.settings.known_available import Available_Services
 from typing import List
 
 
@@ -6,7 +6,7 @@ def execute() -> List:
     """ Return a list of available services
 
     >>> print(execute())
-    ['Marco', 'Status', 'ListServices', 'KnownEntities']
+    ['Error', 'Marco', 'Status', 'ListServices', 'RunMD']
 
     """
 

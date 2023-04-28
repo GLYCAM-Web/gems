@@ -7,7 +7,7 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 class Module_Available_Services(GemsStrEnum):
-    known_entities = 'KnownEntities'
+    run_md = 'RunMD'
 
 Available_Services = GemsStrEnum(
     "Available_Services",

@@ -1,0 +1,11 @@
+{
+ "entity" : {
+    "type": "MDaaS",
+    "services" :
+        { "run_md_at_all" :
+                {
+			"type" : "RunMD" 
+		}
+        }
+  }
+}
