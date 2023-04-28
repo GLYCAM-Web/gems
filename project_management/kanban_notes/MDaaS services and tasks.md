@@ -14,7 +14,7 @@ This first version is going to be an enormous hack.  Apologies in advance to who
 
 All of this code exists in some way or another.   I just need to hack it together for this very specific purpose.
 
-- [ ] Assign working directory naming needs to happen higher up
+- [x] Assign working directory naming needs to happen higher up
 - [ ] Ensure that the input files exist in the expected location
 - [ ] Generate an output (working) directory
 - [ ] Copy the input files to the output directory

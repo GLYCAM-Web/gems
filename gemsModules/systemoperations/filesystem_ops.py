@@ -38,6 +38,9 @@ def separate_path_and_filename( File_Path : str ) -> tuple[str,str]:
     this_dir, this_filename = os.path.split(File_Path)
     return this_dir , this_filename
 
+def copy_file_from_A_to_B(A : str, B : str) :
+    # Make me more resilient one day
+    shutil.copy(A, B)
 
 def copy_all_files_from_dir_A_to_dir_B(A : str, B : str, follow_symlinks=True, copymode=shutil.copy) :
     log.info("copy_all_files_from_dir_A_to_dir_B was called.")

@@ -2,8 +2,9 @@
 from pydantic import BaseModel, Field
 from typing   import List, Union
 
-from gemsModules.common.main_api_services import Service_Request, Service_Response
 from gemsModules.common.main_api_resources import Resource, Resources
+
+from gemsModules.mmservice.mdaas.main_api import MDaaS_Service_Request, MDaaS_Service_Response
 
 from gemsModules.logging.logger import Set_Up_Logging 
 log = Set_Up_Logging(__name__)
@@ -51,6 +52,36 @@ class run_md_Inputs(BaseModel) :
         title='Amber Rst7',
         description='Name of Amber Rst7 file',
     )
+    pUUID : str = Field(
+        None,
+        title='Project UUID',
+        description='UUID of Project',
+    )
+    outputDirPath : str = Field(
+        None,
+        title='Output Directory Path',
+        description='Path to output directory',
+    )
+    inputFilesPath : str = Field(
+        None,
+        title='Input Files Directory Path',
+        description='Path to whhere the input files are stored',
+    )
+    protocolFilesPath : str = Field(
+        None,
+        title='Protocol files directory',
+        description='Path to where the protocol files are stored',
+    )
+    use_serial : bool = Field(
+        False,
+        title='Use Serial',
+        description='Should we force the GEMS code to run in serial?',
+    )
+    control_script : str = Field(
+        "Run_Protocol.bash",
+        title='Control Script',
+        description='Name of the script used to run the protocol',
+    )
     resources : run_md_Resources = run_md_Resources()
     
     
@@ -63,7 +94,7 @@ class run_md_Outputs(BaseModel) :
     resources : run_md_Resources = run_md_Resources()
 
 
-class run_md_Request(Service_Request) :
+class run_md_Request(MDaaS_Service_Request) :
     typename : str  = Field(
         "RunMD",   
         alias='type'
@@ -71,7 +102,7 @@ class run_md_Request(Service_Request) :
     # the following must be redefined in a child class
     inputs : run_md_Inputs = run_md_Inputs()
 
-class run_md_Response(Service_Response) :
+class run_md_Response(MDaaS_Service_Response) :
     typename : str  = Field(
         "RunMD",   
         alias='type'

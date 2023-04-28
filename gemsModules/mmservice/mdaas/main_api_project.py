@@ -23,12 +23,12 @@ class MdProject(Project):
     has_input_files : bool = True
     system_phase : constr(max_length=25) = "In solvent"
     input_type : constr(max_length=25) = "Amber-prmtop & inpcrd"
-    prmtop_file_name : constr(max_length=255) = "DManpa1-OH.parm7"
-    inpcrd_file_name : constr(max_length=255) = "DManpa1-OH.rst7"
+    parm7_file_name : constr(max_length=255) = "DGlcpa1-OH.parm7"
+    rst7_file_name : constr(max_length=255) = "DGlcpa1-OH.rst7"
     u_uuid : constr(max_length=36) = " "
     sim_length : constr(max_length=5) = '100'
     notify : bool = False
-    upload_path : constr(max_length=255)  = "/website/programs/gems/tests/temp-inputs/mdinput"
+    upload_path : constr(max_length=255)  = "/programs/gems/tests/temp-inputs/mdinput"
     
     project_type : Literal['md'] = Field(  
             'md',

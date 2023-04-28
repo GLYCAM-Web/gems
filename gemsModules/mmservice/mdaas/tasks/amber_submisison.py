@@ -1,6 +1,8 @@
 import os
 from gemsModules.mmservice.mdaas_amber.amber import manageIncomingString
 
+from gemsModules.logging.logger import Set_Up_Logging
+log = Set_Up_Logging(__name__)
 
 
 def make_input(pUUID : str, outputDirPath : str, control_script : str):
@@ -10,7 +12,9 @@ def make_input(pUUID : str, outputDirPath : str, control_script : str):
     "molecularModelingJobType":"Roe Protocol", \
     "jobID":"' + pUUID + '", \
     "localWorkingDirectory":"' + outputDirPath + '", \
+    "submissionName":"MDaaS", \
     "simulationControlScriptPath":"' + simulationControlScriptPath + '", \
+    "simulationWorkingDirectory":"' + outputDirPath + '", \
     "comment":"initiated by gemsModules/mmservice/mdaas"\
     }'
     return amberSubmissionJson

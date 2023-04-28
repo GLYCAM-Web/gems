@@ -14,15 +14,15 @@ log = Set_Up_Logging(__name__)
 class mdaas_Project_Manager(Project_Manager):
 
     def process(self) -> MdProject:
-        return None
+        self.response_project = MdProject()
+        self.instantiate_response_project()
+        return self.response_project
 
-    def instantiate_new_project(self) -> MdProject:
-        new_project=MdProject()
-        new_project.add_temporary_info()
-        return new_project
+    def instantiate_response_project(self) -> MdProject:
+        self.response_project.add_temporary_info()
 
     def fill_response_project_from_incoming_project(self):
-        return None
+        pass
 
     def fill_response_project_from_response_entity(self):
         pass

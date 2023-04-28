@@ -12,7 +12,7 @@ log = Set_Up_Logging(__name__)
 class Project_Manager(ABC):
     
     def __init__(self, entity : Entity, project : Project = None):
-        self.response_entity = entity
+        self.incoming_entity = entity
         self.incoming_project = project
 
     def process(self) -> Project:

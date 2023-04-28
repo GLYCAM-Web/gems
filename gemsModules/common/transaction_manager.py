@@ -25,6 +25,8 @@ class Transaction_Manager(ABC):
 
     def process(self):
         log.debug('Processing transaction')
+        log.debug("about to manage project")
+        self.manage_project()
         log.debug("about to manage requests")
         self.manage_requests()
         log.debug("about to generate aaop tree pair")
@@ -33,8 +35,6 @@ class Transaction_Manager(ABC):
         self.invoke_servicer()
         log.debug("about to manage responses")
         self.manage_responses()
-        log.debug("about to manage project")
-        self.manage_project()
         log.debug("about to update transaction")
         self.update_transaction()
         log.debug("about to return transaction")
@@ -48,8 +48,12 @@ class Transaction_Manager(ABC):
         self.response_manager_type = Response_Manager
         self.project_manager_type = common_Project_Manager
     
+    def manage_project(self):
+        self.project_manager = self.project_manager_type(project=self.incoming_project, entity=self.incoming_entity)
+        self.response_project = self.project_manager.process()
+        
     def manage_requests(self):
-        self.request_manager = self.request_manager_type(entity=self.incoming_entity, project=self.incoming_project)
+        self.request_manager = self.request_manager_type(entity=self.incoming_entity, project=self.response_project)
         self.aaop_request_list : List[AAOP] = self.request_manager.process()
         log.debug("the aaop request list is: ")
         log.debug(self.aaop_request_list)
@@ -73,10 +77,6 @@ class Transaction_Manager(ABC):
         self.response_manager = self.response_manager_type(aaop_tree_pair=self.aaop_tree_pair)
         self.response_entity = self.response_manager.process()
 
-    def manage_project(self):
-        self.project_manager = self.project_manager_type(project=self.incoming_project, entity=self.response_entity)
-        self.response_project = self.project_manager.process()
-        
     def update_transaction(self):
         this_transaction_type = self.transaction.get_API_type()
         entity_json = self.response_entity.dict(by_alias=True)
