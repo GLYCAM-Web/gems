@@ -124,9 +124,7 @@ def manageIncomingString(jsonObjectString):
         log.debug("the local host is: " + localHost)
         if theHost == localHost:
             useGRPC=False
-    print("1")
     thisSlurmJobInfo.incoming_dict["slurm_runscript_name"] = "slurm_submit.sh"
-    print("2")
     slurm_runscript_path = thisSlurmJobInfo.incoming_dict["workingDirectory"] + "/" + thisSlurmJobInfo.incoming_dict["slurm_runscript_name"]
     log.debug ("Slurm runscript path: " + slurm_runscript_path + "\n")
     if os.path.exists(slurm_runscript_path) :

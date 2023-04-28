@@ -86,4 +86,4 @@ class Transaction_Manager(ABC):
         log.debug("the transaction outputs are: ")
         log.debug(self.transaction.outputs.json(indent=2, by_alias=True))
         if self.response_project is not None:
-            self.transaction.outputs=this_transaction_type(project = self.response_project.copy(deep=True))
+            self.transaction.outputs.project=self.response_project.copy(deep=True)

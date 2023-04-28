@@ -13,22 +13,19 @@ def manageIncomingString(jsonObjectString: str):
 
     try : 
         amber_job = mdaas_io.amberProject(**input_json_dict)
-        #amber_job.initialize()
-        #amber_job.copy_protocol_files()
     except:
         log.error("Could not get amber_job to work correctly.")
         raise ValueError ("MDaaS had trouble getting the amber job to run.")
 
     from gemsModules.deprecated.batchcompute import batchcompute
-    print("amber.py: amber_job.submissionName is: " + amber_job.submissionName)
+    log.debug("amber.py: amber_job.submissionName is: " + amber_job.submissionName)
     outgoing_json_dict = {}
     outgoing_json_dict["partition"] = "amber"
     outgoing_json_dict["user"] = "webdev"
     outgoing_json_dict["name"] = amber_job.submissionName 
     outgoing_json_dict["workingDirectory"] = amber_job.simulationWorkingDirectory
     outgoing_json_dict["sbatchArgument"] = amber_job.simulationControlScriptPath
-    print("got past the outgoing_json_dict stuff in amber.py")
 
     batchcompute.batch_compute_delegation(outgoing_json_dict)
-    print("got past the batchcompute.batch_compute_delegation(outgoing_json_dict) stuff in amber.py")
+    log.debug("got past the batchcompute.batch_compute_delegation(outgoing_json_dict) stuff in amber.py")
 

@@ -14,9 +14,7 @@ def execute(protocol_files_dir : str, output_dir_path : str, uploads_dir_path : 
     filesystem_ops.copy_all_files_from_dir_A_to_dir_B(A=protocol_files_dir, B=output_dir_path)
     # copy the parm7 and rst7 files to the output directory
     fileA = uploads_dir_path + '/' + parm7_real_name
-    print("fileA is: " + str(fileA))
     fileB = output_dir_path + '/' + parm7_real_name
-    print("fileB is: " + str(fileB))
     filesystem_ops.copy_file_from_A_to_B(A=fileA, B=fileB)
     filesystem_ops.copy_file_from_A_to_B(A=uploads_dir_path + '/' + rst7_real_name, B=output_dir_path + '/' + rst7_real_name)
     # make symbolid links from the expected protocol file names to the real protocol file names

@@ -86,10 +86,10 @@ class run_md_Inputs(BaseModel) :
     
     
 class run_md_Outputs(BaseModel) :
-    zip_file : str = Field(
+    outputDirPath : str = Field(
         None,
-        title='Zip File',
-        description='Name of Zip file for download',
+        title='Output Directory Path',
+        description='Path to output directory',
     )
     resources : run_md_Resources = run_md_Resources()
 

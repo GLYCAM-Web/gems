@@ -30,7 +30,7 @@ def execute(pUUID : str, outputDirPath: str, control_script : str = "Run_Protoco
 
 def testme():
     this_input=make_input(pUUID="1234567890", outputDirPath="this_is_a_path", control_script="this_is_a_script")
-    print(this_input)
+#    print(this_input)
 
 
 

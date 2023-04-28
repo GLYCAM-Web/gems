@@ -21,6 +21,8 @@ def Serve(service : run_md_Request) -> run_md_Response:
                            use_serial=True, 
                            )
                    
-                                    
+    response = run_md_Response()
+    response.outputs.outputDirPath = service.inputs.outputDirPath
+    return response
 
     
