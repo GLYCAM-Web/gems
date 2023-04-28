@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
-import os, sys
-import json
+import os
 import uuid
 import traceback
 from typing import Any, List
 from datetime import datetime
-from pydantic import BaseModel, Field, ValidationError, constr
-from pydantic.schema import schema
+
+from pydantic import BaseModel, constr
+
+from gemsModules.deprecated.common import logic as commonlogic
+from gemsModules.deprecated.common import settings as commonsettings
+
 from gemsModules.common.main_api_notices import Notice
+
+from gemsModules.project import settings as project_settings
 
 # ## TODO - a lot of this info really belongs elsewhere.  It's not really
 #    project information.  For example, 'seqID' only applies to the sequence
@@ -77,6 +82,13 @@ class Project(BaseModel):
     django_project_id : constr(max_length=36)=""
     app : constr(max_length=25)="project"
   
+    
+    ## In some cases, GEMS will choose to start a new project 
+    ## even if one is provided.  If you don't want to force
+    ## GEMS to use this project, set this to True.
+    force_use_this_project : bool = False
+
+
     notices : List[Notice] = []
 
 
@@ -96,6 +108,7 @@ class Project(BaseModel):
 #    from gemsModules.project._defaultInitializeProject import defaultInitializeProject
 
     def setFilesystemPath(self, specifiedPath : str = None, noClobber : bool = True) :
+        log.info("setFilesystemPath was called.")
         # If a path exists, and it shouldbot be clobbered, return
         # This **SHOULD** be the case if the incoming JSON object specified a path.
         # For this to be true, ensure that your outgoing project is deep-copied from 
@@ -105,10 +118,12 @@ class Project(BaseModel):
                 message = "Filesystem Output Path already exists in Project and cannot be clobbered.  It is:\n" + str(self.filesystem_path)
                 log.debug(message)
                 return
-        # If a path was specified, set it and return
+        context = commonlogic.getGemsExecutionContext()
+        # If a path was specified, set it, if allowed, and return
         if specifiedPath is not None :
-            self.filesystem_path = specifiedPath
-            return
+            if context != 'website' :
+              self.filesystem_path = specifiedPath
+              return
         # Still here?  Try to determine the path using internal logic
         try :
             ## this is the userdata dir.
@@ -116,7 +131,7 @@ class Project(BaseModel):
         except :
             message = "There was an error while asking common for the  GEMS Filesystem Output Path. \nForgins ahead with Project default anyway."
             log.error(message)
-            self.filesystem_path = gemsModules.project.settings.default_filesystem_output_path
+            self.filesystem_path = project_settings.default_filesystem_output_path
             return
         # Assign the path based on the return values from common
         if source == 'Environment' :
@@ -124,11 +139,19 @@ class Project(BaseModel):
             log.debug(message)
             self.filesystem_path = path
         elif source == 'Default':
-            context = commonlogic.getGemsExecutionContext()
             if context == 'website' :    
-                message = "Overriding GEMS Filesystem Output Path with the default from Project." 
-                log.debug(message) 
-                self.filesystem_path = gemsModules.project.settings.default_filesystem_output_path
+                if specifiedPath is not None :
+                    log.debug("An output path is specified in website context.  Checking to see if it is allowed." )
+                    if specifiedPath not in project_settings.allowed_website_filesystem_paths :
+                        message = "The specified output path is not allowed.  Using default instead."
+                        log.error(message)
+                        self.filesystem_path = project_settings.default_filesystem_output_path
+                    else:
+                        message = "The specified output path is allowed.  Using it."
+                        log.debug(message)
+                        self.filesystem_path = specifiedPath
+                else:
+                    self.filesystem_path = project_settings.default_filesystem_output_path
             else :
                 message = "Using the default GEMS Filesystem Output Path." 
                 log.debug(message) 
@@ -136,11 +159,11 @@ class Project(BaseModel):
         elif source == 'Error' :
             message = "Common reported an error trying to determine the GEMS Filesystem Output Path. \nForgins ahead with Project default anyway."
             log.error(message)
-            self.filesystem_path = gemsModules.project.settings.default_filesystem_output_path
+            self.filesystem_path = project_settings.default_filesystem_output_path
         else :
             message = "Unknown source for GEMS Filesystem Output Path.  Using default from Project."
             log.debug(message)
-            self.filesystem_path = gemsModules.project.settings.default_filesystem_output_path
+            self.filesystem_path = project_settings.default_filesystem_output_path
 
 
     def setServiceDir(self, specifiedDirectory : str = None, noClobber : bool = False) :
@@ -245,7 +268,7 @@ class Project(BaseModel):
         if self.versions_file_path is None or self.versions_file_path == "" :
             log.error("There was a problem setting the versions file path.  Cannot load versions file info")
             return
-        from gemsModules.project.projectUtilPydantic import getVersionsFileInfo
+        from gemsModules.deprecated.project.projectUtilPydantic import getVersionsFileInfo
         log.debug("About to load the version info.")
         try : 
             theDict = getVersionsFileInfo(self.versions_file_path)
@@ -346,7 +369,7 @@ class Project(BaseModel):
         if self.has_input_files != "True":
             log.error("This project says it does NOT have input files, but copyUploadedFiles was called.")
             try:
-                common.logic.copyPathFileToPath(self.upload_path, self.uploaded_file_name, self.project_dir)
+                commonlogic.copyPathFileToPath(self.upload_path, self.uploaded_file_name, self.project_dir)
             except Exception as error:
                 log.error("There was a problem uploading the input: " + str(error))
                 raise error
@@ -393,9 +416,9 @@ class Project(BaseModel):
 class CbProject(Project):
     sequence_id : constr(max_length=255)=""
     sequence_path : constr(max_length=255)=""
-    indexOrderedSequence : constr(max_length=255)=""
+    indexOrderedSequence : constr(max_length=65535)=""
     seqID : constr(max_length=36)=""
-    selected_rotamers : constr(max_length=3000)=""
+    selected_rotamers : constr(max_length=65535)=""
 
     def setIndexOrderedSequence(self, theSequence : str ) :
         self.indexOrderedSequence = theSequence
@@ -475,23 +498,24 @@ class GrProject(Project):
        super().__init__(**data)
        self.project_type = "gr"
 
-class MdProject(Project):
-    system_phase : constr(max_length=25) = "In solvent."
-    input_type : constr(max_length=25) = "Amber-prmtop & inpcrd"
-    prmtop_file_name : constr(max_length=255) = " "
-    inpcrd_file_name : constr(max_length=255) = " "
-    pdb_file_name  : constr(max_length=255) = " "
-    mmcif_file_name : constr(max_length=255) = " "
-    off_file_name : constr(max_length=255)  = " "
-    u_uuid : constr(max_length=36) = " "
-    water_model : constr(max_length=10) = "TIP-3P"
-    sim_length : constr(max_length=5) = '100'
-    notify : bool =True
-    upload_path : constr(max_length=255)  = " "
+##  Moving child projects to their own files in their own modules.
+# class MdProject(Project):
+#     system_phase : constr(max_length=25) = "In solvent."
+#     input_type : constr(max_length=25) = "Amber-prmtop & inpcrd"
+#     prmtop_file_name : constr(max_length=255) = " "
+#     inpcrd_file_name : constr(max_length=255) = " "
+#     pdb_file_name  : constr(max_length=255) = " "
+#     mmcif_file_name : constr(max_length=255) = " "
+#     off_file_name : constr(max_length=255)  = " "
+#     u_uuid : constr(max_length=36) = " "
+#     water_model : constr(max_length=10) = "TIP-3P"
+#     sim_length : constr(max_length=5) = '100'
+#     notify : bool =True
+#     upload_path : constr(max_length=255)  = " "
     
-    def __init__(self, **data : Any):
-       super().__init__(**data)
-       self.project_type = "md"
+#     def __init__(self, **data : Any):
+#        super().__init__(**data)
+#        self.project_type = "md"
 
 ##  Are these used at all?????
 ### Details and location of the build of a single pose of a structure.
@@ -547,9 +571,10 @@ def generateProjectSchemaForWeb():
         with open(childFilePath, 'w') as childFile:
             childFile.write(GpProject.schema_json(indent=spaceCount))
 
-        childFilePath = os.path.join(moduleSchemaDir, 'MdProject.json')
-        with open(childFilePath, 'w') as childFile:
-            childFile.write(MdProject.schema_json(indent=spaceCount))
+        ## Need to move these statements to their own modules
+        # childFilePath = os.path.join(moduleSchemaDir, 'MdProject.json')
+        # with open(childFilePath, 'w') as childFile:
+        #     childFile.write(MdProject.schema_json(indent=spaceCount))
 
         childFilePath = os.path.join(moduleSchemaDir, 'GrProject.json')
         with open(childFilePath, 'w') as childFile:

@@ -3,7 +3,9 @@ from pydantic import  Field
 from typing import Literal
 from gemsModules.common import main_api
 from gemsModules.common import main_api_entity
+
 from gemsModules.mmservice.mdaas.main_settings import WhoIAm
+from gemsModules.mmservice.mdaas.main_api_project import MdProject
 
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
@@ -22,6 +24,7 @@ class MDaaS_Entity(main_api_entity.Entity) :
 # It should also define more services that are specific to mmservice.mdaas
 class MDaaS_API(main_api.Common_API):
     entity : MDaaS_Entity
+    project : MdProject
 
 
 class MDaaS_Transaction(main_api.Transaction):

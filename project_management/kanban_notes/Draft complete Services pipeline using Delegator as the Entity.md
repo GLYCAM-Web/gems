@@ -80,5 +80,5 @@ This old list is probably redundant, but check it:
 	- [x] Write all the tasks that are needed
 	- [ ] Write mechanism for each service to perform each task in order
 	- [ ] Write mechanism for services to be performed in order
-	- [ ] Refine and expand mechanism for converting top-level input into service requests
+	- [x] Refine and expand mechanism for converting top-level input into service requests
 	- [ ] Write mechanism for converting service responses into top-level output
