@@ -1,0 +1,164 @@
+{
+  "timestamp": "2023-04-18_03:59:30",
+  "entity": {
+    "type": "Sequence",
+    "requestID": null,
+    "services": {
+      "build": {
+        "type": "Evaluate",
+        "givenName": null,
+        "myUuid": null,
+        "inputs": null,
+        "options": null
+      }
+    },
+    "responses": null,
+    "resources": null,
+    "notices": null,
+    "procedural_options": {
+      "context": "website",
+      "force_serial_execution": false,
+      "use_library": true,
+      "strict_library": true,
+      "build_default_on_evaluation": true,
+      "md_minimize": true,
+      "number_structures_hard_limit": 8
+    },
+    "options": null,
+    "inputs": {
+      "sequence": {
+        "payload": "DGlcpa1-OH",
+        "format": "GlycamCondensed"
+      },
+      "sequenceVariants": null,
+      "systemSolvationOptions": null,
+      "geometryOptions": null,
+      "buildOptions": null,
+      "evaluationOptions": null,
+      "drawOptions": null
+    },
+    "outputs": {
+      "sequenceEvaluationOutput": {
+        "sequenceIsValid": true,
+        "sequenceVariants": {
+          "indexOrdered": "DGlcpa1-OH",
+          "longestChainOrdered": "Currently unavailble in gmml. Request if needed!",
+          "userOrdered": "DGlcpa1-OH",
+          "monospacedTextDiagram": null,
+          "indexOrderedLabeled": "DGlcp&Label=residue-2;a1-&Label=link-0;OH&Label=residue-1;",
+          "longestChainOrderedLabeled": null,
+          "userOrderedLabeled": null,
+          "monospacedTextDiagramLabeled": null,
+          "suuid": "98abcc28-2325-55fe-9d32-d2908dd33860",
+          "smd5sum": null
+        },
+        "evaluationOptions": {
+          "validateOnly": false,
+          "evaluateForBuild": false,
+          "noBuild": false
+        },
+        "buildOptions": {
+          "solvationOptions": null,
+          "geometryOptions": {
+            "residues": null,
+            "linkages": {
+              "linkageRotamerInfo": {
+                "singleLinkageRotamerDataList": [],
+                "totalLikelyRotamers": 1,
+                "totalPossibleRotamers": 1,
+                "totalSelectedRotamers": 1
+              }
+            }
+          },
+          "mdMinimize": true,
+          "numberStructuresHardLimit": 1
+        },
+        "drawOptions": null
+      },
+      "structureBuildInfo": {
+        "incomingSequence": "DGlcpa1-OH",
+        "indexOrderedSequence": "DGlcpa1-OH",
+        "seqID": "98abcc28-2325-55fe-9d32-d2908dd33860",
+        "individualBuildDetails": [
+          {
+            "date": "2023-04-18T03:59:30.630284",
+            "status": "new",
+            "payload": "",
+            "pUUID": "f86b075b-a9cc-465e-bc7a-512004946bbc",
+            "entity_id": "sequence",
+            "service_id": "cb",
+            "incomingSequence": "",
+            "indexOrderedSequence": "DGlcpa1-OH",
+            "seqID": "",
+            "conformerID": "structure",
+            "conformerLabel": "structure",
+            "sequenceConformation": [],
+            "isDefaultStructure": true,
+            "isGlobalDefaultStructure": true,
+            "isNewBuild": true,
+            "structureDirectoryName": "structure",
+            "filesystem_path": "/website/userdata/",
+            "host_url_base_path": "https://172.24.0.2",
+            "conformer_path": "/website/userdata/sequence/cb/Builds/f86b075b-a9cc-465e-bc7a-512004946bbc/Requested_Builds/structure",
+            "absolute_conformer_path": "/website/userdata/sequence/cb/Builds/f86b075b-a9cc-465e-bc7a-512004946bbc/New_Builds/structure",
+            "downloadUrlPath": "https://172.24.0.2/json/download/sequence/cb/f86b075b-a9cc-465e-bc7a-512004946bbc/structure/",
+            "forceField": "See Build Directory Files"
+          }
+        ],
+        "buildStrategyID": "buildStrategyID1"
+      }
+    }
+  },
+  "project": {
+    "pUUID": "f86b075b-a9cc-465e-bc7a-512004946bbc",
+    "title": "",
+    "comment": "",
+    "timestamp": "2023-04-18T03:59:30.567571",
+    "gems_timestamp": "2023-04-18T03:59:30.567571",
+    "project_type": "cb",
+    "parent_entity": "Sequence",
+    "requested_service": "Build3DStructure",
+    "entity_id": "sequence",
+    "service_id": "cb",
+    "filesystem_path": "/website/userdata/",
+    "compute_cluster_filesystem_path": "",
+    "service_dir": "/website/userdata/sequence/cb",
+    "project_dir": "/website/userdata/sequence/cb/Builds/f86b075b-a9cc-465e-bc7a-512004946bbc",
+    "logs_dir": "/website/userdata/sequence/cb/Builds/f86b075b-a9cc-465e-bc7a-512004946bbc/logs",
+    "requesting_agent": "",
+    "has_input_files": false,
+    "site_version": "c9d06aad9d0b175b6f626998b2ac4d2bc24c6da6",
+    "site_branch": "fix-multi-structure-bug",
+    "site_code_name": "Developer-Environment",
+    "gems_version": "31a92d1a5e57f398b3409f42b2c5d1d51ee008ef",
+    "gems_branch": "fix-multi-structure-bug",
+    "md_utils_version": "dd4b5c57d82c89f438477987252f90ce63db7ff8",
+    "md_utils_branch": "md-test",
+    "gmml_version": "f65be25dc6a693a709ee176d341758d703d047b4",
+    "gmml_branch": "gmml-test",
+    "gp_version": "",
+    "gp_branch": "",
+    "site_mode": "CONTAINERS",
+    "site_host_name": "172.24.0.2",
+    "versions_file_path": "/website/userdata/VERSIONS.sh",
+    "host_url_base_path": "https://172.24.0.2",
+    "download_url_path": "https://172.24.0.2/json/download/sequence/cb/f86b075b-a9cc-465e-bc7a-512004946bbc/",
+    "force_field": "default",
+    "parameter_version": "default",
+    "amber_version": "default",
+    "json_api_version": "0.0.1",
+    "django_project_id": "",
+    "app": "project",
+    "force_use_this_project": false,
+    "notices": [],
+    "sequence_id": "98abcc28-2325-55fe-9d32-d2908dd33860",
+    "sequence_path": "/website/userdata/sequence/cb/Sequences/98abcc28-2325-55fe-9d32-d2908dd33860",
+    "indexOrderedSequence": "DGlcpa1-OH",
+    "seqID": "98abcc28-2325-55fe-9d32-d2908dd33860",
+    "selected_rotamers": ""
+  },
+  "prettyPrint": true,
+  "mdMinimize": true,
+  "options": null,
+  "notices": []
+}

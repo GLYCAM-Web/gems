@@ -1,0 +1,23 @@
+{
+    "entity": {
+        "type": "Sequence",
+        "services": 
+            {
+                "build": {
+                    "type": "Evaluate"
+                }
+            },
+        "inputs": 
+            {
+                "sequence": {
+                    "payload": "DGlcpa1-OH"
+                },
+		"resources" :[]
+            }
+    },
+    "project" : {
+	    "filesystem_path" : "/website/TESTS/git-ignore-me/temp"
+    },
+    "prettyPrint" : true,
+    "mdMinimize" : true
+}
