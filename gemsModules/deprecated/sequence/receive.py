@@ -23,10 +23,10 @@ else:
 #   @param Transaction receivedTransactrion
 def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transaction:
     log.info("sequence.receive() was called:\n")
-    log.debug("The received transaction contains this incoming string: ")
-    log.debug(receivedTransaction.incoming_string)
-    log.debug("request dict: ")
-    log.debug(receivedTransaction.request_dict)
+    # log.debug("The received transaction contains this incoming string: ")
+    # log.debug(receivedTransaction.incoming_string)
+    # log.debug("request dict: ")
+    # log.debug(receivedTransaction.request_dict)
 
     # ## Initialize the transaction
     from pydantic import ValidationError
@@ -91,7 +91,7 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
             from gemsModules.deprecated.project import io as projectio
             thisProject = projectio.CbProject()
 
-        log.debug("Initializing the non-filesystem-writing parts of the outgoing project")
+        # log.debug("Initializing the non-filesystem-writing parts of the outgoing project")
         if thisTransaction.transaction_in.project is not None:
             if thisTransaction.transaction_in.project.filesystem_path is not None:
                 thisProject.setFilesystemPath(thisTransaction.transaction_in.project.filesystem_path, noClobber=False)
@@ -119,16 +119,16 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
             "There was a problem initializing the outgoing project: " + str(error))
         log.error(traceback.format_exc())
         raise Exception
-    log.debug("Just initialized the outgoing project.  The transaction_out is :   ")
-    log.debug(thisTransaction.transaction_out.json(indent=2))
+    # log.debug("Just initialized the outgoing project.  The transaction_out is :   ")
+    # log.debug(thisTransaction.transaction_out.json(indent=2))
 
     ###################################################################
     #
     # these are for logging/debugging and can go if they get heavy
     #
     log.debug("The entity type is : " + thisSequenceEntity.entityType)
-    log.debug("The services are: ")
-    log.debug(thisSequenceEntity.services)
+    # log.debug("The services are: ")
+    # log.debug(thisSequenceEntity.services)
     vals = thisSequenceEntity.services.values()
     for j in vals:
         if 'Build3DStructure' in j.typename:
@@ -143,10 +143,10 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
             log.debug("Found a marco request.")
         else:
             log.debug("Found an unknown service: '" + str(j.typename))
-    log.debug("The Seqence Entity's inputs looks like:")
-    log.debug(thisSequenceEntity.inputs)
-    log.debug("The Seqence Entity's inputs.Sequence looks like:")
-    log.debug(thisSequenceEntity.inputs.sequence.payload)
+    # log.debug("The Seqence Entity's inputs looks like:")
+    # log.debug(thisSequenceEntity.inputs)
+    # log.debug("The Seqence Entity's inputs.Sequence looks like:")
+    # log.debug(thisSequenceEntity.inputs.sequence.payload)
     ###################################################################
 
 

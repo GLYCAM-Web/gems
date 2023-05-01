@@ -211,16 +211,16 @@ class Single3DStructureBuildDetails(BaseModel):
     def __init__(self, **data: Any):
         super().__init__(**data)
 
-        log.debug(
-            "These are the values at initialization of Single3DStructureBuildDetails")
-        log.debug("payload(projectID): " + self.payload)
-        log.debug("incomingSequence: " + self.incomingSequence)
-        log.debug("indexOrderedSequence: " + self.indexOrderedSequence)
-        log.debug("seqID: " + self.seqID)
-        log.debug("conformerID: " + self.conformerID)
-        log.debug("conformerLabel: " + self.conformerLabel)
-        log.debug("conformerPath: " + self.conformer_path)
-        log.debug("downloadUrlPath: " + self.downloadUrlPath)
+        # log.debug(
+        #     "These are the values at initialization of Single3DStructureBuildDetails")
+        # log.debug("payload(projectID): " + self.payload)
+        # log.debug("incomingSequence: " + self.incomingSequence)
+        # log.debug("indexOrderedSequence: " + self.indexOrderedSequence)
+        # log.debug("seqID: " + self.seqID)
+        # log.debug("conformerID: " + self.conformerID)
+        # log.debug("conformerLabel: " + self.conformerLabel)
+        # log.debug("conformerPath: " + self.conformer_path)
+        # log.debug("downloadUrlPath: " + self.downloadUrlPath)
 
     # Plain setters because logic elsewhere should determine them
 
@@ -412,7 +412,7 @@ class TheGeometryOptions(BaseModel):
         super().__init__(**data)
 
     def getRotamerData(self):
-        log.info("GeometryOptions.getRotamerData was called")
+        # log.info("GeometryOptions.getRotamerData was called")
         if self.linkages is None:
             return None
         elif self.linkages.linkageRotamerInfo is None:
@@ -421,7 +421,7 @@ class TheGeometryOptions(BaseModel):
             return self.linkages.linkageRotamerInfo
 
     def createRotamerData(self):
-        log.info("Geometry options.createRotamerDataOut was called")
+        # log.info("Geometry options.createRotamerDataOut was called")
         if self.linkages is None:
             self.linkages = TheLinkageGeometryOptions()
         if self.linkages.linkageRotamerInfo is None:
@@ -453,20 +453,20 @@ class TheBuildOptions(BaseModel):
         super().__init__(**data)
 
     def setGeometryOptions(self, validatedSequence: str):
-        log.info("Setting geometryOptions in BuildOptions")
-        log.debug("validatedSequence: " + validatedSequence)
+        # log.info("Setting geometryOptions in BuildOptions")
+        # log.debug("validatedSequence: " + validatedSequence)
         self.geometryOptions = TheGeometryOptions()
         self.geometryOptions.setLinkageRotamerInfo(validatedSequence)
 
     def getRotamerData(self):
-        log.info("buildOptions.getRotamerDataOut was called")
+        # log.info("buildOptions.getRotamerDataOut was called")
         if self.geometryOptions is None:
             return None
         else:
             return self.geometryOptions.getRotamerData()
 
     def createRotamerData(self):
-        log.info("Build Options.createRotamerDataOut was called")
+        # log.info("Build Options.createRotamerDataOut was called")
         if self.geometryOptions is None:
             self.geometryOptions = TheGeometryOptions()
         self.geometryOptions.createRotamerData()
@@ -511,14 +511,14 @@ class TheSequenceEvaluationOutput(BaseModel):
         super().__init__(**data)
 
     def getRotamerData(self):
-        log.info("sequenceEvaluationOutput.getRotamerData was called")
+        # log.info("sequenceEvaluationOutput.getRotamerData was called")
         if self.buildOptions is None:
             return None
         else:
             return self.buildOptions.getRotamerData()
 
     def createRotamerData(self):
-        log.info("Sequence evaluation data.createRotamerDataOut was called")
+        # log.info("Sequence evaluation data.createRotamerDataOut was called")
         if self.buildOptions is None:
             self.buildOptions = TheBuildOptions()
         self.buildOptions.createRotamerData()
@@ -532,26 +532,23 @@ class TheSequenceEvaluationOutput(BaseModel):
         self.sequenceVariants = evaluate.getSequenceVariants(sequence)
 
         ## This block is just for troubleshooting / logging
-        log.debug("Just got sequence variants.  They are:")
-        log.debug(str(self.sequenceVariants))
-        log.debug("indexOrdered: " +
-                  str(self.sequenceVariants.indexOrdered))
+        # log.debug("Just got sequence variants.  They are:")
+        # log.debug(str(self.sequenceVariants))
+        # log.debug("indexOrdered: " +
+        #           str(self.sequenceVariants.indexOrdered))
         reducingSuffix = self.sequenceVariants.indexOrdered[-7:]
-        log.debug("reducingSuffix: " + reducingSuffix)
-        log.debug("# of '-': " + str(reducingSuffix.count('-')))
+        # log.debug("reducingSuffix: " + reducingSuffix)
+        # log.debug("# of '-': " + str(reducingSuffix.count('-')))
 
     def getBuildEvaluation(self, sequence: str):
         self.buildOptions = TheBuildOptions()
         self.buildOptions.setGeometryOptions(sequence)
 
     def getEvaluation(self, sequence: str, validateOnly):
-        log.info("Getting the Evaluation for SequenceEvaluationOutput.")
-
-        log.debug("sequence: " + repr(sequence))
-        log.debug("validateOnly: " + repr(validateOnly))
-
+        # log.info("Getting the Evaluation for SequenceEvaluationOutput.")
+        # log.debug("sequence: " + repr(sequence))
+        # log.debug("validateOnly: " + repr(validateOnly))
         self.getBasicEvaluation(sequence)
-
         self.getBuildEvaluationOnly(sequence)
 
 #        from gemsModules.deprecated.sequence import evaluate
@@ -582,7 +579,7 @@ class TheSequenceEvaluationOutput(BaseModel):
 
     # ## I'm certain there is a better way to do this.  - Lachele
     def getSequenceVariant(self, variant):
-        log.debug("TheSequenceEvaluationOutput.getSequenceVariant was called")
+        # log.debug("TheSequenceEvaluationOutput.getSequenceVariant was called")
         # if not 'Evaluate' in  self.responses.Keys() :
         if self.sequenceVariants is None:
             return None
@@ -615,7 +612,7 @@ class sequenceService(commonio.Service):
         super().__init__(**data)
         log.info("Initializing Service.")
         log.debug("the data " + repr(self))
-        log.debug("Init for the Services in sequence was called.")
+        # log.debug("Init for the Services in sequence was called.")
 
 
 # This is a Response and should be called that
@@ -642,14 +639,14 @@ class SequenceOutputs(BaseModel):
             return self.structureBuildInfo.getSequence()
 
     def getRotamerData(self):
-        log.info("evaluate.getRotamerData was called")
+        # log.info("evaluate.getRotamerData was called")
         if self.sequenceEvaluationOutput is None:
             return None
         else:
             return self.sequenceEvaluationOutput.getRotamerData()
 
     def createRotamerData(self):
-        log.info("Sequence outputs.createRotamerDataOut was called")
+        # log.info("Sequence outputs.createRotamerDataOut was called")
         if self.sequenceEvaluationOutput is None:
             self.sequenceEvaluationOutput = TheSequenceEvaluationOutput()
         self.sequenceEvaluationOutput.createRotamerData()
@@ -724,12 +721,12 @@ class sequenceEntity(commonio.Entity):
 
     def __init__(self, **data: Any):
         super().__init__(**data)
-        log.info("Instantiating a sequenceEntity")
-        log.debug("entityType: " + self.entityType)
+        # log.info("Instantiating a sequenceEntity")
+        # log.debug("entityType: " + self.entityType)
 
     # ## I'm certain there is a better way to do this.  - Lachele
     def getInputSequencePayload(self):
-        log.info("sequenceEntity.getInputSequencePayload was called")
+        # log.info("sequenceEntity.getInputSequencePayload was called")
         if self.inputs is None:
             return None
         elif self.inputs.sequence is None:
@@ -752,9 +749,9 @@ class sequenceEntity(commonio.Entity):
             return self.outputs.getSequence()
 
     def getRotamerDataIn(self):
-        log.info("Entity.getRotamerDataIn was called")
+        # log.info("Entity.getRotamerDataIn was called")
         if self.inputs is None:
-            log.debug("inputs is None. returning None.")
+            # log.debug("inputs is None. returning None.")
             return None
         elif self.inputs.geometryOptions is None:
             log.debug("inputs.geometryOptions is None. returning None.")
@@ -763,21 +760,21 @@ class sequenceEntity(commonio.Entity):
             return self.inputs.geometryOptions.getRotamerData()
 
     def getRotamerDataOut(self):
-        log.info("Entity.getRotamerDataOut was called")
+        # log.info("Entity.getRotamerDataOut was called")
         if self.outputs is None:
             return None
         else:
             return self.outputs.getRotamerData()
 
     def createRotamerDataOut(self):
-        log.info("Entity.createRotamerDataOut was called")
+        # log.info("Entity.createRotamerDataOut was called")
         if self.outputs is None:
             self.outputs = SequenceOutputs()
         self.outputs.createRotamerData()
 
     # ## I'm certain there is a better way to do this.  - Lachele
     def getSequenceVariantIn(self, variant):
-        log.info("sequenceEntity.getSequenceVariantIn was called")
+        # log.info("sequenceEntity.getSequenceVariantIn was called")
         if self.inputs is None:
             return None
         elif self.inputs.sequenceVariants is None:
@@ -787,17 +784,17 @@ class sequenceEntity(commonio.Entity):
 
     # ## I'm certain there is a better way to do this.  - Lachele
     def getSequenceVariantOut(self, variant):
-        log.debug("sequenceEntity.getSequenceVariantOut was called")
+        # log.debug("sequenceEntity.getSequenceVariantOut was called")
         if self.outputs is None:
-            log.debug("sequenceEntity.getSequenceVariantOut found NO OUPUTS")
+            # log.debug("sequenceEntity.getSequenceVariantOut found NO OUPUTS")
             return None
         elif self.outputs.sequenceEvaluationOutput is None:
-            log.debug(
-                "sequenceEntity.getSequenceVariantOut found NO Sequence Evaluation Output")
+            # log.debug(
+            #     "sequenceEntity.getSequenceVariantOut found NO Sequence Evaluation Output")
             return None
         else:
-            log.debug(
-                "sequenceEntity.getSequenceVariantOut attempting to return variant.")
+            # log.debug(
+            #     "sequenceEntity.getSequenceVariantOut attempting to return variant.")
             return self.outputs.sequenceEvaluationOutput.getSequenceVariant(variant)
 
 #    def validateCondensedSequence(self, validateOnly: bool = False):
@@ -855,28 +852,28 @@ class sequenceTransactionSchema(commonio.TransactionSchema):
 
     # ## I'm certain there is a better way to do this.  - Lachele
     def getInputSequencePayload(self):
-        log.info("sequenceTransactionSchema.getInputSequencePayload was called")
+        # log.info("sequenceTransactionSchema.getInputSequencePayload was called")
         if self.entity is None:
             return None
         else:
             return self.entity.getInputSequencePayload()
 
     def getRotamerDataIn(self):
-        log.info("Transaction.getRotamerDataIn was called")
+        # log.info("Transaction.getRotamerDataIn was called")
         if self.entity is None:
             return None
         else:
             return self.entity.getRotamerDataIn()
 
     def getRotamerDataOut(self):
-        log.info("Transaction.getRotamerDataOut was called")
+        # log.info("Transaction.getRotamerDataOut was called")
         if self.entity is None:
             return None
         else:
             return self.entity.getRotamerDataOut()
 
     def createRotamerDataOut(self):
-        log.info("Transaction.createRotamerDataOut was called")
+        # log.info("Transaction.createRotamerDataOut was called")
         if self.entity is None:
             self.entity = sequenceEntity()
         self.entity.createRotamerDataOut()
@@ -895,7 +892,7 @@ class sequenceTransactionSchema(commonio.TransactionSchema):
 
     # ## I'm certain there is a better way to do this.  - Lachele
     def getSequenceVariantIn(self, variant):
-        log.info("sequenceTransactionSchema.getSequenceVariantIn was called")
+        # log.info("sequenceTransactionSchema.getSequenceVariantIn was called")
         if self.entity is None:
             return None
         else:
@@ -903,7 +900,7 @@ class sequenceTransactionSchema(commonio.TransactionSchema):
 
     # ## I'm certain there is a better way to do this.  - Lachele
     def getSequenceVariantOut(self, variant):
-        log.info("sequenceTransactionSchema.getSequenceVariantOut was called")
+        # log.info("sequenceTransactionSchema.getSequenceVariantOut was called")
         if self.entity is None:
             return None
         else:
@@ -916,40 +913,40 @@ class Transaction(commonio.Transaction):
     transaction_out: sequenceTransactionSchema
 
     def populate_transaction_in(self):
-        log.info("sequence - Transaction.populate_transaction_in was called")
+        # log.info("sequence - Transaction.populate_transaction_in was called")
         self.transaction_in = sequenceTransactionSchema(**self.request_dict)
-        log.debug("The transaction_in is: ")
-        log.debug(self.transaction_in.json(indent=2))
+        # log.debug("The transaction_in is: ")
+        # log.debug(self.transaction_in.json(indent=2))
 
     def initialize_transaction_out_from_transaction_in(self):
-        log.info("initialize_transaction_out_from_transaction_in was called")
+        # log.info("initialize_transaction_out_from_transaction_in was called")
         self.transaction_out = self.transaction_in.copy(deep=True)
-        log.debug("The transaction_out is: ")
-        log.debug(self.transaction_out.json(indent=2))
+        # log.debug("The transaction_out is: ")
+        # log.debug(self.transaction_out.json(indent=2))
 
     def getRotamerDataIn(self):
-        log.info("Transaction-Wrapper.getRotamerDataIn was called")
+        # log.info("Transaction-Wrapper.getRotamerDataIn was called")
         if self.transaction_in is None:
             return None
         else:
             return self.transaction_in.getRotamerDataIn()
 
     def getRotamerDataOut(self):
-        log.info("Transaction-Wrapper.getRotamerDataOut was called")
+        # log.info("Transaction-Wrapper.getRotamerDataOut was called")
         if self.transaction_out is None:
             return None
         else:
             return self.transaction_out.getRotamerDataOut()
 
     def createRotamerDataOut(self):
-        log.info("Transaction-Wrapper.createRotamerDataOut was called")
+        # log.info("Transaction-Wrapper.createRotamerDataOut was called")
         if self.transaction_out is None:
             self.transaction_out = sequenceTransactionSchema()
         return self.transaction_out.createRotamerDataOut()
 
     # ## I'm certain there is a better way to do this.  - Lachele
     def getInputSequencePayload(self):
-        log.info("sequence - Transaction.getInputSequencePayload was called")
+        # log.info("sequence - Transaction.getInputSequencePayload was called")
         if self.transaction_in is None:
             return None
         else:
@@ -1137,7 +1134,7 @@ class Transaction(commonio.Transaction):
 
     # ## I'm certain there is a better way to do this.  - Lachele
     def getSequenceVariantIn(self, variant):
-        log.info("sequence - Transaction.getSequenceVariantIn was called")
+        # log.info("sequence - Transaction.getSequenceVariantIn was called")
         if self.transaction_in is None:
             return None
         else:
@@ -1145,7 +1142,7 @@ class Transaction(commonio.Transaction):
 
     # ## I'm certain there is a better way to do this.  - Lachele
     def getSequenceVariantOut(self, variant):
-        log.info("sequence - Transaction.getSequenceVariantOut was called")
+        # log.info("sequence - Transaction.getSequenceVariantOut was called")
         if self.transaction_out is None:
             return None
         else:
@@ -1214,19 +1211,19 @@ class Transaction(commonio.Transaction):
         ##########
 
         this_entity.outputs.sequenceEvaluationOutput.getBuildEvaluation(the_sequence)
-        log.debug("called this_entity.outputs.sequenceEvaluationOutput.getBuildEvaluation(the_sequence)")
+        # log.debug("called this_entity.outputs.sequenceEvaluationOutput.getBuildEvaluation(the_sequence)")
 
         ## If we need to do a default build, then do it now
         if this_entity.procedural_options.build_default_on_evaluation:
-            log.debug("this_entity.procedural_options.build_default_on_evaluation is true")
+            # log.debug("this_entity.procedural_options.build_default_on_evaluation is true")
             if this_entity.outputs.structureBuildInfo is None: 
-                log.debug("this_entity.outputs.structureBuildInfo is None")
+                # log.debug("this_entity.outputs.structureBuildInfo is None")
                 from gemsModules.deprecated.sequence.projects import get_default_evaluation_path_from_sequence
                 the_path = get_default_evaluation_path_from_sequence(self)
-                log.debug("The path returned was : " + str(the_path))
+                # log.debug("The path returned was : " + str(the_path))
                 if the_path is not None:
                     return
-                log.debug("the path was None so we are going to do a default build")
+                # log.debug("the path was None so we are going to do a default build")
                 self.manageSequenceBuild3DStructureRequest(defaultOnly=True)
                 ## If we're doing this, then ensure that the default evaluation path is made
                 from gemsModules.deprecated.sequence.projects import set_default_evaluation_symlink_in_sequence

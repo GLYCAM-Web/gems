@@ -75,7 +75,7 @@ def createLogger(name):
             log.addHandler(infoFileHandler)
 
         loggers[name] = log
-        log.debug("created a new logger for: " + name + ", LOGGING_LEVEL: " + str(LOGGING_LEVEL))
+        # log.debug("created a new logger for: " + name + ", LOGGING_LEVEL: " + str(LOGGING_LEVEL))
     return log
 
 

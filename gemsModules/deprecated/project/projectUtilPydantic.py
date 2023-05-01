@@ -338,11 +338,11 @@ def getSequenceFromTransaction(thisTransaction: commonio.Transaction, sequenceTy
 #   @return uuid seqID
 #   TODO: merge this into the more generic getUuidForString, below
 def getSeqIdForSequence(sequence):
-    log.info("getSeqUUDIFor() was called. sequence: " + str(sequence))
+    # log.info("getSeqUUDIFor() was called. sequence: " + str(sequence))
     if sequence is None :
         raise AttributeError("no sequence to get seqID from")
     seqID = str(uuid.uuid5(uuid.NAMESPACE_OID, sequence))
-    log.debug("seqID: " + str(seqID))
+    # log.debug("seqID: " + str(seqID))
     return seqID
 
 
@@ -370,7 +370,7 @@ def buildDownloadUrlPath(
         service_id : str ,
         pUUID : str , 
         subdirectory : str = None ):
-    log.info("buildDownloadUrlPath was called.\n")
+    # log.info("buildDownloadUrlPath was called.\n")
     try :
         downloadUrlPath =  hostUrlBasePath + "/" + "json"+ "/" + "download" + "/" + entity_id + "/" + service_id + "/" + pUUID + "/"
         if subdirectory is not None :

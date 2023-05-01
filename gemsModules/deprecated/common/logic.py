@@ -240,7 +240,7 @@ def copyPathFileToPath( fromPath : str, fromName : str, toPath : str, noClobber 
 #
 # writeMode can be 'w' for overwrite existing or 'a' for append
 def writeStringToFile(theString, filePath, writeMode : str = 'w'):
-    log.info("writeStringToFile() was called.\n")
+    # log.info("writeStringToFile() was called.\n")
     try:
         with open(filePath, writeMode, encoding='utf-8') as file:
            file.write(theString)

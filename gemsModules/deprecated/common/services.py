@@ -163,7 +163,7 @@ def getCurrentStableJsonApiVersion():
 
 ##  Looks for an environment var with GEMSHOME and returns it.
 def getGemsHome():
-    log.info("getGemsHome() was called.\n")
+    # log.info("getGemsHome() was called.\n")
     GEMSHOME = os.environ.get('GEMSHOME')
     if GEMSHOME == None:
         log.error("""
