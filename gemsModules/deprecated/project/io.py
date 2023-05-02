@@ -260,7 +260,7 @@ class Project(BaseModel):
                     )
             return
         # If we are still here, set the directory 
-        self.versions_file_path =  os.path.join(self.filesystem_path, project_settings.default_versions_file_name  )
+        self.versions_file_path =  os.path.join(project_settings.default_filesystem_output_path, project_settings.default_versions_file_name  )
         log.debug("self.versions_file_path is : >>>" + self.versions_file_path + "<<<")
 
     def loadVersionsFileInfo(self) :
@@ -274,12 +274,12 @@ class Project(BaseModel):
         log.debug("About to load the version info.")
         try : 
             theDict = getVersionsFileInfo(self.versions_file_path)
-            log.debug("The dictionary is : " + str(theDict))
+            # log.debug("The dictionary is : " + str(theDict))
             for k in theDict.keys() :
                 #log.debug("k is : " + k)
                 setattr(self, k, theDict[k])
-            log.debug("My contents are now: ")
-            log.debug(self.json(indent=2))
+            # log.debug("My contents are now: ")
+            # log.debug(self.json(indent=2))
         except Exception as error :
             log.error("There was aproblem loading the versions file info")
             raise error
@@ -322,7 +322,7 @@ class Project(BaseModel):
     #   @param  self.pUUID
     #   @param  self.project_type
     def setDownloadUrlPath(self):
-        log.info("setDownloadUrlPath was called.\n")
+        log.info("setDownloadUrlPath was called.")
         try :
             if self.host_url_base_path == "" :
                 log.error("the host url base path is not set so cannot set download url path.")
@@ -333,7 +333,7 @@ class Project(BaseModel):
                     self.entity_id ,
                     self.service_id ,
                     self.pUUID )
-            log.debug("downloadUrl : " + self.download_url_path )
+            # log.debug("downloadUrl : " + self.download_url_path )
         except AttributeError as error:
             log.error("Something went wrong building the downloadUrlPath.")
             raise error
@@ -355,8 +355,8 @@ class Project(BaseModel):
             self.logs_dir = os.path.join( 
                     self.project_dir, 
                     "logs")
-            message = "The path to the logs directory is: " + self.logs_dir
-            log.debug(message)
+            # message = "The path to the logs directory is: " + self.logs_dir
+            # log.debug(message)
     
         ## Create the directories if needed
         import pathlib
@@ -381,11 +381,13 @@ class Project(BaseModel):
         try:
             log.info("About to write initial logs entry from Project.\n")
             filename=os.path.join( self.logs_dir, 'ProjectLog.json')
-            log.debug("The filename is: " + str(filename))
+            log.debug("The log filename is: " + str(filename))
             with open(filename, 'w', encoding='utf-8') as file:
                 jsonString = self.json(indent=4, sort_keys=False, by_alias=True)
-                log.debug("jsonString: \n" + jsonString )
+                # log.debug("jsonString: \n" + jsonString )
                 file.write(jsonString)
+
+            log.debug("Go check here: " + filename)
         except Exception as error:
             log.error("There was a problem writing the project logs: " + str(error))
             raise error

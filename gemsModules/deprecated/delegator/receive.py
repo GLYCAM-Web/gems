@@ -30,7 +30,7 @@ def delegate(jsonObjectString):
     module for that entity, it passes the Transaction object over.
     """
     log.info("delegate() was called.\n")
-    log.debug("incoming jsonObjectString: " + jsonObjectString)
+    # log.debug("incoming jsonObjectString: " + jsonObjectString)
 
     # Make a new Transaction object for holding I/O information.    
 

@@ -1,0 +1,81 @@
+{
+	"entity": {
+		"type": "Sequence",
+		"services": {
+			"build": {
+				"type": "Build3DStructure"
+			}
+		},
+		"inputs": {
+			"sequence": {
+				"payload": "DManpa1-6DManpa1-OH"
+			},
+			"geometryOptions": {
+				"linkages": {
+					"linkageRotamerInfo": {
+						"singleLinkageRotamerDataList": [{
+							"indexOrderedLabel": "1",
+							"linkageLabel": "1",
+							"selectedRotamers": [{
+								"dihedralName": "omg",
+								"dihedralValues": ["gg"]
+							}]
+						}]
+					}
+				}
+			},
+			"buildOptions": {
+				"mdMinimize": "True"
+			}
+		}
+	},
+	"project": {
+		"pUUID": "e3124346-0c0b-4f4b-b4f7-a20cb2f6302e",
+		"title": "",
+		"comment": "",
+		"timestamp": "2023-02-06T08:44:48.252203",
+		"gems_timestamp": "2023-02-06T08:44:48.252203",
+		"project_type": "cb",
+		"parent_entity": "Sequence",
+		"requested_service": "Build3DStructure",
+		"entity_id": "sequence",
+		"service_id": "cb",
+		"filesystem_path": "/website/TESTS/",
+		"compute_cluster_filesystem_path": "",
+		"service_dir": "/website/userdata/sequence/cb",
+		"project_dir": "/website/userdata/sequence/cb/Builds/e3124346-0c0b-4f4b-b4f7-a20cb2f6302e",
+		"logs_dir": "/website/userdata/sequence/cb/Builds/e3124346-0c0b-4f4b-b4f7-a20cb2f6302e/logs",
+		"requesting_agent": "",
+		"has_input_files": "False",
+		"site_version": "dbd783e081549059b41b152f96851bd527c952f4",
+		"site_branch": "ai_test",
+		"site_code_name": "Developer-Environment",
+		"gems_version": "f4f50a74cff6990303a9a5fd8529e94d41c39c07",
+		"gems_branch": "gems-test",
+		"md_utils_version": "dd4b5c57d82c89f438477987252f90ce63db7ff8",
+		"md_utils_branch": "md-test",
+		"gmml_version": "dcad5a4bf9e103a0772d75bf918ccf2aa45550a2",
+		"gmml_branch": "gmml-test",
+		"gp_version": "",
+		"gp_branch": "",
+		"site_mode": "CONTAINERS",
+		"site_host_name": "172.29.0.2",
+		"versions_file_path": "/website/userdata/VERSIONS.sh",
+		"host_url_base_path": "https://172.29.0.2",
+		"download_url_path": "https://172.29.0.2/json/download/sequence/cb/e3124346-0c0b-4f4b-b4f7-a20cb2f6302e/",
+		"force_field": "default",
+		"parameter_version": "default",
+		"amber_version": "default",
+		"json_api_version": "0.0.1",
+		"django_project_id": "",
+		"app": "project",
+		"id": "4cf6924c-89bb-41c9-acd0-7dfc9cc9e350",
+		"sequence_id": "8f89c814-df0f-5867-a9d4-fc393bfea61b",
+		"sequence_path": "/website/userdata/sequence/cb/Sequences/8f89c814-df0f-5867-a9d4-fc393bfea61b",
+		"indexOrderedSequence": "DManpa1-6DManpa1-OH",
+		"seqID": "8f89c814-df0f-5867-a9d4-fc393bfea61b",
+		"selected_rotamers": "['1_omg_gg']"
+	},
+	"prettyPrint": "True",
+	"mdMinimize": "True"
+}

@@ -15,12 +15,12 @@ else:
 
 
 def getLinkageOptionsFromGmmlcbBuilder(sequence):
-    log.info("getLinkageOptionsFromGmmlcbBuilder() was called.\n")
-    log.debug("sequence: " + sequence)
+    # log.info("getLinkageOptionsFromGmmlcbBuilder() was called.\n")
+    # log.debug("sequence: " + sequence)
     from gemsModules.deprecated.sequence import build
     cbBuilder = build.getCbBuilderForSequence(sequence)
     gmmllinkageOptionsVector = cbBuilder.GenerateUserOptionsDataStruct()
-    log.debug("gmmllinkageOptionsVector: " + repr(gmmllinkageOptionsVector))
+    # log.debug("gmmllinkageOptionsVector: " + repr(gmmllinkageOptionsVector))
 
     gemsLinkageGeometryOptions = sequenceio.AllLinkageRotamerInfo()
     gemsLinkageGeometryOptions.totalPossibleRotamers = cbBuilder.GetNumberOfShapes()
@@ -64,8 +64,8 @@ def getLinkageOptionsFromGmmlcbBuilder(sequence):
         gemsLinkageGeometryOptions.singleLinkageRotamerDataList.append(
             gemsLinkageOptions)
 
-    log.debug("gemsLinkageGeometryOptions: " +
-              repr(gemsLinkageGeometryOptions))
+    # log.debug("gemsLinkageGeometryOptions: " +
+    #           repr(gemsLinkageGeometryOptions))
     return gemsLinkageGeometryOptions
 
 
@@ -82,7 +82,7 @@ def get_index_ordered_sequene(validatedSequence: str):
 #   @param  str sequence
 #   @return dict sequences
 def getSequenceVariants(validatedSequence: str):
-    log.info("getSequenceVariants() was called.\n")
+    # log.info("getSequenceVariants() was called.\n")
     # ##
     # ##  This function assumes that the validity of the sequence was determined elsewhere
     # ##
@@ -94,7 +94,7 @@ def getSequenceVariants(validatedSequence: str):
     Sequences.indexOrderedLabeled = this_sequence.getIndexLabeled()
     from gemsModules.deprecated.project.projectUtilPydantic import getSeqIdForSequence
     Sequences.suuid = getSeqIdForSequence(Sequences.indexOrdered)
-    log.debug("Here are the new Sequences: " + str(Sequences))
+    # log.debug("Here are the new Sequences: " + str(Sequences))
     return Sequences
 
 
