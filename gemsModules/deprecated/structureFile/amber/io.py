@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 import urllib.request
-import pathlib
+import pathlib, os
 from enum import Enum, auto
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union, Any
 from typing import ForwardRef
 from pydantic import BaseModel, Field, ValidationError, validator
 from pydantic.schema import schema
-from gemsModules.deprecated.common.loggingConfig import *
 from gemsModules.deprecated.common import io as commonIO
 from gemsModules.deprecated.common.logic import prettyPrint
 from gemsModules.deprecated.common.settings import SCHEMA_DIR
@@ -16,13 +15,8 @@ from gemsModules.deprecated.project import projectUtil as projectUtil
 from gemsModules.deprecated.structureFile import settings as structureFileSettings
 from gemsModules.deprecated.structureFile.amber import settings as amberSettings
 import gmml, traceback
-
-if loggers.get(__name__):
-    pass
-else:
-    log = createLogger(__name__)
-
-
+from gemsModules.logging.logger import Set_Up_Logging
+log = Set_Up_Logging(__name__)
 
 def getAmberResidueName(item):
     log.info("getAmberResidueName() was called.")
@@ -512,13 +506,15 @@ class PreprocessorManager:
 
     ## Only meant to be used in this class. Python automatically throws an error if methods
     #   that begin with 2 underscores are called from other files.
-    def __load_pdb_file(self, uploadFile):
-        log.info("__load_pdb_file() was called.")
-        log.debug("uploadFile: " + uploadFile)
+    def __load_pdb_file(self, uploadFilePath):
+        log.info("__load_pdb_file was called.")
+        upload_file = os.path.join("website", "uploads", uploadFilePath)
+
+        log.debug("upload_file: " + upload_file)
         # need a pdb file object.
         try:
             log.debug("working dir: " + os.getcwd())
-            self.pdbFileObj = gmml.PdbFile(uploadFile)
+            self.pdbFileObj = gmml.PdbFile(upload_file)
             log.debug("pdbFile: " + str(self.pdbFileObj))
         except Exception as error:
             log.error("There was a problem creating the pdbFile object from the uploaded pdb file: " + str(error))
@@ -901,9 +897,9 @@ class StructureFileService(commonIO.Service):
 
     def __init__(self, **data : Any):
         super().__init__(**data)
-        log.info("Initializing Service.")
-        log.debug("the data " + repr(self))
-        log.debug("Init for the Services in StructureFile was called.")
+        # log.info("Initializing Service.")
+        # log.debug("the data " + repr(self))
+        # log.debug("Init for the Services in StructureFile was called.")
 
 
 class StructureFileEntity(commonIO.Entity):
@@ -919,8 +915,8 @@ class StructureFileEntity(commonIO.Entity):
 
     def __init__(self, **data: Any):
         super().__init__(**data)
-        log.info("Instantiating a structureFileEntity")
-        log.debug("entityType: " + self.entityType)
+        # log.info("Instantiating a structureFileEntity")
+        # log.debug("entityType: " + self.entityType)
 
 
 ## @brief Override TransactionSchema, setting this entity to StructureFile
@@ -938,11 +934,11 @@ class PdbTransaction(commonIO.Transaction):
     transaction_out : StructureFileTransactionSchema
 
     def populate_transaction_in(self):
-        log.info("Populating transaction_in for a PdbTransaction:")
+        log.info("Populating PdbTransaction transaction_in")
         try:
             self.transaction_in = StructureFileTransactionSchema(**self.request_dict)
-            log.debug("The transaction_in is: " )
-            log.debug(self.transaction_in.json(indent=2))
+            # log.debug("The transaction_in is: " )
+            # log.debug(self.transaction_in.json(indent=2))
         except Exception as error:
             log.error("Failed to populate the transaction_in: " + str(error))
             log.error(traceback.format_exc())
@@ -951,11 +947,11 @@ class PdbTransaction(commonIO.Transaction):
 
     ## @brief Gets started on the output, before providing services.
     def initialize_transaction_out_from_transaction_in(self) :
-        log.info("initialize_transaction_out_from_transaction_in() was called.")
+        log.info("initialize_transaction_out_from_transaction_in was called.")
         try:
             self.transaction_out=self.transaction_in.copy(deep=True)
-            log.debug("The transaction_out is: " )
-            log.debug(self.transaction_out.json(indent=2))
+            # log.debug("The transaction_out is: " )
+            # log.debug(self.transaction_out.json(indent=2))
         except Exception as error:
             log.error("There was a problem copying transaction in into transaction out: " + str(error))
             log.error(traceback.format_exc())
