@@ -11,22 +11,28 @@
             "id": "5af0e0a7d20199ee",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {}
+              "type": "kanban",
+              "state": {
+                "file": "project_management/Rewrite_Kanban.md"
+              }
             }
           }
         ]
       },
       {
-        "id": "26463ffbb746bd89",
+        "id": "eac971a7389fbf22",
         "type": "tabs",
         "children": [
           {
-            "id": "ce7285925c9b6067",
+            "id": "40e143e0fb8f93a6",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {}
+              "type": "markdown",
+              "state": {
+                "file": "project_management/kanban_notes/Build an entity template.md",
+                "mode": "source",
+                "source": false
+              }
             }
           }
         ]
@@ -95,6 +101,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "project_management/kanban_notes/Build an entity template.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -111,6 +118,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "project_management/kanban_notes/Build an entity template.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -132,7 +140,9 @@
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {}
+              "state": {
+                "file": "project_management/kanban_notes/Build an entity template.md"
+              }
             }
           }
         ]
@@ -152,19 +162,24 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "5af0e0a7d20199ee",
+  "active": "40e143e0fb8f93a6",
   "lastOpenFiles": [
-    "tests/temp-inputs/sample_mdaas_out.json",
-    "tests/temp-inputs/mdinput/DGlcpa1-OH.rst7",
-    "tests/temp-inputs/mdinput/DGlcpa1-OH.parm7",
-    "tests/temp-inputs/mdinput",
-    "tests/temp-inputs/cb_dir_for_DGlcpa1-OH/Sequences/98abcc28-2325-55fe-9d32-d2908dd33860/buildStrategyID1/All_Builds",
-    "tests/temp-inputs/cb_dir_for_DGlcpa1-OH/Sequences/98abcc28-2325-55fe-9d32-d2908dd33860/buildStrategyID1",
-    "tests/temp-inputs/cb_dir_for_DGlcpa1-OH/Sequences/98abcc28-2325-55fe-9d32-d2908dd33860",
-    "tests/temp-inputs/cb_dir_for_DGlcpa1-OH/Sequences",
-    "tests/temp-inputs/cb_dir_for_DGlcpa1-OH/Builds/f86b075b-a9cc-465e-bc7a-512004946bbc/logs/response.json",
-    "tests/temp-inputs/cb_dir_for_DGlcpa1-OH/Builds/f86b075b-a9cc-465e-bc7a-512004946bbc/logs/request-raw.json",
-    "tests/temp-inputs/cb_dir_for_DGlcpa1-OH/Builds/f86b075b-a9cc-465e-bc7a-512004946bbc/logs/request-initialized.json",
+    "gemsModules/TEMPLATE/services/settings/service_modules.py~",
+    "gemsModules/TEMPLATE/services/settings/known_available.py~",
+    "gemsModules/TEMPLATE/services/settings/implied_modules.py~",
+    "gemsModules/TEMPLATE/services/settings/duplicates_modules.py~",
+    "gemsModules/TEMPLATE/services/work_flows.py~",
+    "gemsModules/TEMPLATE/services/servicer.py~",
+    "gemsModules/TEMPLATE/services/response_manager.py~",
+    "gemsModules/TEMPLATE/services/request_manager.py~",
+    "gemsModules/TEMPLATE/services/request_data_filler.py~",
+    "gemsModules/TEMPLATE/services/implied_requests.py~",
+    "gemsModules/TEMPLATE/services/duplicate_requests.py~",
+    "project_management/Rewrite_Kanban.md",
+    "project_management/kanban_notes/Build an entity template.md",
+    "project_management/kanban_notes/MDaaS services and tasks.md",
+    "project_management/kanban_notes/Move abstractables to common.md",
+    "project_management/kanban_notes/Draft complete Services pipeline using Delegator as the Entity.md",
     "tests/temp-inputs/cb_dir_for_DGlcpa1-OH/Builds/f86b075b-a9cc-465e-bc7a-512004946bbc/New_Builds/structure/Readme-Stopgap.md",
     "tests/temp-inputs/cb_dir_for_DGlcpa1-OH/Builds/f86b075b-a9cc-465e-bc7a-512004946bbc/New_Builds/structure/README.md",
     "gemsModules/mmservice/mdaas_amber/README.md",
@@ -194,11 +209,6 @@
     "project_management/kanban_notes/Hack a working MDaaS.md",
     "gemsModules/docs/gemsModules/Images/Workflow/Service_Tree_example.md",
     "gemsModules/docs/gemsModules/sequence/services.md",
-    "gemsModules/docs/gemsModules/sequence/overview.md",
-    "gemsModules/docs/gemsModules/project_management/Microcosm Overview.md",
-    "gemsModules/docs/gemsModules/workflow.md",
-    "gemsModules/docs/gemsModules/the_modules.md",
-    "gemsModules/docs/gemsModules/notable_services.md",
-    "gemsModules/docs/gemsModules/microcosm.md"
+    "gemsModules/docs/gemsModules/sequence/overview.md"
   ]
 }
