@@ -508,13 +508,10 @@ class PreprocessorManager:
     #   that begin with 2 underscores are called from other files.
     def __load_pdb_file(self, uploadFilePath):
         log.info("__load_pdb_file was called.")
-        upload_file = os.path.join("website", "uploads", uploadFilePath)
-
-        log.debug("upload_file: " + upload_file)
+        log.debug("uploadFilePath: " + uploadFilePath)
         # need a pdb file object.
         try:
-            log.debug("working dir: " + os.getcwd())
-            self.pdbFileObj = gmml.PdbFile(upload_file)
+            self.pdbFileObj = gmml.PdbFile(uploadFilePath)
             log.debug("pdbFile: " + str(self.pdbFileObj))
         except Exception as error:
             log.error("There was a problem creating the pdbFile object from the uploaded pdb file: " + str(error))
