@@ -4,17 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "eac971a7389fbf22",
+        "id": "dfb8a36594eb5afc",
         "type": "tabs",
         "children": [
           {
-            "id": "40e143e0fb8f93a6",
+            "id": "4df5390ce08a00df",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "project_management/kanban_notes/MDaaS services and tasks.md",
-                "mode": "source",
+                "file": "docs/gemsModules/For_Developers/Defining_Services.md",
+                "mode": "preview",
                 "source": false
               }
             }
@@ -77,7 +77,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 300,
+    "collapsed": true
   },
   "right": {
     "id": "5468528cfb984212",
@@ -93,7 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "project_management/kanban_notes/MDaaS services and tasks.md",
+                "file": "docs/gemsModules/For_Developers/Defining_Services.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -110,7 +111,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "project_management/kanban_notes/MDaaS services and tasks.md",
+                "file": "docs/gemsModules/For_Developers/Defining_Services.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -133,7 +134,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "project_management/kanban_notes/MDaaS services and tasks.md"
+                "file": "docs/gemsModules/For_Developers/Defining_Services.md"
               }
             }
           }
@@ -154,52 +155,53 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "40e143e0fb8f93a6",
+  "active": "4df5390ce08a00df",
   "lastOpenFiles": [
-    "docs/gemsModules/about.md",
-    "project_management/Rewrite_Kanban.md",
-    "project_management/kanban_notes/MDaaS services and tasks.md",
-    "docs/gemsModules/probaby_cruft/out/gemsModules_Stakeholder_view/gemsModules_Stakeholder_view.png",
-    "docs/gemsModules/probaby_cruft/out/gemsModules_Stakeholder_view",
-    "docs/gemsModules/probaby_cruft/out",
-    "docs/gemsModules/probaby_cruft/Stakeholder_View.wsd",
-    "docs/gemsModules/probaby_cruft/Overall_Activity_Diagram.wsd",
-    "docs/gemsModules/probaby_cruft/Workflow/user-data-and-software-data.dot",
-    "docs/gemsModules/probaby_cruft/Workflow/servicer_needs.dot",
-    "docs/gemsModules/probaby_cruft/Workflow/sequence_data-manager-and-servicer.dot",
-    "docs/gemsModules/probaby_cruft/Workflow/main_workflow.dot",
-    "docs/gemsModules/probaby_cruft/Workflow/japanese-1184847.png",
-    "docs/gemsModules/probaby_cruft/Workflow/image_credits.txt",
-    "docs/gemsModules/probaby_cruft/Workflow/graph_servicer_needs.dot.jpg",
-    "docs/gemsModules/probaby_cruft/Workflow/graph_sequence_data-manager-and-servicer.dot.jpg",
-    "docs/gemsModules/probaby_cruft/Workflow/graph_delegator-entity-workflow.dot.jpg",
-    "docs/gemsModules/probaby_cruft/Workflow/graph_data-manager-and-servicer_progress_2022-10-10.dot.jpg",
-    "docs/gemsModules/probaby_cruft/Workflow/graph_data-manager-and-servicer_progress_2022-10-03.dot.jpg",
-    "docs/gemsModules/probaby_cruft/Workflow/graph_data-manager-and-servicer_progress_2022-09-26.dot.jpg",
-    "docs/gemsModules/probaby_cruft/Workflow/graph_data-manager-and-servicer_BRIEF.dot.jpg",
-    "docs/gemsModules/probaby_cruft/Workflow/graph_data-manager-and-servicer.dot.jpg",
-    "docs/gemsModules/probaby_cruft/Workflow/data-manager-and-servicer_progress_2022-10-10.dot",
-    "docs/gemsModules/probaby_cruft/Workflow/Service_Tree_example.md",
-    "project_management/kanban_notes/Build an entity template.md",
-    "project_management/kanban_notes/Move abstractables to common.md",
-    "project_management/kanban_notes/Draft complete Services pipeline using Delegator as the Entity.md",
-    "tests/temp-inputs/cb_dir_for_DGlcpa1-OH/Builds/f86b075b-a9cc-465e-bc7a-512004946bbc/New_Builds/structure/Readme-Stopgap.md",
-    "tests/temp-inputs/cb_dir_for_DGlcpa1-OH/Builds/f86b075b-a9cc-465e-bc7a-512004946bbc/New_Builds/structure/README.md",
-    "gemsModules/mmservice/mdaas_amber/README.md",
-    "gemsModules/mmservice/mdaas/README.md",
-    "gemsModules/delegator/README.md",
+    "project_management/Microcosm Overview.md",
+    "docs/gemsModules/For_Developers/Defining_Services.md",
+    "docs/gemsModules/For_Developers",
+    "docs/gemsModules/drafts/probaby_cruft/Archi-html-docs/lib/bootstrap/js/bootstrap-3.3.2.min.js",
+    "docs/gemsModules/drafts/probaby_cruft/Archi-html-docs/lib/bootstrap/fonts/glyphicons-halflings-regular.woff2",
+    "docs/gemsModules/drafts/probaby_cruft/Archi-html-docs/lib/bootstrap/fonts/glyphicons-halflings-regular.woff",
+    "docs/gemsModules/drafts/probaby_cruft/Archi-html-docs/lib/bootstrap/fonts/glyphicons-halflings-regular.ttf",
+    "docs/gemsModules/drafts/probaby_cruft/Archi-html-docs/lib/bootstrap/fonts/glyphicons-halflings-regular.svg",
+    "docs/gemsModules/drafts/probaby_cruft/Archi-html-docs/lib/bootstrap/fonts/glyphicons-halflings-regular.eot",
+    "docs/gemsModules/drafts/probaby_cruft/Archi-html-docs/lib/bootstrap/css/bootstrap.min.yeti.css",
+    "docs/gemsModules/drafts/probaby_cruft/Archi-html-docs/lib/jquery-ui/css/jquery-ui-1.11.2.min.css",
+    "docs/gemsModules/drafts/probaby_cruft/Archi-html-docs/lib/jquery-ui-layout/js/jquery.layout-1.4.4.js",
+    "docs/gemsModules/drafts/probaby_cruft/Archi-html-docs/lib/jquery-ui-layout/css/layout-default-1.4.4.css",
+    "docs/gemsModules/drafts/probaby_cruft/Archi-html-docs/id-4044d88a4b1c4cd58f8a625e380cbc5f/images/id-ff961566cd6940cb88508517cfba8713.png",
+    "docs/gemsModules/drafts/probaby_cruft/Archi-html-docs/id-4044d88a4b1c4cd58f8a625e380cbc5f/images/id-faeb9eeb69064a16add79a9b0e0a1840.png",
+    "docs/gemsModules/drafts/probaby_cruft/Archi-html-docs/id-4044d88a4b1c4cd58f8a625e380cbc5f/images/id-ddd44a571588466ca7b7075b4a9332fa.png",
+    "docs/gemsModules/drafts/probaby_cruft/Archi-html-docs/id-4044d88a4b1c4cd58f8a625e380cbc5f/images/id-dc5b9ef623f848f29945c95206c40cdb.png",
+    "docs/gemsModules/drafts/probaby_cruft/Archi-html-docs/id-4044d88a4b1c4cd58f8a625e380cbc5f/images/id-ca0e774e149b42399ff11bcd8c79e38f.png",
+    "docs/gemsModules/drafts/probaby_cruft/Archi-html-docs/id-4044d88a4b1c4cd58f8a625e380cbc5f/images/id-b250d56cce8a4c768640ed7599927e7a.png",
+    "docs/gemsModules/drafts/probaby_cruft/Archi-html-docs/id-4044d88a4b1c4cd58f8a625e380cbc5f/images/id-a4daa650a0494afd98a39f9b824610dc.png",
+    "docs/gemsModules/drafts/probaby_cruft/Archi-html-docs/id-4044d88a4b1c4cd58f8a625e380cbc5f/images/id-93b55d21ff1649d7b1da785fd08d6358.png",
+    "docs/gemsModules/drafts/probaby_cruft/Archi-html-docs/id-4044d88a4b1c4cd58f8a625e380cbc5f/images/id-8096f39d1c5141818f9c1008932b6947.png",
+    "docs/gemsModules/drafts/probaby_cruft/Workflow/Service_Tree_example.md",
+    "docs/gemsModules/drafts/inspiration_or_cruft/sequence/overview.md",
+    "docs/gemsModules/drafts/inspiration_or_cruft/sequence/services.md",
+    "docs/gemsModules/drafts/inspiration_or_cruft/workflow.md",
+    "docs/gemsModules/drafts/inspiration_or_cruft/the_modules.md",
+    "docs/gemsModules/drafts/inspiration_or_cruft/notable_services.md",
+    "docs/gemsModules/drafts/inspiration_or_cruft/microcosm.md",
+    "docs/gemsModules/drafts/inspiration_or_cruft/keeping_code_clean.md",
+    "docs/gemsModules/drafts/inspiration_or_cruft/constraints.md",
+    "docs/gemsModules/drafts/inspiration_or_cruft/about.md",
+    "docs/gemsModules/inspiration_or_cruft/sequence/services.md",
+    "docs/gemsModules/inspiration_or_cruft/sequence/overview.md",
     "docs/gemsModules/workflow.md",
+    "docs/gemsModules/inspiration_or_cruft/workflow.md",
+    "docs/gemsModules/inspiration_or_cruft/the_modules.md",
+    "docs/gemsModules/inspiration_or_cruft/notable_services.md",
+    "docs/gemsModules/inspiration_or_cruft/microcosm.md",
+    "docs/gemsModules/inspiration_or_cruft/keeping_code_clean.md",
+    "docs/gemsModules/inspiration_or_cruft/constraints.md",
+    "docs/gemsModules/inspiration_or_cruft/about.md",
     "docs/gemsModules/the_modules.md",
-    "docs/gemsModules/sequence/services.md",
-    "docs/gemsModules/sequence/overview.md",
-    "docs/gemsModules/project_management/Microcosm Overview.md",
     "docs/gemsModules/notable_services.md",
     "docs/gemsModules/microcosm.md",
-    "docs/gemsModules/keeping_code_clean.md",
-    "docs/gemsModules/constraints.md",
-    "docs/gemsModules/Images/Workflow/Service_Tree_example.md",
-    "project_management/kanban_notes/Hack a working MDaaS.md",
-    "gemsModules/docs/gemsModules/Images/Workflow/Service_Tree_example.md",
-    "gemsModules/docs/gemsModules/sequence/services.md"
+    "docs/gemsModules/keeping_code_clean.md"
   ]
 }
