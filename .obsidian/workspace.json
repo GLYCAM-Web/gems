@@ -4,22 +4,6 @@
     "type": "split",
     "children": [
       {
-        "id": "5b78760675548806",
-        "type": "tabs",
-        "children": [
-          {
-            "id": "5af0e0a7d20199ee",
-            "type": "leaf",
-            "state": {
-              "type": "kanban",
-              "state": {
-                "file": "project_management/Rewrite_Kanban.md"
-              }
-            }
-          }
-        ]
-      },
-      {
         "id": "eac971a7389fbf22",
         "type": "tabs",
         "children": [
@@ -29,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "project_management/kanban_notes/Build an entity template.md",
+                "file": "project_management/kanban_notes/MDaaS services and tasks.md",
                 "mode": "source",
                 "source": false
               }
@@ -80,6 +64,14 @@
               "type": "starred",
               "state": {}
             }
+          },
+          {
+            "id": "52316f7e55362e86",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {}
+            }
           }
         ]
       }
@@ -101,7 +93,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "project_management/kanban_notes/Build an entity template.md",
+                "file": "project_management/kanban_notes/MDaaS services and tasks.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -118,7 +110,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "project_management/kanban_notes/Build an entity template.md",
+                "file": "project_management/kanban_notes/MDaaS services and tasks.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -141,7 +133,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "project_management/kanban_notes/Build an entity template.md"
+                "file": "project_management/kanban_notes/MDaaS services and tasks.md"
               }
             }
           }
@@ -164,20 +156,31 @@
   },
   "active": "40e143e0fb8f93a6",
   "lastOpenFiles": [
-    "gemsModules/TEMPLATE/services/settings/service_modules.py~",
-    "gemsModules/TEMPLATE/services/settings/known_available.py~",
-    "gemsModules/TEMPLATE/services/settings/implied_modules.py~",
-    "gemsModules/TEMPLATE/services/settings/duplicates_modules.py~",
-    "gemsModules/TEMPLATE/services/work_flows.py~",
-    "gemsModules/TEMPLATE/services/servicer.py~",
-    "gemsModules/TEMPLATE/services/response_manager.py~",
-    "gemsModules/TEMPLATE/services/request_manager.py~",
-    "gemsModules/TEMPLATE/services/request_data_filler.py~",
-    "gemsModules/TEMPLATE/services/implied_requests.py~",
-    "gemsModules/TEMPLATE/services/duplicate_requests.py~",
+    "docs/gemsModules/about.md",
     "project_management/Rewrite_Kanban.md",
-    "project_management/kanban_notes/Build an entity template.md",
     "project_management/kanban_notes/MDaaS services and tasks.md",
+    "docs/gemsModules/probaby_cruft/out/gemsModules_Stakeholder_view/gemsModules_Stakeholder_view.png",
+    "docs/gemsModules/probaby_cruft/out/gemsModules_Stakeholder_view",
+    "docs/gemsModules/probaby_cruft/out",
+    "docs/gemsModules/probaby_cruft/Stakeholder_View.wsd",
+    "docs/gemsModules/probaby_cruft/Overall_Activity_Diagram.wsd",
+    "docs/gemsModules/probaby_cruft/Workflow/user-data-and-software-data.dot",
+    "docs/gemsModules/probaby_cruft/Workflow/servicer_needs.dot",
+    "docs/gemsModules/probaby_cruft/Workflow/sequence_data-manager-and-servicer.dot",
+    "docs/gemsModules/probaby_cruft/Workflow/main_workflow.dot",
+    "docs/gemsModules/probaby_cruft/Workflow/japanese-1184847.png",
+    "docs/gemsModules/probaby_cruft/Workflow/image_credits.txt",
+    "docs/gemsModules/probaby_cruft/Workflow/graph_servicer_needs.dot.jpg",
+    "docs/gemsModules/probaby_cruft/Workflow/graph_sequence_data-manager-and-servicer.dot.jpg",
+    "docs/gemsModules/probaby_cruft/Workflow/graph_delegator-entity-workflow.dot.jpg",
+    "docs/gemsModules/probaby_cruft/Workflow/graph_data-manager-and-servicer_progress_2022-10-10.dot.jpg",
+    "docs/gemsModules/probaby_cruft/Workflow/graph_data-manager-and-servicer_progress_2022-10-03.dot.jpg",
+    "docs/gemsModules/probaby_cruft/Workflow/graph_data-manager-and-servicer_progress_2022-09-26.dot.jpg",
+    "docs/gemsModules/probaby_cruft/Workflow/graph_data-manager-and-servicer_BRIEF.dot.jpg",
+    "docs/gemsModules/probaby_cruft/Workflow/graph_data-manager-and-servicer.dot.jpg",
+    "docs/gemsModules/probaby_cruft/Workflow/data-manager-and-servicer_progress_2022-10-10.dot",
+    "docs/gemsModules/probaby_cruft/Workflow/Service_Tree_example.md",
+    "project_management/kanban_notes/Build an entity template.md",
     "project_management/kanban_notes/Move abstractables to common.md",
     "project_management/kanban_notes/Draft complete Services pipeline using Delegator as the Entity.md",
     "tests/temp-inputs/cb_dir_for_DGlcpa1-OH/Builds/f86b075b-a9cc-465e-bc7a-512004946bbc/New_Builds/structure/Readme-Stopgap.md",
@@ -187,28 +190,16 @@
     "gemsModules/delegator/README.md",
     "docs/gemsModules/workflow.md",
     "docs/gemsModules/the_modules.md",
-    "docs/gemsModules/sequence/Overview/newSequenceTargetWorkflow.svg",
-    "docs/gemsModules/sequence/Overview/newSequenceTargetWorkflow.png",
     "docs/gemsModules/sequence/services.md",
     "docs/gemsModules/sequence/overview.md",
     "docs/gemsModules/project_management/Microcosm Overview.md",
-    "docs/gemsModules/out/gemsModules_Stakeholder_view/gemsModules_Stakeholder_view.png",
     "docs/gemsModules/notable_services.md",
     "docs/gemsModules/microcosm.md",
     "docs/gemsModules/keeping_code_clean.md",
-    "docs/gemsModules/gemsModules_Activity_Implementation_Default_View.png",
     "docs/gemsModules/constraints.md",
-    "docs/gemsModules/about.md",
-    "docs/gemsModules/Images/Workflow/japanese-1184847.png",
-    "docs/gemsModules/Images/Workflow/graph_servicer_needs.dot.jpg",
-    "docs/gemsModules/Images/Workflow/graph_sequence_data-manager-and-servicer.dot.jpg",
-    "docs/gemsModules/Images/Workflow/graph_delegator-entity-workflow.dot.jpg",
-    "docs/gemsModules/Images/Workflow/graph_data-manager-and-servicer_progress_2022-10-10.dot.jpg",
-    "docs/gemsModules/Images/Workflow/graph_data-manager-and-servicer_progress_2022-10-03.dot.jpg",
     "docs/gemsModules/Images/Workflow/Service_Tree_example.md",
     "project_management/kanban_notes/Hack a working MDaaS.md",
     "gemsModules/docs/gemsModules/Images/Workflow/Service_Tree_example.md",
-    "gemsModules/docs/gemsModules/sequence/services.md",
-    "gemsModules/docs/gemsModules/sequence/overview.md"
+    "gemsModules/docs/gemsModules/sequence/services.md"
   ]
 }

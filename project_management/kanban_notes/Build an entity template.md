@@ -9,3 +9,6 @@ At 2:39 I had finished a first pass at generating a template entity from an exis
 40 minutes, doing it all by hand.  And, it's easily scriptable.  
 
 Cookiecutter is looking good for this. 
+DEFINITELY look into Jinja
+Leaning more toward Cookiecutter, but need to learn more.
+
