@@ -1,9 +1,7 @@
 # The GEMS Modules
 
 ## Overview
-GEMS has a series of gemsModules, that define entities. Entities
-provide services. Services, then, are defined in the gemsModule that
-is named after the requested entity. 
+The gemsModules contain entities. Entities provide services.  Not all sub-folders in the gemsModules are Entities, but most are.
 
 One key gemsModule, delegator, receives a json-formatted request that
 defines one entity, and a list of requested services. The delegator validates 
