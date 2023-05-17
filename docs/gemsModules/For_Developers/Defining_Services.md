@@ -22,7 +22,7 @@ We will get to the other items in the list above in due time.  But, for now, we 
 
 The image below shows a Service-centered view of the API.  Note especially the two groupings titled "User Convenience".  Everything inside those groupings could potentially need to be copied into a Service_Request or out from a Service_Response.  This doesn't mean you should make things hard on the user by avoiding using the components that are convenient to the user.  But, you can also minimize how hard you make things for yourself.
 
-![[GEMS - API Overview.png]]
+![[../img/GEMS - API Overview.png]]
 
 Also find the notes that start with "Form varies by".  Inputs and outputs at the Entity level apply to the entire Entity and, potentially, all of its services.  The same goes for the Project (which is on the same level with Entity).  Note that the Service-level inputs, outputs, options and notices are specific to each Service.  Each Service_Request and Service_Response must be completely self-contained.  There might be user-convenience information that is copied into multiple services.  Be careful how you include information at higher levels if it might differ from one service to another.   Generally, it is best to avoid having data that will vary in this way.  
 
