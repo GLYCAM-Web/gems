@@ -1,32 +1,23 @@
 #!/usr/bin/env python3
 from pydantic import ValidationError
-from abc import ABC, abstractmethod
-
-from gemsModules.common import settings
-from gemsModules.common.main_api import common_Transaction
-from gemsModules.common.transaction_manager import Transaction_Manager
+from gemsModules.common.json_string_manager import Json_String_Manager
+from gemsModules.delegator.main_settings import WhoIAm
+from gemsModules.delegator.main_api import Delegator_Transaction
+from gemsModules.delegator.main_api import Redirector_Transaction
+from gemsModules.delegator.transaction_manager import delegator_Transaction_Manager
 
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
-class common_Transaction_Manager(Transaction_Manager):
 
-    def set_local_modules(self):
-        super().set_local_modules()
+class Redirector_Json_String_Manager(Json_String_Manager):
 
-class Receiver(ABC):
-
-    def __init__(self):
-        self.get_local_components()
-
-    @abstractmethod
     def get_local_components(self):
-        self.transaction = common_Transaction()
-        self.entityType = settings.WhoIAm
-        self.transaction_manager_type = common_Transaction_Manager
+        self.transaction = Redirector_Transaction()
+        self.entityType = WhoIAm
+        self.transaction_manager_type = None
 
-
-    def receive(self, incoming_string: str):
+    def process(self, incoming_string: str):
         try: 
             return_value=self.transaction.process_incoming_string(in_string=incoming_string, initialize_out=False)
         except ValidationError as e:
@@ -41,11 +32,12 @@ class Receiver(ABC):
         if return_value is not None and return_value != 0:
             return self.transaction.get_outgoing_string()
 
-        try:
-            self.transaction_manager = self.transaction_manager_type(self.transaction)
-            self.transaction = self.transaction_manager.process()
-            return self.transaction.get_outgoing_string()
-        except Exception as e:
-            self.transaction.generate_error_response(EntityType=self.entityType, Brief='UnknownError', AdditionalInfo={'error': str(e)})
-            return self.transaction.get_outgoing_string()
+    def get_incoming_entity_type(self):
+        return self.transaction.inputs.entity.entityType
 
+class Delegator_Json_String_Manager(Json_String_Manager):
+
+    def get_local_components(self):
+        self.transaction = Delegator_Transaction()
+        self.entityType = WhoIAm
+        self.transaction_manager_type = delegator_Transaction_Manager
