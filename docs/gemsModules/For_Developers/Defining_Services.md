@@ -18,6 +18,24 @@ Because we are in the process of adding MD as a service (MDaaS) to GEMS at the t
 
 We will get to the other items in the list above in due time.  But, for now, we have enough to begin.
 
+## Become familiar with the API
+
+The image below shows a Service-centered view of the API.  Note especially the two groupings titled "User Convenience".  Everything inside those groupings could potentially need to be copied into a Service_Request or out from a Service_Response.  This doesn't mean you should make things hard on the user by avoiding using the components that are convenient to the user.  But, you can also minimize how hard you make things for yourself.
+
+![[GEMS - API Overview.png]]
+
+Also find the notes that start with "Form varies by".  Inputs and outputs at the Entity level apply to the entire Entity and, potentially, all of its services.  The same goes for the Project (which is on the same level with Entity).  Note that the Service-level inputs, outputs, options and notices are specific to each Service.  Each Service_Request and Service_Response must be completely self-contained.  There might be user-convenience information that is copied into multiple services.  Be careful how you include information at higher levels if it might differ from one service to another.   Generally, it is best to avoid having data that will vary in this way.  
+
+Inside the code, the translation into a Service_Request is handled by a Request_Manager.  The translation back out from a Service_Response is handled by a Response_Manager.  These two managers allow each Service to specify - and deide - which parts of the User-Convenience data apply to them.  
+
+**Example**
+
+> Below, we will see that two of the desired services are called 'Evaluate' and 'Run_MD'.  Each of these services will need to know the location of the input files.  In the first case, the Evaluate service will inspect the files and return information about them to the user.  In the second case, the files will be used to run a molecular dynamics simulation.  Because this Entity is concerned entirely with running molecular dynamics simulations, it makes sense to require that the user only write this information once, at the Entity level's inputs.
+
+**Example**
+
+> Considering those same two services, it would be best to keep any output written to a filesystem inside a single parent directory.  Their outputs could be placed in separate subdirectories, of course.  But, it would be best to avoid, for example, having to provide an 'evaluation parent path' that is separate from the 'md parent path'. 
+
 ## Start with the user story
 
 The user is the reason we bother to write software.  We want to make things easy for the user.  So, we start off by considering what the user wants and needs.
@@ -71,6 +89,10 @@ Don't forget any complexity that you know will come later.  That knowledge is us
 		- Single trajectory file in mdcrd format.
 	- Special actions:
 		- Very large files might need special transfer methods.
+>- Status:
+>	- The behavior of the Status service will need to change depending on the information it is given.
+>- List acceptable inputs:
+>	- what types, sizes, etc.
 >- Analyze the MD output:
 	- Users will eventually want the MD analyzed. 
 	- This is tabled for now.
