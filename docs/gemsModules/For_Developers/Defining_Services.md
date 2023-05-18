@@ -24,17 +24,19 @@ The image below shows a Service-centered view of the API.  Note especially the t
 
 ![[../img/GEMS - API Overview.png]]
 
-Also find the notes that start with "Form varies by".  Inputs and outputs at the Entity level apply to the entire Entity and, potentially, all of its services.  The same goes for the Project (which is on the same level with Entity).  Note that the Service-level inputs, outputs, options and notices are specific to each Service.  Each Service_Request and Service_Response must be completely self-contained.  There might be user-convenience information that is copied into multiple services.  Be careful how you include information at higher levels if it might differ from one service to another.   Generally, it is best to avoid having data that will vary in this way.  
+Also find the notes that start with "Form varies by".  Inputs and outputs at the Entity level apply to the entire Entity and, potentially, all of its services.  The same goes for the Project (which is on the same level with Entity).  Note that the Service-level inputs, outputs, options and notices are specific to each Service.  
+
+Each Service_Request and Service_Response must be completely self-contained.  There might be user-convenience information that is copied into multiple services.  Be careful how you include information at higher levels if it might differ from one service to another.   Generally, it is best to avoid having data that will vary in this way.  
 
 Inside the code, the translation into a Service_Request is handled by a Request_Manager.  The translation back out from a Service_Response is handled by a Response_Manager.  These two managers allow each Service to specify - and deide - which parts of the User-Convenience data apply to them.  
 
 **Example**
 
-> Below, we will see that two of the desired services are called 'Evaluate' and 'Run_MD'.  Each of these services will need to know the location of the input files.  In the first case, the Evaluate service will inspect the files and return information about them to the user.  In the second case, the files will be used to run a molecular dynamics simulation.  Because this Entity is concerned entirely with running molecular dynamics simulations, it makes sense to require that the user only write this information once, at the Entity level's inputs.
+> Below, we will see that two of the desired services are called 'Evaluate' and 'Run_MD'.  Each of these services will need to know the location of the input files.  In the first case, the Evaluate service will inspect the files and return information about them to the user.  In the second case, the files will be used to run a molecular dynamics simulation.  Because this Entity is concerned entirely with running molecular dynamics simulations, it makes sense to require that the user only write this information once, at the Entity level's inputs.  Of course, it should also be acceptable for users to write the information directly into a Service Request.  
 
 **Example**
 
-> Considering those same two services, it would be best to keep any output written to a filesystem inside a single parent directory.  Their outputs could be placed in separate subdirectories, of course.  But, it would be best to avoid, for example, having to provide an 'evaluation parent path' that is separate from the 'md parent path'. 
+> Considering those same two services, it would be best to keep any output written to a filesystem inside a single parent directory.  Outputs from the two Services could be placed in separate subdirectories, of course.  But, it would be best to avoid, for example, having to provide an 'evaluation parent path' that is separate from the 'md parent path'. 
 
 ## Start with the user story
 
