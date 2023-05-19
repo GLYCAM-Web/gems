@@ -229,7 +229,7 @@ This one is an mmCIF file to be retrieved from the wwPDB:
 ```
 
 
-The Entity's inputs/outputs can also 
+The Entity's inputs/outputs can contain Resources.  Note that the inputs and outputs in the API defined in the common module can be overwritten by the other entities.
 
 **Example**
 
@@ -253,5 +253,14 @@ The Entity's inputs/outputs can also
 }
 ```
 >The last field would imply an additional service - the conversion of the trajectory to ascii.  Note that the use of the Resource here forces the user to specify the file type.  Furthermore, the entire Resource can be copied into each Service Request that needs it (evaluate, run md, etc.).
+
+
+## First code: no user conveniences
+
+When you first start writing your code, write it assuming only explicit Service Requests and Service Responses.  Doing this is useful for these reasons:
+
+- There are no translations into and out of the internal Service needs.  This will simplify troubleshooting while you get the basic service working.
+- It will improve your higher-level user conveniences.  You will gain a clearer pictue of the operation of the service, so you will be better able to craft the higher-level inputs in a way that is friendly to you and to the users.
+- Later, when you write the convenient interface, you will have known behaviors (write tests!) so that you can ensure proper functioning.
 
 
