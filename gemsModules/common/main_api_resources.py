@@ -9,6 +9,12 @@ log = Set_Up_Logging(__name__)
 
 class Resource(BaseModel):
     """Information describing a resource containing data."""
+    typename : str  = Field(
+        'Unset',
+        alias='type',
+        title='Resource type',
+        description='The name of the type of Resource.'
+    )
     locationType: str = Field(
             None,
             title='Location Type',
@@ -32,6 +38,32 @@ class Resource(BaseModel):
 class Resources(BaseModel):
     __root__ : List[Resource] = None
     
+    def add_resource(self,
+            resource : Resource
+            ):
+        if self.__root__ is None :
+            self.__root__ : List[Resource] = []
+        self.__root__.append(resource)
+    
+    def type_is_present(self, typename : str) :
+        if self.__root__  is None or self.__root__ == [] :
+            return False
+        for resource in self.__root__ :
+            if resource.typename == typename :
+                return True
+        else :
+            return False
+
+    def get_resource_by_type(self, typename : str):
+        if self.__root__  is None or self.__root__ == [] :
+            return False
+        for resource in self.__root__ :
+            if resource.typename == typename :
+                return resource
+        else :
+            return None
+
+
 
 def generateSchema():
     print(Resource.schema_json(indent=2))

@@ -11,13 +11,13 @@
 				"parameter-topology-file" : 
 				{ 
 					"locationType" : "filesystem-path-unix", 
-					"resourceFormat" : "AMBER-7-restart", 
+					"resourceFormat" : "AMBER-7-prmtop", 
 					"payload" : "/programs/gems/tests/correct_outputs/008_reference/cb_final_state/Builds/140b63e5-e57a-4578-8c37-6eac6607b5c0/New_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-t5p.parm7"
 				}, 
 				"input-coordinate-file" : 
 				{ 
 					"locationType" : "filesystem-path-unix", 
-					"resourceFormat" : "AMBER-7-prmtop", 
+					"resourceFormat" : "AMBER-7-restart", 
 					"payload" : "/programs/gems/tests/correct_outputs/008_reference/cb_final_state/Builds/140b63e5-e57a-4578-8c37-6eac6607b5c0/New_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-t5p.rst7"
 				} 
 			}
