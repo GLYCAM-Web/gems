@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 THISPYTHON='python3'
 ##################### Test 4 ########################
 echo "Testing test_installation.py..."

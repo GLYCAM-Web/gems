@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # This test passes each of the invalid sequence input payloads in $GEMSHOME/tests/inputs/010.input.txt through the delegator.
 # For the test to pass, each output must contain the appropriate error message.
 runInvalidSequenceInputTest()

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Tests should be about passing invalid inputs to the delegator
 

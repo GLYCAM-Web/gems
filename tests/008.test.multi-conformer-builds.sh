@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 . './utilities/common_environment.bash'
 . './utilities/functions.bash'

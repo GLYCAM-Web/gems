@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 THISPYTHON='python3'
 testNumber=016
 echo "Testing $0..."

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 ## Shortens time spent minimizing
 export GEMS_MD_TEST_WORKFLOW=True
