@@ -1,34 +1,23 @@
 #!/usr/bin/env python3
 import sys
 import os
-#import json
 from pathlib import Path
 
-# check out the environment
 GemsPath = os.environ.get('GEMSHOME')
-# import gems/gmml stuff
-sys.path.append(GemsPath) # is this required for import gmml??
+sys.path.append(GemsPath) #Required for import gmml
 import gmml
 
-## Defining the Usage Statement
 USAGE="""
+\nUsage: AmberMDPrep.py inputPdbFile
+Exmpl: python3 bin/AmberMDPrep.py tests/inputs/016.AmberMDPrep.4mbzEdit.pdb
+\n"""
+if len(sys.argv) != 2:
+    print(USAGE)
+    sys.exit()
 
-AmberMDPrep.py [ OPTIONS ] [ SEQUENCE ]
-
-OPTIONS:
-    -v, --verbose           Will be verbose on what is happening. (For Debugging)
-    -h, --help              Show this help message and exit.
-    -w, --write             Write out a default config file(JSON) and exit.
-    -c CONFIG_FILE          CONFIG_FILE is the path to the config file(JSON) used.
-    
-CONFIG_FILE:
-    
-SEQUENCE:
-
-"""
-## Declare and define the main function.
 def main():
-    pdbFile = gmml.cds_PdbFile("tests/inputs/016.AmberMDPrep.4mbzEdit.pdb")
+    pdbFileName = sys.argv[1]
+    pdbFile = gmml.cds_PdbFile(pdbFileName)
     options = gmml.PreprocessorOptions() # Default values are good, but here I show how you change them:
     options.chainNTermination_ = "NH3+" # aka zwitterionic
     options.chainCTermination_ = "CO2-" # aka zwitterionic
