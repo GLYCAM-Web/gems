@@ -30,10 +30,10 @@ do
 		echo "Test passed with input: $invalidSequenceJson"
 	else
 		echo "Test failed with input: $invalidSequenceJson"
-		exit 1
+		return 1
 	fi
 done < "$inputs"
 
 echo "All Tests passed"
-exit 0
+return 0
 

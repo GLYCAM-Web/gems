@@ -20,7 +20,7 @@ runTest()
         echo "Found test input: $jsonInputFile"
     else
         echo "Test 013 failed: Failed to find request input: $jsonInputFile"
-        exit 1
+        return 1
     fi
 
 
@@ -30,7 +30,7 @@ runTest()
         echo "Found correct_outputs reference: $outputRefFile"
     else
         echo "Test 013 failed: Failed to find the correct_outputs reference: $outputRefFile"
-        exit 1
+        return 1
     fi
 
     testResponse="${GEMSHOME}/tests/bad_outputs/${now}_git-ignore-me_test_response_013.json"
@@ -53,7 +53,7 @@ runTest()
     else
         echo "Test 013 failed: Failed to find the outputFile:"
         echo "$outputFile"
-        exit 1
+        return 1
     fi
 
 
@@ -70,7 +70,7 @@ Look for details in $errorFile
 "
         echo "Test failed: unexpected response"
         echo $( diff $outputFile  $outputRefFile ) > $errorFile
-        exit 1
+        return 1
     fi
 
     return 0
@@ -81,5 +81,5 @@ Look for details in $errorFile
 
 if runTest; then
 	echo "013 -- passed"
-	exit 0
+	return 0
 fi

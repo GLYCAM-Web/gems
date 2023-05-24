@@ -19,7 +19,7 @@ runTest()
         echo "Found test input: $jsonInputFile"
     else
         echo "Test 012 failed: Failed to find request input: $jsonInputFile"
-        exit 1
+        return 1
     fi
 
     outputRefFile=$GEMSHOME/tests/correct_outputs/test012_output
@@ -27,7 +27,7 @@ runTest()
         echo "Found correct_outputs reference: $outputRefFile"
     else
         echo "Test 012 failed: Failed to find the correct_outputs reference: $outputRefFile"
-        exit 1
+        return 1
     fi
 
     ## Timestamps and projects will be different.
@@ -57,7 +57,7 @@ response:
 $response
 "
         echo "Test failed: unexpected response"
-        exit 1
+        return 1
     fi
 
 
@@ -66,6 +66,6 @@ $response
 
 if runTest; then
     echo "012 -- passed"
-    exit 0
+    return 0
 fi
 

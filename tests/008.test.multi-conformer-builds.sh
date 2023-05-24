@@ -65,7 +65,7 @@ else
 fi
 if [ ! -d "${sequenceServicePath}" ] ; then
         echo "Unable to create output directory.  Exiting." | tee -a $badOutput
-        exit 1
+        return 1
 fi
 
 
