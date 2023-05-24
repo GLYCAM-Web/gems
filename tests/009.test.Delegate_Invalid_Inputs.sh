@@ -22,10 +22,8 @@ run_Invalid_Json_Input_Response_Test()
 if run_Invalid_Json_Input_Response_Test; then
 	echo "009a -- grep did not find: brief : NotAJSONObject in response"
 	echo "009a -- exiting"
-	exit 1
-else
-	echo "009a -- passed"
+	return 1
 fi
-
-echo "All 009 tests passed"
-exit 0
+echo "009a -- passed"
+echo "Test 009 sub-tests all passed"
+return 0

@@ -58,14 +58,14 @@ do_the_common_tasks() {
 # First remove all outputs in Builds and Sequences to test New_Builds functionality
 echo "Checking for sequence service path"
 if [ -d "${sequenceServicePath}" ] ; then
-        echo "Removing Sequences and Builds from ${sequenceServicePath}" >> $badOutput
-        ( cd ${sequenceServicePath} && rm -rf Sequences Builds )
+    echo "Removing Sequences and Builds from ${sequenceServicePath}" >> $badOutput
+    ( cd ${sequenceServicePath} && rm -rf Sequences Builds )
 else
-        mkdir -p ${sequenceServicePath}
+    mkdir -p ${sequenceServicePath}
 fi
 if [ ! -d "${sequenceServicePath}" ] ; then
-        echo "Unable to create output directory.  Exiting." | tee -a $badOutput
-        exit 1
+    echo "Unable to create output directory.  Exiting." | tee -a $badOutput
+    return 1
 fi
 
 

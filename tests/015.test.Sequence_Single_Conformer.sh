@@ -112,7 +112,7 @@ else
 fi
 if [ ! -d "${gemsServicePath}" ] ; then
 	echo "Unable to create output directory.  Exiting." | tee -a $badOutput
-	exit 1
+	return 1
 fi
 
 echo "Allowing up to $((maxTimeCount*sleepTime)) seconds to complete the build." | tee -a $badOutput
