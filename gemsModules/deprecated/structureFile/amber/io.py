@@ -543,7 +543,7 @@ class PreprocessorManager:
             log.debug("Evaluator: ")
             log.debug("pdbFileObj: " + str(self.pdbFileObj))
             ### GMML's Preprocess
-            self.preprocessor.Preprocess()
+            #self.preprocessor.Preprocess()
             ##pdbfile, amino_libs, glycam_libs, prep
             self.preprocessor.ApplyPreprocessingWithTheGivenModelNumber()
             # self.preprocessor.Print()
@@ -577,20 +577,6 @@ class PreprocessorManager:
             log.error("There was a problem loading resources from gmml: " + str(error))
             log.error(traceback.format_exc())
             raise error
-        
-
-
-        ## need a preprocessor object.
-        try:
-            log.debug("About to preprocess an unevaluated file.")
-            ### GMML's Preprocess
-            self.preprocessor.Preprocess() #GMML makes assumptions about libs that are fine.
-        except Exception as error:
-            log.error("There was a prolem preprocessing the input: " + str(error))
-            log.error(traceback.format_exc())
-            raise error
-
-
         ##UnrecognizedAtoms
         try: 
             log.debug("unrecognized heavy atoms?")
