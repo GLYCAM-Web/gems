@@ -1,7 +1,15 @@
 #!/usr/bin/env python3
+
+####
+####  I need to be rewritten bc the services all changed a lot
+####
+
+
+
 import os
 from gemsModules.delegator.main_api import Delegator_Transaction
-from gemsModules.delegator.services.marco.request_translator import marco_request_translator
+#from gemsModules.delegator.services.marco.request_translator import marco_request_translator
+from gemsModules.common.services.marco.request_translator import marco_request_translator
 
 #test_files_list = [ 
 #        os.path.join('inputs', 'caca_milis.json'), 
