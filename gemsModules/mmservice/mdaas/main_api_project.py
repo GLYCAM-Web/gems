@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-from typing import Literal
 import os
 
 from pydantic import constr, Field
+from pydantic.typing import Literal as pyLiteral
 
 from gemsModules.project.main_api import Project
 
@@ -30,7 +30,7 @@ class MdProject(Project):
     notify : bool = False
     upload_path : constr(max_length=255)  = "/programs/gems/tests/temp-inputs/mdinput"
     
-    project_type : Literal['md'] = Field(  
+    project_type : pyLiteral['md'] = Field(  
             'md',
             title='Type',
             alias='type'

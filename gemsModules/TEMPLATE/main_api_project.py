@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
-from typing import Literal
-import os
-
 from pydantic import constr, Field
+from pydantic.typing import Literal as pyLiteral
 
 from gemsModules.project.main_api import Project
 
@@ -25,7 +23,7 @@ class TemplateProject(Project):
     notify : bool = False
     upload_path : constr(max_length=255)  = "/path/to/template_dir"
     
-    project_type : Literal['template'] = Field(  
+    project_type : pyLiteral['template'] = Field(  
             'template',
             title='Type',
             alias='type'

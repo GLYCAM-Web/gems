@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
-from pydantic import  Field
-from typing import Literal, Dict
+from typing import Dict
+
+from pydantic import Field
+from pydantic.typing import Literal as pyLiteral
+
 from gemsModules.common import main_api
 from gemsModules.common import main_api_entity
 from gemsModules.common import main_api_services
@@ -36,7 +39,7 @@ class Template_Service_Responses(main_api_services.Service_Responses):
 
 class Template_Entity(main_api_entity.Entity) :
 
-    entityType : Literal['Template'] = Field(  # This is the only required field in all of the API
+    entityType : pyLiteral['Template'] = Field(  # This is the only required field in all of the API
             ...,
             title='Type',
             alias='type'
