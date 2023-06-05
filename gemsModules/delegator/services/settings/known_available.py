@@ -34,9 +34,9 @@ Request_Conflict_Action.update(Module_Request_Conflict_Action)
 def testme():
     """ Ensure that the settings info is complete.
     >>> testme()
-    ['Marco', 'Status', 'ListServices', 'KnownEntities']
-    {'Marco': 'Merge', 'Status': 'Merge', 'ListServices': 'Merge', 'KnownEntities': 'Merge'}
-    {'Marco': 'Fail', 'Status': 'LastIn', 'ListServices': 'LastIn', 'KnownEntities': 'LastIn'}
+    ['Error', 'Marco', 'Status', 'ListServices', 'KnownEntities']
+    {'Error': 'All', 'Marco': 'Merge', 'Status': 'Merge', 'ListServices': 'Merge', 'KnownEntities': 'Merge'}
+    {'Error': 'FirstIn', 'Marco': 'Fail', 'Status': 'LastIn', 'ListServices': 'LastIn', 'KnownEntities': 'LastIn'}
 
     """
     print(Available_Services.get_json_list())
