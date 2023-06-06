@@ -498,7 +498,7 @@ class PreprocessorManager:
             self.otherLibs = gmml.string_vector()
             self.otherLibs.push_back(amberSettings.OTHER_LIBS)
 
-            self.preprocessor = gmml.PdbPreprocessor()
+            self.preprocessor = gmml.PdbPreprocessor(self.pdbFileObj)
         except Exception as error:
             log.error("There was a problem loading gmml resources: " + str(error))
             log.error(traceback.format_exc())
@@ -523,42 +523,26 @@ class PreprocessorManager:
     def preprocessPdbForAmber(self, uploadFile, projectDir):
         log.info("preprocessPdbForAmber() was called.")
         try:
-            self.__load_gmml_resources()
-        except Exception as error:
-            log.error("There was a problem loading resources from gmml: " + str(error))
-            log.error(traceback.format_exc())
-            raise error
-
-        try:
             self.__load_pdb_file(uploadFile)
         except Exception as error:
             log.error("There was a problem uploading the pdb file: " + str(error))
             log.error(traceback.format_exc())
             raise error
-
+        try:
+            self.__load_gmml_resources()
+        except Exception as error:
+            log.error("There was a problem loading resources from gmml: " + str(error))
+            log.error(traceback.format_exc())
+            raise error
         ## need a preprocessor object.
         try:
             log.debug("About to preprocess an unevaluated file.")
             log.debug("Evaluator: ")
             log.debug("pdbFileObj: " + str(self.pdbFileObj))
-
-            log.debug("aminoLibs:")
-            for item in self.aminoLibs:
-                log.debug(str(item))
-            log.debug("glycamLibs:")
-            for item in self.glycamLibs:
-                log.debug(str(item))
-            log.debug("otherLibs:")
-            for item in self.otherLibs:
-                log.debug(str(item))
-            log.debug("prepFile:")
-            for item in self.prepFile:
-                log.debug(str(item))
-
             ### GMML's Preprocess
-            self.preprocessor.Preprocess(self.pdbFileObj, self.aminoLibs, self.glycamLibs, self.otherLibs, self.prepFile)
+            #self.preprocessor.Preprocess()
             ##pdbfile, amino_libs, glycam_libs, prep
-            self.preprocessor.ApplyPreprocessingWithTheGivenModelNumber(self.pdbFileObj, self.aminoLibs, self.glycamLibs, self.prepFile)
+            self.preprocessor.ApplyPreprocessingWithTheGivenModelNumber()
             # self.preprocessor.Print()
 
             seq_map = self.pdbFileObj.GetSequenceNumberMapping()
@@ -579,46 +563,17 @@ class PreprocessorManager:
     def doEvaluation(self, uploadFile):
         log.info("doEvaluation() was called.")
         try:
-            self.__load_gmml_resources()
-        except Exception as error:
-            log.error("There was a problem loading resources from gmml: " + str(error))
-            log.error(traceback.format_exc())
-            raise error
-        
-        try:
             self.__load_pdb_file(uploadFile)
         except Exception as error:
             log.error("There was a problem uploading the pdb file: " + str(error))
             log.error(traceback.format_exc())
             raise error
-
-        ## need a preprocessor object.
         try:
-            log.debug("About to preprocess an unevaluated file.")
-            log.debug("Evaluator: ")
-            log.debug("pdbFileObj: " + str(self.pdbFileObj))
-
-            log.debug("aminoLibs:")
-            for item in self.aminoLibs:
-                log.debug(str(item))
-            log.debug("glycamLibs:")
-            for item in self.glycamLibs:
-                log.debug(str(item))
-            log.debug("otherLibs:")
-            for item in self.otherLibs:
-                log.debug(str(item))
-            log.debug("prepFile:")
-            for item in self.prepFile:
-                log.debug(str(item))
-
-            ### GMML's Preprocess
-            self.preprocessor.Preprocess(self.pdbFileObj, self.aminoLibs, self.glycamLibs, self.otherLibs, self.prepFile)
+            self.__load_gmml_resources()
         except Exception as error:
-            log.error("There was a prolem preprocessing the input: " + str(error))
+            log.error("There was a problem loading resources from gmml: " + str(error))
             log.error(traceback.format_exc())
             raise error
-
-
         ##UnrecognizedAtoms
         try: 
             log.debug("unrecognized heavy atoms?")

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Tests should be about passing invalid inputs to the delegator
 
@@ -23,9 +23,7 @@ if run_Invalid_Json_Input_Response_Test; then
 	echo "009a -- grep did not find: brief : NotAJSONObject in response"
 	echo "009a -- exiting"
 	return 1
-else
-	echo "009a -- passed"
 fi
-
-echo "All subtests of 009.test passed"
+echo "009a -- passed"
+echo "Test 009 sub-tests all passed"
 return 0

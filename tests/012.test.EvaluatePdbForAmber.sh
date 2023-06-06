@@ -9,8 +9,6 @@ echo "
 012: Testing pdb evaluation response.
 " 
 
-
-
 runTest()
 {
     # JSON INPUTS
@@ -36,7 +34,7 @@ runTest()
 
     ## TODO: Move this output file to bad_outputs.
     cat $jsonInputFile | $GEMSHOME/bin/delegate > ${badOutDir}git-ignore-me_test_out_012
-    response=$( sed '/project/q' ${badOutDir}git-ignore-me_test_out_012| grep -v "timestamp" )
+    response=$( sed '/project/q' ${badOutDir}git-ignore-me_test_out_012 | grep -v "timestamp" )
     
     # response=$(cat $jsonInputFile | $GEMSHOME/bin/delegate | grep -v "timestamp" | grep -B "project")
 
@@ -59,13 +57,13 @@ $response
         echo "Test failed: unexpected response"
         return 1
     fi
-
-
     return 0
 }
 
-if runTest; then
-    echo "012 -- passed"
-    return 0
+if ! runTest; then
+    return 1
 fi
+echo "012 -- passed"
+return 0
+
 
