@@ -99,6 +99,7 @@ def buildQueryString(thisTransaction : Transaction):
                 str(virtLocation),
                 str(theseOptions['output_file_type'])
                 )
+        log.debug(theQueryString)
         
     elif theseOptions['queryType'] == "plotlyCHI":
       log.debug("plotlyCHI query")
@@ -219,7 +220,7 @@ def buildQueryString(thisTransaction : Transaction):
       jsonObj = json.loads(pUUID_JSON)
       # thisTransaction.response_dict= jsonObj
     elif theseOptions['queryType'] != "plotlyCHI":
-      log.debug(theQueryString)
+    #   log.debug(theQueryString)
       proc = subprocess.Popen(theQueryString, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
       (out, err) = proc.communicate()
       out = str(out.decode('utf-8'))
