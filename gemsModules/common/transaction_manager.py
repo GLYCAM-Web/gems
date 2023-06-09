@@ -31,6 +31,9 @@ class Transaction_Manager(ABC):
         self.manage_requests()
         log.debug("about to generate aaop tree pair")
         self.generate_aaop_tree_pair()
+# Grayson - see if you can make project management able to go her for mdaas
+#        log.debug("about to manage project")
+#        self.manage_project()
         log.debug("about to invoke servicer")
         self.invoke_servicer()
         log.debug("about to manage responses")
