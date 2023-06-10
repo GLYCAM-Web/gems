@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # This test passes each of the invalid sequence input payloads in $GEMSHOME/tests/inputs/010.input.txt through the delegator.
 # For the test to pass, each output must contain the appropriate error message.
 runInvalidSequenceInputTest()
@@ -30,10 +30,9 @@ do
 		echo "Test passed with input: $invalidSequenceJson"
 	else
 		echo "Test failed with input: $invalidSequenceJson"
-		exit 1
+		return 1
 	fi
 done < "$inputs"
 
 echo "All Tests passed"
-exit 0
-
+return 0
