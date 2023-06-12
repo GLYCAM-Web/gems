@@ -4,9 +4,9 @@ from typing import List, Union
 
 from gemsModules.common.main_api_resources import Resource, Resources
 
-from gemsModules.mmservice.mdaas.main_api import (
-    MDaaS_Service_Request,
-    MDaaS_Service_Response,
+from gemsModules.ambermdprep.main_api import (
+    AmberMDPrep_Service_Request,
+    AmberMDPrep_Service_Response,
 )
 
 from gemsModules.logging.logger import Set_Up_Logging
@@ -110,12 +110,12 @@ class prepare_pdb_Outputs(BaseModel):
     resources: prepare_pdb_Resources = prepare_pdb_Resources()
 
 
-class prepare_pdb_Request(MDaaS_Service_Request):
+class prepare_pdb_Request(AmberMDPrep_Service_Request):
     typename: str = Field("PreparePDB", alias="type")
     # the following must be redefined in a child class
     inputs: prepare_pdb_Inputs = prepare_pdb_Inputs()
 
 
-class prepare_pdb_Response(MDaaS_Service_Response):
+class prepare_pdb_Response(AmberMDPrep_Service_Response):
     typename: str = Field("PreparePDB", alias="type")
     outputs: prepare_pdb_Outputs = prepare_pdb_Outputs()

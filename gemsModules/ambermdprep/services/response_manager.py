@@ -12,7 +12,7 @@ log = Set_Up_Logging(__name__)
 
 class AmberMDPrep_Response_Manager(Response_Manager):
     def generate_response_entity(self):
-        self.response_entity = AmberMDPrep_Entity(type="MDaaS")
+        self.response_entity = AmberMDPrep_Entity(type="AmberMDPrep")
         self.response_entity.notices = Notices()
         request_aaop_list = self.aaop_tree_pair.input_tree.make_linear_list()
         response_aaop_list = self.aaop_tree_pair.output_tree.make_linear_list()
