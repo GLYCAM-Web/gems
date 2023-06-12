@@ -97,6 +97,11 @@ class prepare_pdb_Inputs(BaseModel):
 
 
 class prepare_pdb_Outputs(BaseModel):
+    message: str = Field(
+        None,
+        title="Message",
+        description="Message from the service",
+    )
     outputDirPath: str = Field(
         None,
         title="Output Directory Path",

@@ -6,7 +6,7 @@ from gemsModules.ambermdprep.services.prepare_pdb.api import (
 
 # from gemsModules.mmservice.mdaas.tasks import set_up_run_md_directory
 # from gemsModules.mmservice.mdaas.tasks import initiate_build
-
+from gemsModules.ambermdprep.services.prepare_pdb.logic import execute
 from gemsModules.logging.logger import Set_Up_Logging
 
 log = Set_Up_Logging(__name__)
@@ -27,5 +27,5 @@ def Serve(service: prepare_pdb_Request) -> prepare_pdb_Response:
     # )
 
     response = prepare_pdb_Response()
-    response.outputs.outputDirPath = service.inputs.outputDirPath
+    response.outputs.message = execute(service.inputs)
     return response

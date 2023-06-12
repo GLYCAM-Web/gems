@@ -6,7 +6,7 @@
                 "type": "PreparePDB",
                 "inputs": {
                     "pdb_filename": "tests/inputs/016.AmberMDPrep.4mbzEdit.pdb",
-                    "output_filename": "tests/outputs/016.AmberMDPrep.4mbzEdit.prepared.pdb"
+                    "output_filename": "tests/outputs/016.AmberMDPrep.4mbzEdit-git-ignore-me.prepared.pdb"
                 }
             }
         }

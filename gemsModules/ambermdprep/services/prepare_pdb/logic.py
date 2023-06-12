@@ -36,12 +36,11 @@ class serviceOutputs(BaseModel):
 
 
 def execute(inputs: serviceInputs) -> serviceOutputs:
+    """Executes the service."""
     log.debug(f"serviceInputs: {inputs}")
     service_outputs = serviceOutputs()
     # The who_I_am must be set in the options.
-    output = prepare_pdb(
-        inputs.pdb_filename,
-        inputs.output_filename,
-    )
+    output = prepare_pdb.execute(inputs["pdb_filename"], inputs["output_filename"])
 
     service_outputs.outputs.message = output
+    return service_outputs
