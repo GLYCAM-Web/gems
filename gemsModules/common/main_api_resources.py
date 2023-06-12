@@ -23,7 +23,7 @@ class Resource(BaseModel):
     resourceFormat: str = Field(
             None,
             title='Resource Format',
-            description='Supported formats will varu with each Entity.',
+            description='Supported formats will vary with each Entity.',
             )
     payload : Union[str,int,float] = Field(
             None,
