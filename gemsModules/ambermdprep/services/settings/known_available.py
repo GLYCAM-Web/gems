@@ -15,7 +15,7 @@ log = Set_Up_Logging(__name__)
 
 
 class Module_Available_Services(GemsStrEnum):
-    ambermdprep = "AmberMDPrep"
+    prepare_pdb = "PreparePDB"
 
 
 Available_Services = GemsStrEnum(
@@ -40,7 +40,7 @@ Allowed_File_Formats = GemsStrEnum(
 def testme():
     """Ensure that the settings info is complete.
     >>> testme()
-    ['AmberMDPrep']
+    ['PreparePDB']
     ['PDB', 'mmCIF', 'Mol2', 'xyz', 'amber_parm7', 'amber_rst7']
 
     """

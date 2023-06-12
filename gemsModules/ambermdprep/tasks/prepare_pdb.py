@@ -1,29 +1,27 @@
 import gmml
 
 
-def execute(pdbFileName: str) -> str:
+def execute(input_pdb_path: str, output_pdb_path: str = "./Preprocessed.pdb") -> str:
     """Prepare an Amber MD input file
 
-    >>> print(execute("tests/inputs/016.AmberMDPrep.4mbzEdit.pdb"))
-    True
+    >>> execute("tests/inputs/016.AmberMDPrep.4mbzEdit.pdb"))
 
     """
 
     # Replace with JSON input from delegator.
-    pdbFileName = "tests/inputs/016.AmberMDPrep.4mbzEdit.pdb"
-    pdbFile = gmml.cds_PdbFile(pdbFileName)
+    pdbFile = gmml.cds_PdbFile(input_pdb_path)
 
     options = gmml.PreprocessorOptions()
     # The defaults are fine, but we can change them if we want:
-    options.chainNTermination_ = "NH3+"  # aka zwitterionic
-    options.chainCTermination_ = "CO2-"  # aka zwitterionic
-    options.gapNTermination_ = "COCH3"  # aka ACE
-    options.gapCTermination_ = "NHCH3"  # aka NME
-    options.hisSelections_.append(("HIS_20_?_A_1", "HID"))
+    # options.chainNTermination_ = "NH3+"  # aka zwitterionic
+    # options.chainCTermination_ = "CO2-"  # aka zwitterionic
+    # options.gapNTermination_ = "COCH3"  # aka ACE
+    # options.gapCTermination_ = "NHCH3"  # aka NME
+    # options.hisSelections_.append(("HIS_20_?_A_1", "HID"))
 
     ppInfo = pdbFile.PreProcess(options)
     # TODO: change this to a file given by delegator.
-    pdbFile.Write("./preprocessed.pdb")
+    pdbFile.Write(output_pdb_path)
 
     # Build the output string
     output = ""
@@ -50,7 +48,7 @@ def execute(pdbFileName: str) -> str:
         output += f"{chainT.chainId_} | {chainT.startIndex_} | {chainT.nTermination_} | {chainT.endIndex_} | {chainT.cTermination_}\n"
     output += "\nWe made it to the end. Congratulations!\n"
 
-    return True
+    return output
 
 
 if __name__ == "__main__":
