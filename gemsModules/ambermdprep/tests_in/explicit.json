@@ -5,8 +5,8 @@
             "any_amber_prep": {
                 "type": "PreparePDB",
                 "inputs": {
-                    "pdb_filename": "tests/inputs/016.AmberMDPrep.4mbzEdit.pdb",
-                    "output_filename": "tests/outputs/016.AmberMDPrep.4mbzEdit-git-ignore-me.prepared.pdb"
+                    "pdb_filename": "/programs/gems/tests/inputs/016.AmberMDPrep.4mbzEdit.pdb",
+                    "output_filename": "/programs/gems/tests/outputs/016.AmberMDPrep.4mbzEdit-git-ignore-me.prepared.pdb"
                 }
             }
         }

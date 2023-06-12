@@ -42,5 +42,5 @@ def execute(inputs: serviceInputs) -> serviceOutputs:
     # The who_I_am must be set in the options.
     output = prepare_pdb.execute(inputs["pdb_filename"], inputs["output_filename"])
 
-    service_outputs.outputs.message = output
-    return service_outputs
+    # NOTE: using serviceOutputs doubles up the keys.
+    return output
