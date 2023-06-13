@@ -40,6 +40,7 @@ def execute(inputs: serviceInputs) -> serviceOutputs:
     log.debug(f"serviceInputs: {inputs}")
     service_outputs = serviceOutputs()
     # The who_I_am must be set in the options.
+
     output = prepare_pdb.execute(inputs["pdb_filename"], inputs["output_filename"])
 
     # NOTE: using serviceOutputs doubles up the keys.

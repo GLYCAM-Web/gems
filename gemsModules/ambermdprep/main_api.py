@@ -22,8 +22,8 @@ class AmberMDPrep_Service_Request(main_api_services.Service_Request):
     typename: Available_Services = Field(
         "AmberMDPrep",
         alias="type",
-        title="Services Offered by ",
-        description="The service requested of the Common Servicer",
+        title="Services Offered by AmberMDPrep",
+        description="The service requested of the AmberMDPrep Servicer",
     )
 
 
@@ -32,7 +32,7 @@ class AmberMDPrep_Service_Response(main_api_services.Service_Response):
         None,
         alias="type",
         title="Services Offered by AmberMDPrep",
-        description="The service requested of AmberMDPrep",
+        description="The service response from AmberMDPrep",
     )
 
 

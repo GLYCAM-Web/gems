@@ -4,6 +4,8 @@ from gemsModules.ambermdprep.services.prepare_pdb.api import (
     prepare_pdb_Response,
 )
 
+from gemsModules.systemoperations.filesystem_ops import separate_path_and_filename
+
 # from gemsModules.mmservice.mdaas.tasks import set_up_run_md_directory
 # from gemsModules.mmservice.mdaas.tasks import initiate_build
 from gemsModules.ambermdprep.services.prepare_pdb.logic import execute
@@ -28,4 +30,9 @@ def Serve(service: prepare_pdb_Request) -> prepare_pdb_Response:
 
     response = prepare_pdb_Response()
     response.outputs.message = execute(service.inputs)
+    response.outputs.outputDirPath = separate_path_and_filename(
+        service.inputs["output_filename"]
+    )[0]
+
+    log.debug(f"AmberMDPrep prepare_pdb_Response: {response}")
     return response

@@ -4,8 +4,8 @@ import gmml
 def execute(input_pdb_path: str, output_pdb_path: str = "./preprocessed.pdb") -> str:
     """Prepare an Amber MD input file
 
-    >>> execute("tests/inputs/016.AmberMDPrep.4mbzEdit.pdb"))
-
+    >>> "Congratulations" in execute("tests/inputs/016.AmberMDPrep.4mbzEdit.pdb")
+    True
     """
 
     # Replace with JSON input from delegator.
@@ -20,7 +20,6 @@ def execute(input_pdb_path: str, output_pdb_path: str = "./preprocessed.pdb") ->
     # options.hisSelections_.append(("HIS_20_?_A_1", "HID"))
 
     ppInfo = pdbFile.PreProcess(options)
-    # TODO: change this to a file given by delegator.
     pdbFile.Write(output_pdb_path)
 
     # Build the output string
@@ -54,4 +53,12 @@ def execute(input_pdb_path: str, output_pdb_path: str = "./preprocessed.pdb") ->
 if __name__ == "__main__":
     import doctest
 
-    doctest.testmod()
+    results = doctest.testmod()
+    if results.failed == 0:
+        print(
+            f"Congratulations! All {results.attempted} tests passed! "
+            "Now removing the test output file..."
+        )
+        import os
+
+        os.remove("./preprocessed.pdb")
