@@ -27,7 +27,7 @@ if ! cd "${GEMSHOME}/gmml" ; then
 	echo "Cannot complete acquisition of versions info."
 	exit 1
 fi
-if ! ./programs/make-versions-file.bash ; then
+if ! ./make-versions-file.bash ; then
 	echo "Could not generate gmml versions file"
 	echo "Cannot complete acquisition of versions info."
 	exit 1
