@@ -24,7 +24,7 @@ class responseOutputs(BaseModel):
     info: Optional[str] = None
 
 
-class serviceInputs(Protocol):
+class serviceInputs(BaseModel):
     """Allows a Service_Request to be used as input"""
 
     inputs: requestInputs = requestInputs()
@@ -43,5 +43,5 @@ def execute(inputs: serviceInputs) -> serviceOutputs:
 
     output = prepare_pdb.execute(inputs["pdb_filename"], inputs["output_filename"])
 
-    # NOTE: using serviceOutputs doubles up the keys.
+    # NOTE/TODO: using serviceOutputs doubles up the keys.
     return output

@@ -12,7 +12,8 @@ if [ -f test${testNumber}_output ]; then
     rm test${testNumber}_output
 fi
 
-# jq would be more convenient...
+# Note, json_ripper will throw up if you don't give it a valid JSON object, 
+# so the test will fail in that case too. jq would be more convenient...
 ${THISPYTHON} $GEMSHOME/bin/delegate $GEMSHOME/gemsModules/ambermdprep/tests_in/explicit.json |\
     $GEMSHOME/tests/utilities/json_ripper.py entity.responses.any_amber_prep.outputs.message > test${testNumber}_output
 
