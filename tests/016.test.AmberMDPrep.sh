@@ -14,7 +14,7 @@ fi
 
 # Note, json_ripper will throw up if you don't give it a valid JSON object, 
 # so the test will fail in that case too. jq would be more convenient...
-${THISPYTHON} $GEMSHOME/bin/delegate $GEMSHOME/gemsModules/ambermdprep/tests_in/explicit.json |\
+cat $GEMSHOME/gemsModules/ambermdprep/tests_in/explicit.json | $GEMSHOME/bin/delegate |\
     $GEMSHOME/tests/utilities/json_ripper.py entity.responses.any_amber_prep.outputs.message > test${testNumber}_output
 
 if ! cmp test${testNumber}_output correct_outputs/test${testNumber}_output > /dev/null 2>&1; then
