@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
 from typing import Dict
 
-from pydantic import Field
-from pydantic.typing import Literal as pyLiteral
+from pydantic import Field, typing
 
 from gemsModules.common import main_api
 from gemsModules.common import main_api_entity
 from gemsModules.common import main_api_services
 
-from gemsModules.mmservice.mdaas.main_api_project import MdProject
+from gemsModules.ambermdprep.main_api_project import AmberMDPrepProject
+from gemsModules.ambermdprep.services.settings.known_available import Available_Services
 
 from gemsModules.ambermdprep.main_settings import WhoIAm
-from gemsModules.ambermdprep.services.settings.known_available import Available_Services
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -45,7 +44,7 @@ class AmberMDPrep_Service_Responses(main_api_services.Service_Responses):
 
 
 class AmberMDPrep_Entity(main_api_entity.Entity):
-    entityType: pyLiteral[
+    entityType: typing.Literal[
         "AmberMDPrep"
     ] = Field(  # This is the only required field in all of the API
         ..., title="Type", alias="type"
@@ -58,7 +57,7 @@ class AmberMDPrep_Entity(main_api_entity.Entity):
 # It should also define more services that are specific to mmservice.mdaas
 class AmberMDPrep_API(main_api.Common_API):
     entity: AmberMDPrep_Entity
-    project: MdProject = MdProject()
+    project: AmberMDPrepProject = AmberMDPrepProject()
 
 
 class AmberMDPrep_Transaction(main_api.Transaction):
