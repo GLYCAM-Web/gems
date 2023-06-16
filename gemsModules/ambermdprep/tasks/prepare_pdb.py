@@ -2,8 +2,9 @@ import gmml
 import pydantic
 
 
+# TODO: These probably belong elsewhere, but for now prepare_pdb is motivating their creation.
 class PreprocessorOptions(pydantic.BaseModel):
-    """Pydantic model for gmml.PreprocessorOptions(), which is passed to gmml.PreProcess()"""
+    """Pydantic model for gmml.PreprocessorOptions(), which is used for gmml.PreProcess()"""
 
     chainNTermination: str = pydantic.Field(default="NH3+", alias="chainNtermination_")
     chainCTermination: str = pydantic.Field(default="CO2-", alias="chainCtermination_")
@@ -36,22 +37,67 @@ class PreprocessorOptions(pydantic.BaseModel):
         return options
 
 
-def preprocess(input_pdb_path: str, options: PreprocessorOptions) -> tuple:
-    """Run the gmml.PreProcess() function on a PDB file and return the output and the cds_PdbFile object"""
+class PpInfo(pydantic.BaseModel):
+    """Pydantic model for gmml.PpInfo, which is returned by gmml.PreProcess()"""
+
+    unrecognizedAtoms: list[str] = pydantic.Field(
+        default_factory=list, alias="unrecognizedAtoms_"
+    )
+    missingHeavyAtoms: list[str] = pydantic.Field(
+        default_factory=list, alias="missingHeavyAtoms_"
+    )
+    unrecognizedResidues: list[str] = pydantic.Field(
+        default_factory=list, alias="unrecognizedResidues_"
+    )
+    missingResidues: list[str] = pydantic.Field(
+        default_factory=list, alias="missingResidues_"
+    )
+    hisResidues: list[str] = pydantic.Field(default_factory=list, alias="hisResidues_")
+    cysBondResidues: list[str] = pydantic.Field(
+        default_factory=list, alias="cysBondResidues_"
+    )
+    chainTerminals: list[str] = pydantic.Field(
+        default_factory=list, alias="chainTerminals_"
+    )
+
+
+class cds_PdbFile(pydantic.BaseModel):
+    """Hacky pydantic wrapper for gmml.cds_PdbFile, which is returned by gmml.cds_PdbFile()"""
+
+    pdbfile: pydantic.typing.Any = pydantic.Field(default_factory=object)
+
+    def Write(self, path: str):
+        """Write the PDB file to a path - manually wrapping the gmml.cds_PdbFile.Write() function as an example."""
+        self.pdbfile.Write(path)
+
+    @property
+    def raw(self) -> pydantic.typing.Any:
+        """Return the underlying gmml.cds_PdbFile object - unsafe."""
+        return self.pdbfile
+
+
+def preprocess(
+    input_pdb_path: str, options: PreprocessorOptions
+) -> tuple[PpInfo, cds_PdbFile]:
+    """Run the gmml.PreProcess() function on a PDB file.
+
+    Returns the PpInfo and the cds_PdbFile objects.
+    """
     pdb_file = gmml.cds_PdbFile(input_pdb_path)
-    return pdb_file.PreProcess(options), pdb_file
+    return pdb_file.PreProcess(options), cds_PdbFile(pdbfile=pdb_file)
 
 
 def preprocess_and_write_pdb(
     input_pdb_path: str,
     options: PreprocessorOptions,
     output_pdb_path: str = "./preprocessed.pdb",
-) -> tuple:
-    """Run the gmml.PreProcess() function on a PDB file and write the output to a new PDB file.
+) -> tuple[PpInfo, cds_PdbFile]:
+    """Preprocess a PDB file and write it.
 
-    Returns the ppInfo."""
+    Returns the ppInfo and the cds_PdbFile objects.
+    """
     pp_info, pdb_file = preprocess(input_pdb_path, options)
-    pdb_file.Write(output_pdb_path)
+    pdb_file.raw.Write(output_pdb_path)
 
     return pp_info, pdb_file
 
