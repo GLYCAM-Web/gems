@@ -33,14 +33,16 @@ class AmberMDPrep_Project_Manager(Project_Manager):
         return project
 
     def fill_response_project_from_incoming_project(self):
-        if self.incoming_project is not None:
-            self.response_project = AmberMDPrepProject(**self.incoming_project.dict())
+        # if self.incoming_project is not None:
+        #    self.response_project = AmberMDPrepProject(**self.incoming_project.dict())
+        pass
 
     def fill_response_project_from_response_entity(self):
         # find inputs in entity and put them in project
         # find outputs in entity and put them in project
 
-        self.response_project = AmberMDPrepProject(**self.incoming_entity.inputs)
+        # self.response_project = AmberMDPrepProject(**self.incoming_entity.inputs)
+        pass
 
 
 def testme() -> AmberMDPrepProject:
@@ -53,5 +55,5 @@ def testme() -> AmberMDPrepProject:
 
 
 if __name__ == "__main__":
-    project = testme()
-    print(project.json(indent=2))
+    proj = testme()
+    print(proj.json(indent=2))

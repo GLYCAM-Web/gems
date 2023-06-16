@@ -53,16 +53,12 @@ class prepare_pdb_Resources(Resources):
 
 
 class prepare_pdb_Inputs(BaseModel):
-    amber_parm7: str = Field(
+    pdb_file: str = Field(
         None,
         title="Amber Parm7",
-        description="Name of Amber Parm7 file",
+        description="Name of Amber PDB file",
     )
-    amber_rst7: str = Field(
-        None,
-        title="Amber Rst7",
-        description="Name of Amber Rst7 file",
-    )
+
     pUUID: str = Field(
         None,
         title="Project UUID",
@@ -78,20 +74,10 @@ class prepare_pdb_Inputs(BaseModel):
         title="Input Files Directory Path",
         description="Path to whhere the input files are stored",
     )
-    protocolFilesPath: str = Field(
-        None,
-        title="Protocol files directory",
-        description="Path to where the protocol files are stored",
-    )
     use_serial: bool = Field(
         False,
         title="Use Serial",
         description="Should we force the GEMS code to run in serial?",
-    )
-    control_script: str = Field(
-        "Run_Protocol.bash",
-        title="Control Script",
-        description="Name of the script used to run the protocol",
     )
     resources: Resources = Resources()
 

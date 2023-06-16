@@ -15,8 +15,9 @@ def receive(incomingString: str) -> str:
 
     if AmberMDPrep_manager_error_response is not None:
         log.debug(
-            "Error in AmberMDPrep Json String Manager:\tThe incoming string is not valid:\n%s",
+            "Error in AmberMDPrep Json String Manager:\tThe incoming string is not valid:\n%s\n%s",
             incomingString,
+            AmberMDPrep_manager_error_response,
         )
         return AmberMDPrep_manager_error_response
 
