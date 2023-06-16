@@ -16,7 +16,7 @@ class AmberMDPrepProject(Project):
 
     """
 
-    title: str = "very hacky initial MDaaS service"
+    title: str = "very hacky initial AmberMDPrep service"
     parent_entity: str = "ambermdprep"
     app: str = "md"
     requested_service: str = "ambermdprep"

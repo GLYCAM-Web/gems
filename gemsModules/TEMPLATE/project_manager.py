@@ -9,10 +9,11 @@ from gemsModules.TEMPLATE.main_api import Template_Entity
 from gemsModules.TEMPLATE.main_api_project import TemplateProject
 
 from gemsModules.logging.logger import Set_Up_Logging
+
 log = Set_Up_Logging(__name__)
 
-class template_Project_Manager(Project_Manager):
 
+class template_Project_Manager(Project_Manager):
     def process(self) -> TemplateProject:
         self.response_project = TemplateProject()
         self.instantiate_response_project()
@@ -28,12 +29,15 @@ class template_Project_Manager(Project_Manager):
         pass
 
 
-def testme() -> TemplateProject :
-    the_entity=Template_Entity(type="Template")
-    the_project=TemplateProject()
-    the_manager=template_Project_Manager(entity=the_entity, project=the_project)
+def testme() -> TemplateProject:
+    the_entity = Template_Entity(type="Template")
+    the_project = TemplateProject()
+    the_manager = template_Project_Manager(
+        entity=the_entity, incoming_project=the_project
+    )
     return the_manager.instantiate_new_project()
 
+
 if __name__ == "__main__":
-    project=testme()
+    project = testme()
     print(project.json(indent=2))
