@@ -2,7 +2,7 @@
 THISPYTHON='python3'
 testNumber=016
 echo "Testing $0..."
-preprocess_file="/programs/gems/tests/outputs/016.AmberMDPrep.4mbzEdit-git-ignore-me.prepared.pdb"
+preprocess_file="/programs/gems/tests/outputs/016.AmberMDPrep.4mbzEdit.pdb"
 
 # clean up from previous runs
 if [ -f $preprocess_file ]; then
@@ -35,7 +35,7 @@ cat ${GEMSHOME}/gemsModules/ambermdprep/tests_in/explicit.json | ${GEMSHOME}/bin
 
 # echo -e "\nRipped Output Message Bytes: $(wc -c < test${testNumber}_output) (Expected $(wc -c < correct_outputs/test${testNumber}_output))"
 if ! cmp test${testNumber}_output correct_outputs/test${testNumber}_output > /dev/null 2>&1; then
-    printf "Test FAILED! Output file %s different from %s \n" test${testNumber}_output correct_outputs/test${testNumber}_output
+    printf "Test FAILED! Output file %s different from %s \n" outputs/test${testNumber}_output correct_outputs/test${testNumber}_output
     return 1
 fi
 if ! [ -f $preprocess_file ]; then

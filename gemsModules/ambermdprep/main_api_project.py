@@ -12,7 +12,7 @@ log = Set_Up_Logging(__name__)
 class AmberMDPrepProject(Project):
     """A project for storing information about an AmberMDPrep project.
 
-    Right now, this only offers the PreparePDB service.
+    Right now, this only can use the PreparePDB service.
 
     """
 
@@ -23,7 +23,7 @@ class AmberMDPrepProject(Project):
     entity_id: str = "AmberMDPrep"
     service_id: str = "PreparePDB"
     filesystem_path: str = "/website/userdata/"
-    service_dir: str = "prepare_pdb"
+    service_dir: str = "ambermdprep"
     requesting_agent: str = "tester"
     has_input_files: bool = True
     system_phase: constr(max_length=25) = "In solvent"
@@ -31,9 +31,7 @@ class AmberMDPrepProject(Project):
     pdb_file_name: constr(max_length=255) = "016.AmberMDPrep.4mbzEdit.pdb"
     u_uuid: constr(max_length=36) = " "
     notify: bool = False
-    upload_path: constr(
-        max_length=255
-    ) = "/website/userdata/prepare_pdb/016.AmberMDPrep.4mbzEdit.pdb"
+    upload_path: constr(max_length=255) = "/website/TESTS/ambermdprep/"
 
     project_type: typing.Literal["md"] = Field("md", title="Type", alias="type")
 

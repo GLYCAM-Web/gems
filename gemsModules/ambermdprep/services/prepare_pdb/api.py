@@ -65,12 +65,12 @@ class prepare_pdb_Inputs(BaseModel):
         description="UUID of Project",
     )
     outputDirPath: str = Field(
-        None,
+        "/website/TESTS/ambermdprep/ambermdprep_test_files/output_dir",
         title="Output Directory Path",
         description="Path to output directory",
     )
     inputFilesPath: str = Field(
-        None,
+        "/website/TESTS/ambermdprep/test_files",
         title="Input Files Directory Path",
         description="Path to whhere the input files are stored",
     )

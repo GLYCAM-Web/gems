@@ -30,9 +30,9 @@ def Serve(service: prepare_pdb_Request) -> prepare_pdb_Response:
 
     response = prepare_pdb_Response()
     response.outputs.message = execute(service.inputs)
-    response.outputs.outputDirPath = separate_path_and_filename(
-        service.inputs["output_filename"]
-    )[0]
+    # response.outputs.outputDirPath = separate_path_and_filename(
+    #     service.inputs["output_filename"]
+    # )[0]
 
     log.debug(f"AmberMDPrep prepare_pdb_Response: {response}")
     return response

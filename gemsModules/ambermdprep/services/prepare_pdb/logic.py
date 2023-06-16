@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
+import os
 from typing import Protocol, Dict, Optional
 from pydantic import BaseModel
 
 from gemsModules.ambermdprep.tasks import prepare_pdb
+from gemsModules.ambermdprep.services.prepare_pdb.api import (
+    prepare_pdb_Inputs,
+    prepare_pdb_Outputs,
+)
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -35,13 +40,16 @@ class serviceOutputs(BaseModel):
     outputs: responseOutputs = responseOutputs()
 
 
-def execute(inputs: serviceInputs) -> serviceOutputs:
+def execute(inputs: prepare_pdb_Inputs) -> prepare_pdb_Outputs:
     """Executes the service."""
     log.debug(f"serviceInputs: {inputs}")
-    service_outputs = serviceOutputs()
+    service_outputs = prepare_pdb_Outputs()
     # The who_I_am must be set in the options.
 
-    output = prepare_pdb.execute(inputs["pdb_filename"], inputs["output_filename"])
+    output = prepare_pdb.execute(
+        os.path.join(inputs.inputFilesPath, inputs.pdb_file),
+        os.path.join(inputs.outputDirPath, inputs.pdb_file),
+    )
 
     # NOTE/TODO: using serviceOutputs doubles up the keys.
     return output
