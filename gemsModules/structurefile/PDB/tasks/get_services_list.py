@@ -1,4 +1,6 @@
-from gemsModules.ambermdprep.services.settings.known_available import Available_Services
+from gemsModules.structurefile.PDB.services.settings.known_available import (
+    Available_Services,
+)
 from typing import List
 
 

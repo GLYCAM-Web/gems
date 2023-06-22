@@ -24,7 +24,7 @@ class Known_Entities(GemsStrEnum):
     Sequence = "Sequence"
     DrawGlycan = "DrawGlycan"
     StructureFile = "StructureFile"
-    AmberMDPrep = "AmberMDPrep"
+    PDB = "PDB"
 
 
 from gemsModules.deprecated.delegator.receive import delegate as deprecated_delegator
@@ -33,7 +33,7 @@ from gemsModules.common.receive import receive as common
 
 from gemsModules.mmservice.receive import receive as mmservice
 from gemsModules.mmservice.mdaas.receive import receive as mdaas
-from gemsModules.ambermdprep.receive import receive as ambermdprep
+from gemsModules.structurefile.PDB.receive import receive as pdb
 
 from gemsModules.status.receive import receive as status
 
@@ -54,5 +54,5 @@ Known_Entity_Reception_Modules = {
     "Sequence": deprecated_delegator,
     #'Status' : deprecated_delegator,
     "StructureFile": deprecated_delegator,
-    "AmberMDPrep": ambermdprep,
+    "PDB": pdb,
 }

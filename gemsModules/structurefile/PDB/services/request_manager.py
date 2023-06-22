@@ -7,19 +7,19 @@ from gemsModules.common.services.explicit_requests import (
 from gemsModules.common.services.service_packages_list import (
     Services_Package_List_Utilities,
 )
-from gemsModules.ambermdprep.services.implied_requests import (
+from gemsModules.structurefile.PDB.services.implied_requests import (
     AmberMDPrep_Implied_Services_Request_Manager,
 )
-from gemsModules.ambermdprep.services.default_requests import (
+from gemsModules.structurefile.PDB.services.default_requests import (
     AmberMDPrep_Default_Service_Request_Manager,
 )
-from gemsModules.ambermdprep.services.duplicate_requests import (
+from gemsModules.structurefile.PDB.services.duplicate_requests import (
     AmberMDPrep_Duplicate_Requests_Manager,
 )
-from gemsModules.ambermdprep.services.request_data_filler import (
+from gemsModules.structurefile.PDB.services.request_data_filler import (
     AmberMDPrep_Request_Data_Filler,
 )
-from gemsModules.ambermdprep.tasks import get_services_list
+from gemsModules.structurefile.PDB.tasks import get_services_list
 
 from gemsModules.logging.logger import Set_Up_Logging
 

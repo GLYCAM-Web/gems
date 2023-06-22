@@ -5,10 +5,10 @@ from typing import List
 from gemsModules.common.action_associated_objects import AAOP
 from gemsModules.common.services.request_data_filler import Request_Data_Filler
 
-from gemsModules.ambermdprep.main_api import AmberMDPrep_Entity
-from gemsModules.ambermdprep.main_api_project import AmberMDPrepProject
+from gemsModules.structurefile.PDB.main_api import AmberMDPrep_Entity
+from gemsModules.structurefile.PDB.main_api_project import PDBProject
 
-from gemsModules.ambermdprep.services.prepare_pdb import api
+from gemsModules.structurefile.PDB.services.AmberMDPrep import api
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -17,7 +17,7 @@ log = Set_Up_Logging(__name__)
 
 class AmberMDPrep_Request_Data_Filler(Request_Data_Filler):
     def process(self) -> List[AAOP]:
-        this_Project: AmberMDPrepProject = self.project
+        this_Project: PDBProject = self.project
 
         for i, aaop in enumerate(self.aaop_list):
             if aaop.Dictionary_Name == "any_amber_prep":

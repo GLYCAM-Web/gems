@@ -2,12 +2,14 @@
 
 from gemsModules.common.transaction_manager import Transaction_Manager
 from gemsModules.common.services.aaop_tree_pair_manager import AAOP_Tree_Pair_Generator
-from gemsModules.ambermdprep.project_manager import AmberMDPrep_Project_Manager
-from gemsModules.ambermdprep.services.request_manager import AmberMDPrep_Request_Manager
-from gemsModules.ambermdprep.services.response_manager import (
+from gemsModules.structurefile.PDB.project_manager import AmberMDPrep_Project_Manager
+from gemsModules.structurefile.PDB.services.request_manager import (
+    AmberMDPrep_Request_Manager,
+)
+from gemsModules.structurefile.PDB.services.response_manager import (
     AmberMDPrep_Response_Manager,
 )
-from gemsModules.ambermdprep.services.servicer import AmberMDPrep_Servicer
+from gemsModules.structurefile.PDB.services.servicer import AmberMDPrep_Servicer
 
 from gemsModules.logging.logger import Set_Up_Logging
 

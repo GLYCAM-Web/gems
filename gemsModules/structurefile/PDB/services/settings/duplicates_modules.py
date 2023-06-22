@@ -6,7 +6,7 @@ from gemsModules.common.services.status.manage_multiples import status_Multiples
 
 # from gemsModules.mmservice.mdaas.services.list_services.manage_multiples import list_services_Multiples_Manager
 # from gemsModules.mmservice.mdaas.services.run_md.manage_multiples import run_md_Multiples_Manager
-from gemsModules.ambermdprep.services.prepare_pdb.manage_multiples import (
+from gemsModules.structurefile.PDB.services.AmberMDPrep.manage_multiples import (
     prepare_pdb_Multiples_Manager,
 )
 
@@ -19,6 +19,6 @@ duplicates_modules: Dict[str, Callable] = {
     #'ListServices': list_services_Multiples_Manager,
     "Marco": marco_Multiples_Manager,
     "Status": status_Multiples_Manager,
-    "PreparePDB": prepare_pdb_Multiples_Manager,
+    "AmberMDPrep": prepare_pdb_Multiples_Manager,
     #'RunMD': run_md_Multiples_Manager
 }

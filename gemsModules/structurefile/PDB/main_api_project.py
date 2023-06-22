@@ -9,7 +9,7 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
-class AmberMDPrepProject(Project):
+class PDBProject(Project):
     """A project for storing information about an AmberMDPrep project.
 
     Right now, this only can use the PreparePDB service.
@@ -17,13 +17,13 @@ class AmberMDPrepProject(Project):
     """
 
     title: str = "very hacky initial AmberMDPrep service"
-    parent_entity: str = "ambermdprep"
-    app: str = "md"
-    requested_service: str = "ambermdprep"
-    entity_id: str = "AmberMDPrep"
-    service_id: str = "PreparePDB"
+    parent_entity: str = "structurefile"
+    app: str = "mdprep"
+    requested_service: str = "AmberMDPrep"
+    entity_id: str = "PDB"
+    service_id: str = "AmberMDPrep"
     filesystem_path: str = "/website/userdata/"
-    service_dir: str = "ambermdprep"
+    service_dir: str = ""
     requesting_agent: str = "tester"
     has_input_files: bool = True
     system_phase: constr(max_length=25) = "In solvent"
@@ -31,9 +31,9 @@ class AmberMDPrepProject(Project):
     pdb_file_name: constr(max_length=255) = "016.AmberMDPrep.4mbzEdit.pdb"
     u_uuid: constr(max_length=36) = " "
     notify: bool = False
-    upload_path: constr(max_length=255) = "/website/TESTS/ambermdprep/"
+    upload_path: constr(max_length=255) = "/website/TESTS/PDB/"
 
-    project_type: typing.Literal["md"] = Field("md", title="Type", alias="type")
+    project_type: typing.Literal["pdb"] = Field("pdb", title="Type", alias="type")
 
     def add_temporary_info(self):
         self.project_dir: str = os.path.join(

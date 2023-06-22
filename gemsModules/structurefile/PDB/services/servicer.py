@@ -14,7 +14,7 @@ log = Set_Up_Logging(__name__)
 
 class AmberMDPrep_Servicer(Servicer):
     def get_module_for_this_request(self, this_request_aaop: AAOP) -> Callable:
-        from gemsModules.ambermdprep.services.settings.service_modules import (
+        from gemsModules.structurefile.PDB.services.settings.service_modules import (
             service_modules,
         )
 

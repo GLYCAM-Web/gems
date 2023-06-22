@@ -7,7 +7,7 @@ from gemsModules.common.services.list_services.server import (
 from gemsModules.common.services.marco.server import Serve as serve_marco
 from gemsModules.common.services.status.server import Serve as serve_status
 
-from gemsModules.ambermdprep.services.prepare_pdb.server import (
+from gemsModules.structurefile.PDB.services.AmberMDPrep.server import (
     Serve as serve_prepare_pdb,
 )
 
@@ -20,5 +20,5 @@ service_modules: Dict[str, Callable] = {
     "ListServices": serve_list_services,
     "Marco": serve_marco,
     "Status": serve_status,
-    "PreparePDB": serve_prepare_pdb,
+    "AmberMDPrep": serve_prepare_pdb,
 }

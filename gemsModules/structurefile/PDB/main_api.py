@@ -7,10 +7,11 @@ from gemsModules.common import main_api
 from gemsModules.common import main_api_entity
 from gemsModules.common import main_api_services
 
-from gemsModules.ambermdprep.main_api_project import AmberMDPrepProject
-from gemsModules.ambermdprep.services.settings.known_available import Available_Services
-
-from gemsModules.ambermdprep.main_settings import WhoIAm
+from gemsModules.structurefile.PDB.main_api_project import PDBProject
+from gemsModules.structurefile.PDB.services.settings.known_available import (
+    Available_Services,
+)
+from gemsModules.structurefile.PDB.main_settings import WhoIAm
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -19,7 +20,7 @@ log = Set_Up_Logging(__name__)
 
 class AmberMDPrep_Service_Request(main_api_services.Service_Request):
     typename: Available_Services = Field(
-        "AmberMDPrep",
+        "PDB",
         alias="type",
         title="Services Offered by AmberMDPrep",
         description="The service requested of the AmberMDPrep Servicer",
@@ -45,7 +46,7 @@ class AmberMDPrep_Service_Responses(main_api_services.Service_Responses):
 
 class AmberMDPrep_Entity(main_api_entity.Entity):
     entityType: typing.Literal[
-        "AmberMDPrep"
+        "PDB"
     ] = Field(  # This is the only required field in all of the API
         ..., title="Type", alias="type"
     )
@@ -57,7 +58,7 @@ class AmberMDPrep_Entity(main_api_entity.Entity):
 # It should also define more services that are specific to mmservice.mdaas
 class AmberMDPrep_API(main_api.Common_API):
     entity: AmberMDPrep_Entity
-    project: AmberMDPrepProject = AmberMDPrepProject()
+    project: PDBProject = PDBProject()
 
 
 class AmberMDPrep_Transaction(main_api.Transaction):

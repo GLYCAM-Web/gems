@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 from pydantic import ValidationError
 from gemsModules.common.json_string_manager import Json_String_Manager
-from gemsModules.ambermdprep.main_settings import WhoIAm
-from gemsModules.ambermdprep.main_api import AmberMDPrep_Transaction
-from gemsModules.ambermdprep.transaction_manager import AmberMDPrep_Transaction_Manager
+from gemsModules.structurefile.PDB.main_settings import WhoIAm
+from gemsModules.structurefile.PDB.main_api import AmberMDPrep_Transaction
+from gemsModules.structurefile.PDB.transaction_manager import (
+    AmberMDPrep_Transaction_Manager,
+)
 
 from gemsModules.logging.logger import Set_Up_Logging
 

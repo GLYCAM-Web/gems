@@ -3,8 +3,8 @@ import os
 from typing import Protocol, Dict, Optional
 from pydantic import BaseModel
 
-from gemsModules.ambermdprep.tasks import prepare_pdb
-from gemsModules.ambermdprep.services.prepare_pdb.api import (
+from gemsModules.structurefile.PDB.tasks import prepare_pdb
+from gemsModules.structurefile.PDB.services.AmberMDPrep.api import (
     prepare_pdb_Inputs,
     prepare_pdb_Outputs,
 )

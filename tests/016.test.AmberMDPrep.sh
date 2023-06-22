@@ -3,6 +3,7 @@ THISPYTHON='python3'
 testNumber=016
 echo "Testing $0..."
 preprocess_file="/programs/gems/tests/outputs/016.AmberMDPrep.4mbzEdit.pdb"
+PDB_tests_dir="${GEMSHOME}/gemsModules/structurefile/PDB/tests_in"
 
 # clean up from previous runs
 if [ -f $preprocess_file ]; then
@@ -18,8 +19,9 @@ fi
 # echo "$(which ${THISPYTHON})"
 # pwd 
 
-if ! [ -f "${GEMSHOME}/gemsModules/ambermdprep/tests_in/explicit.json" ]; then
-    printf "Test FAILED! File %s does not exist \n" ${GEMSHOME}/gemsModules/ambermdprep/tests_in/explicit.json
+
+if ! [ -f "${PDB_tests_dir}/explicit.json" ]; then
+    printf "Test FAILED! File %s does not exist \n" ${PDB_tests_dir}/explicit.json
     return 1
 fi
 
@@ -30,7 +32,7 @@ fi
 # ${GEMSHOME}/bin/delegate ${GEMSHOME}/gemsModules/ambermdprep/tests_in/explicit.json |\
 #
 # This works with prepush:
-cat ${GEMSHOME}/gemsModules/ambermdprep/tests_in/explicit.json | ${GEMSHOME}/bin/delegate |\
+cat ${PDB_tests_dir}/explicit.json | ${GEMSHOME}/bin/delegate |\
     $GEMSHOME/tests/utilities/json_ripper.py entity.responses.any_amber_prep.outputs.message > test${testNumber}_output
 
 # echo -e "\nRipped Output Message Bytes: $(wc -c < test${testNumber}_output) (Expected $(wc -c < correct_outputs/test${testNumber}_output))"

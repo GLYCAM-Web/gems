@@ -15,7 +15,7 @@ log = Set_Up_Logging(__name__)
 
 
 class Module_Available_Services(GemsStrEnum):
-    prepare_pdb = "PreparePDB"
+    prepare_pdb = "AmberMDPrep"
 
 
 Available_Services = GemsStrEnum(

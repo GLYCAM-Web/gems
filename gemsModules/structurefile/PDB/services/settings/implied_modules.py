@@ -15,7 +15,7 @@ from gemsModules.common.services.list_services.implied_translator import (
 )
 
 # from gemsModules.mmservice.mdaas.services.run_md.implied_translator import run_md_Implied_Translator
-from gemsModules.ambermdprep.services.prepare_pdb.implied_translator import (
+from gemsModules.structurefile.PDB.services.AmberMDPrep.implied_translator import (
     prepare_pdb_Implied_Translator,
 )
 
@@ -28,6 +28,6 @@ implied_modules: Dict[str, Callable] = {
     "ListServices": list_services_Implied_Translator,
     "Marco": marco_Implied_Translator,
     "Status": status_Implied_Translator,
-    "PreparePDB": prepare_pdb_Implied_Translator
+    "AmberMDPrep": prepare_pdb_Implied_Translator
     # 'RunMD': run_md_Implied_Translator
 }

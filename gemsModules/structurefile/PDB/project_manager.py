@@ -5,8 +5,8 @@ from abc import ABC, abstractmethod
 
 from gemsModules.common.project_manager import Project_Manager
 
-from gemsModules.ambermdprep.main_api import AmberMDPrep_Entity
-from gemsModules.ambermdprep.main_api_project import AmberMDPrepProject
+from gemsModules.structurefile.PDB.main_api import AmberMDPrep_Entity
+from gemsModules.structurefile.PDB.main_api_project import PDBProject
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -14,21 +14,21 @@ log = Set_Up_Logging(__name__)
 
 
 class AmberMDPrep_Project_Manager(Project_Manager):
-    def process(self) -> AmberMDPrepProject:
+    def process(self) -> PDBProject:
         self.instantiate_response_project()
         return self.response_project
 
-    def instantiate_response_project(self) -> AmberMDPrepProject:
+    def instantiate_response_project(self) -> PDBProject:
         # self.fill_response_project_from_incoming_project()
-        self.response_project = AmberMDPrepProject()
+        self.response_project = PDBProject()
         self.response_project.add_temporary_info()
 
         return self.response_project
 
     @staticmethod
-    def instantiate_new_project() -> AmberMDPrepProject:
+    def instantiate_new_project() -> PDBProject:
         """This is a static method that returns a new project."""
-        project = AmberMDPrepProject()
+        project = PDBProject()
         project.add_temporary_info()
         return project
 
@@ -45,9 +45,9 @@ class AmberMDPrep_Project_Manager(Project_Manager):
         pass
 
 
-def testme() -> AmberMDPrepProject:
+def testme() -> PDBProject:
     the_entity = AmberMDPrep_Entity(type="AmberMDPrep")
-    the_project = AmberMDPrepProject()
+    the_project = PDBProject()
     the_manager = AmberMDPrep_Project_Manager(
         entity=the_entity, incoming_project=the_project
     )

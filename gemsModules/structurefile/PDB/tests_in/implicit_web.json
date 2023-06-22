@@ -1,9 +1,9 @@
 {
     "entity": {
-        "type": "AmberMDPrep",
+        "type": "PDB",
         "services": {
             "web_amber_prep": {
-                "type": "PreparePDB"
+                "type": "AmberMDPrep"
             }
         }
     }

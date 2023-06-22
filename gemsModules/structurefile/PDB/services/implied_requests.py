@@ -5,8 +5,10 @@ from gemsModules.common.services.implied_requests import (
     Implied_Services_Request_Manager,
 )
 
-from gemsModules.ambermdprep.tasks import get_services_list
-from gemsModules.ambermdprep.services.settings.implied_modules import implied_modules
+from gemsModules.structurefile.PDB.tasks import get_services_list
+from gemsModules.structurefile.PDB.services.settings.implied_modules import (
+    implied_modules,
+)
 
 from gemsModules.logging.logger import Set_Up_Logging
 

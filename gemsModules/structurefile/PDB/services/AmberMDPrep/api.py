@@ -4,7 +4,7 @@ from typing import List, Union
 
 from gemsModules.common.main_api_resources import Resource, Resources
 
-from gemsModules.ambermdprep.main_api import (
+from gemsModules.structurefile.PDB.main_api import (
     AmberMDPrep_Service_Request,
     AmberMDPrep_Service_Response,
 )
@@ -97,11 +97,11 @@ class prepare_pdb_Outputs(BaseModel):
 
 
 class prepare_pdb_Request(AmberMDPrep_Service_Request):
-    typename: str = Field("PreparePDB", alias="type")
+    typename: str = Field("AmberMDPrep", alias="type")
     # the following must be redefined in a child class
     inputs: prepare_pdb_Inputs = prepare_pdb_Inputs()
 
 
 class prepare_pdb_Response(AmberMDPrep_Service_Response):
-    typename: str = Field("PreparePDB", alias="type")
+    typename: str = Field("AmberMDPrep", alias="type")
     outputs: prepare_pdb_Outputs = prepare_pdb_Outputs()

@@ -3,7 +3,7 @@ from typing import List, Callable
 
 from gemsModules.common.services.duplicate_requests import Duplicate_Requests_Manager
 
-from gemsModules.ambermdprep.tasks import get_services_list
+from gemsModules.structurefile.PDB.tasks import get_services_list
 
 from gemsModules.logging.logger import Set_Up_Logging
 
