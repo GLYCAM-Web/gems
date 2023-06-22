@@ -6,7 +6,9 @@ import pydantic
 class PreprocessorOptions(pydantic.BaseModel):
     """Pydantic model for gmml.PreprocessorOptions(), which is used for gmml.PreProcess()"""
 
-    chainNTermination: str = pydantic.Field(default="NH3+", alias="chainNtermination_")
+    chainNTermination: pydantic.typing.Literal["NH3+", ""] = pydantic.Field(
+        default="NH3+", alias="chainNtermination_"
+    )
     chainCTermination: str = pydantic.Field(default="CO2-", alias="chainCtermination_")
     gapNTermination: str = pydantic.Field(default="COCH3", alias="gapNtermination_")
     gapCTermination: str = pydantic.Field(default="NHCH3", alias="gapCtermination_")
@@ -117,44 +119,90 @@ def execute(
     True
     """
 
+    # Demonstration
     if options is None:
-        options = PreprocessorOptions(
-            chainCTermination="CO2-",
-            chainNTermination="NH3+",
-            gapCTermination="NHCH3",
-            gapNTermination="COCH3",
-        )
-        options.append_his_selection(("HIS_20_?_A_1", "HID"))
-        options = options.build()
+        options = PreprocessorOptions().build()
     else:
         options = PreprocessorOptions(**options).build()
 
     pp_info, _ = preprocess_and_write_pdb(input_pdb_path, options, output_pdb_path)
 
     # Build the output string
-    output = ""
-    output += "Unrecognized atoms:\n"
-    for unrecognized in pp_info.unrecognizedAtoms_:
-        output += f"{unrecognized.name_}  |  {unrecognized.residue_.getName()}  |  {unrecognized.residue_.getChainId()}  |  {unrecognized.residue_.getNumberAndInsertionCode()}\n"
-    output += "Missing heavy atoms:\n"
-    for missing in pp_info.missingHeavyAtoms_:
-        output += f"{missing.name_}  |  {missing.residue_.getName()}  |  {missing.residue_.getChainId()}  |  {missing.residue_.getNumberAndInsertionCode()}\n"
-    output += "Unrecognized residues:\n"
-    for unrecognized in pp_info.unrecognizedResidues_:
-        output += f"{unrecognized.getName()}  |  {unrecognized.getChainId()}  |  {unrecognized.getNumberAndInsertionCode()}\n"
-    output += "Gaps in amino acid chain:\n"
-    for gap in pp_info.missingResidues_:
-        output += f"{gap.chainId_}  |  {gap.residueBeforeGap_}  |  {gap.residueAfterGap_}  |  {gap.terminationBeforeGap_}  |  {gap.terminationAfterGap_}\n"
-    output += "Histidine Protonation:\n"
-    for his in pp_info.hisResidues_:
-        output += f"{his.getName()}  |  {his.getChainId()}  |  {his.getNumberAndInsertionCode()}\n"
-    output += "Disulphide bonds:\n"
-    for cysBond in pp_info.cysBondResidues_:
-        output += f"{cysBond.residue1_.getChainId()}  |  {cysBond.residue1_.getName()}  |  {cysBond.residue1_.getNumberAndInsertionCode()}  |  {cysBond.distance_:.2f}  |  {cysBond.residue2_.getChainId()}  |  {cysBond.residue2_.getName()}  |  {cysBond.residue2_.getNumberAndInsertionCode()}\n"
-    output += "Chain terminations:\n"
-    for chainT in pp_info.chainTerminals_:
-        output += f"{chainT.chainId_}  |  {chainT.startIndex_}  |  {chainT.nTermination_}  |  {chainT.endIndex_}  |  {chainT.cTermination_}\n"
-    output += "We made it to the end. Congratulations!\n"
+    output = {}
+    output["unrecognizedAtoms"] = [
+        {
+            "atomName": {a.name_},
+            "residueName": a.residue_.getName(),
+            "chainId": a.residue_.getChainId(),
+            "numberAndInsertionCode": a.residue_.getNumberAndInsertionCode(),
+        }
+        for a in pp_info.unrecognizedAtoms_
+    ]
+    output["missingHeavyAtoms"] = [
+        {
+            "atomName": {a.name_},
+            "residueName": a.residue_.getName(),
+            "chainId": a.residue_.getChainId(),
+            "numberAndInsertionCode": a.residue_.getNumberAndInsertionCode(),
+        }
+        for a in pp_info.missingHeavyAtoms_
+    ]
+    output["unrecognizedResidues"] = [
+        {
+            "residueName": {r.getName()},
+            "chainId": r.getChainId(),
+            "numberAndInsertionCode": r.getNumberAndInsertionCode(),
+        }
+        for r in pp_info.unrecognizedResidues_
+    ]
+
+    output["missingResidues"] = [
+        {
+            "chainId": r.chainId_,
+            "residueBeforeGap": r.residueBeforeGap_,
+            "residueAfterGap": r.residueAfterGap_,
+            "terminationBeforeGap": r.terminationBeforeGap_,
+            "terminationAfterGap": r.terminationAfterGap_,
+        }
+        for r in pp_info.missingResidues_
+    ]
+
+    output["hisResidues"] = [
+        {
+            "chainId": r.getChainId(),
+            "residueName": r.getName(),
+            "numberAndInsertionCode": r.getNumberAndInsertionCode(),
+        }
+        for r in pp_info.hisResidues_
+    ]
+
+    output["cysBondResidues"] = [
+        {
+            "residue1": {
+                "chainId": r.residue1_.getChainId(),
+                "residueName": r.residue1_.getName(),
+                "numberAndInsertionCode": r.residue1_.getNumberAndInsertionCode(),
+            },
+            "distance": r.distance_,
+            "residue2": {
+                "chainId": r.residue2_.getChainId(),
+                "residueName": r.residue2_.getName(),
+                "numberAndInsertionCode": r.residue2_.getNumberAndInsertionCode(),
+            },
+        }
+        for r in pp_info.cysBondResidues_
+    ]
+
+    output["chainTerminals"] = [
+        {
+            "chainId": ct.chainId_,
+            "startIndex": ct.startIndex_,
+            "endIndex": ct.endIndex_,
+            "nTermination": ct.nTermination_,
+            "cTermination": ct.cTermination_,
+        }
+        for ct in pp_info.chainTerminals_
+    ]
 
     return output
 
