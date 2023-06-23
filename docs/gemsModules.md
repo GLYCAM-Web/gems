@@ -1,5 +1,12 @@
 # The GEMS Modules
 
+## These docs are out of date
+
+Many changes have occurred.  We need to update these docs.  
+
+The gist of what they say is probably correct, but the execution details 
+have changed a lot.
+
 ## Overview
 GEMS has a series of gemsModules, that define entities. Entities
 provide services. Services, then, are defined in the gemsModule that
