@@ -17,7 +17,7 @@ from gemsModules.structurefile.PDB.services.duplicate_requests import (
     AmberMDPrep_Duplicate_Requests_Manager,
 )
 from gemsModules.structurefile.PDB.services.request_data_filler import (
-    AmberMDPrep_Request_Data_Filler,
+    PDB_Request_Data_Filler,
 )
 from gemsModules.structurefile.PDB.tasks import get_services_list
 
@@ -33,5 +33,5 @@ class AmberMDPrep_Request_Manager(Request_Manager):
         self.implied_manager_type = AmberMDPrep_Implied_Services_Request_Manager
         self.duplicate_manager_type = AmberMDPrep_Duplicate_Requests_Manager
         self.default_manager_type = AmberMDPrep_Default_Service_Request_Manager
-        self.data_filler_type = AmberMDPrep_Request_Data_Filler
+        self.data_filler_type = PDB_Request_Data_Filler
         self.available_services = get_services_list.execute()

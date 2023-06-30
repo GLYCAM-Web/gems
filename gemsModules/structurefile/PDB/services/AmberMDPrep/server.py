@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from gemsModules.structurefile.PDB.services.AmberMDPrep.api import (
-    prepare_pdb_Request,
-    prepare_pdb_Response,
+    AmberMDPrep_Request,
+    AmberMDPrep_Response,
 )
 
 from gemsModules.systemoperations.filesystem_ops import separate_path_and_filename
@@ -14,7 +14,7 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
-def Serve(service: prepare_pdb_Request) -> prepare_pdb_Response:
+def Serve(service: AmberMDPrep_Request) -> AmberMDPrep_Response:
     # set_up_prepare_pdb_directory.execute(
     #     protocol_files_dir=service.inputs.protocolFilesPath,
     #     output_dir_path=service.inputs.outputDirPath,
@@ -28,7 +28,7 @@ def Serve(service: prepare_pdb_Request) -> prepare_pdb_Response:
     #     use_serial=True,
     # )
 
-    response = prepare_pdb_Response()
+    response = AmberMDPrep_Response()
     response.outputs.message = execute(service.inputs)
     # response.outputs.outputDirPath = separate_path_and_filename(
     #     service.inputs["output_filename"]

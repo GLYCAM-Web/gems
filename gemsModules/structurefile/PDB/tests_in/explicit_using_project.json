@@ -1,0 +1,13 @@
+{
+    "entity": {
+        "type": "PDB",
+        "services": {
+            "any_amber_prep": {
+                "type": "AmberMDPrep",
+                "inputs": {
+                    "pdb_filename": "016.AmberMDPrep.4mbzEdit.pdb"
+                }
+            }
+        }
+    }
+}

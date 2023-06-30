@@ -7,7 +7,7 @@ from gemsModules.common import main_api
 from gemsModules.common import main_api_entity
 from gemsModules.common import main_api_services
 
-from gemsModules.structurefile.PDB.main_api_project import PDBProject
+from gemsModules.structurefile.PDB.main_api_project import PDB_Project
 from gemsModules.structurefile.PDB.services.settings.known_available import (
     Available_Services,
 )
@@ -18,49 +18,49 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
-class AmberMDPrep_Service_Request(main_api_services.Service_Request):
+class PDB_Service_Request(main_api_services.Service_Request):
     typename: Available_Services = Field(
         "PDB",
         alias="type",
-        title="Services Offered by AmberMDPrep",
-        description="The service requested of the AmberMDPrep Servicer",
+        title="Services offered by PDB Entity",
+        description="The service requested of the PDB Servicer",
     )
 
 
-class AmberMDPrep_Service_Response(main_api_services.Service_Response):
+class PDB_Service_Response(main_api_services.Service_Response):
     typename: Available_Services = Field(
         None,
         alias="type",
-        title="Services Offered by AmberMDPrep",
-        description="The service response from AmberMDPrep",
+        title="Services offered by PDB Entity",
+        description="The service response from PDB",
     )
 
 
-class AmberMDPrep_Service_Requests(main_api_services.Service_Requests):
-    __root__: Dict[str, AmberMDPrep_Service_Request] = None
+class PDB_Service_Requests(main_api_services.Service_Requests):
+    __root__: Dict[str, PDB_Service_Request] = None
 
 
-class AmberMDPrep_Service_Responses(main_api_services.Service_Responses):
-    __root__: Dict[str, AmberMDPrep_Service_Response] = None
+class PDB_Service_Responses(main_api_services.Service_Responses):
+    __root__: Dict[str, PDB_Service_Response] = None
 
 
-class AmberMDPrep_Entity(main_api_entity.Entity):
+class PDB_Entity(main_api_entity.Entity):
     entityType: typing.Literal[
         "PDB"
     ] = Field(  # This is the only required field in all of the API
         ..., title="Type", alias="type"
     )
-    services: AmberMDPrep_Service_Requests = AmberMDPrep_Service_Requests()
-    responses: AmberMDPrep_Service_Responses = AmberMDPrep_Service_Responses()
+    services: PDB_Service_Requests = PDB_Service_Requests()
+    responses: PDB_Service_Responses = PDB_Service_Responses()
 
 
 # The Delegator uses the main_api.Transaction class to define the transaction
 # It should also define more services that are specific to mmservice.mdaas
-class AmberMDPrep_API(main_api.Common_API):
-    entity: AmberMDPrep_Entity
-    project: PDBProject = PDBProject()
+class PDB_API(main_api.Common_API):
+    entity: PDB_Entity
+    project: PDB_Project = PDB_Project()
 
 
-class AmberMDPrep_Transaction(main_api.Transaction):
+class PDB_Transaction(main_api.Transaction):
     def get_API_type(self):  # This allows dependency injection in the children
-        return AmberMDPrep_API
+        return PDB_API

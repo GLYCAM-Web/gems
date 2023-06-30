@@ -5,8 +5,8 @@ from typing import List, Union
 from gemsModules.common.main_api_resources import Resource, Resources
 
 from gemsModules.structurefile.PDB.main_api import (
-    AmberMDPrep_Service_Request,
-    AmberMDPrep_Service_Response,
+    PDB_Service_Request,
+    PDB_Service_Response,
 )
 
 from gemsModules.logging.logger import Set_Up_Logging
@@ -14,7 +14,7 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
-class prepare_pdb_input_Resource(Resource):
+class AmberMDPrep_input_Resource(Resource):
     """Need to write validators."""
 
     ## Works now:
@@ -30,7 +30,7 @@ class prepare_pdb_input_Resource(Resource):
     pass
 
 
-class prepare_pdb_output_Resource(Resource):
+class AmberMDPrep_output_Resource(Resource):
     """Need to write validators."""
 
     ## Works now:
@@ -46,13 +46,13 @@ class prepare_pdb_output_Resource(Resource):
     pass
 
 
-class prepare_pdb_Resources(Resources):
+class AmberMDPrep_Resources(Resources):
     __root__: List[
-        Union[prepare_pdb_input_Resource, prepare_pdb_output_Resource]
+        Union[AmberMDPrep_input_Resource, AmberMDPrep_output_Resource]
     ] = None
 
 
-class prepare_pdb_Inputs(BaseModel):
+class AmberMDPrep_Inputs(BaseModel):
     pdb_file: str = Field(
         None,
         title="Amber Parm7",
@@ -82,7 +82,7 @@ class prepare_pdb_Inputs(BaseModel):
     resources: Resources = Resources()
 
 
-class prepare_pdb_Outputs(BaseModel):
+class AmberMDPrep_Outputs(BaseModel):
     message: str = Field(
         None,
         title="Message",
@@ -93,15 +93,15 @@ class prepare_pdb_Outputs(BaseModel):
         title="Output Directory Path",
         description="Path to output directory",
     )
-    resources: prepare_pdb_Resources = prepare_pdb_Resources()
+    resources: AmberMDPrep_Resources = AmberMDPrep_Resources()
 
 
-class prepare_pdb_Request(AmberMDPrep_Service_Request):
+class AmberMDPrep_Request(PDB_Service_Request):
     typename: str = Field("AmberMDPrep", alias="type")
     # the following must be redefined in a child class
-    inputs: prepare_pdb_Inputs = prepare_pdb_Inputs()
+    inputs: AmberMDPrep_Inputs = AmberMDPrep_Inputs()
 
 
-class prepare_pdb_Response(AmberMDPrep_Service_Response):
+class AmberMDPrep_Response(PDB_Service_Response):
     typename: str = Field("AmberMDPrep", alias="type")
-    outputs: prepare_pdb_Outputs = prepare_pdb_Outputs()
+    outputs: AmberMDPrep_Outputs = AmberMDPrep_Outputs()

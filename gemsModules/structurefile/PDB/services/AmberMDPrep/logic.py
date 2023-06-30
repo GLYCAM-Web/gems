@@ -5,8 +5,8 @@ from pydantic import BaseModel
 
 from gemsModules.structurefile.PDB.tasks import prepare_pdb
 from gemsModules.structurefile.PDB.services.AmberMDPrep.api import (
-    prepare_pdb_Inputs,
-    prepare_pdb_Outputs,
+    AmberMDPrep_Inputs,
+    AmberMDPrep_Outputs,
 )
 
 from gemsModules.logging.logger import Set_Up_Logging
@@ -40,12 +40,14 @@ class serviceOutputs(BaseModel):
     outputs: responseOutputs = responseOutputs()
 
 
-def execute(inputs: prepare_pdb_Inputs) -> prepare_pdb_Outputs:
+def execute(inputs: AmberMDPrep_Inputs) -> AmberMDPrep_Outputs:
     """Executes the service."""
     log.debug(f"serviceInputs: {inputs}")
-    service_outputs = prepare_pdb_Outputs()
+    service_outputs = AmberMDPrep_Outputs()
     # The who_I_am must be set in the options.
 
+    # TODO: should this always execute? I think what makes sense is for it to conditionally
+    # execute on an AAO_Type of "prepare_pdb" which is only known to the PDB.AmberMDPrep service.
     output = prepare_pdb.execute(
         os.path.join(inputs.inputFilesPath, inputs.pdb_file),
         os.path.join(inputs.outputDirPath, inputs.pdb_file),

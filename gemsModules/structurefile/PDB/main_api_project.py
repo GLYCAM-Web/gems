@@ -9,7 +9,7 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
-class PDBProject(Project):
+class PDB_Project(Project):
     """A project for storing information about an AmberMDPrep project.
 
     Right now, this only can use the PreparePDB service.
@@ -28,12 +28,12 @@ class PDBProject(Project):
     has_input_files: bool = True
     system_phase: constr(max_length=25) = "In solvent"
     input_type: constr(max_length=25) = "pdb"
-    pdb_file_name: constr(max_length=255) = "016.AmberMDPrep.4mbzEdit.pdb"
+    pdb_filename: constr(max_length=255) = "016.AmberMDPrep.4mbzEdit.pdb"
     u_uuid: constr(max_length=36) = " "
-    notify: bool = False
-    upload_path: constr(max_length=255) = "/website/TESTS/PDB/"
+    notify: bool = True
+    upload_path: constr(max_length=255) = "/website/TESTS/pdb/"
 
-    project_type: typing.Literal["pdb"] = Field("pdb", title="Type", alias="type")
+    project_type: typing.Literal["PDB"] = Field("PDB", title="Type", alias="type")
 
     def add_temporary_info(self):
         self.project_dir: str = os.path.join(

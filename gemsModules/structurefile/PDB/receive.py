@@ -20,6 +20,5 @@ def receive(incomingString: str) -> str:
             "Error in PDB Json String Manager:\n%s",
             AmberMDPrep_manager_error_response,
         )
-        return AmberMDPrep_manager_error_response
 
     return manager.transaction.get_outgoing_string()
