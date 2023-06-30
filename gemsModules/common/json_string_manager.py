@@ -27,48 +27,27 @@ class Json_String_Manager(ABC):
         self.transaction_manager_type = common_Transaction_Manager
 
     def process(self, incoming_string: str):
-        log.debug("Processing incoming JSON string.")
+        brief = None
         try:
             return_value = self.transaction.process_incoming_string(
                 in_string=incoming_string, initialize_out=False
             )
+            if return_value is None or return_value == 0:
+                self.transaction_manager = self.transaction_manager_type(
+                    self.transaction
+                )
+                self.transaction = self.transaction_manager.process()
         except ValidationError as e:
-            log.error("ValidationError: " + str(e))
-            self.transaction.generate_error_response(
-                EntityType=self.entityType,
-                Brief="InvalidInput",
-                AdditionalInfo={"error": str(e)},
-            )
-            return self.transaction.get_outgoing_string()
+            brief = "InvalidInput", e
         except ValueError as e:
-            log.error("ValueError: " + str(e))
-            self.transaction.generate_error_response(
-                EntityType=self.entityType,
-                Brief="EntityNotKnown",
-                AdditionalInfo={"error": str(e)},
-            )
-            return self.transaction.get_outgoing_string()
+            brief = "EntityNotKnown", e
         except Exception as e:
-            log.error("Exception: " + str(e))
-            self.transaction.generate_error_response(
-                EntityType=self.entityType,
-                Brief="UnknownError",
-                AdditionalInfo={"error": str(e)},
-            )
-            return self.transaction.get_outgoing_string()
-        if return_value is not None and return_value != 0:
-            log.debug(f"Return value is {return_value}, which is not 0.")
-            return self.transaction.get_outgoing_string()
+            brief = "UnknownError", e
 
-        try:
-            self.transaction_manager = self.transaction_manager_type(self.transaction)
-            self.transaction = self.transaction_manager.process()
-            return self.transaction.get_outgoing_string()
-        except Exception as e:
-            log.error("Exception: " + str(e))
+        if brief is not None:
             self.transaction.generate_error_response(
                 EntityType=self.entityType,
-                Brief="UnknownError",
-                AdditionalInfo={"error": str(e)},
+                Brief=brief[0],
+                AdditionalInfo={"error": str(brief[1])},
             )
             return self.transaction.get_outgoing_string()
