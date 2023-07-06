@@ -3,7 +3,7 @@ THISPYTHON='python3'
 testNumber=016
 echo "Testing $0..."
 preprocess_file="/programs/gems/tests/outputs/016.AmberMDPrep.4mbzEdit.pdb"
-PDB_tests_dir="${GEMSHOME}/gemsModules/structurefile/PDB/tests_in"
+PDB_tests_dir="${GEMSHOME}/gemsModules/structurefile/PDBFile/tests_in"
 
 # clean up from previous runs
 if [ -f $preprocess_file ]; then
@@ -25,13 +25,8 @@ if ! [ -f "${PDB_tests_dir}/explicit.json" ]; then
     return 1
 fi
 
-# Note, json_ripper will throw up if you don't give it a valid JSON object, (This is reason for the TypeError failure in the test run from prepush)
-# so the test will fail in that case too. jq would be more convenient...
-#
-# This should not fail, however old JSON_from_Command_line will fail if abberant stdin is given, such as via git prepush
-# ${GEMSHOME}/bin/delegate ${GEMSHOME}/gemsModules/ambermdprep/tests_in/explicit.json |\
-#
-# This works with prepush:
+# jq would be more convenient but it's not installed in the GRPC container.
+# Because some directories change on every run, we strip just the output we want to test.
 cat ${PDB_tests_dir}/explicit.json | ${GEMSHOME}/bin/delegate |\
     $GEMSHOME/tests/utilities/json_ripper.py entity.responses.any_amber_prep.outputs.message > test${testNumber}_output
 
