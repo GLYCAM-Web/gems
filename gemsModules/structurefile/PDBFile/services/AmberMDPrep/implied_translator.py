@@ -31,6 +31,7 @@ class AmbderMDPrep_Implied_Translator(Implied_Translator):
                 service_request.inputs = {
                     "pdb_filename": "016.AmberMDPrep.4mbzEdit.pdb",
                     "inputFilesPath": "/programs/gems/tests/inputs/",
+                    "outputDirPath": "/programs/gems/tests/outputs/",
                 }
                 this_aaop = AAOP(
                     Dictionary_Name="implied_PDBFile_AmberMDPrep",
@@ -43,5 +44,7 @@ class AmbderMDPrep_Implied_Translator(Implied_Translator):
                 log.debug(
                     "Implicitly adding AmberMDPrep service request with prepare_pdb task"
                 )
+        else:
+            pass
 
         return self.get_aaop_list()

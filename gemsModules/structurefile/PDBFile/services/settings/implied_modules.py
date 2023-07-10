@@ -28,6 +28,5 @@ implied_modules: Dict[str, Callable] = {
     "ListServices": list_services_Implied_Translator,
     "Marco": marco_Implied_Translator,
     "Status": status_Implied_Translator,
-    "AmberMDPrep": AmbderMDPrep_Implied_Translator
-    # 'RunMD': run_md_Implied_Translator
+    "AmberMDPrep": AmbderMDPrep_Implied_Translator,
 }

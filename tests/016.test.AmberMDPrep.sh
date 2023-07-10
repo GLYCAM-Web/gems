@@ -26,9 +26,9 @@ if ! [ -f "${PDB_tests_dir}/explicit.json" ]; then
 fi
 
 # jq would be more convenient but it's not installed in the GRPC container.
-# Because some directories change on every run, we strip just the output we want to test.
+# Because some directories change on every run, we strip just the output we want to test for now.
 cat ${PDB_tests_dir}/explicit.json | ${GEMSHOME}/bin/delegate |\
-    $GEMSHOME/tests/utilities/json_ripper.py entity.responses.any_amber_prep.outputs.message > test${testNumber}_output
+    $GEMSHOME/tests/utilities/json_ripper.py entity.responses.any_amber_prep.outputs.ppinfo > test${testNumber}_output
 
 # echo -e "\nRipped Output Message Bytes: $(wc -c < test${testNumber}_output) (Expected $(wc -c < correct_outputs/test${testNumber}_output))"
 if ! cmp test${testNumber}_output correct_outputs/test${testNumber}_output > /dev/null 2>&1; then

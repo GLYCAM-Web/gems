@@ -33,8 +33,8 @@ from gemsModules.common.receive import receive as common
 
 from gemsModules.mmservice.receive import receive as mmservice
 from gemsModules.mmservice.mdaas.receive import receive as mdaas
-from gemsModules.structurefile.PDBFile.receive import receive as pdbfile
 
+from gemsModules.structurefile.PDBFile.receive import receive as pdbfile
 from gemsModules.status.receive import receive as status
 
 

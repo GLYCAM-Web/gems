@@ -83,10 +83,10 @@ class AmberMDPrep_Inputs(BaseModel):
 
 
 class AmberMDPrep_Outputs(BaseModel):
-    message: str = Field(
+    ppinfo: str = Field(
         None,
-        title="Message",
-        description="Message from the service",
+        title="Preprocessing Information",
+        description="AmberMDPrep's preprocessing information",
     )
     outputDirPath: str = Field(
         None,

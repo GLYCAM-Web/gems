@@ -19,8 +19,10 @@ class PDBFile_Request_Data_Filler(Request_Data_Filler):
 
         for i, aaop in enumerate(self.aaop_list):
             # Get the filename from the aaop inputs (originating from an actual "inputs": {} field in the service request.)
+            # Theoretically, we're duplicating explicit_requests.py logic here, Is this how we should wrap inputs?
             if "pdb_filename" in aaop.The_AAO.inputs:
                 if "outputDirPath" in aaop.The_AAO.inputs:
+                    # I don't think we should be grabbing inputs from the aaop like this?
                     outDir = aaop.The_AAO.inputs["outputDirPath"]
                 else:
                     outDir = this_Project.upload_path + "output/"
@@ -38,22 +40,6 @@ class PDBFile_Request_Data_Filler(Request_Data_Filler):
                     inputFilesPath=inDir,
                 )
                 log.debug("Found 'pdb_filename' in aaop.The_AAO.inputs: %s", aaop)
-            # Lets use the project's pdb_filename if it exists.
-            elif hasattr(
-                this_Project, "pdb_filename" and len(this_Project.pdb_file_name) > 0
-            ):
-                self.aaop_list[i].The_AAO.inputs = api.AmberMDPrep_Inputs(
-                    pdb_file=this_Project.pdb_filename,
-                    pUUID=this_Project.pUUID,
-                    # TODO: create project directory and update inputFile selection.
-                    outputDirPath=this_Project.upload_path + "/output",
-                    inputFilesPath=this_Project.upload_path,
-                )
-                log.debug("Found 'pdb_filename' in this_Project: %s", aaop)
-            # If we can't find a pdb_filename, then we can't do anything. Can we?
-            else:
-                pass
-
         log.debug(
             "Project with pUUID: %s processed by AmberMDPrep Request Data filler",
             this_Project.pUUID,
