@@ -22,10 +22,9 @@ else:
 
 ##  Pass in the name of an entity, receive a module or an error.
 def importEntity(requestedEntity):
-    log.info("importEntity() was called.\n")
-    log.debug("requestedEntity: " + requestedEntity)
+    # log.info("importEntity() was called.")
+    # log.debug("requestedEntity: " + requestedEntity)
     #log.debug("Entities known to Common Services: " + str(subEntities))
-
     try:
         requestedModule = '.deprecated.' + subEntities[requestedEntity]
         log.debug("requestedModule: " + requestedModule)
@@ -41,7 +40,6 @@ def importEntity(requestedEntity):
             log.error(traceback.format_exc())
             raise error
         else:
-
             if module_spec is None:
                 log.error("The module spec returned None for requestedEntity: " + requestedEntity)
                 raise FileNotFoundError(requestedEntity)
@@ -152,7 +150,7 @@ def getCurrentStableJsonApiVersion():
 
 ##  Looks for an environment var with GEMSHOME and returns it.
 def getGemsHome():
-    log.info("getGemsHome() was called.\n")
+    # log.info("getGemsHome() was called.\n")
     GEMSHOME = os.environ.get('GEMSHOME')
     if GEMSHOME == None:
         log.error("""

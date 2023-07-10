@@ -61,21 +61,16 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
     the_sequence = receiver_tasks.get_sequence(thisSequenceEntity)
     if the_sequence is not None:
         from gemsModules.deprecated.sequence import build
-        carbBuilder = build.getCbBuilderForSequence(the_sequence)
-        valid = carbBuilder.IsStatusOk()
-        if not valid:
-            log.error(carbBuilder.GetStatusMessage())
-            log.debug(
-                "About to call generateCommonParserNotice with the outgoing project.  The transaction_out is :   ")
+        #Ok Oliver, here we should try/catch:
+        try:
+            carbBuilder = build.getCbBuilderForSequence(the_sequence)
+        except Exception as error:
+            log.debug("Just about to call generateCommonParserNotice with the outgoing project.  The transaction_out is :   ")
             log.debug(thisTransaction.transaction_out.json(indent=2))
-            thisTransaction.generateCommonParserNotice(
-                noticeBrief='InvalidInputPayload', 
-                exitMessage=carbBuilder.GetStatusMessage())
+            thisTransaction.generateCommonParserNotice(noticeBrief='InvalidInputPayload', exitMessage=str(error))
             thisTransaction.build_outgoing_string()
-            return thisTransaction
+            return thisTransaction # do this or no?  # if the process has altered this Transaction, then yes
         log.debug("Sequence is valid.")
-
-
     # If there are no explicit services
     if thisSequenceEntity.services == []:
         log.debug("'services' was not present in the request. Do the default.")

@@ -29,7 +29,7 @@ def delegate(jsonObjectString):
     reads the identity of the top-level Entity and, if it can load a
     module for that entity, it passes the Transaction object over.
     """
-    log.info("delegate() was called.\n")
+    log.info("delegate was called.")
     # log.debug("incoming jsonObjectString: " + jsonObjectString)
 
     # Make a new Transaction object for holding I/O information.    

@@ -5,12 +5,13 @@ from gemsModules.common.main_api_entity import Entity
 from gemsModules.common.action_associated_objects import AAOP_Tree_Pair
 
 from gemsModules.logging.logger import Set_Up_Logging
+
 log = Set_Up_Logging(__name__)
 
 
 class Response_Manager(ABC):
-    
-    def __init__(self, aaop_tree_pair : AAOP_Tree_Pair):
+    def __init__(self, aaop_tree_pair: AAOP_Tree_Pair):
+        self.response_entity = None
         self.aaop_tree_pair = aaop_tree_pair
 
     def process(self) -> Entity:

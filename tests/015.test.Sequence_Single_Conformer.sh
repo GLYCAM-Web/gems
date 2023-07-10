@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 ## Shortens time spent minimizing
 export GEMS_MD_TEST_WORKFLOW=True
@@ -87,7 +87,7 @@ run_sequenceDirectory_test()
 	correctOutput=correct_outputs/test015.output
 	if ! cmp $currentOutput $correctOutput > /dev/null 2>&1; then
 		echo "Test 015 FAILED!" | tee -a $badOutput
-		echo "These files are different:\n$currentOutput\n$correctOutput\n" | tee -a $badOutput
+		printf "These files are different:\n$currentOutput $correctOutput\n" | tee -a $badOutput
 		if  test -e "$currentOutput"  ; then
 			echo "output from test exists: $currentOutput" | tee -a $badOutput
 		else
@@ -112,7 +112,7 @@ else
 fi
 if [ ! -d "${gemsServicePath}" ] ; then
 	echo "Unable to create output directory.  Exiting." | tee -a $badOutput
-	exit 1
+	return 1
 fi
 
 echo "Allowing up to $((maxTimeCount*sleepTime)) seconds to complete the build." | tee -a $badOutput

@@ -88,7 +88,12 @@ def buildEach3DStructureInStructureInfo(thisTransaction: sequenceio.Transaction)
                 inputSequence = thisTransaction.getSequenceVariantOut(
                     'indexOrdered')
                 log.debug("About to getCbBuilderForSequence: " + inputSequence)
-                builder = getCbBuilderForSequence(inputSequence)
+                try:
+                    builder = getCbBuilderForSequence(inputSequence)
+                except Exception as error:
+                    log.error("Something went wrong in gems when creating the carbohydrate.")
+                    loglog.error(error)
+                    raise error
             buildDir = "New_Builds/"
             buildState.setIsNewBuild(True)
             outputDirPath = buildState.getAbsoluteConformerPath()
@@ -188,26 +193,9 @@ def build3DStructure(buildState: sequenceio.Single3DStructureBuildDetails, thisT
             log.debug("Generating default structure in: " + outputDirPath)
             log.debug("IS THE DEFAULT: Here is the buildState):")
             log.debug(buildState)
-            # Using multiprocessing for this function call.
-            builder.GenerateSingle3DStructureDefaultFiles(outputDirPath)
-            if not builder.IsStatusOk():
-                log.error(carbBuilder.GetStatusMessage())
-                log.debug(
-                    "Just about to call generateCommonParserNotice with the outgoing project.  The transaction_out is :   ")
-                log.debug(thisTransaction.transaction_out.json(indent=2))
-                thisTransaction.generateCommonParserNotice(
-                    noticeBrief='InvalidInputPayload', exitMessage=carbBuilder.GetStatusMessage())
-                thisTransaction.build_outgoing_string()
-                return thisTransaction # do this or no?  # if the process has altered this Transaction, then yes
-            #p = Process(target=builder.GenerateSingle3DStructureDefaultFiles, args=(outputDirPath,))
-            # p.start()
+            builder.GenerateSingle3DStructureDefaultFiles(outputDirPath)        
         else:
-            log.debug(
-                "The request is for a conformer with outputDirPath: " + outputDirPath)
-            # Need to put the info into the GMML struct: SingleRotamerInfoVector
-#            gmmlConformerInfo = populateGMMLConformerInfoStruct(buildState)
-            if not builder.IsStatusOk():
-                log.debug("builder says it is not ok")
+            log.debug("The request is for a conformer with outputDirPath: " + outputDirPath)
             log.debug("Here is the input to the builder.")
             log.debug("NOT DEFAULT: Here is the buildState):")
             log.debug(buildState)
@@ -215,30 +203,18 @@ def build3DStructure(buildState: sequenceio.Single3DStructureBuildDetails, thisT
             log.debug(gmmlConformerInfo)
             log.debug("outputDirPath : ")
             log.debug(outputDirPath)
-#            import sys  ## REMOVE ME
-#            sys.exit(0)  ## REMOVE ME
-            builder.GenerateSpecific3DStructure(
-                gmmlConformerInfo, outputDirPath)
+            builder.GenerateSpecific3DStructure(gmmlConformerInfo, outputDirPath)
             log.debug("just did builder.GenerateSpecific3DStructure")
-            if not builder.IsStatusOk():
-                log.error(carbBuilder.GetStatusMessage())
-                log.debug(
-                    "Just about to call generateCommonParserNotice with the outgoing project.  The transaction_out is :   ")
-                log.debug(thisTransaction.transaction_out.json(indent=2))
-                thisTransaction.generateCommonParserNotice(
-                    noticeBrief='InvalidInputPayload', exitMessage=carbBuilder.GetStatusMessage())
-                thisTransaction.build_outgoing_string()
-                return thisTransaction # do this or no?
-            #p = Process(target=builder.GenerateSpecific3DStructure, args=(gmmlConformerInfo, outputDirPath,))
-            # p.start()
     except Exception as error:
-        log.error("There was a problem generating this build: " + str(error))
-        raise error
+        log.debug("Just about to call generateCommonParserNotice with the outgoing project.  The transaction_out is :   ")
+        log.debug(thisTransaction.transaction_out.json(indent=2))
+        thisTransaction.generateCommonParserNotice(noticeBrief='InvalidInputPayload', exitMessage=str(error))
+        thisTransaction.build_outgoing_string()
+        return thisTransaction # do this or no?  # if the process has altered this Transaction, then yes
     if thisBuildOptions.mdMinimize is False:
         log.debug("mdMinimize is false and this is the gmmlConformerInfo : ")
         log.debug(gmmlConformerInfo)
         return gmmlConformerInfo
-
     # Generate JSOn to tell mmservice/amber that there is a job to do
     # TODO  make filling this in use a class in amber/io.py
     amberSubmissionJson = '{ \

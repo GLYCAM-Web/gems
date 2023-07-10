@@ -7,8 +7,9 @@
 ##
 ##   To run a single test (even a disabled one):
 ##
-##        Use the filename for the test as a command-lin argument.
+##        Use the filename for the test as a command-line argument.
 ##        You can use this method to run disabled tests.
+##        Exmpl: run_tests.sh 007.test.DrawGlycan.sh
 ##
 export badOutDir='bad_outputs'
 START=$SECONDS
@@ -34,14 +35,14 @@ if [ "${1}zzz" != "zzz" ] ; then
 	fi
 	if run_test ${1} ; then 
 		echo "The test passed."
-    		echo "removing bad outputs directory"
-    		rm -rf ${badOutDir}
-    		exit 0
+    	echo "removing bad outputs directory"
+    	rm -rf ${badOutDir}
+    	exit 0
 	else
-    		echo "The test failed."
+    	echo "The test failed."
 		echo "Check this directory for more information:"
 		echo "        ${badOutDir}"
-    		exit 1
+    	exit 1
 	fi
 fi
 
@@ -82,7 +83,6 @@ if [ "$tests_passed" -ge "$required_passing_tests" ]; then
     echo "removing bad outputs directory"
     rm -rf ${badOutDir}
     exit 0
-else
-    echo "Some required tests did not pass."
-    exit 1
 fi
+echo "Some required tests did not pass."
+exit 1
