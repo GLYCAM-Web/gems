@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 THISPYTHON='python3'
 ##################### Test 6 ########################
 echo "Testing GMMO query 2..."

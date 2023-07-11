@@ -35,8 +35,8 @@ else:
 class Project(BaseModel):
     ## The name of the output dir is the pUUID
     pUUID : constr(max_length=36)=""
-    title : constr(max_length=25)=""
-    comment : constr(max_length=50)=""
+    title : constr(max_length=100)=""
+    comment : constr(max_length=500)=""
     timestamp : datetime = None
     gems_timestamp : datetime = None
     # The following should be overridden as needed in child classes.  See CbProject, for example.

@@ -37,7 +37,7 @@ descriptions = {
 
 try:
     gemsHome = getGemsHome()
-    log.debug("gemsHome: " + gemsHome)
+    # log.debug("gemsHome: " + gemsHome)
 except Exception as error:
     log.error("There was a problem getting GEMSHOME.")
     raise error
