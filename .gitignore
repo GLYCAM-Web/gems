@@ -14,10 +14,6 @@ site
 
 ## general things to ignore
 *.obsidian
-<<<<<<< HEAD
-=======
-*.vscode
->>>>>>> gems-test
 *__pycache__
 *.pyc
 *.pyo
