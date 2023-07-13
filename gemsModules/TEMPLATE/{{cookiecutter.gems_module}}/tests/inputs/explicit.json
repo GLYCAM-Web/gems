@@ -1,0 +1,10 @@
+{
+    "entity": {
+        "type": "{{ cookiecutter.gems_module }}",
+        "services": {
+            "default_{{ cookiecutter.service_name }}": {
+                "type": "{{ cookiecutter.gems_module }}"
+            }
+        }
+    }
+}
