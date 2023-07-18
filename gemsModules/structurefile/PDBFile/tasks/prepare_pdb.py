@@ -1,5 +1,8 @@
 import gmml
 import pydantic
+from gemsModules.logging.logger import Set_Up_Logging
+
+log = Set_Up_Logging(__name__)
 
 
 # TODO: These probably belong elsewhere, but for now prepare_pdb is motivating their creation.
@@ -99,6 +102,7 @@ def preprocess_and_write_pdb(
     Returns the ppInfo and the cds_PdbFile objects.
     """
     pp_info, pdb_file = preprocess(input_pdb_path, options)
+    log.debug(f"Writing preprocessed PDB file to {output_pdb_path}...")
     pdb_file.raw.Write(output_pdb_path)
 
     return pp_info, pdb_file

@@ -27,15 +27,15 @@ class Transaction_Manager(ABC):
 
     def process(self):
         log.debug("Processing transaction")
-        log.debug("about to manage project")
-        self.manage_project()
+        # log.debug("about to manage project")
+        # self.manage_project()
         log.debug("about to manage requests")
         self.manage_requests()
         log.debug("about to generate aaop tree pair")
         self.generate_aaop_tree_pair()
         # Grayson - see if you can make project management able to go her for mdaas
-        #        log.debug("about to manage project")
-        #        self.manage_project()
+        log.debug("about to manage project")
+        self.manage_project()
         log.debug("about to invoke servicer")
         self.invoke_servicer()
         log.debug("about to manage responses")
@@ -58,11 +58,13 @@ class Transaction_Manager(ABC):
             incoming_project=self.incoming_project, entity=self.incoming_entity
         )
         self.response_project = self.project_manager.process()
+        # TODO\Q: getter/setter
+        log.debug("about to fill request data needs")
+        self.request_manager.fill_request_data_needs(self.response_project)
+        log.debug(self.request_manager.deduplicated_aaop_list)
 
     def manage_requests(self):
-        self.request_manager = self.request_manager_type(
-            entity=self.incoming_entity, project=self.response_project
-        )
+        self.request_manager = self.request_manager_type(entity=self.incoming_entity)
         self.aaop_request_list: List[AAOP] = self.request_manager.process()
         log.debug("the aaop request list is: ")
         log.debug(self.aaop_request_list)

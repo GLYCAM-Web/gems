@@ -37,6 +37,8 @@ class Json_String_Manager(ABC):
                     self.transaction
                 )
                 self.transaction = self.transaction_manager.process()
+                # Should this return a good response? It seems we use get_outgoing_string() elsewhere as we're not missing information.
+                # (We also no longer see an erroneous error in logs.)
         except ValidationError as e:
             brief = "InvalidInput", e
         except ValueError as e:
