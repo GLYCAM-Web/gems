@@ -1,4 +1,5 @@
 import gmml
+import os
 import pydantic
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -104,6 +105,8 @@ def preprocess_and_write_pdb(
     pp_info, pdb_file = preprocess(input_pdb_path, options)
     log.debug(f"Writing preprocessed PDB file to {output_pdb_path}...")
     pdb_file.raw.Write(output_pdb_path)
+    if not os.path.exists(output_pdb_path):
+        log.warning(f"GMML failed to write preprocessed PDB file to {output_pdb_path}!")
 
     return pp_info, pdb_file
 
