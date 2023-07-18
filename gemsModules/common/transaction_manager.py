@@ -7,7 +7,7 @@ from gemsModules.common.action_associated_objects import AAOP_Tree_Pair
 from gemsModules.common.main_api import Transaction
 from gemsModules.common.project_manager import common_Project_Manager
 from gemsModules.common.services.request_manager import common_Request_Manager
-from gemsModules.common.services.response_manager import Response_Manager
+from gemsModules.common.services.response_manager import common_Response_Manager
 from gemsModules.common.services.aaop_tree_pair_manager import AAOP_Tree_Pair_Generator
 from gemsModules.common.services.servicer import commonservices_Servicer
 
@@ -27,13 +27,10 @@ class Transaction_Manager(ABC):
 
     def process(self):
         log.debug("Processing transaction")
-        # log.debug("about to manage project")
-        # self.manage_project()
         log.debug("about to manage requests")
         self.manage_requests()
         log.debug("about to generate aaop tree pair")
         self.generate_aaop_tree_pair()
-        # Grayson - see if you can make project management able to go her for mdaas
         log.debug("about to manage project")
         self.manage_project()
         log.debug("about to invoke servicer")

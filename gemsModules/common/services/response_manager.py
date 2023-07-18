@@ -21,3 +21,8 @@ class Response_Manager(ABC):
     @abstractmethod
     def generate_response_entity(self):
         pass
+
+
+class common_Response_Manager(Response_Manager):
+    def generate_response_entity(self):
+        self.response_entity = Entity(entity_type="Common")
