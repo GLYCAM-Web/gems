@@ -38,7 +38,7 @@ class Json_String_Manager(ABC):
                 )
                 self.transaction = self.transaction_manager.process()
                 # Should this return a good response here?
-                return self.transaction.get_outgoing_string()
+                # return self.transaction.get_outgoing_string()
         except ValidationError as e:
             brief = "InvalidInput", e
         except ValueError as e:
