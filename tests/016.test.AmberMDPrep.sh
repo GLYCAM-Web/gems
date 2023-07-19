@@ -1,20 +1,20 @@
-#!/bin/sh
+#!/bin/bash
 THISPYTHON='python3'
 testNumber=016
 echo "Testing $0..."
 
-preprocess_file="${GEMSHOME}/tests/016.AmberMDPrep.4mbzEdit.pdb"
 PDB_tests_dir="${GEMSHOME}/gemsModules/structurefile/PDBFile/tests_in"
 test_request="${PDB_tests_dir}/explicit_test.json" 
+out_file="${GEMSHOME}/tests/016.AmberMDPrep.4mbzEdit.pdb" # Base path needs to match the json outputDirPath
 test_output=test${testNumber}_output
 
 
 # clean up from previous runs
-if [ -f $preprocess_file ]; then
-    rm "${preprocess_file}"
+if [ -f $out_file ]; then
+    rm "${out_file}"
 fi
-if [ -f test${testNumber}_output ]; then
-    rm test${testNumber}_output
+if [ -f $test_output ]; then
+    rm $test_output
 fi
 
 # sanity check due to bs bug
@@ -34,8 +34,8 @@ fi
 cat $test_request | ${GEMSHOME}/bin/delegate |\
     $GEMSHOME/tests/utilities/json_ripper.py entity.responses.any_amber_prep.outputs.ppinfo > test${testNumber}_output
 
-echo "Sleeping for 3 seconds to allow for file creation..."
-sleep 3
+echo "Sleeping for 1 second to allow for file creation..."
+sleep 1
 
 # echo -e "\nRipped Output Message Bytes: $(wc -c < test${testNumber}_output) (Expected $(wc -c < correct_outputs/test${testNumber}_output))"
 if ! cmp ${test_output} correct_outputs/${test_output} > /dev/null 2>&1; then
@@ -44,11 +44,11 @@ if ! cmp ${test_output} correct_outputs/${test_output} > /dev/null 2>&1; then
 fi
 rm $test_output
 
-if ! [ -f $preprocess_file ]; then
-    echo "Test partially FAILED! Did not create '${preprocess_file}'! Is gmml.cds_PdbFile.Write working?"
-    return 0
+if ! [ -f $out_file ]; then
+    echo "Test partially FAILED! Did not create '${out_file}'!"
+    return 1
 fi
 
 echo "Test passed."
-rm $preprocess_file
+rm $out_file
 return 0

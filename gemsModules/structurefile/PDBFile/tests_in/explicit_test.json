@@ -8,7 +8,7 @@
                     "action": "preprocess",
                     "pdb_filename": "016.AmberMDPrep.4mbzEdit.pdb",
                     "inputFilesPath": "/programs/gems/tests/inputs/",
-                    "outputDirPath": "/programs/gems/tests/outputs/"
+                    "outputDirPath": "/programs/gems/tests/"
                 }
             }
         }
