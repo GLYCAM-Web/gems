@@ -17,32 +17,12 @@ log = Set_Up_Logging(__name__)
 class AmberMDPrep_input_Resource(Resource):
     """Need to write validators."""
 
-    ## Works now:
-    ##
-    ## locationType = filepath
-    ##
-    ## resourceFormat = amber_parm7 | amber_rst7 | md_path | max_hours
-    ##
-    ## payload = string containing a /path/to/file  |  integer (number of hours)
-    ##
-    ## options = none currently read
-    ##
     pass
 
 
 class AmberMDPrep_output_Resource(Resource):
     """Need to write validators."""
 
-    ## Works now:
-    ##
-    ## locationType = filepath
-    ##
-    ## resourceFormat = amber_parm7 | amber_rst7 | amber_nc | amber_mdcrd | amber_mdout | zipfile
-    ##
-    ## payload = string containing a /path/to/file
-    ##
-    ## notices = these will surely happen
-    ##
     pass
 
 
@@ -56,8 +36,8 @@ class AmberMDPrep_Inputs(BaseModel):
     pdb_file: str = Field(
         # Note: This should be a required field, but the way Request instantiates an empty Inputs disallows this.
         ...,
-        title="Amber Parm7",
-        description="Name of Amber PDB file",
+        title="PDB File",
+        description="Name of PDB file to preprocess.",
     )
     outputFileName: Optional[str] = Field(
         None,
@@ -71,7 +51,7 @@ class AmberMDPrep_Inputs(BaseModel):
     )
     outputFilePath: Optional[str] = Field(
         None,  # "/website/TESTS/ambermdprep/ambermdprep_test_files/output_dir",
-        title="Output Directory Path",
+        title="Output File Path",
         description="Path to output directory",
     )
 
@@ -96,8 +76,8 @@ class AmberMDPrep_Outputs(BaseModel):
     )
     outputFilePath: str = Field(
         None,
-        title="Output Directory Path",
-        description="Path to output directory",
+        title="Output File Path",
+        description="Full path to output file",
     )
     resources: AmberMDPrep_Resources = AmberMDPrep_Resources()
 

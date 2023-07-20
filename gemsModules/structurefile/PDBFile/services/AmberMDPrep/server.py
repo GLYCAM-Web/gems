@@ -29,7 +29,7 @@ def Serve(service: AmberMDPrep_Request) -> AmberMDPrep_Response:
     # )
 
     response = AmberMDPrep_Response()
-    response.outputs.ppinfo = execute(service.inputs)
+    response.outputs = execute(service.inputs)
     # response.outputs.outputFilePath = separate_path_and_filename(
     #     service.inputs["output_filename"]
     # )[0]

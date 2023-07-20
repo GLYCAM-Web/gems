@@ -24,7 +24,7 @@ class PDBFile_Request_Data_Filler(Request_Data_Filler):
                 in aaop.The_AAO.inputs  #  Should we make a utility function for optional keys or do this check another way?
                 and aaop.The_AAO.inputs["pUUID"] is not None
             ):
-                # TODO: get the project from the database
+                # TODO: get the project by pUUID
                 root = this_Project.project_dir
                 output_root = root
             # Attempt to use the inputFilePath and outputFilePath otherwise use the general project directory
@@ -54,7 +54,7 @@ class PDBFile_Request_Data_Filler(Request_Data_Filler):
                 out_filename = f"preprocessed.{aaop.The_AAO.inputs['pdb_filename']}"
 
             log.debug(
-                "gdm About to build AmberMDPrep_Inputs with %s, %s, %s",
+                "About to build AmberMDPrep_Inputs with %s, %s, %s",
                 root,
                 output_root,
                 out_filename,

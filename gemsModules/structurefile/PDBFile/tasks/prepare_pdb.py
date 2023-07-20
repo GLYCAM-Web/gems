@@ -115,7 +115,7 @@ def execute(
     input_pdb_path: str,
     output_pdb_path: str = "./preprocessed.pdb",
     options: dict = None,
-) -> str:
+) -> dict:
     """Prepare an Amber MD input file
 
     options: dict
@@ -134,7 +134,7 @@ def execute(
 
     pp_info, _ = preprocess_and_write_pdb(input_pdb_path, options, output_pdb_path)
 
-    # Build the output string
+    # Build the output dict
     output = {}
     output["unrecognizedAtoms"] = [
         {
