@@ -17,20 +17,20 @@ log = Set_Up_Logging(__name__)
 def Serve(service: AmberMDPrep_Request) -> AmberMDPrep_Response:
     # set_up_prepare_pdb_directory.execute(
     #     protocol_files_dir=service.inputs.protocolFilesPath,
-    #     output_dir_path=service.inputs.outputDirPath,
-    #     uploads_dir_path=service.inputs.inputFilesPath,
+    #     output_dir_path=service.inputs.outputFilePath,
+    #     uploads_dir_path=service.inputs.inputFilePath,
     #     parm7_real_name=service.inputs.amber_parm7,
     #     rst7_real_name=service.inputs.amber_rst7,
     # )
     # initiate_build.execute(
     #     pUUID=service.inputs.pUUID,
-    #     outputDirPath=service.inputs.outputDirPath,
+    #     outputFilePath=service.inputs.outputFilePath,
     #     use_serial=True,
     # )
 
     response = AmberMDPrep_Response()
     response.outputs.ppinfo = execute(service.inputs)
-    # response.outputs.outputDirPath = separate_path_and_filename(
+    # response.outputs.outputFilePath = separate_path_and_filename(
     #     service.inputs["output_filename"]
     # )[0]
 

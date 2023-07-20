@@ -49,8 +49,8 @@ def execute(inputs: AmberMDPrep_Inputs) -> AmberMDPrep_Outputs:
     # TODO: should this always execute? I think what makes sense is for it to conditionally
     # execute on an AAO_Type of "prepare_pdb" which is only known to the PDB.AmberMDPrep service.
     output = prepare_pdb.execute(
-        os.path.join(inputs.inputFilesPath, inputs.pdb_file),
-        os.path.join(inputs.outputDirPath, inputs.pdb_file),
+        os.path.join(inputs.inputFilePath, inputs.pdb_file),
+        os.path.join(inputs.outputFilePath, inputs.outputFileName),
     )
 
     # NOTE/TODO: using serviceOutputs doubles up the keys.

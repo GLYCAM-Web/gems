@@ -17,9 +17,10 @@
 										"action": "preprocess", // Not currently handled.
 										// Currently, 'pdb_filename' is preprocessed by default
 										"pdb_filename": "016.AmberMDPrep.4mbzEdit.pdb", 
-										// TODO: base these paths at /website/[TESTS|userdata]/PDBFile/...
-										"inputFilesPath": "/programs/gems/tests/inputs/", // Your `PDBFile` path here. 
-										"outputDirPath": "/programs/gems/tests/outputs/"  // Need to implement a more robust PDBFile fs project construction.
+										// Optional:
+										"pUUID": "some-puuid-here", // Not currently handled.
+										"inputFilsPath": "/programs/gems/tests/inputs/", // Your `PDBFile` path here. 
+										"outputFilePath": "/programs/gems/tests/outputs/"  // Need to implement a more robust PDBFile fs project construction.
 									}
 								}
 							}
@@ -42,4 +43,8 @@
 > Note JSON request inputs["pdb_filename"] are currently implicitly associated with an AmberMDPrep Service Request.
 
 ### TODO
-* Implement a more robust PDBFile fs project construction.
+- [] Implement a more robust PDBFile fs project construction.
+
+
+#### Rough Notes
+- Passing inputDirPath or outputFilePath forces absolute path names, while omitting them uses Project paths.

@@ -6,6 +6,7 @@ from gemsModules.common.action_associated_objects import AAOP
 from gemsModules.common.services.implied_requests import Implied_Services_Inputs
 from gemsModules.structurefile.PDBFile.services.AmberMDPrep.api import (
     AmberMDPrep_Request,
+    AmberMDPrep_Inputs,
 )
 from gemsModules.common.services.each_service.implied_translator import (
     Implied_Translator,
@@ -22,29 +23,31 @@ class AmbderMDPrep_Implied_Translator(Implied_Translator):
     """
 
     def process(self, input_object: Implied_Services_Inputs) -> List[AAOP]:
-        if input_object is not None and input_object.inputs is not None:
-            the_inputs = input_object.inputs
-            if "pdb_filename" not in the_inputs.keys():
-                service_request = AmberMDPrep_Request()
-                # service_request.options = {}
-                # service_request.options["pdb"] = the_inputs["pdb"]
-                service_request.inputs = {
-                    "pdb_filename": "016.AmberMDPrep.4mbzEdit.pdb",
-                    "inputFilesPath": "/programs/gems/tests/inputs/",
-                    "outputDirPath": "/programs/gems/tests/outputs/",
-                }
-                this_aaop = AAOP(
-                    Dictionary_Name="implied_PDBFile_AmberMDPrep",
-                    ID_String=uuid.uuid4(),
-                    The_AAO=service_request,
-                    AAO_Type="prepare_pdb",
-                )
-                self.aaop_list.append(this_aaop)
+        # if input_object is not None and input_object.inputs is not None:
+        #     the_inputs = AmberMDPrep_Inputs(**input_object.inputs)
 
-                log.debug(
-                    "Implicitly adding AmberMDPrep service request with prepare_pdb task"
-                )
-        else:
-            pass
+        #     if "pdb_filename" not in the_inputs:
+        #         service_request = AmberMDPrep_Request()
+        #         # service_request.options = {}
+        #         # service_request.options["pdb"] = the_inputs["pdb"]
+        #         service_request.inputs = {
+        #             "pdb_filename":
+        #             "inputFilePath": "/programs/gems/tests/inputs/",
+        #             "outputFilePath": "/programs/gems/tests/outputs/",
+        #         }
+        #         this_aaop = AAOP(
+        #             Dictionary_Name="implied_PDBFile_AmberMDPrep",
+        #             ID_String=uuid.uuid4(),
+        #             The_AAO=service_request,
+        #             AAO_Type="prepare_pdb",
+        #         )
+        #         self.aaop_list.append(this_aaop)
 
+        #         log.debug(
+        #             "Implicitly adding AmberMDPrep service request with prepare_pdb task"
+        #         )
+        # else:
+        #     pass
+
+        self.aaop_list = []
         return self.get_aaop_list()

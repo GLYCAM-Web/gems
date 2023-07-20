@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
+# import from typing first, in case you want to import pydantic.typing
+from typing import Optional, Union
 from pydantic import BaseModel, Field
-from typing import List, Union
-
 from gemsModules.common.main_api_resources import Resource, Resources
 
 from gemsModules.structurefile.PDBFile.main_api import (
@@ -47,30 +47,36 @@ class AmberMDPrep_output_Resource(Resource):
 
 
 class AmberMDPrep_Resources(Resources):
-    __root__: List[
+    __root__: list[
         Union[AmberMDPrep_input_Resource, AmberMDPrep_output_Resource]
     ] = None
 
 
 class AmberMDPrep_Inputs(BaseModel):
     pdb_file: str = Field(
-        None,
+        # Note: This should be a required field, but the way Request instantiates an empty Inputs disallows this.
+        ...,
         title="Amber Parm7",
         description="Name of Amber PDB file",
     )
-
-    pUUID: str = Field(
+    outputFileName: Optional[str] = Field(
+        None,
+        title="Output file name",
+        description="Name of output file",
+    )
+    pUUID: Optional[str] = Field(
         None,
         title="Project UUID",
         description="UUID of Project",
     )
-    outputDirPath: str = Field(
-        "/website/TESTS/ambermdprep/ambermdprep_test_files/output_dir",
+    outputFilePath: Optional[str] = Field(
+        None,  # "/website/TESTS/ambermdprep/ambermdprep_test_files/output_dir",
         title="Output Directory Path",
         description="Path to output directory",
     )
-    inputFilesPath: str = Field(
-        "/website/TESTS/ambermdprep/test_files",
+
+    inputFilePath: Optional[str] = Field(
+        None,  # "/website/TESTS/ambermdprep/test_files",
         title="Input Files Directory Path",
         description="Path to whhere the input files are stored",
     )
@@ -88,7 +94,7 @@ class AmberMDPrep_Outputs(BaseModel):
         title="Preprocessing Information",
         description="AmberMDPrep's preprocessing information",
     )
-    outputDirPath: str = Field(
+    outputFilePath: str = Field(
         None,
         title="Output Directory Path",
         description="Path to output directory",
@@ -99,7 +105,7 @@ class AmberMDPrep_Outputs(BaseModel):
 class AmberMDPrep_Request(PDBFile_Service_Request):
     typename: str = Field("AmberMDPrep", alias="type")
     # the following must be redefined in a child class
-    inputs: AmberMDPrep_Inputs = AmberMDPrep_Inputs()
+    inputs: AmberMDPrep_Inputs = None
 
 
 class AmberMDPrep_Response(PDBFile_Service_Response):

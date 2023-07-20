@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from typing import List
+from pathlib import Path
 
 from gemsModules.common.action_associated_objects import AAOP
 from gemsModules.common.services.request_data_filler import Request_Data_Filler
@@ -14,15 +14,61 @@ log = Set_Up_Logging(__name__)
 
 
 class PDBFile_Request_Data_Filler(Request_Data_Filler):
-    def process(self) -> List[AAOP]:
+    def process(self) -> list[AAOP]:
         this_Project: PDBFile_Project = self.project
 
         for i, aaop in enumerate(self.aaop_list):
+            # Use the pUUID to get a project
+            if (
+                "pUUID"
+                in aaop.The_AAO.inputs  #  Should we make a utility function for optional keys or do this check another way?
+                and aaop.The_AAO.inputs["pUUID"] is not None
+            ):
+                # TODO: get the project from the database
+                root = this_Project.project_dir
+                output_root = root
+            # Attempt to use the inputFilePath and outputFilePath otherwise use the general project directory
+            else:
+                if (
+                    "inputFilePath" in aaop.The_AAO.inputs
+                    and aaop.The_AAO.inputs["inputFilePath"] is None
+                ):
+                    root = self.project.project_dir
+                else:
+                    # TODO: move input file from some generic upload directory to the project directory instead.
+                    root = aaop.The_AAO.inputs["inputFilePath"]
+
+                if (
+                    "outputFilePath" in aaop.The_AAO.inputs
+                    and aaop.The_AAO.inputs["outputFilePath"] is None
+                ):
+                    output_root = root
+                else:
+                    # Q: deprecate this ability to write to arbitrary paths?
+                    output_root = aaop.The_AAO.inputs["outputFilePath"]
+
+            # update output file name
+            if (
+                "outputFileName" in aaop.The_AAO.inputs
+                and aaop.The_AAO.inputs["outputFileName"] is not None
+            ):
+                out_filename = aaop.The_AAO.inputs["outputFileName"]
+            else:
+                out_filename = f"preprocessed.{aaop.The_AAO.inputs['pdb_filename']}"
+
+            log.debug(
+                "gdm About to build AmberMDPrep_Inputs with %s, %s, %s",
+                root,
+                output_root,
+                out_filename,
+            )
             self.aaop_list[i].The_AAO.inputs = api.AmberMDPrep_Inputs(
                 pdb_file=aaop.The_AAO.inputs["pdb_filename"],
+                outputFileName=out_filename,
                 pUUID=this_Project.pUUID,
-                outputDirPath=aaop.The_AAO.inputs["outputDirPath"],
-                inputFilesPath=aaop.The_AAO.inputs["inputFilesPath"],
+                outputFilePath=output_root,
+                inputFilePath=root,
             )
+            log.debug("Finished building AmberMDPrep_Inputs")
 
         return self.aaop_list
