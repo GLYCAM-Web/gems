@@ -17,9 +17,10 @@
 										"action": "preprocess", // Not currently handled.
 										// Currently, 'pdb_filename' is preprocessed by default
 										"pdb_filename": "016.AmberMDPrep.4mbzEdit.pdb", 
-										// Optional:
 										"pUUID": "some-puuid-here", // Not currently handled.
-										"inputFilsPath": "/programs/gems/tests/inputs/", // Your `PDBFile` path here. 
+										// TODO: handle arbitrary input paths and copy to project directory
+										"inputFilePath": "/programs/gems/tests/inputs/", // Your `PDBFile` path here. 
+										// Optional, if not passed write to the project directory.
 										"outputFilePath": "/programs/gems/tests/outputs/"  // Need to implement a more robust PDBFile fs project construction.
 									}
 								}
@@ -44,6 +45,12 @@
 
 ### TODO
 - [] Implement a more robust PDBFile fs project construction.
+	- [x] Use gems project manager to instantiate project
+	- [x] Write preprocessed pdb file to project directory
+
+- [] copy upload file from an "arbitrary" upload path to project directory before servicing
+- [] copy json request to project directory
+- [] write project specific logs to project directory
 
 
 #### Rough Notes

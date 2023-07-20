@@ -5,7 +5,7 @@ echo "Testing $0..."
 
 PDB_tests_dir="${GEMSHOME}/gemsModules/structurefile/PDBFile/tests_in"
 test_request="${PDB_tests_dir}/explicit_test.json" 
-out_file="${GEMSHOME}/tests/016.AmberMDPrep.4mbzEdit.pdb" # Base path needs to match the json outputDirPath
+out_file="${GEMSHOME}/tests/preprocessed.016.AmberMDPrep.4mbzEdit.pdb" # Base path needs to match the json outputDirPath and the input file name.
 test_output=test${testNumber}_output
 
 

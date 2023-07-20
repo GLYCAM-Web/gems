@@ -39,7 +39,11 @@ class PDBFile_Project(Project):
 
     def add_temporary_info(self):
         self.project_dir: str = os.path.join(
-            self.filesystem_path, self.service_dir, self.project_type, self.pUUID
+            self.filesystem_path,
+            self.parent_entity,
+            self.service_dir,
+            self.project_type,
+            self.pUUID,
         )
         self.compute_cluster_filesystem_path: str = self.project_dir
         self.logs_dir: str = os.path.join(self.project_dir, "logs")

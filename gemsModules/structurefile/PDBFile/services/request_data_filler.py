@@ -29,21 +29,18 @@ class PDBFile_Request_Data_Filler(Request_Data_Filler):
                 output_root = root
             # Attempt to use the inputFilePath and outputFilePath otherwise use the general project directory
             else:
+                root = this_Project.project_dir
                 if (
                     "inputFilePath" in aaop.The_AAO.inputs
-                    and aaop.The_AAO.inputs["inputFilePath"] is None
+                    and aaop.The_AAO.inputs["inputFilePath"] is not None
                 ):
-                    root = self.project.project_dir
-                else:
-                    # TODO: move input file from some generic upload directory to the project directory instead.
                     root = aaop.The_AAO.inputs["inputFilePath"]
 
+                output_root = this_Project.project_dir
                 if (
                     "outputFilePath" in aaop.The_AAO.inputs
-                    and aaop.The_AAO.inputs["outputFilePath"] is None
+                    and aaop.The_AAO.inputs["outputFilePath"] is not None
                 ):
-                    output_root = root
-                else:
                     # Q: deprecate this ability to write to arbitrary paths?
                     output_root = aaop.The_AAO.inputs["outputFilePath"]
 

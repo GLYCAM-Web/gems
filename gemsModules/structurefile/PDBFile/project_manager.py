@@ -2,6 +2,7 @@
 ## Possibly this should be in gemsModules/project.
 
 from abc import ABC, abstractmethod
+import os
 
 from gemsModules.common.project_manager import Project_Manager
 
@@ -22,6 +23,8 @@ class PDBFile_Project_Manager(Project_Manager):
         # self.fill_response_project_from_incoming_project()
         self.response_project = PDBFile_Project()
         self.response_project.add_temporary_info()
+
+        os.makedirs(self.response_project.project_dir, exist_ok=True)
 
         return self.response_project
 
