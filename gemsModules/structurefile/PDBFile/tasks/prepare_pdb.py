@@ -1,13 +1,38 @@
 import gmml
 import os
 import pydantic
+from pydantic import root_validator
 from gemsModules.logging.logger import Set_Up_Logging
 
 log = Set_Up_Logging(__name__)
 
 
-# TODO: These probably belong elsewhere, but for now prepare_pdb is motivating their creation.
-class PreprocessorOptions(pydantic.BaseModel):
+# TODO: These BaseModels probably belong elsewhere, but for now prepare_pdb is motivating their creation.
+class SwigModel(pydantic.BaseModel):
+    # cannot be set, has to be built from the swigpyobject, is not a field to set yourself
+    swigobj: pydantic.typing.Any = pydantic.Field(default_factory=object)
+
+    @staticmethod
+    def try_from_swigpyobject(spobj: pydantic.typing.Any) -> "SwigModel":
+        raise NotImplementedError(
+            "This is an abstract method, it must be implemented by the inheriting class."
+        )
+
+    @root_validator(pre=True)
+    def parse_swig_object(cls, values):
+        # This is non trivial, because values is supposed to be a dict, but we want to pass BaseModel(SwigPyObject) (ideally **SwigPyObject.__fields__ or similar, but that's not possible.)
+        # Essentially, we need to run try_from_swigpyobject on values before they even get to the validator.
+        # This is not possible with Pydantic, as it expects values to already be formatted dict it can validate.
+
+        # this does not work, as the validator "coerces" values into a dict.
+        values = cls.try_from_swigpyobject(values)
+
+        # Because the above cannot work, we have to do this manually.
+
+        return values
+
+
+class PreprocessorOptions(pydantic.BaseModel):  # SwigModel):
     """Pydantic model for gmml.PreprocessorOptions(), which is used for gmml.PreProcess()
 
     The gmml defaults are:
@@ -17,30 +42,30 @@ class PreprocessorOptions(pydantic.BaseModel):
         gapCTermination = "NHCH3"
     """
 
-    chainNTermination: pydantic.typing.Literal["NH3+", ""] = pydantic.Field(
+    chainNTermination_: str = pydantic.Field(
         default=None,
-        alias="chainNtermination_",
+        alias="chainNtermination",
         description="The residue name of the N-terminus of the chain, defaults to NH3+.",
     )
     # TODO: Should we make these default to None to not shadow gmml?
-    chainCTermination: str = pydantic.Field(
+    chainCTermination_: str = pydantic.Field(
         default=None,
-        alias="chainCtermination_",
+        alias="chainCtermination",
         description="The residue name of the C-terminus of the chain, defaults to CO2-.",
     )
-    gapNTermination: str = pydantic.Field(
+    gapNTermination_: str = pydantic.Field(
         default=None,
-        alias="gapNtermination_",
+        alias="gapNtermination",
         description="The residue name of the N-terminus of the gap residue, defaults to COCH3.",
     )
-    gapCTermination: str = pydantic.Field(
+    gapCTermination_: str = pydantic.Field(
         default=None,
-        alias="gapCtermination_",
+        alias="gapCtermination",
         description="The residue name of the C-terminus of the gap residue, defaults to NHCH3.",
     )
-    hisSelections: list[tuple[str, str]] = pydantic.Field(
+    hisSelections_: list[tuple[str, str]] = pydantic.Field(
         default_factory=list,
-        alias="hisSelections_",
+        alias="hisSelections",
         description="A list of histidine selections to use in preprocessing.",
     )
 
@@ -57,14 +82,59 @@ class PreprocessorOptions(pydantic.BaseModel):
         """Build a gmml.PreprocessorOptions object from this Pydantic model"""
         options = gmml.PreprocessorOptions()
 
-        options.chainNtermination_ = self.chainNTermination
-        options.chainCtermination_ = self.chainCTermination
-        options.gapNtermination_ = self.gapNTermination
-        options.gapCtermination_ = self.gapCTermination
-        for selection in self.hisSelections:
-            options.hisSelections_.append(selection)
+        # We acheck every field to make sure gmml can pass it's defaults.
+        if self.chainNTermination_ is not None:
+            options.chainNtermination_ = self.chainNTermination_
+        if self.chainCTermination_ is not None:
+            options.chainCtermination_ = self.chainCTermination_
+        if self.gapNTermination_ is not None:
+            options.gapNtermination_ = self.gapNTermination_
+        if self.gapCTermination_ is not None:
+            options.gapCtermination_ = self.gapCTermination_
+
+        # this must be done because options.hisSelections_ is a raw swig std::Vector<Pair> wrapper. (only an iterator, not a list)
+        if len(self.hisSelections_):
+            for selection in self.hisSelections_:
+                options.hisSelections_.append(selection)
 
         return options
+
+    # Note: Ideally, swig would produce the Pydantic.BaseModel compatible wrappers for us, thesee methods are an annoying work-around.
+    @staticmethod
+    def try_from_swigpyobject(spobj: gmml.PreprocessorOptions) -> "PreprocessorOptions":
+        """Try to create a PreprocessorOptions object from a swigpyobject.
+
+        This is a hacky workaround for the fact that Pydantic doesn't support swigpyobjects, it converts a generic SwigPyOjbect wrapper to the appropriate gems BaseModel for the gmml class.
+        As such, it needs custom logic for each class. Swig should probably handle this logic itself, in the future.
+
+        - If we were to try to pass the swigpyobject.__dict__ directly to the constructor, we would not be able to find the appropriate fields from all the attributes.
+        - If we were to try to use the swigpyobject directly with Pydantic, we would not be able to use the private member getters as appropriate with a validator.
+            - This is because a BaseModel constructor expects a dict of fields, and without extracting the fields manually for each gmml Class wrapped by swig, we cannot create such a dict.
+            - there is no way to transform the values input to a validator before the validator, meaning we cannot pass a SwigPyObject to a validator and have it work.
+                - We could pass SwigPyObject.__dict__, but to process this, we'd have to know the fields of the swigpyobject, which we cannot get from the swigpyobject dynamically, demanding a custom interface like the try_from_swigpyobject methods.
+                    - Doing so would end up with BaseModels that have to be constructed like such: BaseModel(**gmml.SwigPyObject.__dict__) where SwigPyObject represents any of the gmml classes wrapped by swig.
+        """
+        # Because PydanticModel validates on construction or coerces the input into a dict,
+        # which can not be appropriate for all SwigPyObject-wrapped gmml classes, we need
+        # to manually build the dict of fields to pass to the constructor instead.
+        return PreprocessorOptions(
+            # pydantic aliases affect the field names, so we need to use the alias names here..
+            chainNTermination_=spobj.chainNtermination_,
+            chainCTermination_=spobj.chainCtermination_,
+            gapNTermination_=spobj.gapNtermination_,
+            gapCtermination_=spobj.gapCtermination_,
+            hisSelections_=spobj.hisSelections_,
+        )
+        log.debug("type of spobj: %s", type(spobj))
+        # If we could get the validator to apply try_from_swigpyobject to the values before the validator, we could just pass the swigpyobject.__dict__ to the constructor - if all gmml interfaces were unified.
+        # However, because they aren't we still need to manually build python dicts for each gmml class wrapped by swig to access the class's public members and attributes appropriately.
+        # return {
+        #     "chainNTermination_": spobj.chainNtermination_,
+        #     "chainCTermination_": spobj.chainCtermination_,
+        #     "gapNTermination_": spobj.gapNtermination_,
+        #     "gapCtermination_": spobj.gapCtermination_,
+        #     "hisSelections_": spobj.hisSelections_,
+        # }
 
 
 class ResidueId(pydantic.BaseModel):
@@ -80,6 +150,8 @@ class ResidueId(pydantic.BaseModel):
         """Try to create a ResidueId object from a swigpyobject."""
         return ResidueId(
             # Again, we can't just use the swig object, instead we're using the private member getters.
+            # Because of the diverse ways the actual gmml code works, and the lack of unified swig interface, we can not generalize this static method for preparsing a validator's input.
+            # (On top of the fact pydantic doesn't let us do that. If SwigPyObject provided __fields__ this might be different)
             residueName_=spobj.getName(),
             sequenceNumber_=spobj.getNumber(),
             insertionCode_=spobj.getInsertionCode(),
@@ -120,6 +192,7 @@ class GapInAminoAcidChain(pydantic.BaseModel):
         """
 
         return GapInAminoAcidChain(
+            # **spobj.__dict__ - This does not work .__dict__ != __fields__
             chainId_=spobj.chainId_,
             # These are strings in gmml, but need to be residues, probably. Lets ignore for now
             # residueBeforeGap_=ResidueId.try_from_swigpyobject(spobj.residueBeforeGap_),
@@ -163,10 +236,6 @@ class ChainTerminal(pydantic.BaseModel):
 
         This is a hacky workaround for the fact that Pydantic doesn't support swigpyobjects.
         """
-        log.debug(
-            f" Attempting to create ChainTerminal from {spobj}:\nspobj.chainId_={spobj.chainId_}\nspobj.startIndex_={spobj.startIndex_}\nspobj.endIndex_={spobj.endIndex_}\nspobj.nTermination_={spobj.nTermination_}\nspobj.cTermination_={spobj.cTermination_}"
-        )
-
         return ChainTerminal(
             # No private getters, just access the members directly, remember, we cannot use dict unpacking on swigpyobjects.
             chainId_=spobj.chainId_,
@@ -321,15 +390,17 @@ def execute(
     True
     """
 
-    # Demonstration
+    # Use all gmml defaults
     if options is None:
         options = PreprocessorOptions().build()
     else:
+        # Use user options if provided
         options = PreprocessorOptions(**options).build()
 
     pp_info, _ = preprocess_and_write_pdb(input_pdb_path, options, output_pdb_path)
 
     # The nice thing about below, is we don't validate the PpInfo contents, as Gems probably shouldn't have the scientific knowledge to validate it.
+    # If I were somehow able to use SwigPyObjects in BaseModel construction, it wouldn't produce the same format.
     # Build the output dict
     # output = {}
     # output["unrecognizedAtoms"] = [
