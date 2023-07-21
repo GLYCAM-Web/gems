@@ -7,10 +7,11 @@ log = Set_Up_Logging(__name__)
 def execute(cls: "AmberMDPrep_Response_Manager") -> "AmberMDPrep_Response_Manager":
     request_aaop_list = cls.aaop_tree_pair.input_tree.make_linear_list()
     response_aaop_list = cls.aaop_tree_pair.output_tree.make_linear_list()
-    log.debug("the_request_aaop_list is: ")
-    log.debug(request_aaop_list)
-    log.debug("the_response_aaop_list is: ")
-    log.debug(response_aaop_list)
+    log.debug(
+        "the request aaop list is: %s\nthe response aaop list is: %s",
+        request_aaop_list,
+        response_aaop_list,
+    )
     for aaop in request_aaop_list:
         this_service = aaop.The_AAO.copy(deep=True)
         this_service.myUuid = aaop.ID_String

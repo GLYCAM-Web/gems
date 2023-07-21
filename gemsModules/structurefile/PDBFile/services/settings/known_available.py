@@ -3,7 +3,6 @@ from gemsModules.common.code_utils import GemsStrEnum
 from gemsModules.common.services.settings.known_available import (
     Available_Services as Common_Available_Services,
 )
-
 from gemsModules.mmservice.each_service.known_available import (
     Mmservice_Allowed_File_Formats,
 )
@@ -26,8 +25,7 @@ Available_Services = GemsStrEnum(
 
 
 class Module_Allowed_File_Formats(GemsStrEnum):
-    amber_parm7 = "amber_parm7"
-    amber_rst7 = "amber_rst7"
+    amber_pdb = "pdb"
 
 
 Allowed_File_Formats = GemsStrEnum(
