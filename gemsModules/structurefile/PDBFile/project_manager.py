@@ -24,6 +24,10 @@ class PDBFile_Project_Manager(Project_Manager):
         self.response_project = PDBFile_Project()
         self.response_project.add_temporary_info()
 
+        # By creating the project dir here, we have no control over it's creation by services.
+        # That is, if a service doesn't write any files, it's always created.
+        #
+        # Rather, assign a project for a service to create the directory.
         os.makedirs(self.response_project.project_dir, exist_ok=True)
 
         return self.response_project

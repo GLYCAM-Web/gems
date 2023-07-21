@@ -53,19 +53,13 @@ class PDBFile_Request_Data_Filler(Request_Data_Filler):
             else:
                 out_filename = f"preprocessed.{aaop.The_AAO.inputs['pdb_filename']}"
 
-            log.debug(
-                "About to build AmberMDPrep_Inputs with %s, %s, %s",
-                root,
-                output_root,
-                out_filename,
-            )
+            # create actual request inputs
             self.aaop_list[i].The_AAO.inputs = api.AmberMDPrep_Inputs(
                 pdb_file=aaop.The_AAO.inputs["pdb_filename"],
                 outputFileName=out_filename,
-                pUUID=this_Project.pUUID,
+                pUUID=this_Project.pUUID,  # Q: Should we just pass the project_dir? That way we can copy the file to the project dir in a task. (w/o some pUUID project registry)
                 outputFilePath=output_root,
                 inputFilePath=root,
             )
-            log.debug("Finished building AmberMDPrep_Inputs")
 
         return self.aaop_list
