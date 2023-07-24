@@ -11,6 +11,10 @@ from gemsModules.structurefile.PDBFile.services.AmberMDPrep.server import (
     Serve as serve_prepare_pdb,
 )
 
+from gemsModules.structurefile.PDBFile.services.ProjectManagement.server import (
+    Serve as serve_project_management,
+)
+
 from gemsModules.logging.logger import Set_Up_Logging
 
 log = Set_Up_Logging(__name__)
@@ -21,4 +25,5 @@ service_modules: Dict[str, Callable] = {
     "Marco": serve_marco,
     "Status": serve_status,
     "AmberMDPrep": serve_prepare_pdb,
+    "ProjectManagement": serve_project_management,
 }
