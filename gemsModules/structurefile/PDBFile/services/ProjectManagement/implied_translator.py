@@ -39,14 +39,29 @@ class ProjectManagement_Implied_Translator(Implied_Translator):
             )
             this_aaop = AAOP(
                 AAO_Type="ProjectManagement",
-                The_AAO=None,
+                The_AAO=ProjectManagement_Request(),
                 ID_String=uuid.uuid4(),
                 Dictionary_Name="ProjectManagement_Request",
             )
 
             # TODO/Q: I think if we want to run this service before AmberMDPrep, we need to
-            # add a dependency to AmberMDPrep and fill this Request with that service ID to
-            # build the aaop tree correctly.
+            # add a this AAOP as a dependency to the AmberMDPrep AAOP. I think we need to use something like:
+
+            # for service in input_object.services.get_services_of_type("AmberMDPrep"):
+            #    this_aaop = AAOP( ... )
+            #    service.add_dependency(this_aaop.ID_String)
+            #
+            # But, then we need to actually execute the PM service first by resolving dependenices...
+            # - Also fill the PM request from the associated mdprep request.
+            #
+            #  After directory creation:
+            # - One thing the PM service needs to be able to do is copy the input file given to AmberMDPrep to the project.
+            #   - This way AmberMDPrep only has to look for an input.pdb file in the project directory no matter how we got it there.
+            # - We also need to be able to dump the incoming request.json() to the project directory
+
+            #  > These things mean that when we run PM service to resolve a dependency for AmberMDPrep, we need to be able to resolve the
+            #  > pUUID of the associated mdprep service request, rather than an arbitrary or any default created for PM service.
+            #
             self.aaop_list.append(this_aaop)
 
         return self.get_aaop_list()

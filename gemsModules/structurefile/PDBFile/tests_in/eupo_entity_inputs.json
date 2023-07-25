@@ -1,13 +1,13 @@
 {
     "entity": {
         "type": "PDBFile",
+        "inputs": {
+            "pdb_filename": "016.AmberMDPrep.4mbzEdit.pdb",
+            "inputFilePath": "/programs/gems/tests/inputs/"
+        },
         "services": {
             "any_amber_prep": {
-                "type": "AmberMDPrep",
-                "inputs": {
-                    "pdb_filename": "016.AmberMDPrep.4mbzEdit.pdb",
-                    "inputFilePath": "/programs/gems/tests/inputs/"
-                }
+                "type": "AmberMDPrep"
             }
         }
     }

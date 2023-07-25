@@ -68,7 +68,7 @@ class ProjectManagement_Outputs(BaseModel):
 class ProjectManagement_Request(PDBFile_Service_Request):
     typename: str = Field("ProjectManagement", alias="type")
     # Cannot Make a PM request without inputs.
-    inputs: ProjectManagement_Inputs = None
+    inputs: ProjectManagement_Inputs = ProjectManagement_Inputs()
 
 
 class ProjectManagement_Response(PDBFile_Service_Response):

@@ -20,7 +20,8 @@ class PDBFile_Request_Data_Filler(Request_Data_Filler):
 
         for i, aaop in enumerate(self.aaop_list):
             if aaop.AAO_Type == "AmberMDPrep":
-                # I believe this should be done by the ProjectManagement service, but we currently give these inputs to AmberMDPrep.
+                # I believe we this should be handled by the ProjectManagement service copying the input file to the project dir
+                # but we currently give these inputs to AmberMDPrep.
                 #
                 # Also,  Q: should we be using the entity inputs and filling the service inputs here?
                 # Not doing so means in the implied translator we have to know about services.
@@ -38,17 +39,21 @@ class PDBFile_Request_Data_Filler(Request_Data_Filler):
                     inputFilePath=root,
                 )
                 log.debug(
-                    "Finished building AmberMDPrep_Inputs, %s",
+                    "Finished building AmberMDPrep_Inputs, %s aaop_list[%s]",
                     self.aaop_list[i].The_AAO.inputs,
+                    i,
                 )
             elif aaop.AAO_Type == "ProjectManagement":
-                this_service = pm_api.ProjectManagement_Request()
-                this_service.inputs = pm_api.ProjectManagement_Inputs(
+                aaop.The_AAO.inputs = pm_api.ProjectManagement_Inputs(
                     pUUID=this_Project.pUUID,
                     projectDir=this_Project.project_dir,
                 )
+                log.debug(
+                    "Finished building ProjectManagement_Inputs, %s aaop_list[%s]",
+                    self.aaop_list[i].The_AAO.inputs,
+                    i,
+                )
 
-                # TODO/O: How do we get the project directory from the ProjectManagement service to AmberMDPrep?
-                self.aaop_list[i].The_AAO = this_service
+                # TODO/O: How do we get the input filename from the ambermdprep service request to it's implied dependency, the project management service?
 
         return self.aaop_list
