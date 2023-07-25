@@ -14,7 +14,7 @@ from gemsModules.common.services.list_services.implied_translator import (
 )
 
 from gemsModules.structurefile.PDBFile.services.AmberMDPrep.implied_translator import (
-    AmbderMDPrep_Implied_Translator,
+    AmberMDPrep_Implied_Translator,
 )
 
 from gemsModules.structurefile.PDBFile.services.ProjectManagement.implied_translator import (
@@ -31,6 +31,6 @@ implied_modules: Dict[str, Callable] = {
     "ListServices": list_services_Implied_Translator,
     "Marco": marco_Implied_Translator,
     "Status": status_Implied_Translator,
-    "AmberMDPrep": AmbderMDPrep_Implied_Translator,
+    "AmberMDPrep": AmberMDPrep_Implied_Translator,
     "ProjectManagement": ProjectManagement_Implied_Translator,
 }

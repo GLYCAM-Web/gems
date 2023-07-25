@@ -33,32 +33,15 @@ class ProjectManagement_Resources(Resources):
 
 
 class ProjectManagement_Inputs(BaseModel):
-    pdb_file: str = Field(
-        # Note: This should be a required field, but the way Request instantiates an empty Inputs disallows this.
-        ...,
-        title="PDB File",
-        description="Name of PDB file to preprocess.",
-    )
-    outputFileName: Optional[str] = Field(
-        None,
-        title="Output file name",
-        description="Name of output file",
-    )
     pUUID: Optional[str] = Field(
         None,
         title="Project UUID",
         description="UUID of Project",
     )
-    outputFilePath: Optional[str] = Field(
-        None,  # "/website/TESTS/ambermdprep/ambermdprep_test_files/output_dir",
-        title="Output File Path",
-        description="Path to output directory",
-    )
-
-    inputFilePath: Optional[str] = Field(
-        None,  # "/website/TESTS/ambermdprep/test_files",
-        title="Input Files Directory Path",
-        description="Path to whhere the input files are stored",
+    projectDir: Optional[str] = Field(
+        None,
+        title="Project Directory",
+        description="Full path to project directory",
     )
     use_serial: bool = Field(
         False,
@@ -84,7 +67,7 @@ class ProjectManagement_Outputs(BaseModel):
 
 class ProjectManagement_Request(PDBFile_Service_Request):
     typename: str = Field("ProjectManagement", alias="type")
-    # the following must be redefined in a child class
+    # Cannot Make a PM request without inputs.
     inputs: ProjectManagement_Inputs = None
 
 

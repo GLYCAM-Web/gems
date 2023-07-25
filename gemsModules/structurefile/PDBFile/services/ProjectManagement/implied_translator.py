@@ -27,9 +27,8 @@ class ProjectManagement_Implied_Translator(Implied_Translator):
         self.aaop_list = []
 
         log.debug(
-            "@@ In ProjectManagement_Implied_Translator, process, \n\ninput_object=%s\nservices=%s\n",
+            "In ProjectManagement_Implied_Translator.process, \n\ninput_object=%s\n\n",
             input_object.json(indent=2),
-            str([service for service in input_object.services]),
         )
 
         # TODO/Q: It seems that we could instead add a Dependency to AmberMDPrep, but I don't think they get resolved yet.
@@ -38,17 +37,16 @@ class ProjectManagement_Implied_Translator(Implied_Translator):
             log.debug(
                 "Implicitly adding a ProjectManagement service request, needed by the AmberMDPrep service."
             )
-            this_service = ProjectManagement_Request()
             this_aaop = AAOP(
                 AAO_Type="ProjectManagement",
-                The_AAO=this_service,
+                The_AAO=None,
                 ID_String=uuid.uuid4(),
                 Dictionary_Name="ProjectManagement_Request",
             )
 
-            # If we want to run this service before AmberMDPrep, we need to add a dependency to AmberMDPrep with this service's ID.
-
-            # I suppose implied services are always run before explicit, but what do we do when implied requests have conflicting dependencies themselves?
+            # TODO/Q: I think if we want to run this service before AmberMDPrep, we need to
+            # add a dependency to AmberMDPrep and fill this Request with that service ID to
+            # build the aaop tree correctly.
             self.aaop_list.append(this_aaop)
 
         return self.get_aaop_list()

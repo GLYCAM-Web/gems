@@ -61,6 +61,8 @@ class Request_Manager(ABC):
         self.gather_implicit_services()
         log.debug("the implicit aaop list is: ")
         log.debug(self.implicit_aaops)
+        # Should we have implicits first because explicits will often depend on implicits?
+        # I believe we should be using Dependencies and AAO IDs to run services in the appropriate order.
         self.aaop_list = self.managed_explicit_aaops + self.implicit_aaops
         log.debug("the current aaop list is: ")
         log.debug(self.aaop_list)

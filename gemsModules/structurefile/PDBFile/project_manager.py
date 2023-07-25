@@ -20,16 +20,8 @@ class PDBFile_Project_Manager(Project_Manager):
         return self.response_project
 
     def instantiate_response_project(self) -> PDBFile_Project:
-        # self.fill_response_project_from_incoming_project()
         self.response_project = PDBFile_Project()
         self.response_project.add_temporary_info()
-
-        # By creating the project dir here, we have no control over it's creation by services.
-        # That is, if a service doesn't write any files, it's always created.
-        #
-        # TODO: Rather, assign a project directory for an implicit service to create.
-        os.makedirs(self.response_project.project_dir, exist_ok=True)
-
         return self.response_project
 
     @staticmethod

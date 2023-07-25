@@ -14,38 +14,12 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
-## These are a little redundant in this simple example.
-class requestInputs(BaseModel):
-    """Defines the inputs to the service."""
-
-    entity: str = None
-    who_I_am: str = None
-
-
-class responseOutputs(BaseModel):
-    """Defines the outputs from the service."""
-
-    message: str = None
-    info: Optional[str] = None
-
-
-class serviceInputs(BaseModel):
-    """Allows a Service_Request to be used as input"""
-
-    inputs: requestInputs = requestInputs()
-    options: Dict[str, str]
-
-
-class serviceOutputs(BaseModel):
-    outputs: responseOutputs = responseOutputs()
-
-
 def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     """Executes the service."""
     log.debug(f"serviceInputs: {inputs}")
     service_outputs = ProjectManagement_Outputs()
 
-    # in_file = os.path.join(inputs.inputFilePath, inputs.pdb_file)
-    # out_file = os.path.join(inputs.outputFilePath, inputs.outputFileName)
+    log.debug("Creating project directory: " + str(inputs.projectDir))
+    os.makedirs(inputs.projectDir, exist_ok=True)
 
     return service_outputs
