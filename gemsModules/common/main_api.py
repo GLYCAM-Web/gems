@@ -74,6 +74,7 @@ class Transaction(ABC):
                 self.initialize_outputs_from_inputs()
             return None
         except Exception as error:
+            # TODO: Clean this up, looks doubled up.
             errMsg = "problem processing this string: " + str(in_string)
             log.error(errMsg)
             log.error(error)

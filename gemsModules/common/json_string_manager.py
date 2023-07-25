@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import traceback
+
 from pydantic import ValidationError
 from abc import ABC, abstractmethod
 
@@ -7,6 +9,7 @@ from gemsModules.common.main_api import common_Transaction
 from gemsModules.common.transaction_manager import Transaction_Manager
 
 from gemsModules.logging.logger import Set_Up_Logging
+
 
 log = Set_Up_Logging(__name__)
 
@@ -39,17 +42,20 @@ class Json_String_Manager(ABC):
                 self.transaction = self.transaction_manager.process()
                 # Should this return a good response here?
                 # return self.transaction.get_outgoing_string()
-        except ValidationError as e:
-            brief = "InvalidInput", e
-        except ValueError as e:
-            brief = "EntityNotKnown", e
-        except Exception as e:
-            brief = "UnknownError", e
-
-        if brief is not None:
-            self.transaction.generate_error_response(
-                EntityType=self.entityType,
-                Brief=brief[0],
-                AdditionalInfo={"error": str(brief[1])},
-            )
-            return self.transaction.get_outgoing_string()
+        except (ValueError, ValidationError, Exception) as e:
+            # Could use use a NamedTuple here.
+            if isinstance(e, ValueError):
+                brief = "InvalidInput", e
+            elif isinstance(e, ValidationError):
+                brief = "ValidationError", e
+            else:
+                brief = "UnknownError", e
+            log.error("Exception in Json_String_Manager: %s", traceback.format_exc())
+        finally:
+            if brief is not None:
+                self.transaction.generate_error_response(
+                    EntityType=self.entityType,
+                    Brief=brief[0],
+                    AdditionalInfo={"error": str(brief[1])},
+                )
+                return self.transaction.get_outgoing_string()

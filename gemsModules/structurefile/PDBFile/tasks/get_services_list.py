@@ -8,7 +8,7 @@ def execute() -> List:
     """Return a list of available services
 
     >>> print(execute())
-    ['AmberMDPrep']
+    ['AmberMDPrep', 'ProjectManagement']
 
     """
 

@@ -44,12 +44,8 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     """Executes the service."""
     log.debug(f"serviceInputs: {inputs}")
     service_outputs = ProjectManagement_Outputs()
-    # The who_I_am must be set in the options.
 
-    in_file = os.path.join(inputs.inputFilePath, inputs.pdb_file)
-    out_file = os.path.join(inputs.outputFilePath, inputs.outputFileName)
-
-    # TODO/Q: should this always execute? ProjectManagement surely doesn't always prepare a PDB file?
-    service_outputs.ppinfo = prepare_pdb.execute(in_file, out_file)
+    # in_file = os.path.join(inputs.inputFilePath, inputs.pdb_file)
+    # out_file = os.path.join(inputs.outputFilePath, inputs.outputFileName)
 
     return service_outputs
