@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from typing import Callable, List, Dict
+from typing import Callable, List, Dict, Literal
 import uuid
 
 from gemsModules.common.code_utils import Annotated_List
@@ -72,7 +72,7 @@ class Action_Associated_Object_Package:
     def add_child_package(self, child_package):
         if self.child_packages is None:
             self.create_child_package_list(self)
-        self.child_packages.items.append(child_package)
+        self.child_packages.add_item(child_package)
 
     def get_child_packages(self):
         return self.child_packages
@@ -86,27 +86,20 @@ class Action_Associated_Object_Package:
         if self.child_packages is not None:
             for child_package in self.child_packages:
                 additional_list = child_package.get_linear_list()
-        new_self = self.make_skeleton_copy()
-        new_self.child_packages = None
-        linear_list.append(self)
+        new_self = self.make_skeleton_copy(clean_child_packages=True)
+        linear_list.append(new_self)
         linear_list.extend(additional_list)
         return linear_list
 
-    def make_skeleton_copy(self):
+    def make_skeleton_copy(self, clean_child_packages=False):
         """Create a new AAOP with the same ID_String, AAO_Type, Dictionary_Name,
         Dependencies, and skeleton copies of any child packages.
         """
-        new_aaop = Action_Associated_Object_Package(
-            ID_String=self.ID_String,
-            AAO_Type=self.AAO_Type,
-            Dictionary_Name=self.Dictionary_Name,
-            Dependencies=self.Dependencies,
-        )
-        if self.child_packages is not None:
-            new_aaop.create_child_package_list()
-            new_aaop.child_packages.ordered = self.child_packages.ordered
-            for child_package in self.child_packages:
-                new_aaop.add_child_package(child_package.make_skeleton_copy())
+        new_aaop = self.make_deep_copy()
+
+        if clean_child_packages:
+            new_aaop.child_packages = None
+
         return new_aaop
 
     def make_deep_copy(self):
@@ -120,11 +113,13 @@ class Action_Associated_Object_Package:
             The_AAO=self.The_AAO,
             Dependencies=self.Dependencies,
         )
+
         if self.child_packages is not None:
             new_aaop.create_child_package_list()
-            new_aaop.child_packages.ordered = self.child_packages.ordered
+            new_aaop.child_packages.set_ordered(self.child_packages.ordered)
             for child_package in self.child_packages:
                 new_aaop.add_child_package(child_package.make_deep_copy())
+
         return new_aaop
 
 
@@ -143,7 +138,7 @@ class AAOP_Tree:
 
     def __init__(self, packages: Annotated_List) -> None:
         self.packages = packages
-        self._current_aaop_index = -1
+        self._current_AAOP_index = -1
 
     def __repr__(self):
         return f"{self.packages=!r}\n"
@@ -154,19 +149,19 @@ class AAOP_Tree:
         # We will need special iterator, eventually.
         # Need depth-first search, but each AAOP should be able to override that.
         log.debug("in _next_AAOP. putme  = >>>>%s<<<<", str(putme))
-        log.debug(f"{self.packages.items=}")
+        log.debug(f"{self.packages=}")
 
-        self._current_aaop_index += 1
-        if self._current_aaop_index >= len(self.packages.items):
+        self._current_AAOP_index += 1
+        if self._current_AAOP_index >= len(self.packages):
             log.debug("raising StopIteration")
             raise StopIteration
         if putme is not None:
             log.debug("putting putme")
             # TODO/Q: Should use setter?
-            self.packages.items[self._current_aaop_index] = putme
+            self.packages[self._current_AAOP_index] = putme
         else:
-            log.debug(f"returning {self.packages.items[self._current_AAOP_index]=}")
-            return self.packages.items[self._current_aaop_index]
+            log.debug(f"returning {self.packages[self._current_AAOP_index]=}")
+            return self.packages[self._current_AAOP_index]
 
     def get_next_AAOP(self):
         """Return the next AAOP in the tree.  Set that as current."""
@@ -178,40 +173,61 @@ class AAOP_Tree:
         log.debug("about to put_next_AAOP")
         self._next_AAOP(putme=putme)
 
-    #    def get_AAOP_by_ID (ID_String: str) :
-    #        """Get an AAOP by ID"""
-    #        #return self._temporary_AAOP
-    #        pass
-    #
-    #    def put_AAOP_by_ID (ID_String: str, incoming_aaop: AAOP) :
-    #        """Overwrite an AAOP by ID"""
-    #        #return self._temporary_AAOP
-    #        pass
+    def get_aaop_by_id(self, id_string: str):
+        """Get an AAOP by ID"""
+        for package in self.packages:
+            if package.ID_String == id_string:
+                return package
+
+    # TODO: rename to place
+    def put_aaop_by_id(
+        self,
+        id_string: str,
+        incoming_aaop: AAOP,
+        position: Literal["before", "after", "replace"] = "replace",
+    ):
+        """Generic put an AAOP by ID"""
+        for i, package in enumerate(self.packages):
+            if package.ID_String == id_string:
+                if position == "replace":
+                    self.packages[i] = incoming_aaop
+                elif position == "before":
+                    self.packages.insert(i, incoming_aaop)
+                elif position == "after":
+                    self.packages.insert(i + 1, incoming_aaop)
+                else:
+                    raise ValueError(f"Invalid position: {position}")
 
     def make_skeleton_copy(self):
         """Make a skeleton copy of the tree"""
         new_tree = AAOP_Tree(packages=Annotated_List())
-        new_tree.packages.ordered = self.packages.ordered
-        for package in self.packages.items:
-            new_tree.packages.items.append(package.make_skeleton_copy())
+        new_tree.packages.set_ordered(self.packages.ordered)
+
+        for package in self.packages:
+            new_tree.packages.append(package.make_skeleton_copy())
+
         return new_tree
 
     def make_deep_copy(self):
         """Make a deep copy of the tree"""
         new_tree = AAOP_Tree(packages=Annotated_List())
-        new_tree.packages.ordered = self.packages.ordered
-        for package in self.packages.items:
+        new_tree.packages.set_ordered(self.packages.ordered)
+
+        for package in self.packages:
             new_tree.packages.items.append(package.make_deep_copy())
+
         return new_tree
 
     def make_linear_list(self) -> List:
         """Make a linear list of AAOPs in the tree"""
         new_list: List[AAOP] = []
-        for package in self.packages.items:
+
+        for package in self.packages:
             new_list.append(package)
             if package.child_packages is not None:
                 for child_package in package.child_packages.items:
                     new_list.append(child_package)
+
         return new_list
 
 
