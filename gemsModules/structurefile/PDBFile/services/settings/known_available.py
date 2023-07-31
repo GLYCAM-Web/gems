@@ -14,7 +14,9 @@ log = Set_Up_Logging(__name__)
 
 
 class Module_Available_Services(GemsStrEnum):
+    # TODO: Rename key to match service name
     prepare_pdb = "AmberMDPrep"
+    project_manage = "ProjectManagement"
 
 
 Available_Services = GemsStrEnum(

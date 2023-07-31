@@ -61,7 +61,9 @@ class Request_Manager(ABC):
         self.gather_implicit_services()
         log.debug("the implicit aaop list is: ")
         log.debug(self.implicit_aaops)
-        self.aaop_list = self.managed_explicit_aaops + self.implicit_aaops
+        # Should we have implicits first because explicits will often depend on implicits?
+        # I believe we should be using Dependencies and AAO IDs to run services in the appropriate order.
+        self.aaop_list = self.implicit_aaops + self.managed_explicit_aaops
         log.debug("the current aaop list is: ")
         log.debug(self.aaop_list)
         log.debug("about to manage duplicates")
@@ -101,7 +103,6 @@ class Request_Manager(ABC):
         ] = self.default_manager.get_default_services_aaops()
         return self.default_aaops
 
-    # The project_manager should perform this at a later state so request manager isn't dependent on project.
     def fill_request_data_needs(self, project):
         self.project = project
         self.data_filler = self.data_filler_type(

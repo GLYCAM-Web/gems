@@ -44,11 +44,6 @@ class AmberMDPrep_Inputs(BaseModel):
         title="Output file name",
         description="Name of output file",
     )
-    pUUID: Optional[str] = Field(
-        None,
-        title="Project UUID",
-        description="UUID of Project",
-    )
     outputFilePath: Optional[str] = Field(
         None,  # "/website/TESTS/ambermdprep/ambermdprep_test_files/output_dir",
         title="Output File Path",

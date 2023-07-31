@@ -6,7 +6,8 @@ from gemsModules.common.services.request_data_filler import Request_Data_Filler
 
 from gemsModules.structurefile.PDBFile.main_api_project import PDBFile_Project
 
-from gemsModules.structurefile.PDBFile.services.AmberMDPrep import api
+from gemsModules.structurefile.PDBFile.services.AmberMDPrep import api as mdprep_api
+from gemsModules.structurefile.PDBFile.services.ProjectManagement import api as pm_api
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -18,17 +19,12 @@ class PDBFile_Request_Data_Filler(Request_Data_Filler):
         this_Project: PDBFile_Project = self.project
 
         for i, aaop in enumerate(self.aaop_list):
-            # Use the pUUID to get a project
-            if (
-                "pUUID"
-                in aaop.The_AAO.inputs  #  Should we make a utility function for optional keys or do this check another way?
-                and aaop.The_AAO.inputs["pUUID"] is not None
-            ):
-                # TODO: get the project by pUUID
-                root = this_Project.project_dir
-                output_root = root
-            # Attempt to use the inputFilePath and outputFilePath otherwise use the general project directory
-            else:
+            if aaop.AAO_Type == "AmberMDPrep":
+                # I believe we this should be handled by the ProjectManagement service copying the input file to the project dir
+                # but we currently give these inputs to AmberMDPrep.
+                #
+                # Also,  Q: should we be using the entity inputs and filling the service inputs here?
+                # Not doing so means in the implied translator we have to know about services.
                 root = this_Project.project_dir
                 if (
                     "inputFilePath" in aaop.The_AAO.inputs
@@ -36,36 +32,28 @@ class PDBFile_Request_Data_Filler(Request_Data_Filler):
                 ):
                     root = aaop.The_AAO.inputs["inputFilePath"]
 
-                output_root = this_Project.project_dir
-                if (
-                    "outputFilePath" in aaop.The_AAO.inputs
-                    and aaop.The_AAO.inputs["outputFilePath"] is not None
-                ):
-                    # Q: deprecate this ability to write to arbitrary paths?
-                    output_root = aaop.The_AAO.inputs["outputFilePath"]
+                self.aaop_list[i].The_AAO.inputs = mdprep_api.AmberMDPrep_Inputs(
+                    pdb_file=aaop.The_AAO.inputs["pdb_filename"],
+                    outputFileName=f"preprocessed.{aaop.The_AAO.inputs['pdb_filename']}",
+                    outputFilePath=this_Project.project_dir,
+                    inputFilePath=root,
+                )
+                log.debug(
+                    "Finished building AmberMDPrep_Inputs, %s aaop_list[%s]",
+                    self.aaop_list[i].The_AAO.inputs,
+                    i,
+                )
+            elif aaop.AAO_Type == "ProjectManagement":
+                aaop.The_AAO.inputs = pm_api.ProjectManagement_Inputs(
+                    pUUID=this_Project.pUUID,
+                    projectDir=this_Project.project_dir,
+                )
+                log.debug(
+                    "Finished building ProjectManagement_Inputs, %s aaop_list[%s]",
+                    self.aaop_list[i].The_AAO.inputs,
+                    i,
+                )
 
-            # update output file name
-            if (
-                "outputFileName" in aaop.The_AAO.inputs
-                and aaop.The_AAO.inputs["outputFileName"] is not None
-            ):
-                out_filename = aaop.The_AAO.inputs["outputFileName"]
-            else:
-                out_filename = f"preprocessed.{aaop.The_AAO.inputs['pdb_filename']}"
-
-            log.debug(
-                "About to build AmberMDPrep_Inputs with %s, %s, %s",
-                root,
-                output_root,
-                out_filename,
-            )
-            self.aaop_list[i].The_AAO.inputs = api.AmberMDPrep_Inputs(
-                pdb_file=aaop.The_AAO.inputs["pdb_filename"],
-                outputFileName=out_filename,
-                pUUID=this_Project.pUUID,
-                outputFilePath=output_root,
-                inputFilePath=root,
-            )
-            log.debug("Finished building AmberMDPrep_Inputs")
+                # TODO/O: How do we get the input filename from the ambermdprep service request to it's implied dependency, the project management service?
 
         return self.aaop_list
