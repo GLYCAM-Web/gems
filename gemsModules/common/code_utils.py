@@ -54,6 +54,7 @@ class Annotated_List(list):
     items can be processed in any order, or in parallel, etc.
     """
 
+    # TODO: items -> *items, calls will need to be updated - Annotated_List([1, 2, 3]) vs Annotated_List(1, 2, 3)
     def __init__(
         self,
         items: List = None,
@@ -61,10 +62,6 @@ class Annotated_List(list):
     ) -> None:
         super().__init__(items or [])
         self._ordered: bool = ordered
-
-    def __repr__(self):
-        out_string = f"items = {super()!r}\n" f"ordered = {self.ordered!r}\n"
-        return out_string
 
     def add_item(self, item):
         super().append(item)
@@ -81,3 +78,28 @@ class Annotated_List(list):
 
     def set_ordered(self, ordered):
         self._ordered = ordered
+
+
+def resolve_dependency_list(
+    service: str,
+    dependencies: dict[str, Annotated_List],
+) -> Annotated_List:
+    """Attempts to resolve a dependency list for a service.
+
+    Currently assumes dependencies[].Annotations_Lists are unordered.
+
+    TODO
+    - [ ] Add support for ordered dependencies
+    - [ ] duplicate services with different dependencies?
+
+    """
+    resolved = Annotated_List(ordered=True)
+    # resolve for service
+    log.debug("Attempting to resolve dependencies for service: %s", service)
+    if service in dependencies.keys():
+        for dependency in dependencies[service]:
+            resolved.extend(resolve_dependency_list(dependency, dependencies))
+    else:
+        return []
+
+    return resolved

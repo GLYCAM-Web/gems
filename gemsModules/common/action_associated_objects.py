@@ -42,11 +42,11 @@ class Action_Associated_Object_Package:
 
     def __repr__(self):
         out_string = (
-            f"ID_String = {self.ID_String}\n"
-            f"AAO_Type = {self.AAO_Type}\n"
-            f"Dictionary_Name = {self.Dictionary_Name}\n"
-            f"The_AAO = AAO callable (see below)\n"
-            f"Dependencies = {self.Dependencies!r}\n"
+            f"{{\n\tID_String = {self.ID_String}\n"
+            f"\tAAO_Type = {self.AAO_Type}\n"
+            f"\tDictionary_Name = {self.Dictionary_Name}\n"
+            f"\tThe_AAO = AAO callable (see below)\n"
+            f"\tDependencies = {self.Dependencies!r}\n}}\n"
         )
         out_string += "The_AAO callable = " + str(self.The_AAO) + "\n"
         if self.child_packages is not None:

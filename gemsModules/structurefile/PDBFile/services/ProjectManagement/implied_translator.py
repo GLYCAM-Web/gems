@@ -32,7 +32,7 @@ class ProjectManagement_Implied_Translator(Implied_Translator):
         )
 
         # TODO/Q: It seems that we could instead add a Dependency to AmberMDPrep, but I don't think they get resolved yet.
-        # It appears the only references to Dependencies are the class definition and deep copy at the moment.
+        # TODO: This should not be here, but in a dependency manager.
         if input_object.services.is_present("AmberMDPrep"):
             log.debug(
                 "Implicitly adding a ProjectManagement service request, needed by the AmberMDPrep service."
@@ -62,6 +62,7 @@ class ProjectManagement_Implied_Translator(Implied_Translator):
             #  > These things mean that when we run PM service to resolve a dependency for AmberMDPrep, we need to be able to resolve the
             #  > pUUID of the associated mdprep service request, rather than an arbitrary or any default created for PM service.
             #
+            # get index of all AmberMDPrep requests and prepend an aaop for each:
             self.aaop_list.append(this_aaop)
 
         return self.get_aaop_list()

@@ -6,6 +6,7 @@ from pydantic import Field, typing
 from gemsModules.common import main_api
 from gemsModules.common import main_api_entity
 from gemsModules.common import main_api_services
+from gemsModules.common.code_utils import Annotated_List
 
 from gemsModules.structurefile.PDBFile.main_api_project import PDBFile_Project
 from gemsModules.structurefile.PDBFile.services.settings.known_available import (
@@ -44,6 +45,12 @@ class PDBFile_Service_Responses(main_api_services.Service_Responses):
     __root__: Dict[str, PDBFile_Service_Response] = None
 
 
+# TODO: To Service_Workflow manager
+Service_Dependencies = {
+    "AmberMDPrep": Annotated_List(["ProjectManagement"], ordered=False)
+}
+
+
 class PDBFile_Entity(main_api_entity.Entity):
     entityType: typing.Literal[
         "PDBFile"
@@ -52,6 +59,10 @@ class PDBFile_Entity(main_api_entity.Entity):
     )
     services: PDBFile_Service_Requests = PDBFile_Service_Requests()
     responses: PDBFile_Service_Responses = PDBFile_Service_Responses()
+
+    # TODO: generalize to Common_Entity or make task. Are common tasks discoverable by other entities, I think not?
+    def get_dependencies(self) -> list[str]:
+        return Service_Dependencies
 
 
 # The Delegator uses the main_api.Transaction class to define the transaction
