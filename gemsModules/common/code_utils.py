@@ -93,13 +93,13 @@ def resolve_dependency_list(
     - [ ] duplicate services with different dependencies?
 
     """
-    resolved = Annotated_List(ordered=True)
-    # resolve for service
     log.debug("Attempting to resolve dependencies for service: %s", service)
+
+    resolved = Annotated_List(ordered=True)
     if service in dependencies.keys():
         for dependency in dependencies[service]:
             resolved.extend(resolve_dependency_list(dependency, dependencies))
     else:
-        return []
+        return [service]
 
     return resolved

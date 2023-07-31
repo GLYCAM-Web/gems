@@ -31,7 +31,6 @@ log = Set_Up_Logging(__name__)
 duplicates_modules: Dict[str, Callable] = {
     "Error": error_Multiples_Manager,
     "ListServices": list_services_Multiples_Manager,
-    "ListServices": list_services_Multiples_Manager,
     "Marco": marco_Multiples_Manager,
     "Status": status_Multiples_Manager,
     "AmberMDPrep": AmberMDPrep_Multiples_Manager,

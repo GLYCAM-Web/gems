@@ -1,5 +1,5 @@
-from gemsModules.common.services.orders_dependencies import Service_Work_Flows_{{cookiecutter.gems_module}}
-from gemsModules.common.services.orders_dependencies import Service_Work_Flow_Order_{{cookiecutter.gems_module}}
+from gemsModules.common.services.workflow_manager import Service_Work_Flows_{{cookiecutter.gems_module}}
+from gemsModules.common.services.workflow_manager import Service_Work_Flow_Order_{{cookiecutter.gems_module}}
 
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)

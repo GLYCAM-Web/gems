@@ -4,11 +4,11 @@ from typing import List
 
 from gemsModules.common.action_associated_objects import AAOP
 from gemsModules.common.action_associated_objects import AAOP_Tree_Pair
-from gemsModules.common.code_utils import Annotated_List, resolve_dependency_list
 from gemsModules.common.main_api import Transaction
 from gemsModules.common.project_manager import common_Project_Manager
 from gemsModules.common.services.request_manager import common_Request_Manager
 from gemsModules.common.services.response_manager import common_Response_Manager
+from gemsModules.common.services.workflow_manager import common_Workflow_Manager
 from gemsModules.common.services.aaop_tree_pair_manager import AAOP_Tree_Pair_Generator
 from gemsModules.common.services.servicer import commonservices_Servicer
 
@@ -37,6 +37,7 @@ class Transaction_Manager(ABC):
         self.project_manager = None
         self.this_servicer = None
         self.response_manager = None
+        self.workflow_manager = None
 
         self.set_local_modules()
 
@@ -51,6 +52,7 @@ class Transaction_Manager(ABC):
         self.this_servicer_type = commonservices_Servicer
         self.response_manager_type = common_Response_Manager
         self.project_manager_type = common_Project_Manager
+        self.workflow_manager_type = common_Workflow_Manager
 
     def process(self):
         """Process the incoming entity and project bundled in a new Transaction."""
@@ -76,47 +78,15 @@ class Transaction_Manager(ABC):
         log.debug("\tthe aaop request list is: ")
         log.debug(self.aaop_request_list)
 
-    # TODO: End of request_manager.process?
+    # TODO: Move to end of request_manager.process?
     def resolve_dependencies(self):
         """Service Requests may have Service dependencies which need to be run first for the service to complete successfully."""
         log.debug("about to resolve dependencies")
 
-        # self.workflow_manager = self.workflow_manager_type(entity=self.incoming_entity)
-        # TODO: aggregate all known entities dependencies so we can do cross-entity service dep resolution.
-        service_deps = self.incoming_entity.get_dependencies()
-        log.debug("\tthe service dependencies are: %s", service_deps)
+        self.workflow_manager = self.workflow_manager_type(entity=self.incoming_entity)
+        self.aaop_request_list = self.workflow_manager.process(self.aaop_request_list)
 
-        ordered = Annotated_List(ordered=True)
-        unordered = self.aaop_request_list
-        log.debug("\tthe unordered aaop request list is: %s", unordered)
-
-        # Use AAO_type and service_deps dict to determine order.
-        while len(unordered) > 0:
-            # Get the next aaop
-            current_aaop = unordered.pop(0)
-
-            # Add this aaops deps before this aaop
-            these_deps = resolve_dependency_list(current_aaop.AAO_Type, service_deps)
-            log.debug(
-                "\tthe ordered dependencies for %s are: %s",
-                current_aaop.AAO_Type,
-                these_deps,
-            )
-
-            for new_dep in these_deps:
-                # TODO/FIX:This currently is depending on the fact that the PM.implied_translator is adding it's service.
-                if new_dep in [aaop.AAO_Type for aaop in unordered]:
-                    log.debug("\t\tadding %s to ordered list", new_dep)
-                    dep_aaop = unordered.pop(unordered.index(new_dep))
-                    ordered.append(dep_aaop)
-
-            # Add this aaop after its deps
-            ordered.append(current_aaop)
-
-        # TODO: Prune dependency services that only need to be run once, regardless of requester.
-
-        log.debug("\tthe ordered aaop request list is: %s", ordered)
-        self.aaop_request_list = ordered
+        log.debug("\tthe ordered aaop request list is: %s", self.aaop_request_list)
 
     def generate_aaop_tree_pair(self):
         """Generate the AAOP Tree Pair from the AAOP Request List."""

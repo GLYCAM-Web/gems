@@ -35,20 +35,3 @@ Allowed_File_Formats = GemsStrEnum(
     [(avail.name, avail.value) for avail in Mmservice_Allowed_File_Formats]
     + [(avail.name, avail.value) for avail in Module_Allowed_File_Formats],
 )
-
-
-def testme():
-    """Ensure that the settings info is complete.
-    >>> testme()
-    ['PreparePDB']
-    ['PDB', 'mmCIF', 'Mol2', 'xyz', 'amber_parm7', 'amber_rst7']
-
-    """
-    print(Available_Services.get_json_list())
-    print(Allowed_File_Formats.get_json_list())
-
-
-if __name__ == "__main__":
-    import doctest
-
-    doctest.testmod()

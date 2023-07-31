@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # import from typing first, in case you want to import pydantic.typing
 from typing import Optional, Union
+import uuid
 from pydantic import BaseModel, Field
+from gemsModules.common.action_associated_objects import AAOP
 from gemsModules.common.main_api_resources import Resource, Resources
 
 from gemsModules.structurefile.PDBFile.main_api import (
@@ -74,3 +76,25 @@ class ProjectManagement_Request(PDBFile_Service_Request):
 class ProjectManagement_Response(PDBFile_Service_Response):
     typename: str = Field("ProjectManagement", alias="type")
     outputs: ProjectManagement_Outputs = ProjectManagement_Outputs()
+
+
+class ProjectManagement_AAOP(AAOP):
+    def __init__(self, name=None, request=True):
+        if name is None:
+            name = "ProjectManagement"
+        if request:
+            name = f"{name}_Request"
+        else:
+            name = f"{name}_Response"
+
+        if request:
+            aao = ProjectManagement_Request()
+        else:
+            aao = ProjectManagement_Response()
+
+        super().__init__(
+            AAO_Type="ProjectManagement",
+            The_AAO=aao,
+            ID_String=uuid.uuid4(),
+            Dictionary_Name=name,
+        )
