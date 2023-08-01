@@ -37,7 +37,6 @@ class Transaction_Manager(ABC):
         self.project_manager = None
         self.this_servicer = None
         self.response_manager = None
-        self.workflow_manager = None
 
         self.set_local_modules()
 
@@ -52,14 +51,12 @@ class Transaction_Manager(ABC):
         self.this_servicer_type = commonservices_Servicer
         self.response_manager_type = common_Response_Manager
         self.project_manager_type = common_Project_Manager
-        self.workflow_manager_type = common_Workflow_Manager
 
     def process(self):
         """Process the incoming entity and project bundled in a new Transaction."""
         log.debug("Processing transaction")
 
         self.manage_requests()
-        self.resolve_dependencies()
         self.generate_aaop_tree_pair()
         self.manage_project()
         self.invoke_servicer()
@@ -79,14 +76,6 @@ class Transaction_Manager(ABC):
         log.debug(self.aaop_request_list)
 
     # TODO: Move to end of request_manager.process?
-    def resolve_dependencies(self):
-        """Service Requests may have Service dependencies which need to be run first for the service to complete successfully."""
-        log.debug("about to resolve dependencies")
-
-        self.workflow_manager = self.workflow_manager_type(entity=self.incoming_entity)
-        self.aaop_request_list = self.workflow_manager.process(self.aaop_request_list)
-
-        log.debug("\tthe ordered aaop request list is: %s", self.aaop_request_list)
 
     def generate_aaop_tree_pair(self):
         """Generate the AAOP Tree Pair from the AAOP Request List."""
@@ -112,7 +101,7 @@ class Transaction_Manager(ABC):
         # TODO\Q: getter/setter
         log.debug("about to fill request data needs")
         self.request_manager.fill_request_data_needs(self.response_project)
-        log.debug(self.request_manager.deduplicated_aaop_list)
+        log.debug(self.aaop_request_list)
 
     def invoke_servicer(self):
         """Invoke the Servicer.

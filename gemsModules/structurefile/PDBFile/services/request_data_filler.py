@@ -19,6 +19,7 @@ class PDBFile_Request_Data_Filler(Request_Data_Filler):
         this_Project: PDBFile_Project = self.project
 
         for i, aaop in enumerate(self.aaop_list):
+            log.debug(f"i: {i}, aaopty: {aaop.AAO_Type}")
             if aaop.AAO_Type == "AmberMDPrep":
                 # I believe we this should be handled by the ProjectManagement service copying the input file to the project dir
                 # but we currently give these inputs to AmberMDPrep.
@@ -44,10 +45,12 @@ class PDBFile_Request_Data_Filler(Request_Data_Filler):
                     i,
                 )
             elif aaop.AAO_Type == "ProjectManagement":
+                # TODO: stop this WET nonsense.
                 aaop.The_AAO.inputs = pm_api.ProjectManagement_Inputs(
                     pUUID=this_Project.pUUID,
                     projectDir=this_Project.project_dir,
                 )
+
                 log.debug(
                     "Finished building ProjectManagement_Inputs, %s aaop_list[%s]",
                     self.aaop_list[i].The_AAO.inputs,

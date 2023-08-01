@@ -21,6 +21,7 @@ from gemsModules.common.services.duplicate_requests import (
 )
 from gemsModules.common.services.request_data_filler import common_Request_Data_Filler
 from gemsModules.common.services.settings.known_available import Available_Services
+from gemsModules.common.services.workflow_manager import common_Workflow_Manager
 from gemsModules.project.main_api import Project
 
 from gemsModules.logging.logger import Set_Up_Logging
@@ -35,6 +36,24 @@ class Request_Manager(ABC):
         self.project = None
         self.explicit_aaops: List[AAOP] = []
         self.aaop_list: List[AAOP] = []
+
+        self.explicit_manager_type: Callable = None
+        self.unknown_manager_type: Callable = None
+        self.implied_manager_type: Callable = None
+        self.duplicate_manager_type: Callable = None
+        self.default_manager_type: Callable = None
+        self.workflow_manager_type: Callable = None
+        self.data_filler_type: Callable = None
+        self.available_services: List[str] = None
+
+        self.explicit_manager = None
+        self.unknown_manager = None
+        self.implied_manager = None
+        self.duplicate_manager = None
+        self.default_manager = None
+        self.workflow_manager = None
+        self.data_filler = None
+
         self.set_local_modules()
 
     @abstractmethod
@@ -44,6 +63,7 @@ class Request_Manager(ABC):
         self.implied_manager_type: Callable = common_Implied_Services_Request_Manager
         self.duplicate_manager_type: Callable = common_Duplicate_Requests_Manager
         self.default_manager_type: Callable = common_Default_Service_Request_Manager
+        self.workflow_manager_type: Callable = common_Workflow_Manager
         self.data_filler_type: Callable = common_Request_Data_Filler
         self.available_services: List[str] = Available_Services.get_list()
 
@@ -70,6 +90,7 @@ class Request_Manager(ABC):
         self.manage_duplicates()
         log.debug("the current aaop list is: ")
         log.debug(self.deduplicated_aaop_list)
+        self.resolve_dependencies()
         if self.deduplicated_aaop_list == []:
             self.deduplicated_aaop_list = self.get_default_aaops()
         log.debug("the current aaop list is: ")
@@ -103,12 +124,25 @@ class Request_Manager(ABC):
         ] = self.default_manager.get_default_services_aaops()
         return self.default_aaops
 
+    def resolve_dependencies(self):
+        """Service Requests may have Service dependencies which need to be run first for the service to complete successfully."""
+        log.debug("about to resolve dependencies")
+
+        self.workflow_manager = self.workflow_manager_type(entity=self.entity)
+        self.deduplicated_aaop_list = self.workflow_manager.process(
+            self.deduplicated_aaop_list
+        )
+
+        log.debug("\tthe ordered aaop request list is: %s", self.deduplicated_aaop_list)
+
     def fill_request_data_needs(self, project):
         self.project = project
         self.data_filler = self.data_filler_type(
-            aaop_list=self.aaop_list, entity=self.entity, project=self.project
+            aaop_list=self.deduplicated_aaop_list,
+            entity=self.entity,
+            project=self.project,
         )
-        self.aaop_list = self.data_filler.process()
+        self.deduplicated_aaop_list = self.data_filler.process()
 
 
 class common_Request_Manager(Request_Manager):

@@ -19,6 +19,9 @@ from gemsModules.structurefile.PDBFile.services.duplicate_requests import (
 from gemsModules.structurefile.PDBFile.services.request_data_filler import (
     PDBFile_Request_Data_Filler,
 )
+from gemsModules.structurefile.PDBFile.services.workflow_manager import (
+    PDBFile_Workflow_Manager,
+)
 from gemsModules.structurefile.PDBFile.tasks import get_services_list
 
 from gemsModules.logging.logger import Set_Up_Logging
@@ -33,5 +36,6 @@ class PDBFile_Request_Manager(Request_Manager):
         self.implied_manager_type = PDBFile_Implied_Services_Request_Manager
         self.duplicate_manager_type = PDBFile_Duplicate_Requests_Manager
         self.default_manager_type = PDBFile_Default_Service_Request_Manager
+        self.workflow_manager_type = PDBFile_Workflow_Manager
         self.data_filler_type = PDBFile_Request_Data_Filler
         self.available_services = get_services_list.execute()

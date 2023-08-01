@@ -22,7 +22,14 @@ class Workflow_Manager(ABC):
     def get_linear_workflow_list(self) -> List[str]:
         pass
 
+    @abstractmethod
+    def process(self, aaop_list):
+        pass
+
 
 class common_Workflow_Manager(Workflow_Manager):
     def get_linear_workflow_list(self) -> List[str]:
         return []
+
+    def process(self, aaop_list):
+        return aaop_list
