@@ -33,10 +33,11 @@ class Transaction_Manager(ABC):
 
         # Local Modules
         self.request_manager = None
+        self.workflow_manager = None
+        self.response_manager = None
         self.aaop_tree_pair_manager = None
         self.project_manager = None
         self.this_servicer = None
-        self.response_manager = None
 
         self.set_local_modules()
 
@@ -51,6 +52,7 @@ class Transaction_Manager(ABC):
         self.this_servicer_type = commonservices_Servicer
         self.response_manager_type = common_Response_Manager
         self.project_manager_type = common_Project_Manager
+        self.workflow_manager_type = common_Workflow_Manager
 
     def process(self):
         """Process the incoming entity and project bundled in a new Transaction."""
@@ -72,8 +74,8 @@ class Transaction_Manager(ABC):
 
         self.request_manager = self.request_manager_type(entity=self.incoming_entity)
         self.aaop_request_list: List[AAOP] = self.request_manager.process()
-        log.debug("\tthe aaop request list is: ")
-        log.debug(self.aaop_request_list)
+
+        log.debug("\tthe aaop request list is: %s", self.aaop_request_list)
 
     # TODO: Move to end of request_manager.process?
 
