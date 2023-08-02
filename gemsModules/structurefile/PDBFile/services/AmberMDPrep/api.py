@@ -88,25 +88,3 @@ class AmberMDPrep_Request(PDBFile_Service_Request):
 class AmberMDPrep_Response(PDBFile_Service_Response):
     typename: str = Field("AmberMDPrep", alias="type")
     outputs: AmberMDPrep_Outputs = AmberMDPrep_Outputs()
-
-
-class AmberMDPrep_AAOP(AAOP):
-    def __init__(self, name=None, request=True):
-        if name is None:
-            name = "AmberMDPrep"
-        if request:
-            name = f"{name}_Request"
-        else:
-            name = f"{name}_Response"
-
-        if request:
-            aao = AmberMDPrep_Request()
-        else:
-            aao = AmberMDPrep_Response()
-
-        super().__init__(
-            AAO_Type="AmberMDPrep",
-            The_AAO=aao,
-            ID_String=uuid.uuid4(),
-            Dictionary_Name=name,
-        )

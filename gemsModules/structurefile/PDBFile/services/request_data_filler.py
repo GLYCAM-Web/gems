@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
+import json
 from pathlib import Path
 
 from gemsModules.common.action_associated_objects import AAOP
+from gemsModules.common.main_api_resources import Resource
 from gemsModules.common.services.request_data_filler import Request_Data_Filler
 
 from gemsModules.structurefile.PDBFile.main_api_project import PDBFile_Project
@@ -21,11 +23,6 @@ class PDBFile_Request_Data_Filler(Request_Data_Filler):
         for i, aaop in enumerate(self.aaop_list):
             log.debug(f"i: {i}, aaopty: {aaop.AAO_Type}")
             if aaop.AAO_Type == "AmberMDPrep":
-                # I believe we this should be handled by the ProjectManagement service copying the input file to the project dir
-                # but we currently give these inputs to AmberMDPrep.
-                #
-                # Also,  Q: should we be using the entity inputs and filling the service inputs here?
-                # Not doing so means in the implied translator we have to know about services.
                 root = this_Project.project_dir
                 if (
                     "inputFilePath" in aaop.The_AAO.inputs
@@ -40,19 +37,40 @@ class PDBFile_Request_Data_Filler(Request_Data_Filler):
                     inputFilePath=root,
                 )
                 log.debug(
-                    "Finished building AmberMDPrep_Inputs, %s aaop_list[%s]",
+                    "\tFinished building AmberMDPrep_Inputs, %s aaop_list[%s]",
                     self.aaop_list[i].The_AAO.inputs,
                     i,
                 )
             elif aaop.AAO_Type == "ProjectManagement":
-                # TODO: stop this WET nonsense.
+                # TODO: Resources need conversion methods.
+                # fill in the project management service request with the resources to copy
+                input_json = Resource(
+                    locationType="File",
+                    resourceFormat="json",
+                    payload=json.dumps(self.entity.schema()),
+                )
+
+                if aaop.Requester is not None:
+                    input_pdb = Resource(
+                        locationType="File",
+                        resourceFormat="pdb",
+                        payload=aaop.Requester.The_AAO.inputs["pdb_filename"],
+                    )
+                else:
+                    log.debug(
+                        "No requester found for aaop_list[%s], PM service request will not have a pdb file resource.",
+                        i,
+                    )
+                    input_pdb = None
+
                 aaop.The_AAO.inputs = pm_api.ProjectManagement_Inputs(
                     pUUID=this_Project.pUUID,
                     projectDir=this_Project.project_dir,
+                    resources=[input_json, input_pdb],
                 )
 
                 log.debug(
-                    "Finished building ProjectManagement_Inputs, %s aaop_list[%s]",
+                    "\tFinished building ProjectManagement_Inputs, %s aaop_list[%s]",
                     self.aaop_list[i].The_AAO.inputs,
                     i,
                 )

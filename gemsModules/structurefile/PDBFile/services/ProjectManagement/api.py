@@ -45,11 +45,6 @@ class ProjectManagement_Inputs(BaseModel):
         title="Project Directory",
         description="Full path to project directory",
     )
-    use_serial: bool = Field(
-        False,
-        title="Use Serial",
-        description="Should we force the GEMS code to run in serial?",
-    )
     resources: Resources = Resources()
 
 
@@ -76,25 +71,3 @@ class ProjectManagement_Request(PDBFile_Service_Request):
 class ProjectManagement_Response(PDBFile_Service_Response):
     typename: str = Field("ProjectManagement", alias="type")
     outputs: ProjectManagement_Outputs = ProjectManagement_Outputs()
-
-
-class ProjectManagement_AAOP(AAOP):
-    def __init__(self, name=None, request=True):
-        if name is None:
-            name = "ProjectManagement"
-        if request:
-            name = f"{name}_Request"
-        else:
-            name = f"{name}_Response"
-
-        if request:
-            aao = ProjectManagement_Request()
-        else:
-            aao = ProjectManagement_Response()
-
-        super().__init__(
-            AAO_Type="ProjectManagement",
-            The_AAO=aao,
-            ID_String=uuid.uuid4(),
-            Dictionary_Name=name,
-        )
