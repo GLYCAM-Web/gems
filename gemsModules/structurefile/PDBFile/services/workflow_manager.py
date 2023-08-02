@@ -79,13 +79,11 @@ class PDBFile_Workflow_Manager(Workflow_Manager):
                         current_aaop,
                     )
 
-                    # Update the current AAOP's dependencies and set it as a requester AAOP.
+                    # Update the current AAOP's dependencies and set it as the requester AAOP.
                     if current_aaop.Dependencies is None:
                         current_aaop.Dependencies = []
-                    current_aaop.Dependencies.append(new_aaop)
-                    new_aaop.Requester = (
-                        current_aaop  # TODO: use current_aaop.ID_String instead?
-                    )
+                    current_aaop.Dependencies.append(new_aaop.ID_String)
+                    new_aaop.Requester = current_aaop.ID_String
 
                     # Append the new AAOP before the current AAOP.
                     ordered.append(new_aaop)

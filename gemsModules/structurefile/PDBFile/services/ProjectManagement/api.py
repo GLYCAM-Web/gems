@@ -49,11 +49,6 @@ class ProjectManagement_Inputs(BaseModel):
 
 
 class ProjectManagement_Outputs(BaseModel):
-    ppinfo: str = Field(
-        None,
-        title="Preprocessing Information",
-        description="ProjectManagement's preprocessing information",
-    )
     outputFilePath: str = Field(
         None,
         title="Output File Path",

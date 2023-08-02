@@ -37,23 +37,11 @@ class Action_Associated_Object_Package:
         self.ID_String = ID_String
         self.The_AAO = The_AAO
         self.Dictionary_Name = Dictionary_Name
-        self.Dependencies = Dependencies
-        self.child_packages = None
 
+        self.Dependencies = Dependencies
         self.Requester = None  # prototyping for workflows needing information from their requesting aaop.
 
-    def __repr__(self):
-        out_string = (
-            f"{{\n\tID_String = {self.ID_String}\n"
-            f"\tAAO_Type = {self.AAO_Type}\n"
-            f"\tDictionary_Name = {self.Dictionary_Name}\n"
-            f"\tThe_AAO = AAO callable (see below)\n"
-        )
-        out_string += "The_AAO callable = " + str(self.The_AAO) + "\n"
-        if self.child_packages is not None:
-            # print("child_packages = " + str(self.child_packages))
-            out_string += f"child_packages = {self.child_packages!r}\n"
-        return out_string
+        self.child_packages = None
 
     # right now, the AAOs are all Pydantic Models, so they need to be copied using the copy() method
     # I'll try handling this in the Servicer
@@ -104,7 +92,7 @@ class Action_Associated_Object_Package:
         return new_aaop
 
     def make_deep_copy(self):
-        """Create a new AAOP that is an exact duplicate of the current one, including
+        """Create a new AAOP that is an exa`ct duplicate of the current one, including
         any child packages.
         """
         new_aaop = Action_Associated_Object_Package(
@@ -122,6 +110,20 @@ class Action_Associated_Object_Package:
                 new_aaop.add_child_package(child_package.make_deep_copy())
 
         return new_aaop
+
+    def __repr__(self):
+        out_string = (
+            f"{{\n\tID_String = {self.ID_String}\n"
+            f"\tAAO_Type = {self.AAO_Type}\n"
+            f"\tDictionary_Name = {self.Dictionary_Name}\n"
+            f"\tThe_AAO = {self.The_AAO}\n"
+            f"\tDependencies = {str(self.Dependencies)}\n"
+        )
+
+        if self.child_packages is not None:
+            out_string += f"child_packages = {self.child_packages!r}\n"
+
+        return out_string + "}"
 
 
 AAOP = Action_Associated_Object_Package

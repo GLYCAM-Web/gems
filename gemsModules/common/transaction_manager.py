@@ -33,7 +33,6 @@ class Transaction_Manager(ABC):
 
         # Local Modules
         self.request_manager = None
-        self.workflow_manager = None
         self.response_manager = None
         self.aaop_tree_pair_manager = None
         self.project_manager = None
@@ -52,7 +51,6 @@ class Transaction_Manager(ABC):
         self.this_servicer_type = commonservices_Servicer
         self.response_manager_type = common_Response_Manager
         self.project_manager_type = common_Project_Manager
-        self.workflow_manager_type = common_Workflow_Manager
 
     def process(self):
         """Process the incoming entity and project bundled in a new Transaction."""

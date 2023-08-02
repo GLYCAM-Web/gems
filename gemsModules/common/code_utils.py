@@ -80,6 +80,7 @@ class Annotated_List(list):
         self._ordered = ordered
 
 
+# These may belong somewhere else
 def resolve_dependency_list(
     service: str,
     dependencies: dict[str, Annotated_List],
@@ -103,3 +104,19 @@ def resolve_dependency_list(
         return [service]
 
     return resolved
+
+
+def find_aaop_by_id(aaop_list: List, id_string: str):
+    """For general usage on list[AAOP].
+
+    Assumes unique ID_Strings.
+
+    Useful for accessing the requesting AAOP (AAOP.Requester if not None) by ID_String or 
+    it's dependent AAOPs from AAOP.Dependencies.
+
+    S/N: I believe we could deprecate this if we rely on AAOP_Tree instead of bare AAOP lists.
+    """
+    for aaop in aaop_list:
+        if aaop.ID_String == id_string:
+            return aaop
+    return None
