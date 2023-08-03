@@ -19,6 +19,10 @@ from gemsModules.common.services.default_requests import (
 from gemsModules.common.services.duplicate_requests import (
     common_Duplicate_Requests_Manager,
 )
+from gemsModules.common.services.workflow_manager import (
+    common_Workflow_Manager,
+)
+
 from gemsModules.common.services.request_data_filler import common_Request_Data_Filler
 from gemsModules.common.services.settings.known_available import Available_Services
 from gemsModules.project.main_api import Project
@@ -54,6 +58,7 @@ class Request_Manager(ABC):
         self.implied_manager = None
         self.duplicate_manager = None
         self.default_manager = None
+        self.workflow_manager = None
         self.data_filler = None
 
         self.set_local_modules()
@@ -65,6 +70,7 @@ class Request_Manager(ABC):
         self.implied_manager_type: Callable = common_Implied_Services_Request_Manager
         self.duplicate_manager_type: Callable = common_Duplicate_Requests_Manager
         self.default_manager_type: Callable = common_Default_Service_Request_Manager
+        self.workflow_manager_type: Callable = common_Workflow_Manager
         self.data_filler_type: Callable = common_Request_Data_Filler
         self.available_services: List[str] = Available_Services.get_list()
 

@@ -20,69 +20,75 @@ log = Set_Up_Logging(__name__)
 
 class PDBFile_Request_Data_Filler(Request_Data_Filler):
     def process(self) -> list[AAOP]:
-        this_Project: PDBFile_Project = self.project
-
+        """Fill in any data required in the service request aaop_list."""
         for i, aaop in enumerate(self.aaop_list):
             log.debug(f"i: {i}, {aaop.AAO_Type=}")
-            if aaop.AAO_Type == "AmberMDPrep":
-                root = this_Project.project_dir
-                if (
-                    "inputFilePath" in aaop.The_AAO.inputs
-                    and aaop.The_AAO.inputs["inputFilePath"] is not None
-                ):
-                    root = aaop.The_AAO.inputs["inputFilePath"]
 
-                self.aaop_list[i].The_AAO.inputs = mdprep_api.AmberMDPrep_Inputs(
-                    pdb_file=aaop.The_AAO.inputs["pdb_filename"],
-                    outputFileName=f"preprocessed.{aaop.The_AAO.inputs['pdb_filename']}",
-                    outputFilePath=this_Project.project_dir,
-                    inputFilePath=root,
-                )
-                log.debug(
-                    "\tFinished building AmberMDPrep_Inputs, %s aaop_list[%s]",
-                    self.aaop_list[i].The_AAO.inputs,
-                    i,
-                )
+            if aaop.AAO_Type == "AmberMDPrep":
+                self.__fill_ambermdprep_aaop(i, aaop)
             elif aaop.AAO_Type == "ProjectManagement":
-                self.__manage_pm_aaop(i, aaop)
+                self.__fill_projman_aaop(i, aaop)
 
         return self.aaop_list
 
-    def __manage_pm_aaop(self, i: int, aaop: AAOP):
-        # TODO: Resources need conversion methods.
-        # fill in the project management service request with the resources to copy
-        input_json = Resource(
-            locationType="File",
-            resourceFormat="json",
-            payload=self.entity.schema_json(),
+    def __fill_ambermdprep_aaop(self, i: int, aaop: AAOP):
+        root = self.project.project_dir
+        if (
+            "inputFilePath" in aaop.The_AAO.inputs
+            and aaop.The_AAO.inputs["inputFilePath"] is not None
+        ):
+            root = aaop.The_AAO.inputs["inputFilePath"]
+
+        self.aaop_list[i].The_AAO.inputs = mdprep_api.AmberMDPrep_Inputs(
+            pdb_file=aaop.The_AAO.inputs["pdb_filename"],
+            outputFileName=f"preprocessed.{aaop.The_AAO.inputs['pdb_filename']}",
+            outputFilePath=self.project.project_dir,
+            inputFilePath=root,
         )
+
+        log.debug(
+            "\tFinished building AmberMDPrep_Inputs, aaop_list[%s].The_AAO.inputs: %s",
+            i,
+            self.aaop_list[i].The_AAO.inputs,
+        )
+
+    def __fill_projman_aaop(self, i: int, aaop: AAOP):
+        # Fill in the project management service request
+        aaop.The_AAO.inputs = pm_api.ProjectManagement_Inputs(
+            pUUID=self.project.pUUID,
+            projectDir=self.project.project_dir,
+        )
+
+        # Add the resources to copy to the project management service request
+        input_json = pm_api.PM_Resource.from_payload(
+            self.entity.schema_json(), "input", "json"
+        )
+        aaop.The_AAO.inputs.resources.append(input_json)
 
         if aaop.Requester is not None:
             # If we were using an AAOP_Tree we could use aaop_tree.get_aaop_by_id(aaop.Requester)
             requester_aaop = find_aaop_by_id(self.aaop_list, aaop.Requester)
 
-            input_pdb = Resource(
+            p = Path(requester_aaop.The_AAO.inputs["pdb_filename"])
+
+            input_pdb = pm_api.PM_Resource(
+                name=p.stem,
+                res_format="pdb",
+                location=str(requester_aaop.The_AAO.inputs["inputFilePath"]),
                 locationType="File",
-                resourceFormat="pdb",
-                payload=requester_aaop.The_AAO.inputs["pdb_filename"],
             )
+            log.debug(
+                "Adding input_pdb resource to ProjectManagement_Inputs: %s", input_pdb
+            )
+            aaop.The_AAO.inputs.resources.append(input_pdb)
         else:
             log.debug(
                 "No requester found for aaop_list[%s], PM service request will not have a pdb file resource.",
                 i,
             )
-            input_pdb = None
-
-        aaop.The_AAO.inputs = pm_api.ProjectManagement_Inputs(
-            pUUID=self.project.pUUID,
-            projectDir=self.project.project_dir,
-            resources=[input_json, input_pdb],
-        )
 
         log.debug(
-            "\tFinished building ProjectManagement_Inputs, %s aaop_list[%s]",
-            self.aaop_list[i].The_AAO.inputs,
+            "\tFinished building ProjectManagement_Inputs, aaop_list[%s].inputs filled with %s",
             i,
+            self.aaop_list[i].The_AAO.inputs,
         )
-
-        # TODO/O: How do we get the input filename from the ambermdprep service request to it's implied dependency, the project management service?

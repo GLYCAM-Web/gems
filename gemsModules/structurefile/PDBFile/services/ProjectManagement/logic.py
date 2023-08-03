@@ -22,4 +22,9 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     log.debug("Creating project directory: " + str(inputs.projectDir))
     os.makedirs(inputs.projectDir, exist_ok=True)
 
+    log.debug("ProjectManagement Resource list: " + str(inputs.resources))
+    for resource in inputs.resources:
+        log.debug(f"Copying resource: {resource} to project directory.")
+        resource.copy_to(inputs.projectDir)
+
     return service_outputs

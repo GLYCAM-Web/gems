@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from typing import Dict, List, Union
+from typing import Any, List
 from pydantic import BaseModel, Field
 
 from gemsModules.common.main_api_notices import Notices
@@ -28,22 +28,22 @@ class Resource(BaseModel):
         title="Resource Format",
         description="Supported formats will vary with each Entity.",
     )
-    payload: Union[str, int, float] = Field(
+    payload: Any = Field(
         None, description="The thing that is described by the location and format"
     )
     notices: Notices = Notices()
-    options: Dict[str, str] = Field(
+    options: dict[str, str] = Field(
         None,
         description="Key-value pairs that are specific to each entity, service, etc",
     )
 
 
 class Resources(BaseModel):
-    __root__: List[Resource] = None
+    __root__: list[Resource] = None
 
     def add_resource(self, resource: Resource):
         if self.__root__ is None:
-            self.__root__: List[Resource] = []
+            self.__root__: list[Resource] = []
         self.__root__.append(resource)
 
     def type_is_present(self, typename: str):
