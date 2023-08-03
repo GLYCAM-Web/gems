@@ -97,10 +97,9 @@ class Transaction_Manager(ABC):
             incoming_project=self.incoming_project, entity=self.incoming_entity
         )
         self.response_project = self.project_manager.process()
+        self.request_manager.set_response_project(self.response_project)
 
-        # TODO\Q: getter/setter
-        log.debug("about to fill request data needs")
-        self.request_manager.fill_request_data_needs(self.response_project)
+        self.request_manager.fill_request_data_needs(self.transaction)
         log.debug(self.aaop_request_list)
 
     def invoke_servicer(self):

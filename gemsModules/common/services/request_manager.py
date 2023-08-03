@@ -36,7 +36,7 @@ class Request_Manager(ABC):
     def __init__(self, entity: Entity):
         self.entity: Entity = entity
         # Project needs to be initialized by the project_manager.
-        self.project: Project = None
+        self.response_project: Project = None
 
         # TODO/Q: Do we need to keep all these aaop lists? If so, the manager that processes could be the only owners.
         self.default_aaops: List[AAOP] = []
@@ -73,6 +73,9 @@ class Request_Manager(ABC):
         self.workflow_manager_type: Callable = common_Workflow_Manager
         self.data_filler_type: Callable = common_Request_Data_Filler
         self.available_services: List[str] = Available_Services.get_list()
+
+    def set_response_project(self, response_project: Project):
+        self.response_project = response_project
 
     def process(self) -> List[AAOP]:
         log.debug("Processing request for entity")
@@ -146,12 +149,13 @@ class Request_Manager(ABC):
 
         log.debug("\tthe ordered aaop request list is: %s", self.deduplicated_aaop_list)
 
-    def fill_request_data_needs(self, project):
-        self.project = project
+    def fill_request_data_needs(self, transaction):
+        log.debug("about to fill request data needs")
+
         self.data_filler = self.data_filler_type(
             aaop_list=self.deduplicated_aaop_list,
-            entity=self.entity,
-            project=self.project,
+            transaction=transaction,
+            response_project=self.response_project,
         )
         self.deduplicated_aaop_list = self.data_filler.process()
 

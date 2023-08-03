@@ -32,7 +32,7 @@ class PDBFile_Request_Data_Filler(Request_Data_Filler):
         return self.aaop_list
 
     def __fill_ambermdprep_aaop(self, i: int, aaop: AAOP):
-        root = self.project.project_dir
+        root = self.response_project.project_dir
         if (
             "inputFilePath" in aaop.The_AAO.inputs
             and aaop.The_AAO.inputs["inputFilePath"] is not None
@@ -42,7 +42,7 @@ class PDBFile_Request_Data_Filler(Request_Data_Filler):
         self.aaop_list[i].The_AAO.inputs = mdprep_api.AmberMDPrep_Inputs(
             pdb_file=aaop.The_AAO.inputs["pdb_filename"],
             outputFileName=f"preprocessed.{aaop.The_AAO.inputs['pdb_filename']}",
-            outputFilePath=self.project.project_dir,
+            outputFilePath=self.response_project.project_dir,
             inputFilePath=root,
         )
 
@@ -55,13 +55,13 @@ class PDBFile_Request_Data_Filler(Request_Data_Filler):
     def __fill_projman_aaop(self, i: int, aaop: AAOP):
         # Fill in the project management service request
         aaop.The_AAO.inputs = pm_api.ProjectManagement_Inputs(
-            pUUID=self.project.pUUID,
-            projectDir=self.project.project_dir,
+            pUUID=self.response_project.pUUID,
+            projectDir=self.response_project.project_dir,
         )
 
         # Add the resources to copy to the project management service request
         input_json = pm_api.PM_Resource.from_payload(
-            self.entity.schema_json(), "input", "json"
+            self.transaction.incoming_string, "input", "json"
         )
         aaop.The_AAO.inputs.resources.append(input_json)
 
@@ -69,10 +69,8 @@ class PDBFile_Request_Data_Filler(Request_Data_Filler):
             # If we were using an AAOP_Tree we could use aaop_tree.get_aaop_by_id(aaop.Requester)
             requester_aaop = find_aaop_by_id(self.aaop_list, aaop.Requester)
 
-            p = Path(requester_aaop.The_AAO.inputs["pdb_filename"])
-
             input_pdb = pm_api.PM_Resource(
-                name=p.stem,
+                name=Path(requester_aaop.The_AAO.inputs["pdb_filename"]).stem,
                 res_format="pdb",
                 location=str(requester_aaop.The_AAO.inputs["inputFilePath"]),
                 locationType="File",
