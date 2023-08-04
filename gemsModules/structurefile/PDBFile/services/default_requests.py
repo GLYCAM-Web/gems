@@ -16,9 +16,9 @@ class PDBFile_Default_Service_Request_Manager(Default_Service_Request_Manager):
     def get_default_services_aaops(self) -> List[AAOP]:
         this_service = PDBFile_Service_Request()
         this_aaop = AAOP(
-            AAO_Type="PDB",
+            AAO_Type="PDBFile",
             The_AAO=this_service,
             ID_String=uuid.uuid4(),
-            Dictionary_Name="Default_PDB",
+            Dictionary_Name="Default_PDBFile_Service_Request",
         )
         return [this_aaop]

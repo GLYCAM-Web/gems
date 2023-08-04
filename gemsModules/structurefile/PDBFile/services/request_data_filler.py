@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
+import json
 from pathlib import Path
 
 from gemsModules.common.action_associated_objects import AAOP
+from gemsModules.common.main_api_resources import Resource
 from gemsModules.common.services.request_data_filler import Request_Data_Filler
 
 from gemsModules.structurefile.PDBFile.main_api_project import PDBFile_Project
 
-from gemsModules.structurefile.PDBFile.services.AmberMDPrep import api
+from gemsModules.structurefile.PDBFile.services.AmberMDPrep import api as mdprep_api
+from gemsModules.structurefile.PDBFile.services.ProjectManagement import api as pm_api
+
+from gemsModules.common.code_utils import find_aaop_by_id
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -15,57 +20,73 @@ log = Set_Up_Logging(__name__)
 
 class PDBFile_Request_Data_Filler(Request_Data_Filler):
     def process(self) -> list[AAOP]:
-        this_Project: PDBFile_Project = self.project
-
+        """Fill in any data required in the service request aaop_list."""
         for i, aaop in enumerate(self.aaop_list):
-            # Use the pUUID to get a project
-            if (
-                "pUUID"
-                in aaop.The_AAO.inputs  #  Should we make a utility function for optional keys or do this check another way?
-                and aaop.The_AAO.inputs["pUUID"] is not None
-            ):
-                # TODO: get the project by pUUID
-                root = this_Project.project_dir
-                output_root = root
-            # Attempt to use the inputFilePath and outputFilePath otherwise use the general project directory
-            else:
-                root = this_Project.project_dir
-                if (
-                    "inputFilePath" in aaop.The_AAO.inputs
-                    and aaop.The_AAO.inputs["inputFilePath"] is not None
-                ):
-                    root = aaop.The_AAO.inputs["inputFilePath"]
+            log.debug(f"i: {i}, {aaop.AAO_Type=}")
 
-                output_root = this_Project.project_dir
-                if (
-                    "outputFilePath" in aaop.The_AAO.inputs
-                    and aaop.The_AAO.inputs["outputFilePath"] is not None
-                ):
-                    # Q: deprecate this ability to write to arbitrary paths?
-                    output_root = aaop.The_AAO.inputs["outputFilePath"]
-
-            # update output file name
-            if (
-                "outputFileName" in aaop.The_AAO.inputs
-                and aaop.The_AAO.inputs["outputFileName"] is not None
-            ):
-                out_filename = aaop.The_AAO.inputs["outputFileName"]
-            else:
-                out_filename = f"preprocessed.{aaop.The_AAO.inputs['pdb_filename']}"
-
-            log.debug(
-                "About to build AmberMDPrep_Inputs with %s, %s, %s",
-                root,
-                output_root,
-                out_filename,
-            )
-            self.aaop_list[i].The_AAO.inputs = api.AmberMDPrep_Inputs(
-                pdb_file=aaop.The_AAO.inputs["pdb_filename"],
-                outputFileName=out_filename,
-                pUUID=this_Project.pUUID,
-                outputFilePath=output_root,
-                inputFilePath=root,
-            )
-            log.debug("Finished building AmberMDPrep_Inputs")
+            if aaop.AAO_Type == "AmberMDPrep":
+                self.__fill_ambermdprep_aaop(i, aaop)
+            elif aaop.AAO_Type == "ProjectManagement":
+                self.__fill_projman_aaop(i, aaop)
 
         return self.aaop_list
+
+    def __fill_ambermdprep_aaop(self, i: int, aaop: AAOP):
+        root = self.response_project.project_dir
+        if (
+            "inputFilePath" in aaop.The_AAO.inputs
+            and aaop.The_AAO.inputs["inputFilePath"] is not None
+        ):
+            root = aaop.The_AAO.inputs["inputFilePath"]
+
+        self.aaop_list[i].The_AAO.inputs = mdprep_api.AmberMDPrep_Inputs(
+            pdb_file=aaop.The_AAO.inputs["pdb_filename"],
+            outputFileName=f"preprocessed.{aaop.The_AAO.inputs['pdb_filename']}",
+            outputFilePath=self.response_project.project_dir,
+            inputFilePath=root,
+        )
+
+        log.debug(
+            "\tFinished building AmberMDPrep_Inputs, aaop_list[%s].The_AAO.inputs: %s",
+            i,
+            self.aaop_list[i].The_AAO.inputs,
+        )
+
+    def __fill_projman_aaop(self, i: int, aaop: AAOP):
+        # Fill in the project management service request
+        aaop.The_AAO.inputs = pm_api.ProjectManagement_Inputs(
+            pUUID=self.response_project.pUUID,
+            projectDir=self.response_project.project_dir,
+        )
+
+        # Add the resources to copy to the project management service request
+        input_json = pm_api.PM_Resource.from_payload(
+            self.transaction.incoming_string, "input", "json"
+        )
+        aaop.The_AAO.inputs.resources.append(input_json)
+
+        if aaop.Requester is not None:
+            # If we were using an AAOP_Tree we could use aaop_tree.get_aaop_by_id(aaop.Requester)
+            requester_aaop = find_aaop_by_id(self.aaop_list, aaop.Requester)
+
+            input_pdb = pm_api.PM_Resource(
+                name=Path(requester_aaop.The_AAO.inputs["pdb_filename"]).stem,
+                res_format="pdb",
+                location=str(requester_aaop.The_AAO.inputs["inputFilePath"]),
+                locationType="File",
+            )
+            log.debug(
+                "Adding input_pdb resource to ProjectManagement_Inputs: %s", input_pdb
+            )
+            aaop.The_AAO.inputs.resources.append(input_pdb)
+        else:
+            log.debug(
+                "No requester found for aaop_list[%s], PM service request will not have a pdb file resource.",
+                i,
+            )
+
+        log.debug(
+            "\tFinished building ProjectManagement_Inputs, aaop_list[%s].inputs filled with %s",
+            i,
+            self.aaop_list[i].The_AAO.inputs,
+        )

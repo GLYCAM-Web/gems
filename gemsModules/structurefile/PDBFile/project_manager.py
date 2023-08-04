@@ -20,12 +20,8 @@ class PDBFile_Project_Manager(Project_Manager):
         return self.response_project
 
     def instantiate_response_project(self) -> PDBFile_Project:
-        # self.fill_response_project_from_incoming_project()
         self.response_project = PDBFile_Project()
         self.response_project.add_temporary_info()
-
-        os.makedirs(self.response_project.project_dir, exist_ok=True)
-
         return self.response_project
 
     @staticmethod

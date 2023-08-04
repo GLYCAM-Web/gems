@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # import from typing first, in case you want to import pydantic.typing
 from typing import Optional, Union
+import uuid
 from pydantic import BaseModel, Field
+from gemsModules.common.action_associated_objects import AAOP
 from gemsModules.common.main_api_resources import Resource, Resources
 
 from gemsModules.structurefile.PDBFile.main_api import (
@@ -43,11 +45,6 @@ class AmberMDPrep_Inputs(BaseModel):
         None,
         title="Output file name",
         description="Name of output file",
-    )
-    pUUID: Optional[str] = Field(
-        None,
-        title="Project UUID",
-        description="UUID of Project",
     )
     outputFilePath: Optional[str] = Field(
         None,  # "/website/TESTS/ambermdprep/ambermdprep_test_files/output_dir",

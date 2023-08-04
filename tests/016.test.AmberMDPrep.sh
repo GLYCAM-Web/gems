@@ -5,23 +5,12 @@ echo "Testing $0..."
 
 PDB_tests_dir="${GEMSHOME}/gemsModules/structurefile/PDBFile/tests_in"
 test_request="${PDB_tests_dir}/explicit_test.json" 
-out_file="${GEMSHOME}/tests/preprocessed.016.AmberMDPrep.4mbzEdit.pdb" # Base path needs to match the json outputDirPath and the input file name.
 test_output=test${testNumber}_output
 
-
-# clean up from previous runs
-if [ -f $out_file ]; then
-    rm "${out_file}"
-fi
+# Clean up old files
 if [ -f $test_output ]; then
     rm $test_output
 fi
-
-# sanity check due to bs bug
-# echo "ENV CHECK:"
-# echo "$GEMSHOME"
-# echo "$(which ${THISPYTHON})"
-# pwd 
 
 
 if ! [ -f $test_request ]; then
@@ -31,8 +20,14 @@ fi
 
 # jq would be more convenient but it's not installed in the GRPC container.
 # Because some directories change on every run, we strip just the output we want to test for now.
-cat $test_request | ${GEMSHOME}/bin/delegate |\
-    $GEMSHOME/tests/utilities/json_ripper.py entity.responses.any_amber_prep.outputs.ppinfo > test${testNumber}_output
+responseString=$(cat $test_request | ${GEMSHOME}/bin/delegate)
+
+# Get output
+echo $responseString | $GEMSHOME/tests/utilities/json_ripper.py entity.responses.any_amber_prep.outputs.ppinfo > $test_output
+
+# Get project directory
+projectDir=$(echo $responseString | $GEMSHOME/tests/utilities/json_ripper.py project.project_dir)
+out_file="${projectDir}/preprocessed.016.AmberMDPrep.4mbzEdit.pdb"
 
 echo "Sleeping for 1 second to allow for file creation..."
 sleep 1
