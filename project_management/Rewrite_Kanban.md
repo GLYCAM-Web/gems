@@ -7,16 +7,10 @@ kanban-plugin: basic
 ## Backlog
 
 - [ ] [[Remove refs to deprecated code]]
-- [ ] [[Populate systemoperations and networkconnections]] ^golpwj
-- [ ] Refine MDaaS API
-- [ ] Refine MDaaS Behavior
 
 
 ## Up Next
 
-- [ ] Add a proof-of-concept call to another entity from inside Delegator (Status maybe?)
-- [ ] [[Move abstractables to common]]
-- [ ] [[Draft complete Services pipeline using Delegator as the Entity]]
 
 
 ## In Focus
@@ -24,10 +18,15 @@ kanban-plugin: basic
 - [ ] [[MDaaS services and tasks]]
 - [ ] [[Little Things]]
 - [ ] [[Build an entity template]]
+- [ ] [[Refine MDaaS API]]
+- [ ] Refine MDaaS Behavior
+- [ ] [[Populate systemoperations and networkconnections]] ^golpwj
+- [ ] [[Decouple gRPC]]
 
 
 ## For Review
 
+- [ ] [[Move abstractables to common]]
 
 
 ## Completed
@@ -35,6 +34,8 @@ kanban-plugin: basic
 - [ ] Reproduce Delegator's draft form of the new code design for MDaaS
 - [ ] [[Hack a working MDaaS]]
 - [ ] Design MDaaS API and associated Pydantic classes
+- [ ] [[Draft complete Services pipeline using Delegator as the Entity]]
+- [ ] Add a proof-of-concept call to another entity from inside Delegator (Status maybe?)
 
 
 
