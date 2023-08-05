@@ -16,7 +16,7 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
-# TODO: To settings.service_dependencies?
+# TODO: To services.settings... ?
 Service_Dependencies = {
     "AmberMDPrep": Annotated_List(["ProjectManagement"], ordered=False)
 }
@@ -34,12 +34,12 @@ class PDBFile_Workflow_Manager(Workflow_Manager):
         unordered = aaop_list.copy()
         log.debug("\tthe unordered aaop request list is: %s", unordered)
 
-        # Use AAO_type and Service_Dependencies  dict to determine order.
+        # Use AAO_type and Service_Dependencies dict to determine AAOP execution order.
         while len(unordered) > 0:
             # Get the next aaop
             current_aaop = unordered.pop(0)
 
-            # Add this aaops deps before this aaop, TODO: resolve/unify these_deps against prior deps
+            # TODO: resolve/unify these_deps against prior deps
             these_deps = resolve_dependency_list(
                 current_aaop.AAO_Type, Service_Dependencies
             )
@@ -51,19 +51,14 @@ class PDBFile_Workflow_Manager(Workflow_Manager):
 
             for new_dep in these_deps:
                 new_aaop = None
+                # TODO: We could probably generalize this for Entity-registered services...
                 if new_dep == "ProjectManagement":
-                    # TODO: We need AmberMDPrep inputs to be added to new_aaop in data_request_filler where we can get a project.
-                    # However, then it's not as easy to get AmberMDPrep inputs for the ProjectManagement request.
-                    if current_aaop.AAO_Type == "AmberMDPrep":
-                        pass
-
                     new_aaop = AAOP(
                         AAO_Type="ProjectManagement",
                         The_AAO=ProjectManagement_Request(),
                         ID_String=uuid.uuid4(),
                         Dictionary_Name="ProjectManagement_Dep_Request",
                     )
-                # Nothing depends on AmberMDPrep, but we'll include it's arm for now.
                 elif new_dep == "AmberMDPrep":
                     new_aaop = AAOP(
                         AAO_Type="AmberMDPrep",

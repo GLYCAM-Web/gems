@@ -152,9 +152,6 @@ class ResidueId(pydantic.BaseModel):
         This is a hacky workaround for the fact that Pydantic doesn't support swigpyobjects and swigpyobjects are actually generic wrappers for specialized gmml classes.
         """
         return ResidueId(
-            # Again, we can't just use the swig object, instead we're using the private member getters.
-            # Because of the diverse ways the actual gmml code works, and the lack of unified swig interface, we can not generalize this static method for preparsing a validator's input.
-            # (On top of the fact pydantic doesn't let us do that. If SwigPyObject provided __fields__ this might be different)
             residueName_=spobj.getName(),
             sequenceNumber_=spobj.getNumber(),
             insertionCode_=spobj.getInsertionCode(),
@@ -195,15 +192,9 @@ class GapInAminoAcidChain(pydantic.BaseModel):
         """
 
         return GapInAminoAcidChain(
-            # **spobj.__dict__ - This does not work .__dict__ != __fields__, we need custom logic for each spobj because they are generic,
-            # but instead wrap specialized gmml classes with different interfaces.
             chainId_=spobj.chainId_,
-            # These are strings in gmml, but need to be residues, probably. Lets ignore for now
-            # residueBeforeGap_=ResidueId.try_from_swigpyobject(spobj.residueBeforeGap_),
-            # residueAfterGap_=ResidueId.try_from_swigpyobject(spobj.residueAfterGap_),
             residueBeforeGap_=spobj.residueBeforeGap_,
             residueAfterGap_=spobj.residueAfterGap_,
-            # These probably shoudl be some sort of Id as well instead of strings.
             terminationBeforeGap_=spobj.terminationBeforeGap_,
             terminationAfterGap_=spobj.terminationAfterGap_,
         )
@@ -241,7 +232,6 @@ class ChainTerminal(pydantic.BaseModel):
         This is a hacky workaround for the fact that Pydantic doesn't support swigpyobjects and swigpyobjects are actually generic wrappers for specialized gmml classes.
         """
         return ChainTerminal(
-            # No private getters, just access the members directly, remember, we cannot use dict unpacking on swigpyobjects.
             chainId_=spobj.chainId_,
             startIndex_=spobj.startIndex_,
             endIndex_=spobj.endIndex_,

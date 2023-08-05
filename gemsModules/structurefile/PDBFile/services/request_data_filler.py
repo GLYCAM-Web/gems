@@ -65,6 +65,7 @@ class PDBFile_Request_Data_Filler(Request_Data_Filler):
         )
         aaop.The_AAO.inputs.resources.append(input_json)
 
+        # Lets try to get inputs from the requesting AAOP for ProjectManagement
         if aaop.Requester is not None:
             # If we were using an AAOP_Tree we could use aaop_tree.get_aaop_by_id(aaop.Requester)
             requester_aaop = find_aaop_by_id(self.aaop_list, aaop.Requester)

@@ -127,7 +127,6 @@ class Request_Manager(ABC):
 
         if self.deduplicated_aaop_list == []:
             self.deduplicated_aaop_list = self.get_default_aaops()
-        log.debug("the current aaop list is: %s", self.deduplicated_aaop_list)
 
         log.debug("the current aaop list is: %s", self.deduplicated_aaop_list)
 
