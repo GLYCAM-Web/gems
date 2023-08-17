@@ -1,7 +1,7 @@
 graph G {graph [splines=false forcelabels=true  dpi=72];
-node [ shape="none" fontname=Helvetica labelfontsize=12 forcelabels="true";
+node [ shape="none" fontname=DejaVuSans labelfontsize=12 forcelabels="true";
 label="none" size=50 fixedsize="true" scale="true"];
-edge [labelfontsize=12 fontname=Helvetica labeldistance=1.2 labelangle = 320.0];
+edge [labelfontsize=12 fontname=DejaVuSans labeldistance=1.2 labelangle = 320.0];
 rankdir=LR nodesep="0.05" ranksep="0.8";
 1 [shape=box label="OME"]
 2 [label="" height="0.7" image="/programs/gems/gmml/includes/MolecularMetadata/Sugars/SNFG_Symbol_Images/DGalNAc.svg"];
