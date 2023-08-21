@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package testconn;
+
+service Unary{
+ rpc GetServerResponse(Message) returns (MessageResponse) {}
+}
+
+message Message{
+ string message = 1;
+}
+
+message MessageResponse{
+ string message = 1;
+}
