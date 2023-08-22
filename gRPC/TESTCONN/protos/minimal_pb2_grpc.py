@@ -2,10 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-# TODO: GEMS -> valid python module
-# from gems.gRPC.TESTCONN.protos import minimal_pb2
-
-import protos.minimal_pb2 as minimal_pb2
+import protos.minimal_pb2 as minimal__pb2
 
 
 class UnaryStub(object):
@@ -18,9 +15,9 @@ class UnaryStub(object):
             channel: A grpc.Channel.
         """
         self.GetServerResponse = channel.unary_unary(
-            "/unary.Unary/GetServerResponse",
-            request_serializer=minimal_pb2.Message.SerializeToString,
-            response_deserializer=minimal_pb2.MessageResponse.FromString,
+            "/testconn.Unary/GetServerResponse",
+            request_serializer=minimal__pb2.Message.SerializeToString,
+            response_deserializer=minimal__pb2.MessageResponse.FromString,
         )
 
 
@@ -38,12 +35,12 @@ def add_UnaryServicer_to_server(servicer, server):
     rpc_method_handlers = {
         "GetServerResponse": grpc.unary_unary_rpc_method_handler(
             servicer.GetServerResponse,
-            request_deserializer=minimal_pb2.Message.FromString,
-            response_serializer=minimal_pb2.MessageResponse.SerializeToString,
+            request_deserializer=minimal__pb2.Message.FromString,
+            response_serializer=minimal__pb2.MessageResponse.SerializeToString,
         ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-        "unary.Unary", rpc_method_handlers
+        "testconn.Unary", rpc_method_handlers
     )
     server.add_generic_rpc_handlers((generic_handler,))
 
@@ -68,9 +65,9 @@ class Unary(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            "/unary.Unary/GetServerResponse",
-            minimal_pb2.Message.SerializeToString,
-            minimal_pb2.MessageResponse.FromString,
+            "/testconn.Unary/GetServerResponse",
+            minimal__pb2.Message.SerializeToString,
+            minimal__pb2.MessageResponse.FromString,
             options,
             channel_credentials,
             insecure,
