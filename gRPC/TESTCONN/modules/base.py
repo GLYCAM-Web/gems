@@ -9,6 +9,9 @@ log = logging.getLogger(__name__)
 
 
 class SimpleGRPCServer(ABC):
+    Servicer = None
+    PB_GRPC_MODULE = None
+
     def __init__(self, port=51151):
         self.port = port
 
@@ -17,7 +20,14 @@ class SimpleGRPCServer(ABC):
         self.server = grpc.server(self.pool)
         self.server.add_insecure_port(f"[::]:{port}")
 
-        self.add_servicer()
+        if self.Servicer is None or self.PB_GRPC_MODULE is None:
+            raise NotImplementedError("Servicer and GRPC_STUB must be defined")
+        else:
+            servicer_name = self.Servicer.__bases__[-1].__name__
+            add_to_server = getattr(
+                self.PB_GRPC_MODULE, f"add_{servicer_name}_to_server"
+            )
+            add_to_server(self.Servicer(), self.server)
 
     def start(self):
         self.server.start()
@@ -28,10 +38,6 @@ class SimpleGRPCServer(ABC):
 
     def join(self):
         self.server.wait_for_termination()
-
-    @abstractmethod
-    def add_servicer(self):
-        pass
 
 
 class SimpleGRPCClient(ABC):
@@ -66,9 +72,11 @@ class SimpleGRPCClient(ABC):
             self._channel.close()
             self._channel = None
 
-    @abstractmethod
     def send_request(self, request):
-        pass
+        log.debug(f"Querying {self.host} with {request}...")
+        response = self.get_response(request)
+        log.debug(f"Response: {response}")
+        return response
 
     @abstractmethod
     def get_response(self, request):
