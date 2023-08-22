@@ -71,7 +71,7 @@ def createLinkagesQuery(oligoID):
   queryLogicString = ( "WHERE\n"
       "{\n"
       "  :"+  oligoID + " :hasGlycosidicLinkage ?glycoLink.\n"
-      "  ?glycoLink  :residueLinkageName     ?LinkageName.\n"
+      "  ?glycoLink  :residueLinkage     ?LinkageName.\n"
       "}\n"
   )
   
@@ -134,7 +134,8 @@ def createPlotlyQuery(oligoID, linkage):
   selectString = ( \
     "SELECT DISTINCT\n"
     "  ?Linkage\n"
-    "  ?LinkageName\n"
+    "  ?oligoResidueLinks\n"
+    # "  ?LinkageName\n"
     "  ?LinkageResidueNames\n\n"
     
     "  (xsd:float(?Phi) as ?phi)\n" 
@@ -153,31 +154,26 @@ def createPlotlyQuery(oligoID, linkage):
     "  :" + oligoID + "\n"
     "    :hasGlycosidicLinkage :" + linkage + ".\n"
     "  :" + oligoID + "\n"
+    "    :oligoResidueLinks ?oligoResidueLinks;\n"
     "    :hasMono ?mono1;\n"
     "    :hasMono ?mono2.\n"
     "  :" + linkage + "\n"
-    "    :hasParent              ?residue2;\n"
-    "    :hasChild               ?residue1;\n"
-    "    :residueLinkageName     ?LinkageResidueNames;\n"
-    "    :linkageName            ?Linkage;\n"
+    "    :hasParentMono              ?mono2;\n"
+    "    :hasChildMono          ?mono1;\n"
+    "    :residueLinkage     ?LinkageResidueNames;\n"
+    "    :glycosidicLinkage            ?Linkage;\n"
     "    :phiCHIFunction         ?phiCHIFunction;\n"
     "    :psiCHIFunction         ?psiCHIFunction;\n"
-    "    :hasGlycosidicPhiAngle  ?Phi;\n"
-    "    :hasGlycosidicPsiAngle  ?Psi;\n"
+    "    :hasPhiAngle          ?Phi;\n"
+    "    :hasPsiAngle          ?Psi;\n"
     "    :totalCHIEnergy         ?totalCHIEnergy.\n\n"
-    "  ?residue1\n"
-    "    rdf:type :SequenceResidue;\n"
-    "    :identifier ?mono1ID.\n"
-    "  ?residue2\n"
-    "    rdf:type :SequenceResidue;\n"
-    "    :identifier ?mono2ID.\n\n"
     "  ?mono1\n"
     "    :identifier ?mono1ID;\n"
-    "    :BFMPRingConformation ?mono1BFMP;\n"
+    "    :BFMP ?mono1BFMP;\n"
     "    :isNucleotide false.\n"
     "  ?mono2\n"
     "    :identifier ?mono2ID;\n"
-    "    :BFMPRingConformation ?mono2BFMP;\n"
+    "    :BFMP ?mono2BFMP;\n"
     "    :isNucleotide false.\n\n"
     "}\n"
   )
@@ -290,13 +286,18 @@ def generatePlotlyHTML(linkageJson, linkage, writeToFile=False):
         family='Arial, sans-serif'
       )
     )
-    titleStr = (linkage.split('_oligo')[0].upper() + "<br><sup>" 
-                + str(link["LinkageResidueNames"]["value"]).split('_')[0] + "_"
-                + str(link["LinkageResidueNames"]["value"]).split('_')[2] + " "
-                + str(link["LinkageResidueNames"]["value"]).split(' ')[1] + " "
-                + str(link["LinkageResidueNames"]["value"]).split(' ')[2].split('_')[0] + "_"
-                + str(link["LinkageResidueNames"]["value"]).split(' ')[2].split('_')[2] 
-                + "</sup>"
+    # Create title to show residue name, number, and chain
+    # Ex linkageResidueNames: GCD_B_2_?_?_1 (1-3) NG6_B_1_?_?_1
+    titleStr = (
+        linkage.split('_oligo')[0].upper() + "<br><sup>" 
+        + str(link["LinkageResidueNames"]["value"]).split('_')[0] + "_"
+        + str(link["LinkageResidueNames"]["value"]).split('_')[1] + "_"
+        + str(link["LinkageResidueNames"]["value"]).split('_')[2] + " "
+        + str(link["LinkageResidueNames"]["value"]).split(' ')[1] + " "
+        + str(link["LinkageResidueNames"]["value"]).split(' ')[2].split('_')[0] + "_"
+        + str(link["LinkageResidueNames"]["value"]).split(' ')[2].split('_')[1] + "_"
+        + str(link["LinkageResidueNames"]["value"]).split(' ')[2].split('_')[2] 
+        + "</sup>"
     )
     
     
