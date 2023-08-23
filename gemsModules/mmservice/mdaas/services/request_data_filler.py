@@ -24,7 +24,7 @@ class mdaas_Request_Data_Filler(Request_Data_Filler):
             if aaop.AAO_Type == "RunMD":
                 from gemsModules.mmservice.mdaas.services.run_md import api
 
-                this_Project: MdProject = self.project
+                this_Project: MdProject = self.response_project
                 log.debug("REQUEST_DATA_FILLER: run_md")
                 aaop.The_AAO.inputs = api.run_md_Inputs()
                 aaop.The_AAO.inputs.amber_parm7 = this_Project.parm7_file_name

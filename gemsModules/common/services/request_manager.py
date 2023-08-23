@@ -141,6 +141,10 @@ class Request_Manager(ABC):
         """Service Requests may have Service dependencies which need to be run first for the service to complete successfully."""
         log.debug("about to resolve dependencies")
 
+        if self.workflow_manager_type is None:
+            log.warning("No workflow manager type set, skipping dependency resolution.")
+            return
+
         self.workflow_manager = self.workflow_manager_type(entity=self.entity)
         self.deduplicated_aaop_list = self.workflow_manager.process(
             self.deduplicated_aaop_list
