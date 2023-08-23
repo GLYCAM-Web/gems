@@ -46,12 +46,32 @@ def argparser():
         "--host",
         dest="host",
         default="localhost:51151",
+        help="The host and port to connect to. If running a server, it will listen on this host and port.",
+    )
+
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        dest="log_level",
+        default="INFO",
+        choices=["v", "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        help="Set the logging level.",
     )
 
     args = parser.parse_args()
     # args = host_from_env(args)
 
+    # -vINFO or -vv for instance.
+    if args.log_level == "v":
+        args.log_level = logging.DEBUG
+    else:
+        try:
+            args.log_level = getattr(logging, args.log_level.upper())
+        except AttributeError:
+            args.log_level = logging.INFO
+
     args.port = int(args.host.split(":")[1])
+
     return args
 
 
@@ -65,14 +85,14 @@ def client_main(host):
     content = "Hello world!"
 
     response = MinClient(host).send_request(content)
+    # strip newline
+    response.replace("\n", "")
 
     log.debug(f"Client thread finished, stopping...")
-    log.debug(
-        f"Was this Response expected? {'yes' if response.message[:-1] == content else 'no'}"
-    )
+    log.info(f"Was this Response expected? {'yes' if response == content else 'no'}")
 
     # Returning just the message to avoid certain pickling complications.
-    return response.message
+    return response
 
 
 def server_main(port):
@@ -97,11 +117,12 @@ def server_main(port):
 # Main Thread
 def entry_main():
     """This python script is useful for ensuring a GRPC connection can be established between two GEMS installs."""
-    logging.basicConfig(
-        level=logging.DEBUG,
-        format="%(levelname)s:%(module)s:%(funcName)s\t| %(message)s",
-    )
     args = argparser()
+
+    logging.basicConfig(
+        level=args.log_level,
+        format="%(levelname).1s %(module)8.8s:%(funcName)13s\t| %(message)s",
+    )
 
     with multiprocessing.Pool() as pool:
         if args.server:

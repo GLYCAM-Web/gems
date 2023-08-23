@@ -14,51 +14,50 @@ log = logging.getLogger(__name__)
 class MinServer(SimpleGRPCServer):
     PB_GRPC_MODULE = minimal_pb2_grpc
 
-    class Servicer(minimal_pb2_grpc.UnaryServicer):
+    class Servicer(PB_GRPC_MODULE.UnaryServicer):
         def GetServerResponse(self, request, context):
-            log.debug(f"{self.__class__.__name__}'s gRPC Servicer has been called.")
+            log.debug(f"{self.__class__.__name__}.GetServerResponse has been called.")
+            request = bytes.fromhex(request.message)
 
-            response = minimal_pb2.MessageResponse(message="No response.")
+            response = "No response."
 
             GEMSHOME = os.environ.get("GEMSHOME")
             if GEMSHOME == None:
                 log.error("GEMSHOME is not set.")
-                response = minimal_pb2.MessageResponse(message="GemsHomeNotSet")
+                response = "GemsHomeNotSet"
             else:
                 try:
                     p = Popen(
-                        # f"{GEMSHOME}/bin/delegate",
-                        ["echo", f"{request.message}"],
+                        ["echo", f"{request.decode('utf-8')}"],
                         stdin=PIPE,
                         stdout=PIPE,
                         stderr=PIPE,
                         shell=False,
                     )
 
-                    (stdout, stderr) = p.communicate(
-                        input=request.message.encode("utf-8")
-                    )
+                    (stdout, stderr) = p.communicate(input=request)
 
                     if p.returncode != 0 or stderr:
-                        response = minimal_pb2.MessageResponse(
-                            message=stderr.decode("utf-8").replace('"', "")
-                        )
+                        response = stderr.decode("utf-8").replace('"', "")
                     else:
-                        response = minimal_pb2.MessageResponse(
-                            message=stdout.decode("utf-8").replace('"', "")
-                        )
-                except Exception:
-                    response = minimal_pb2.MessageResponse(
-                        message=f"{traceback.format_exc()}"
-                    )
+                        response = stdout.decode("utf-8").replace('"', "")
 
-            return response
+                except Exception:
+                    response = f"{traceback.format_exc()}"
+
+            return minimal_pb2.MessageResponse(message=bytes(response, "utf-8").hex())
 
 
 class MinClient(SimpleGRPCClient):
-    STUB_TYPE = minimal_pb2_grpc.UnaryStub
     PB_MODULE = minimal_pb2
+    STUB_TYPE = minimal_pb2_grpc.UnaryStub
 
     def get_response(self, request):
-        # We might be able to automate this, but "GetServerResponse is arbitrary - part of the protobuf definition."
-        return self.stub.GetServerResponse(self.protobuf.Message(message=request))
+        log.debug(f"{self.__class__.__name__}.get_response has been called.")
+        request = bytes(request, "utf-8").hex()
+
+        # We might be able to automate this, but "GetServerResponse" and "Message" are arbitrary - part of the protobuf definition.
+        response = self.stub.GetServerResponse(self.protobuf.Message(message=request))
+        response = bytes.fromhex(response.message).decode("utf-8")
+        response = response.replace("\n", "")
+        return response

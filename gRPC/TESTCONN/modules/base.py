@@ -4,7 +4,6 @@ import concurrent.futures as futures
 
 from abc import abstractmethod, ABC
 
-
 log = logging.getLogger(__name__)
 
 
@@ -48,22 +47,27 @@ class SimpleGRPCClient(ABC):
         self.host = host
 
         self._stub = None
-        self._pb_module = None
         self._channel = None
 
     @property
     def protobuf(self):
+        if self.PB_MODULE is None:
+            raise NotImplementedError("PB_MODULE must be defined")
         return self.PB_MODULE
 
     @property
     def stub(self):
         if self._stub is None:
+            log.debug(
+                f"Creating {self.STUB_TYPE=} for communication over channel with {self.host=}"
+            )
             self._stub = self.STUB_TYPE(self.channel)
         return self._stub
 
     @property
     def channel(self):
         if self._channel is None:
+            log.debug(f"Creating channel for communication with {self.host=}")
             self._channel = grpc.insecure_channel(self.host)
         return self._channel
 
@@ -73,9 +77,9 @@ class SimpleGRPCClient(ABC):
             self._channel = None
 
     def send_request(self, request):
-        log.debug(f"Querying {self.host} with {request}...")
+        log.debug(f"Sending {request=} to {self.host}...")
         response = self.get_response(request)
-        log.debug(f"Response: {response}")
+        log.debug(f"Got {response=}")
         return response
 
     @abstractmethod

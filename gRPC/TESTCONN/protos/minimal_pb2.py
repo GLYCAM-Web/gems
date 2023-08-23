@@ -3,6 +3,7 @@
 # source: minimal.proto
 """Generated protocol buffer code."""
 from google.protobuf import descriptor as _descriptor
+from google.protobuf import descriptor_pool as _descriptor_pool
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
@@ -13,124 +14,34 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor.FileDescriptor(
-  name='minimal.proto',
-  package='testconn',
-  syntax='proto3',
-  serialized_options=None,
-  create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\rminimal.proto\x12\x08testconn\"\x1a\n\x07Message\x12\x0f\n\x07message\x18\x01 \x01(\t\"\"\n\x0fMessageResponse\x12\x0f\n\x07message\x18\x01 \x01(\t2L\n\x05Unary\x12\x43\n\x11GetServerResponse\x12\x11.testconn.Message\x1a\x19.testconn.MessageResponse\"\x00\x62\x06proto3'
-)
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rminimal.proto\x12\x07minimal\"\x1a\n\x07Message\x12\x0f\n\x07message\x18\x01 \x01(\t\"\"\n\x0fMessageResponse\x12\x0f\n\x07message\x18\x01 \x01(\t2J\n\x05Unary\x12\x41\n\x11GetServerResponse\x12\x10.minimal.Message\x1a\x18.minimal.MessageResponse\"\x00\x62\x06proto3')
 
 
 
-
-_MESSAGE = _descriptor.Descriptor(
-  name='Message',
-  full_name='testconn.Message',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='message', full_name='testconn.Message.message', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=27,
-  serialized_end=53,
-)
-
-
-_MESSAGERESPONSE = _descriptor.Descriptor(
-  name='MessageResponse',
-  full_name='testconn.MessageResponse',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='message', full_name='testconn.MessageResponse.message', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=55,
-  serialized_end=89,
-)
-
-DESCRIPTOR.message_types_by_name['Message'] = _MESSAGE
-DESCRIPTOR.message_types_by_name['MessageResponse'] = _MESSAGERESPONSE
-_sym_db.RegisterFileDescriptor(DESCRIPTOR)
-
+_MESSAGE = DESCRIPTOR.message_types_by_name['Message']
+_MESSAGERESPONSE = DESCRIPTOR.message_types_by_name['MessageResponse']
 Message = _reflection.GeneratedProtocolMessageType('Message', (_message.Message,), {
   'DESCRIPTOR' : _MESSAGE,
   '__module__' : 'minimal_pb2'
-  # @@protoc_insertion_point(class_scope:testconn.Message)
+  # @@protoc_insertion_point(class_scope:minimal.Message)
   })
 _sym_db.RegisterMessage(Message)
 
 MessageResponse = _reflection.GeneratedProtocolMessageType('MessageResponse', (_message.Message,), {
   'DESCRIPTOR' : _MESSAGERESPONSE,
   '__module__' : 'minimal_pb2'
-  # @@protoc_insertion_point(class_scope:testconn.MessageResponse)
+  # @@protoc_insertion_point(class_scope:minimal.MessageResponse)
   })
 _sym_db.RegisterMessage(MessageResponse)
 
+_UNARY = DESCRIPTOR.services_by_name['Unary']
+if _descriptor._USE_C_DESCRIPTORS == False:
 
-
-_UNARY = _descriptor.ServiceDescriptor(
-  name='Unary',
-  full_name='testconn.Unary',
-  file=DESCRIPTOR,
-  index=0,
-  serialized_options=None,
-  create_key=_descriptor._internal_create_key,
-  serialized_start=91,
-  serialized_end=167,
-  methods=[
-  _descriptor.MethodDescriptor(
-    name='GetServerResponse',
-    full_name='testconn.Unary.GetServerResponse',
-    index=0,
-    containing_service=None,
-    input_type=_MESSAGE,
-    output_type=_MESSAGERESPONSE,
-    serialized_options=None,
-    create_key=_descriptor._internal_create_key,
-  ),
-])
-_sym_db.RegisterServiceDescriptor(_UNARY)
-
-DESCRIPTOR.services_by_name['Unary'] = _UNARY
-
+  DESCRIPTOR._options = None
+  _MESSAGE._serialized_start=26
+  _MESSAGE._serialized_end=52
+  _MESSAGERESPONSE._serialized_start=54
+  _MESSAGERESPONSE._serialized_end=88
+  _UNARY._serialized_start=90
+  _UNARY._serialized_end=164
 # @@protoc_insertion_point(module_scope)

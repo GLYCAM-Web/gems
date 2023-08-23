@@ -13,6 +13,7 @@ $ pip3 install grpcio==1.46.3 grpcio-tools==1.46.3
 Trivial in-process test of gRPC connection:
 ```bash
 $ cd $GEMSHOME/gRPC
+$ python TESTCONN -h [-v]
 $ python TESTCONN --server --client # --host localhost:51151
 ```
 
@@ -46,3 +47,4 @@ DEBUG:__main__:main_entry       | Client got this response: hello world!
 --- CONNECTION SUCCESS ---
 Client got a Response, connection over GRPC is working.
 ```
+
