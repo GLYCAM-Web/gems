@@ -86,7 +86,6 @@ def client_main(host):
 
     response = MinClient(host).send_request(content)
     # strip newline
-    response.replace("\n", "")
 
     log.debug(f"Client thread finished, stopping...")
     log.info(f"Was this Response expected? {'yes' if response == content else 'no'}")
