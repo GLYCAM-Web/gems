@@ -41,12 +41,15 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     )
 
     service_outputs.outputDirPath = inputs.outputDirPath
-    # TODO: we can use PM_Resource.copy_to to copy the files to the output directory.
-    service_outputs.resources = ProjectManagement_Resources(
-        resources=[
-            PM_Resource(location=inputs.amber_parm7),
-            PM_Resource(location=inputs.amber_rst7),
-        ]
-    )
+
+    # resources = [
+    #     PM_Resource(location=inputs.amber_parm7),
+    #     PM_Resource(location=inputs.amber_rst7),
+    # ]
+    # for resource in resources:
+    #     resource.copy_to(inputs.outputDirPath)
+
+    # # TODO: we can use PM_Resource.copy_to to copy the files to the output directory.
+    # service_outputs.resources = ProjectManagement_Resources(resources=resources)
 
     return service_outputs
