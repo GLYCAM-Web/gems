@@ -34,11 +34,6 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
         parm7_real_name=inputs.amber_parm7,
         rst7_real_name=inputs.amber_rst7,
     )
-    initiate_build.execute(
-        pUUID=inputs.pUUID,
-        outputDirPath=inputs.outputDirPath,
-        use_serial=True,
-    )
 
     service_outputs.outputDirPath = inputs.outputDirPath
 
