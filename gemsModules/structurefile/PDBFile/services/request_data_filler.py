@@ -69,6 +69,12 @@ class PDBFile_Request_Data_Filler(Request_Data_Filler):
         if aaop.Requester is not None:
             # If we were using an AAOP_Tree we could use aaop_tree.get_aaop_by_id(aaop.Requester)
             requester_aaop = find_aaop_by_id(self.aaop_list, aaop.Requester)
+            log.debug(
+                "Found requester aaop[%s] for aaop_list[%s], %s",
+                requester_aaop,
+                i,
+                requester_aaop.The_AAO.inputs,
+            )
 
             input_pdb = pm_api.PM_Resource(
                 name=Path(requester_aaop.The_AAO.inputs["pdb_filename"]).stem,

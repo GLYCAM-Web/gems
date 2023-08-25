@@ -15,18 +15,28 @@ log = Set_Up_Logging(__name__)
 
 class mdaas_Project_Manager(Project_Manager):
     def process(self) -> MdProject:
-        self.response_project = MdProject()
         self.instantiate_response_project()
         return self.response_project
 
     def instantiate_response_project(self) -> MdProject:
-        self.response_project.add_temporary_info()
+        self.response_project = self.instantiate_new_project()
 
+    @staticmethod
+    def instantiate_new_project() -> MdProject:
+        """This is a static method that returns a new project."""
+        project = MdProject()
+        project.add_temporary_info()
+        return project
+
+    # TODO: can probably be generalized and just pass the Project type.
     def fill_response_project_from_incoming_project(self):
-        pass
+        if self.incoming_project is not None:
+            self.response_project = MdProject(**self.incoming_project.dict())
 
     def fill_response_project_from_response_entity(self):
-        pass
+        self.response_project = MdProject()
+        self.response_project.inputs = self.incoming_entity.inputs
+        self.response_project.outputs = self.incoming_entity.outputs
 
 
 def testme() -> MdProject:
