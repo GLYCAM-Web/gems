@@ -9,16 +9,7 @@ log = Set_Up_Logging(__name__)
 
 def make_input(pUUID: str, outputDirPath: str, control_script: str):
     simulationControlScriptPath = os.path.join(outputDirPath, control_script)
-    # amberSubmissionJson = '{ \
-    # "molecularSystemType":"Solvated System", \
-    # "molecularModelingJobType":"Roe Protocol", \
-    # "jobID":"' + pUUID + '", \
-    # "localWorkingDirectory":"' + outputDirPath + '", \
-    # "submissionName":"MDaaS", \
-    # "simulationControlScriptPath":"' + simulationControlScriptPath + '", \
-    # "simulationWorkingDirectory":"' + outputDirPath + '", \
-    # "comment":"initiated by gemsModules/mmservice/mdaas"\
-    # }'
+
     amberSubmissionJson = json.dumps(
         {
             "molecularSystemType": "Solvated System",

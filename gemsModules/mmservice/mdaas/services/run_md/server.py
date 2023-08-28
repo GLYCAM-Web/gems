@@ -14,15 +14,11 @@ log = Set_Up_Logging(__name__)
 
 
 def Serve(service_request: run_md_Request) -> run_md_Response:
-    # needs to access after data filler, but is it?
     log.debug("SERVE: run_md")
 
     response = run_md_Response()
     response.outputs = execute(service_request.inputs)
 
-    # This is handled earlier, long before services, no?
-    # I believe we should rely on run_md_api, and avoid logic's api definitions for now.
-    #
     # run_md request doesn't normally contain the entity/who_am_i info.
     # The who_I_am must be set in the options.
     # if (
@@ -44,7 +40,7 @@ def Serve(service_request: run_md_Request) -> run_md_Response:
             docake = True
             cake_inputs.color = service_request.options["color"]
         if docake == True:
-            service_request.outputs.info = cake.execute(cake_inputs)
+            response.outputs.info = cake.execute(cake_inputs)
 
     response.outputs.outputDirPath = service_request.inputs.outputDirPath
     return response

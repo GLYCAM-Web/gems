@@ -16,10 +16,16 @@ log = Set_Up_Logging(__name__)
 class mdaas_Project_Manager(Project_Manager):
     def process(self) -> MdProject:
         self.instantiate_response_project()
+        # Broken:
+        # self.fill_response_project_from_incoming_project()
+        # self.fill_response_project_from_response_entity()
+
         return self.response_project
 
     def instantiate_response_project(self) -> MdProject:
         self.response_project = self.instantiate_new_project()
+        self.response_project.add_temporary_info()
+        return self.response_project
 
     @staticmethod
     def instantiate_new_project() -> MdProject:
@@ -34,9 +40,11 @@ class mdaas_Project_Manager(Project_Manager):
             self.response_project = MdProject(**self.incoming_project.dict())
 
     def fill_response_project_from_response_entity(self):
-        self.response_project = MdProject()
-        self.response_project.inputs = self.incoming_entity.inputs
-        self.response_project.outputs = self.incoming_entity.outputs
+        # Note: In most service requests, entity inputs are empty.
+        # Otherwise, we might want to fill the resposne project here
+        # Because the RDF could most conveniently make use of a filled response project.
+        # Right now, response project isn't filled completely by RDF and not very useful to it.
+        pass
 
 
 def testme() -> MdProject:

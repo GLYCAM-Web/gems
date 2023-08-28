@@ -84,6 +84,9 @@ class Request_Manager(ABC):
         self.remove_unknown_services()
         self.gather_implicit_services()
         self.manage_duplicates()
+        # TODO: Resolve dependencies needs to happen after data filling because the data filler operates linearly.
+        # By allowing the RDF to run first, it can ensure that it resolves data dependencies in the correct order.
+        # Which may different from the execution order.
         self.resolve_dependencies()
 
         return self.deduplicated_aaop_list
@@ -161,6 +164,9 @@ class Request_Manager(ABC):
             response_project=self.response_project,
         )
         self.deduplicated_aaop_list = self.data_filler.process()
+        # RDF would be able to fill dependencies better:
+        # However, if we resolve here, it seems then the aoop_list is not complete by the time we start serving
+        # self.resolve_dependencies()
 
 
 class common_Request_Manager(Request_Manager):

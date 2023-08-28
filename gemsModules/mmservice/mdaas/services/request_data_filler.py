@@ -38,28 +38,47 @@ class mdaas_Request_Data_Filler(Request_Data_Filler):
         return self.aaop_list
 
     def __fill_run_md_aaop(self, i: int, aaop: AAOP) -> List[AAOP]:
+        # TODO/FIX!:Please note, response_project is only the defaults here, right now.
+        # TODO: Project manager still needs to fill out the project intelligently.
         this_Project: MdProject = self.response_project
-        log.debug("REQUEST_DATA_FILLER: run_md\nproject: %s", this_Project)
-        aaop.The_AAO.inputs = run_md_api.run_md_Inputs()
-        aaop.The_AAO.inputs.amber_parm7 = this_Project.parm7_file_name
-        aaop.The_AAO.inputs.amber_rst7 = this_Project.rst7_file_name
-        aaop.The_AAO.inputs.pUUID = this_Project.pUUID
-        aaop.The_AAO.inputs.outputDirPath = this_Project.project_dir
-        aaop.The_AAO.inputs.protocolFilesPath = "/programs/gems/tests/temp-inputs/RoeProtocol"  # this_Project.protocolFilesPath trying to avoid modifying the current mdaas request
-        aaop.The_AAO.inputs.inputFilesPath = this_Project.upload_path
+        log.debug(
+            "REQUEST_DATA_FILLER: run_md project: %s %s",
+            self.response_project.parm7_file_name,
+            self.response_project.rst7_file_name,
+        )
+        aaop.The_AAO.inputs = run_md_api.run_md_Inputs(
+            # TODO: One would hope: But the project manager can't easily decode entity inputs.
+            # (And probably shouldn't - but fill_response_project_* methods are tempting solutions.)
+            # amber_parm7=this_Project.parm7_file_name,
+            # amber_rst7=this_Project.rst7_file_name,
+            # Hack: The project should have it's defaults overwritten if entity inputs were given.
+            amber_parm7=aaop.The_AAO.inputs["parameter-topology-file"]["payload"],
+            amber_rst7=aaop.The_AAO.inputs["input-coordinate-file"]["payload"],
+            pUUID=this_Project.pUUID,
+            outputDirPath=this_Project.project_dir,
+            protocolFilesPath=this_Project.protocolFilesPath,
+            # TODO: Probably needs to be set by procedural options/env
+            inputFilesPath=this_Project.upload_path,
+        )
 
         return self.aaop_list
 
     def __fill_projman_aaop(self, i: int, aaop: AAOP):
-        # Fill in the project management service request
+        log.debug(
+            "REQUEST_DATA_FILLER: projman\nproject: %s %s",
+            self.response_project.parm7_file_name,
+            self.response_project.rst7_file_name,
+        )
+
         aaop.The_AAO.inputs = pm_api.ProjectManagement_Inputs(
             pUUID=self.response_project.pUUID,
             projectDir=self.response_project.project_dir,
-            protocolFilesPath="/programs/gems/tests/temp-inputs/RoeProtocol",  # this_Project.protocolFilesPath trying to avoid modifying the current mdaas request # TODO: no protocol files for MDaaS project currently.
+            protocolFilesPath=self.response_project.protocolFilesPath,  # this_Project.protocolFilesPath trying to avoid modifying the current mdaas request # TODO: no protocol files for MDaaS project currently.
             outputDirPath=self.response_project.project_dir,
             inputFilesPath=self.response_project.upload_path,
-            amber_parm7=self.response_project.parm7_file_name,
-            amber_rst7=self.response_project.rst7_file_name,
+            # We will gather these from the requester's aaop.
+            # amber_parm7=self.response_project.parm7_file_name,
+            # amber_rst7=self.response_project.rst7_file_name,
         )
 
         # Add the resources to copy to the project management service request
@@ -72,42 +91,57 @@ class mdaas_Request_Data_Filler(Request_Data_Filler):
         if aaop.Requester is not None:
             # If we were using an AAOP_Tree we could use aaop_tree.get_aaop_by_id(aaop.Requester)
             requester_aaop = find_aaop_by_id(self.aaop_list, aaop.Requester)
+            log.debug("Found requester aaop[%s]", requester_aaop)
             log.debug(
-                "Found requester aaop[%s] for aaop_list[%s], %s",
-                requester_aaop,
+                "for aaop_list[%s], %s",
                 i,
                 requester_aaop.The_AAO.inputs,
             )
+
+            # TODO/Q: I don't think run_md.json should specify anything more than the location
+            # for the topology and coordinate files.
             # we don't use run_md_Inputs because they may not have been filled in yet.
+            #
+            # Crap... So we are using the valid inputs from the run_md service request
+            # Which get filled/overwritten buy the fill_run_md_aaop method.
+            # But they don't get filled appropriately... Should we be filling the
+            # project itself before this?
+            #
+            # Ok, so fill response_project_from_response entity can handle this, so that the above response_project has valid inputs.
+            # - But for the project manager to handle this, it needs to understand service requests.
+            #
+            # Ah, jeez.
+            # These paths are relative to project.upload_path
+            _parm7_path = requester_aaop.The_AAO.inputs["parameter-topology-file"][
+                "payload"
+            ]
+            _rst7_path = requester_aaop.The_AAO.inputs["input-coordinate-file"][
+                "payload"
+            ]
+
             # input_parm7 = pm_api.PM_Resource(
-            #     name=Path(
-            #         requester_aaop.The_AAO.inputs["parameter-topology-file"]
-            #     ).stem,
+            #     name=_parm7_path.stem,
             #     res_format="parm7",
-            #     location=str(requester_aaop.The_AAO.inputs["parameter-topology-file"]),
+            #     location=str(_parm7_path.parent),
             #     locationType="File",
             # )
 
             # input_rst7 = pm_api.PM_Resource(
-            #     name=Path(
-            #         requester_aaop.The_AAO.inputs["input-coordinate-file"].location
-            #     ).stem,
+            #     name=str(_rst7_path.stem),
             #     res_format="rst7",
-            #     location=str(
-            #         requester_aaop.The_AAO.inputs["input-coordinate-file"].location
-            #     ),
-            #
+            #     location=str(_rst7_path.parent),
+            # )
 
-            # TODO: These double up run_md inputs in a strange way, probably don't need MDaaS PM inputs to include these.
-            input_parm7 = requester_aaop.The_AAO.inputs["parameter-topology-file"]
-            input_rst7 = requester_aaop.The_AAO.inputs["input-coordinate-file"]
-            log.debug(
-                "Adding MDaaS resources to ProjectManagement_Inputs:\n\t%s and %s",
-                input_parm7,
-                input_rst7,
-            )
-            aaop.The_AAO.inputs.resources.append(input_parm7)
-            aaop.The_AAO.inputs.resources.append(input_rst7)
+            # log.debug(
+            #     "Adding MDaaS resources to ProjectManagement_Inputs:\n\t%s and %s",
+            #     input_parm7,
+            #     input_rst7,
+            # )
+            # aaop.The_AAO.inputs.resources.append(input_parm7)
+            # aaop.The_AAO.inputs.resources.append(input_rst7)
+
+            aaop.The_AAO.inputs.amber_parm7 = str(_parm7_path)
+            aaop.The_AAO.inputs.amber_rst7 = str(_rst7_path)
 
             # TODO: also fill the protocol files path properly, (not a static string)
         else:

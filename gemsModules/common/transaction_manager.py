@@ -96,10 +96,15 @@ class Transaction_Manager(ABC):
         self.project_manager = self.project_manager_type(
             incoming_project=self.incoming_project, entity=self.incoming_entity
         )
+        log.debug(
+            "\tthe project manager's incoming entity is: %s", self.incoming_entity
+        )
+
         self.response_project = self.project_manager.process()
         self.request_manager.set_response_project(self.response_project)
 
         self.request_manager.fill_request_data_needs(self.transaction)
+
         log.debug(self.aaop_request_list)
 
     def invoke_servicer(self):

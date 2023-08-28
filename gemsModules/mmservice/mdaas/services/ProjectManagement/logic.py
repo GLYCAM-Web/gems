@@ -14,7 +14,6 @@ from gemsModules.mmservice.mdaas.services.ProjectManagement.resources import (
 )
 
 from gemsModules.mmservice.mdaas.tasks import set_up_run_md_directory
-from gemsModules.mmservice.mdaas.tasks import initiate_build
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -30,6 +29,7 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     set_up_run_md_directory.execute(
         protocol_files_dir=inputs.protocolFilesPath,
         output_dir_path=inputs.outputDirPath,
+        # TODO: Right now, the uploads dir path is obtained from a default MDProject.
         uploads_dir_path=inputs.inputFilesPath,
         parm7_real_name=inputs.amber_parm7,
         rst7_real_name=inputs.amber_rst7,
@@ -37,11 +37,8 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
 
     service_outputs.outputDirPath = inputs.outputDirPath
 
-    # resources = [
-    #     PM_Resource(location=inputs.amber_parm7),
-    #     PM_Resource(location=inputs.amber_rst7),
-    # ]
-    # for resource in resources:
+    # TODO: use resources to copy input files to the output directory.
+    # for resource in inputs.resources:
     #     resource.copy_to(inputs.outputDirPath)
 
     # # TODO: we can use PM_Resource.copy_to to copy the files to the output directory.

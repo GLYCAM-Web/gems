@@ -83,8 +83,13 @@ class PM_Resource(BaseModel):
         # ensure that the payload is loaded
         if self._payload is None:
             if self.locationType == "File":
-                self.load(path=Path(self.location) / self.filename)
-
+                try:
+                    self.load(path=Path(self.location) / self.filename)
+                except FileNotFoundError as e:
+                    log.error(
+                        f"Could not load resource {self.name} from {Path(self.location) / self.filename}."
+                    )
+                    raise e
         if self._payload is not None:
             log.debug(f"Copying resource {self.name} to {path}...")
             self.write(path)
