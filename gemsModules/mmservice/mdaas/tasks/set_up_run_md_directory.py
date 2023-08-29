@@ -1,7 +1,10 @@
 from pathlib import Path
 
 from gemsModules.systemoperations import filesystem_ops
-from gemsModules.systemoperations.environment_ops import is_GEMS_test_workflow
+from gemsModules.systemoperations.environment_ops import (
+    is_GEMS_test_workflow,
+    get_default_GEMS_procs,
+)
 
 from gemsModules.deprecated.common import logic as commonlogic
 from gemsModules.logging.logger import Set_Up_Logging
@@ -53,9 +56,16 @@ def execute(
         parent_directory=output_dir_path,
     )
 
+    # or maybe? deprecated.common.getGemsExecutionContext???
     if is_GEMS_test_workflow():
         # cp the Local_Run_Parameters.bash.example to Local_Run_Parameters.bash
+        # We only do this for test workflows for now because in production the Run_Parameters are set globally.
         # TODO: Amber/MDaaS need to be able to configure this
         src = out_dir / "Local_Run_Parameters.bash.example"
         dest = out_dir / "Local_Run_Parameters.bash"
         filesystem_ops.copy_file_from_A_to_B(A=src, B=dest)
+
+        # now update the Local_Run_Parameters.bash file with the correct number of processors
+        filesystem_ops.replace_bash_variable_in_file(
+            dest, {"numProcs": get_default_GEMS_procs()}
+        )

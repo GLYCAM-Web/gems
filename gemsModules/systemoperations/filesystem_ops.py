@@ -86,3 +86,35 @@ def copy_dir_A_to_become_dir_B():
 
 def copy_dir_A_inside_of_dir_B():
     pass
+
+
+def replace_bash_variable_in_file(path, vars: dict[str, any]):
+    """Replace a value for a bash script variable. Only works in the simplest cases."""
+    # a bash var is usually set like this:  varname="varvalue"
+    # so we need to replace the varname= with varname="varvalue"
+    # we also need to make sure that the varvalue is quoted
+    # first find the line in question
+    # then split the line into two parts
+    modified = False
+    with open(path, "r") as f:
+        lines = f.readlines()
+    for i, line in enumerate(lines):
+        # Just to be safe, we're not interested in lines that start with "if"
+        # might as well skip comments too
+        if line.strip().startswith("if") or line.startswith("#"):
+            continue
+
+        if line.startswith("export"):
+            line = line[7:]
+        for vname, vval in vars.items():
+            if f"{vname}=" in line:
+                log.debug(f"Found {vname} in {line}")
+                old_val = line.split("=")[1]
+                lines[i] = line.replace(old_val, f"'{vval}'\n")
+                modified = True
+
+    if modified:
+        # write back lines
+        with open(path, "w") as f:
+            f.writelines(lines)
+            return True

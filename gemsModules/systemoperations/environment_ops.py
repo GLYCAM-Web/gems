@@ -27,6 +27,11 @@ def is_GEMS_test_workflow() -> bool:
     return os.getenv("GEMS_MD_TEST_WORKFLOW") == "True"
 
 
+def get_default_GEMS_procs() -> int:
+    """Not robust."""
+    return int(os.getenv("GEMSMAKEPROCS", 1))
+
+
 ## Return Codes and their associated briefs and messages
 ## If returning to a shell, we add 128 because the error is fatal
 brief_to_code = {
