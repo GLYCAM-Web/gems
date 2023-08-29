@@ -38,34 +38,41 @@ class mdaas_Request_Data_Filler(Request_Data_Filler):
         return self.aaop_list
 
     def __fill_run_md_aaop(self, i: int, aaop: AAOP) -> List[AAOP]:
+        upload_dir = Path(self.response_project.upload_path)
         # Please note, if you need values from response_project, make sure they are initialized appropriately by project manager.
         aaop.The_AAO.inputs = run_md_api.run_md_Inputs(
-            amber_parm7=self.response_project.parm7_file_name,
-            amber_rst7=self.response_project.rst7_file_name,
             pUUID=self.response_project.pUUID,
             outputDirPath=self.response_project.project_dir,
             protocolFilesPath=self.response_project.protocolFilesPath,
             # TODO: inputsFilePath is mostly ignored by setup_run_md_directory.
             # Possibly needs to be set by procedural options/env and/or doesn't make sense for GEMS to know about.
             inputFilesPath=self.response_project.upload_path,
+            amber_parm7=str(upload_dir / self.response_project.parm7_file_name),
+            amber_rst7=str(upload_dir / self.response_project.rst7_file_name),
         )
 
         return self.aaop_list
 
     def __fill_projman_aaop(self, i: int, aaop: AAOP):
-        log.debug("REQUEST_DATA_FILLER: projman\nproject: %s %s", self.response_project)
+        upload_dir = Path(self.response_project.upload_path)
 
         aaop.The_AAO.inputs = pm_api.ProjectManagement_Inputs(
             pUUID=self.response_project.pUUID,
             projectDir=self.response_project.project_dir,
             protocolFilesPath=self.response_project.protocolFilesPath,
             outputDirPath=self.response_project.project_dir,
+            # Unfortunately, currently mostly ignored.
             inputFilesPath=self.response_project.upload_path,
-            amber_parm7=self.response_project.parm7_file_name,
-            amber_rst7=self.response_project.rst7_file_name,
+            # It's the website's job to upload and make a request, so gems doesn't really understand
+            # upload_paths. The project field may not be necessary.
+            # For now, to avoid writing the full paths as the project filenames,
+            # we'll use upload path, as set by the project manager, to build the filenames.
+            amber_parm7=str(upload_dir / self.response_project.parm7_file_name),
+            amber_rst7=str(upload_dir / self.response_project.rst7_file_name),
         )
 
         # Add the resources to copy to the project output directory by the Project Management service.
+        # TODO: copy parm7/rst7 this way.
         input_json = pm_api.PM_Resource.from_payload(
             self.transaction.incoming_string, "input", "json"
         )

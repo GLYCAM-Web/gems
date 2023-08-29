@@ -49,15 +49,20 @@ class mdaas_Project_Manager(Project_Manager):
             if service.typename == "RunMD":
                 # THe problem with setting the files here is that then they have their full paths,
                 # and we still need the full paths for the RDF...
-                upload_dir = Path(
-                    service.inputs["input-coordinate-file"]["payload"]
-                ).parent
-                self.response_project.parm7_file_name = service.inputs[
-                    "parameter-topology-file"
-                ]["payload"]
-                self.response_project.rst7_file_name = service.inputs[
-                    "input-coordinate-file"
-                ]["payload"]
+                parm_path = Path(service.inputs["parameter-topology-file"]["payload"])
+                rst_path = Path(service.inputs["input-coordinate-file"]["payload"])
+
+                # Part of a temporary MdProject.upload_path hack. TODO: Remove upload path? Hardcode full file paths in project?
+                if rst_path.parent != parm_path.parent:
+                    log.warning(
+                        "Parm7/rst7 upload paths do not agree! Response upload path may be incorrect!"
+                    )
+                self.response_project.upload_path = str(rst_path.parent)
+
+                self.response_project.parm7_file_name = str(parm_path.name)
+                self.response_project.rst7_file_name = str(rst_path.name)
+
+                # See MDProject for default.
                 # self.response_project.protocolFilesPath = service.inputs["protocol-files-path"]["payload"]
 
         pass
