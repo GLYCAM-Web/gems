@@ -49,26 +49,22 @@ class mdaas_Request_Data_Filler(Request_Data_Filler):
         aaop.The_AAO.inputs = run_md_api.run_md_Inputs(
             # TODO: One would hope: But the project manager can't easily decode entity inputs.
             # (And probably shouldn't - but fill_response_project_* methods are tempting solutions.)
-            # amber_parm7=this_Project.parm7_file_name,
-            # amber_rst7=this_Project.rst7_file_name,
+            amber_parm7=this_Project.parm7_file_name,
+            amber_rst7=this_Project.rst7_file_name,
             # Hack: The project should have it's defaults overwritten if entity inputs were given.
-            amber_parm7=aaop.The_AAO.inputs["parameter-topology-file"]["payload"],
-            amber_rst7=aaop.The_AAO.inputs["input-coordinate-file"]["payload"],
+            # amber_parm7=aaop.The_AAO.inputs["parameter-topology-file"]["payload"],
+            # amber_rst7=aaop.The_AAO.inputs["input-coordinate-file"]["payload"],
             pUUID=this_Project.pUUID,
             outputDirPath=this_Project.project_dir,
             protocolFilesPath=this_Project.protocolFilesPath,
-            # TODO: Probably needs to be set by procedural options/env
+            # TODO: Probably needs to be set by procedural options/env and/or doesn't make sense for GEMS to know about.
             inputFilesPath=this_Project.upload_path,
         )
 
         return self.aaop_list
 
     def __fill_projman_aaop(self, i: int, aaop: AAOP):
-        log.debug(
-            "REQUEST_DATA_FILLER: projman\nproject: %s %s",
-            self.response_project.parm7_file_name,
-            self.response_project.rst7_file_name,
-        )
+        log.debug("REQUEST_DATA_FILLER: projman\nproject: %s %s", self.response_project)
 
         aaop.The_AAO.inputs = pm_api.ProjectManagement_Inputs(
             pUUID=self.response_project.pUUID,
@@ -77,8 +73,8 @@ class mdaas_Request_Data_Filler(Request_Data_Filler):
             outputDirPath=self.response_project.project_dir,
             inputFilesPath=self.response_project.upload_path,
             # We will gather these from the requester's aaop.
-            # amber_parm7=self.response_project.parm7_file_name,
-            # amber_rst7=self.response_project.rst7_file_name,
+            amber_parm7=self.response_project.parm7_file_name,
+            amber_rst7=self.response_project.rst7_file_name,
         )
 
         # Add the resources to copy to the project management service request
@@ -97,27 +93,6 @@ class mdaas_Request_Data_Filler(Request_Data_Filler):
                 i,
                 requester_aaop.The_AAO.inputs,
             )
-
-            # TODO/Q: I don't think run_md.json should specify anything more than the location
-            # for the topology and coordinate files.
-            # we don't use run_md_Inputs because they may not have been filled in yet.
-            #
-            # Crap... So we are using the valid inputs from the run_md service request
-            # Which get filled/overwritten buy the fill_run_md_aaop method.
-            # But they don't get filled appropriately... Should we be filling the
-            # project itself before this?
-            #
-            # Ok, so fill response_project_from_response entity can handle this, so that the above response_project has valid inputs.
-            # - But for the project manager to handle this, it needs to understand service requests.
-            #
-            # Ah, jeez.
-            # These paths are relative to project.upload_path
-            _parm7_path = requester_aaop.The_AAO.inputs["parameter-topology-file"][
-                "payload"
-            ]
-            _rst7_path = requester_aaop.The_AAO.inputs["input-coordinate-file"][
-                "payload"
-            ]
 
             # input_parm7 = pm_api.PM_Resource(
             #     name=_parm7_path.stem,
@@ -139,9 +114,6 @@ class mdaas_Request_Data_Filler(Request_Data_Filler):
             # )
             # aaop.The_AAO.inputs.resources.append(input_parm7)
             # aaop.The_AAO.inputs.resources.append(input_rst7)
-
-            aaop.The_AAO.inputs.amber_parm7 = str(_parm7_path)
-            aaop.The_AAO.inputs.amber_rst7 = str(_rst7_path)
 
             # TODO: also fill the protocol files path properly, (not a static string)
         else:

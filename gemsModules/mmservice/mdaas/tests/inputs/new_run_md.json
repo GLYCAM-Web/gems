@@ -9,12 +9,12 @@
 					"parameter-topology-file": {
 						"locationType": "filesystem-path-unix",
 						"resourceFormat": "AMBER-7-prmtop",
-						"payload": "unminimized-t5p.parm7"
+						"payload": "/programs/gems/tests/temp-inputs/mdinput/unminimized-t5p.parm7"
 					},
 					"input-coordinate-file": {
 						"locationType": "filesystem-path-unix",
 						"resourceFormat": "AMBER-7-restart",
-						"payload": "unminimized-t5p.rst7"
+						"payload": "/programs/gems/tests/temp-inputs/mdinput/unminimized-t5p.rst7"
 					}
 				}
 			}

@@ -18,12 +18,13 @@ class mdaas_Project_Manager(Project_Manager):
         self.instantiate_response_project()
         # Broken:
         # self.fill_response_project_from_incoming_project()
-        # self.fill_response_project_from_response_entity()
+        self.fill_response_project_from_response_entity()
 
         return self.response_project
 
     def instantiate_response_project(self) -> MdProject:
         self.response_project = self.instantiate_new_project()
+
         self.response_project.add_temporary_info()
         return self.response_project
 
@@ -44,6 +45,19 @@ class mdaas_Project_Manager(Project_Manager):
         # Otherwise, we might want to fill the resposne project here
         # Because the RDF could most conveniently make use of a filled response project.
         # Right now, response project isn't filled completely by RDF and not very useful to it.
+        # Lets try updating run_md inputs for now...
+        log.debug("fill_response_project_from_response_entity %s", self.incoming_entity)
+        for service in self.incoming_entity.services.__root__.values():
+            log.debug("fill_response_project_from_response_entity %s", service)
+            if service.typename == "RunMD":
+                self.response_project.parm7_file_name = service.inputs[
+                    "parameter-topology-file"
+                ]["payload"]
+                self.response_project.rst7_file_name = service.inputs[
+                    "input-coordinate-file"
+                ]["payload"]
+                # self.response_project.protocolFilesPath = service.inputs["protocol-files-path"]["payload"]
+
         pass
 
 

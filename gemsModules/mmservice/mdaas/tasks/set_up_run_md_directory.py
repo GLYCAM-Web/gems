@@ -29,23 +29,38 @@ def execute(
         A=protocol_files_dir, B=output_dir_path
     )
     # copy the parm7 and rst7 files to the output directory
-    fileA = uploads_dir_path + "/" + parm7_real_name
-    fileB = output_dir_path + "/" + parm7_real_name
+    out_dir = Path(output_dir_path)
+    fileA = Path(parm7_real_name)
+    fileB = out_dir / fileA.name
     filesystem_ops.copy_file_from_A_to_B(A=fileA, B=fileB)
-    filesystem_ops.copy_file_from_A_to_B(
-        A=uploads_dir_path + "/" + rst7_real_name,
-        B=output_dir_path + "/" + rst7_real_name,
-    )
     # make symbolid links from the expected protocol file names to the real protocol file names
     commonlogic.make_relative_symbolic_link(
-        path_down_to_source=output_dir_path + "/" + parm7_real_name,
+        path_down_to_source=fileB,
         path_down_to_dest_dir=output_dir_path,
         dest_link_label=parm7_protocol_name,
         parent_directory=output_dir_path,
     )
+
+    fileA = Path(rst7_real_name)
+    fileB = out_dir / fileA.name
+    filesystem_ops.copy_file_from_A_to_B(A=fileA, B=fileB)
     commonlogic.make_relative_symbolic_link(
-        path_down_to_source=output_dir_path + "/" + rst7_real_name,
+        path_down_to_source=fileB,
         path_down_to_dest_dir=output_dir_path,
         dest_link_label=rst7_protocol_name,
         parent_directory=output_dir_path,
     )
+
+    # # make symbolid links from the expected protocol file names to the real protocol file names
+    # commonlogic.make_relative_symbolic_link(
+    #     path_down_to_source=output_dir_path + "/" + parm7_real_name,
+    #     path_down_to_dest_dir=output_dir_path,
+    #     dest_link_label=parm7_protocol_name,
+    #     parent_directory=output_dir_path,
+    # )
+    # commonlogic.make_relative_symbolic_link(
+    #     path_down_to_source=output_dir_path + "/" + rst7_real_name,
+    #     path_down_to_dest_dir=output_dir_path,
+    #     dest_link_label=rst7_protocol_name,
+    #     parent_directory=output_dir_path,
+    # )
