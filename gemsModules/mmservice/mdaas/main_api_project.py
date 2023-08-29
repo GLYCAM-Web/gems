@@ -31,12 +31,13 @@ class MdProject(Project):
     u_uuid: constr(max_length=36) = " "
     sim_length: constr(max_length=5) = "100"
     notify: bool = False
+    # TODO: Currently ignored by set_up_run_md_directory.
     upload_path: constr(max_length=255) = "/programs/gems/tests/temp-inputs/mdinput"
 
     project_type: pyLiteral["md"] = Field("md", title="Type", alias="type")
 
     # TODO need protocol file in mdproject
-    protocolFilesPath: str = "/programs/gems/tests/temp-inputs/RoeProtocol"
+    protocolFilesPath: str = "/programs/gems/External/MD_Utils/protocols/RoeProtocol"
 
     def add_temporary_info(self):
         self.project_dir: str = os.path.join(
