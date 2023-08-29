@@ -41,11 +41,7 @@ class mdaas_Project_Manager(Project_Manager):
             self.response_project = MdProject(**self.incoming_project.dict())
 
     def fill_response_project_from_response_entity(self):
-        # Note: In most service requests, entity inputs are empty.
-        # Otherwise, we might want to fill the resposne project here
-        # Because the RDF could most conveniently make use of a filled response project.
-        # Right now, response project isn't filled completely by RDF and not very useful to it.
-        # Lets try updating run_md inputs for now...
+        # Lets try updating from run_md inputs for now...
         log.debug("fill_response_project_from_response_entity %s", self.incoming_entity)
         for service in self.incoming_entity.services.__root__.values():
             log.debug("fill_response_project_from_response_entity %s", service)

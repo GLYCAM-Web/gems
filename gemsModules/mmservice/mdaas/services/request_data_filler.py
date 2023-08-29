@@ -38,27 +38,16 @@ class mdaas_Request_Data_Filler(Request_Data_Filler):
         return self.aaop_list
 
     def __fill_run_md_aaop(self, i: int, aaop: AAOP) -> List[AAOP]:
-        # TODO/FIX!:Please note, response_project is only the defaults here, right now.
-        # TODO: Project manager still needs to fill out the project intelligently.
-        this_Project: MdProject = self.response_project
-        log.debug(
-            "REQUEST_DATA_FILLER: run_md project: %s %s",
-            self.response_project.parm7_file_name,
-            self.response_project.rst7_file_name,
-        )
+        # Please note, if you need values from response_project, make sure they are initialized appropriately by project manager.
         aaop.The_AAO.inputs = run_md_api.run_md_Inputs(
-            # TODO: One would hope: But the project manager can't easily decode entity inputs.
-            # (And probably shouldn't - but fill_response_project_* methods are tempting solutions.)
-            amber_parm7=this_Project.parm7_file_name,
-            amber_rst7=this_Project.rst7_file_name,
-            # Hack: The project should have it's defaults overwritten if entity inputs were given.
-            # amber_parm7=aaop.The_AAO.inputs["parameter-topology-file"]["payload"],
-            # amber_rst7=aaop.The_AAO.inputs["input-coordinate-file"]["payload"],
-            pUUID=this_Project.pUUID,
-            outputDirPath=this_Project.project_dir,
-            protocolFilesPath=this_Project.protocolFilesPath,
-            # TODO: Probably needs to be set by procedural options/env and/or doesn't make sense for GEMS to know about.
-            inputFilesPath=this_Project.upload_path,
+            amber_parm7=self.response_project.parm7_file_name,
+            amber_rst7=self.response_project.rst7_file_name,
+            pUUID=self.response_project.pUUID,
+            outputDirPath=self.response_project.project_dir,
+            protocolFilesPath=self.response_project.protocolFilesPath,
+            # TODO: inputsFilePath is mostly ignored by setup_run_md_directory.
+            # Possibly needs to be set by procedural options/env and/or doesn't make sense for GEMS to know about.
+            inputFilesPath=self.response_project.upload_path,
         )
 
         return self.aaop_list
@@ -69,58 +58,31 @@ class mdaas_Request_Data_Filler(Request_Data_Filler):
         aaop.The_AAO.inputs = pm_api.ProjectManagement_Inputs(
             pUUID=self.response_project.pUUID,
             projectDir=self.response_project.project_dir,
-            protocolFilesPath=self.response_project.protocolFilesPath,  # this_Project.protocolFilesPath trying to avoid modifying the current mdaas request # TODO: no protocol files for MDaaS project currently.
+            protocolFilesPath=self.response_project.protocolFilesPath,
             outputDirPath=self.response_project.project_dir,
             inputFilesPath=self.response_project.upload_path,
-            # We will gather these from the requester's aaop.
             amber_parm7=self.response_project.parm7_file_name,
             amber_rst7=self.response_project.rst7_file_name,
         )
 
-        # Add the resources to copy to the project management service request
+        # Add the resources to copy to the project output directory by the Project Management service.
         input_json = pm_api.PM_Resource.from_payload(
             self.transaction.incoming_string, "input", "json"
         )
         aaop.The_AAO.inputs.resources.append(input_json)
 
-        # Lets try to get inputs from the requesting AAOP for ProjectManagement
-        if aaop.Requester is not None:
-            # If we were using an AAOP_Tree we could use aaop_tree.get_aaop_by_id(aaop.Requester)
-            requester_aaop = find_aaop_by_id(self.aaop_list, aaop.Requester)
-            log.debug("Found requester aaop[%s]", requester_aaop)
-            log.debug(
-                "for aaop_list[%s], %s",
-                i,
-                requester_aaop.The_AAO.inputs,
-            )
-
-            # input_parm7 = pm_api.PM_Resource(
-            #     name=_parm7_path.stem,
-            #     res_format="parm7",
-            #     location=str(_parm7_path.parent),
-            #     locationType="File",
-            # )
-
-            # input_rst7 = pm_api.PM_Resource(
-            #     name=str(_rst7_path.stem),
-            #     res_format="rst7",
-            #     location=str(_rst7_path.parent),
-            # )
-
-            # log.debug(
-            #     "Adding MDaaS resources to ProjectManagement_Inputs:\n\t%s and %s",
-            #     input_parm7,
-            #     input_rst7,
-            # )
-            # aaop.The_AAO.inputs.resources.append(input_parm7)
-            # aaop.The_AAO.inputs.resources.append(input_rst7)
-
-            # TODO: also fill the protocol files path properly, (not a static string)
-        else:
-            log.debug(
-                "No requester found for aaop_list[%s], PM service request will not have a pdb file resource.",
-                i,
-            )
+        # if aaop.Requester is not None:
+        #     # If we were using an AAOP_Tree we could use aaop_tree.get_aaop_by_id(aaop.Requester)
+        #     requester_aaop = find_aaop_by_id(self.aaop_list, aaop.Requester)
+        #     log.debug("Found requester aaop[%s]", requester_aaop)
+        #     log.debug(
+        #         "for aaop_list[%s], %s",
+        #         i, requester_aaop.The_AAO.inputs,
+        #     )
+        # else:
+        #     log.debug(
+        #         "No requester found for aaop_list[%s], PM service request will not have a pdb file resource.", i,
+        #     )
 
         log.debug(
             "\tFinished building ProjectManagement_Inputs, aaop_list[%s].inputs filled with %s",
