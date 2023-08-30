@@ -2,7 +2,6 @@
 import sys
 import socket
 import grpc
-import gems_grpc_slurm_client
 
 from pydantic import BaseModel, Field
 from pydantic.schema import schema
@@ -60,6 +59,7 @@ def try_slurm_grpc_submit(jsonObjectString, thisSlurmJobInfo, gems_grpc_host_por
             log.warning("GEMSHOME is not set.  Cannot submit via gRPC.")
             return "Failed to submit via gRPC.  GEMSHOME is not set."
         sys.path.append(f"{gemsPath}/gRPC/SLURM")
+        import gems_grpc_slurm_client
 
         log.debug("submitting to gems_grpc_slurm_client.")
         submission = gems_grpc_slurm_client.GemsGrpcSlurmClient(json=jsonObjectString)

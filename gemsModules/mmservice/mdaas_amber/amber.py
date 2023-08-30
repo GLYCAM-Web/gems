@@ -18,7 +18,11 @@ def manageIncomingString(jsonObjectString: str):
         log.error("Could not get amber_job to work correctly.")
         raise ValueError("MDaaS had trouble getting the amber job to run.")
 
-    from gemsModules.deprecated.batchcompute import batchcompute
+    from gemsModules.batchcompute.slurm.receive import receive as slurm_receive
+
+    # from gemsModules.deprecated.batchcompute.batchcompute import (
+    #     batch_compute_delegation as slurm_receive,
+    # )
 
     log.debug("amber.py: amber_job.submissionName is: " + amber_job.submissionName)
     outgoing_json_dict = {
@@ -29,7 +33,9 @@ def manageIncomingString(jsonObjectString: str):
         "sbatchArgument": amber_job.simulationControlScriptPath,
     }
 
-    batchcompute.batch_compute_delegation(outgoing_json_dict)
+    # TODO: This receive isn't quite a proper Entity-module
+    slurm_receive(json.dumps(outgoing_json_dict))
+
     log.debug(
         "got past the batchcompute.batch_compute_delegation(outgoing_json_dict) stuff in amber.py"
     )

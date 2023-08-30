@@ -56,4 +56,4 @@ def execute(path, thisSlurmJobInfo):
 
     incoming_dict = thisSlurmJobInfo.incoming_dict
 
-    script.write(make_slurm_submission_script(script, incoming_dict))
+    script.write(make_slurm_submission_script(incoming_dict))

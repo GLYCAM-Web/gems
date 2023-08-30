@@ -28,7 +28,9 @@ class Known_Entities(GemsStrEnum):
 
 
 from gemsModules.deprecated.delegator.receive import delegate as deprecated_delegator
-from gemsModules.batchcompute.receive import receive as batchcompute
+
+# TODO: For now, amber is directly calling slurm, rather than going through delegator.
+# from gemsModules.batchcompute.slurm.receive import receive as slurm
 from gemsModules.common.receive import receive as common
 
 from gemsModules.mmservice.receive import receive as mmservice

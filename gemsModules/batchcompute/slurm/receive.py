@@ -11,6 +11,8 @@ from gemsModules.deprecated.common.transaction import *  # might need whole file
 from gemsModules.deprecated.batchcompute.slurm.dataio import *
 from gemsModules.deprecated.batchcompute.slurm.receive import manageIncomingString
 
+from gemsModules.mmservice.mdaas.tasks import create_slurm_submission
+
 from gemsModules.networkconnections.grpc import try_slurm_grpc_submit
 from gemsModules.systemoperations.environment_ops import is_GEMS_test_workflow
 from gemsModules.logging.logger import Set_Up_Logging
@@ -62,17 +64,16 @@ def submit(thisSlurmJobInfo):
         return "Was unable to submit the job."
 
 
-from Web_Programs.gems.gemsModules.mmservice.mdaas.tasks import create_slurm_submission
-
-
 def receive(jsonObjectString):
     """
     TODO write me a docstring
     """
     import os, sys, socket
 
-    log.info("manageIncomingString() was called.\n")
-    log.debug("incoming jsonObjectString: \n" + jsonObjectString)
+    log.info("batchcompute.slurm.receive() was called.\n")
+    log.debug(
+        "incoming jsonObjectString: \n" + str(jsonObjectString)
+    )  # Actually a dict? SlurmJobInfo?
 
     # Make a new SlurmJobInfo object for holding I/O information.
     thisSlurmJobInfo = SlurmJobInfo(jsonObjectString)
@@ -91,10 +92,11 @@ def receive(jsonObjectString):
         log.debug("Writing a new Slurm run script.")
         create_slurm_submission.execute(slurm_runscript_path, thisSlurmJobInfo)
 
+    # TODO/MDaaS: Here is where we can probably decide if this is the correct host or not for using gRPC.
     response = try_slurm_grpc_submit(
         jsonObjectString,
         thisSlurmJobInfo,
-        gems_grpc_host_port=os.getenv("GEMS_GRPC_SLURM_PORT"),
+        # gems_grpc_host_port=os.getenv("GEMS_GRPC_SLURM_PORT"),
     )
 
     # try_slurm_grpc_submit returns none if not meant for gRPC.
