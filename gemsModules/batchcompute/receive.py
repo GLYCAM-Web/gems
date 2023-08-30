@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
+import sys, os
+import traceback
+
 import gemsModules.deprecated
+import gemsModules.deprecated.batchcompute.settings as batchcomputeSettings
+
 from gemsModules.deprecated import common
 from gemsModules.deprecated.common.services import *
 from gemsModules.deprecated.common.transaction import *  # might need whole file...
-import traceback
 from gemsModules.deprecated.batchcompute.slurm.dataio import *
-import gemsModules.deprecated.batchcompute.settings as batchcomputeSettings
 from gemsModules.deprecated.batchcompute.slurm.receive import manageIncomingString
 
-from gemsModules.networkconnections.grpc import slurm_grpc_submit
+from gemsModules.networkconnections.grpc import try_slurm_grpc_submit
+from gemsModules.systemoperations.environment_ops import is_GEMS_test_workflow
 from gemsModules.logging.logger import Set_Up_Logging
 
 
@@ -58,56 +62,7 @@ def submit(thisSlurmJobInfo):
         return "Was unable to submit the job."
 
 
-def writeSlurmSubmissionScript(path, thisSlurmJobInfo):
-    import sys, os
-
-    try:
-        script = open(path, "w")
-    except Exception as error:
-        log.error("Cannnot write slurm run script. Aborting")
-        log.error("Error type: " + str(type(error)))
-        log.error(traceback.format_exc())
-        raise error
-        # sys.exit(1)
-
-    incoming_dict = thisSlurmJobInfo.incoming_dict
-
-    GEMS_MD_TEST_WORKFLOW = "False"
-    try:
-        GEMS_MD_TEST_WORKFLOW = os.environ.get("GEMS_MD_TEST_WORKFLOW")
-        log.debug("got GEMS_MD_TEST_WORKFLOW and it is:  " + str(GEMS_MD_TEST_WORKFLOW))
-    except Exception as error:
-        log.error("Cannnot determine workflow status.")
-        log.error("Error type: " + str(type(error)))
-        log.error(traceback.format_exc())
-
-    script.write("#!/bin/bash" + "\n")
-    script.write("#SBATCH --chdir=" + incoming_dict["workingDirectory"] + "\n")
-    script.write("#SBATCH --error=slurm_%x-%A.err" + "\n")
-    script.write("#SBATCH --get-user-env" + "\n")
-    script.write("#SBATCH --job-name=" + incoming_dict["name"] + "\n")
-    script.write("#SBATCH --nodes=1" + "\n")
-    script.write("#SBATCH --output=slurm_%x-%A.out" + "\n")
-    script.write("#SBATCH --partition=" + incoming_dict["partition"] + "\n")
-    script.write("#SBATCH --tasks-per-node=4" + "\n")
-    #  The following was needed until Slurm did their security fix.
-    #  Something like it might be needed by someone one day.
-    #    script.write("#SBATCH --uid=" + incoming_dict["user"] + "\n")
-    script.write("\n")
-    log.debug(
-        "still have GEMS_MD_TEST_WORKFLOW and it is:  " + str(GEMS_MD_TEST_WORKFLOW)
-    )
-    if GEMS_MD_TEST_WORKFLOW == "True":
-        log.debug("setting testing workflow to yes")
-        script.write("export MDUtilsTestRunWorkflow=Yes" + "\n")
-        script.write("\n")
-    else:
-        log.debug("NOT setting testing workflow to yes")
-    log.debug("The sbatchArgument is : " + incoming_dict["sbatchArgument"])
-    script.write(incoming_dict["sbatchArgument"] + "\n")
-
-
-#    sys.exit(1)
+from Web_Programs.gems.gemsModules.mmservice.mdaas.tasks import create_slurm_submission
 
 
 def receive(jsonObjectString):
@@ -134,42 +89,60 @@ def receive(jsonObjectString):
         log.debug("Found existing Slurm run script.  Refusing to clobber.")
     else:
         log.debug("Writing a new Slurm run script.")
-        writeSlurmSubmissionScript(slurm_runscript_path, thisSlurmJobInfo)
+        create_slurm_submission.execute(slurm_runscript_path, thisSlurmJobInfo)
 
-    slurm_grpc_submit(jsonObjectString, thisSlurmJobInfo)
+    response = try_slurm_grpc_submit(
+        jsonObjectString,
+        thisSlurmJobInfo,
+        gems_grpc_host_port=os.getenv("GEMS_GRPC_SLURM_PORT"),
+    )
 
-
-def main():
-    import importlib.util, os, sys
-
-    # from importlib import util
-    if importlib.util.find_spec("deprecated") is None:
-        this_dir, this_filename = os.path.split(__file__)
-        sys.path.append(this_dir + "/../../")
-        if importlib.util.find_spec("common") is None:
-            print("I cannot find the Common Servicer.  No clue what to do. Exiting")
-            sys.exit(1)
+    # try_slurm_grpc_submit returns none if not meant for gRPC.
+    if response is None:
+        response = submit(thisSlurmJobInfo)
+        if response is None:
+            log.error("Got none response")
+            # TODO: return a proper error response.
         else:
-            from common import utils
-    else:
-        from gemsModules.deprecated.common import utils
-    jsonObjectString = utils.JSON_From_Command_Line(sys.argv)
-    try:
-        thisSlurmJobInfo = manageIncomingString(jsonObjectString)
-    except Exception as error:
-        print("\nThe Slurm Job info string manager captured an error.")
-        print("Error type: " + str(type(error)))
-        print(traceback.format_exc())
-        ##TODO: see about exploring this error and returning more info. Temp solution for now.
-    try:
-        submit(thisSlurmJobInfo)
-    except Exception as error:
-        print("\nThe Slurm Job sumbit module captured an error.")
-        print("Error type: " + str(type(error)))
-        print(traceback.format_exc())
-
-    print("\ndelegator is returning this: \n" + responseObjectString)
+            thisSlurmJobInfo.copyJobinfoInToOut()
+            thisSlurmJobInfo.addSbatchResponseToJobinfoOut(response)
+            log.debug("The outgoing dictionary is: \n")
+            log.debug(str(thisSlurmJobInfo.outgoing_dict))
+            log.debug("\n")
+            return thisSlurmJobInfo.outgoing_dict
 
 
-if __name__ == "__main__":
-    main()
+# def main():
+#     import importlib.util, os, sys
+
+#     # from importlib import util
+#     if importlib.util.find_spec("deprecated") is None:
+#         this_dir, this_filename = os.path.split(__file__)
+#         sys.path.append(this_dir + "/../../")
+#         if importlib.util.find_spec("common") is None:
+#             print("I cannot find the Common Servicer.  No clue what to do. Exiting")
+#             sys.exit(1)
+#         else:
+#             from common import utils
+#     else:
+#         from gemsModules.deprecated.common import utils
+#     jsonObjectString = utils.JSON_From_Command_Line(sys.argv)
+#     try:
+#         thisSlurmJobInfo = manageIncomingString(jsonObjectString)
+#     except Exception as error:
+#         print("\nThe Slurm Job info string manager captured an error.")
+#         print("Error type: " + str(type(error)))
+#         print(traceback.format_exc())
+#         ##TODO: see about exploring this error and returning more info. Temp solution for now.
+#     try:
+#         submit(thisSlurmJobInfo)
+#     except Exception as error:
+#         print("\nThe Slurm Job sumbit module captured an error.")
+#         print("Error type: " + str(type(error)))
+#         print(traceback.format_exc())
+
+#     print("\ndelegator is returning this: \n" + responseObjectString)
+#
+
+# if __name__ == "__main__":
+#     main()

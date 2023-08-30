@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os, sys
 import importlib
+import traceback
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -24,7 +25,15 @@ def add_gems_to_python_path() -> None:
 
 
 def is_GEMS_test_workflow() -> bool:
-    return os.getenv("GEMS_MD_TEST_WORKFLOW") == "True"
+    try:
+        GEMS_MD_TEST_WORKFLOW = os.getenv("GEMS_MD_TEST_WORKFLOW", False)
+        log.debug("got GEMS_MD_TEST_WORKFLOW and it is:  " + str(GEMS_MD_TEST_WORKFLOW))
+    except Exception as error:
+        log.error("Cannnot determine workflow status.")
+        log.error("Error type: " + str(type(error)))
+        log.error(traceback.format_exc())
+    finally:
+        return GEMS_MD_TEST_WORKFLOW
 
 
 def get_default_GEMS_procs() -> int:
