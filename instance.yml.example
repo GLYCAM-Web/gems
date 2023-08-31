@@ -1,0 +1,10 @@
+hosts:
+  swarm:
+    contexts: [Swarm, DevEnv, FreeTier, ShortJob, Sequence-Build3DStructure]
+    address: gw-slurm-head
+  thoreau:
+    contexts: [Swarm, PaidTier, MediumJob, LongJob, MDaaS-RunMD]
+    address: thoreau
+  harper:
+    contexts: [ Swarm, FreeTier, PaidTier, MediumJob, LongJob, Glycomimetics ]
+    address: harper
