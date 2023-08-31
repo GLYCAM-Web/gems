@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import json
 import sys
 import socket
 from typing_extensions import Literal
@@ -83,4 +84,4 @@ def slurm_grpc_submit(jsonObjectString, host=None, port=None):
     submission = gems_grpc_slurm_client.GemsGrpcSlurmClient(
         json=jsonObjectString, host=host, port=port
     )
-    return submission.response
+    return json.loads(submission.response)

@@ -2,6 +2,8 @@
 import sys, os
 import traceback
 
+import grpc
+
 import gemsModules.deprecated
 import gemsModules.deprecated.batchcompute.settings as batchcomputeSettings
 
@@ -115,13 +117,30 @@ def receive(jsonObjectString):
 
             return thisSlurmJobInfo.outgoing_dict
     else:
-        address = InstanceConfig().get_possible_hosts_for_context(
+        addresses = InstanceConfig().get_possible_hosts_for_context(
             "MDaaS-RunMD", with_slurmport=True
         )
-        # just using first host for now
-        host, port = address[0].split(":")
+        # just using first host for now, we could try slurm_grpc_submit, and if it fails, go down the list
+        host, port = addresses[0].split(":")
 
-        response = slurm_grpc_submit(jsonObjectString, host=host, port=port)
+        failed = False
+        tried = []
+        while len(addresses):
+            h, p = addresses.pop().split(":")
+            try:
+                response = slurm_grpc_submit(jsonObjectString, host=h, port=p)
+                failed = False
+                break
+            except grpc.RpcError:
+                failed = True
+            finally:
+                tried.append(h)
+
+        if failed:
+            log.debug(
+                "All attempts to make a SLURM submission over gRPC failed. servers tried: %s",
+                tried,
+            )
 
 
 # def main():
