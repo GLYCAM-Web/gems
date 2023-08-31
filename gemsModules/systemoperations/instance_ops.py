@@ -58,11 +58,13 @@ class InstanceConfig(dict):
 
         available_contexts = []
         for host in self["hosts"]:
-            if instance_hostname in host["addresses"]:
-                available_contexts.extend(host["contexts"])
+            if instance_hostname == host["host"]:
+                available_contexts.append(host["contexts"])
         return available_contexts
 
-    def get_possible_hosts_for_context(self, context: str) -> list:
+    def get_possible_hosts_for_context(
+        self, context: str, with_slurmport=False
+    ) -> list:
         """
         Returns a list of possible hosts for a given context.
         """
@@ -70,5 +72,8 @@ class InstanceConfig(dict):
         for host in self["hosts"]:
             for host_context in host["contexts"]:
                 if host_context == context:
-                    possible_hosts.extend(host["addresses"])
+                    if with_slurmport:
+                        possible_hosts.append(f"{host['host']}:{host['slurmport']}")
+                    else:
+                        possible_hosts.append(host["host"])
         return possible_hosts

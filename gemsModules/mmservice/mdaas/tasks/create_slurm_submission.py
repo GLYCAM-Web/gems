@@ -3,8 +3,6 @@ import os
 import traceback
 from gemsModules.systemoperations.environment_ops import is_GEMS_test_workflow
 
-from gemsModules.mmservice.mdaas_amber.amber import manageIncomingString
-
 from gemsModules.logging.logger import Set_Up_Logging
 
 log = Set_Up_Logging(__name__)

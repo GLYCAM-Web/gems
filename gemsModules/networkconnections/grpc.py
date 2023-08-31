@@ -24,49 +24,45 @@ def should_use_GRPC():
     pass
 
 
-def get_gems_slurm_host():
+def get_gems_slurm_host_from_env():
     return os.getenv("GEMS_GRPC_SLURM_HOST", None), os.getenv(
         "GEMS_GRPC_SLURM_PORT", None
     )
 
 
-def is_GEMS_instance_for_SLURM_submission(requesting_ctx=None, requested_instance=None):
+def get_gems_slurm_instance_by_config():
+    pass
+
+
+def is_GEMS_instance_for_SLURM_submission(requested_ctx=None, requested_instance=None):
     """Uses the GEMS instance_config to determine if this instance is the correct SLURM submitter."""
+    ic = InstanceConfig()
+
+    this_instance_can_run_ctx = False
+    if requested_ctx is not None:
+        if requested_ctx in ic.get_available_contexts():
+            this_instance_can_run_ctx = True
+
+    this_instance_is_requested = False
+    if requested_instance is not None:
+        if requested_instance == socket.gethostname():
+            this_instance_is_requested = True
+
+    return this_instance_can_run_ctx and this_instance_is_requested
 
 
-def _is_GEMS_instance_for_SLURM_submission():
+def naive_is_GEMS_instance_for_SLURM_submission():
     """Naive check which just attempts to get the submission to the configured SLURM host."""
     this_host = socket.gethostname()
     log.debug(f"This hostname is: {this_host}")
     useGRPC = True
 
-    if this_host is not None and this_host == get_gems_slurm_host():
+    if this_host is not None and this_host == get_gems_slurm_host_from_env():
         useGRPC = False
 
     useSLURM = not useGRPC
     log.debug(f"Is this a GEMS instance for SLURM submission? {useSLURM}")
     return useSLURM
-
-
-def _is_correct_GEMS_instance(gems_grpc_host_port=None):
-    """Replicates original deprecated/batchcompute behaviour"""
-    log.debug(f"This hostname is: {socket.gethostname()}")
-    useGRPC = True
-
-    host, port = get_gems_slurm_host().split(":")
-    if gems_grpc_host_port is not None:
-        host, port = gems_grpc_host_port.split(":")
-        port = int(port)
-
-    log.debug("the host is: " + host)
-    if host is None:
-        log.debug("cant find grpc slurm submission host. using localhost")
-        useGRPC = False
-    else:
-        if host == socket.gethostname():
-            useGRPC = False
-
-    return useGRPC
 
 
 def import_grpc_client():
@@ -79,26 +75,12 @@ def import_grpc_client():
     import gems_grpc_slurm_client
 
 
-# gross coupling of slurm submit in batch compute to grpc submissions.
-# simplest solution is allowing us to pass a closure to this grpc_submit for the local submit fn.
-# that sounds wrong though.
-def slurm_grpc_submit(jsonObjectString):
-    """ """
+def slurm_grpc_submit(jsonObjectString, host=None, port=None):
+    """Submit a SLURM request to the gRPC server for delegation on another GEMs instance."""
     import_grpc_client()
 
-    log.debug("submitting to gems_grpc_slurm_client.")
-    # TODO: This needs to be able to take a host/port
-    submission = gems_grpc_slurm_client.GemsGrpcSlurmClient(json=jsonObjectString)
+    log.debug("Sending SLURM request over gRPC to %s...", host, port)
+    submission = gems_grpc_slurm_client.GemsGrpcSlurmClient(
+        json=jsonObjectString, host=host, port=port
+    )
     return submission.response
-
-
-# schedulerGrpcHost: str = Field(
-#    None,
-#    title='Scheduler gRPC server',
-#    description='The server to contact via gRPC for submitting the job.  Normally not required.'
-#    )
-# schedulerGrpcPort: int = Field(
-#    None,
-#    title='Scheduler gRPC port',
-#    description='The port to contact via gRPC for submitting the job.  Normally not required.'
-#    )

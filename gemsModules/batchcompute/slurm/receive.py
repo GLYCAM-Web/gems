@@ -17,6 +17,7 @@ from gemsModules.networkconnections.grpc import (
     slurm_grpc_submit,
     is_GEMS_instance_for_SLURM_submission,
 )
+from gemsModules.systemoperations.instance_ops import InstanceConfig
 from gemsModules.systemoperations.environment_ops import is_GEMS_test_workflow
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -99,7 +100,8 @@ def receive(jsonObjectString):
 
     # If grpc-delegator, we want to reroute to the correct host with gRPC.
     # See instance_config.json for info on available hosts and contexts.
-    if is_GEMS_instance_for_SLURM_submission(requesting_context="MDaaS-RunMD"):
+
+    if is_GEMS_instance_for_SLURM_submission(requested_ctx="MDaaS-RunMD"):
         response = run_slurm_submission_script(thisSlurmJobInfo)
         if response is None:
             log.error("Got none response")
@@ -113,11 +115,13 @@ def receive(jsonObjectString):
 
             return thisSlurmJobInfo.outgoing_dict
     else:
-        log.debug("Sending SLURM request over gRPC....")
-        response = slurm_grpc_submit(
-            jsonObjectString,
-            # gems_grpc_host_port=os.getenv("GEMS_GRPC_SLURM_PORT"),
+        address = InstanceConfig().get_possible_hosts_for_context(
+            "MDaaS-RunMD", with_slurmport=True
         )
+        # just using first host for now
+        host, port = address[0].split(":")
+
+        response = slurm_grpc_submit(jsonObjectString, host=host, port=port)
 
 
 # def main():

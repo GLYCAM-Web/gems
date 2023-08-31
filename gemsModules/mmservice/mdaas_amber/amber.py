@@ -33,5 +33,5 @@ def manageIncomingString(jsonObjectString: str):
     log.debug("amber.py: amber_job.submissionName is: " + outgoing_json_str)
     # TODO: This receive isn't quite a proper Entity-module, but eventually, we should be able
     # to decouple this call by delegating a submission to the batchcompute/slurm gemsModule like
-    # any other GEMSrequest.
+    # any other GEMS JSON API Request.
     slurm_receive(outgoing_json_str)
