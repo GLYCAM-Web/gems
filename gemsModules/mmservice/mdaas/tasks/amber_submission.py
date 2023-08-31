@@ -27,7 +27,11 @@ def make_input(pUUID: str, outputDirPath: str, control_script: str):
     return amberSubmissionJson
 
 
-def execute(pUUID: str, outputDirPath: str, control_script: str = "Run_Protocol.bash"):
+def execute(
+    pUUID: str,
+    outputDirPath: str,
+    control_script: str = "Run_Multi-Part_Simulation.bash",
+):
     the_input = make_input(
         pUUID=pUUID, outputDirPath=outputDirPath, control_script=control_script
     )

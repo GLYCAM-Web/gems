@@ -5,7 +5,7 @@ def execute(
     pUUID: str,
     outputDirPath: str,
     use_serial: bool = False,
-    control_script: str = "Run_Protocol.bash",
+    control_script: str = "Run_Multi-Part_Simulation.bash",
 ):
     if use_serial == True:
         amber_submission.execute(

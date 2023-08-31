@@ -13,7 +13,10 @@ from gemsModules.deprecated.batchcompute.slurm.receive import manageIncomingStri
 
 from gemsModules.mmservice.mdaas.tasks import create_slurm_submission
 
-from gemsModules.networkconnections.grpc import try_slurm_grpc_submit
+from gemsModules.networkconnections.grpc import (
+    slurm_grpc_submit,
+    is_GEMS_instance_for_SLURM_submission,
+)
 from gemsModules.systemoperations.environment_ops import is_GEMS_test_workflow
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -92,15 +95,8 @@ def receive(jsonObjectString):
         log.debug("Writing a new Slurm run script.")
         create_slurm_submission.execute(slurm_runscript_path, thisSlurmJobInfo)
 
-    # TODO/MDaaS: Here is where we can probably decide if this is the correct host or not for using gRPC.
-    response = try_slurm_grpc_submit(
-        jsonObjectString,
-        thisSlurmJobInfo,
-        # gems_grpc_host_port=os.getenv("GEMS_GRPC_SLURM_PORT"),
-    )
-
-    # try_slurm_grpc_submit returns none if not meant for gRPC.
-    if response is None:
+    # If grpc-delegator, we want to reroute to the correct host with gRPC.
+    if is_GEMS_instance_for_SLURM_submission():
         response = submit(thisSlurmJobInfo)
         if response is None:
             log.error("Got none response")
@@ -111,7 +107,16 @@ def receive(jsonObjectString):
             log.debug("The outgoing dictionary is: \n")
             log.debug(str(thisSlurmJobInfo.outgoing_dict))
             log.debug("\n")
+
+            # This is where we can reroute.
             return thisSlurmJobInfo.outgoing_dict
+    else:
+        log.debug("Sending SLURM request over gRPC....")
+        # TODO/MDaaS: Here is where we can probably decide if this is the correct host or not for using gRPC.
+        response = slurm_grpc_submit(
+            jsonObjectString,
+            # gems_grpc_host_port=os.getenv("GEMS_GRPC_SLURM_PORT"),
+        )
 
 
 # def main():

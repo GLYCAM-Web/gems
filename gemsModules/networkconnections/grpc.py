@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sys
 import socket
+from typing_extensions import Literal
 import grpc
 
 from pydantic import BaseModel, Field
@@ -22,48 +23,69 @@ def should_use_GRPC():
     pass
 
 
-# gross coupling of slurm submit in batch compute to grpc submissions.
-# simplest solution is allowing us to pass a closure to this grpc_submit for the local submit fn.
-# that sounds wrong though.
-def try_slurm_grpc_submit(jsonObjectString, thisSlurmJobInfo, gems_grpc_host_port=None):
-    """ """
+def import_grpc_client():
+    global gems_grpc_slurm_client
+    gemsPath = os.environ.get("GEMSHOME")
+    if gemsPath is None:
+        log.warning("GEMSHOME is not set.  Cannot submit via gRPC.")
+        return "Failed to submit via gRPC.  GEMSHOME is not set."
+    sys.path.append(f"{gemsPath}/gRPC/SLURM")
+    import gems_grpc_slurm_client
+
+
+def get_gems_slurm_host():
+    return os.getenv("GEMS_GRPC_SLURM_HOST", None), os.getenv(
+        "GEMS_GRPC_SLURM_PORT", None
+    )
+
+
+def is_GEMS_instance_for_SLURM_submission():
+    this_host = socket.gethostname()
+    log.debug(f"This hostname is: {this_host}")
+    useGRPC = True
+
+    if this_host is not None and this_host == get_gems_slurm_host():
+        useGRPC = False
+
+    useSLURM = not useGRPC
+    log.debug(f"Is this a GEMS instance for SLURM submission? {useSLURM}")
+    return useSLURM
+
+
+def _is_correct_GEMS_instance(gems_grpc_host_port=None):
+    """Replicates original deprecated/batchcompute behaviour"""
+    log.debug(f"This hostname is: {socket.gethostname()}")
     useGRPC = True
     # TODO: We probably want to lift the gems instance selection out of slurm grpc_submit.
     # It should probably be figured out earlier in gems. ETA: Now in transit.
 
-    host, port = None, None
+    host, port = get_gems_slurm_host().split(":")
     if gems_grpc_host_port is not None:
         host, port = gems_grpc_host_port.split(":")
         port = int(port)
 
-    thePort = port or os.environ.get("GEMS_GRPC_SLURM_PORT")
-    log.debug("the port is: " + thePort)
-    if thePort is None:
-        log.debug("cant find grpc slurm submission port. using localhost")
-        useGRPC = False
-    theHost = host or os.environ.get("GEMS_GRPC_SLURM_HOST")
-    log.debug("the host is: " + theHost)
-    if theHost is None:
+    log.debug("the host is: " + host)
+    if host is None:
         log.debug("cant find grpc slurm submission host. using localhost")
         useGRPC = False
     else:
-        localHost = socket.gethostname()
-        log.debug("the local host is: " + localHost)
-        if theHost == localHost:
+        if host == socket.gethostname():
             useGRPC = False
 
-    log.debug("useGRPC: " + str(useGRPC))
-    if useGRPC:
-        gemsPath = os.environ.get("GEMSHOME")
-        if gemsPath is None:
-            log.warning("GEMSHOME is not set.  Cannot submit via gRPC.")
-            return "Failed to submit via gRPC.  GEMSHOME is not set."
-        sys.path.append(f"{gemsPath}/gRPC/SLURM")
-        import gems_grpc_slurm_client
+    return useGRPC
 
-        log.debug("submitting to gems_grpc_slurm_client.")
-        submission = gems_grpc_slurm_client.GemsGrpcSlurmClient(json=jsonObjectString)
-        return submission.response
+
+# gross coupling of slurm submit in batch compute to grpc submissions.
+# simplest solution is allowing us to pass a closure to this grpc_submit for the local submit fn.
+# that sounds wrong though.
+def slurm_grpc_submit(jsonObjectString):
+    """ """
+    import_grpc_client()
+
+    log.debug("submitting to gems_grpc_slurm_client.")
+    # TODO: This needs to be able to take a host/port
+    submission = gems_grpc_slurm_client.GemsGrpcSlurmClient(json=jsonObjectString)
+    return submission.response
 
 
 # schedulerGrpcHost: str = Field(
