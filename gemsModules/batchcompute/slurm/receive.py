@@ -137,7 +137,8 @@ def receive(jsonObjectString):
                 tried.append(h)
 
         if failed:
-            log.debug(
+            # maybe should be error?
+            log.warning(
                 "All attempts to make a SLURM submission over gRPC failed. servers tried: %s",
                 tried,
             )

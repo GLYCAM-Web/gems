@@ -71,7 +71,7 @@ def import_grpc_client():
     gemsPath = os.environ.get("GEMSHOME")
     if gemsPath is None:
         log.warning("GEMSHOME is not set.  Cannot submit via gRPC.")
-        return "Failed to submit via gRPC.  GEMSHOME is not set."
+        # raise EnvironmentError("Failed to submit via gRPC.  GEMSHOME is not set.")
     sys.path.append(f"{gemsPath}/gRPC/SLURM")
     import gems_grpc_slurm_client
 
@@ -80,7 +80,7 @@ def slurm_grpc_submit(jsonObjectString, host=None, port=None):
     """Submit a SLURM request to the gRPC server for delegation on another GEMs instance."""
     import_grpc_client()
 
-    log.debug("Sending SLURM request over gRPC to %s...", host, port)
+    log.debug("Sending SLURM request over gRPC to %s:%s...", host, port)
     submission = gems_grpc_slurm_client.GemsGrpcSlurmClient(
         json=jsonObjectString, host=host, port=port
     )

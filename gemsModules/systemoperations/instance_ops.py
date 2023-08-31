@@ -41,8 +41,8 @@ class InstanceConfig(dict):
         instance_config_path = Path(os.getenv("GEMSHOME", "")) / "instance_config.json"
         if not instance_config_path.exists():
             raise FileNotFoundError(
-                "instance_config.yml not found at GEMSHOME: %s",
-                instance_config_path,
+                f"instance_config.json not found at GEMSHOME: {instance_config_path}\n"
+                f"Please copy the example file from {os.getenv('GEMSHOME', '$GEMSHOME')}/instance_config.json.example.",
             )
 
         with open(instance_config_path, "r") as f:
