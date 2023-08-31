@@ -13,6 +13,7 @@ from gemsModules.deprecated.common.loggingConfig import *
 
 from gemsModules.deprecated.batchcompute.slurm.dataio import *
 
+from gemsModules.systemoperations.instance_ops import InstanceConfig
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -23,23 +24,18 @@ def should_use_GRPC():
     pass
 
 
-def import_grpc_client():
-    global gems_grpc_slurm_client
-    gemsPath = os.environ.get("GEMSHOME")
-    if gemsPath is None:
-        log.warning("GEMSHOME is not set.  Cannot submit via gRPC.")
-        return "Failed to submit via gRPC.  GEMSHOME is not set."
-    sys.path.append(f"{gemsPath}/gRPC/SLURM")
-    import gems_grpc_slurm_client
-
-
 def get_gems_slurm_host():
     return os.getenv("GEMS_GRPC_SLURM_HOST", None), os.getenv(
         "GEMS_GRPC_SLURM_PORT", None
     )
 
 
-def is_GEMS_instance_for_SLURM_submission():
+def is_GEMS_instance_for_SLURM_submission(requesting_ctx=None, requested_instance=None):
+    """Uses the GEMS instance_config to determine if this instance is the correct SLURM submitter."""
+
+
+def _is_GEMS_instance_for_SLURM_submission():
+    """Naive check which just attempts to get the submission to the configured SLURM host."""
     this_host = socket.gethostname()
     log.debug(f"This hostname is: {this_host}")
     useGRPC = True
@@ -56,8 +52,6 @@ def _is_correct_GEMS_instance(gems_grpc_host_port=None):
     """Replicates original deprecated/batchcompute behaviour"""
     log.debug(f"This hostname is: {socket.gethostname()}")
     useGRPC = True
-    # TODO: We probably want to lift the gems instance selection out of slurm grpc_submit.
-    # It should probably be figured out earlier in gems. ETA: Now in transit.
 
     host, port = get_gems_slurm_host().split(":")
     if gems_grpc_host_port is not None:
@@ -73,6 +67,16 @@ def _is_correct_GEMS_instance(gems_grpc_host_port=None):
             useGRPC = False
 
     return useGRPC
+
+
+def import_grpc_client():
+    global gems_grpc_slurm_client
+    gemsPath = os.environ.get("GEMSHOME")
+    if gemsPath is None:
+        log.warning("GEMSHOME is not set.  Cannot submit via gRPC.")
+        return "Failed to submit via gRPC.  GEMSHOME is not set."
+    sys.path.append(f"{gemsPath}/gRPC/SLURM")
+    import gems_grpc_slurm_client
 
 
 # gross coupling of slurm submit in batch compute to grpc submissions.

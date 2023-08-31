@@ -24,8 +24,9 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
-def submit(thisSlurmJobInfo):
-    log.debug("submit() was called.\n")
+# TODO: TO a task?
+def run_slurm_submission_script(thisSlurmJobInfo):
+    log.debug("run_slurm_submission_script() was called.\n")
     import os, sys, subprocess, signal
     from subprocess import Popen
 
@@ -43,7 +44,7 @@ def submit(thisSlurmJobInfo):
     log.debug("The current directory is:  " + os.getcwd())
     try:
         log.debug(
-            "In func submit(), incoming dict sbatchArg is: "
+            "In func run_slurm_submission_script, incoming dict sbatchArg is: "
             + thisSlurmJobInfo.incoming_dict["sbatchArgument"]
             + "\n"
         )
@@ -79,6 +80,7 @@ def receive(jsonObjectString):
     )  # Actually a dict? SlurmJobInfo?
 
     # Make a new SlurmJobInfo object for holding I/O information.
+    # TODO: newstyle gemsModule
     thisSlurmJobInfo = SlurmJobInfo(jsonObjectString)
     thisSlurmJobInfo.parseIncomingString()
 
@@ -96,8 +98,9 @@ def receive(jsonObjectString):
         create_slurm_submission.execute(slurm_runscript_path, thisSlurmJobInfo)
 
     # If grpc-delegator, we want to reroute to the correct host with gRPC.
-    if is_GEMS_instance_for_SLURM_submission():
-        response = submit(thisSlurmJobInfo)
+    # See instance_config.json for info on available hosts and contexts.
+    if is_GEMS_instance_for_SLURM_submission(requesting_context="MDaaS-RunMD"):
+        response = run_slurm_submission_script(thisSlurmJobInfo)
         if response is None:
             log.error("Got none response")
             # TODO: return a proper error response.
@@ -108,11 +111,9 @@ def receive(jsonObjectString):
             log.debug(str(thisSlurmJobInfo.outgoing_dict))
             log.debug("\n")
 
-            # This is where we can reroute.
             return thisSlurmJobInfo.outgoing_dict
     else:
         log.debug("Sending SLURM request over gRPC....")
-        # TODO/MDaaS: Here is where we can probably decide if this is the correct host or not for using gRPC.
         response = slurm_grpc_submit(
             jsonObjectString,
             # gems_grpc_host_port=os.getenv("GEMS_GRPC_SLURM_PORT"),

@@ -37,7 +37,7 @@ def is_GEMS_test_workflow() -> bool:
 
 
 def get_default_GEMS_procs() -> int:
-    """Not robust."""
+    """Not robust. Currently recycles GEMSMAKEPROCS environment variable."""
     return int(os.getenv("GEMSMAKEPROCS", 1))
 
 
