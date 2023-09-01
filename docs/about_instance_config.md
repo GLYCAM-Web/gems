@@ -32,6 +32,8 @@ For now, grpc-default is ignored as a SLURM host, and routes are documentation o
         "DevEnv",
         "FreeTier",
         "ShortJob",
+        // Currently, if one tries to run RunMD, it will only run on thoreau. If you want to run on slurm-head, because for instance you do not have access to thoreau, you must define it here.  
+        // "MDaaS-RunMD",
         "Sequence-Build3DStructure"
       ],
       "host": "gw-slurm-head",

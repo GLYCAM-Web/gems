@@ -133,6 +133,12 @@ def receive(jsonObjectString):
                 break
             except grpc.RpcError:
                 failed = True
+                log.warning(
+                    "Failed to submit to %s:%s. Trying next host in list.",
+                    h,
+                    p,
+                    exc_info=True,
+                )
             finally:
                 tried.append(h)
 
@@ -142,6 +148,11 @@ def receive(jsonObjectString):
                 "All attempts to make a SLURM submission over gRPC failed. servers tried: %s",
                 tried,
             )
+
+        if response is None:
+            log.error("Got none response")
+
+        return response
 
 
 # def main():

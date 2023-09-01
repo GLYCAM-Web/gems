@@ -9,16 +9,6 @@ log = Set_Up_Logging(__name__)
 
 
 def make_slurm_submission_script(SlurmJobInfo):
-    # script.write("#!/bin/bash" + "\n")
-    # script.write("#SBATCH --chdir=" + incoming_dict["workingDirectory"] + "\n")
-    # script.write("#SBATCH --error=slurm_%x-%A.err" + "\n")
-    # script.write("#SBATCH --get-user-env" + "\n")
-    # script.write("#SBATCH --job-name=" + incoming_dict["name"] + "\n")
-    # script.write("#SBATCH --nodes=1" + "\n")
-    # script.write("#SBATCH --output=slurm_%x-%A.out" + "\n")
-    # script.write("#SBATCH --partition=" + incoming_dict["partition"] + "\n")
-    # script.write("#SBATCH --tasks-per-node=4\n\n")
-    # using fstrings and building up the string before writing
     script = (
         "#!/bin/bash\n"
         f"#SBATCH --chdir={SlurmJobInfo['workingDirectory']}\n"

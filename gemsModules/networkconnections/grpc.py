@@ -84,4 +84,4 @@ def slurm_grpc_submit(jsonObjectString, host=None, port=None):
     submission = gems_grpc_slurm_client.GemsGrpcSlurmClient(
         json=jsonObjectString, host=host, port=port
     )
-    return json.loads(submission.response)
+    return submission.response
