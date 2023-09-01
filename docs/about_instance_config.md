@@ -12,9 +12,8 @@ Curently, the only request routed using this feature is "RunMD" which is used to
 For now, grpc-default is ignored as a SLURM host, and routes are documentation only.
 ```json
 {
-  "hosts": [
-    {
-      "name": "grpc-default",
+  "hosts": {
+    "grpc-default": {
       "contexts": [
         "DevEnv"
       ],
@@ -25,22 +24,20 @@ For now, grpc-default is ignored as a SLURM host, and routes are documentation o
         "harper"
       ]
     },
-    {
-      "name": "swarm",
+    "swarm": {
       "contexts": [
         "Swarm",
         "DevEnv",
         "FreeTier",
         "ShortJob",
-        // Currently, if one tries to run RunMD, it will only run on thoreau. If you want to run on slurm-head, because for instance you do not have access to thoreau, you must define it here.  
-        // "MDaaS-RunMD",
         "Sequence-Build3DStructure"
+        // If you want to run mdaas on DevEnv without thoreau access, define this:
+        // "MDaaS-RunMD"
       ],
       "host": "gw-slurm-head",
       "slurmport": "50052"
     },
-    {
-      "name": "thoreau",
+    "thoreau": {
       "contexts": [
         "Swarm",
         "PaidTier",
@@ -49,10 +46,18 @@ For now, grpc-default is ignored as a SLURM host, and routes are documentation o
         "MDaaS-RunMD"
       ],
       "host": "thoreau",
-      "slurmport": "50052"
+      "slurmport": "50052",
+      "sbatch_arguments": {
+        "MDaaS-RunMD": {
+          "partition": "defq",
+          "time": "120",
+          "job-name": "md-{{pUUID}}",
+          "nodes": "1",
+          "gres": "gpu:1"
+        }
+      }
     },
-    {
-      "name": "harper",
+    "harper": {
       "contexts": [
         "Swarm",
         "FreeTier",
@@ -64,5 +69,20 @@ For now, grpc-default is ignored as a SLURM host, and routes are documentation o
       "host": "harper",
       "slurmport": "50052"
     }
-  ]
-}```
+  },
+  "default_sbatch_arguments": {
+    "DevEnv": {
+      "partition": "defq",
+      "time": "120",
+      "job-name": "none-{{pUUID}}",
+      "nodes": "4"
+    },
+    "Default": {
+      "partition": "defq",
+      "time": "120",
+      "job-name": "none-{{pUUID}}{{time}}",
+      "nodes": "4"
+    }
+  }
+}
+```

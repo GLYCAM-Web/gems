@@ -46,6 +46,7 @@ def seek_correct_host(jsonObjectString, context):
 
     failed = False
     tried = []
+    response = None
     while len(addresses):
         h, p = addresses.pop().split(":")
         try:
