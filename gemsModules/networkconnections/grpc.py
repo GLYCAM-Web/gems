@@ -20,6 +20,9 @@ from gemsModules.logging.logger import Set_Up_Logging
 
 log = Set_Up_Logging(__name__)
 
+# just re-exposing grpc.RpcError so we don't need to import grpc for it.
+RpcError = grpc.RpcError
+
 
 def should_use_GRPC():
     pass

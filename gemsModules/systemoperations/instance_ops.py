@@ -1,6 +1,7 @@
-import json
-import os, glob, shutil, socket
+import json, os, glob, shutil, socket
 from pathlib import Path
+
+from gemsModules.systemoperations.environment_ops import is_GEMS_test_workflow
 
 # from gemsModules.logging.logger import Set_Up_Logging
 
@@ -8,6 +9,7 @@ from pathlib import Path
 # log = Set_Up_Logging(__name__)
 
 
+# TODO: tests
 class InstanceConfig(dict):
     """
     A class for parsing and using the instance_config.yml of the active GEMS installation.
@@ -57,9 +59,9 @@ class InstanceConfig(dict):
             instance_hostname = socket.gethostname()
 
         available_contexts = []
-        for host in self["hosts"]:
-            if instance_hostname == host["host"]:
-                available_contexts.append(host["contexts"])
+        for host in self["hosts"].keys():
+            if instance_hostname == host:
+                available_contexts.extend(host["contexts"])
         return available_contexts
 
     def get_possible_hosts_for_context(
@@ -69,7 +71,7 @@ class InstanceConfig(dict):
         Returns a list of possible hosts for a given context.
         """
         possible_hosts = []
-        for host in self["hosts"]:
+        for host in self["hosts"].values():
             for host_context in host["contexts"]:
                 if host_context == context:
                     if with_slurmport:
@@ -77,3 +79,36 @@ class InstanceConfig(dict):
                     else:
                         possible_hosts.append(host["host"])
         return possible_hosts
+
+    # sbatch argument helpers
+    def get_default_sbatch_arguments(self, context="Default") -> dict:
+        return self["default_sbatch_arguments"][context]
+
+    def get_sbatch_arguments_by_context(self, context) -> list[dict]:
+        l = []
+        for host in self["hosts"].values():
+            l.append(host["sbatch_arguments"])
+
+    def get_sbatch_arguments_by_host(self, host) -> dict[str, dict]:
+        return self["hosts"][host]["sbatch_arguments"]
+
+    def get_sbatch_arguments(self, host=None, context=None):
+        if context is None:
+            # TODO: Is this sensible?
+            if is_GEMS_test_workflow():
+                context = "DevEnv"
+            elif host is not None and "Swarm" in self.get_available_contexts(host):
+                context = "Swarm"
+
+        if host is None:
+            if context is None:
+                return self.get_default_sbatch_arguments()
+            else:
+                possible_hosts = self.get_possible_hosts_for_context(context)
+                # TODO: More complicated selection of proper host
+                host = possible_hosts.pop()
+
+        possible_sbatch_args = self.get_sbatch_arguments_by_host(host)
+        for ctx, args in possible_sbatch_args.items():
+            if ctx == context:
+                return args
