@@ -74,7 +74,7 @@ def receive(jsonObjectString):
     # TODO/Q: We might want this "requested context branch" to be more interchangeable subcomponents of the slurm entity.
     # TODO/FIX: Right now, it's just checking if the requested context is for MDaaS-RunMD.
     # But it needs to check if the request in the jsonObjectString is for runmd first.
-    ctx = "MDaaS-RunMD"
+    ctx = thisSlurmJobInfo.incoming_dict["context"]
     if is_GEMS_instance_for_SLURM_submission(requested_ctx=ctx):
         if create_runscript:
             log.debug("About to create runscript")
@@ -83,4 +83,6 @@ def receive(jsonObjectString):
             )
         slurm_submit(thisSlurmJobInfo)
     else:
-        seek_correct_host(jsonObjectString, context=ctx)
+        # Needs to be a proper GEMS response.
+        response = seek_correct_host(jsonObjectString, context=ctx)
+        return response

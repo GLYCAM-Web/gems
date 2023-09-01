@@ -2,7 +2,7 @@ from pathlib import Path
 
 from gemsModules.systemoperations import filesystem_ops
 from gemsModules.systemoperations.environment_ops import (
-    is_GEMS_test_workflow,
+    is_GEMS_live_swarm,
     get_default_GEMS_procs,
 )
 
@@ -57,7 +57,7 @@ def execute(
     )
 
     # or maybe? deprecated.common.getGemsExecutionContext???
-    if is_GEMS_test_workflow():
+    if not is_GEMS_live_swarm():
         # cp the Local_Run_Parameters.bash.example to Local_Run_Parameters.bash
         # We only do this for test workflows for now because in production the Run_Parameters are set globally.
         # TODO: Amber/MDaaS need to be able to configure this

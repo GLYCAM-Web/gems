@@ -16,22 +16,21 @@ def create_contextual_slurm_submission_script(
     context, slurm_runscript_path, thisSlurmJobInfo
 ):
     ic = InstanceConfig()
-    args = ic.get_sbatch_args(context=context)
+    ic_args = ic.get_sbatch_args(context=context)
 
     # TODO: One day, different slurm submission will need to be made.
     # TODO: Update job info keys so that we can just dict unpack/update. RN this is a compatibility patch.
-    thisSlurmJobInfo["workingDirectory"] = args["chdir"]
-    thisSlurmJobInfo["name"] = args["job-name"]
-    thisSlurmJobInfo["nodes"] = args["nodes"]
-    thisSlurmJobInfo["time"] = args["time"]
-    thisSlurmJobInfo["partition"] = args["partition"]
-    thisSlurmJobInfo["sbatchArgument"] = args["sbatchArgument"]
-    thisSlurmJobInfo["tasks-per-node"] = args["tasks-per-node"]
-    if hasattr(args, "gres"):
-        thisSlurmJobInfo["gres"] = args["gres"]
+    thisSlurmJobInfo["nodes"] = ic_args["nodes"]
+    thisSlurmJobInfo["time"] = ic_args["time"]
+    thisSlurmJobInfo["partition"] = ic_args["partition"]
+    # Default is okay for now:
+    # thisSlurmJobInfo["sbatchArgument"] = ic_args["sbatchArgument"]
+    thisSlurmJobInfo["tasks-per-node"] = ic_args["tasks-per-node"]
+    if hasattr(ic_args, "gres"):
+        thisSlurmJobInfo["gres"] = ic_args["gres"]
     else:
         thisSlurmJobInfo["gres"] = None
-    log.debug(f"Filled SLURM Job info with sbatch_arguments from: %s", args)
+    log.debug(f"Filled SLURM Job info with sbatch_arguments from: %s", ic_args)
 
     create_slurm_submission.execute(slurm_runscript_path, thisSlurmJobInfo)
 
@@ -41,8 +40,6 @@ def seek_correct_host(jsonObjectString, context):
     addresses = InstanceConfig().get_possible_hosts_for_context(
         context, with_slurmport=True
     )
-    # just using first host for now, we could try slurm_grpc_submit, and if it fails, go down the list
-    host, port = addresses[0].split(":")
 
     failed = False
     tried = []
@@ -70,8 +67,5 @@ def seek_correct_host(jsonObjectString, context):
             "All attempts to make a SLURM submission over gRPC failed. servers tried: %s",
             tried,
         )
-
-    if response is None:
-        log.error("Got none response")
 
     return response

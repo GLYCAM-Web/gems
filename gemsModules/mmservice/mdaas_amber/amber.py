@@ -9,7 +9,7 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
-# TODO: New-style gems Module for mdaas_amber
+# TODO: New-style gems Module for mdaas_amber so we can append notice from no instance config
 def manageIncomingString(jsonObjectString: str):
     input_json_dict = json.loads(jsonObjectString)
     log.debug("amber.py input_json_dict is : " + str(input_json_dict))
@@ -17,8 +17,7 @@ def manageIncomingString(jsonObjectString: str):
     try:
         amber_job = mdaas_io.amberProject(**input_json_dict)
     except:
-        log.error("Could not get amber_job to work correctly.")
-        raise ValueError("MDaaS had trouble getting the amber job to run.")
+        log.warning("Could not get mdaas_amber reception to work correctly.")
 
     outgoing_json_str = json.dumps(
         {
@@ -27,11 +26,14 @@ def manageIncomingString(jsonObjectString: str):
             "name": amber_job.submissionName,
             "workingDirectory": amber_job.simulationWorkingDirectory,
             "sbatchArgument": amber_job.simulationControlScriptPath,
+            # TODO: THis all needs to be made proper newstyle gemsModules...:(
+            "context": input_json_dict["context"],
         }
     )
 
-    log.debug("amber.py: amber_job.submissionName is: " + outgoing_json_str)
+    log.debug("amber.py: amber_job " + outgoing_json_str)
     # TODO: This receive isn't quite a proper Entity-module, but eventually, we should be able
     # to decouple this call by delegating a submission to the batchcompute/slurm gemsModule like
-    # any other GEMS JSON API Request.
-    slurm_receive(outgoing_json_str)
+    # any other GEMS JSON API Request. For now, amber is calling it directly, but eventually
+    # delegator.redirector settings should have slurm_receive.
+    return slurm_receive(outgoing_json_str)

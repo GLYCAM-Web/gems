@@ -9,7 +9,11 @@ Curently, the only request routed using this feature is "RunMD" which is used to
 
 # instance_config.json.example
 
-For now, grpc-default is ignored as a SLURM host, and routes are documentation only.
+"swarm" like an emulation of the SLURM stack that thoreau/harper serve. It may not be sensical.
+
+
+For now, grpc-default is ignored as a SLURM host, it's just auxilary - and routes are documentation only.
+
 ```json
 {
   "hosts": {
@@ -31,7 +35,7 @@ For now, grpc-default is ignored as a SLURM host, and routes are documentation o
         "FreeTier",
         "ShortJob",
         "Sequence-Build3DStructure"
-        // If you want to run mdaas on DevEnv without thoreau access, define this:
+        // If you want to run mdaas on DevEnv without thoreau access, define this: (And make sure to add a comma to the end of the line above)
         // "MDaaS-RunMD"
       ],
       "host": "gw-slurm-head",
@@ -51,7 +55,6 @@ For now, grpc-default is ignored as a SLURM host, and routes are documentation o
         "MDaaS-RunMD": {
           "partition": "defq",
           "time": "120",
-          "job-name": "md-{{pUUID}}",
           "nodes": "1",
           "gres": "gpu:1"
         }
@@ -74,13 +77,11 @@ For now, grpc-default is ignored as a SLURM host, and routes are documentation o
     "DevEnv": {
       "partition": "defq",
       "time": "120",
-      "job-name": "none-{{pUUID}}",
       "nodes": "4"
     },
     "Default": {
       "partition": "defq",
       "time": "120",
-      "job-name": "none-{{pUUID}}{{time}}",
       "nodes": "4"
     }
   }

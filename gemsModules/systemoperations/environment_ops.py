@@ -24,6 +24,24 @@ def add_gems_to_python_path() -> None:
     sys.path.append(GemsPath)
 
 
+def is_GEMS_live_swarm() -> bool:
+    """For deciding if DevEnv or not.
+
+    This is different from getGemsExecutionContext in that it returns false if unset.
+
+    TODO: merge with procedural options.
+    """
+    try:
+        GEMS_MD_LIVE_SWARM = os.getenv("GEMS_MD_LIVE_SWARM", False)
+        log.debug("got GEMS_MD_LIVE_SWARM and it is:  " + str(GEMS_MD_LIVE_SWARM))
+    except Exception as error:
+        log.error("Cannnot determine swarm status.")
+        log.error("Error type: " + str(type(error)))
+        log.error(traceback.format_exc())
+    finally:
+        return GEMS_MD_LIVE_SWARM
+
+
 def is_GEMS_test_workflow() -> bool:
     try:
         GEMS_MD_TEST_WORKFLOW = os.getenv("GEMS_MD_TEST_WORKFLOW", False)
