@@ -13,10 +13,12 @@ log = Set_Up_Logging(__name__)
 
 
 def create_contextual_slurm_submission_script(
-    context, slurm_runscript_path, thisSlurmJobInfo
+    context, slurm_runscript_path, SlurmJobInfo
 ):
     ic = InstanceConfig()
-    ic_args = ic.get_sbatch_args(context=context)
+    ic_args = ic.get_sbatch_arguments(context=context)
+
+    thisSlurmJobInfo = SlurmJobInfo.incoming_dict
 
     # TODO: One day, different slurm submission will need to be made.
     # TODO: Update job info keys so that we can just dict unpack/update. RN this is a compatibility patch.
@@ -25,14 +27,19 @@ def create_contextual_slurm_submission_script(
     thisSlurmJobInfo["partition"] = ic_args["partition"]
     # Default is okay for now:
     # thisSlurmJobInfo["sbatchArgument"] = ic_args["sbatchArgument"]
-    thisSlurmJobInfo["tasks-per-node"] = ic_args["tasks-per-node"]
+
+    if hasattr(ic_args, "tasks-per_node"):
+        thisSlurmJobInfo["tasks-per-node"] = ic_args["tasks-per-node"]
+    else:
+        thisSlurmJobInfo["tasks-per-node"] = "1"
+
     if hasattr(ic_args, "gres"):
         thisSlurmJobInfo["gres"] = ic_args["gres"]
     else:
         thisSlurmJobInfo["gres"] = None
     log.debug(f"Filled SLURM Job info with sbatch_arguments from: %s", ic_args)
 
-    create_slurm_submission.execute(slurm_runscript_path, thisSlurmJobInfo)
+    create_slurm_submission.execute(slurm_runscript_path, SlurmJobInfo)
 
 
 def seek_correct_host(jsonObjectString, context):

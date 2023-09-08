@@ -52,6 +52,9 @@ def receive(jsonObjectString):
     thisSlurmJobInfo = SlurmJobInfo(jsonObjectString)
     thisSlurmJobInfo.parseIncomingString()
 
+    # Get context from SlurmJobInfo, this could be overwritten based on instance config settings.
+    ctx = thisSlurmJobInfo.incoming_dict["context"]
+
     thisSlurmJobInfo.incoming_dict["slurm_runscript_name"] = "slurm_submit.sh"
     slurm_runscript_path = (
         thisSlurmJobInfo.incoming_dict["workingDirectory"]
@@ -59,28 +62,21 @@ def receive(jsonObjectString):
         + thisSlurmJobInfo.incoming_dict["slurm_runscript_name"]
     )
 
-    create_runscript = False
+    # TODO: This can probably move to the "is correct instance for SLURM submit"
     log.debug("Slurm runscript path: " + slurm_runscript_path + "\n")
     if os.path.exists(slurm_runscript_path):
         log.debug("Found existing Slurm runscript.  Refusing to clobber.")
     else:
         log.debug("Will generate a new Slurm runscript.")
-        create_runscript = True
 
-    # If grpc-delegator, we want to reroute to the correct host with gRPC.
-    # See instance_config.json for info on available hosts and contexts.
+        log.debug("About to create runscript")
+        create_contextual_slurm_submission_script(
+            ctx, slurm_runscript_path, thisSlurmJobInfo
+        )
 
+    # TODO/Q: We might want this "requested context branch" to be more interchangeable.
     response = None
-    # TODO/Q: We might want this "requested context branch" to be more interchangeable subcomponents of the slurm entity.
-    # TODO/FIX: Right now, it's just checking if the requested context is for MDaaS-RunMD.
-    # But it needs to check if the request in the jsonObjectString is for runmd first.
-    ctx = thisSlurmJobInfo.incoming_dict["context"]
     if is_GEMS_instance_for_SLURM_submission(requested_ctx=ctx):
-        if create_runscript:
-            log.debug("About to create runscript")
-            create_contextual_slurm_submission_script(
-                slurm_runscript_path, thisSlurmJobInfo, context=ctx
-            )
         slurm_submit(thisSlurmJobInfo)
     else:
         # Needs to be a proper GEMS response.

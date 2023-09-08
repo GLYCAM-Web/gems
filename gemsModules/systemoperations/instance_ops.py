@@ -100,9 +100,10 @@ class InstanceConfig(dict):
             elif host is not None and "Swarm" in self.get_available_contexts(host):
                 context = "Swarm"
 
+        sb_arg_dict = self.get_default_sbatch_arguments()
         if host is None:
             if context is None:
-                return self.get_default_sbatch_arguments()
+                return sb_arg_dict
             else:
                 possible_hosts = self.get_possible_hosts_for_context(context)
                 # TODO: More complicated selection of proper host
@@ -111,4 +112,5 @@ class InstanceConfig(dict):
         possible_sbatch_args = self.get_sbatch_arguments_by_host(host)
         for ctx, args in possible_sbatch_args.items():
             if ctx == context:
-                return args
+                sb_arg_dict.update(args)
+                return sb_arg_dict

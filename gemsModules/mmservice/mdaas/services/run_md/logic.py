@@ -45,7 +45,7 @@ class cakeInputs:
 
 
 def execute(inputs: run_md_Inputs) -> serviceOutputs:
-    log.debug(f"serviceInputs: {serviceInputs}")
+    log.debug(f"serviceInputs: {inputs}")
     service_outputs = run_md_Outputs()
 
     initiate_build.execute(
