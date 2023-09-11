@@ -12,6 +12,7 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
+# TODO: This is deeply coupled with systemoperations.instance_ops.InstanceConfig / instance_config.json
 def create_contextual_slurm_submission_script(
     context, slurm_runscript_path, SlurmJobInfo
 ):

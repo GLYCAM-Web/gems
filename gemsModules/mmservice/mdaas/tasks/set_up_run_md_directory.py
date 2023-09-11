@@ -18,8 +18,10 @@ def execute(
     uploads_dir_path: str,
     parm7_real_name: str,
     rst7_real_name: str,
-    parm7_protocol_name: str = "mdInput.parm7",
-    rst7_protocol_name: str = "mdInput.rst7",
+    # NOTE: Run_Multi-Part_Protocol.bash depends on these precise default names:
+    # If you change them from here, you must change them there.
+    parm7_protocol_name: str = "MdInput.parm7",
+    rst7_protocol_name: str = "MdInput.rst7",
 ):
     log.debug("set_up_run_md_directory.py execute() called, %s", locals())
     # ensure that the protocol files directory exists
