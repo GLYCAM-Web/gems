@@ -49,9 +49,12 @@ def is_GEMS_instance_for_SLURM_submission(requested_ctx=None, requested_instance
 
     this_instance_is_requested = False
     if requested_instance is not None:
+        # TODO: PREFIX gets in the way of instance configs right now, just ignoring it.
         if requested_instance == socket.gethostname():
             this_instance_is_requested = True
 
+    log.debug(f"Is this instance configured to run SLURM? {this_instance_can_run_ctx}")
+    log.debug(f"Is this instance requested for SLURM? {this_instance_is_requested}")
     return this_instance_can_run_ctx and this_instance_is_requested
 
 
@@ -83,7 +86,12 @@ def slurm_grpc_submit(jsonObjectString, host=None, port=None):
     """Submit a SLURM request to the gRPC server for delegation on another GEMs instance."""
     import_grpc_client()
 
-    log.debug("Sending SLURM request over gRPC to %s:%s...", host, port)
+    log.debug(
+        "Sending SLURM request over gRPC to %s:%s... Request: %s",
+        host,
+        port,
+        jsonObjectString,
+    )
     submission = gems_grpc_slurm_client.GemsGrpcSlurmClient(
         json=jsonObjectString, host=host, port=port
     )

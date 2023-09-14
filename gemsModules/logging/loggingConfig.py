@@ -1,14 +1,17 @@
 import logging, os
+import socket
+
 # logging cannot import anything else from gemsModules
 
 ##TODO Create custom logging levels for critical errors to be able to specify
 ##  email recipient.
 
+
 ## Set the verbosity via the GEMS_LOGGING_LEVEL environment var.
 def getGemsLoggingLevel():
     try:
-        loggingLevel = os.environ.get('GEMS_LOGGING_LEVEL')
-        
+        loggingLevel = os.environ.get("GEMS_LOGGING_LEVEL")
+
         if loggingLevel == None:
             loggingLevel = logging.ERROR
         elif loggingLevel == "error":
@@ -18,10 +21,14 @@ def getGemsLoggingLevel():
         elif loggingLevel == "debug":
             loggingLevel = logging.DEBUG
         else:
-            print("The only valid values for GEMS_LOGGING_LEVEL are: error, info, or debug: " + str(loggingLevel))
+            print(
+                "The only valid values for GEMS_LOGGING_LEVEL are: error, info, or debug: "
+                + str(loggingLevel)
+            )
         return loggingLevel
     except Exception as error:
         return logging.ERROR
+
 
 LOGGING_LEVEL = getGemsLoggingLevel()
 loggers = {}
@@ -30,9 +37,19 @@ loggers = {}
 Creates a logging solution for writing to the console. Can add handlers if
 we want to write logs to file, send emails, etc...
 """
+
+
+class HostnameFilter(logging.Filter):
+    hostname = socket.gethostname()
+
+    def filter(self, record):
+        record.hostname = HostnameFilter.hostname
+        return True
+
+
 def createLogger(name):
-    #print("name: " + name + ", LOGGING_LEVEL: " + str(LOGGING_LEVEL))
-    if(loggers.get(name)):
+    # print("name: " + name + ", LOGGING_LEVEL: " + str(LOGGING_LEVEL))
+    if loggers.get(name):
         log.debug("logger already exists with name: " + name)
     else:
         log = logging.getLogger(name)
@@ -42,22 +59,35 @@ def createLogger(name):
         errorFileHandler = logging.FileHandler(logsDir + "git-ignore-me_gemsError.log")
         errorFileHandler.setLevel(logging.ERROR)
         if LOGGING_LEVEL > 10:
-            infoFileHandler = logging.FileHandler(logsDir + "/git-ignore-me_gemsInfo.log")
+            infoFileHandler = logging.FileHandler(
+                logsDir + "/git-ignore-me_gemsInfo.log"
+            )
             infoFileHandler.setLevel(logging.INFO)
         if LOGGING_LEVEL > 0:
-            debugFileHandler = logging.FileHandler(logsDir + "/git-ignore-me_gemsDebug.log")
+            debugFileHandler = logging.FileHandler(
+                logsDir + "/git-ignore-me_gemsDebug.log"
+            )
             debugFileHandler.setLevel(logging.DEBUG)
-
+        ##Filters
+        hostnameFilter = HostnameFilter()
+        errorFileHandler.addFilter(hostnameFilter)
+        if LOGGING_LEVEL > 10:
+            infoFileHandler.addFilter(hostnameFilter)
+        if LOGGING_LEVEL > 0:
+            debugFileHandler.addFilter(hostnameFilter)
 
         ##Formatters
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s',  datefmt='%Y-%m-%d %I:%M:%S %p')
+        formatter = logging.Formatter(
+            "%(hostname)s %(asctime)s - %(name)s - %(levelname)s - %(message)s",
+            datefmt="%Y-%m-%d %I:%M:%S %p",
+        )
         errorFileHandler.setFormatter(formatter)
-    
+
         if LOGGING_LEVEL > 10:
             infoFileHandler.setFormatter(formatter)
         if LOGGING_LEVEL > 0:
             debugFileHandler.setFormatter(formatter)
-        #log.addHandler(streamHandler)
+        # log.addHandler(streamHandler)
         log.addHandler(errorFileHandler)
         if LOGGING_LEVEL > 10:
             log.addHandler(infoFileHandler)
@@ -69,11 +99,12 @@ def createLogger(name):
 
 
 def getLogsDir():
-    GEMSHOME = os.environ.get('GEMSHOME')
+    GEMSHOME = os.environ.get("GEMSHOME")
     if GEMSHOME == None:
-        ##Print statements break the website. However, so does a delgator container that 
+        ##Print statements break the website. However, so does a delgator container that
         #   cannot find GEMSHOME, and logs do not exist at the point this is called.
-        print("""
+        print(
+            """
 
         GEMSHOME environment variable is not set.
 
@@ -81,7 +112,8 @@ def getLogsDir():
 
           BASH:  export GEMSHOME=/path/to/gems
           SH:    setenv GEMSHOME /path/to/gems
-        """)
+        """
+        )
     logsDir = GEMSHOME + "/logs/"
     if not os.path.exists(logsDir):
         os.makedirs(logsDir)

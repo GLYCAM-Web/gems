@@ -3,7 +3,7 @@
 ##    * Submit a job to a Slurm cluster served by gRPC
 import importlib.util, os, sys, getopt
 
-USAGE="""
+USAGE = """
 USAGE:
 
     This script takes in a JSON object and returns a JSON object.  
@@ -40,27 +40,34 @@ USAGE:
 \n"""
 
 if len(sys.argv) > 1:
-    if sys.argv[1] in ( "-h", "--help") :
+    if sys.argv[1] in ("-h", "--help"):
         sys.stderr.write(USAGE)
         sys.exit(1)
 
 
 if importlib.util.find_spec("gemsModules") is None:
-  this_dir, this_filename = os.path.split(__file__)
-  sys.path.append(this_dir + "/../gemsModules/")
-  if importlib.util.find_spec("deprecated.common") is None:
-    sys.stderr.write("Unable to locate Common Services.  Exiting.\n")
-    sys.exit(129)
-  else:
-    from deprecated.common import utils
+    this_dir, this_filename = os.path.split(__file__)
+    sys.path.append(this_dir + "/../gemsModules/")
+    if importlib.util.find_spec("deprecated.common") is None:
+        sys.stderr.write("Unable to locate Common Services.  Exiting.\n")
+        sys.exit(129)
+    else:
+        from deprecated.common import utils
 else:
-  from gemsModules.deprecated.common import utils
-jsonObjectString=utils.JSON_From_Command_Line(sys.argv)
+    from gemsModules.deprecated.common import utils
+jsonObjectString = utils.JSON_From_Command_Line(sys.argv)
+with open('slurmreceive_jsonObjectString', 'w+') as f:
+    f.write(jsonObjectString)
 
+responseObjectString = None
+# try:
+#     from gemsModules.deprecated.batchcompute.slurm.receive import manageIncomingString
+#
+#     responseObjectString = manageIncomingString(jsonObjectString)
+# except Exception as error:
+#     # Silently attempt new style gemsModule
+from gemsModules.batchcompute.slurm.receive import receive
 
-from gemsModules.deprecated.batchcompute.slurm.receive import manageIncomingString
-responseObjectString=manageIncomingString(jsonObjectString)
+responseObjectString = receive(jsonObjectString)
+# finally:
 sys.stdout.write(str(responseObjectString))
-
-
-

@@ -14,6 +14,7 @@ def slurm_submit(thisSlurmJobInfo):
     if response is None:
         log.error("Got none response")
         # TODO: return a proper error response.
+        return "{{'Error': Got none response}}"
     else:
         thisSlurmJobInfo.copyJobinfoInToOut()
         thisSlurmJobInfo.addSbatchResponseToJobinfoOut(response)

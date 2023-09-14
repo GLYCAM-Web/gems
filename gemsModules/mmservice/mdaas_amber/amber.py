@@ -21,8 +21,8 @@ def manageIncomingString(jsonObjectString: str):
 
     outgoing_json_str = json.dumps(
         {
-            "partition": "amber",
-            "user": "webdev",
+            "partition": "amber",  # TODO: Remove - not a valid partition, overwritten by instance config later.
+            "user": "webdev",  # TODO: We could remove this as get it on demand.
             "name": amber_job.submissionName,
             "workingDirectory": amber_job.simulationWorkingDirectory,
             "sbatchArgument": amber_job.simulationControlScriptPath,
@@ -36,4 +36,5 @@ def manageIncomingString(jsonObjectString: str):
     # to decouple this call by delegating a submission to the batchcompute/slurm gemsModule like
     # any other GEMS JSON API Request. For now, amber is calling it directly, but eventually
     # delegator.redirector settings should have slurm_receive.
+    # We need to use bin/slurmreceive here, basically.
     return slurm_receive(outgoing_json_str)

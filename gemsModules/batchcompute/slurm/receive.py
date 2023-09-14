@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import sys, os
+import sys, os, socket
 import traceback
 
 import grpc
@@ -40,9 +40,7 @@ def receive(jsonObjectString):
     """
     TODO write me a docstring
     """
-    import os, sys, socket
-
-    log.info("batchcompute.slurm.receive() was called.\n")
+    log.info("batchcompute.slurm.receive() was called on %s", socket.gethostname())
     log.debug(
         "incoming jsonObjectString: \n" + str(jsonObjectString)
     )  # Actually a dict? SlurmJobInfo?
@@ -75,10 +73,37 @@ def receive(jsonObjectString):
         )
 
     # TODO/Q: We might want this "requested context branch" to be more interchangeable.
-    response = None
+    log.debug(
+        "Checking if this instance is configured to run SLURM. %s %s %s",
+        socket.gethostname(),
+        jsonObjectString,
+        ctx,
+    )
+
+    # TODO: PM needs to be run on appropriate host.
     if is_GEMS_instance_for_SLURM_submission(requested_ctx=ctx):
-        slurm_submit(thisSlurmJobInfo)
+        log.debug(
+            "This instance is configured to run SLURM. host=%s requested_ctx=%s",
+            os.uname(),
+            ctx,
+        )
+        response = slurm_submit(thisSlurmJobInfo)
     else:
+        log.debug(
+            "This instance is not configured to run SLURM. host=%s requested_ctx=%s",
+            os.uname(),
+            ctx,
+        )
         # Needs to be a proper GEMS response.
-        response = seek_correct_host(jsonObjectString, context=ctx)
-        return response
+        # TODO/FIX!: This probably needs to be daemonized to not block a gems response before slurm batching.
+        # response = seek_correct_host(jsonObjectString, context=ctx)
+        # Daemonic seek_correct_host / disowned/nohup
+        from multiprocessing import Process
+
+        p = Process(target=seek_correct_host, args=(jsonObjectString, ctx))
+        p.start()
+        response = {
+            "notices": ["Seeking correct host for SLURM submission.  Check back later."]
+        }
+
+    return response

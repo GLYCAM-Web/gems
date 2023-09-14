@@ -36,6 +36,7 @@ class GemsGrpcSlurmClient:
         log.debug("hostport is >>>" + hostport + "<<<")
         with grpc.insecure_channel(hostport) as channel:
             stub = gems_grpc_slurm_pb2_grpc.GemsGrpcSlurmStub(channel)
+            log.debug("Attempting to send %s over %s", self.json, hostport)
             response = stub.GemsGrpcSlurmReceiver(
                 gems_grpc_slurm_pb2.GemsGrpcSlurmRequest(input=self.json)
             )
