@@ -102,8 +102,10 @@ def receive(jsonObjectString):
         # This change allows a response, but still gems/grpc_server deadlock.
         from multiprocessing import Process
 
-        p = Process(target=seek_correct_host, args=(jsonObjectString, ctx), daemon=True)
+        p = Process(target=seek_correct_host, args=(jsonObjectString, ctx))
         p.start()
+
+        # TODO: Append this to actual resposne
         response = {
             "notices": ["Seeking correct host for SLURM submission.  Check back later."]
         }

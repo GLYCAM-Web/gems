@@ -89,8 +89,18 @@ class InstanceConfig(dict):
         for host in self["hosts"].values():
             l.append(host["sbatch_arguments"])
 
-    def get_sbatch_arguments_by_host(self, host) -> dict[str, dict]:
-        return self["hosts"][host]["sbatch_arguments"]
+    def get_named_hostname(self, name) -> str:
+        return self["hosts"][name]["host"]
+
+    def get_name_by_hostname(self, hostname) -> str:
+        for name, host in self["hosts"].items():
+            if host["host"] == hostname:
+                return name
+        return None
+
+    def get_sbatch_arguments_by_host(self, hostname) -> dict[str, dict]:
+        name = self.get_name_by_hostname(hostname)
+        return self["hosts"][name]["sbatch_arguments"]
 
     def get_sbatch_arguments(self, host=None, context=None):
         if context is None:
