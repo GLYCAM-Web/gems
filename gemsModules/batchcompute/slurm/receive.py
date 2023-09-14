@@ -98,9 +98,11 @@ def receive(jsonObjectString):
         # TODO/FIX!: This probably needs to be daemonized to not block a gems response before slurm batching.
         # response = seek_correct_host(jsonObjectString, context=ctx)
         # Daemonic seek_correct_host / disowned/nohup
+        #
+        # This change allows a response, but still gems/grpc_server deadlock.
         from multiprocessing import Process
 
-        p = Process(target=seek_correct_host, args=(jsonObjectString, ctx))
+        p = Process(target=seek_correct_host, args=(jsonObjectString, ctx), daemon=True)
         p.start()
         response = {
             "notices": ["Seeking correct host for SLURM submission.  Check back later."]
