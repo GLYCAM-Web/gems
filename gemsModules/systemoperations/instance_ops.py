@@ -6,7 +6,7 @@ from gemsModules.systemoperations.environment_ops import is_GEMS_test_workflow
 # from gemsModules.logging.logger import Set_Up_Logging
 
 
-# log = Set_Up_Logging(__name__)
+# log = Set_Up_Logging(_z_name__)
 
 
 # TODO: tests
@@ -82,27 +82,36 @@ class InstanceConfig(dict):
 
     # sbatch argument helpers
     def get_default_sbatch_arguments(self, context="Default") -> dict:
+        """Returns the default sbatch arguments for a given context."""
         return self["default_sbatch_arguments"][context]
 
     def get_sbatch_arguments_by_context(self, context) -> list[dict]:
+        """Returns a list of possible sbatch arguments per host for a given context."""
         l = []
         for host in self["hosts"].values():
             l.append(host["sbatch_arguments"])
 
     def get_named_hostname(self, name) -> str:
+        """Returns the actual hostname of a named host.
+
+        Each host is keyed by an arbitrary name in the hosts dict of the instance_config.json.
+        """
         return self["hosts"][name]["host"]
 
     def get_name_by_hostname(self, hostname) -> str:
+        """Returns the name of a host given it's hostname."""
         for name, host in self["hosts"].items():
             if host["host"] == hostname:
                 return name
         return None
 
-    def get_sbatch_arguments_by_host(self, hostname) -> dict[str, dict]:
+    def get_sbatch_arguments_by_hostname(self, hostname) -> dict[str, dict]:
+        """Returns a dict of possible sbatch arguments per context for a given host."""
         name = self.get_name_by_hostname(hostname)
         return self["hosts"][name]["sbatch_arguments"]
 
     def get_sbatch_arguments(self, host=None, context=None):
+        """Returns the sbatch arguments for a given host and context."""
         if context is None:
             # TODO: Is this sensible?
             if is_GEMS_test_workflow():
@@ -119,7 +128,7 @@ class InstanceConfig(dict):
                 # TODO: More complicated selection of proper host
                 host = possible_hosts.pop()
 
-        possible_sbatch_args = self.get_sbatch_arguments_by_host(host)
+        possible_sbatch_args = self.get_sbatch_arguments_by_hostname(host)
         for ctx, args in possible_sbatch_args.items():
             if ctx == context:
                 sb_arg_dict.update(args)
