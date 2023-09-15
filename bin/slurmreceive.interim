@@ -56,18 +56,18 @@ if importlib.util.find_spec("gemsModules") is None:
 else:
     from gemsModules.deprecated.common import utils
 jsonObjectString = utils.JSON_From_Command_Line(sys.argv)
-with open('slurmreceive_jsonObjectString', 'w+') as f:
-    f.write(jsonObjectString)
 
+# TODO/FIX: Determining if we need old or slurm is non-trivial, temporary hack.
 responseObjectString = None
-# try:
-#     from gemsModules.deprecated.batchcompute.slurm.receive import manageIncomingString
-#
-#     responseObjectString = manageIncomingString(jsonObjectString)
-# except Exception as error:
-#     # Silently attempt new style gemsModule
-from gemsModules.batchcompute.slurm.receive import receive
+try:
+    from gemsModules.deprecated.batchcompute.slurm.receive import manageIncomingString
 
-responseObjectString = receive(jsonObjectString)
+    responseObjectString = manageIncomingString(jsonObjectString)
+except Exception as error:
+    # Silently attempt new style gemsModule
+    from gemsModules.batchcompute.slurm.receive import receive
+
+    responseObjectString = receive(jsonObjectString)
+
 # finally:
 sys.stdout.write(str(responseObjectString))

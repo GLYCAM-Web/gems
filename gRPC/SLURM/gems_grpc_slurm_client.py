@@ -20,12 +20,13 @@ class GemsGrpcSlurmClient:
         log.info("gRPC Slurm client called.\n")
 
         # So that run still behaves as expected for anything still using json_client.run() without args:
-        if theHost is None and thePort is None:
+        if theHost is None:
             theHost = os.environ.get("GEMS_GRPC_SLURM_HOST")
             log.debug("the host is:  " + theHost)
             if theHost is None:
                 log.error("The gRPC/SLURM server host is not defined.  Exiting.")
                 sys.exit(1)
+        if thePort is None:
             thePort = os.environ.get("GEMS_GRPC_SLURM_PORT")
             log.debug("the port is:  " + thePort)
             if theHost is None:

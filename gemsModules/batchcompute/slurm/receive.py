@@ -72,7 +72,6 @@ def receive(jsonObjectString):
             ctx, slurm_runscript_path, thisSlurmJobInfo
         )
 
-    # TODO/Q: We might want this "requested context branch" to be more interchangeable.
     log.debug(
         "Checking if this instance is configured to run SLURM. %s %s %s",
         socket.gethostname(),
