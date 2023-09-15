@@ -20,7 +20,22 @@
         "Sequence-Build3DStructure"
       ],
       "host": "gw-slurm-head",
-      "slurmport": "50052"
+      "slurmport": "50052",
+      "sbatch_arguments": {
+        "MDaaS-RunMD": {
+          "partition": "amber",
+          "time": "120"
+        }
+      },
+      "subhosts": [
+        [
+          "MDaaS-RunMD",
+          [
+            "gw-slurm-amber-1",
+            "gw-slurm-amber-2"
+          ]
+        ]
+      ]
     },
     "thoreau": {
       "contexts": [
@@ -56,14 +71,16 @@
   },
   "default_sbatch_arguments": {
     "DevEnv": {
-      "partition": "defq",
+      "partition": "amber",
       "time": "120",
-      "nodes": "4"
+      "nodes": "1",
+      "tasks-per-node": "4"
     },
     "Default": {
       "partition": "defq",
       "time": "120",
-      "nodes": "4"
+      "nodes": "1",
+      "tasks-per-node": "4"
     }
   }
 }
