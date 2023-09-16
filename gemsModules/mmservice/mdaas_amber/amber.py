@@ -19,6 +19,7 @@ def manageIncomingString(jsonObjectString: str):
     except:
         log.warning("Could not get mdaas_amber reception to work correctly.")
 
+    # This is to become the SLURM job info dict used later for slurm submission.
     outgoing_json_str = json.dumps(
         {
             "partition": "amber",  # TODO: Remove - not a valid partition, overwritten by instance config later.

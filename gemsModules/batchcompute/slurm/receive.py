@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 import sys, os, socket
 import traceback
-
 import grpc
+
+from multiprocessing import Process
 
 import gemsModules.deprecated
 import gemsModules.deprecated.batchcompute.settings as batchcomputeSettings
@@ -37,8 +38,9 @@ log = Set_Up_Logging(__name__)
 
 
 def receive(jsonObjectString):
-    """
-    TODO write me a docstring
+    """batchcompute.slurm Entity reception module.
+
+    This is more or less an intermediate on the way to a proper new-style entity.
     """
     log.info("batchcompute.slurm.receive() was called on %s", socket.gethostname())
     log.debug(
@@ -54,13 +56,9 @@ def receive(jsonObjectString):
     ctx = thisSlurmJobInfo.incoming_dict["context"]
 
     thisSlurmJobInfo.incoming_dict["slurm_runscript_name"] = "slurm_submit.sh"
-    slurm_runscript_path = (
-        thisSlurmJobInfo.incoming_dict["workingDirectory"]
-        + "/"
-        + thisSlurmJobInfo.incoming_dict["slurm_runscript_name"]
-    )
+    slurm_runscript_path = f"{thisSlurmJobInfo.incoming_dict['workingDirectory']}/{thisSlurmJobInfo.incoming_dict['slurm_runscript_name']}"
 
-    # TODO: This can probably move to the "is correct instance for SLURM submit"
+    # In the future, We could possibly move this down to after we know if this is the correct host to submit on.
     log.debug("Slurm runscript path: " + slurm_runscript_path + "\n")
     if os.path.exists(slurm_runscript_path):
         log.debug("Found existing Slurm runscript.  Refusing to clobber.")
@@ -79,32 +77,17 @@ def receive(jsonObjectString):
         ctx,
     )
 
-    # TODO: PM needs to be run on appropriate host.
+    # Check if this is the appropriate host to submit the SLURM job to.
     if is_GEMS_instance_for_SLURM_submission(requested_ctx=ctx):
-        log.debug(
-            "This instance is configured to run SLURM. host=%s requested_ctx=%s",
-            os.uname(),
-            ctx,
-        )
         response = slurm_submit(thisSlurmJobInfo)
     else:
-        log.debug(
-            "This instance is not configured to run SLURM. host=%s requested_ctx=%s",
-            os.uname(),
-            ctx,
-        )
-        # Needs to be a proper GEMS response.
-        # TODO/FIX!: This probably needs to be daemonized to not block a gems response before slurm batching.
-        # response = seek_correct_host(jsonObjectString, context=ctx)
-        # Daemonic seek_correct_host / disowned/nohup
-        #
-        # This change allows a response, but still gems/grpc_server deadlock.
-        from multiprocessing import Process
-
-        p = Process(target=seek_correct_host, args=(jsonObjectString, ctx))
+        # Otherwise, we need to seek the correct host to submit to.
+        p = Process(
+            target=seek_correct_host, args=(jsonObjectString, ctx)
+        )  #  , daemon=True)
         p.start()
 
-        # TODO: Append this to actual resposne
+        # TODO: Append this to actual GEMS response.
         response = {
             "notices": ["Seeking correct host for SLURM submission.  Check back later."]
         }

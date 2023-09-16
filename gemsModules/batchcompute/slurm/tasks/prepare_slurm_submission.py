@@ -16,6 +16,7 @@ log = Set_Up_Logging(__name__)
 def create_contextual_slurm_submission_script(
     context, slurm_runscript_path, SlurmJobInfo
 ):
+    """Create a slurm submission script with context-specific sbatch arguments using the InstanceConfig."""
     ic = InstanceConfig()
     ic_args = ic.get_sbatch_arguments(context=context)
 
@@ -44,7 +45,7 @@ def create_contextual_slurm_submission_script(
 
 
 def seek_correct_host(jsonObjectString, context):
-    """Using gRPC."""
+    """Using gRPC, try to reroute the request to the correct host given a context, ususally the current one."""
     addresses = InstanceConfig().get_possible_hosts_for_context(
         context, with_slurmport=True
     )

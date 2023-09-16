@@ -59,7 +59,10 @@ def is_GEMS_instance_for_SLURM_submission(requested_ctx=None, requested_instance
 
 
 def naive_is_GEMS_instance_for_SLURM_submission():
-    """Naive check which just attempts to get the submission to the configured SLURM host."""
+    """Naive check which just attempts to get the submission to the configured SLURM host.
+
+    This mimics old behviour.
+    """
     this_host = socket.gethostname()
     log.debug(f"This hostname is: {this_host}")
     useGRPC = True

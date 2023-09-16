@@ -6,11 +6,15 @@ from gemsModules.mmservice.mdaas.services.run_md.run_md_api import (
 from gemsModules.common.tasks import cake
 
 from gemsModules.mmservice.mdaas.services.run_md.logic import execute
-from gemsModules.mmservice.mdaas.services.run_md.logic import cakeInputs
 
 from gemsModules.logging.logger import Set_Up_Logging
 
 log = Set_Up_Logging(__name__)
+
+
+class cakeInputs:
+    cake: bool = False
+    color: str = None
 
 
 def Serve(service_request: run_md_Request) -> run_md_Response:

@@ -13,38 +13,7 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
-## These are a little redundant in this simple example.
-class requestInputs(BaseModel):
-    """Defines the inputs to the service."""
-
-    entity: str = None
-    who_I_am: str = None
-
-
-class responseOutputs(BaseModel):
-    """Defines the outputs from the service."""
-
-    message: str = None
-    info: Optional[str] = None
-
-
-class serviceInputs(Protocol):
-    """Allows a Service_Request to be used as input"""
-
-    inputs: requestInputs = requestInputs()
-    options: Dict[str, str]
-
-
-class serviceOutputs(BaseModel):
-    outputs: responseOutputs = responseOutputs()
-
-
-class cakeInputs:
-    cake: bool = False
-    color: str = None
-
-
-def execute(inputs: run_md_Inputs) -> serviceOutputs:
+def execute(inputs: run_md_Inputs) -> run_md_Outputs:
     log.debug(f"serviceInputs: {inputs}")
     service_outputs = run_md_Outputs()
 
@@ -53,4 +22,5 @@ def execute(inputs: run_md_Inputs) -> serviceOutputs:
         outputDirPath=inputs.outputDirPath,
         use_serial=True,
     )
+
     return service_outputs

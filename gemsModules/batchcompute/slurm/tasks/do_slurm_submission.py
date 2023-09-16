@@ -9,7 +9,9 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
+# TODO: Task's "execute" ?
 def slurm_submit(thisSlurmJobInfo):
+    """Submit a job to SLURM."""
     response = run_slurm_submission_script(thisSlurmJobInfo)
     if response is None:
         log.error("Got none response")
@@ -25,8 +27,14 @@ def slurm_submit(thisSlurmJobInfo):
         return thisSlurmJobInfo.outgoing_dict
 
 
-# TODO: TO a task?
 def run_slurm_submission_script(thisSlurmJobInfo):
+    """Performs the task of actually submitting the job to SLURM.
+
+    It does this by calling the sbatch command with runscript as an argument.
+
+    The runscript will have already been created and sbatch arguments configured by
+    the prepare_slurm_submission task.
+    """
     log.debug("run_slurm_submission_script() was called.\n")
 
     if "sbatchArgument" not in thisSlurmJobInfo.incoming_dict.keys():
@@ -54,6 +62,7 @@ def run_slurm_submission_script(thisSlurmJobInfo):
         )
         (outputhere, errorshere) = p.communicate()
         if p.returncode != 0:
+            log.debug("errorshere: " + str(errorshere))
             return "SLURM submit got non-zero exit upon attempt to submit."
         else:
             log.debug("outputhere in raw form: " + str(outputhere))
@@ -62,6 +71,5 @@ def run_slurm_submission_script(thisSlurmJobInfo):
             return theOutput
     except Exception as error:
         log.error("Was unable to submit the job.")
-        log.error("Error type: " + str(type(error)))
         log.error(traceback.format_exc())
         return "Was unable to submit the job."
