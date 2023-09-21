@@ -26,6 +26,7 @@ class Delegator_Entity(main_api_entity.Entity):
     ] = Field(  # This is the only required field in all of the API
         ..., title="Type", alias="type"
     )
+    # Delegator overrides services so that it's own available services are used
     services: GenericServiceRequests[Available_Services] = GenericServiceRequests()
 
 

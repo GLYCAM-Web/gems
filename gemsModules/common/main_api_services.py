@@ -65,6 +65,7 @@ class GenericServiceRequests(GenericModel, Generic[T]):
             return False
 
 
+# The original Common Service Request, most entities will want to use GenericServiceRequest with their own Available_Services instead.
 Service_Request = GenericServiceRequest[Available_Services]
 Service_Requests = GenericServiceRequests[Available_Services]
 

@@ -15,7 +15,7 @@ def Serve(request: Service_Request) -> Service_Response:
     response = Service_Response()
 
     response.typename = request.typename
-    response.outputs = {"message": get_known_entities()}
+    response.outputs = {"entities": get_known_entities()}
     response.notices = Notices()
 
     return response
