@@ -17,7 +17,8 @@ log = Set_Up_Logging(__name__)
 
 service_modules: Dict[str, Callable] = {
     "Error": serve_error,
-    "listEntities": serve_known_entities,  # json contract compatibility
+    "listEntities": serve_known_entities,  # json contract compatibility (old)
+    "ListEntities": serve_known_entities,  # json contract compatibility (what it should have been)
     "KnownEntities": serve_known_entities,
     "ListServices": serve_list_services,
     "Marco": serve_marco,
