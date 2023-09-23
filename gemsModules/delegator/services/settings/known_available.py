@@ -18,7 +18,10 @@ log = Set_Up_Logging(__name__)
 
 class Module_Available_Services(GemsStrEnum):
     known_entities = "KnownEntities"
-    listEntities = "listEntities"  # json contract compatibility
+    listEntities = "listEntities"  # old json contract compatibility
+    ListEntities = (
+        "ListEntities"  # json contract compatibility (what it should have been)
+    )
 
 
 Available_Services = GemsStrEnum(
