@@ -3,10 +3,10 @@ from pathlib import Path
 
 from gemsModules.systemoperations.environment_ops import is_GEMS_test_workflow
 
-# from gemsModules.logging.logger import Set_Up_Logging
+from gemsModules.logging.logger import Set_Up_Logging
 
 
-# log = Set_Up_Logging(_z_name__)
+log = Set_Up_Logging(__name__)
 
 
 class InstanceConfigError(Exception):
@@ -21,13 +21,20 @@ class InstanceConfigNotFoundError(FileNotFoundError):
 
     """
 
-    def __init__(self, *args, **kwargs):
-        default_message = (
-            f"instance_config.json not found in $GEMSHOME.\n"
-            f"Please copy the example file from {os.getenv('GEMSHOME', '$GEMSHOME')}/instance_config.json.example.",
-        )
+    def __init__(self, msg=None, *args, **kwargs):
+        if msg is None:
+            msg = (
+                "Warning! Did you configure your GEMS instance?\n"
+                "\tThe GEMS instance_config.json was not found in $GEMSHOME.\n\n"
+                "\tPlease copy the example file:\n"
+                "\t\t`cp $GEMSHOME/instance_config.json.example $GEMSHOME/instance_config.json`\n\n"
+                "\tOtherwise, some GEMS requests may not function as expected.\n"
+                f"\t$GEMSHOME is {os.getenv('GEMSHOME', '$GEMSHOME')}."
+            )
 
-        super().__init__(default_message, *args, **kwargs)
+        log.error(msg)
+
+        super().__init__(msg, *args, **kwargs)
 
 
 # TODO: tests

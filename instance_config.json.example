@@ -17,14 +17,17 @@
         "DevEnv",
         "FreeTier",
         "ShortJob",
-        "Sequence-Build3DStructure"
+        "Sequence-Build3DStructure",
+        "MDaaS-RunMD"
       ],
       "host": "gw-slurm-head",
       "slurmport": "50052",
       "sbatch_arguments": {
         "MDaaS-RunMD": {
           "partition": "amber",
-          "time": "120"
+          "time": "120",
+          "nodes": "1",
+          "tasks-per-node": "4"
         }
       },
       "subhosts": [
@@ -42,8 +45,7 @@
         "Swarm",
         "PaidTier",
         "MediumJob",
-        "LongJob",
-        "MDaaS-RunMD"
+        "LongJob"
       ],
       "host": "thoreau",
       "slurmport": "50052",
@@ -52,7 +54,8 @@
           "partition": "defq",
           "time": "120",
           "nodes": "1",
-          "gres": "gpu:1"
+          "gres": "gpu:1",
+          "tasks-per-node": "4"
         }
       }
     },
