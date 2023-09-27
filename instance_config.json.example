@@ -6,9 +6,7 @@
       ],
       "host": "gw-grpc-delegator",
       "routes": [
-        "swarm",
-        "thoreau",
-        "harper"
+        "swarm"
       ]
     },
     "swarm": {
@@ -29,58 +27,12 @@
           "nodes": "1",
           "tasks-per-node": "4"
         }
-      },
-      "subhosts": [
-        [
-          "MDaaS-RunMD",
-          [
-            "gw-slurm-amber-1",
-            "gw-slurm-amber-2"
-          ]
-        ]
-      ]
-    },
-    "thoreau": {
-      "contexts": [
-        "Swarm",
-        "PaidTier",
-        "MediumJob",
-        "LongJob"
-      ],
-      "host": "thoreau",
-      "slurmport": "50052",
-      "sbatch_arguments": {
-        "MDaaS-RunMD": {
-          "partition": "defq",
-          "time": "120",
-          "nodes": "1",
-          "gres": "gpu:1",
-          "tasks-per-node": "4"
-        }
       }
-    },
-    "harper": {
-      "contexts": [
-        "Swarm",
-        "FreeTier",
-        "PaidTier",
-        "MediumJob",
-        "LongJob",
-        "Glycomimetics"
-      ],
-      "host": "harper",
-      "slurmport": "50052"
     }
   },
   "default_sbatch_arguments": {
-    "DevEnv": {
-      "partition": "amber",
-      "time": "120",
-      "nodes": "1",
-      "tasks-per-node": "4"
-    },
     "Default": {
-      "partition": "defq",
+      "partition": "amber",
       "time": "120",
       "nodes": "1",
       "tasks-per-node": "4"

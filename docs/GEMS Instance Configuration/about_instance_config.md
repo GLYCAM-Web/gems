@@ -13,7 +13,7 @@ Curently, the only request routed using this feature is "RunMD" which is used to
 > grpc-default is ignored as a SLURM host, it's just auxilary. routes and subhosts are currently documentation only.
 
 
-The below is for reference only, please use the provided `instance_config.json.example` in the $GEMSHOME root.
+The below is for reference only, please use the provided `instance_config.json.example` in the $GEMSHOME root. The `instance_config.json.wip` file is a blueprint/work in progress. 
 
 ```json
 {

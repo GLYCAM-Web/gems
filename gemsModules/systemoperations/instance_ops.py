@@ -1,7 +1,10 @@
 import json, os, glob, shutil, socket
 from pathlib import Path
 
-from gemsModules.systemoperations.environment_ops import is_GEMS_test_workflow
+from gemsModules.systemoperations.environment_ops import (
+    is_GEMS_test_workflow,
+    is_GEMS_live_swarm,
+)
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -37,7 +40,6 @@ class InstanceConfigNotFoundError(FileNotFoundError):
         super().__init__(msg, *args, **kwargs)
 
 
-# TODO: tests
 class InstanceConfig(dict):
     """
     A class for parsing and using the instance_config.yml of the active GEMS installation.
@@ -78,7 +80,19 @@ class InstanceConfig(dict):
         if instance_config_path is None:
             instance_config_path = InstanceConfig.get_default_path()
         if not instance_config_path.exists():
-            raise InstanceConfigNotFoundError
+            if is_GEMS_live_swarm():
+                # We are in a swarm, so we can't copy the example file naively.
+                raise InstanceConfigNotFoundError
+            else:
+                # It's a DevEnv, so the example file is suitable.
+                shutil.copyfile(
+                    InstanceConfig.get_default_path(example=True),
+                    InstanceConfig.get_default_path(),
+                )
+                log.warning(
+                    "The instance_config.json file was not found. "
+                    "An example file has been copied to the default path."
+                )
 
         with open(instance_config_path, "r") as f:
             instance_config = json.load(f)
@@ -141,7 +155,9 @@ class InstanceConfig(dict):
             if context in host["contexts"] and "sbatch_arguments" in host:
                 l.append(host["sbatch_arguments"])
 
-        l.append(self["default_sbatch_arguments"][context])
+        if context in self["default_sbatch_arguments"]:
+            l.append(self["default_sbatch_arguments"][context])
+
         return l
 
     def get_named_hostname(self, name) -> str:
