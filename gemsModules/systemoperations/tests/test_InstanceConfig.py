@@ -14,14 +14,14 @@ class Test_InstanceConfig(unittest.TestCase):
         """
         Set up for testing InstanceConfig.
         """
-        self.ic = InstanceConfig()
-        example_path = self.ic.get_default_path(example=True)
-        # copy example to cwd temporarily
+        # copy instance_config.json.example to temporarily test.
+        example_path = InstanceConfig.get_default_path(example=True)
         self.test_ic_path = pathlib.Path(os.getcwd()) / example_path.name.replace(
             ".example", ""
         )
         shutil.copyfile(example_path, self.test_ic_path)
 
+        self.ic = InstanceConfig(config_path=self.test_ic_path)
         self.ic.load(instance_config_path=self.test_ic_path)
 
     def tearDown(self) -> None:

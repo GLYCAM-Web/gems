@@ -9,6 +9,27 @@ from gemsModules.systemoperations.environment_ops import is_GEMS_test_workflow
 # log = Set_Up_Logging(_z_name__)
 
 
+class InstanceConfigError(Exception):
+    pass
+
+
+class InstanceConfigNotFoundError(FileNotFoundError):
+    """Raised when the $GEMSHOME/instance_config.json file is not found.
+
+    This file is required for GEMS to route requests appropriately. Please copy the example file
+    from $GEMSHOME/instance_config.json.example.
+
+    """
+
+    def __init__(self, *args, **kwargs):
+        default_message = (
+            f"instance_config.json not found in $GEMSHOME.\n"
+            f"Please copy the example file from {os.getenv('GEMSHOME', '$GEMSHOME')}/instance_config.json.example.",
+        )
+
+        super().__init__(default_message, *args, **kwargs)
+
+
 # TODO: tests
 class InstanceConfig(dict):
     """
@@ -31,26 +52,35 @@ class InstanceConfig(dict):
             cls._instance.__initialized = False
         return cls._instance
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, config_dict=None, config_path=None, **kwargs):
+        # Only initialize once
         if self.__initialized:
             return
+
         super().__init__(*args, **kwargs)
         self.__initialized = True
-        self.update(self.load())
+
+        if config_dict is None:
+            config_dict = self.load(instance_config_path=config_path)
+
+        # update the InstanceConfig dict with the loaded config_dict
+        self.update(config_dict)
 
     @staticmethod
     def load(instance_config_path=None) -> dict:
         if instance_config_path is None:
             instance_config_path = InstanceConfig.get_default_path()
         if not instance_config_path.exists():
-            raise FileNotFoundError(
-                f"instance_config.json not found at GEMSHOME: {instance_config_path}\n"
-                f"Please copy the example file from {os.getenv('GEMSHOME', '$GEMSHOME')}/instance_config.json.example.",
-            )
+            raise InstanceConfigNotFoundError
 
         with open(instance_config_path, "r") as f:
             instance_config = json.load(f)
+
         return instance_config
+
+    @classmethod
+    def from_dict(cls, config_dict):
+        return cls(config_dict=config_dict)
 
     @staticmethod
     def get_default_path(example=False) -> Path:
