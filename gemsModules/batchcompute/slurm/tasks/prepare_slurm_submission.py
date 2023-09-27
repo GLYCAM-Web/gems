@@ -30,16 +30,21 @@ def create_contextual_slurm_submission_script(
     # Default is okay for now:
     # thisSlurmJobInfo["sbatchArgument"] = ic_args["sbatchArgument"]
 
-    if hasattr(ic_args, "tasks-per_node"):
+    if "tasks-per-node" in ic_args:
+        log.debug("Found tasks-per-node in ic_args")
         thisSlurmJobInfo["tasks-per-node"] = ic_args["tasks-per-node"]
     else:
         thisSlurmJobInfo["tasks-per-node"] = "1"
 
-    if hasattr(ic_args, "gres"):
+    if "gres" in ic_args:
         thisSlurmJobInfo["gres"] = ic_args["gres"]
     else:
         thisSlurmJobInfo["gres"] = None
-    log.debug(f"Filled SLURM Job info with sbatch_arguments from: %s", ic_args)
+    log.debug(
+        f"Filled SLURM Job info with sbatch_arguments from: %s\nJobInfo: %s",
+        ic_args,
+        thisSlurmJobInfo,
+    )
 
     create_slurm_submission.execute(slurm_runscript_path, SlurmJobInfo)
 
