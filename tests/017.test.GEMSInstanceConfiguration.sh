@@ -3,16 +3,15 @@ THISPYTHON='python3'
 testNumber=017
 echo "Testing $0..."
 
-ACT_CFG="$GEMSHOME/instance_config.json"
-EX_CFG="$ACT_CFG.example"
+ACTUAL_CONFIG="$GEMSHOME/instance_config.json"
+EXAMPLE_CONFIG="$ACTUAL_CONFIG.example"
 
 DELEGATE_TEST_INPUT="$GEMSHOME/gemsModules/mmservice/mdaas/tests/inputs/run_md.json"
 
 function test() {
     response="$(cat $DELEGATE_TEST_INPUT | $GEMSHOME/bin/delegate)"
     notices="$(echo $response | $GEMSHOME/tests/utilities/json_ripper.py notices)"
-    echo $notices
-    # notices should equal "{}" if there is no error, lets return 0 then
+    # notices should equal "{}" if there is no error, indicating we were able to destructure a valid response, and nothing unusual happened.
     if [ "$notices" == "{}" ]; then
         return 0
     else
@@ -20,28 +19,29 @@ function test() {
     fi
 }
 
-# if ACT_CFG doesn't exist, warn and fail
-if ! [ -f $ACT_CFG ]; then
-    printf "Test FAILED! No instance_json to use!\n%s does not exist\n\tPlease copy %s there." $ACT_CFG $EX_CFG
+# if ACTUAL_CONFIG doesn't exist, warn and fail
+if ! [ -f $ACTUAL_CONFIG ]; then
+    printf "\nThe instance configuration test requires a configuration to be placed in your \$GEMSHOME!\n\n\t'$ACTUAL_CONFIG' does not exist!\n\n" 
+    printf "\tIf you are in a DevEnv, you can use the example configuration:\n\t  \`cp $EXAMPLE_CONFIG $ACTUAL_CONFIG\`\n\n" 
     return 1
 fi
 
 
 # test with the config that exists.
 SUCCESS=test 
-if ! diff $ACT_CFG $EX_CFG > /dev/null 2>&1; then
+if ! diff $ACTUAL_CONFIG $EXAMPLE_CONFIG > /dev/null 2>&1; then
     # If they're different, we need to swap them and test the default config.
-    mv $ACT_CFG $ACT_CFG.bak
-    cp $EX_CFG $ACT_CFG
+    mv $ACTUAL_CONFIG $ACTUAL_CONFIG.bak.test017
+    cp $EXAMPLE_CONFIG $ACTUAL_CONFIG
 
     SUCCESS=$SUCCESS && test
 
     # Swap them back
-    rm $ACT_CFG
-    mv $ACT_CFG.bak $ACT_CFG
+    rm $ACTUAL_CONFIG
+    mv $ACTUAL_CONFIG.bak.test017 $ACTUAL_CONFIG
 fi
 
 if ! $SUCCESS; then
-    printf "Test FAILED! \n"
+    printf "Instance configuration test failed, if you are in a development environment, please try the example configuration!\nIf you are running in production, please check your configuration!\n"
     return 1
 fi
