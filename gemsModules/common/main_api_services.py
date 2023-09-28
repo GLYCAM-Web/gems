@@ -16,6 +16,19 @@ T = TypeVar("T")
 
 
 class GenericServiceRequest(GenericModel, Generic[T]):
+    """ A generic service request.
+
+    To use this class, you must use your Entity's Available_Services Enum in the GenericServiceRequest's generic.
+
+    Typically, Available_Services is defined in gemsModules.<THE_DESIRED_ENTITY>.services.settings.known_available.
+
+    For example, the Common Service Request is defined this way:
+    ```python
+    from gemsModules.common.services.settings.known_available import Available_Services
+
+    Service_Request = GenericServiceRequest[Available_Services]
+    ```
+    """
     class Config:
         title = "Service"
 
@@ -45,8 +58,17 @@ class GenericServiceRequest(GenericModel, Generic[T]):
         return f"{{ {self.typename} : {self.givenName}\n\t{self.myUuid}\n\t{self.inputs=}\n\t{self.options=}\n}}"
 
 
-# For the services container
 class GenericServiceRequests(GenericModel, Generic[T]):
+    """ A generic service request container.
+    
+    To use this class, you must add your Entity's Available_Services Enum in the GenericServiceRequests's generic.
+
+    ```python
+    from gemsModules.common.services.settings.known_available import Available_Services
+
+    Service_Requests = GenericServiceRequests[Available_Services]
+    ```
+    """
     __root__: Dict[str, GenericServiceRequest[T]] = None
 
     def add_service(self, key_string: str, service: GenericServiceRequest[T]):
@@ -111,10 +133,9 @@ class Service_Responses(BaseModel):
         title = "Responses"
 
 
-def generateSchema():
-    import json
+def generateSchema(show: bool = True):
+    schema = Service_Requests.schema_json(indent=2)
+    if show:
+        print(schema)
 
-    print(Service_Requests.schema_json(indent=2))
-
-
-#    print(Service_Responses.schema_json(indent=2))
+    return schema
