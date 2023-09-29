@@ -21,15 +21,17 @@ function test() {
 
 # if ACTUAL_CONFIG doesn't exist, warn and fail
 if ! [ -f $ACTUAL_CONFIG ]; then
-    printf "\nThe instance configuration test requires a configuration to be placed in your \$GEMSHOME!\n\n\t'$ACTUAL_CONFIG' does not exist!\n\n" 
-    printf "\tIf you are in a DevEnv, you can use the example configuration:\n\t  \`cp $EXAMPLE_CONFIG $ACTUAL_CONFIG\`\n\n" 
-    return 1
+    printf "\nThe instance configuration test requires a configuration to be placed in your \$GEMSHOME!\n'$ACTUAL_CONFIG' does not exist!\n\n" 
+    printf "\tThe impending test will automatically generate a default configuration for you.\n\n"
+    # printf "\tIf you are in a DevEnv, you can use the example configuration:\n\t  \`cp $EXAMPLE_CONFIG $ACTUAL_CONFIG\`\n\n" 
+    # return 1
 fi
 
-
-# test with the config that exists.
+# Using RunMD will generate a default configuration if one does not exist.
 SUCCESS=test 
-if ! diff $ACTUAL_CONFIG $EXAMPLE_CONFIG > /dev/null 2>&1; then
+
+
+if [ -f $ACTUAL_CONFIG ] && ! [ diff $ACTUAL_CONFIG $EXAMPLE_CONFIG > /dev/null 2>&1 ]; then
     # If they're different, we need to swap them and test the default config.
     mv $ACTUAL_CONFIG $ACTUAL_CONFIG.bak.test017
     cp $EXAMPLE_CONFIG $ACTUAL_CONFIG
