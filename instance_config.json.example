@@ -28,6 +28,5 @@
       "nodes": "1",
       "tasks-per-node": "4"
     }
-  },
-  "md_cluster_filesystem_path": ""
+  }
 }

@@ -37,24 +37,14 @@ def configure_md_cluster_host_for_swarm(ic: InstanceConfig):
         contexts=["MDaaS-RunMD"],
     )
 
-    # we now need to use this to update the instance_config with the appropriate md host.
-    md_cluster_path = os.getenv("MD_CLUSTER_USERDATA_BASE_PATH")
-    if md_cluster_path == "" or md_cluster_path is None:
-        print(
-            "MD_CLUSTER_USERDATA_BASE_PATH must be set in the environment.\n"
-            "Please set this and re-run this script."
-        )
-
-    ic.set_md_filesystem_path(md_cluster_path)
-
-    ic.save(ic.get_default_path())
-
     # print out the newly added host sub-dict because it will be useful for configuring the MD cluster host.
     print(
         "Added the following MD Cluster host to the instance_config.json:\n"
         f'"{MD_GRPC_HOSTNAME}":\n{json.dumps(ic["hosts"][MD_GRPC_HOSTNAME], indent=2)}\n'
         "(you can use this entry to help initialize the MD cluster host)"
     )
+
+    ic.save(ic.get_default_path())
 
 
 def main():

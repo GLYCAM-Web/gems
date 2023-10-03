@@ -123,16 +123,12 @@ class InstanceConfig(dict):
             contexts = []
 
         if hostname in self["hosts"]:
-            print(f"Updating {hostname=}...")
-            print(f"\tStarted with: {self['hosts'][hostname]}")
             self["hosts"][hostname]["host"] = host
             self["hosts"][hostname]["slurmport"] = slurmport
 
             contexts.extend(self["hosts"][hostname]["contexts"])
             self["hosts"][hostname]["contexts"] = list(set(contexts))
-            print(f"\tProduced: {self['hosts'][hostname]}")
         else:
-            print(f"New host added: {hostname}")
             self["hosts"][hostname] = {
                 "host": host,
                 "slurmport": slurmport,
@@ -217,13 +213,19 @@ class InstanceConfig(dict):
                 return name
         return None
 
+    # TODO: if we make sbatch_arguments a property we could do this more cleanly.
     def get_sbatch_arguments_by_named_host(self, name) -> dict[str, dict]:
         """Returns a dict of possible sbatch arguments per context for a given named host."""
+        if "sbatch_arguments" not in self["hosts"][name]:
+            return {}
+
         return self["hosts"][name]["sbatch_arguments"]
 
     def get_sbatch_arguments_by_hostname(self, hostname) -> dict[str, dict]:
         """Returns a dict of possible sbatch arguments per context for a given host."""
         name = self.get_name_by_hostname(hostname)
+        if name is None or "sbatch_arguments" not in self["hosts"][name]:
+            return {}
         return self["hosts"][name]["sbatch_arguments"]
 
     def get_sbatch_arguments(self, host=None, context=None):
@@ -251,20 +253,5 @@ class InstanceConfig(dict):
         for ctx, args in possible_sbatch_args.items():
             if ctx == context:
                 sb_arg_dict.update(args)
-                return sb_arg_dict
 
-    # md cluster host helpers aka "MDaaS-RunMD" context helpers
-    def get_md_filesystem_path(self) -> str:
-        """Returns the filesystem path for the compute cluster by hostname defined in the instance config's hosts dict."""
-        if "md_cluster_filesystem_path" not in self:
-            # Because if unset, we can default to the filesystem_path.
-            return ""
-
-        return self["md_cluster_filesystem_path"]
-
-    def set_md_filesystem_path(self, path):
-        """Sets the filesystem path for the compute cluster by hostname defined in the instance config's hosts dict.
-
-        You probably want to save the instance config after this.
-        """
-        self["md_cluster_filesystem_path"] = path
+        return sb_arg_dict

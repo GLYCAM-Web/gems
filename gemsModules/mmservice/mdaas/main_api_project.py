@@ -50,9 +50,12 @@ class MdProject(Project):
         ic = InstanceConfig()
 
         fs_path = os.path.join(
-            str(ic.get_md_filesystem_path()),
+            self.filesystem_path,
+            self.service_dir,
+            self.app,
             self.pUUID,
         )
+
         log.debug(f"md_project location: {fs_path}")
 
         self.project_dir: str = fs_path
