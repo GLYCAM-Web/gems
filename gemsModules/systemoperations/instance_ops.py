@@ -50,7 +50,7 @@ class InstanceConfig(dict):
     >>> instance_config = InstanceConfig()
     >>> instance_config.get_available_contexts('gw-grpc-delegator')
 
-
+    TODO: This class is getting monolithic, break out functionality. (e.g. md cluster related)
     """
 
     _instance = None
@@ -75,10 +75,20 @@ class InstanceConfig(dict):
         # update the InstanceConfig dict with the loaded config_dict
         self.update(config_dict)
 
+    @property
+    def is_configured(self) -> bool:
+        """Returns True if the $GEMSHOME/instance_config.json exists and is valid."""
+        return self.get_default_path().exists()
+
+    @classmethod
+    def from_dict(cls, config_dict):
+        return cls(config_dict=config_dict)
+
     @staticmethod
     def load(instance_config_path=None) -> dict:
         if instance_config_path is None:
             instance_config_path = InstanceConfig.get_default_path()
+
         if not instance_config_path.exists():
             if is_GEMS_live_swarm():
                 # We are in a swarm, so we can't copy the example file naively.
@@ -99,18 +109,47 @@ class InstanceConfig(dict):
 
         return instance_config
 
-    @classmethod
-    def from_dict(cls, config_dict):
-        return cls(config_dict=config_dict)
+    def save(self, instance_config_path):
+        with open(instance_config_path, "w") as f:
+            json.dump(self, f, indent=2)
 
+    ### HOSTS METHODS ###
+    def add_host(self, hostname, host, slurmport, contexts=None):
+        """Adds a host to the instance_config.json.
+
+        This is the only way to add a host to the instance_config.json.
+        """
+        if contexts is None:
+            contexts = []
+
+        if hostname in self["hosts"]:
+            print(f"Updating {hostname=}...")
+            print(f"\tStarted with: {self['hosts'][hostname]}")
+            self["hosts"][hostname]["host"] = host
+            self["hosts"][hostname]["slurmport"] = slurmport
+
+            contexts.extend(self["hosts"][hostname]["contexts"])
+            self["hosts"][hostname]["contexts"] = list(set(contexts))
+            print(f"\tProduced: {self['hosts'][hostname]}")
+        else:
+            print(f"New host added: {hostname}")
+            self["hosts"][hostname] = {
+                "host": host,
+                "slurmport": slurmport,
+                "contexts": contexts,
+            }
+
+    ### GETTERS AND SETTERS ###
     @staticmethod
     def get_default_path(example=False) -> Path:
+        """The default path is the active GEMS instance configuration."""
         name = "instance_config.json"
         if example:
             name += ".example"
 
         return Path(os.getenv("GEMSHOME", "")) / name
 
+    # context stuff
     def get_available_contexts(self, instance_hostname=None) -> list:
         """
         Returns a list of available contexts for the active GEMS instance.
@@ -142,6 +181,10 @@ class InstanceConfig(dict):
                         else:
                             possible_hosts.append(host["host"])
         return possible_hosts
+
+    def add_context_to_host(self, hostname, context):
+        """Adds a context to a host."""
+        self["hosts"][hostname]["contexts"].append(context)
 
     # sbatch argument helpers
     def get_default_sbatch_arguments(self, context="Default") -> dict:
@@ -209,3 +252,19 @@ class InstanceConfig(dict):
             if ctx == context:
                 sb_arg_dict.update(args)
                 return sb_arg_dict
+
+    # md cluster host helpers aka "MDaaS-RunMD" context helpers
+    def get_md_filesystem_path(self) -> str:
+        """Returns the filesystem path for the compute cluster by hostname defined in the instance config's hosts dict."""
+        if "md_cluster_filesystem_path" not in self:
+            # Because if unset, we can default to the filesystem_path.
+            return ""
+
+        return self["md_cluster_filesystem_path"]
+
+    def set_md_filesystem_path(self, path):
+        """Sets the filesystem path for the compute cluster by hostname defined in the instance config's hosts dict.
+
+        You probably want to save the instance config after this.
+        """
+        self["md_cluster_filesystem_path"] = path

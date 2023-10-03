@@ -50,7 +50,7 @@ def create_contextual_slurm_submission_script(
 
 
 def seek_correct_host(jsonObjectString, context):
-    """Using gRPC, try to reroute the request to the correct host given a context, ususally the current one."""
+    """Using gRPC, try to reroute the request to the correct host given a context, usually the current one."""
     addresses = InstanceConfig().get_possible_hosts_for_context(
         context, with_slurmport=True
     )

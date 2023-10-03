@@ -15,19 +15,10 @@
         "DevEnv",
         "FreeTier",
         "ShortJob",
-        "Sequence-Build3DStructure",
-        "MDaaS-RunMD"
+        "Sequence-Build3DStructure"
       ],
       "host": "gw-slurm-head",
-      "slurmport": "50052",
-      "sbatch_arguments": {
-        "MDaaS-RunMD": {
-          "partition": "amber",
-          "time": "120",
-          "nodes": "1",
-          "tasks-per-node": "4"
-        }
-      }
+      "slurmport": "50052"
     }
   },
   "default_sbatch_arguments": {
@@ -37,5 +28,6 @@
       "nodes": "1",
       "tasks-per-node": "4"
     }
-  }
+  },
+  "md_cluster_filesystem_path": ""
 }

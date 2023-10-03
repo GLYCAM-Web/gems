@@ -77,7 +77,8 @@ def receive(jsonObjectString):
         ctx,
     )
 
-    # Check if this is the appropriate host to submit the SLURM job to.
+    # Check if this is the appropriate host to submit the SLURM job on.
+    # Note: GEMS hosts cannot currently be daisy-chained.
     if is_GEMS_instance_for_SLURM_submission(requested_ctx=ctx):
         response = slurm_submit(thisSlurmJobInfo)
     else:

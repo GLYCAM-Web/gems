@@ -41,15 +41,11 @@ def make_slurm_submission_script(SlurmJobInfo):
 
 def execute(path, thisSlurmJobInfo):
     try:
-        script = open(path, "w")
+        with open(path, "w") as script:
+            script.write(make_slurm_submission_script(thisSlurmJobInfo.incoming_dict))
+            log.debug("Wrote slurm submission script to: " + path)
     except Exception as error:
         log.error("Cannnot write slurm run script. Aborting")
         log.error("Error type: " + str(type(error)))
         log.error(traceback.format_exc())
         raise error
-        # sys.exit(1)
-
-    incoming_dict = thisSlurmJobInfo.incoming_dict
-
-    script.write(make_slurm_submission_script(incoming_dict))
-    log.debug("Wrote slurm submission script to: " + path)

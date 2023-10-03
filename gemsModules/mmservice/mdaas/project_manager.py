@@ -26,7 +26,6 @@ class mdaas_Project_Manager(Project_Manager):
     def instantiate_response_project(self) -> MdProject:
         self.response_project = self.instantiate_new_project()
 
-        self.response_project.add_temporary_info()
         return self.response_project
 
     @staticmethod
@@ -39,7 +38,16 @@ class mdaas_Project_Manager(Project_Manager):
     # TODO: can probably be generalized and just pass the Project type.
     def fill_response_project_from_incoming_project(self):
         if self.incoming_project is not None:
-            self.response_project = MdProject(**self.incoming_project.dict())
+            # need to combine instead of create new
+            # self.response_project = MdProject(**self.incoming_project.dict())
+            if self.response_project is None:
+                self.response_project = self.instantiate_new_project()
+
+            for key, value in self.incoming_project.dict().items():
+                if key in self.response_project.dict().keys():
+                    self.response_project.dict()[key] = value
+                else:
+                    log.warning("Key %s not in response project", key)
 
     def fill_response_project_from_response_entity(self):
         # Lets try updating from run_md inputs for now...
@@ -61,11 +69,6 @@ class mdaas_Project_Manager(Project_Manager):
 
                 self.response_project.parm7_file_name = str(parm_path.name)
                 self.response_project.rst7_file_name = str(rst_path.name)
-
-                # See MDProject for default.
-                # self.response_project.protocolFilesPath = service.inputs["protocol-files-path"]["payload"]
-
-        pass
 
 
 def testme() -> MdProject:

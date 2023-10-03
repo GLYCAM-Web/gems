@@ -45,7 +45,7 @@ class PDBFile_Project(Project):
             self.project_type,
             self.pUUID,
         )
-        self.compute_cluster_filesystem_path: str = self.project_dir
+        # self.compute_cluster_filesystem_path: str = self.project_dir
         self.logs_dir: str = os.path.join(self.project_dir, "logs")
         self.site_mode: str = "proof-of-concept"
         self.versions_file_path: str = os.path.join(self.project_dir, "VERSIONS.sh")

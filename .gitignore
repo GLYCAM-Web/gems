@@ -23,8 +23,9 @@ site
 *git-ignore-me*
 Doxygen/html
 Doxygen/docs_build.log
-
 testing*
 queryLog.txt
 
+# instance config stuffs
 instance_config.json
+*.json.*.bak
