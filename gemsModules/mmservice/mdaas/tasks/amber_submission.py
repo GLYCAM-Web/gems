@@ -9,6 +9,7 @@ log = Set_Up_Logging(__name__)
 
 
 def make_input(pUUID: str, outputDirPath: str, control_script: str):
+    outputDirPath = os.path.join(outputDirPath, pUUID)
     simulationControlScriptPath = os.path.join(outputDirPath, control_script)
 
     amberSubmissionJson = json.dumps(

@@ -8,75 +8,95 @@ from gemsModules.systemoperations.instance_ops import InstanceConfig
 
 
 def argparser():
+    """
+    ```bash
+    $ python3 "${GEMSHOME}/bin/setup-instance.py" --add-host "${MD_GRPC_HOSTNAME};[MDaaS-RunMD];${MD_GRPC_HOST}:${MD_GRPC_PORT}"
+    $ python3 "${GEMSHOME}/bin/setup-instance.py" --set-sbatch-arguments "${MD_GRPC_HOSTNAME};MDaaS-RunMD;${SBATCH_ARGS}"
+    $ python3 "${GEMSHOME}/bin/setup-instance.py" --set-md-cluster-filesystem-path $MD_CLUSTER_FILESYSTEM_PATH
+    $ python3 "${GEMSHOME}/bin/setup-instance.py" --gen_md_cluster_host_config
+    ```
+    """
     parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--add-host",
+        type=str,
+        help="Add a host to the instance_config.json. Format: 'hostname,contexts,host:port'",
+    )
 
-    return parser.parse_args()
+    parser.add_argument(
+        "--set-sbatch-arguments",
+        type=str,
+        help="Set the sbatch_arguments for a host in the instance_config.json. Format: 'hostname,context,sbatch_arguments'",
+    )
+
+    parser.add_argument(
+        "--gen-remote-md-cluster-config",
+        type=str,
+        help="Generate a partial remote MD cluster config file for the MD cluster host with the given filesystem path.",
+    )
+
+    parser.add_argument(
+        "--set-md-cluster-filesystem-path",
+        type=str,
+        help="Sets the md_cluster_filesystem_path for the MD cluster host.",
+    )
+
+    return parser
 
 
-# TODO: Lift all config details out of GEMS side.
-# TODO: basically, need to make setup-instance.py a cli configurator frontend to InstanceConfig -
-# a script to use from GRPC/bin/initialize.sh to set everything.
-def configure_md_cluster_host_for_swarm(ic: InstanceConfig):
-    """For RunMD to function appropriately, you need to configure your MD host, port and datapath."""
+def configure_instance_config_md(ic, args):
+    print("\nAbout to configure this GEMS instance...")
+    SAVE = False
+    if args.set_md_cluster_filesystem_path is not None:
+        ic.set_md_filesystem_path(args.set_md_cluster_filesystem_path)
+        SAVE = True
 
-    # Set the MD Cluster host and port to configure the instance_config.json with.
-    MD_GRPC_HOST, MD_GRPC_PORT = os.getenv("MD_GRPC_HOST"), os.getenv("MD_GRPC_PORT")
-    MD_GRPC_HOSTNAME = os.getenv("MD_GRPC_HOSTNAME")
-    if MD_GRPC_HOST is None or MD_GRPC_PORT is None or MD_GRPC_HOSTNAME is None:
+    if args.add_host is not None:
+        hostname, contexts, hostport = args.add_host.split(";")
+        host, port = hostport.split(":")
+        contexts = contexts.strip("[]").split(",")
         print(
-            "MD_GRPC_HOST, MD_GRPC_PORT, and MD_GRPC_HOSTNAME must be set in the environment.\n"
-            "Please check GRPC/settings.sh for these settings and re-run this script. See env.json for debugging info.\n"
-            f"Got: {MD_GRPC_HOST=}, {MD_GRPC_PORT=}, {MD_GRPC_HOSTNAME=}"
+            f"Adding host: {hostname} with contexts: {contexts} and host: {host}:{port}"
         )
-        # dump env
-        with open("env.json", "w") as f:
-            json.dump(dict(os.environ), f)
-        exit(1)
+        ic.add_host(hostname, host, port, contexts)
+        SAVE = True
 
-    # Add the MD Cluster host to the instance_config.json.
-    # TODO: need to pass the contexts and sbatch_arguments from GRPC/bin/initialize.sh
-    # - partition needs to be "amber" in DevEnv, "defq" in production.
-    # - gres also needs to be set to "gpu:1" in production. and no key in DevEnv.
-    ic.add_host(
-        MD_GRPC_HOSTNAME,
-        host=MD_GRPC_HOST,
-        slurmport=MD_GRPC_PORT,
-        contexts=["MDaaS-RunMD"],
-        sbatch_arguments={
-            "MDaaS-RunMD": {
-                "partition": "defq",  # amber in devenv
-                "time": "120",
-                "nodes": "1",
-                "gres": "gpu:1",  # Not in devenv
-                "tasks-per-node": "4",
-            }
-        },
-    )
+    if args.set_sbatch_arguments is not None:
+        (
+            sbatch_hostname,
+            sbatch_context,
+            sbatch_arguments,
+        ) = args.set_sbatch_arguments.split(";")
+        sbatch_arguments = json.loads(sbatch_arguments)
+        ic.add_sbatch_arguments_to_host(
+            sbatch_hostname, sbatch_context, sbatch_arguments
+        )
+        SAVE = True
 
-    # Set the MD Cluster filesystem path to configure the instance_config.json with.
-    MD_CLUSTER_FILESYSTEM_PATH = os.getenv("MD_CLUSTER_FILESYSTEM_PATH")
-    ic.set_md_filesystem_path(MD_CLUSTER_FILESYSTEM_PATH)
+    if SAVE:
+        md_cluster_host_config_str = (
+            f'"{hostname}":\n{json.dumps(ic["hosts"][hostname], indent=2)},\n'
+            f'"md_cluster_filesystem_path": "{args.gen_remote_md_cluster_config}"\n\n'
+        )
 
-    md_cluster_host_config_str = (
-        f'"{MD_GRPC_HOSTNAME}":\n{json.dumps(ic["hosts"][MD_GRPC_HOSTNAME], indent=2)},\n'
-        f'"md_cluster_filesystem_path": "/scratch2/thoreau-web/mmservice/md"\n\n'
-    )
+        # print out the newly added host sub-dict because it will be useful for configuring the MD cluster host.
+        print(
+            "Added the following json keys to the instance_config.json:\n\n"
+            + md_cluster_host_config_str
+            + "(you can use this entry to help initialize the MD cluster host, but the\n"
+            "given md_cluster_filesystem_path is only valid for the MD host thoreau.)\n\n"
+            "Simply ignore this notice if you are in a DevEnv as no further configuration is necessary.\n"
+        )
+        with open(
+            os.path.join(GemsPath, "MD_CLUSTER_HOST_PARTIAL_CONFIG-git-ignore-me.json"),
+            "w",
+        ) as f:
+            f.write(md_cluster_host_config_str)
+            print(
+                "Wrote out $GEMSHOME/MD_CLUSTER_HOST_PARTIAL_CONFIG-git-ignore-me.json"
+            )
 
-    # print out the newly added host sub-dict because it will be useful for configuring the MD cluster host.
-    print(
-        "Simply ignore this if you are in a DevEnv as no further configuration is necessary.\n"
-        "Added the following json keys to the MD Cluster host's instance_config.json:\n\n"
-        + md_cluster_host_config_str
-        + "(you can use this entry to help initialize the MD cluster host, but the\n"
-        "given md_cluster_filesystem_path is only valid for the MD host thoreau.)\n"
-    )
-    with open(
-        os.path.join(GemsPath, "MD_CLUSTER_HOST_PARTIAL_CONFIG-git-ignore-me.json"), "w"
-    ) as f:
-        f.write(md_cluster_host_config_str)
-        print("Wrote out $GEMSHOME/MD_CLUSTER_HOST_PARTIAL_CONFIG-git-ignore-me.json")
-
-    ic.save(ic.get_default_path())
+        ic.save(ic.get_default_path())
 
 
 def main():
@@ -85,8 +105,9 @@ def main():
     Can be used by a DevEnv or manual GEMS setup.
     """
     ic = InstanceConfig()
+    args = argparser().parse_args()
 
-    # Don't reconfigure unless forced.
+    # Don't reconfigure unless forced, back up if forced.
     if ic.is_configured and os.getenv("GEMS_FORCE_INSTANCE_RECONFIGURATION") == "True":
         print("Backing up current instance_config.json...")
         shutil.move(
@@ -97,6 +118,7 @@ def main():
         )
         # ic.is_configured should now return False
 
+    # Configure the instance_config.json if it is not already configured.
     if (
         not ic.is_configured
         or os.getenv("GEMS_FORCE_INSTANCE_RECONFIGURATION") == "True"
@@ -107,8 +129,7 @@ def main():
             ic.get_default_path(),
         )
 
-        print("About to configure this GEMS instance...")
-        configure_md_cluster_host_for_swarm(ic)
+        configure_instance_config_md(ic, args)
 
 
 if __name__ == "__main__":

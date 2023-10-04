@@ -143,6 +143,11 @@ class InstanceConfig(dict):
 
     def add_sbatch_arguments_to_host(self, hostname, context, sbatch_arguments):
         """Adds sbatch arguments to a host for a given context."""
+        if hostname not in self["hosts"]:
+            raise InstanceConfigError(
+                f"Hostname {hostname} not found in instance_config.json."
+            )
+
         if "sbatch_arguments" not in self["hosts"][hostname]:
             self["hosts"][hostname]["sbatch_arguments"] = {}
 
