@@ -37,11 +37,17 @@ def configure_md_cluster_host_for_swarm(ic: InstanceConfig):
         contexts=["MDaaS-RunMD"],
     )
 
+    MD_CLUSTER_FILESYSTEM_PATH = os.getenv("MD_CLUSTER_FILESYSTEM_PATH")
+    ic.set_md_filesystem_path(MD_CLUSTER_FILESYSTEM_PATH)
+
     # print out the newly added host sub-dict because it will be useful for configuring the MD cluster host.
     print(
-        "Added the following MD Cluster host to the instance_config.json:\n"
-        f'"{MD_GRPC_HOSTNAME}":\n{json.dumps(ic["hosts"][MD_GRPC_HOSTNAME], indent=2)}\n'
-        "(you can use this entry to help initialize the MD cluster host)"
+        "Simply ignore this if you are in a DevEnv as no further configuration is necessary.\n"
+        "Added the following json keys to the MD Cluster host's instance_config.json:\n\n"
+        f'"{MD_GRPC_HOSTNAME}":\n{json.dumps(ic["hosts"][MD_GRPC_HOSTNAME], indent=2)},\n'
+        f'"md_cluster_filesystem_path": "/thoreau/scratch2/thoreau-web/mmservice/md"\n\n'
+        "(you can use this entry to help initialize the MD cluster host, but the\n"
+        "given md_cluster_filesystem_path is only valid for the MD host thoreau.)\n"
     )
 
     ic.save(ic.get_default_path())

@@ -43,22 +43,11 @@ class MdProject(Project):
     protocolFilesPath: str = "/programs/gems/External/MD_Utils/protocols/RoeProtocol"
 
     def add_temporary_info(self):
-        # This is assuming an MDaaS-RunMD Context, in swarm needs to be:
-        # self.compute_cluster_filesystem_path = None or "/cluster/thoreau/scratch2/thoreau-web"
-        # and the metal thoreau config should be:
-        # self.compute_cluster_filesystem_path = "/scratch2/thoreau-web"
         ic = InstanceConfig()
 
-        fs_path = os.path.join(
-            self.filesystem_path,
-            self.service_dir,
-            self.app,
-            self.pUUID,
-        )
+        self.project_dir: str = os.path.join(ic.get_md_filesystem_path(), self.pUUID)
+        log.debug(f"MdProject location: {self.project_dir}")
 
-        log.debug(f"md_project location: {fs_path}")
-
-        self.project_dir: str = fs_path
         self.logs_dir: str = os.path.join(self.project_dir, "logs")
         self.site_mode: str = "proof-of-concept"
         self.versions_file_path: str = os.path.join(self.project_dir, "VERSIONS.sh")

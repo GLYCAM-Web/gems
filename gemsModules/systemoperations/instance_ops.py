@@ -255,3 +255,23 @@ class InstanceConfig(dict):
                 sb_arg_dict.update(args)
 
         return sb_arg_dict
+
+    # md cluster host helpers aka "MDaaS-RunMD" context helpers
+    def get_md_filesystem_path(self) -> str:
+        """Returns the filesystem path for the compute cluster by hostname defined in the instance config's hosts dict."""
+        if (
+            "md_cluster_filesystem_path" not in self
+            or len(self["md_cluster_filesystem_path"]) == 0
+        ):
+            log.error(
+                "Access attempted but MD Cluster filesystem path not set in instance_config.json."
+            )
+
+        return self["md_cluster_filesystem_path"]
+
+    def set_md_filesystem_path(self, path):
+        """Sets the filesystem path for the compute cluster by hostname defined in the instance config's hosts dict.
+
+        You probably want to save the instance config after this.
+        """
+        self["md_cluster_filesystem_path"] = path
