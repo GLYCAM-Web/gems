@@ -13,6 +13,9 @@ def argparser():
     return parser.parse_args()
 
 
+# TODO: Lift all config details out of GEMS side.
+# TODO: basically, need to make setup-instance.py a cli configurator frontend to InstanceConfig -
+# a script to use from GRPC/bin/initialize.sh to set everything.
 def configure_md_cluster_host_for_swarm(ic: InstanceConfig):
     """For RunMD to function appropriately, you need to configure your MD host, port and datapath."""
 
@@ -31,6 +34,8 @@ def configure_md_cluster_host_for_swarm(ic: InstanceConfig):
         exit(1)
 
     # Add the MD Cluster host to the instance_config.json.
+    # TODO: need to pass the contexts and sbatch_arguments from GRPC/bin/initialize.sh
+    # - partition needs to be "amber" in DevEnv, "defq" in production.
     ic.add_host(
         MD_GRPC_HOSTNAME,
         host=MD_GRPC_HOST,
@@ -38,9 +43,10 @@ def configure_md_cluster_host_for_swarm(ic: InstanceConfig):
         contexts=["MDaaS-RunMD"],
         sbatch_arguments={
             "MDaaS-RunMD": {
-                "partition": "amber",
+                "partition": "defq",
                 "time": "120",
                 "nodes": "1",
+                "gres": "gpu:1",
                 "tasks-per-node": "4",
             }
         },

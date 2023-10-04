@@ -13,8 +13,9 @@ import gems_grpc_slurm_pb2_grpc
 
 from gemsModules.logging.logger import Set_Up_Logging
 
-log = Set_Up_Logging(__name__)
-
+# in production this is causing problems. TODO: separate logging files per server.
+# log = Set_Up_Logging(__name__)
+log = logging.getLogger(__name__)
 
 brief_to_code = {
     "GemsHomeNotSet": 1,
@@ -197,7 +198,7 @@ def serve():
 
 
 if __name__ == "__main__":
-    # logging.basicConfig()
+    logging.basicConfig(level=logging.DEBUG)
     try:
         print("About to call serve.")
         serve()

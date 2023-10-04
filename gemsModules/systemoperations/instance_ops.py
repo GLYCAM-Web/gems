@@ -133,6 +133,9 @@ class InstanceConfig(dict):
 
     def add_contexts_to_host(self, hostname, contexts):
         """Adds contexts to a host."""
+        if "contexts" not in self["hosts"][hostname]:
+            self["hosts"][hostname]["contexts"] = []
+
         self["hosts"][hostname]["contexts"].extend(contexts)
         self["hosts"][hostname]["contexts"] = list(
             set(self["hosts"][hostname]["contexts"])
