@@ -30,25 +30,44 @@ def configure_md_cluster_host_for_swarm(ic: InstanceConfig):
             json.dump(dict(os.environ), f)
         exit(1)
 
+    # Add the MD Cluster host to the instance_config.json.
     ic.add_host(
         MD_GRPC_HOSTNAME,
         host=MD_GRPC_HOST,
         slurmport=MD_GRPC_PORT,
         contexts=["MDaaS-RunMD"],
+        sbatch_arguments={
+            "MDaaS-RunMD": {
+                "partition": "amber",
+                "time": "120",
+                "nodes": "1",
+                "tasks-per-node": "4",
+            }
+        },
     )
 
+    # Set the MD Cluster filesystem path to configure the instance_config.json with.
     MD_CLUSTER_FILESYSTEM_PATH = os.getenv("MD_CLUSTER_FILESYSTEM_PATH")
     ic.set_md_filesystem_path(MD_CLUSTER_FILESYSTEM_PATH)
+
+    md_cluster_host_config_str = (
+        f'"{MD_GRPC_HOSTNAME}":\n{json.dumps(ic["hosts"][MD_GRPC_HOSTNAME], indent=2)},\n'
+        f'"md_cluster_filesystem_path": "/scratch2/thoreau-web/mmservice/md"\n\n'
+    )
 
     # print out the newly added host sub-dict because it will be useful for configuring the MD cluster host.
     print(
         "Simply ignore this if you are in a DevEnv as no further configuration is necessary.\n"
         "Added the following json keys to the MD Cluster host's instance_config.json:\n\n"
-        f'"{MD_GRPC_HOSTNAME}":\n{json.dumps(ic["hosts"][MD_GRPC_HOSTNAME], indent=2)},\n'
-        f'"md_cluster_filesystem_path": "/thoreau/scratch2/thoreau-web/mmservice/md"\n\n'
-        "(you can use this entry to help initialize the MD cluster host, but the\n"
+        + md_cluster_host_config_str
+        + "(you can use this entry to help initialize the MD cluster host, but the\n"
         "given md_cluster_filesystem_path is only valid for the MD host thoreau.)\n"
     )
+    with open(
+        os.path.join(GemsPath, "MD_CLUSTER_HOST_PARTIAL_CONFIG-git-ignore-me.json"), "w"
+    ) as f:
+        f.write(md_cluster_host_config_str)
+        print("Wrote out $GEMSHOME/MD_CLUSTER_HOST_PARTIAL_CONFIG-git-ignore-me.json")
 
     ic.save(ic.get_default_path())
 

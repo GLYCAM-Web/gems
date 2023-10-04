@@ -114,26 +114,38 @@ class InstanceConfig(dict):
             json.dump(self, f, indent=2)
 
     ### HOSTS METHODS ###
-    def add_host(self, hostname, host, slurmport, contexts=None):
+    def add_host(self, hostname, host, slurmport, contexts=None, sbatch_arguments=None):
         """Adds a host to the instance_config.json.
 
         This is the only way to add a host to the instance_config.json.
         """
-        if contexts is None:
-            contexts = []
+        self["hosts"][hostname] = {
+            "host": host,
+            "slurmport": slurmport,
+        }
 
-        if hostname in self["hosts"]:
-            self["hosts"][hostname]["host"] = host
-            self["hosts"][hostname]["slurmport"] = slurmport
+        if isinstance(sbatch_arguments, dict):
+            for ctx, args in sbatch_arguments.items():
+                self.add_sbatch_arguments_to_host(hostname, ctx, args)
 
-            contexts.extend(self["hosts"][hostname]["contexts"])
-            self["hosts"][hostname]["contexts"] = list(set(contexts))
-        else:
-            self["hosts"][hostname] = {
-                "host": host,
-                "slurmport": slurmport,
-                "contexts": contexts,
-            }
+        if isinstance(contexts, list):
+            self.add_contexts_to_host(hostname, contexts)
+
+    def add_contexts_to_host(self, hostname, contexts):
+        """Adds contexts to a host."""
+        self["hosts"][hostname]["contexts"].extend(contexts)
+        self["hosts"][hostname]["contexts"] = list(
+            set(self["hosts"][hostname]["contexts"])
+        )
+
+    def add_sbatch_arguments_to_host(self, hostname, context, sbatch_arguments):
+        """Adds sbatch arguments to a host for a given context."""
+        if "sbatch_arguments" not in self["hosts"][hostname]:
+            self["hosts"][hostname]["sbatch_arguments"] = {}
+
+        if context not in self["hosts"][hostname]["sbatch_arguments"]:
+            self["hosts"][hostname]["sbatch_arguments"][context] = {}
+        self["hosts"][hostname]["sbatch_arguments"][context].update(sbatch_arguments)
 
     ### GETTERS AND SETTERS ###
     @staticmethod
@@ -177,10 +189,6 @@ class InstanceConfig(dict):
                         else:
                             possible_hosts.append(host["host"])
         return possible_hosts
-
-    def add_context_to_host(self, hostname, context):
-        """Adds a context to a host."""
-        self["hosts"][hostname]["contexts"].append(context)
 
     # sbatch argument helpers
     def get_default_sbatch_arguments(self, context="Default") -> dict:
