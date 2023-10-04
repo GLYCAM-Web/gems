@@ -44,8 +44,10 @@ def argparser():
     return parser
 
 
-def configure_instance_config_md(ic, args):
+def configure_instance_config_md(args):
     print("\nAbout to configure this GEMS instance...")
+    ic = InstanceConfig()
+
     SAVE = False
     if args.set_md_cluster_filesystem_path is not None:
         ic.set_md_filesystem_path(args.set_md_cluster_filesystem_path)
@@ -73,7 +75,7 @@ def configure_instance_config_md(ic, args):
         )
         SAVE = True
 
-    if SAVE:
+    if args.gen_remote_md_cluster_config is not None:
         md_cluster_host_config_str = (
             f'"{hostname}":\n{json.dumps(ic["hosts"][hostname], indent=2)},\n'
             f'"md_cluster_filesystem_path": "{args.gen_remote_md_cluster_config}"\n\n'
@@ -96,6 +98,7 @@ def configure_instance_config_md(ic, args):
                 "Wrote out $GEMSHOME/MD_CLUSTER_HOST_PARTIAL_CONFIG-git-ignore-me.json"
             )
 
+    if SAVE:
         ic.save(ic.get_default_path())
 
 
@@ -104,15 +107,17 @@ def main():
 
     Can be used by a DevEnv or manual GEMS setup.
     """
-    ic = InstanceConfig()
     args = argparser().parse_args()
 
     # Don't reconfigure unless forced, back up if forced.
-    if ic.is_configured and os.getenv("GEMS_FORCE_INSTANCE_RECONFIGURATION") == "True":
+    if (
+        InstanceConfig.is_configured()
+        and os.getenv("GEMS_FORCE_INSTANCE_RECONFIGURATION") == "True"
+    ):
         print("Backing up current instance_config.json...")
         shutil.move(
-            ic.get_default_path(),
-            ic.get_default_path().with_name(
+            InstanceConfig.get_default_path(),
+            InstanceConfig.get_default_path().with_name(
                 f"instance_config.json.{datetime.datetime.now()}.bak"
             ),
         )
@@ -120,16 +125,16 @@ def main():
 
     # Configure the instance_config.json if it is not already configured.
     if (
-        not ic.is_configured
+        not InstanceConfig.is_configured()
         or os.getenv("GEMS_FORCE_INSTANCE_RECONFIGURATION") == "True"
     ):
         print("Copying instance_config.json.example into place...")
         shutil.copyfile(
-            ic.get_default_path(example=True),
-            ic.get_default_path(),
+            InstanceConfig.get_default_path(example=True),
+            InstanceConfig.get_default_path(),
         )
 
-        configure_instance_config_md(ic, args)
+        configure_instance_config_md(args)
 
 
 if __name__ == "__main__":

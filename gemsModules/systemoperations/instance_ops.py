@@ -75,10 +75,10 @@ class InstanceConfig(dict):
         # update the InstanceConfig dict with the loaded config_dict
         self.update(config_dict)
 
-    @property
-    def is_configured(self) -> bool:
+    @staticmethod
+    def is_configured() -> bool:
         """Returns True if the $GEMSHOME/instance_config.json exists and is valid."""
-        return self.get_default_path().exists()
+        return InstanceConfig.get_default_path().exists()
 
     @classmethod
     def from_dict(cls, config_dict):
@@ -88,21 +88,6 @@ class InstanceConfig(dict):
     def load(instance_config_path=None) -> dict:
         if instance_config_path is None:
             instance_config_path = InstanceConfig.get_default_path()
-
-        if not instance_config_path.exists():
-            if is_GEMS_live_swarm():
-                # We are in a swarm, so we can't copy the example file naively.
-                raise InstanceConfigNotFoundError
-            else:
-                # It's a DevEnv, so the example file is suitable.
-                shutil.copyfile(
-                    InstanceConfig.get_default_path(example=True),
-                    InstanceConfig.get_default_path(),
-                )
-                log.warning(
-                    "The instance_config.json file was not found. "
-                    "An example file has been copied to the default path."
-                )
 
         with open(instance_config_path, "r") as f:
             instance_config = json.load(f)
