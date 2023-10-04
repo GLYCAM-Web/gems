@@ -36,6 +36,7 @@ def configure_md_cluster_host_for_swarm(ic: InstanceConfig):
     # Add the MD Cluster host to the instance_config.json.
     # TODO: need to pass the contexts and sbatch_arguments from GRPC/bin/initialize.sh
     # - partition needs to be "amber" in DevEnv, "defq" in production.
+    # - gres also needs to be set to "gpu:1" in production. and no key in DevEnv.
     ic.add_host(
         MD_GRPC_HOSTNAME,
         host=MD_GRPC_HOST,
@@ -43,10 +44,10 @@ def configure_md_cluster_host_for_swarm(ic: InstanceConfig):
         contexts=["MDaaS-RunMD"],
         sbatch_arguments={
             "MDaaS-RunMD": {
-                "partition": "defq",
+                "partition": "defq",  # amber in devenv
                 "time": "120",
                 "nodes": "1",
-                "gres": "gpu:1",
+                "gres": "gpu:1",  # Not in devenv
                 "tasks-per-node": "4",
             }
         },
@@ -83,12 +84,10 @@ def main():
 
     Can be used by a DevEnv or manual GEMS setup.
     """
-    print("About to configure this GEMS instance...")
-    # args = argparser()
     ic = InstanceConfig()
 
     # Don't reconfigure unless forced.
-    if ic.is_configured or os.getenv("GEMS_FORCE_INSTANCE_RECONFIGURATION") == "True":
+    if ic.is_configured and os.getenv("GEMS_FORCE_INSTANCE_RECONFIGURATION") == "True":
         print("Backing up current instance_config.json...")
         shutil.move(
             ic.get_default_path(),
@@ -98,13 +97,17 @@ def main():
         )
         # ic.is_configured should now return False
 
-    if not ic.is_configured:
+    if (
+        not ic.is_configured
+        or os.getenv("GEMS_FORCE_INSTANCE_RECONFIGURATION") == "True"
+    ):
         print("Copying instance_config.json.example into place...")
         shutil.copyfile(
             ic.get_default_path(example=True),
             ic.get_default_path(),
         )
 
+        print("About to configure this GEMS instance...")
         configure_md_cluster_host_for_swarm(ic)
 
 
