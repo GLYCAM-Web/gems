@@ -10,39 +10,47 @@ log = Set_Up_Logging(__name__)
 
 
 # This might be generalized, but for now it expects to only be triggered by MDaaS as a task of mdaas.
-def make_slurm_submission_script(SlurmJobInfo):
+def make_slurm_submission_script(SlurmJobDict):
+    log.debug("SlurmJobDict: " + str(SlurmJobDict))
     script = (
         "#!/bin/bash\n"
-        f"#SBATCH --chdir={SlurmJobInfo['workingDirectory']}\n"
+        f"#SBATCH --chdir={SlurmJobDict['workingDirectory']}\n"
         f"#SBATCH --error=slurm_%x-%A.err\n"
         f"#SBATCH --get-user-env\n"
-        f"#SBATCH --job-name={SlurmJobInfo['name']}\n"
-        f"#SBATCH --nodes={SlurmJobInfo['nodes']}\n"
+        f"#SBATCH --job-name={SlurmJobDict['name']}\n"
+        f"#SBATCH --nodes={SlurmJobDict['nodes']}\n"
         f"#SBATCH --output=slurm_%x-%A.out\n"
-        f"#SBATCH --partition={SlurmJobInfo['partition']}\n"
-        f"#SBATCH --tasks-per-node={SlurmJobInfo['tasks-per-node']}\n\n"
+        f"#SBATCH --partition={SlurmJobDict['partition']}\n"
+        f"#SBATCH --tasks-per-node={SlurmJobDict['tasks-per-node']}\n\n"
     )
 
-    if SlurmJobInfo["gres"] is not None:
-        script += f"#SBATCH --gres={SlurmJobInfo['gres']}\n"
+    if SlurmJobDict["gres"] is not None:
+        script += f"#SBATCH --gres={SlurmJobDict['gres']}\n"
 
     if is_GEMS_test_workflow():
         log.debug("setting testing workflow to yes")
         script += "export MDUtilsTestRunWorkflow=Yes\n\n"
     else:
         log.debug("NOT setting testing workflow to yes")
-    log.debug("The sbatchArgument is : " + SlurmJobInfo["sbatchArgument"])
+    log.debug("The sbatchArgument is : " + SlurmJobDict["sbatchArgument"])
 
     # This argument is set to the script we want slurm to execute.
-    script += f"{SlurmJobInfo['sbatchArgument']}\n"
+    script += (
+        os.path.join(
+            SlurmJobDict["workingDirectory"],
+            SlurmJobDict["sbatchArgument"],
+        )
+        + "\n"
+    )
 
     return script
 
 
-def execute(path, thisSlurmJobInfo):
+def execute(SlurmJobDict):
+    path = SlurmJobDict["slurm_runscript_name"]
     try:
         with open(path, "w") as script:
-            script.write(make_slurm_submission_script(thisSlurmJobInfo.incoming_dict))
+            script.write(make_slurm_submission_script(SlurmJobDict))
             log.debug("Wrote slurm submission script to: " + path)
     except Exception as error:
         log.error("Cannnot write slurm run script. Aborting")

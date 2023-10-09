@@ -52,47 +52,26 @@ def receive(jsonObjectString):
     thisSlurmJobInfo = SlurmJobInfo(jsonObjectString)
     thisSlurmJobInfo.parseIncomingString()
 
-    # Get context from SlurmJobInfo, this could be overwritten based on instance config settings.
-    ctx = thisSlurmJobInfo.incoming_dict["context"]
-
     log.debug(
         "Checking if this instance is configured to run SLURM. %s %s %s",
         socket.gethostname(),
         jsonObjectString,
-        ctx,
+        thisSlurmJobInfo.incoming_dict["context"],
     )
 
     # Check if this is the appropriate host to submit the SLURM job on.
     # Note: GEMS hosts cannot currently be daisy-chained.
-    if is_GEMS_instance_for_SLURM_submission(requested_ctx=ctx):
-        thisSlurmJobInfo.incoming_dict["slurm_runscript_name"] = "slurm_submit.sh"
-        thisSlurmJobInfo.incoming_dict["workingDirectory"] = os.path.join(
-            InstanceConfig().get_md_filesystem_path(),
-            thisSlurmJobInfo.incoming_dict["pUUID"],
-        )
-        # instead of passing working directory, pass pUUID only and get base mdcluster path # also this will need to have specialized function for contexts in the future. (md cluster path is only for MDaaS-RunMD)
-        slurm_runscript_path = os.path.join(
-            thisSlurmJobInfo.incoming_dict["workingDirectory"],
-            thisSlurmJobInfo.incoming_dict["slurm_runscript_name"],
-        )
-
-        # In the future, We could possibly move this down to after we know if this is the correct host to submit on.
-        log.debug("Slurm runscript path: " + slurm_runscript_path + "\n")
-        if os.path.exists(slurm_runscript_path):
-            log.debug("Found existing Slurm runscript.  Refusing to clobber.")
-        else:
-            log.debug("Will generate a new Slurm runscript.")
-
-            log.debug("About to create runscript")
-            create_contextual_slurm_submission_script(
-                ctx, slurm_runscript_path, thisSlurmJobInfo
-            )
+    if is_GEMS_instance_for_SLURM_submission(
+        requested_ctx=thisSlurmJobInfo.incoming_dict["context"]
+    ):
+        create_contextual_slurm_submission_script(thisSlurmJobInfo)
 
         response = slurm_submit(thisSlurmJobInfo)
     else:
         # Otherwise, we need to seek the correct host to submit to.
         p = Process(
-            target=seek_correct_host, args=(jsonObjectString, ctx)
+            target=seek_correct_host,
+            args=(jsonObjectString, thisSlurmJobInfo.incoming_dict["context"]),
         )  #  , daemon=True)
         p.start()
 
