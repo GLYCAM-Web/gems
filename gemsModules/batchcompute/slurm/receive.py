@@ -68,7 +68,7 @@ def receive(jsonObjectString):
         thisSlurmJobInfo.incoming_dict["slurm_runscript_name"] = "slurm_submit.sh"
         thisSlurmJobInfo.incoming_dict["workingDirectory"] = os.path.join(
             InstanceConfig().get_md_filesystem_path(),
-            thisSlurmJobInfo.incoming_dict["jobID"],
+            thisSlurmJobInfo.incoming_dict["pUUID"],
         )
         # instead of passing working directory, pass pUUID only and get base mdcluster path # also this will need to have specialized function for contexts in the future. (md cluster path is only for MDaaS-RunMD)
         slurm_runscript_path = os.path.join(

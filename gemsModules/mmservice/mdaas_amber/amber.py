@@ -22,6 +22,7 @@ def manageIncomingString(jsonObjectString: str):
     # This is to become the SLURM job info dict used later for slurm submission.
     outgoing_json_str = json.dumps(
         {
+            "pUUID": amber_job.jobID,
             "partition": "amber",  # TODO: Remove - not a valid partition, overwritten by instance config later.
             "user": "webdev",  # TODO: We could remove this as get it on demand.
             "name": amber_job.submissionName,
