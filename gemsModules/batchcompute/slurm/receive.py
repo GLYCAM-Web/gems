@@ -23,7 +23,7 @@ from gemsModules.batchcompute.slurm.tasks.prepare_slurm_submission import (
     seek_correct_host,
     create_contextual_slurm_submission_script,
 )
-
+from gemsModules.systemoperations.instance_ops import InstanceConfig
 
 from gemsModules.networkconnections.grpc import (
     is_GEMS_instance_for_SLURM_submission,
@@ -55,21 +55,6 @@ def receive(jsonObjectString):
     # Get context from SlurmJobInfo, this could be overwritten based on instance config settings.
     ctx = thisSlurmJobInfo.incoming_dict["context"]
 
-    thisSlurmJobInfo.incoming_dict["slurm_runscript_name"] = "slurm_submit.sh"
-    slurm_runscript_path = f"{thisSlurmJobInfo.incoming_dict['workingDirectory']}/{thisSlurmJobInfo.incoming_dict['slurm_runscript_name']}"
-
-    # In the future, We could possibly move this down to after we know if this is the correct host to submit on.
-    log.debug("Slurm runscript path: " + slurm_runscript_path + "\n")
-    if os.path.exists(slurm_runscript_path):
-        log.debug("Found existing Slurm runscript.  Refusing to clobber.")
-    else:
-        log.debug("Will generate a new Slurm runscript.")
-
-        log.debug("About to create runscript")
-        create_contextual_slurm_submission_script(
-            ctx, slurm_runscript_path, thisSlurmJobInfo
-        )
-
     log.debug(
         "Checking if this instance is configured to run SLURM. %s %s %s",
         socket.gethostname(),
@@ -80,6 +65,29 @@ def receive(jsonObjectString):
     # Check if this is the appropriate host to submit the SLURM job on.
     # Note: GEMS hosts cannot currently be daisy-chained.
     if is_GEMS_instance_for_SLURM_submission(requested_ctx=ctx):
+        thisSlurmJobInfo.incoming_dict["slurm_runscript_name"] = "slurm_submit.sh"
+        thisSlurmJobInfo.incoming_dict["workingDirectory"] = os.path.join(
+            InstanceConfig().get_md_filesystem_path(),
+            thisSlurmJobInfo.incoming_dict["jobID"],
+        )
+        # instead of passing working directory, pass pUUID only and get base mdcluster path # also this will need to have specialized function for contexts in the future. (md cluster path is only for MDaaS-RunMD)
+        slurm_runscript_path = os.path.join(
+            thisSlurmJobInfo.incoming_dict["workingDirectory"],
+            thisSlurmJobInfo.incoming_dict["slurm_runscript_name"],
+        )
+
+        # In the future, We could possibly move this down to after we know if this is the correct host to submit on.
+        log.debug("Slurm runscript path: " + slurm_runscript_path + "\n")
+        if os.path.exists(slurm_runscript_path):
+            log.debug("Found existing Slurm runscript.  Refusing to clobber.")
+        else:
+            log.debug("Will generate a new Slurm runscript.")
+
+            log.debug("About to create runscript")
+            create_contextual_slurm_submission_script(
+                ctx, slurm_runscript_path, thisSlurmJobInfo
+            )
+
         response = slurm_submit(thisSlurmJobInfo)
     else:
         # Otherwise, we need to seek the correct host to submit to.
