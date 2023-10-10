@@ -2,6 +2,7 @@
 ##  Use this file to:
 ##    * Submit a job to a Slurm cluster served by gRPC
 import importlib.util, os, sys, getopt
+import json
 
 USAGE = """
 USAGE:
@@ -57,17 +58,19 @@ else:
     from gemsModules.deprecated.common import utils
 jsonObjectString = utils.JSON_From_Command_Line(sys.argv)
 
-# TODO/FIX: Determining if we need old or slurm is non-trivial, temporary hack.
 responseObjectString = None
-try:
-    from gemsModules.deprecated.batchcompute.slurm.receive import manageIncomingString
-
-    responseObjectString = manageIncomingString(jsonObjectString)
-except Exception as error:
-    # Silently attempt new style gemsModule
+# check if context is in the incoming string
+if "context" in json.loads(jsonObjectString):
+    # if it is, it's a new slurm submission
     from gemsModules.batchcompute.slurm.receive import receive
 
     responseObjectString = receive(jsonObjectString)
+else:
+    # otherwise, it's a deprecated slurm submission
+    from gemsModules.deprecated.batchcompute.slurm.receive import manageIncomingString
+
+    responseObjectString = manageIncomingString(jsonObjectString)
+
 
 # finally:
 sys.stdout.write(str(responseObjectString))
