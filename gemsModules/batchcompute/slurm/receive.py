@@ -3,7 +3,7 @@ import pdb
 import sys, os, socket
 import traceback
 import grpc
-
+from datetime import datetime
 from multiprocessing import Process
 
 import gemsModules.deprecated
@@ -32,10 +32,10 @@ from gemsModules.networkconnections.grpc import (
 
 from gemsModules.systemoperations.instance_ops import InstanceConfig
 from gemsModules.systemoperations.environment_ops import is_GEMS_test_workflow
-from gemsModules.logging.logger import Set_Up_Logging
+from gemsModules.logging.logger import new_concurrent_logger
 
 
-log = Set_Up_Logging(__name__)
+log = new_concurrent_logger(__name__)
 
 
 def receive(jsonObjectString):
@@ -57,7 +57,7 @@ def receive(jsonObjectString):
         "Checking if this instance is configured to run SLURM. %s %s %s",
         socket.gethostname(),
         jsonObjectString,
-        thisSlurmJobInfo.incoming_dict["context"],
+        thisSlurmJobInfo.incoming_dict,
     )
 
     # Only works in dev mode, not in production, because same md cluster path is used (and mounted to volumes in the same places).
@@ -74,11 +74,12 @@ def receive(jsonObjectString):
 
         response = slurm_submit(thisSlurmJobInfo)
     else:
+        log.debug("This is not the correct host to submit to.")
         # Otherwise, we need to seek the correct host to submit to.
         p = Process(
             target=seek_correct_host,
             args=(jsonObjectString, thisSlurmJobInfo.incoming_dict["context"]),
-            daemon=True,
+            # daemon=True,
         )
         p.start()
         # seek_correct_host(jsonObjectString, thisSlurmJobInfo.incoming_dict["context"])

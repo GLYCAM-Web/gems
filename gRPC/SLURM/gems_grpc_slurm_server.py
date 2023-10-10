@@ -1,6 +1,8 @@
 """The Python implementation of the GemsGrpcSlurmReceiver server."""
 
 from concurrent import futures
+from datetime import datetime
+import socket
 import time
 import logging  ## this might not be necessary - maybe used by gRPC?
 
@@ -11,11 +13,14 @@ from subprocess import *
 import gems_grpc_slurm_pb2
 import gems_grpc_slurm_pb2_grpc
 
-from gemsModules.logging.logger import Set_Up_Logging
+from gemsModules.logging.logger import new_concurrent_logger
 
 # in production this is causing problems. TODO: separate logging files per server.
 # log = Set_Up_Logging(__name__)
-log = logging.getLogger(__name__)
+# because this gets called by grpc we need to make sure to open a fresh file handler. for a logger
+
+log = new_concurrent_logger(__name__)
+
 
 brief_to_code = {
     "GemsHomeNotSet": 1,
