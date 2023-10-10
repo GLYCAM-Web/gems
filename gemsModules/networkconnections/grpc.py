@@ -47,11 +47,9 @@ def is_GEMS_instance_for_SLURM_submission(requested_ctx=None, requested_instance
         if requested_ctx in ic.get_available_contexts():
             this_instance_can_run_ctx = True
 
-    this_instance_is_requested = False
-    if requested_instance is not None:
-        # TODO: PREFIX gets in the way of instance configs right now, just ignoring it.
-        if requested_instance == socket.gethostname():
-            this_instance_is_requested = True
+    this_instance_is_requested = True
+    if requested_instance is not None and requested_instance != socket.gethostname():
+        this_instance_is_requested = False
 
     log.debug(f"Is this instance configured to run SLURM? {this_instance_can_run_ctx}")
     log.debug(f"Is this instance requested for SLURM? {this_instance_is_requested}")
