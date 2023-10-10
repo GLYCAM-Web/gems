@@ -15,6 +15,7 @@ def manageIncomingString(jsonObjectString: str):
     log.debug("amber.py input_json_dict is : " + str(input_json_dict))
 
     try:
+        # This is technically when the project directory first gets created.
         amber_job = mdaas_io.amberProject(**input_json_dict)
     except:
         log.warning("Could not get mdaas_amber reception to work correctly.")
@@ -37,6 +38,5 @@ def manageIncomingString(jsonObjectString: str):
     # TODO: This receive isn't quite a proper Entity-module, but eventually, we should be able
     # to decouple this call by delegating a submission to the batchcompute/slurm gemsModule like
     # any other GEMS JSON API Request. For now, amber is calling it directly, but eventually
-    # delegator.redirector settings should have slurm_receive.
-    # We need to use bin/slurmreceive here, basically.
+    # delegator.redirector settings should have slurm_receive. Probably.
     return slurm_receive(outgoing_json_str)

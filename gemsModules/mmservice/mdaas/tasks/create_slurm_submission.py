@@ -46,6 +46,21 @@ def execute(SlurmJobDict):
         with open(path, "w") as script:
             script.write(make_slurm_submission_script(SlurmJobDict))
             log.debug("Wrote slurm submission script to: " + path)
+        # TODO: Fix? Hacked?
+        # Also update Local_Run_Parameters.bash as it was copied by gemsModules/mmservice/amber before we were local.
+        local_param_file = os.path.join(
+            SlurmJobDict["workingDirectory"], "Local_Run_Parameters.bash"
+        )
+        if SlurmJobDict["gres"] is not None:
+            # the job is meant for gpu
+            # replace `useMPI='Y'` with `useMPI='N'` and useCUDA='N' with useCUDA='Y'
+            with open(local_param_file, "r") as f:
+                content = f.read()
+                content = content.replace("useMPI='Y'", "useMPI='N'")
+                content = content.replace("useCUDA='N'", "useCUDA='Y'")
+            with open(local_param_file, "w") as f:
+                f.write(content)
+
     except Exception as error:
         log.error("Cannnot write slurm run script. Aborting")
         log.error("Error type: " + str(type(error)))
