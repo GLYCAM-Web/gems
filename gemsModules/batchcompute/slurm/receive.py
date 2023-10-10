@@ -59,13 +59,13 @@ def receive(jsonObjectString):
         thisSlurmJobInfo.incoming_dict["context"],
     )
 
+    create_contextual_slurm_submission_script(thisSlurmJobInfo)
+
     # Check if this is the appropriate host to submit the SLURM job on.
     # Note: GEMS hosts cannot currently be daisy-chained.
     if is_GEMS_instance_for_SLURM_submission(
         requested_ctx=thisSlurmJobInfo.incoming_dict["context"]
     ):
-        create_contextual_slurm_submission_script(thisSlurmJobInfo)
-
         response = slurm_submit(thisSlurmJobInfo)
     else:
         # Otherwise, we need to seek the correct host to submit to.

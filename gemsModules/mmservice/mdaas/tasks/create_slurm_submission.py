@@ -35,13 +35,7 @@ def make_slurm_submission_script(SlurmJobDict):
     log.debug("The sbatchArgument is : " + SlurmJobDict["sbatchArgument"])
 
     # This argument is set to the script we want slurm to execute.
-    script += (
-        os.path.join(
-            SlurmJobDict["workingDirectory"],
-            SlurmJobDict["sbatchArgument"],
-        )
-        + "\n"
-    )
+    script += SlurmJobDict["sbatchArgument"] + "\n"
 
     return script
 

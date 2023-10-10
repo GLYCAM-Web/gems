@@ -33,6 +33,14 @@ def create_contextual_slurm_submission_script(thisSlurmJobInfo):
         SlurmJobDict["slurm_runscript_name"],
     )
 
+    SlurmJobDict["sbatchArgument"] = (
+        os.path.join(
+            SlurmJobDict["workingDirectory"],
+            SlurmJobDict["sbatchArgument"],
+        )
+        + "\n"
+    )
+
     # In the future, We could possibly move this down to after we know if this is the correct host to submit on.
     log.debug("Slurm runscript path: " + SlurmJobDict["slurm_runscript_name"] + "\n")
     if os.path.exists(SlurmJobDict["slurm_runscript_name"]):
