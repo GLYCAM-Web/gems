@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import pdb
 import sys, os, socket
 import traceback
 import grpc
@@ -59,25 +60,34 @@ def receive(jsonObjectString):
         thisSlurmJobInfo.incoming_dict["context"],
     )
 
-    create_contextual_slurm_submission_script(thisSlurmJobInfo)
+    # Only works in dev mode, not in production, because same md cluster path is used (and mounted to volumes in the same places).
+    # create_contextual_slurm_submission_script(thisSlurmJobInfo)
 
     # Check if this is the appropriate host to submit the SLURM job on.
     # Note: GEMS hosts cannot currently be daisy-chained.
     if is_GEMS_instance_for_SLURM_submission(
         requested_ctx=thisSlurmJobInfo.incoming_dict["context"]
     ):
+        # pdb.set_trace()
+        # Necessarily, we must wait until the correct instance:
+        create_contextual_slurm_submission_script(thisSlurmJobInfo)
+
         response = slurm_submit(thisSlurmJobInfo)
     else:
         # Otherwise, we need to seek the correct host to submit to.
         p = Process(
             target=seek_correct_host,
             args=(jsonObjectString, thisSlurmJobInfo.incoming_dict["context"]),
-        )  #  , daemon=True)
+            daemon=True,
+        )
         p.start()
+        # seek_correct_host(jsonObjectString, thisSlurmJobInfo.incoming_dict["context"])
 
         # TODO: Append this to actual GEMS response.
         response = {
-            "notices": ["Seeking correct host for SLURM submission.  Check back later."]
+            "notices": [
+                "Attempting to find correct host for SLURM submission.  Check back later."
+            ]
         }
 
     return response
