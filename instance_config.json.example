@@ -29,5 +29,5 @@
       "tasks-per-node": "4"
     }
   },
-  "md_cluster_filesystem_path": ""
+  "md_cluster_filesystem_path": "/website/userdata/mmservice/md"
 }
