@@ -44,7 +44,7 @@ function test_runmd() {
 
 # if ACTUAL_CONFIG doesn't exist, warn and fail
 if ! [ -f $ACTUAL_CONFIG ]; then
-    printf "\nThe instance configuration test requires a configuration to be placed in your \$GEMSHOME!\n'$ACTUAL_CONFIG' does not exist!\n\n" 
+    printf "\n\nThe instance configuration test requires a configuration to be placed in your \$GEMSHOME!\n'$ACTUAL_CONFIG' does not exist!\n\n" 
     printf "\tThe easiest way to get a configuration is restart the DevEnv, possibly setting GEMS_FORCE_INSTANCE_RECONFIGURATION=True.\n\n"
     # printf "\tIf you are in a DevEnv, you can use the example configuration:\n\t  \`cp $EXAMPLE_CONFIG $ACTUAL_CONFIG\`\n\n" 
     # return 1

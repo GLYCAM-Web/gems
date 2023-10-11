@@ -21,11 +21,12 @@ def make_slurm_submission_script(SlurmJobDict):
         f"#SBATCH --nodes={SlurmJobDict['nodes']}\n"
         f"#SBATCH --output=slurm_%x-%A.out\n"
         f"#SBATCH --partition={SlurmJobDict['partition']}\n"
-        f"#SBATCH --tasks-per-node={SlurmJobDict['tasks-per-node']}\n\n"
+        f"#SBATCH --tasks-per-node={SlurmJobDict['tasks-per-node']}\n"
+        f"#SBATCH --time={SlurmJobDict['time']}\n"
     )
-
     if SlurmJobDict["gres"] is not None:
         script += f"#SBATCH --gres={SlurmJobDict['gres']}\n"
+    script += "\n"
 
     if is_GEMS_test_workflow():
         log.debug("setting testing workflow to yes")
