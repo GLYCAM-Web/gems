@@ -20,7 +20,9 @@ def create_contextual_slurm_submission_script(thisSlurmJobInfo):
     SlurmJobDict = thisSlurmJobInfo.incoming_dict
 
     ic = InstanceConfig()
-    ic_args = ic.get_sbatch_arguments(context=SlurmJobDict["context"])
+    ic_args = ic.get_keyed_arguments(
+        "sbatch_arguments", context=SlurmJobDict["context"]
+    )
 
     SlurmJobDict["slurm_runscript_name"] = "slurm_submit.sh"
     SlurmJobDict["workingDirectory"] = os.path.join(

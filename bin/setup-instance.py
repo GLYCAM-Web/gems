@@ -30,6 +30,12 @@ def argparser():
     )
 
     parser.add_argument(
+        "--set-local-parameters",
+        type=str,
+        help="Set the local_parameters for a host in the instance_config.json. Format: 'hostname,context,local_parameters'",
+    )
+
+    parser.add_argument(
         "--gen-remote-md-cluster-config",
         type=str,
         help="Generate a partial remote MD cluster config file for the MD cluster host with the given filesystem path.",
@@ -70,8 +76,23 @@ def configure_instance_config_md(args):
             sbatch_arguments,
         ) = args.set_sbatch_arguments.split(";")
         sbatch_arguments = json.loads(sbatch_arguments)
-        ic.add_sbatch_arguments_to_host(
-            sbatch_hostname, sbatch_context, sbatch_arguments
+        ic.add_keyed_arguments_to_host(
+            "sbatch_arguments", sbatch_hostname, sbatch_context, sbatch_arguments
+        )
+        SAVE = True
+
+    if args.set_local_parameters is not None:
+        (
+            local_parameters_hostname,
+            local_parameters_context,
+            local_parameters,
+        ) = args.set_local_parameters.split(";")
+        local_parameters = json.loads(local_parameters)
+        ic.add_keyed_arguments_to_host(
+            "local_parameters",
+            local_parameters_hostname,
+            local_parameters_context,
+            local_parameters,
         )
         SAVE = True
 

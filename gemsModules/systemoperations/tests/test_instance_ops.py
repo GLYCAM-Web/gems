@@ -60,14 +60,18 @@ class Test_InstanceConfig(unittest.TestCase):
         """
         Test the get_default_sbatch_arguments method.
         """
-        sbatch_args = self.ic.get_default_sbatch_arguments(context="Default")
+        sbatch_args = self.ic.get_default_keyed_arguments(
+            "sbatch_arguments", context="Default"
+        )
         self.assertIsInstance(sbatch_args, dict)
 
     def test_get_sbatch_arguments_by_context(self):
         """
         Test the get_sbatch_arguments_by_context method.
         """
-        sbatch_args = self.ic.get_sbatch_arguments_by_context(context="MDaaS-RunMD")
+        sbatch_args = self.ic.get_keyed_arguments_by_context(
+            "sbatch_arguments", context="MDaaS-RunMD"
+        )
         self.assertIsInstance(sbatch_args, list)
 
     def test_get_named_hostname(self):
@@ -88,14 +92,18 @@ class Test_InstanceConfig(unittest.TestCase):
         """
         Test the get_sbatch_arguments_by_hostname method.
         """
-        sbatch_args = self.ic.get_sbatch_arguments_by_hostname(hostname="gw-slurm-head")
+        sbatch_args = self.ic.get_keyed_arguments_by_hostname(
+            "sbatch_arguments", hostname="gw-slurm-head"
+        )
         self.assertIsInstance(sbatch_args, dict)
 
     def test_get_sbatch_arguments(self):
         """
         Test the get_sbatch_arguments method.
         """
-        sbatch_args = self.ic.get_sbatch_arguments(host="swarm", context="MDaaS-RunMD")
+        sbatch_args = self.ic.get_keyed_arguments(
+            "sbatch_arguments", host="swarm", context="MDaaS-RunMD"
+        )
         self.assertIsInstance(sbatch_args, dict)
 
 

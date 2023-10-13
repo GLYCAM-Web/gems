@@ -111,7 +111,9 @@ class InstanceConfig(dict):
 
         if isinstance(sbatch_arguments, dict):
             for ctx, args in sbatch_arguments.items():
-                self.add_sbatch_arguments_to_host(hostname, ctx, args)
+                self.add_keyed_arguments_to_host(
+                    "sbatch_arguments", hostname, ctx, args
+                )
 
         if isinstance(contexts, list):
             self.add_contexts_to_host(hostname, contexts)
@@ -126,19 +128,19 @@ class InstanceConfig(dict):
             set(self["hosts"][hostname]["contexts"])
         )
 
-    def add_sbatch_arguments_to_host(self, hostname, context, sbatch_arguments):
+    def add_keyed_arguments_to_host(self, key, hostname, context, args):
         """Adds sbatch arguments to a host for a given context."""
         if hostname not in self["hosts"]:
             raise InstanceConfigError(
                 f"Hostname {hostname} not found in instance_config.json."
             )
 
-        if "sbatch_arguments" not in self["hosts"][hostname]:
-            self["hosts"][hostname]["sbatch_arguments"] = {}
+        if key not in self["hosts"][hostname]:
+            self["hosts"][hostname][key] = {}
 
-        if context not in self["hosts"][hostname]["sbatch_arguments"]:
-            self["hosts"][hostname]["sbatch_arguments"][context] = {}
-        self["hosts"][hostname]["sbatch_arguments"][context].update(sbatch_arguments)
+        if context not in self["hosts"][hostname][key]:
+            self["hosts"][hostname][key][context] = {}
+        self["hosts"][hostname][key][context].update(args)
 
     ### GETTERS AND SETTERS ###
     @staticmethod
@@ -190,23 +192,6 @@ class InstanceConfig(dict):
                             possible_hosts.append(host["host"])
         return possible_hosts
 
-    # sbatch argument helpers
-    def get_default_sbatch_arguments(self, context="Default") -> dict:
-        """Returns the default sbatch arguments for a given context."""
-        return self["default_sbatch_arguments"][context]
-
-    def get_sbatch_arguments_by_context(self, context) -> list[dict]:
-        """Returns a list of possible sbatch arguments per host for a given context."""
-        l = []
-        for host in self["hosts"].values():
-            if context in host["contexts"] and "sbatch_arguments" in host:
-                l.append(host["sbatch_arguments"])
-
-        if context in self["default_sbatch_arguments"]:
-            l.append(self["default_sbatch_arguments"][context])
-
-        return l
-
     def get_named_hostname(self, name) -> str:
         """Returns the actual hostname of a named host.
 
@@ -221,22 +206,39 @@ class InstanceConfig(dict):
                 return name
         return None
 
+    # sbatch argument
+    def get_default_keyed_arguments(self, key, context="Default") -> dict:
+        """Returns the default sbatch arguments for a given context."""
+        return self[f"default_{key}"][context]
+
+    def get_keyed_arguments_by_context(self, key, context) -> list[dict]:
+        """Returns a list of possible sbatch arguments per host for a given context."""
+        l = []
+        for host in self["hosts"].values():
+            if context in host["contexts"] and key in host:
+                l.append(host[key])
+
+        if context in self[f"default_{key}"]:
+            l.append(self[f"default_{key}"][context])
+
+        return l
+
     # TODO: if we make sbatch_arguments a property we could do this more cleanly.
-    def get_sbatch_arguments_by_named_host(self, name) -> dict[str, dict]:
+    def get_keyed_arguments_by_named_host(self, key, name) -> dict[str, dict]:
         """Returns a dict of possible sbatch arguments per context for a given named host."""
-        if "sbatch_arguments" not in self["hosts"][name]:
+        if key not in self["hosts"][name]:
             return {}
 
-        return self["hosts"][name]["sbatch_arguments"]
+        return self["hosts"][name][key]
 
-    def get_sbatch_arguments_by_hostname(self, hostname) -> dict[str, dict]:
+    def get_keyed_arguments_by_hostname(self, key, hostname) -> dict[str, dict]:
         """Returns a dict of possible sbatch arguments per context for a given host."""
         name = self.get_name_by_hostname(hostname)
-        if name is None or "sbatch_arguments" not in self["hosts"][name]:
+        if name is None or key not in self["hosts"][name]:
             return {}
-        return self["hosts"][name]["sbatch_arguments"]
+        return self["hosts"][name][key]
 
-    def get_sbatch_arguments(self, host=None, context=None):
+    def get_keyed_arguments(self, key, host=None, context=None):
         """Returns the sbatch arguments for a given host and context."""
 
         if context is None:
@@ -246,10 +248,10 @@ class InstanceConfig(dict):
             elif host is not None and "Swarm" in self.get_available_contexts(host):
                 context = "Swarm"
 
-        sb_arg_dict = self.get_default_sbatch_arguments()
+        args_dict = self.get_default_keyed_arguments(key)
         if host is None:
             if context is None:
-                return sb_arg_dict
+                return args_dict
             else:
                 possible_hosts = self.get_possible_hosts_for_context(
                     context, return_names=True
@@ -257,12 +259,12 @@ class InstanceConfig(dict):
                 # TODO: More complicated selection of proper host
                 host = possible_hosts.pop()
 
-        possible_sbatch_args = self.get_sbatch_arguments_by_named_host(host)
-        for ctx, args in possible_sbatch_args.items():
+        possible_keyed_args = self.get_keyed_arguments_by_named_host(key, host)
+        for ctx, args in possible_keyed_args.items():
             if ctx == context:
-                sb_arg_dict.update(args)
+                args_dict.update(args)
 
-        return sb_arg_dict
+        return args_dict
 
     # md cluster host helpers aka "MDaaS-RunMD" context helpers
     def get_md_filesystem_path(self) -> str:

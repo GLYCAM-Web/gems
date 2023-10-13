@@ -29,5 +29,10 @@
       "tasks-per-node": "4"
     }
   },
+  "default_local_parameters": {
+    "Default": {
+      "numProcs": "4"
+    }
+  },
   "md_cluster_filesystem_path": "/website/userdata/mmservice/md"
 }
