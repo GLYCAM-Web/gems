@@ -36,7 +36,7 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     )
 
     # lets also update sim_length in the protocol here. We're given inputs.sim_length in ns, but must calculate the nstlim stepcount.
-    sim_length = int(inputs.sim_length)
+    sim_length = float(inputs.sim_length)
     nstlim = sim_length * 500000  # 500k because dt=0.002
     # TODO: edit_amber_input_file() is not yet implemented.
     with open(inputs.outputDirPath + "/10.produ.in", "r") as f:
