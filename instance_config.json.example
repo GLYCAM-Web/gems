@@ -27,7 +27,7 @@
       "time": "120",
       "nodes": "1",
       "tasks-per-node": "4",
-      "ntasks": "4",
+      "cpus-per-task": "1"
     }
   },
   "default_local_parameters": {
