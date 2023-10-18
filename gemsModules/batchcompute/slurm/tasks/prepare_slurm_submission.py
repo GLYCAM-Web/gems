@@ -24,6 +24,8 @@ def create_contextual_slurm_submission_script(thisSlurmJobInfo):
         "sbatch_arguments", context=SlurmJobDict["context"]
     )
 
+    SlurmJobDict.update(ic_args)
+
     SlurmJobDict["slurm_runscript_name"] = "slurm_submit.sh"
     SlurmJobDict["workingDirectory"] = os.path.join(
         ic.get_md_filesystem_path(),
@@ -52,30 +54,6 @@ def create_contextual_slurm_submission_script(thisSlurmJobInfo):
         log.debug("Will generate a new Slurm runscript.")
 
         log.debug("About to create runscript on %s", socket.gethostname())
-
-    # TODO: One day, different slurm submission will need to be made.
-    # TODO: Update job info keys so that we can just dict unpack/update. RN this is a compatibility patch.
-    SlurmJobDict["nodes"] = ic_args["nodes"]
-    SlurmJobDict["time"] = ic_args["time"]
-    SlurmJobDict["partition"] = ic_args["partition"]
-    # Default is okay for now:
-    # thisSlurmJobInfo["sbatchArgument"] = ic_args["sbatchArgument"]
-
-    if "tasks-per-node" in ic_args:
-        log.debug("Found tasks-per-node in ic_args")
-        SlurmJobDict["tasks-per-node"] = ic_args["tasks-per-node"]
-    else:
-        SlurmJobDict["tasks-per-node"] = "1"
-
-    if "gres" in ic_args:
-        SlurmJobDict["gres"] = ic_args["gres"]
-    else:
-        SlurmJobDict["gres"] = None
-    log.debug(
-        f"Filled SLURM Job info with sbatch_arguments from: %s\nJobInfo: %s",
-        ic_args,
-        SlurmJobDict,
-    )
 
     create_slurm_submission.execute(SlurmJobDict)
 

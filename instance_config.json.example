@@ -26,7 +26,8 @@
       "partition": "amber",
       "time": "120",
       "nodes": "1",
-      "tasks-per-node": "4"
+      "tasks-per-node": "4",
+      "ntasks": "4",
     }
   },
   "default_local_parameters": {
