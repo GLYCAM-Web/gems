@@ -35,6 +35,28 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
         rst7_real_name=inputs.amber_rst7,
     )
 
+    # lets also update sim_length in the protocol here. We're given inputs.sim_length in ns, but must calculate the nstlim stepcount.
+    sim_length = int(inputs.sim_length)
+    nstlim = sim_length * 500000  # 500k because dt=0.002
+    checkpoint_percent = int(nstlim * 0.01)  # 1% of nstlim
+    # TODO: edit_amber_input_file() is not yet implemented.
+    with open(inputs.outputDirPath + "/10.produ.in", "r") as f:
+        lines = f.readlines()
+        for i in range(len(lines)):
+            if "nstlim" in lines[i]:
+                lines[i] = "  nstlim = " + str(nstlim) + ",\n"
+            if "ntwx" in lines[i]:
+                lines[i] = "  ntwx = " + str(checkpoint_percent) + ",\n"
+            if "ntpr" in lines[i]:
+                lines[i] = "  ntpr = " + str(checkpoint_percent) + ",\n"
+            if "ntwe" in lines[i]:
+                lines[i] = "  ntwe = " + str(checkpoint_percent) + ",\n"
+            if "ntwr" in lines[i]:
+                lines[i] = "  ntwr = " + str(checkpoint_percent) + ",\n"
+    with open(inputs.outputDirPath + "/10.produ.in", "w") as f:
+        f.writelines(lines)
+
+    # update service outputs
     service_outputs.outputDirPath = inputs.outputDirPath
 
     # TODO: use resources to copy all input files to the output directory, such as parm7/rst7 as well.

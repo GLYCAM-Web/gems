@@ -50,7 +50,7 @@ class mdaas_Project_Manager(Project_Manager):
                     log.warning("Key %s not in response project", key)
 
     def fill_response_project_from_response_entity(self):
-        # Lets try updating from run_md inputs for now...
+        # Lets try updating from run_md inputs for now... # TODO: incoming entity may be wrong to use here.
         log.debug("fill_response_project_from_response_entity %s", self.incoming_entity)
         for service in self.incoming_entity.services.__root__.values():
             log.debug("fill_response_project_from_response_entity %s", service)
@@ -69,6 +69,11 @@ class mdaas_Project_Manager(Project_Manager):
 
                 self.response_project.parm7_file_name = str(parm_path.name)
                 self.response_project.rst7_file_name = str(rst_path.name)
+                if hasattr(service, "options") and service.options is not None:
+                    if "sim_length" in service.options:
+                        self.response_project.sim_length = str(
+                            service.options["sim_length"]
+                        )
 
 
 def testme() -> MdProject:

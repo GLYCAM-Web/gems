@@ -61,6 +61,11 @@ class ProjectManagement_Inputs(BaseModel):
         title="Amber Rst7",
         description="Name of Amber Rst7 file",
     )
+    sim_length: Optional[str] = Field(
+        None,
+        title="Simulation Length",
+        description="Length of simulation in ns",
+    )
 
 
 class ProjectManagement_Outputs(BaseModel):

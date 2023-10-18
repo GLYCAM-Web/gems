@@ -69,6 +69,7 @@ class mdaas_Request_Data_Filler(Request_Data_Filler):
             # we'll use upload path, as set by the project manager, to build the filenames.
             amber_parm7=str(upload_dir / self.response_project.parm7_file_name),
             amber_rst7=str(upload_dir / self.response_project.rst7_file_name),
+            sim_length=self.response_project.sim_length,
         )
 
         # Add the resources to copy to the project output directory by the Project Management service.
