@@ -29,29 +29,31 @@ def make_slurm_submission_script(SlurmJobDict):
         "#!/bin/bash\n"
         f"#SBATCH --chdir={SlurmJobDict['workingDirectory']}\n"
         f"#SBATCH --error=slurm_%x-%A.err\n"
+        f"#SBATCH --output=slurm_%x-%A.out\n"
         f"#SBATCH --get-user-env\n"
         f"#SBATCH --job-name={SlurmJobDict['name']}\n"
         f"#SBATCH --nodes={SlurmJobDict['nodes']}\n"
-        f"#SBATCH --output=slurm_%x-%A.out\n"
         f"#SBATCH --partition={SlurmJobDict['partition']}\n"
-        f"#SBATCH --tasks-per-node={SlurmJobDict['tasks-per-node']}\n"
-        f"#SBATCH --cpus-per-task={SlurmJobDict['cpus-per-task']}\n"
         f"#SBATCH --time={SlurmJobDict['time']}\n"
     )
 
+    # Not setting these may be desirable, so they are optional entries in the instance_config.
+    if "tasks-per-node" in SlurmJobDict:
+        script += f"#SBATCH --tasks-per-node={SlurmJobDict['tasks-per-node']}\n"
+    if "cpus-per-task" in SlurmJobDict:
+        script += f"#SBATCH --cpus-per-task={SlurmJobDict['cpus-per-task']}\n"
+
     if SlurmJobDict["use_gpu"]:
         script += f"#SBATCH --gres={SlurmJobDict['gres']}\n"
+
     script += "\n"
 
     if is_GEMS_test_workflow():
-        log.debug("setting testing workflow to yes")
         script += "export MDUtilsTestRunWorkflow=Yes\n\n"
-    else:
-        log.debug("NOT setting testing workflow to yes")
 
     # This argument is set to the script we want slurm to execute.
     script += SlurmJobDict["sbatchArgument"] + "\n"
-    log.debug("The sbatchArgument is : " + SlurmJobDict["sbatchArgument"])
+    log.debug("Our slurm submission script is:\n" + script + "\n")
 
     return script
 
@@ -75,9 +77,8 @@ def update_local_parameters_file(SlurmJobDict):
     filesystem_ops.replace_bash_variable_in_file(local_param_file, args)
 
 
-def execute(SlurmJobDict):
-    path = SlurmJobDict["slurm_runscript_name"]
-    amber_input_file = os.path.join(SlurmJobDict["workingDirectory"], "MdInput.parm7")
+def update_slurm_job(SlurmJobDict):
+    # amber_input_file = os.path.join(SlurmJobDict["workingDirectory"], "MdInput.parm7")
 
     # could be part of a "update_slurm_job" task.
     # gpu toggle must update both local params and slurm script.
@@ -85,6 +86,7 @@ def execute(SlurmJobDict):
     if "gres" in SlurmJobDict:
         requires_gpu = SlurmJobDict["gres"] is not None
 
+    # Note: This was part of a CPU selection fix to handle Amber's small box problem on GPU.
     # can_use_gpu = get_residues_from_parm7(amber_input_file) > 3
     if requires_gpu:  # and can_use_gpu:
         SlurmJobDict["use_gpu"] = True
@@ -92,7 +94,13 @@ def execute(SlurmJobDict):
         SlurmJobDict["use_gpu"] = False
     log.debug(f"requires_gpu=%s", requires_gpu)
 
+
+def execute(SlurmJobDict):
+    path = SlurmJobDict["slurm_runscript_name"]
+
+    update_slurm_job(SlurmJobDict)
     update_local_parameters_file(SlurmJobDict)
+
     script = make_slurm_submission_script(SlurmJobDict)
 
     try:
