@@ -63,12 +63,10 @@ def update_local_parameters_file(SlurmJobDict):
         SlurmJobDict["workingDirectory"], "Local_Run_Parameters.bash"
     )
 
-    # TODO: needs to be determined from local params setting prob...
-
     # update MPI/CUDA settings if using GPU.
     if SlurmJobDict["use_gpu"]:
         filesystem_ops.replace_bash_variable_in_file(
-            local_param_file, {"useMPI": "N", "useCUDA": "Y"}
+            local_param_file, {"useMpi": "N", "useCuda": "Y"}
         )
 
     # lets replace all local parameters configured from the instance config. For example, "numProcs".
@@ -81,18 +79,18 @@ def execute(SlurmJobDict):
     path = SlurmJobDict["slurm_runscript_name"]
     amber_input_file = os.path.join(SlurmJobDict["workingDirectory"], "MdInput.parm7")
 
-    # could be part of "update_slurm_job" task.
+    # could be part of a "update_slurm_job" task.
     # gpu toggle must update both local params and slurm script.
     requires_gpu = False
     if "gres" in SlurmJobDict:
         requires_gpu = SlurmJobDict["gres"] is not None
 
-    can_use_gpu = get_residues_from_parm7(amber_input_file) > 3
-    log.debug(f"requires_gpu=%s, can_use_gpu=%s", requires_gpu, can_use_gpu)
-    if requires_gpu and can_use_gpu:
+    # can_use_gpu = get_residues_from_parm7(amber_input_file) > 3
+    if requires_gpu:  # and can_use_gpu:
         SlurmJobDict["use_gpu"] = True
     else:
         SlurmJobDict["use_gpu"] = False
+    log.debug(f"requires_gpu=%s", requires_gpu)
 
     update_local_parameters_file(SlurmJobDict)
     script = make_slurm_submission_script(SlurmJobDict)
