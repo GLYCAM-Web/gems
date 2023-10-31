@@ -37,7 +37,6 @@ class InstanceConfigNotFoundError(FileNotFoundError):
                 "\t\t`cp $GEMSHOME/instance_config.json.example $GEMSHOME/instance_config.json`\n\n"
                 "\tOtherwise, some GEMS requests may not function as expected.\n"
                 f"\t$GEMSHOME is {os.getenv('GEMSHOME', '$GEMSHOME')}."
-
             )
 
         log.error(msg)
@@ -51,8 +50,10 @@ class SbatchArguments(BaseModel):
     nodes: str
     tasks_per_node: str
 
+
 class LocalParameters(BaseModel):
     numProcs: str
+
 
 class Host(BaseModel):
     host: str
@@ -62,6 +63,7 @@ class Host(BaseModel):
     sbatch_arguments: Optional[Dict[str, SbatchArguments]]
     local_parameters: Optional[Dict[str, LocalParameters]]
 
+
 class Config(BaseModel):
     hosts: Dict[str, Host]
     default_sbatch_arguments: Dict[str, SbatchArguments]
@@ -69,30 +71,28 @@ class Config(BaseModel):
     md_cluster_filesystem_path: str
 
 
-# in more modern python we could use `type KEYED_ARGUMENTS` to define a type alias. 
-# I believe we can import this functionality (TypeAlias?) from typing as well...
-KEYED_ARGUMENTS = Literal['default_arguments', 'local_parameters']
-
-
-class HostContext(Enum):
-    """ unused - related to  is_GEMS_test_workflow, is_GEMS_live_swarm """
-    DEV_ENV = "DevEnv"
-    SWARM = "Swarm"
-
-
 class ConfigManager(ABC):
-    """ ConfigManager manages a 'config' dict and associated json file at a particular GEMS path.
+    """ConfigManager manages a 'config' dict and associated json file at a particular GEMS path.
+
+    This class is a singleton, so it can be instantiated once and then used throughout the
+    lifetime of a request. One feature of this is that the instance configuration cannot be changed
+    out from under the feet of a request because the real configuration file is read only once.
+
     """
+
     _instance = None
 
     def __new__(cls, *args, **kwargs):
+        # Singleton pattern
         if cls._instance is None:
             cls._instance = super(ConfigManager, cls).__new__(cls)
             cls._instance.__initialized = False
         return cls._instance
 
-    def __init__(self, config: dict = None, config_path=None, reinitialize=False, **kwargs):
-        # Only initialize once, overridable.
+    def __init__(
+        self, config: dict = None, config_path=None, reinitialize=False, **kwargs
+    ):
+        # Singleton pattern - only initialize once, overridable.
         if not reinitialize and self.__initialized:
             return
         self.__initialized = True
@@ -109,6 +109,11 @@ class ConfigManager(ABC):
     def config(self):
         return self._config
 
+    @property
+    def is_configured() -> bool:
+        """Returns True if the $GEMSHOME/instance_config.json exists and is valid."""
+        return InstanceConfig.get_default_path().exists()
+
     def set_active_config(self, config_path: Path):
         self._config = self.load(instance_config_path=config_path)
 
@@ -117,12 +122,36 @@ class ConfigManager(ABC):
 
     @abstractmethod
     def get_default_path(example=False) -> Path:
-        pass
+        """Must be overridden to return the default path for the instance config file."""
+        raise NotImplementedError("Must be overridden to return the default path.")
+
+    @classmethod
+    def from_dict(cls, config_dict):
+        return cls(config=config_dict)
+
+    @staticmethod
+    def load(instance_config_path=None) -> dict:
+        """Load a json instance config file."""
+        if instance_config_path is None:
+            instance_config_path = InstanceConfig.get_default_path()
+
+        with open(instance_config_path, "r") as f:
+            instance_config = json.load(f)
+
+        return instance_config
+
+    def save(self, instance_config_path):
+        """Save a json instance config file."""
+        with open(instance_config_path, "w") as f:
+            json.dump(self.config, f, indent=2)
 
 
 class ContextManager(ConfigManager):
+    # Not an enum so we can extend. Intended to be an associated type / should probably be a Literal Union.
+    Contexts: list = ["DevEnv", "Swarm"]
+
     def get_available_contexts(self, instance_hostname=None) -> list:
-        """ 
+        """
         Returns a list of available contexts for the active GEMS instance.
 
         Can be keyed by a given name (["hosts"] key) or hostname (["hosts"][host]['host']),
@@ -143,9 +172,10 @@ class ContextManager(ConfigManager):
 
 
 class HostManager(ContextManager):
-    """  "Host Manager is a Contextual Manager"
+    """ "Host Manager is a Contextual Manager"
     HostManager depends on contexts, which the ContextManager provides.
     """
+
     def add_host(self, hostname, host, slurmport, contexts=None, sbatch_arguments=None):
         """Adds a host to the instance_config.json.
 
@@ -155,12 +185,6 @@ class HostManager(ContextManager):
             "host": host,
             "slurmport": slurmport,
         }
-
-        if isinstance(sbatch_arguments, dict):
-            for ctx, args in sbatch_arguments.items():
-                self.add_keyed_arguments_to_host(
-                    "sbatch_arguments", hostname, ctx, args
-                )
 
         if isinstance(contexts, list):
             self.add_contexts_to_host(hostname, contexts)
@@ -210,15 +234,39 @@ class HostManager(ContextManager):
 
 
 class KeyedArgManager(HostManager):
-    """     
+    """
     Because this uses extra functionality, but depends on hosts, we inherit from HostManager.
     """
-    # keyed argument
-    def get_default_keyed_arguments(self, key: KEYED_ARGUMENTS, context="Default") -> dict:
+
+    # associated type to define the possible values for key
+    # # in more modern python we could use `type ConfigurationKeys` to define a type alias.
+    # I believe we can import this functionality (TypeAlias?) from typing as well...
+    # Anyways, I envision this being an associated typed
+    class ConfigurationKeys(Enum):
+        """Defines the possible host key values."""
+
+        SBATCH_ARGUMENTS = "sbatch_arguments"
+        LOCAL_PARAMETERS = "local_parameters"
+
+    # should actually wrap host manager(super) and add the isinstance sbatcha_args check here
+    def add_host(self, hostname, host, slurmport, contexts=None, sbatch_arguments=None):
+        super().add_host(hostname, host, slurmport, contexts, sbatch_arguments)
+
+        if isinstance(sbatch_arguments, dict):
+            for ctx, args in sbatch_arguments.items():
+                self.add_keyed_arguments_to_host(
+                    "sbatch_arguments", hostname, ctx, args
+                )
+
+    def get_default_keyed_arguments(
+        self, key: ConfigurationKeys, context="Default"
+    ) -> dict:
         """Returns the default keyed arguments for a given context."""
         return self.config[f"default_{key}"][context]
 
-    def get_keyed_arguments_by_context(self, key: KEYED_ARGUMENTS, context) -> list[dict]:
+    def get_keyed_arguments_by_context(
+        self, key: ConfigurationKeys, context
+    ) -> list[dict]:
         """Returns a list of possible keyed arguments per host for a given context."""
         l = []
         for host in self.config["hosts"].values():
@@ -230,33 +278,29 @@ class KeyedArgManager(HostManager):
 
         return l
 
-    # TODO: if we make sbatch_arguments a property we could do this more cleanly.
-    def get_keyed_arguments_by_named_host(self, key: KEYED_ARGUMENTS, name) -> dict[str, dict]:
+    def get_keyed_arguments_by_named_host(
+        self, key: ConfigurationKeys, name
+    ) -> dict[str, dict]:
         """Returns a dict of possible keyed arguments per context for a given named host."""
         if key not in self.config["hosts"][name]:
             return {}
 
         return self.config["hosts"][name][key]
 
-    def get_keyed_arguments_by_hostname(self, key: KEYED_ARGUMENTS, hostname) -> dict[str, dict]:
+    def get_keyed_arguments_by_hostname(
+        self, key: ConfigurationKeys, hostname
+    ) -> dict[str, dict]:
         """Returns a dict of possible keyed arguments per context for a given host."""
         name = self.get_name_by_hostname(hostname)
         if name is None or key not in self.config["hosts"][name]:
             return {}
         return self.config["hosts"][name][key]
 
-    def get_keyed_arguments(self, key: KEYED_ARGUMENTS, host=None, context=None):
+    def get_keyed_arguments(self, key: ConfigurationKeys, host=None, context=None):
         """Returns the keyed arguments for a given host and context.
-        
-            ex. key in ('sbatch_arguments', 'local_parameters')
-        """
-        if context is None:
-            # TODO: Is this sensible?
-            if is_GEMS_test_workflow():
-                context = "DevEnv"
-            elif host is not None and "Swarm" in self.get_available_contexts(host):
-                context = "Swarm"
 
+        ex. key in ('sbatch_arguments', 'local_parameters')
+        """
         args_dict = self.get_default_keyed_arguments(key)
         if host is None:
             if context is None:
@@ -275,7 +319,9 @@ class KeyedArgManager(HostManager):
 
         return args_dict
 
-    def add_keyed_arguments_to_host(self, key: KEYED_ARGUMENTS, hostname, context, args):
+    def add_keyed_arguments_to_host(
+        self, key: ConfigurationKeys, hostname, context, args
+    ):
         """Adds sbatch arguments to a host for a given context."""
         if hostname not in self.config["hosts"]:
             raise InstanceConfigError(
@@ -290,33 +336,37 @@ class KeyedArgManager(HostManager):
         self.config["hosts"][hostname][key][context].update(args)
 
 
+class DateReversioner:
+    """A class to check if a ConfigManger's config file is older than the updated config file.
+
+    This class should not modify production configuratoin files. It should only run in a DevEnv.
+    """
+
+    ...
+
+
 class InstanceConfig(KeyedArgManager):
-    """ The main GEMS class for parsing it's active instance configuration file.
-    
+    """The main GEMS class for parsing it's active instance configuration file.
+
+    This class only has active GEMS instance specific methods and configuration.
+    It inherits all it's configuration functionality.
+
     A class for parsing and using the instance_config.yml of the active GEMS installation.
 
-    This class is deeply coupled with the active state of your GEMS environment. 
+    This class is deeply coupled with the active state of your GEMS environment.
     It has properties and methods which convey active environmental information.
-
-    This class is a singleton, so it can be instantiated once and then used throughout the
-    lifetime of a request. One feature of this is that the instance configuration cannot be changed
-    out from under the feet of a request because the real configuration file is read only once.
 
     >>> instance_config = InstanceConfig()
     >>> instance_config.get_available_contexts('gw-grpc-delegator')
-
-    TODO: This class is getting monolithic, break out functionality. (e.g. md cluster related)
     """
 
-    @property
-    def is_configured() -> bool:
-        """Returns True if the $GEMSHOME/instance_config.json exists and is valid."""
-        return InstanceConfig.get_default_path().exists()
+    # Not an enum so we can extend here, in the InstanceConfig class, where the most specific GEMS instance configuration is defined.
+    Contexts = ContextManager.Contexts + ["MDaaS-RunMD"]
 
     @staticmethod
     def get_default_path(example=False) -> Path:
         """The default path is the active GEMS instance configuration.
-        
+
         TODO: change to active_path property.
         """
         name = "instance_config.json"
@@ -325,27 +375,30 @@ class InstanceConfig(KeyedArgManager):
 
         return Path(os.getenv("GEMSHOME", "")) / name
 
-    @classmethod
-    def from_dict(cls, config_dict):
-        return cls(config=config_dict)
+    # TODO: Context needs an enum.
+    def get_keyed_arguments(
+        self,
+        key: KeyedArgManager.ConfigurationKeys,
+        host: str = None,
+        context: Contexts = None,
+    ):
+        if context not in self.Contexts:
+            log.warning(f"Context {context} not found in {self.Contexts}.")
 
-    @staticmethod
-    def load(instance_config_path=None) -> dict:
-        if instance_config_path is None:
-            instance_config_path = InstanceConfig.get_default_path()
+        if context is None:
+            # TODO: Is this sensible?
+            if is_GEMS_test_workflow():
+                context = self.Context.DEV_ENV
+            elif host is not None and self.Context.SWARM in self.get_available_contexts(
+                host
+            ):
+                context = self.Context.SWARM
 
-        with open(instance_config_path, "r") as f:
-            instance_config = json.load(f)
-
-        return instance_config
-
-    def save(self, instance_config_path):
-        with open(instance_config_path, "w") as f:
-            json.dump(self.config, f, indent=2)
+        return super().get_keyed_arguments(key, host, context)
 
     # specialized md cluster host helpers aka "MDaaS-RunMD" context helpers
     def get_md_filesystem_path(self) -> str:
-        """Returns the filesystem path for the compute cluster by hostname defined in the instance config's hosts dict."""
+        """Returns the filesystem path for the MD compute cluster by hostname defined in the instance config's hosts dict."""
         if (
             "md_cluster_filesystem_path" not in self.config
             or len(self.config["md_cluster_filesystem_path"]) == 0
@@ -357,7 +410,7 @@ class InstanceConfig(KeyedArgManager):
         return self.config["md_cluster_filesystem_path"]
 
     def set_md_filesystem_path(self, path):
-        """Sets the filesystem path for the compute cluster by hostname defined in the instance config's hosts dict.
+        """Sets the filesystem path for the MD compute cluster by hostname defined in the instance config's hosts dict.
 
         You probably want to save the instance config after this.
         """
