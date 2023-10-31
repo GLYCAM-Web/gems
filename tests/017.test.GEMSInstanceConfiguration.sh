@@ -13,7 +13,7 @@ function test_runmd() {
     notices="$(echo $response | $GEMSHOME/tests/utilities/json_ripper.py notices)"
     
     if [ "$notices" != "{}" ]; then
-        echo "Failure: Notices are not empty."
+        printf "Failure: Notices are not empty.\n$notices\n\n"
         return 1
     fi
 

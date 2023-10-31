@@ -1,5 +1,9 @@
 import json, os, glob, shutil, socket
 from pathlib import Path
+from pydantic import BaseModel
+from typing import Dict, List, Optional, Literal
+from enum import Enum
+from abc import ABC, abstractmethod
 
 from gemsModules.systemoperations.environment_ops import (
     is_GEMS_test_workflow,
@@ -33,6 +37,7 @@ class InstanceConfigNotFoundError(FileNotFoundError):
                 "\t\t`cp $GEMSHOME/instance_config.json.example $GEMSHOME/instance_config.json`\n\n"
                 "\tOtherwise, some GEMS requests may not function as expected.\n"
                 f"\t$GEMSHOME is {os.getenv('GEMSHOME', '$GEMSHOME')}."
+
             )
 
         log.error(msg)
@@ -40,71 +45,113 @@ class InstanceConfigNotFoundError(FileNotFoundError):
         super().__init__(msg, *args, **kwargs)
 
 
-class InstanceConfig(dict):
+class SbatchArguments(BaseModel):
+    partition: str
+    time: str
+    nodes: str
+    tasks_per_node: str
+
+class LocalParameters(BaseModel):
+    numProcs: str
+
+class Host(BaseModel):
+    host: str
+    slurmport: Optional[str]
+    contexts: List[str]
+    routes: Optional[List[str]]
+    sbatch_arguments: Optional[Dict[str, SbatchArguments]]
+    local_parameters: Optional[Dict[str, LocalParameters]]
+
+class Config(BaseModel):
+    hosts: Dict[str, Host]
+    default_sbatch_arguments: Dict[str, SbatchArguments]
+    default_local_parameters: Dict[str, LocalParameters]
+    md_cluster_filesystem_path: str
+
+
+# in more modern python we could use `type KEYED_ARGUMENTS` to define a type alias. 
+# I believe we can import this functionality (TypeAlias?) from typing as well...
+KEYED_ARGUMENTS = Literal['default_arguments', 'local_parameters']
+
+
+class HostContext(Enum):
+    """ unused - related to  is_GEMS_test_workflow, is_GEMS_live_swarm """
+    DEV_ENV = "DevEnv"
+    SWARM = "Swarm"
+
+
+class ConfigManager(ABC):
+    """ ConfigManager manages a 'config' dict and associated json file at a particular GEMS path.
     """
-    A class for parsing and using the instance_config.yml of the active GEMS installation.
-
-    This class is a singleton, so it can be instantiated once and then used throughout the
-    lifetime of the program.
-
-    >>> instance_config = InstanceConfig()
-    >>> instance_config.get_available_contexts('gw-grpc-delegator')
-
-    TODO: This class is getting monolithic, break out functionality. (e.g. md cluster related)
-    """
-
     _instance = None
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
-            cls._instance = super(InstanceConfig, cls).__new__(cls)
+            cls._instance = super(ConfigManager, cls).__new__(cls)
             cls._instance.__initialized = False
         return cls._instance
 
-    def __init__(self, *args, config_dict=None, config_path=None, **kwargs):
-        # Only initialize once
-        if self.__initialized:
+    def __init__(self, config: dict = None, config_path=None, reinitialize=False, **kwargs):
+        # Only initialize once, overridable.
+        if not reinitialize and self.__initialized:
             return
-
-        super().__init__(*args, **kwargs)
         self.__initialized = True
 
-        if config_dict is None:
-            config_dict = self.load(instance_config_path=config_path)
+        self._config = None
+        if config is not None:
+            self.set_config_data(config)
+        elif config_path is not None:
+            self.set_active_config(config_path)
+        else:
+            self.set_active_config(self.get_default_path())
 
-        # update the InstanceConfig dict with the loaded config_dict
-        self.update(config_dict)
+    @property
+    def config(self):
+        return self._config
 
-    @staticmethod
-    def is_configured() -> bool:
-        """Returns True if the $GEMSHOME/instance_config.json exists and is valid."""
-        return InstanceConfig.get_default_path().exists()
+    def set_active_config(self, config_path: Path):
+        self._config = self.load(instance_config_path=config_path)
 
-    @classmethod
-    def from_dict(cls, config_dict):
-        return cls(config_dict=config_dict)
+    def set_config_data(self, config: dict):
+        self._config = config
 
-    @staticmethod
-    def load(instance_config_path=None) -> dict:
-        if instance_config_path is None:
-            instance_config_path = InstanceConfig.get_default_path()
+    @abstractmethod
+    def get_default_path(example=False) -> Path:
+        pass
 
-        with open(instance_config_path, "r") as f:
-            instance_config = json.load(f)
 
-        return instance_config
+class ContextManager(ConfigManager):
+    def get_available_contexts(self, instance_hostname=None) -> list:
+        """ 
+        Returns a list of available contexts for the active GEMS instance.
 
-    def save(self, instance_config_path):
-        with open(instance_config_path, "w") as f:
-            json.dump(self, f, indent=2)
+        Can be keyed by a given name (["hosts"] key) or hostname (["hosts"][host]['host']),
+        but the instance config must contain the real hostname in either. (In some cases,
+        you need to use the ip for the host, in which case the hosts key must be the
+        hostname.)
 
-    ### HOSTS METHODS ###
+        """
+        if instance_hostname is None:
+            instance_hostname = socket.gethostname()
+
+        available_contexts = []
+        for host in self.config["hosts"].keys():
+            h = self.config["hosts"][host]
+            if instance_hostname == host or instance_hostname == h["host"]:
+                available_contexts.extend(h["contexts"])
+        return available_contexts
+
+
+class HostManager(ContextManager):
+    """  "Host Manager is a Contextual Manager"
+    HostManager depends on contexts, which the ContextManager provides.
+    """
     def add_host(self, hostname, host, slurmport, contexts=None, sbatch_arguments=None):
         """Adds a host to the instance_config.json.
 
         This is the only way to add a host to the instance_config.json.
         """
-        self["hosts"][hostname] = {
+        self.config["hosts"][hostname] = {
             "host": host,
             "slurmport": slurmport,
         }
@@ -120,58 +167,13 @@ class InstanceConfig(dict):
 
     def add_contexts_to_host(self, hostname, contexts):
         """Adds contexts to a host."""
-        if "contexts" not in self["hosts"][hostname]:
-            self["hosts"][hostname]["contexts"] = []
+        if "contexts" not in self.config["hosts"][hostname]:
+            self.config["hosts"][hostname]["contexts"] = []
 
-        self["hosts"][hostname]["contexts"].extend(contexts)
-        self["hosts"][hostname]["contexts"] = list(
-            set(self["hosts"][hostname]["contexts"])
+        self.config["hosts"][hostname]["contexts"].extend(contexts)
+        self.config["hosts"][hostname]["contexts"] = list(
+            set(self.config["hosts"][hostname]["contexts"])
         )
-
-    def add_keyed_arguments_to_host(self, key, hostname, context, args):
-        """Adds sbatch arguments to a host for a given context."""
-        if hostname not in self["hosts"]:
-            raise InstanceConfigError(
-                f"Hostname {hostname} not found in instance_config.json."
-            )
-
-        if key not in self["hosts"][hostname]:
-            self["hosts"][hostname][key] = {}
-
-        if context not in self["hosts"][hostname][key]:
-            self["hosts"][hostname][key][context] = {}
-        self["hosts"][hostname][key][context].update(args)
-
-    ### GETTERS AND SETTERS ###
-    @staticmethod
-    def get_default_path(example=False) -> Path:
-        """The default path is the active GEMS instance configuration."""
-        name = "instance_config.json"
-        if example:
-            name += ".example"
-
-        return Path(os.getenv("GEMSHOME", "")) / name
-
-    # context stuff
-    def get_available_contexts(self, instance_hostname=None) -> list:
-        """
-        Returns a list of available contexts for the active GEMS instance.
-
-        Can be keyed by a given name (["hosts"] key) or hostname (["hosts"][host]['host']),
-        but the instance config must contain the real hostname in either. (In some cases,
-        you need to use the ip for the host, in which case the hosts key must be the
-        hostname.)
-
-        """
-        if instance_hostname is None:
-            instance_hostname = socket.gethostname()
-
-        available_contexts = []
-        for host in self["hosts"].keys():
-            h = self["hosts"][host]
-            if instance_hostname == host or instance_hostname == h["host"]:
-                available_contexts.extend(h["contexts"])
-        return available_contexts
 
     def get_possible_hosts_for_context(
         self, context: str, with_slurmport=False, return_names=False
@@ -180,7 +182,7 @@ class InstanceConfig(dict):
         Returns a list of possible hosts for a given context.
         """
         possible_hosts = []
-        for name, host in self["hosts"].items():
+        for name, host in self.config["hosts"].items():
             for host_context in host["contexts"]:
                 if host_context == context:
                     if return_names:
@@ -197,50 +199,57 @@ class InstanceConfig(dict):
 
         Each host is keyed by an arbitrary name in the hosts dict of the instance_config.json.
         """
-        return self["hosts"][name]["host"]
+        return self.config["hosts"][name]["host"]
 
     def get_name_by_hostname(self, hostname) -> str:
         """Returns the name of a host given it's hostname."""
-        for name, host in self["hosts"].items():
+        for name, host in self.config["hosts"].items():
             if host["host"] == hostname:
                 return name
         return None
 
-    # sbatch argument
-    def get_default_keyed_arguments(self, key, context="Default") -> dict:
-        """Returns the default sbatch arguments for a given context."""
-        return self[f"default_{key}"][context]
 
-    def get_keyed_arguments_by_context(self, key, context) -> list[dict]:
-        """Returns a list of possible sbatch arguments per host for a given context."""
+class KeyedArgManager(HostManager):
+    """     
+    Because this uses extra functionality, but depends on hosts, we inherit from HostManager.
+    """
+    # keyed argument
+    def get_default_keyed_arguments(self, key: KEYED_ARGUMENTS, context="Default") -> dict:
+        """Returns the default keyed arguments for a given context."""
+        return self.config[f"default_{key}"][context]
+
+    def get_keyed_arguments_by_context(self, key: KEYED_ARGUMENTS, context) -> list[dict]:
+        """Returns a list of possible keyed arguments per host for a given context."""
         l = []
-        for host in self["hosts"].values():
+        for host in self.config["hosts"].values():
             if context in host["contexts"] and key in host:
                 l.append(host[key])
 
-        if context in self[f"default_{key}"]:
-            l.append(self[f"default_{key}"][context])
+        if context in self.config[f"default_{key}"]:
+            l.append(self.config[f"default_{key}"][context])
 
         return l
 
     # TODO: if we make sbatch_arguments a property we could do this more cleanly.
-    def get_keyed_arguments_by_named_host(self, key, name) -> dict[str, dict]:
-        """Returns a dict of possible sbatch arguments per context for a given named host."""
-        if key not in self["hosts"][name]:
+    def get_keyed_arguments_by_named_host(self, key: KEYED_ARGUMENTS, name) -> dict[str, dict]:
+        """Returns a dict of possible keyed arguments per context for a given named host."""
+        if key not in self.config["hosts"][name]:
             return {}
 
-        return self["hosts"][name][key]
+        return self.config["hosts"][name][key]
 
-    def get_keyed_arguments_by_hostname(self, key, hostname) -> dict[str, dict]:
-        """Returns a dict of possible sbatch arguments per context for a given host."""
+    def get_keyed_arguments_by_hostname(self, key: KEYED_ARGUMENTS, hostname) -> dict[str, dict]:
+        """Returns a dict of possible keyed arguments per context for a given host."""
         name = self.get_name_by_hostname(hostname)
-        if name is None or key not in self["hosts"][name]:
+        if name is None or key not in self.config["hosts"][name]:
             return {}
-        return self["hosts"][name][key]
+        return self.config["hosts"][name][key]
 
-    def get_keyed_arguments(self, key, host=None, context=None):
-        """Returns the sbatch arguments for a given host and context."""
-
+    def get_keyed_arguments(self, key: KEYED_ARGUMENTS, host=None, context=None):
+        """Returns the keyed arguments for a given host and context.
+        
+            ex. key in ('sbatch_arguments', 'local_parameters')
+        """
         if context is None:
             # TODO: Is this sensible?
             if is_GEMS_test_workflow():
@@ -266,22 +275,90 @@ class InstanceConfig(dict):
 
         return args_dict
 
-    # md cluster host helpers aka "MDaaS-RunMD" context helpers
+    def add_keyed_arguments_to_host(self, key: KEYED_ARGUMENTS, hostname, context, args):
+        """Adds sbatch arguments to a host for a given context."""
+        if hostname not in self.config["hosts"]:
+            raise InstanceConfigError(
+                f"Hostname {hostname} not found in instance_config.json."
+            )
+
+        if key not in self.config["hosts"][hostname]:
+            self.config["hosts"][hostname][key] = {}
+
+        if context not in self.config["hosts"][hostname][key]:
+            self.config["hosts"][hostname][key][context] = {}
+        self.config["hosts"][hostname][key][context].update(args)
+
+
+class InstanceConfig(KeyedArgManager):
+    """ The main GEMS class for parsing it's active instance configuration file.
+    
+    A class for parsing and using the instance_config.yml of the active GEMS installation.
+
+    This class is deeply coupled with the active state of your GEMS environment. 
+    It has properties and methods which convey active environmental information.
+
+    This class is a singleton, so it can be instantiated once and then used throughout the
+    lifetime of a request. One feature of this is that the instance configuration cannot be changed
+    out from under the feet of a request because the real configuration file is read only once.
+
+    >>> instance_config = InstanceConfig()
+    >>> instance_config.get_available_contexts('gw-grpc-delegator')
+
+    TODO: This class is getting monolithic, break out functionality. (e.g. md cluster related)
+    """
+
+    @property
+    def is_configured() -> bool:
+        """Returns True if the $GEMSHOME/instance_config.json exists and is valid."""
+        return InstanceConfig.get_default_path().exists()
+
+    @staticmethod
+    def get_default_path(example=False) -> Path:
+        """The default path is the active GEMS instance configuration.
+        
+        TODO: change to active_path property.
+        """
+        name = "instance_config.json"
+        if example:
+            name += ".example"
+
+        return Path(os.getenv("GEMSHOME", "")) / name
+
+    @classmethod
+    def from_dict(cls, config_dict):
+        return cls(config=config_dict)
+
+    @staticmethod
+    def load(instance_config_path=None) -> dict:
+        if instance_config_path is None:
+            instance_config_path = InstanceConfig.get_default_path()
+
+        with open(instance_config_path, "r") as f:
+            instance_config = json.load(f)
+
+        return instance_config
+
+    def save(self, instance_config_path):
+        with open(instance_config_path, "w") as f:
+            json.dump(self.config, f, indent=2)
+
+    # specialized md cluster host helpers aka "MDaaS-RunMD" context helpers
     def get_md_filesystem_path(self) -> str:
         """Returns the filesystem path for the compute cluster by hostname defined in the instance config's hosts dict."""
         if (
-            "md_cluster_filesystem_path" not in self
-            or len(self["md_cluster_filesystem_path"]) == 0
+            "md_cluster_filesystem_path" not in self.config
+            or len(self.config["md_cluster_filesystem_path"]) == 0
         ):
             log.error(
                 "Access attempted but MD Cluster filesystem path not set in instance_config.json."
             )
 
-        return self["md_cluster_filesystem_path"]
+        return self.config["md_cluster_filesystem_path"]
 
     def set_md_filesystem_path(self, path):
         """Sets the filesystem path for the compute cluster by hostname defined in the instance config's hosts dict.
 
         You probably want to save the instance config after this.
         """
-        self["md_cluster_filesystem_path"] = path
+        self.config["md_cluster_filesystem_path"] = path
