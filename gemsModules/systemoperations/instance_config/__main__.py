@@ -18,9 +18,9 @@ log = Set_Up_Logging(__name__)
 
 
 class DateReversioner:
-    """A class to check if a ConfigManger's config file is older than the updated config file.
+    """A class to check if a ConfigManager's config file is older than the updated config file.
 
-    This class should not modify production configuratoin files. It should only run in a DevEnv.
+    This class should not modify production configuration files. It should only run in a DevEnv.
     """
 
     ...

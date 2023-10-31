@@ -22,7 +22,7 @@ class Test_InstanceConfig(unittest.TestCase):
         shutil.copyfile(example_path, self.test_ic_path)
 
         self.ic = InstanceConfig(config_path=self.test_ic_path)
-        self.ic.load(instance_config_path=self.test_ic_path)
+        self.ic.load(config_path=self.test_ic_path)
 
     def tearDown(self) -> None:
         os.remove(self.test_ic_path)
@@ -31,7 +31,7 @@ class Test_InstanceConfig(unittest.TestCase):
         """
         Test that the load method correctly loads the JSON content.
         """
-        config = self.ic.load(instance_config_path=self.test_ic_path)
+        config = self.ic.load(config_path=self.test_ic_path)
         self.assertIsInstance(config, dict)
         self.assertIn("hosts", config)
 

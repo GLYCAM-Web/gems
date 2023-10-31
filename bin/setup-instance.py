@@ -132,7 +132,7 @@ def main():
 
     # Don't reconfigure unless forced, back up if forced.
     if (
-        InstanceConfig.is_configured()
+        InstanceConfig.is_configured
         and os.getenv("GEMS_FORCE_INSTANCE_RECONFIGURATION") == "True"
     ):
         print("Backing up current instance_config.json...")
@@ -146,7 +146,7 @@ def main():
 
     # Configure the instance_config.json if it is not already configured.
     if (
-        not InstanceConfig.is_configured()
+        not InstanceConfig.is_configured
         or os.getenv("GEMS_FORCE_INSTANCE_RECONFIGURATION") == "True"
     ):
         print("Copying instance_config.json.example into place...")

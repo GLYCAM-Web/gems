@@ -47,12 +47,15 @@ class ConfigManager(ABC):
         return self._config
 
     @property
-    def is_configured() -> bool:
+    def is_configured(self) -> bool:
         """Returns True if the $GEMSHOME/instance_config.json exists and is valid."""
-        return InstanceConfig.get_default_path().exists()
+        return self.get_default_path().exists()
 
     def set_active_config(self, config_path: Path):
-        self._config = self.load(instance_config_path=config_path)
+        if config_path is None:
+            config_path = self.get_default_path()
+
+        self._config = self.load(config_path=config_path)
 
     def set_config_data(self, config: dict):
         self._config = config
@@ -67,17 +70,14 @@ class ConfigManager(ABC):
         return cls(config=config_dict)
 
     @staticmethod
-    def load(instance_config_path=None) -> dict:
+    def load(config_path) -> dict:
         """Load a json instance config file."""
-        if instance_config_path is None:
-            instance_config_path = InstanceConfig.get_default_path()
-
-        with open(instance_config_path, "r") as f:
+        with open(config_path, "r") as f:
             instance_config = json.load(f)
 
         return instance_config
 
-    def save(self, instance_config_path):
+    def save(self, config_path):
         """Save a json instance config file."""
-        with open(instance_config_path, "w") as f:
+        with open(config_path, "w") as f:
             json.dump(self.config, f, indent=2)
