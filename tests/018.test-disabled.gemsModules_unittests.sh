@@ -6,7 +6,7 @@ echo "Testing $0..."
 # This test aggregates specific python unittests from the gemsModules package into a pre-push test.
 
 tests=(
-    $GEMSHOME/gemsModules/systemoperations/tests/test_instance_ops.py
+    $GEMSHOME/gemsModules/systemoperations/instance_config/tests/test_instance_ops.py
 )
 
 for test in ${tests[@]}; do

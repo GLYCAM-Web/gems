@@ -6,7 +6,7 @@ from pydantic import constr, Field
 from pydantic.typing import Literal as pyLiteral
 
 from gemsModules.project.main_api import Project
-from gemsModules.systemoperations.instance_ops import InstanceConfig
+from gemsModules.systemoperations.instance_config import InstanceConfig
 
 from gemsModules.logging.logger import Set_Up_Logging
 

@@ -6,7 +6,7 @@ from gemsModules.mmservice.mdaas.tasks import create_slurm_submission
 
 from gemsModules.networkconnections.grpc import slurm_grpc_submit, RpcError
 
-from gemsModules.systemoperations.instance_ops import InstanceConfig
+from gemsModules.systemoperations.instance_config import InstanceConfig
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -14,7 +14,7 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
-# TODO: This is deeply coupled with systemoperations.instance_ops.InstanceConfig / instance_config.json
+# TODO: This is deeply coupled with systemoperations.instance_config.InstanceConfig / instance_config.json
 def create_contextual_slurm_submission_script(thisSlurmJobInfo):
     """Create a slurm submission script with context-specific sbatch arguments using the InstanceConfig."""
     SlurmJobDict = thisSlurmJobInfo.incoming_dict

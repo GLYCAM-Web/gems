@@ -24,13 +24,13 @@ from gemsModules.batchcompute.slurm.tasks.prepare_slurm_submission import (
     seek_correct_host,
     create_contextual_slurm_submission_script,
 )
-from gemsModules.systemoperations.instance_ops import InstanceConfig
+from gemsModules.systemoperations.instance_config import InstanceConfig
 
 from gemsModules.networkconnections.grpc import (
     is_GEMS_instance_for_SLURM_submission,
 )
 
-from gemsModules.systemoperations.instance_ops import InstanceConfig
+from gemsModules.systemoperations.instance_config import InstanceConfig
 from gemsModules.systemoperations.environment_ops import is_GEMS_test_workflow
 from gemsModules.logging.logger import new_concurrent_logger
 

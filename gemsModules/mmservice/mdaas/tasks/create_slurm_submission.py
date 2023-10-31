@@ -2,7 +2,7 @@ import json
 import os
 import traceback
 from gemsModules.systemoperations.environment_ops import is_GEMS_test_workflow
-from gemsModules.systemoperations.instance_ops import InstanceConfig
+from gemsModules.systemoperations.instance_config import InstanceConfig
 from gemsModules.systemoperations import filesystem_ops
 
 from gemsModules.logging.logger import Set_Up_Logging

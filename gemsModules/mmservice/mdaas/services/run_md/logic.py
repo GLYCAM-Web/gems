@@ -7,7 +7,7 @@ from gemsModules.mmservice.mdaas.services.run_md.run_md_api import (
     run_md_Inputs,
     run_md_Outputs,
 )
-from gemsModules.systemoperations.instance_ops import InstanceConfig
+from gemsModules.systemoperations.instance_config import InstanceConfig
 
 from gemsModules.logging.logger import Set_Up_Logging
 

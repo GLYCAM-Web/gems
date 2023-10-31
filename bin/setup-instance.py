@@ -4,7 +4,7 @@ import shutil, argparse, os, sys, json, datetime
 GemsPath = os.environ.get("GEMSHOME")
 sys.path.append(GemsPath)
 from gemsModules.systemoperations.environment_ops import is_GEMS_test_workflow
-from gemsModules.systemoperations.instance_ops import InstanceConfig
+from gemsModules.systemoperations.instance_config import InstanceConfig
 
 
 def argparser():
