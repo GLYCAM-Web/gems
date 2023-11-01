@@ -4,7 +4,7 @@ import shutil, argparse, os, sys, json, datetime
 GemsPath = os.environ.get("GEMSHOME")
 sys.path.append(GemsPath)
 from gemsModules.systemoperations.environment_ops import is_GEMS_test_workflow
-from gemsModules.systemoperations.instance_config import InstanceConfig
+from gemsModules.systemoperations.instance_config import InstanceConfig, DateReversioner
 
 
 def argparser():
@@ -50,7 +50,7 @@ def argparser():
     return parser
 
 
-def configure_instance_config_md(args):
+def configure_instance_config_md(args, mock=False):
     print("\nAbout to configure this GEMS instance...")
     ic = InstanceConfig()
 
@@ -110,17 +110,25 @@ def configure_instance_config_md(args):
             "given md_cluster_filesystem_path is only valid for the MD host thoreau.)\n\n"
             "Simply ignore this notice if you are in a DevEnv as no further configuration is necessary.\n"
         )
-        with open(
-            os.path.join(GemsPath, "MD_CLUSTER_HOST_PARTIAL_CONFIG-git-ignore-me.json"),
-            "w",
-        ) as f:
-            f.write(md_cluster_host_config_str)
-            print(
-                "Wrote out $GEMSHOME/MD_CLUSTER_HOST_PARTIAL_CONFIG-git-ignore-me.json"
-            )
+        if not mock:
+            with open(
+                os.path.join(
+                    GemsPath, "MD_CLUSTER_HOST_PARTIAL_CONFIG-git-ignore-me.json"
+                ),
+                "w",
+            ) as f:
+                f.write(md_cluster_host_config_str)
+                print(
+                    "Wrote out $GEMSHOME/MD_CLUSTER_HOST_PARTIAL_CONFIG-git-ignore-me.json"
+                )
 
-    if SAVE:
+    if SAVE and not mock:
         ic.save(ic.get_default_path())
+
+    if mock:
+        print(f"Generated instance configuration: {ic}")
+
+    return ic
 
 
 def main():
@@ -130,31 +138,20 @@ def main():
     """
     args = argparser().parse_args()
 
-    # Don't reconfigure unless forced, back up if forced.
-    if (
-        InstanceConfig.is_configured
-        and os.getenv("GEMS_FORCE_INSTANCE_RECONFIGURATION") == "True"
-    ):
-        print("Backing up current instance_config.json...")
-        shutil.move(
-            InstanceConfig.get_default_path(),
-            InstanceConfig.get_default_path().with_name(
-                f"instance_config.json.{datetime.datetime.now()}.bak"
-            ),
-        )
-        # ic.is_configured should now return False
+    # If the environment variable GEMS_FORCE_INSTANCE_RECONFIGURATION is set to True,
+    # force the update regardless of the date in the configuration.
+    force_reconfiguration = os.getenv("GEMS_FORCE_INSTANCE_RECONFIGURATION") == "True"
 
-    # Configure the instance_config.json if it is not already configured.
-    if (
-        not InstanceConfig.is_configured
-        or os.getenv("GEMS_FORCE_INSTANCE_RECONFIGURATION") == "True"
-    ):
-        print("Copying instance_config.json.example into place...")
-        shutil.copyfile(
-            InstanceConfig.get_default_path(example=True),
-            InstanceConfig.get_default_path(),
-        )
+    if force_reconfiguration or not InstanceConfig.is_configured:
+        active_config_path = InstanceConfig.get_default_path()
+        example_config_path = InstanceConfig.get_default_path(example=True)
+        reversioner = DateReversioner(active_config_path, example_config_path)
 
+        # Update the configuration using the DateReversioner.
+        # It will attempt to use a date from the active configuration if it exists to update.
+        reversioner.update()
+
+        # Configure the instance config
         configure_instance_config_md(args)
 
 

@@ -5,6 +5,8 @@ from .contexts import ContextManager
 from .hosts import HostManager
 from .keyedargs import KeyedArgManager
 
+from .versions import DateReversioner
+
 from .__main__ import InstanceConfig
 
 
@@ -14,5 +16,6 @@ __all__ = [
     "ContextManager",
     "ConfigManager",
     "InstanceConfig",
+    "DateReversioner",
     *_all_errors,
 ]

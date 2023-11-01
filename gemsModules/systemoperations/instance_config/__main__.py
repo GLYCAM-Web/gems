@@ -1,3 +1,4 @@
+import datetime
 import json, os, glob, shutil, socket
 from pathlib import Path
 from pydantic import BaseModel
@@ -17,13 +18,46 @@ from . import *
 log = Set_Up_Logging(__name__)
 
 
+# GEMS note: We should not modify production configuration files automatically. It should only run in a DevEnv.
 class DateReversioner:
-    """A class to check if a ConfigManager's config file is older than the updated config file.
+    """A class to version a json file based on a timestamp."""
 
-    This class should not modify production configuration files. It should only run in a DevEnv.
-    """
+    def __init__(self, active_config: Path, example_config: Path):
+        self.file_to_version = active_config
+        self.example = example_config
 
-    ...
+    def update(self):
+        """Update the file_to_version with the current date."""
+
+        needs_update = False
+        if self.file_to_version.exists():
+            # could generilize
+            j_data = json.load(open(self.file_to_version))
+            tj_data = json.load(open(self.example))
+            if "date" not in j_data:
+                # if no date is found, lets update to a versioned file
+                needs_update = True
+            else:
+                # check the template file for a date
+                # if the template is newer, lets update to a versioned file
+                if "date" in tj_data:
+                    if j_data["date"] < tj_data["date"]:
+                        needs_update = True
+                else:
+                    raise RuntimeError(
+                        "Template file does not have a date, cannot update."
+                    )
+
+        if needs_update:
+            # Backup the file_to_version.
+            backup_file = self.file_to_version.with_suffix(
+                f".{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.bak"
+            )
+            shutil.copyfile(self.file_to_version, backup_file)
+
+            # copy the example file in place of the file_to_version
+            shutil.copyfile(self.example, self.file_to_version)
+            log.info(f"Updated {self.file_to_version} with new date.")
 
 
 class InstanceConfig(KeyedArgManager):
@@ -67,7 +101,7 @@ class InstanceConfig(KeyedArgManager):
             log.warning(f"Context {context} not found in {self.Contexts}.")
 
         if context is None:
-            # TODO: Is this sensible?
+            # TODO: Is this sensible? We also need to generalize it to a systemoperation or combine with one already in use.
             if is_GEMS_test_workflow():
                 context = self.Contexts.DEV_ENV
             elif host is not None and self.Context.SWARM in self.get_available_contexts(
@@ -77,7 +111,8 @@ class InstanceConfig(KeyedArgManager):
 
         return super().get_keyed_arguments(key, host, context)
 
-    # specialized md cluster host helpers aka "MDaaS-RunMD" context helpers
+    # Special Context Helpers for GEMS defined here.
+    # "MDaaS-RunMD" context - MD Cluster host helpers
     def get_md_filesystem_path(self) -> str:
         """Returns the filesystem path for the MD compute cluster by hostname defined in the instance config's hosts dict."""
         if (
