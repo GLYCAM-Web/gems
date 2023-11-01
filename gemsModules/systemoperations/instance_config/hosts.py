@@ -10,7 +10,7 @@ class HostManager(ContextManager):
     HostManager depends on contexts, which the ContextManager provides.
     """
 
-    def add_host(self, hostname, host, slurmport, contexts=None, sbatch_arguments=None):
+    def add_host(self, hostname, host, slurmport, contexts=None):
         """Adds a host to the instance_config.json.
 
         This is the only way to add a host to the instance_config.json.

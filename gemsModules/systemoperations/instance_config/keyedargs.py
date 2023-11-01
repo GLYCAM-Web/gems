@@ -21,16 +21,6 @@ class KeyedArgManager(HostManager):
         SBATCH_ARGUMENTS = "sbatch_arguments"
         LOCAL_PARAMETERS = "local_parameters"
 
-    # should actually wrap host manager(super) and add the isinstance sbatcha_args check here
-    def add_host(self, hostname, host, slurmport, contexts=None, sbatch_arguments=None):
-        super().add_host(hostname, host, slurmport, contexts, sbatch_arguments)
-
-        if isinstance(sbatch_arguments, dict):
-            for ctx, args in sbatch_arguments.items():
-                self.add_keyed_arguments_to_host(
-                    "sbatch_arguments", hostname, ctx, args
-                )
-
     def get_default_keyed_arguments(
         self, key: ConfigurationKeys, context="Default"
     ) -> dict:

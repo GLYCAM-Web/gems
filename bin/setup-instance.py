@@ -50,8 +50,19 @@ def argparser():
     return parser
 
 
-def configure_instance_config_md(args, mock=False):
-    print("\nAbout to configure this GEMS instance...")
+def main():
+    """Sets up a GEMS instance for the first time.
+
+    Can be used by a DevEnv or manual GEMS setup.
+    """
+    force_reconfiguration = os.getenv("GEMS_FORCE_INSTANCE_RECONFIGURATION") == "True"
+    if force_reconfiguration or not InstanceConfig.is_configured:
+        print("\nAbout to configure this GEMS instance...")
+    else:
+        print("\nThis GEMS instance is already configured. Exiting.")
+        return
+
+    args = argparser().parse_args()
     ic = InstanceConfig()
 
     SAVE = False
@@ -96,21 +107,26 @@ def configure_instance_config_md(args, mock=False):
         )
         SAVE = True
 
-    if args.gen_remote_md_cluster_config is not None:
-        md_cluster_host_config_str = (
-            f'"{hostname}":\n{json.dumps(ic["hosts"][hostname], indent=2)},\n'
-            f'"md_cluster_filesystem_path": "{args.gen_remote_md_cluster_config}"\n\n'
-        )
+    if SAVE:
+        saved = ic.save()
+        if saved and args.gen_remote_md_cluster_config is not None:
+            if args.add_host is None:
+                raise RuntimeError(
+                    "Cannot generate a remote MD cluster config without adding a host first, please try again."
+                )
 
-        # print out the newly added host sub-dict because it will be useful for configuring the MD cluster host.
-        print(
-            "Added the following json keys to the instance_config.json:\n\n"
-            + md_cluster_host_config_str
-            + "(you can use this entry to help initialize the MD cluster host, but the\n"
-            "given md_cluster_filesystem_path is only valid for the MD host thoreau.)\n\n"
-            "Simply ignore this notice if you are in a DevEnv as no further configuration is necessary.\n"
-        )
-        if not mock:
+            md_cluster_host_config_str = (
+                f'"{hostname}":\n{json.dumps(ic.config["hosts"][hostname], indent=2)},\n'
+                f'"md_cluster_filesystem_path": "{args.gen_remote_md_cluster_config}"\n\n'
+            )
+
+            # print out the newly added host sub-dict because it will be useful for configuring the MD cluster host.
+            print(
+                "Added the following json keys to the instance_config.json:\n\n"
+                + md_cluster_host_config_str
+                + "(you can use this entry to help initialize the MD cluster host.)\n"
+                "Simply ignore this notice if you are in a DevEnv as no further configuration is necessary.\n"
+            )
             with open(
                 os.path.join(
                     GemsPath, "MD_CLUSTER_HOST_PARTIAL_CONFIG-git-ignore-me.json"
@@ -122,37 +138,7 @@ def configure_instance_config_md(args, mock=False):
                     "Wrote out $GEMSHOME/MD_CLUSTER_HOST_PARTIAL_CONFIG-git-ignore-me.json"
                 )
 
-    if SAVE and not mock:
-        ic.save(ic.get_default_path())
-
-    if mock:
-        print(f"Generated instance configuration: {ic}")
-
     return ic
-
-
-def main():
-    """Sets up a GEMS instance for the first time.
-
-    Can be used by a DevEnv or manual GEMS setup.
-    """
-    args = argparser().parse_args()
-
-    # If the environment variable GEMS_FORCE_INSTANCE_RECONFIGURATION is set to True,
-    # force the update regardless of the date in the configuration.
-    force_reconfiguration = os.getenv("GEMS_FORCE_INSTANCE_RECONFIGURATION") == "True"
-
-    if force_reconfiguration or not InstanceConfig.is_configured:
-        active_config_path = InstanceConfig.get_default_path()
-        example_config_path = InstanceConfig.get_default_path(example=True)
-        reversioner = DateReversioner(active_config_path, example_config_path)
-
-        # Update the configuration using the DateReversioner.
-        # It will attempt to use a date from the active configuration if it exists to update.
-        reversioner.update()
-
-        # Configure the instance config
-        configure_instance_config_md(args)
 
 
 if __name__ == "__main__":

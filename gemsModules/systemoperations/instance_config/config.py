@@ -5,6 +5,7 @@ from pathlib import Path
 
 from gemsModules.logging.logger import Set_Up_Logging
 
+
 log = Set_Up_Logging(__name__)
 
 
@@ -54,6 +55,9 @@ class ConfigManager(ABC):
     def set_active_config(self, config_path: Path):
         if config_path is None:
             config_path = self.get_default_path()
+
+        if not config_path.exists():
+            config_path = self.get_default_path(example=True)
 
         self._config = self.load(config_path=config_path)
 

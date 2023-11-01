@@ -28,6 +28,7 @@ class Host(BaseModel):
 
 
 class Config(BaseModel):
+    date: str
     hosts: Dict[str, Host]
     default_sbatch_arguments: Dict[str, SbatchArguments]
     default_local_parameters: Dict[str, LocalParameters]
