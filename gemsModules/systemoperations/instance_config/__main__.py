@@ -2,7 +2,7 @@ import datetime
 import json, os, glob, shutil, socket
 from pathlib import Path
 from pydantic import BaseModel
-from typing import Dict, List, Optional, Literal
+from typing import Dict, List, Optional, Literal, Union
 from abc import ABC, abstractmethod
 
 from gemsModules.systemoperations.instance_config.versions import DateReversioner

@@ -64,6 +64,10 @@ def main():
 
     args = argparser().parse_args()
     ic = InstanceConfig()
+    if len(ic.config) and "date" not in ic.config:
+        # Using an old instance config, lets get the example to modify instead.
+        # Theoretically, setup-instance.py can update configs rather than just recreate them.
+        ic.set_active_config(ic.get_default_path(example=True))
 
     SAVE = False
     if args.set_md_cluster_filesystem_path is not None:

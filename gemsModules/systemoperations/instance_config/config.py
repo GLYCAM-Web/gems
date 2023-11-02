@@ -2,6 +2,7 @@ import json
 
 from abc import ABC, abstractmethod
 from pathlib import Path
+from typing import Union
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -28,7 +29,11 @@ class ConfigManager(ABC):
         return cls._instance
 
     def __init__(
-        self, config: dict = None, config_path=None, reinitialize=False, **kwargs
+        self,
+        config: dict = None,
+        config_path: Union[Path, str] = None,
+        reinitialize: bool = False,
+        **kwargs
     ):
         # Singleton pattern - only initialize once, overridable.
         if not reinitialize and self.__initialized:
