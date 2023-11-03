@@ -90,6 +90,29 @@ class TestDateReversioner(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             reversioner.update()
 
+    def test_update_with_custom_data(self):
+        # Create an active config with an old date
+        old_date = (datetime.datetime.now() - datetime.timedelta(days=1)).isoformat()
+        with open(self.active_config_path, "w") as f:
+            json.dump({"date": old_date}, f)
+
+        # Provide new version data directly
+        new_version_data = {
+            "date": datetime.datetime.now().isoformat(),
+            "new_data": "This is some new data",
+        }
+
+        reversioner = DateReversioner(
+            self.active_config_path, new_config_data=new_version_data
+        )
+        reversioner.update()
+
+        with open(self.active_config_path, "r") as f:
+            data = json.load(f)
+
+        self.assertEqual(data["date"], new_version_data["date"])
+        self.assertEqual(data["new_data"], new_version_data["new_data"])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -64,10 +64,6 @@ def main():
 
     args = argparser().parse_args()
     ic = InstanceConfig()
-    if len(ic.config) and "date" not in ic.config:
-        # Using an old instance config, lets get the example to modify instead.
-        # Theoretically, setup-instance.py can update configs rather than just recreate them.
-        ic.set_active_config(ic.get_default_path(example=True))
 
     SAVE = False
     if args.set_md_cluster_filesystem_path is not None:
@@ -130,14 +126,16 @@ def main():
             # print out the newly added host sub-dict because it will be useful for configuring the MD cluster host.
             print(
                 "Please use the following command on the MD Cluster host if you have not already synchronized your instances:\n\n"
-                f"{generating_cmd}\n\n(Ignore this message if you are in a DevEnv, it has been done for you.)\n\n"
+                f"{generating_cmd}\n\n(Ignore this message if you are in a DevEnv, it has been done for you.)\n"
             )
 
             with open(
                 os.path.join(GemsPath, "REMOTE_MD_CLUSTER_HOST_SETUP-git-ignore-me.sh"),
                 "w",
             ) as f:
-                f.write(generating_cmd)
+                # write bash header
+                f.write("#!/bin/bash\n\n")
+                f.write(f"{generating_cmd}\n")
                 print(
                     "Wrote out $GEMSHOME/REMOTE_MD_CLUSTER_HOST_SETUP-git-ignore-me.sh"
                 )

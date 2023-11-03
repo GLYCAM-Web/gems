@@ -35,27 +35,38 @@ class DateReversioner:
 
         return self._new_version_data
 
-    def update(self):
-        """Update the file_to_version with the current date."""
+    def set_new_config_data(self, config: dict):
+        # Because this doesn't use a path, unset it.
+        self._new_version = None
+        self._new_version_data = config
 
-        needs_update = False
-        if self.file_to_version.exists():
-            if "date" not in self.new_version:
-                raise RuntimeError("Template file does not have a date, cannot update.")
+    def set_new_config_path(self, config_path: Path):
+        # Likewise, unset data so we can regenerate it from the path.
+        self._new_version_data = None
+        self._new_version = config_path
 
-            if "date" not in self.old_version:
-                # if no date is found, lets update to a versioned file
-                needs_update = True
-            else:
-                # check the template file for a date
-                # if the template is newer, lets update to a versioned file
-                old_date = datetime.datetime.fromisoformat(self.old_version["date"])
-                new_date = datetime.datetime.fromisoformat(self.new_version["date"])
-                if new_date > old_date:
-                    needs_update = True
+    @property
+    def is_outdated(self) -> bool:
+        """Return True if the file_to_version is older than the new_version."""
+        if not self.file_to_version.exists():
+            return True
+
+        if "date" not in self.new_version:
+            raise RuntimeError("Template file does not have a date, cannot update.")
+
+        if "date" not in self.old_version:
+            # if no date is found, lets update to a versioned file
+            return True
         else:
-            needs_update = True
+            # check the template file for a date
+            # if the template is newer, lets update to a versioned file
+            old_date = datetime.datetime.fromisoformat(self.old_version["date"])
+            new_date = datetime.datetime.fromisoformat(self.new_version["date"])
+            return new_date > old_date
 
+    def update(self) -> bool:
+        """Update the file_to_version with the current date."""
+        needs_update = self.is_outdated
         if needs_update:
             # Backup the file_to_version.
             if self.file_to_version.exists():
@@ -67,8 +78,8 @@ class DateReversioner:
             # copy the example file in place of the file_to_version
             with self.file_to_version.open("w") as f:
                 json.dump(self.new_version, f, indent=2)
-                print(f"Updated {self.file_to_version} with new date.")
+                print(f"\nUpdated {self.file_to_version} with new date.")
         else:
-            print(f"No update needed for {self.file_to_version}.")
+            print(f"\nNo update needed for {self.file_to_version}.")
 
         return needs_update

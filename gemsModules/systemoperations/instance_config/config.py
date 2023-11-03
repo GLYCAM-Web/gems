@@ -90,3 +90,9 @@ class ConfigManager(ABC):
         """Save a json instance config file."""
         with open(config_path, "w") as f:
             json.dump(self.config, f, indent=2)
+
+    def __getitem__(self, key):
+        return self.config[key]
+
+    def __setitem__(self, key, value):
+        self.config[key] = value
