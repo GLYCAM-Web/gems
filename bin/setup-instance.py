@@ -119,27 +119,27 @@ def main():
                     "Cannot generate a remote MD cluster config without adding a host first, please try again."
                 )
 
-            md_cluster_host_config_str = (
-                f'"{hostname}":\n{json.dumps(ic.config["hosts"][hostname], indent=2)},\n'
-                f'"md_cluster_filesystem_path": "{args.gen_remote_md_cluster_config}"\n\n'
+            generating_cmd = (
+                f"python3 $GEMSHOME/bin/setup-instance.py \\\n"
+                f"--add-host '{hostname};[MDaaS-RunMD];{host}:{port}' \\\n"
+                f"--set-sbatch-arguments '{hostname};MDaaS-RunMD;{json.dumps(ic['hosts'][hostname]['sbatch_arguments'])}' \\\n"
+                f"--set-local-parameters '{hostname};MDaaS-RunMD;{json.dumps(ic['hosts'][hostname]['local_parameters'])}' \\\n"
+                f"--set-md-cluster-filesystem-path {args.gen_remote_md_cluster_config}"
             )
 
             # print out the newly added host sub-dict because it will be useful for configuring the MD cluster host.
             print(
-                "Added the following json keys to the instance_config.json:\n\n"
-                + md_cluster_host_config_str
-                + "(you can use this entry to help initialize the MD cluster host.)\n"
-                "Simply ignore this notice if you are in a DevEnv as no further configuration is necessary.\n"
+                "Please use the following command on the MD Cluster host if you have not already synchronized your instances:\n\n"
+                f"{generating_cmd}\n\n(Ignore this message if you are in a DevEnv, it has been done for you.)\n\n"
             )
+
             with open(
-                os.path.join(
-                    GemsPath, "MD_CLUSTER_HOST_PARTIAL_CONFIG-git-ignore-me.json"
-                ),
+                os.path.join(GemsPath, "REMOTE_MD_CLUSTER_HOST_SETUP-git-ignore-me.sh"),
                 "w",
             ) as f:
-                f.write(md_cluster_host_config_str)
+                f.write(generating_cmd)
                 print(
-                    "Wrote out $GEMSHOME/MD_CLUSTER_HOST_PARTIAL_CONFIG-git-ignore-me.json"
+                    "Wrote out $GEMSHOME/REMOTE_MD_CLUSTER_HOST_SETUP-git-ignore-me.sh"
                 )
 
     return ic
