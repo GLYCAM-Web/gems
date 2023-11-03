@@ -1,4 +1,7 @@
 from enum import Enum
+from typing import Dict, List
+
+from gemsModules.systemoperations.instance_config.errors import InstanceConfigError
 from gemsModules.logging.logger import Set_Up_Logging
 
 from . import HostManager
@@ -23,13 +26,13 @@ class KeyedArgManager(HostManager):
 
     def get_default_keyed_arguments(
         self, key: ConfigurationKeys, context="Default"
-    ) -> dict:
+    ) -> Dict:
         """Returns the default keyed arguments for a given context."""
         return self.config[f"default_{key}"][context]
 
     def get_keyed_arguments_by_context(
         self, key: ConfigurationKeys, context
-    ) -> list[dict]:
+    ) -> List[Dict]:
         """Returns a list of possible keyed arguments per host for a given context."""
         l = []
         for host in self.config["hosts"].values():
@@ -43,7 +46,7 @@ class KeyedArgManager(HostManager):
 
     def get_keyed_arguments_by_named_host(
         self, key: ConfigurationKeys, name
-    ) -> dict[str, dict]:
+    ) -> Dict[str, Dict]:
         """Returns a dict of possible keyed arguments per context for a given named host."""
         if key not in self.config["hosts"][name]:
             return {}
@@ -52,7 +55,7 @@ class KeyedArgManager(HostManager):
 
     def get_keyed_arguments_by_hostname(
         self, key: ConfigurationKeys, hostname
-    ) -> dict[str, dict]:
+    ) -> Dict[str, Dict]:
         """Returns a dict of possible keyed arguments per context for a given host."""
         name = self.get_name_by_hostname(hostname)
         if name is None or key not in self.config["hosts"][name]:

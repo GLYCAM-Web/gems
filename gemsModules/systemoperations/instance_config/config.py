@@ -2,7 +2,7 @@ import json
 
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Union
+from typing import Dict, Union
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -30,7 +30,7 @@ class ConfigManager(ABC):
 
     def __init__(
         self,
-        config: dict = None,
+        config: Dict = None,
         config_path: Union[Path, str] = None,
         reinitialize: bool = False,
         **kwargs
@@ -66,7 +66,7 @@ class ConfigManager(ABC):
 
         self._config = self.load(config_path=config_path)
 
-    def set_config_data(self, config: dict):
+    def set_config_data(self, config: Dict):
         self._config = config
 
     @abstractmethod
@@ -79,7 +79,7 @@ class ConfigManager(ABC):
         return cls(config=config_dict)
 
     @staticmethod
-    def load(config_path) -> dict:
+    def load(config_path) -> Dict:
         """Load a json instance config file."""
         with open(config_path, "r") as f:
             instance_config = json.load(f)

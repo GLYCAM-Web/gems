@@ -3,13 +3,14 @@ import datetime
 import json
 from pathlib import Path
 import shutil
+from typing import Dict
 
 
 class DateReversioner:
     """A class to version a json file based on a timestamp."""
 
     def __init__(
-        self, active_config: Path, new_config: Path = None, new_config_data: dict = None
+        self, active_config: Path, new_config: Path = None, new_config_data: Dict = None
     ):
         self.file_to_version = active_config
         self._old_version_data = None
@@ -35,7 +36,7 @@ class DateReversioner:
 
         return self._new_version_data
 
-    def set_new_config_data(self, config: dict):
+    def set_new_config_data(self, config: Dict):
         # Because this doesn't use a path, unset it.
         self._new_version = None
         self._new_version_data = config

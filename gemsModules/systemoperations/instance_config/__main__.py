@@ -1,7 +1,6 @@
 import datetime
 import json, os, glob, shutil, socket
 from pathlib import Path
-from pydantic import BaseModel
 from typing import Dict, List, Optional, Literal, Union
 from abc import ABC, abstractmethod
 
@@ -39,7 +38,7 @@ class InstanceConfig(KeyedArgManager):
 
     def __init__(
         self,
-        config: dict = None,
+        config: Dict = None,
         config_path: Union[Path, str] = None,
         reinitialize: bool = False,
         **kwargs,
