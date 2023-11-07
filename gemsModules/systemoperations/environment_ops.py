@@ -44,7 +44,7 @@ def is_GEMS_live_swarm() -> bool:
 
 def is_GEMS_test_workflow() -> bool:
     try:
-        GEMS_MD_TEST_WORKFLOW = os.getenv("GEMS_MD_TEST_WORKFLOW", False)
+        GEMS_MD_TEST_WORKFLOW = os.getenv("GEMS_MD_TEST_WORKFLOW", "False") == "True"
         log.debug("got GEMS_MD_TEST_WORKFLOW and it is:  " + str(GEMS_MD_TEST_WORKFLOW))
     except Exception as error:
         log.error("Cannnot determine workflow status.")

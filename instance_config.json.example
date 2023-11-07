@@ -1,4 +1,5 @@
 {
+  "date": "2023-11-01T16:26:57.665784",
   "hosts": {
     "grpc-default": {
       "contexts": [
@@ -15,19 +16,10 @@
         "DevEnv",
         "FreeTier",
         "ShortJob",
-        "Sequence-Build3DStructure",
-        "MDaaS-RunMD"
+        "Sequence-Build3DStructure"
       ],
       "host": "gw-slurm-head",
-      "slurmport": "50052",
-      "sbatch_arguments": {
-        "MDaaS-RunMD": {
-          "partition": "amber",
-          "time": "120",
-          "nodes": "1",
-          "tasks-per-node": "4"
-        }
-      }
+      "slurmport": "50052"
     }
   },
   "default_sbatch_arguments": {
@@ -37,5 +29,11 @@
       "nodes": "1",
       "tasks-per-node": "4"
     }
-  }
+  },
+  "default_local_parameters": {
+    "Default": {
+      "numProcs": "4"
+    }
+  },
+  "md_cluster_filesystem_path": "/website/userdata/mmservice/md"
 }

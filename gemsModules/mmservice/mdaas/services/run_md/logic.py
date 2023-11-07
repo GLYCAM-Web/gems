@@ -7,6 +7,7 @@ from gemsModules.mmservice.mdaas.services.run_md.run_md_api import (
     run_md_Inputs,
     run_md_Outputs,
 )
+from gemsModules.systemoperations.instance_config import InstanceConfig
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -17,9 +18,12 @@ def execute(inputs: run_md_Inputs) -> run_md_Outputs:
     log.debug(f"serviceInputs: {inputs}")
     service_outputs = run_md_Outputs()
 
+    ic = InstanceConfig()
+
     initiate_build.execute(
         pUUID=inputs.pUUID,
-        outputDirPath=inputs.outputDirPath,
+        # outputDirPath=inputs.outputDirPath,
+        outputDirPath=ic.get_md_filesystem_path(),
         use_serial=True,
     )
 

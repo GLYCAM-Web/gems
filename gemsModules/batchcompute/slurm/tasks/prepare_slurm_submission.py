@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 
+import os
+import socket
 from gemsModules.mmservice.mdaas.tasks import create_slurm_submission
 
 from gemsModules.networkconnections.grpc import slurm_grpc_submit, RpcError
 
-from gemsModules.systemoperations.instance_ops import InstanceConfig
+from gemsModules.systemoperations.instance_config import InstanceConfig
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -12,45 +14,52 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
-# TODO: This is deeply coupled with systemoperations.instance_ops.InstanceConfig / instance_config.json
-def create_contextual_slurm_submission_script(
-    context, slurm_runscript_path, SlurmJobInfo
-):
+# TODO: This is deeply coupled with systemoperations.instance_config.InstanceConfig / instance_config.json
+def create_contextual_slurm_submission_script(thisSlurmJobInfo):
     """Create a slurm submission script with context-specific sbatch arguments using the InstanceConfig."""
+    SlurmJobDict = thisSlurmJobInfo.incoming_dict
+
     ic = InstanceConfig()
-    ic_args = ic.get_sbatch_arguments(context=context)
-
-    thisSlurmJobInfo = SlurmJobInfo.incoming_dict
-
-    # TODO: One day, different slurm submission will need to be made.
-    # TODO: Update job info keys so that we can just dict unpack/update. RN this is a compatibility patch.
-    thisSlurmJobInfo["nodes"] = ic_args["nodes"]
-    thisSlurmJobInfo["time"] = ic_args["time"]
-    thisSlurmJobInfo["partition"] = ic_args["partition"]
-    # Default is okay for now:
-    # thisSlurmJobInfo["sbatchArgument"] = ic_args["sbatchArgument"]
-
-    if "tasks-per-node" in ic_args:
-        log.debug("Found tasks-per-node in ic_args")
-        thisSlurmJobInfo["tasks-per-node"] = ic_args["tasks-per-node"]
-    else:
-        thisSlurmJobInfo["tasks-per-node"] = "1"
-
-    if "gres" in ic_args:
-        thisSlurmJobInfo["gres"] = ic_args["gres"]
-    else:
-        thisSlurmJobInfo["gres"] = None
-    log.debug(
-        f"Filled SLURM Job info with sbatch_arguments from: %s\nJobInfo: %s",
-        ic_args,
-        thisSlurmJobInfo,
+    ic_args = ic.get_keyed_arguments(
+        "sbatch_arguments", context=SlurmJobDict["context"]
     )
 
-    create_slurm_submission.execute(slurm_runscript_path, SlurmJobInfo)
+    SlurmJobDict.update(ic_args)
+
+    SlurmJobDict["slurm_runscript_name"] = "slurm_submit.sh"
+    SlurmJobDict["workingDirectory"] = os.path.join(
+        ic.get_md_filesystem_path(),
+        SlurmJobDict["pUUID"],
+    )
+    # instead of passing working directory, pass pUUID only and get base mdcluster path # also this will need to have specialized function for contexts in the future. (md cluster path is only for MDaaS-RunMD)
+    SlurmJobDict["slurm_runscript_name"] = os.path.join(
+        SlurmJobDict["workingDirectory"],
+        SlurmJobDict["slurm_runscript_name"],
+    )
+
+    SlurmJobDict["sbatchArgument"] = (
+        os.path.join(
+            SlurmJobDict["workingDirectory"],
+            SlurmJobDict["sbatchArgument"],
+        )
+        + "\n"
+    )
+
+    # In the future, We could possibly move this down to after we know if this is the correct host to submit on.
+    log.debug("Slurm runscript path: " + SlurmJobDict["slurm_runscript_name"] + "\n")
+    if os.path.exists(SlurmJobDict["slurm_runscript_name"]):
+        log.debug("Found existing Slurm runscript.  Refusing to clobber.")
+        return
+    else:
+        log.debug("Will generate a new Slurm runscript.")
+
+        log.debug("About to create runscript on %s", socket.gethostname())
+
+    create_slurm_submission.execute(SlurmJobDict)
 
 
 def seek_correct_host(jsonObjectString, context):
-    """Using gRPC, try to reroute the request to the correct host given a context, ususally the current one."""
+    """Using gRPC, try to reroute the request to the correct host given a context, usually the current one."""
     addresses = InstanceConfig().get_possible_hosts_for_context(
         context, with_slurmport=True
     )

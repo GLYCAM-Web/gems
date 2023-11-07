@@ -6,9 +6,9 @@ import os, sys
 import gems_grpc_slurm_pb2
 import gems_grpc_slurm_pb2_grpc
 
-from gemsModules.logging.logger import Set_Up_Logging
+from gemsModules.logging.logger import new_concurrent_logger
 
-log = Set_Up_Logging(__name__)
+log = new_concurrent_logger(__name__)
 
 
 class GemsGrpcSlurmClient:

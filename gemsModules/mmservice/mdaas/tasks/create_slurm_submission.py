@@ -2,54 +2,113 @@ import json
 import os
 import traceback
 from gemsModules.systemoperations.environment_ops import is_GEMS_test_workflow
-from gemsModules.systemoperations.instance_ops import InstanceConfig
+from gemsModules.systemoperations.instance_config import InstanceConfig
+from gemsModules.systemoperations import filesystem_ops
 
 from gemsModules.logging.logger import Set_Up_Logging
 
 log = Set_Up_Logging(__name__)
 
 
-# This might be generalized, but for now it expects to only be triggered by MDaaS as a task of mdaas.
-def make_slurm_submission_script(SlurmJobInfo):
+# TODO: Where should this go? systemoperations seems like the spot until you consider this is an amber specific function. Tasks might be better interpreted as common library utilities for an Entity.
+def get_residues_from_parm7(parm7_file) -> int:
+    with open(parm7_file, "r") as f:
+        for line in f:
+            if "FLAG SOLVENT_POINTERS" in line:
+                # Skip the next line
+                next(f)
+                # Read the third line after the matched line
+                target_line = next(f).strip()
+                return int(target_line.split()[0])
+    return 0  # "FLAG SOLVENT_POINTERS" not found in file
+
+
+def make_slurm_submission_script(SlurmJobDict):
+    log.debug("SlurmJobDict: " + str(SlurmJobDict))
     script = (
         "#!/bin/bash\n"
-        f"#SBATCH --chdir={SlurmJobInfo['workingDirectory']}\n"
+        f"#SBATCH --chdir={SlurmJobDict['workingDirectory']}\n"
         f"#SBATCH --error=slurm_%x-%A.err\n"
-        f"#SBATCH --get-user-env\n"
-        f"#SBATCH --job-name={SlurmJobInfo['name']}\n"
-        f"#SBATCH --nodes={SlurmJobInfo['nodes']}\n"
         f"#SBATCH --output=slurm_%x-%A.out\n"
-        f"#SBATCH --partition={SlurmJobInfo['partition']}\n"
-        f"#SBATCH --tasks-per-node={SlurmJobInfo['tasks-per-node']}\n\n"
+        f"#SBATCH --get-user-env\n"
+        f"#SBATCH --job-name={SlurmJobDict['name']}\n"
+        f"#SBATCH --nodes={SlurmJobDict['nodes']}\n"
+        f"#SBATCH --partition={SlurmJobDict['partition']}\n"
+        f"#SBATCH --time={SlurmJobDict['time']}\n"
     )
 
-    if SlurmJobInfo["gres"] is not None:
-        script += f"#SBATCH --gres={SlurmJobInfo['gres']}\n"
+    # Not setting these may be desirable, so they are optional entries in the instance_config.
+    if "tasks-per-node" in SlurmJobDict:
+        script += f"#SBATCH --tasks-per-node={SlurmJobDict['tasks-per-node']}\n"
+    if "cpus-per-task" in SlurmJobDict:
+        script += f"#SBATCH --cpus-per-task={SlurmJobDict['cpus-per-task']}\n"
+
+    if SlurmJobDict["use_gpu"]:
+        script += f"#SBATCH --gres={SlurmJobDict['gres']}\n"
+
+    script += "\n"
 
     if is_GEMS_test_workflow():
-        log.debug("setting testing workflow to yes")
         script += "export MDUtilsTestRunWorkflow=Yes\n\n"
-    else:
-        log.debug("NOT setting testing workflow to yes")
-    log.debug("The sbatchArgument is : " + SlurmJobInfo["sbatchArgument"])
 
     # This argument is set to the script we want slurm to execute.
-    script += f"{SlurmJobInfo['sbatchArgument']}\n"
+    script += SlurmJobDict["sbatchArgument"] + "\n"
+    log.debug("Our slurm submission script is:\n" + script + "\n")
 
     return script
 
 
-def execute(path, thisSlurmJobInfo):
+def update_local_parameters_file(SlurmJobDict):
+    # TODO: Fix? Hacked?
+    # We need to update Local_Run_Parameters.bash as it was copied by gemsModules/mmservice/amber before we were local.
+    local_param_file = os.path.join(
+        SlurmJobDict["workingDirectory"], "Local_Run_Parameters.bash"
+    )
+
+    # update MPI/CUDA settings if using GPU.
+    if SlurmJobDict["use_gpu"]:
+        filesystem_ops.replace_bash_variable_in_file(
+            local_param_file, {"useMpi": "N", "useCuda": "Y"}
+        )
+
+    # lets replace all local parameters configured from the instance config. For example, "numProcs".
+    ic = InstanceConfig()
+    args = ic.get_keyed_arguments("local_parameters", context=SlurmJobDict["context"])
+    filesystem_ops.replace_bash_variable_in_file(local_param_file, args)
+
+
+def update_slurm_job(SlurmJobDict):
+    # amber_input_file = os.path.join(SlurmJobDict["workingDirectory"], "MdInput.parm7")
+
+    # could be part of a "update_slurm_job" task.
+    # gpu toggle must update both local params and slurm script.
+    requires_gpu = False
+    if "gres" in SlurmJobDict:
+        requires_gpu = SlurmJobDict["gres"] is not None
+
+    # Note: This was part of a CPU selection fix to handle Amber's small box problem on GPU.
+    # can_use_gpu = get_residues_from_parm7(amber_input_file) > 3
+    if requires_gpu:  # and can_use_gpu:
+        SlurmJobDict["use_gpu"] = True
+    else:
+        SlurmJobDict["use_gpu"] = False
+    log.debug(f"requires_gpu=%s", requires_gpu)
+
+
+def execute(SlurmJobDict):
+    path = SlurmJobDict["slurm_runscript_name"]
+
+    update_slurm_job(SlurmJobDict)
+    update_local_parameters_file(SlurmJobDict)
+
+    script = make_slurm_submission_script(SlurmJobDict)
+
     try:
-        script = open(path, "w")
+        with open(path, "w") as f:
+            f.write(script)
+            log.debug("Wrote slurm submission script to: " + path)
     except Exception as error:
         log.error("Cannnot write slurm run script. Aborting")
         log.error("Error type: " + str(type(error)))
         log.error(traceback.format_exc())
         raise error
-        # sys.exit(1)
-
-    incoming_dict = thisSlurmJobInfo.incoming_dict
-
-    script.write(make_slurm_submission_script(incoming_dict))
-    log.debug("Wrote slurm submission script to: " + path)

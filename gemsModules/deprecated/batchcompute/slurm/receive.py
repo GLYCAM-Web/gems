@@ -2,43 +2,55 @@
 import gemsModules.deprecated
 from gemsModules.deprecated import common
 from gemsModules.deprecated.common.services import *
-from gemsModules.deprecated.common.transaction import * # might need whole file...
+from gemsModules.deprecated.common.transaction import *  # might need whole file...
 import traceback
 from gemsModules.deprecated.batchcompute.slurm.dataio import *
 from gemsModules.deprecated.common.loggingConfig import *
 
-if loggers.get(__name__):
-    pass
-else:
-    log = createLogger(__name__)
+# if loggers.get(__name__):
+#     pass
+# else:
+#     log = createLogger(__name__)
+
+from gemsModules.logging.logger import new_concurrent_logger
+
+log = new_concurrent_logger(__name__)
+
 
 def submit(thisSlurmJobInfo):
     log.debug("submit() was called.\n")
     import os, sys, subprocess, signal
     from subprocess import Popen
 
-    if 'sbatchArgument' not in thisSlurmJobInfo.incoming_dict.keys():
+    if "sbatchArgument" not in thisSlurmJobInfo.incoming_dict.keys():
         return "SLURM submit cannot find sbatch submission arguments."
 
-    if thisSlurmJobInfo.incoming_dict['workingDirectory'] is not None:
+    if thisSlurmJobInfo.incoming_dict["workingDirectory"] is not None:
         try:
-            os.chdir(thisSlurmJobInfo.incoming_dict['workingDirectory'])
+            os.chdir(thisSlurmJobInfo.incoming_dict["workingDirectory"])
         except Exception as error:
             log.error("Was unable to change to the working directory.")
             log.error("Error type: " + str(type(error)))
             log.error(traceback.format_exc())
             return "Was unable to change to the working directory."
-    log.debug("The current directory is:  " + os.getcwd() )
+    log.debug("The current directory is:  " + os.getcwd())
     try:
-        log.debug ("In func submit(), incoming dict sbatchArg is: " + thisSlurmJobInfo.incoming_dict['sbatchArgument'] + "\n")
-        p = subprocess.Popen( [ 'sbatch', thisSlurmJobInfo.incoming_dict["slurm_runscript_name"] ] ,
-                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        (outputhere,errorshere) = p.communicate()
-        if p.returncode != 0 :
+        log.debug(
+            "In func submit(), incoming dict sbatchArg is: "
+            + thisSlurmJobInfo.incoming_dict["sbatchArgument"]
+            + "\n"
+        )
+        p = subprocess.Popen(
+            ["sbatch", thisSlurmJobInfo.incoming_dict["slurm_runscript_name"]],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        (outputhere, errorshere) = p.communicate()
+        if p.returncode != 0:
             return "SLURM submit got non-zero exit upon attempt to submit."
         else:
             log.debug("outputhere in raw form: " + str(outputhere))
-            theOutput=outputhere.decode("utf-8")
+            theOutput = outputhere.decode("utf-8")
             log.debug("outputhere stripped: " + theOutput)
             return theOutput
     except Exception as error:
@@ -47,8 +59,10 @@ def submit(thisSlurmJobInfo):
         log.error(traceback.format_exc())
         return "Was unable to submit the job."
 
+
 def writeSlurmSubmissionScript(path, thisSlurmJobInfo):
     import sys, os
+
     try:
         script = open(path, "w")
     except Exception as error:
@@ -56,15 +70,15 @@ def writeSlurmSubmissionScript(path, thisSlurmJobInfo):
         log.error("Error type: " + str(type(error)))
         log.error(traceback.format_exc())
         raise error
-        #sys.exit(1)
+        # sys.exit(1)
 
     incoming_dict = thisSlurmJobInfo.incoming_dict
 
-    GEMS_MD_TEST_WORKFLOW = 'False'
-    try :
-        GEMS_MD_TEST_WORKFLOW = os.environ.get('GEMS_MD_TEST_WORKFLOW')
-        log.debug("got GEMS_MD_TEST_WORKFLOW and it is:  " + str(GEMS_MD_TEST_WORKFLOW) )
-    except Exception as error :
+    GEMS_MD_TEST_WORKFLOW = "False"
+    try:
+        GEMS_MD_TEST_WORKFLOW = os.environ.get("GEMS_MD_TEST_WORKFLOW")
+        log.debug("got GEMS_MD_TEST_WORKFLOW and it is:  " + str(GEMS_MD_TEST_WORKFLOW))
+    except Exception as error:
         log.error("Cannnot determine workflow status.")
         log.error("Error type: " + str(type(error)))
         log.error(traceback.format_exc())
@@ -78,21 +92,25 @@ def writeSlurmSubmissionScript(path, thisSlurmJobInfo):
     script.write("#SBATCH --output=slurm_%x-%A.out" + "\n")
     script.write("#SBATCH --partition=" + incoming_dict["partition"] + "\n")
     script.write("#SBATCH --tasks-per-node=4" + "\n")
-#  The following was needed until Slurm did their security fix.
-#  Something like it might be needed by someone one day.
-#    script.write("#SBATCH --uid=" + incoming_dict["user"] + "\n")
+    #  The following was needed until Slurm did their security fix.
+    #  Something like it might be needed by someone one day.
+    #    script.write("#SBATCH --uid=" + incoming_dict["user"] + "\n")
     script.write("\n")
-    log.debug("still have GEMS_MD_TEST_WORKFLOW and it is:  " + str(GEMS_MD_TEST_WORKFLOW) )
-    if GEMS_MD_TEST_WORKFLOW == 'True' :
+    log.debug(
+        "still have GEMS_MD_TEST_WORKFLOW and it is:  " + str(GEMS_MD_TEST_WORKFLOW)
+    )
+    if GEMS_MD_TEST_WORKFLOW == "True":
         log.debug("setting testing workflow to yes")
         script.write("export MDUtilsTestRunWorkflow=Yes" + "\n")
         script.write("\n")
-    else :
+    else:
         log.debug("NOT setting testing workflow to yes")
     log.debug("The sbatchArgument is : " + incoming_dict["sbatchArgument"])
     script.write(incoming_dict["sbatchArgument"] + "\n")
 
+
 #    sys.exit(1)
+
 
 def manageIncomingString(jsonObjectString):
     """
@@ -104,38 +122,42 @@ def manageIncomingString(jsonObjectString):
     log.debug("incoming jsonObjectString: \n" + jsonObjectString)
 
     # Make a new SlurmJobInfo object for holding I/O information.
-    thisSlurmJobInfo=SlurmJobInfo(jsonObjectString)
+    thisSlurmJobInfo = SlurmJobInfo(jsonObjectString)
     thisSlurmJobInfo.parseIncomingString()
 
     # Figure out whether we need to send this to a different machine
-    useGRPC=True
-    thePort=os.environ.get('GEMS_GRPC_SLURM_PORT')
+    useGRPC = True
+    thePort = os.environ.get("GEMS_GRPC_SLURM_PORT")
     log.debug("the port is: " + thePort)
     if thePort is None:
         log.debug("cant find grpc slurm submission port. using localhost")
-        useGRPC=False
-    theHost=os.environ.get('GEMS_GRPC_SLURM_HOST')
+        useGRPC = False
+    theHost = os.environ.get("GEMS_GRPC_SLURM_HOST")
     log.debug("the host is: " + theHost)
     if theHost is None:
         log.debug("cant find grpc slurm submission host. using localhost")
-        useGRPC=False
+        useGRPC = False
     else:
         localHost = socket.gethostname()
         log.debug("the local host is: " + localHost)
         if theHost == localHost:
-            useGRPC=False
+            useGRPC = False
     thisSlurmJobInfo.incoming_dict["slurm_runscript_name"] = "slurm_submit.sh"
-    slurm_runscript_path = thisSlurmJobInfo.incoming_dict["workingDirectory"] + "/" + thisSlurmJobInfo.incoming_dict["slurm_runscript_name"]
-    log.debug ("Slurm runscript path: " + slurm_runscript_path + "\n")
-    if os.path.exists(slurm_runscript_path) :
+    slurm_runscript_path = (
+        thisSlurmJobInfo.incoming_dict["workingDirectory"]
+        + "/"
+        + thisSlurmJobInfo.incoming_dict["slurm_runscript_name"]
+    )
+    log.debug("Slurm runscript path: " + slurm_runscript_path + "\n")
+    if os.path.exists(slurm_runscript_path):
         log.debug("Found existing Slurm run script.  Refusing to clobber.")
-    else : 
+    else:
         log.debug("Writing a new Slurm run script.")
         writeSlurmSubmissionScript(slurm_runscript_path, thisSlurmJobInfo)
 
     log.debug("useGRPC: " + str(useGRPC))
     if useGRPC:
-        gemsPath = os.environ.get('GEMSHOME')
+        gemsPath = os.environ.get("GEMSHOME")
         if gemsPath is None:
             return "Cannot determine GEMSHOME."
         sys.path.append(gemsPath + "/gRPC/SLURM")
@@ -163,20 +185,21 @@ def manageIncomingString(jsonObjectString):
 
 def main():
     import importlib.util, os, sys
-    #from importlib import util
+
+    # from importlib import util
     if importlib.util.find_spec("deprecated") is None:
         this_dir, this_filename = os.path.split(__file__)
         sys.path.append(this_dir + "/../../")
         if importlib.util.find_spec("common") is None:
-          print("I cannot find the Common Servicer.  No clue what to do. Exiting")
-          sys.exit(1)
+            print("I cannot find the Common Servicer.  No clue what to do. Exiting")
+            sys.exit(1)
         else:
-          from common import utils
+            from common import utils
     else:
         from gemsModules.deprecated.common import utils
-    jsonObjectString=utils.JSON_From_Command_Line(sys.argv)
+    jsonObjectString = utils.JSON_From_Command_Line(sys.argv)
     try:
-        thisSlurmJobInfo=manageIncomingString(jsonObjectString)
+        thisSlurmJobInfo = manageIncomingString(jsonObjectString)
     except Exception as error:
         print("\nThe Slurm Job info string manager captured an error.")
         print("Error type: " + str(type(error)))
@@ -189,10 +212,8 @@ def main():
         print("Error type: " + str(type(error)))
         print(traceback.format_exc())
 
-
-    print("\ndelegator is returning this: \n" +  responseObjectString)
+    print("\ndelegator is returning this: \n" + responseObjectString)
 
 
 if __name__ == "__main__":
     main()
-

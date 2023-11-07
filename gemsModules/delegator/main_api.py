@@ -1,37 +1,28 @@
 #!/usr/bin/env python3
-from pydantic import validator, Field
-from pydantic.typing import Literal as pyLiteral
-from pydantic.typing import Any as pyAny
-from gemsModules.common import main_api
-from gemsModules.common import main_api_entity
-from gemsModules.delegator.redirector_settings import Known_Entities
-
-from gemsModules.delegator.services.settings.known_available import Available_Services
-
-# This is not compatible:
-# from gemsModules.delegator.services.settings.service_modules import (
-#     service_modules as Available_Services,
-# )
-from gemsModules.delegator.main_settings import WhoIAm
+from pydantic import validator, Field, typing
+from gemsModules.common import main_api, main_api_entity, main_api_services
 from gemsModules.common.main_api_services import GenericServiceRequests
 
+from gemsModules.delegator.main_settings import WhoIAm
+from gemsModules.delegator.services.settings.known_available import Available_Services
+from gemsModules.delegator.redirector_settings import Known_Entities
+
+
 from gemsModules.logging.logger import Set_Up_Logging
+
 
 log = Set_Up_Logging(__name__)
 
 
 class Delegator_Entity(main_api_entity.Entity):
-    entityType: pyLiteral[
-        "Delegator"
-    ] = Field(  # This is the only required field in all of the API
+    entityType: WhoIAm = Field(  # This is the only required field in all of the API
         ..., title="Type", alias="type"
     )
-    # Delegator overrides services so that it's own available services are used
+    # Delegator overrides services so that it's own available services are used, which includes the common services too.
     services: GenericServiceRequests[Available_Services] = GenericServiceRequests()
 
 
 # The Delegator uses the main_api.Transaction class to define the transaction
-# It should also define more services that are specific to the delegator
 class Delegator_API(main_api.Common_API):
     entity: Delegator_Entity
 
@@ -43,11 +34,11 @@ class Delegator_Transaction(main_api.Transaction):
 
 # The Redirector just redirects the transaction to the appropriate service module
 class Redirector_Entity(main_api_entity.Entity):
-    inputs: pyAny = None
-    services: pyAny = None
-    responses: pyAny = None
-    resources: pyAny = None
-    notices: pyAny = None
+    inputs: typing.Any = None
+    services: typing.Any = None
+    responses: typing.Any = None
+    resources: typing.Any = None
+    notices: typing.Any = None
 
     @validator("entityType")
     def checkEntityType(cls, v):
@@ -60,8 +51,8 @@ class Redirector_Entity(main_api_entity.Entity):
 
 class Redirector_API(main_api.Common_API):
     entity: Redirector_Entity
-    project: pyAny = None
-    notices: pyAny = None
+    project: typing.Any = None
+    notices: typing.Any = None
 
 
 class Redirector_Transaction(Delegator_Transaction):
