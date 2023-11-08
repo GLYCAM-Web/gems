@@ -25,6 +25,7 @@ implied_modules: Dict[str, Callable] = {
     "Error": error_Implied_Translator,
     "KnownEntities": known_entities_Implied_Translator,
     "listEntities": known_entities_Implied_Translator,  # json contract compatibility
+    "ListEntities": known_entities_Implied_Translator,  # json contract compatibility
     "ListServices": list_services_Implied_Translator,
     "Marco": marco_Implied_Translator,
     "Status": status_Implied_Translator,
