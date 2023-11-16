@@ -1,17 +1,13 @@
 """The Python implementation of the GemsGrpcSlurmReceiver server."""
 
-from concurrent import futures
-from datetime import datetime
-import socket
-import time
-import logging  ## this might not be necessary - maybe used by gRPC?
+import os, sys, subprocess, json, asyncio, logging
 
-import grpc
-import os, sys, subprocess, signal
+from concurrent import futures
 from subprocess import *
 
-import gems_grpc_slurm_pb2
-import gems_grpc_slurm_pb2_grpc
+import grpc
+import gems_grpc_slurm_pb2, gems_grpc_slurm_pb2_grpc
+
 
 from gemsModules.logging.logger import new_concurrent_logger
 
@@ -19,85 +15,61 @@ from gemsModules.logging.logger import new_concurrent_logger
 # log = Set_Up_Logging(__name__)
 # because this gets called by grpc we need to make sure to open a fresh file handler. for a logger
 
-log = new_concurrent_logger(__name__)
+log = new_concurrent_logger(__name__, force_dirty=True)
+
+MAX_RETRIES = 5
+CHECK_INTERVAL = 5
 
 
-brief_to_code = {
-    "GemsHomeNotSet": 1,
-    "PythonPathHasNoGemsModules": 2,
-    "IncorrectNumberOfArgs": 3,
-    "UnknownError": 4,
-    "NotAFile": 5,
-    "NotAJSONObject": 6,
-    "CaughtSegFault": 7,
-    "CaughtException": 8,
-    "HaveStderr": 9,
-}
-code_to_message = {
-    1: "Unable to read or set a usable GEMSHOME.",
-    2: "Unable to find gemsModules in the PYTHON_PATH.",
-    3: "The number of command-line arguments is incorrect.",
-    4: "There was an unknown fatal error.",
-    5: "The name specified on the command line does not reference a file.",
-    6: "The input supplied is not a JSON objct.",
-    7: "A subprocess generated a segmentation fault.",
-    8: "Caught an exception internally to the script.",
-    9: "Process returned 0 as exit status, but also returned standard error.",
+# Combined dictionary
+briefs = {
+    "GemsHomeNotSet": (1, "Unable to read or set a usable GEMSHOME."),
+    "PythonPathHasNoGemsModules": (2, "Unable to find gemsModules in the PYTHON_PATH."),
+    "IncorrectNumberOfArgs": (3, "The number of command-line arguments is incorrect."),
+    "UnknownError": (4, "There was an unknown fatal error."),
+    "NotAFile": (
+        5,
+        "The name specified on the command line does not reference a file.",
+    ),
+    "NotAJSONObject": (6, "The input supplied is not a JSON objct."),
+    "CaughtSegFault": (7, "A subprocess generated a segmentation fault."),
+    "CaughtException": (8, "Caught an exception internally to the script."),
+    "HaveStderr": (
+        9,
+        "Process returned 0 as exit status, but also returned standard error.",
+    ),
 }
 
 
 def JSON_Error_Response(theBrief, theExitCode, theStdout, theStderr, theExceptionError):
-    whoIAm = "GemsGrpcSlurmReceiver"
-    errorcode = brief_to_code[theBrief]
-    if not theExitCode:
-        theExitCode = "None"
-    if theExitCode is None:
-        theExitCode = "None"
-    if not theStderr:
-        theStderr = "None"
-    if theStderr is None:
-        theStderr = "None"
-    if not theStdout:
-        theStdout = "None"
-    if theStdout is None:
-        theStdout = "None"
-    if not theExceptionError:
-        theExceptionError = "None"
-    if theExceptionError is None:
-        theExceptionError = "None"
-    # Build the JSON object to return if there is an error
-    thereturn = (
-        '{ "entity" : { "type": "GRPC", "responses" : \
-[{ "Error" : { "respondingService" : "'
-        + whoIAm
-        + '",\
-"notice" : { "type" : "Exit",\
-"code" : "'
-        + str(errorcode)
-        + '",\
-"brief" : "'
-        + theBrief
-        + '",\
-"message" : "'
-        + str(code_to_message[errorcode])
-        + '"\
-} "options" : {\
-"osExitCode" : "'
-        + str(theExitCode)
-        + '", \
-"theStandardError": "'
-        + theStderr
-        + '" \
-"theStandardOutput": "'
-        + theStdout
-        + '" \
-"theExceptionError": "'
-        + theExceptionError
-        + '" \
-} } } ] } }'
-    )
+    errorcode, message = briefs[theBrief]
 
-    return thereturn
+    error_response = {
+        "entity": {
+            "type": "GRPC",
+            "responses": [
+                {
+                    "Error": {
+                        "respondingService": "GemsGrpcSlurmReceiver",
+                        "notice": {
+                            "type": "Exit",
+                            "code": str(errorcode),
+                            "brief": theBrief,
+                            "message": message,
+                        },
+                        "options": {
+                            "osExitCode": str(theExitCode) if theExitCode else "None",
+                            "theStandardError": theStderr or "None",
+                            "theStandardOutput": theStdout or "None",
+                            "theExceptionError": theExceptionError or "None",
+                        },
+                    }
+                }
+            ],
+        }
+    }
+
+    return json.dumps(error_response)
 
 
 ONE_DAY_IN_SECONDS = 60 * 60 * 24
