@@ -1,12 +1,14 @@
 """The Python implementation of the GemsGrpcSlurmReceiver server."""
 
-import os, sys, subprocess, json, asyncio, logging
+import os, sys, subprocess, json, asyncio
 
 from concurrent import futures
 from subprocess import *
 
 import grpc
 import gems_grpc_slurm_pb2, gems_grpc_slurm_pb2_grpc
+
+from grpc_health.v1 import health_pb2, health_pb2_grpc
 
 
 from gemsModules.logging.logger import new_concurrent_logger
@@ -152,7 +154,7 @@ class GemsGrpcSlurmReceiver(gems_grpc_slurm_pb2_grpc.GemsGrpcSlurmServicer):
         return gems_grpc_slurm_pb2.GemsGrpcSlurmResponse(output=outputhere)
 
 
-def serve():
+async def serve():
     print("serving")
     log.info("Starting to serve Slurm via GRPC.")
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
@@ -174,14 +176,51 @@ def serve():
         server.stop(0)
 
 
+async def check_server_health(health_stub, max_retries, check_interval):
+    retries = 0
+    while retries < max_retries:
+        try:
+            response = await health_stub.Check(
+                health_pb2.HealthCheckRequest(service="")
+            )
+            if response.status == health_pb2.HealthCheckResponse.SERVING:
+                print("Server is healthy")
+                retries = 0  # Reset the retry counter if the server is healthy
+            else:
+                print("Server is not healthy")
+                retries += 1
+        except Exception as e:
+            print(f"Health check failed: {e}")
+            retries += 1
+
+        await asyncio.sleep(check_interval)
+
+    raise Exception("Server has been unhealthy for too long, initiating restart...")
+
+
+async def main():
+    while True:
+        # Setup the gRPC channel and stub for health checking
+        channel = grpc.insecure_channel("localhost:66666")
+        health_stub = health_pb2_grpc.HealthStub(channel)
+
+        # Start the server and health checker
+        serve_task = asyncio.create_task(serve())
+        health_check_task = asyncio.create_task(
+            check_server_health(health_stub, MAX_RETRIES, CHECK_INTERVAL)
+        )
+
+        try:
+            await asyncio.gather(serve_task, health_check_task)
+        except health_check_task.exception() as e:
+            print(f"Restarting server due to health check failure: {e}")
+
+        print("Restarting serve function...")
+
+
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)
     try:
-        print("About to call serve.")
-        serve()
-    except Exception as error:
-        print("gems_grpc_slurm_server.py main/serve caught an error.")
-        print(str(error))
-    finally:
-        print("Cleaning up and shutting down.")
-        sys.exit(1)  ## TODO:  change this number to something reasonable
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print("Keyboard interrupt received, exiting.")
+        sys.exit(0)
