@@ -37,7 +37,7 @@ def safe_gems_relative_import(rel_path, parent=0, exec_=True):
 
         if util.find_spec("grpc") is None or util.find_spec("grpc_tools") is None:
             raise RuntimeError(
-                "Please ensure Python's GRPC package is installed when using GRPC scripts.\n\tLikely fix: `pip install grpcio==1.46.3 grpcio-tools==1.46.3`"
+                "Please ensure Python's GRPC package is installed when using GRPC scripts.\n\tLikely fix: `pip install grpcio grpcio-tools` (>=1.59.2)"
             )
 
     # TODO\Q: If we make gmml an installable package/library, we can do something like this to check for gmml:
