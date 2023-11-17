@@ -40,16 +40,16 @@ class cakeInputs:
     color: str = None
 
 
-def execute(inputs: serviceInputs) -> responseOutputs:
+def execute(inputs: serviceInputs) -> serviceOutputs:
     log.debug(f"serviceInputs: {serviceInputs}")
 
     # We're not using serviceOutputs because it doubles up .outputs
-    service_outputs = responseOutputs()
+    service_outputs = serviceOutputs()
     # The who_I_am must be set in the options.
     if (
         inputs.inputs.entity == inputs.inputs.who_I_am
     ):  # trivial here, but could be more complex (search a dictionary, etc.).
-        service_outputs.message = "Polo"
+        service_outputs.outputs.message = "Polo"
     else:
         service_outputs.outputs.message = (
             "Marco request sent to wrong entity. See who_I_am in info."
