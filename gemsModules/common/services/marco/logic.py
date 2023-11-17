@@ -17,7 +17,7 @@ class requestInputs(BaseModel):
     who_I_am: str = None
 
 
-class responseOutputs(BaseModel):
+class serviceOutputs(BaseModel):
     """Defines the outputs from the service."""
 
     message: str = None
@@ -31,27 +31,21 @@ class serviceInputs(Protocol):
     options: Dict[str, str]
 
 
-class serviceOutputs(BaseModel):
-    outputs: responseOutputs = responseOutputs()
-
-
 class cakeInputs:
     cake: bool = False
     color: str = None
 
 
 def execute(inputs: serviceInputs) -> serviceOutputs:
-    log.debug(f"serviceInputs: {serviceInputs}")
+    log.debug(f"serviceInputs: {inputs}")
 
-    # We're not using serviceOutputs because it doubles up .outputs
     service_outputs = serviceOutputs()
-    # The who_I_am must be set in the options.
     if (
         inputs.inputs.entity == inputs.inputs.who_I_am
     ):  # trivial here, but could be more complex (search a dictionary, etc.).
-        service_outputs.outputs.message = "Polo"
+        service_outputs.message = "Polo"
     else:
-        service_outputs.outputs.message = (
+        service_outputs.message = (
             "Marco request sent to wrong entity. See who_I_am in info."
         )
     if inputs.options is not None:
@@ -64,5 +58,5 @@ def execute(inputs: serviceInputs) -> serviceOutputs:
             docake = True
             cake_inputs.color = inputs.options["color"]
         if docake == True:
-            service_outputs.outputs.info = cake.execute(cake_inputs)
+            service_outputs.info = cake.execute(cake_inputs)
     return service_outputs
