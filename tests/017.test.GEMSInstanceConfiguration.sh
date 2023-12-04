@@ -20,7 +20,10 @@ function test_runmd() {
     project_dir="$(echo $response | grep -Po '"projectDir"\s*:\s*"\K[^"]*')"
     echo $project_dir
 
-    retries=5
+    retries=24
+    sleeptime=5
+    sleepsofar=0
+    echo "waiting a maximum of $((sleeptime*retries)) seconds for the project to finish."
     while [ $retries -gt 0 ]; do
         # Check for the existence of 10.produ.o and status.log
         if [ -f "${project_dir}/10.produ.o" ] && [ -f "${project_dir}/status.log" ]; then
@@ -32,7 +35,9 @@ function test_runmd() {
                 echo "DID NOT FIND ${project_dir}/10.produ.o and ${project_dir}/status.log after multiple checks"
                 break
             else
-                sleep 3
+                sleep 5
+		sleepsofar="$((sleepsofar+sleeptime))"
+		echo "total wait time so far: ${sleepsofar}"
             fi
         fi
     done

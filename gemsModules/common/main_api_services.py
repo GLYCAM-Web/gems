@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 from uuid import UUID
-from typing import Dict, Optional, TypeVar, Generic
+from typing import Dict, Optional
 from pydantic import BaseModel, Field, typing
-from pydantic.generics import GenericModel
 
 from gemsModules.common.main_api_notices import Notices
 from gemsModules.common.services.settings.known_available import Available_Services
@@ -12,27 +11,16 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
-T = TypeVar("T")
-
-
-class GenericServiceRequest(GenericModel, Generic[T]):
-    """ A generic service request.
-
-    To use this class, you must use your Entity's Available_Services Enum in the GenericServiceRequest's generic.
-
-    Typically, Available_Services is defined in gemsModules.<THE_DESIRED_ENTITY>.services.settings.known_available.
-
-    For example, the Common Service Request is defined this way:
-    ```python
-    from gemsModules.common.services.settings.known_available import Available_Services
-
-    Service_Request = GenericServiceRequest[Available_Services]
-    ```
+class Service_Request(BaseModel):
     """
+    Holds information about a requested Service.
+    This object will have different forms in each Entity.
+    """
+
     class Config:
         title = "Service"
 
-    typename: T = Field(
+    typename: Available_Services = Field(
         "Status",
         alias="type",
         title="Common Services",
@@ -56,40 +44,6 @@ class GenericServiceRequest(GenericModel, Generic[T]):
 
     def __repr__(self) -> str:
         return f"{{ {self.typename} : {self.givenName}\n\t{self.myUuid}\n\t{self.inputs=}\n\t{self.options=}\n}}"
-
-
-class GenericServiceRequests(GenericModel, Generic[T]):
-    """ A generic service request container.
-    
-    To use this class, you must add your Entity's Available_Services Enum in the GenericServiceRequests's generic.
-
-    ```python
-    from gemsModules.common.services.settings.known_available import Available_Services
-
-    Service_Requests = GenericServiceRequests[Available_Services]
-    ```
-    """
-    __root__: Dict[str, GenericServiceRequest[T]] = None
-
-    def add_service(self, key_string: str, service: GenericServiceRequest[T]):
-        if self.__root__ is None:
-            self.__root__ = {}
-        self.__root__[key_string] = service
-
-    def is_present(self, typename: T):
-        if self.__root__ is None or self.__root__ == {}:
-            return False
-        the_services = self.__root__.values()
-        for service in the_services:
-            if service.typename == typename:
-                return True
-        else:
-            return False
-
-
-# The original Common Service Request, most entities will want to use GenericServiceRequest with their own Available_Services instead.
-Service_Request = GenericServiceRequest[Available_Services]
-Service_Requests = GenericServiceRequests[Available_Services]
 
 
 class Service_Response(BaseModel):
@@ -121,6 +75,28 @@ class Service_Response(BaseModel):
         title = "Response"
 
 
+class Service_Requests(BaseModel):
+    __root__: Dict[str, Service_Request] = None
+
+    def add_service(self, key_string: str, service: Service_Request):
+        if self.__root__ is None:
+            self.__root__: Dict[str, Service_Request] = {}
+        self.__root__[key_string] = service
+
+    def is_present(self, typename: str):
+        if self.__root__ is None or self.__root__ == {}:
+            return False
+        the_services = self.__root__.values()
+        for service in the_services:
+            if service.typename == typename:
+                return True
+        else:
+            return False
+
+    class Config:
+        title = "Services"
+
+
 class Service_Responses(BaseModel):
     __root__: Dict[str, Service_Response] = None
 
@@ -133,9 +109,10 @@ class Service_Responses(BaseModel):
         title = "Responses"
 
 
-def generateSchema(show: bool = True):
-    schema = Service_Requests.schema_json(indent=2)
-    if show:
-        print(schema)
+def generateSchema():
+    import json
 
-    return schema
+    print(Service_Requests.schema_json(indent=2))
+
+
+#    print(Service_Responses.schema_json(indent=2))

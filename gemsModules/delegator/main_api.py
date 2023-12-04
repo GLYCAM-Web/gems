@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 from pydantic import validator, Field, typing
 from gemsModules.common import main_api, main_api_entity, main_api_services
-from gemsModules.common.main_api_services import GenericServiceRequests
 
 from gemsModules.delegator.main_settings import WhoIAm
 from gemsModules.delegator.services.settings.known_available import Available_Services
@@ -14,12 +13,41 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
+class Delegator_Service_Request(main_api_services.Service_Request):
+    typename: Available_Services = Field(
+        "Delegator",
+        alias="type",
+        title="Services offered by Delegator Entity",
+        description="The service requested of the Delegator Servicer",
+    )
+
+
+class Delegate_Service_Response(main_api_services.Service_Response):
+    typename: Available_Services = Field(
+        None,
+        alias="type",
+        title="Services offered by Delegator Entity",
+        description="The service response from Delegator",
+    )
+
+
+class Delegator_Service_Requests(main_api_services.Service_Requests):
+    __root__: typing.Dict[str, Delegator_Service_Request] = None
+
+
+class Delegator_Service_Responses(main_api_services.Service_Responses):
+    __root__: typing.Dict[str, Delegate_Service_Response] = None
+
+
 class Delegator_Entity(main_api_entity.Entity):
-    entityType: WhoIAm = Field(  # This is the only required field in all of the API
+    entityType: typing.Literal[
+        "Delegator"
+    ] = Field(  # This is the only required field in all of the API
         ..., title="Type", alias="type"
     )
     # Delegator overrides services so that it's own available services are used, which includes the common services too.
-    services: GenericServiceRequests[Available_Services] = GenericServiceRequests()
+    services: Delegator_Service_Requests = Delegator_Service_Requests()
+    responses: Delegator_Service_Responses = Delegator_Service_Responses()
 
 
 # The Delegator uses the main_api.Transaction class to define the transaction

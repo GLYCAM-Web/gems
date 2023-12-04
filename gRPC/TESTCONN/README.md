@@ -6,7 +6,7 @@ A python script to test gRPC connection availability between two machines.
 
 If you're not running with a full GEMS installation, TESTCONN requires grpcio and grpcio-tools:
 ```bash
-$ pip3 install grpcio==1.46.3 grpcio-tools==1.46.3
+$ pip3 install grpcio==1.59.2 grpcio-tools==1.59.2
 ```
 
 ## Usage
