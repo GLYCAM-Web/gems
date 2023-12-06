@@ -74,8 +74,11 @@ class mdaas_Request_Data_Filler(Request_Data_Filler):
 
         # Add the resources to copy to the project output directory by the Project Management service.
         # TODO: copy parm7/rst7 this way.
-        input_json = pm_api.PM_Resource.from_payload(
-            self.transaction.incoming_string, "input", "json"
+        input_json = pm_api.PM_Resource(
+            payload=self.transaction.incoming_string,
+            resourceFormat="json",
+            locationType="Payload",
+            options={"filename": "input.json"},
         )
         aaop.The_AAO.inputs.resources.append(input_json)
 
