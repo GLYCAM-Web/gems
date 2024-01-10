@@ -2,7 +2,10 @@
 import shutil, argparse, os, sys, json, datetime
 
 GemsPath = os.environ.get("GEMSHOME")
-sys.path.append(GemsPath + "/gemsModules")
+sys.path.append(GemsPath)
+sys.path.append(
+    GemsPath + "/gemsModules"
+)  # Swarm needs /gemsModules. These sys path hacks would be simplified if we used pip to install gems.
 from gemsModules.systemoperations.environment_ops import is_GEMS_test_workflow
 from gemsModules.systemoperations.instance_config import InstanceConfig
 
@@ -30,7 +33,7 @@ def argparser():
     )
 
     parser.add_argument(
-        "--set-local-parametzers",
+        "--set-local-parameters",
         type=str,
         help="Set the local_parameters for a host in the instance_config.json. Format: 'hostname,context,local_parameters'",
     )
