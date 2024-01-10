@@ -60,8 +60,11 @@ class PDBFile_Request_Data_Filler(Request_Data_Filler):
         )
 
         # Add the resources to copy to the project management service request
-        input_json = pm_api.PM_Resource.from_payload(
-            self.transaction.incoming_string, "input", "json"
+        input_json = pm_api.PM_Resource(
+            payload=self.transaction.incoming_string,
+            resourceFormat="json",
+            locationType="Payload",
+            options={"filename": "input.json"},
         )
         aaop.The_AAO.inputs.resources.append(input_json)
 
@@ -77,9 +80,9 @@ class PDBFile_Request_Data_Filler(Request_Data_Filler):
             )
 
             input_pdb = pm_api.PM_Resource(
-                name=Path(requester_aaop.The_AAO.inputs["pdb_filename"]).stem,
-                res_format="pdb",
-                location=str(requester_aaop.The_AAO.inputs["inputFilePath"]),
+                payload=Path(requester_aaop.The_AAO.inputs["inputFilePath"])
+                / requester_aaop.The_AAO.inputs["pdb_filename"],
+                resourceFormat="pdb",
                 locationType="File",
             )
             log.debug(

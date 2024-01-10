@@ -2,9 +2,9 @@
 import shutil, argparse, os, sys, json, datetime
 
 GemsPath = os.environ.get("GEMSHOME")
-sys.path.append(GemsPath)
+sys.path.append(GemsPath + "/gemsModules")
 from gemsModules.systemoperations.environment_ops import is_GEMS_test_workflow
-from gemsModules.systemoperations.instance_config import InstanceConfig, DateReversioner
+from gemsModules.systemoperations.instance_config import InstanceConfig
 
 
 def argparser():
@@ -30,7 +30,7 @@ def argparser():
     )
 
     parser.add_argument(
-        "--set-local-parameters",
+        "--set-local-parametzers",
         type=str,
         help="Set the local_parameters for a host in the instance_config.json. Format: 'hostname,context,local_parameters'",
     )
@@ -55,15 +55,15 @@ def main():
 
     Can be used by a DevEnv or manual GEMS setup.
     """
+    ic = InstanceConfig()
+    args = argparser().parse_args()
+
     force_reconfiguration = os.getenv("GEMS_FORCE_INSTANCE_RECONFIGURATION") == "True"
-    if force_reconfiguration or not InstanceConfig.is_configured:
+    if force_reconfiguration or not ic.is_configured:
         print("\nAbout to configure this GEMS instance...")
     else:
         print("\nThis GEMS instance is already configured. Exiting.")
         return
-
-    args = argparser().parse_args()
-    ic = InstanceConfig()
 
     SAVE = False
     if args.set_md_cluster_filesystem_path is not None:

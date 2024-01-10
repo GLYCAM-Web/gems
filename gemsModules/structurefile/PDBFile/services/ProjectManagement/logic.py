@@ -8,6 +8,9 @@ from gemsModules.structurefile.PDBFile.services.ProjectManagement.api import (
     ProjectManagement_Inputs,
     ProjectManagement_Outputs,
 )
+from gemsModules.structurefile.PDBFile.services.ProjectManagement.resources import (
+    PM_Resource,
+)
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -24,7 +27,8 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
 
     log.debug("ProjectManagement Resource list: " + str(inputs.resources))
     for resource in inputs.resources:
-        log.debug(f"Copying resource: {resource} to project directory.")
-        resource.copy_to(inputs.projectDir)
+        if isinstance(resource, PM_Resource):
+            log.debug(f"Copying resource: {resource} to project directory.")
+            resource.copy_to(inputs.projectDir)
 
     return service_outputs
