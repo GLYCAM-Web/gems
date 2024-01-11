@@ -1,0 +1,22 @@
+{
+    "entity": {
+        "type": "PDBFile",
+        "services": {
+            "any_amber_prep": {
+                "type": "AmberMDPrep",
+                "inputs": {
+                    "action": "preprocess",
+                    "pdb_filename": "016.AmberMDPrep.4mbzEdit.pdb",
+                    "inputFilePath": "/programs/gems/tests/inputs/",
+                    "outputFilePath": "/programs/gems/tests/",
+                    "options": {
+                        "chainNTermination": "NH3+",
+                        "chainCTermination": "CO2-",
+                        "gapNTermination": "COCH3",
+                        "gapCTermination": "NHCH3"
+                    }
+                }
+            }
+        }
+    }
+}

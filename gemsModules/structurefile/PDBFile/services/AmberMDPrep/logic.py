@@ -22,8 +22,11 @@ def execute(inputs: AmberMDPrep_Inputs) -> AmberMDPrep_Outputs:
 
     in_file = os.path.join(inputs.inputFilePath, inputs.pdb_file)
     out_file = os.path.join(inputs.outputFilePath, inputs.outputFileName)
+    options = None
+    if hasattr(inputs, "options"):
+        options = inputs.options
 
     # TODO/Q: should this always execute? AmberMDPrep surely doesn't always prepare a PDB file?
-    service_outputs.ppinfo = prepare_pdb.execute(in_file, out_file)
+    service_outputs.ppinfo = prepare_pdb.execute(in_file, out_file, options)
 
     return service_outputs

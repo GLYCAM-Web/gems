@@ -4,7 +4,7 @@ testNumber=016
 echo "Testing $0..."
 
 PDB_tests_dir="${GEMSHOME}/gemsModules/structurefile/PDBFile/tests_in"
-test_request="${PDB_tests_dir}/explicit_test.json" 
+test_request="${PDB_tests_dir}/explicit_test.json"
 test_output=test${testNumber}_output
 
 # Clean up old files

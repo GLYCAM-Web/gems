@@ -333,16 +333,35 @@ class PreprocessorInformation(pydantic.BaseModel):
         )
 
 
-class cds_PdbFile(pydantic.BaseModel):
-    """Hacky pydantic wrapper for gmml.cds_PdbFile, which is returned by gmml.cds_PdbFile()"""
+class cds_PdbFile:
+    """Hacky Pythonic wrapper for gmml.cds_PdbFile, which is returned by gmml.cds_PdbFile()"""
 
-    pdbfile: pydantic.typing.Any = pydantic.Field(default_factory=object)
+    def __init__(self, path: pydantic.typing.Any, **kwargs):
+        """Initialize a cds_PdbFile object from a path.
 
-    def Write(self, path: str):
-        """Write the PDB file to a path - manually wrapping the gmml.cds_PdbFile.Write() function as an example."""
-        self.pdbfile.Write(path)
+        pdbfile: pydantic.typing.Any
+            A swigpyobject of type gmml.cds_PdbFile
+        """
+        self.path = path
+        self._pdbfile = gmml.cds_PdbFile(path)
 
     @property
     def raw(self) -> pydantic.typing.Any:
         """Return the underlying gmml.cds_PdbFile object - unsafe."""
-        return self.pdbfile
+        return self._pdbfile
+
+    def Write(self, path: str):
+        """Write the PDB file to a path - manually wrapping the gmml.cds_PdbFile.Write() function as an example."""
+        self.raw.Write(path)
+
+    def PreProcess(self, options: PreprocessorOptions) -> PreprocessorInformation:
+        """Preprocess the PDB file - manually wrapping the gmml.cds_PdbFile.PreProcess() function as an example."""
+        if isinstance(options, dict):
+            options = PreprocessorOptions(**options)
+
+        if isinstance(options, PreprocessorOptions):
+            options = options.build()
+
+        return PreprocessorInformation.try_from_swigpyobject(
+            self.raw.PreProcess(options)
+        )

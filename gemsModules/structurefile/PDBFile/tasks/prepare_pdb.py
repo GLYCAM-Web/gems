@@ -1,5 +1,6 @@
 import gmml
 import os
+from typing import Optional
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -12,41 +13,11 @@ from gemsModules.structurefile.PDBFile.swig_api import (
 log = Set_Up_Logging(__name__)
 
 
-def preprocess(
-    input_pdb_path: str, options: PreprocessorOptions
-) -> tuple[PreprocessorInformation, cds_PdbFile]:
-    """Run the gmml.PreProcess() function on a PDB file.
-
-    Returns the PpInfo and the cds_PdbFile objects.
-    """
-    pdb_file = gmml.cds_PdbFile(input_pdb_path)
-    return PreprocessorInformation.try_from_swigpyobject(
-        pdb_file.PreProcess(options)
-    ), cds_PdbFile(pdbfile=pdb_file)
-
-
-def preprocess_and_write_pdb(
-    input_pdb_path: str,
-    options: PreprocessorOptions,
-    output_pdb_path: str = "./preprocessed.pdb",
-) -> tuple[PreprocessorInformation, cds_PdbFile]:
-    """Preprocess a PDB file and write it.
-
-    Returns the ppInfo and the cds_PdbFile objects.
-    """
-    pp_info, pdb_file = preprocess(input_pdb_path, options)
-    log.debug(f"Attempting to writing a preprocessed PDB file to {output_pdb_path}...")
-    pdb_file.raw.Write(output_pdb_path)
-    if not os.path.exists(output_pdb_path):
-        log.warning(f"GMML failed to write preprocessed PDB file to {output_pdb_path}!")
-
-    return pp_info, pdb_file
-
-
+# N.B. execute is not validated by pydantic currently
 def execute(
     input_pdb_path: str,
     output_pdb_path: str = "./preprocessed.pdb",
-    options: dict = None,
+    options: Optional[PreprocessorOptions] = None,
 ) -> PreprocessorInformation:
     """Prepare an Amber MD input file
 
@@ -60,13 +31,20 @@ def execute(
 
     # Use all gmml defaults
     if options is None:
-        options = PreprocessorOptions().build()
+        options = PreprocessorOptions()
     else:
-        options = PreprocessorOptions(**options).build()
+        log.debug(f"PPP: {options}")
+        options = PreprocessorOptions(**options)
 
-    pp_info, _ = preprocess_and_write_pdb(input_pdb_path, options, output_pdb_path)
+    pdb_file = cds_PdbFile(path=input_pdb_path)
+    pp_info = pdb_file.PreProcess(options)
 
-    log.debug(f"Prepare_PDB Created {pp_info=} from {options=}.")
+    log.debug(f"Attempting to writing a preprocessed PDB file to {output_pdb_path}...")
+    pdb_file.Write(output_pdb_path)
+    if not os.path.exists(output_pdb_path):
+        log.warning(f"GMML failed to write preprocessed PDB file to {output_pdb_path}!")
+
+    log.debug(f"Prepare_PDB Created pp_info from {options=}.")
     return pp_info
 
 

@@ -39,11 +39,17 @@ class PDBFile_Request_Data_Filler(Request_Data_Filler):
         ):
             root = aaop.The_AAO.inputs["inputFilePath"]
 
+        if "options" in aaop.The_AAO.inputs:
+            options = aaop.The_AAO.inputs["options"]
+        else:
+            options = None
+
         self.aaop_list[i].The_AAO.inputs = mdprep_api.AmberMDPrep_Inputs(
             pdb_file=aaop.The_AAO.inputs["pdb_filename"],
             outputFileName=f"preprocessed.{aaop.The_AAO.inputs['pdb_filename']}",
             outputFilePath=self.response_project.project_dir,
             inputFilePath=root,
+            options=options,
         )
 
         log.debug(
@@ -52,7 +58,8 @@ class PDBFile_Request_Data_Filler(Request_Data_Filler):
             self.aaop_list[i].The_AAO.inputs,
         )
 
-    # TODO: PDBFile and MDaaS PM data fillers are very similar, can we generalize them?
+        log.debug(f"Options are: {self.aaop_list[i].The_AAO.inputs.options}")
+
     def __fill_projman_aaop(self, i: int, aaop: AAOP):
         # Fill in the project management service request
         aaop.The_AAO.inputs = pm_api.ProjectManagement_Inputs(

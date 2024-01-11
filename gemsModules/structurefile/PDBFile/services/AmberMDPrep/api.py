@@ -55,8 +55,15 @@ class AmberMDPrep_Inputs(BaseModel):
     inputFilePath: Optional[str] = Field(
         None,  # "/website/TESTS/ambermdprep/test_files",
         title="Input Files Directory Path",
-        description="Path to whhere the input files are stored",
+        description="Path to where the input files are stored",
     )
+
+    options: Optional[dict] = Field(
+        None,
+        title="Options",
+        description="Options for PDB file preprocessing",
+    )
+
     use_serial: bool = Field(
         False,
         title="Use Serial",
