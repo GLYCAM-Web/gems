@@ -1,5 +1,6 @@
-import pydantic
 import gmml
+import pydantic
+from abc import ABC, abstractmethod
 
 # A far cry from good:
 # class SwigModel(pydantic.BaseModel):
@@ -29,7 +30,23 @@ import gmml
 # # Note: All this could be done away with if we move the construction logic of BaseModel to swig - gmml's interface file.
 
 
-class PreprocessorOptions(pydantic.BaseModel):  # SwigModel):
+class SwiggableBaseModel(ABC, pydantic.BaseModel):
+    @staticmethod
+    @abstractmethod
+    def try_from_swigpyobject(spobj: pydantic.typing.Any) -> "SwiggableBaseModel":
+        """Try to create an object from a swigpyobject.
+
+        To implement this you must:
+        - Know your SwigPyOjbect's fields and how to access them.
+        - Define a Pydantic model with the appropriate fields.
+        - Implement this method with the appropriate logic to extract the fields from the swigpyobject.
+        """
+        raise NotImplementedError(
+            "This is an abstract method, it must be implemented by the inheriting class."
+        )
+
+
+class PreprocessorOptions(SwiggableBaseModel):
     """Pydantic model for gmml.PreprocessorOptions(), which is used for gmml.PreProcess()
 
     The gmml defaults are:
@@ -138,7 +155,7 @@ class PreprocessorOptions(pydantic.BaseModel):  # SwigModel):
         # }
 
 
-class ResidueId(pydantic.BaseModel):
+class ResidueId(SwiggableBaseModel):
     residueName: str = pydantic.Field(alias="residueName_")
     sequenceNumber: str = pydantic.Field(alias="sequenceNumber_")
     insertionCode: str = pydantic.Field(alias="insertionCode_")
@@ -160,7 +177,7 @@ class ResidueId(pydantic.BaseModel):
         )
 
 
-class AtomInfo(pydantic.BaseModel):
+class AtomInfo(SwiggableBaseModel):
     name: str = pydantic.Field(alias="name_")
     # Note, the original test output expects residue to be unpacked at top level as dict entries with differentfield namesfrom gmml.ResidueId (combined numberAndInsertionCode - for instance)
     residue: ResidueId = pydantic.Field(alias="residue_")
@@ -176,7 +193,7 @@ class AtomInfo(pydantic.BaseModel):
         )
 
 
-class GapInAminoAcidChain(pydantic.BaseModel):
+class GapInAminoAcidChain(SwiggableBaseModel):
     chainId: str = pydantic.Field(alias="chainId_")
     # should these be ResidueIds?
     residueBeforeGap: str = pydantic.Field(alias="residueBeforeGap_")
@@ -200,7 +217,7 @@ class GapInAminoAcidChain(pydantic.BaseModel):
         )
 
 
-class DisulphideBond(pydantic.BaseModel):
+class DisulphideBond(SwiggableBaseModel):
     residue1: ResidueId = pydantic.Field(alias="residue1_")
     distance: float = pydantic.Field(alias="distance_")
     residue2: ResidueId = pydantic.Field(alias="residue2_")
@@ -218,7 +235,7 @@ class DisulphideBond(pydantic.BaseModel):
         )
 
 
-class ChainTerminal(pydantic.BaseModel):
+class ChainTerminal(SwiggableBaseModel):
     chainId: str = pydantic.Field(alias="chainId_")
     startIndex: int = pydantic.Field(alias="startIndex_")
     endIndex: int = pydantic.Field(alias="endIndex_")
@@ -240,7 +257,7 @@ class ChainTerminal(pydantic.BaseModel):
         )
 
 
-class NonNaturalProteinResidue(pydantic.BaseModel):
+class NonNaturalProteinResidue(SwiggableBaseModel):
     residue: ResidueId = pydantic.Field(alias="residue_")
 
     @staticmethod
@@ -256,7 +273,7 @@ class NonNaturalProteinResidue(pydantic.BaseModel):
         )
 
 
-class PreprocessorInformation(pydantic.BaseModel):
+class PreprocessorInformation(SwiggableBaseModel):
     """Pydantic model for gmml.PpInfo, which is returned by gmml.PreProcess()
 
     Note:
