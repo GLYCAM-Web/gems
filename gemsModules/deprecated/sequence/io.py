@@ -1148,7 +1148,7 @@ class Transaction(commonio.Transaction):
         else:
             return self.transaction_out.getSequenceVariantOut(variant)
 
-    def evaluateCondensedSequence(self, validateOnly : bool = False):
+    def evaluateCondensedSequence(self, validateOnly : bool = False, isBuild3DStructureService : bool = True):
         ## If we got to here, there should be valid inputs including a valid sequence
         if self.transaction_out is None and self.transaction_in is None:
             raise ValueError("No transaction, incoming or outgoing, could not be found.")
@@ -1215,15 +1215,23 @@ class Transaction(commonio.Transaction):
 
         ## If we need to do a default build, then do it now
         if this_entity.procedural_options.build_default_on_evaluation:
-            # log.debug("this_entity.procedural_options.build_default_on_evaluation is true")
+            log.debug("this_entity.procedural_options.build_default_on_evaluation is true")
             if this_entity.outputs.structureBuildInfo is None: 
-                # log.debug("this_entity.outputs.structureBuildInfo is None")
+                log.debug("this_entity.outputs.structureBuildInfo is None")
+
+## OG Jan 2024: This next bit might have been a part of the above idea to return evaluation.json from the Sequences/pUUID/ folder if
+## the structure had been requested before. When doing a build3DStructure request, you need to return here if a 
+## default already exists or wonky things happen. However if doing an evaluate, the structureBuildInfo doesn't get filled out 
+## unless you go further so even if there has been a previous evaluation you can't just leave now. You must go into 
+## self.manageSequenceBuild3DStructureRequest(defaultOnly=True)
+
                 from gemsModules.deprecated.sequence.projects import get_default_evaluation_path_from_sequence
                 the_path = get_default_evaluation_path_from_sequence(self)
-                # log.debug("The path returned was : " + str(the_path))
-                if the_path is not None:
+                log.debug("The path returned was : " + str(the_path))
+                if the_path is not None and isBuild3DStructureService :
                     return
-                # log.debug("the path was None so we are going to do a default build")
+                log.debug("We are going to do a default build")
+
                 self.manageSequenceBuild3DStructureRequest(defaultOnly=True)
                 ## If we're doing this, then ensure that the default evaluation path is made
                 from gemsModules.deprecated.sequence.projects import set_default_evaluation_symlink_in_sequence

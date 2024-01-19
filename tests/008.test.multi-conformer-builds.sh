@@ -75,7 +75,6 @@ echo """
 ########################################"""
 
 source './sub_parts/008.0.sub-test.bash'
-
 if [ "${ALL_TESTS_PASSED}" == "true" ] ; then
 	echo """
 ########################################
@@ -83,7 +82,6 @@ if [ "${ALL_TESTS_PASSED}" == "true" ] ; then
 ########################################"""
 	source './sub_parts/008.1.sub-test.bash'
 fi
-
 if [ "${ALL_TESTS_PASSED}" == "true" ] ; then
 	echo """
 ########################################
@@ -100,6 +98,15 @@ if [ "${ALL_TESTS_PASSED}" == "true" ] ; then
 ########################################"""
 
 	source './sub_parts/008.3.sub-test.bash'
+fi
+
+if [ "${ALL_TESTS_PASSED}" == "true" ] ; then
+    echo """
+########################################
+## Sub test 4:  Do Evaluation again
+########################################"""
+
+    source './sub_parts/008.4.sub-test.bash'
 fi
 
 

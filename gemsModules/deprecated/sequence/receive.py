@@ -61,7 +61,6 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
     the_sequence = receiver_tasks.get_sequence(thisSequenceEntity)
     if the_sequence is not None:
         from gemsModules.deprecated.sequence import build
-        #Ok Oliver, here we should try/catch:
         try:
             carbBuilder = build.getCbBuilderForSequence(the_sequence)
         except Exception as error:
@@ -69,14 +68,13 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
             log.debug(thisTransaction.transaction_out.json(indent=2))
             thisTransaction.generateCommonParserNotice(noticeBrief='InvalidInputPayload', exitMessage=str(error))
             thisTransaction.build_outgoing_string()
-            return thisTransaction # do this or no?  # if the process has altered this Transaction, then yes
+            return thisTransaction 
         log.debug("Sequence is valid.")
     # If there are no explicit services
     if thisSequenceEntity.services == []:
         log.debug("'services' was not present in the request. Do the default.")
         thisTransaction = receiver_tasks.doDefaultService(thisTransaction)
         return thisTransaction
-
 
     # ## Initialize the project
     try:
@@ -156,7 +154,7 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
 
             try:
 
-                thisTransaction.evaluateCondensedSequence()
+                thisTransaction.evaluateCondensedSequence(validateOnly=False, isBuild3DStructureService=False)
 
             except Exception as error:
 
@@ -171,8 +169,8 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
             log.debug("Build3DStructure service requested from sequence entity.")
             # Sequence was validated above.  Should not be needed again.
             # An evaluation is needed for checking other things.
-            try:
-                thisTransaction.evaluateCondensedSequence()
+            try: ## evaluateCondensedSequence instantiates things required by Build3DStructure
+                thisTransaction.evaluateCondensedSequence(validateOnly=False, isBuild3DStructureService=True) 
                 thisTransaction.setIsEvaluationForBuild(True)
                 thisTransaction.manageSequenceBuild3DStructureRequest()
             except Exception as error:
@@ -183,7 +181,7 @@ def receive(receivedTransaction: sequenceio.Transaction) -> sequenceio.Transacti
             # this should be able to become part of previous validation, but leaving in for now
             log.debug("Validate service requested from sequence entity.")
             try:
-                thisTransaction.evaluateCondensedSequence(validateOnly=True)
+                thisTransaction.evaluateCondensedSequence(validateOnly=True, isBuild3DStructureService=False)
             except Exception as error:
                 log.error(
                     "There was a problem validating the condensed sequence: " + str(error))
