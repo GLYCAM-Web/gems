@@ -201,11 +201,6 @@ def build3DStructure(
     except Exception as error:
         log.error("Problem finding the project pUUID in the transaction: " + str(error))
         raise error
-
-    # TODO: figure out how to return this response now, and still continue this logic.
-    #  ...use 'yield'...
-    # log.debug("About to getCbBuilderForSequence")
-    # builder = getCbBuilderForSequence(sequence)
     thisEvaluation = (
         thisTransaction.transaction_out.entity.outputs.sequenceEvaluationOutput
     )
@@ -220,22 +215,13 @@ def build3DStructure(
         )
         if buildState.isDefaultStructure:
             log.debug("Generating default structure in: " + outputDirPath)
-            log.debug("IS THE DEFAULT: Here is the buildState):")
-            log.debug(buildState)
-            builder.GenerateSingle3DStructureDefaultFiles(outputDirPath)
-        else:
-            log.debug(
-                "The request is for a conformer with outputDirPath: " + outputDirPath
-            )
-            log.debug("Here is the input to the builder.")
-            log.debug("NOT DEFAULT: Here is the buildState):")
-            log.debug(buildState)
-            log.debug("gmmlConformerInfo:")
-            log.debug(gmmlConformerInfo)
-            log.debug("outputDirPath : ")
-            log.debug(outputDirPath)
-            builder.GenerateSpecific3DStructure(gmmlConformerInfo, outputDirPath)
-            log.debug("just did builder.GenerateSpecific3DStructure")
+        #    log.debug("The request is for a conformer with outputDirPath: " + outputDirPath)
+        log.debug("Here is the input to the builder.")
+        log.debug(buildState)
+        log.debug("gmmlConformerInfo:")
+        log.debug(gmmlConformerInfo)
+        builder.GenerateSpecific3DStructure(gmmlConformerInfo, outputDirPath)
+        log.debug("just did builder.GenerateSpecific3DStructure")
     except Exception as error:
         log.debug(
             "Just about to call generateCommonParserNotice with the outgoing project.  The transaction_out is :   "
