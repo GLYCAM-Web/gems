@@ -214,8 +214,10 @@ def build3DStructure(
             thisTransaction.getSequenceVariantOut("indexOrdered")
         )
         if buildState.isDefaultStructure:
-            log.debug("Generating default structure in: " + outputDirPath)
-        #    log.debug("The request is for a conformer with outputDirPath: " + outputDirPath)
+            # if outputDirPath is None: # This codebase does things to you.
+            #     outputDirPath += 'structure/'
+            log.debug("Generating default structure")
+        log.debug("The outputDirPath is: " + outputDirPath)
         log.debug("Here is the input to the builder.")
         log.debug(buildState)
         log.debug("gmmlConformerInfo:")

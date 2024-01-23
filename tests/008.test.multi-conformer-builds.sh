@@ -21,6 +21,7 @@ build_1_input="${GEMSHOME}/tests/inputs/008.1.build-request-first-two.json"
 build_2_input="${GEMSHOME}/tests/inputs/008.2.build-request-second-two.json"
 build_3_input="${GEMSHOME}/tests/inputs/008.3.build-request-third-four.json"
 build_5_input="${GEMSHOME}/tests/inputs/008.5.build-request-NotDefault.json"
+build_6_input="${GEMSHOME}/tests/inputs/008.6.build-request-NoRotamers.json"
 
 do_the_common_tasks() {	
 	jsonInFile="${1}"
@@ -114,6 +115,16 @@ if [ "${ALL_TESTS_PASSED}" == "true" ] ; then
     source './sub_parts/008.0.sub-test.bash' # Must do an evaluation first because bugs.
     source './sub_parts/008.5.sub-test.bash'
 fi
+
+if [ "${ALL_TESTS_PASSED}" == "true" ] ; then
+    echo """
+################################################################################
+## Sub test 6:  Request with no rotamers. 
+################################################################################"""
+    deleteTestOutputFolders
+    source './sub_parts/008.6.sub-test.bash'
+fi
+
 
 if [ "${ALL_JSON_ARE_GOOD}" == "false" ] ; then
         echo "The builds worked, but one or more JSON delegations FAILED."
