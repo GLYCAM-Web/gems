@@ -1,4 +1,3 @@
-import re
 import socket
 
 from gemsModules.logging.logger import Set_Up_Logging
@@ -6,9 +5,6 @@ from gemsModules.logging.logger import Set_Up_Logging
 from . import ConfigManager
 
 log = Set_Up_Logging(__name__)
-
-
-ip_regex = re.compile(r"^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$")
 
 
 class ContextManager(ConfigManager):
@@ -27,15 +23,6 @@ class ContextManager(ConfigManager):
         """
         if instance_hostname is None:
             instance_hostname = socket.gethostname()
-        elif ip_regex.match(instance_hostname):
-            log.debug(f"Instance hostname is an IP: {instance_hostname}")
-            try:
-                instance_hostname = socket.gethostbyaddr(instance_hostname)[0]
-            except socket.herror:
-                log.error(f"Unable to resolve the IP: {instance_hostname}")
-                raise ValueError(
-                    f"Unable to resolve the GEMS host IP: {instance_hostname}"
-                )
 
         available_contexts = []
         for host in self.config["hosts"].keys():
