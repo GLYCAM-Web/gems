@@ -52,8 +52,8 @@ def create_contextual_slurm_submission_script(thisSlurmJobInfo):
         return
     else:
         log.debug("Will generate a new Slurm runscript.")
-
         log.debug("About to create runscript on %s", socket.gethostname())
+        log.debug("SlurmJobDict: " + str(SlurmJobDict))
 
     create_slurm_submission.execute(SlurmJobDict)
 

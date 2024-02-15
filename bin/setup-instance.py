@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
-import shutil, argparse, os, sys, json, datetime
+import argparse, os, sys, json, re
+import socket
 
 GemsPath = os.environ.get("GEMSHOME")
 sys.path.append(GemsPath)
 sys.path.append(
     GemsPath + "/gemsModules"
 )  # Swarm needs /gemsModules. These sys path hacks would be simplified if we used pip to install gems.
-from gemsModules.systemoperations.environment_ops import is_GEMS_test_workflow
 from gemsModules.systemoperations.instance_config import InstanceConfig
+
+
+ip_regex = re.compile(r"^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$")
 
 
 def argparser():
@@ -89,6 +92,16 @@ def main():
             sbatch_context,
             sbatch_arguments,
         ) = args.set_sbatch_arguments.split(";")
+
+        if ip_regex.match(sbatch_hostname):
+            print(f"Instance hostname is an IP: {sbatch_hostname}")
+            try:
+                sbatch_hostname = socket.gethostbyaddr(sbatch_hostname)[0]
+            except socket.herror:
+                raise ValueError(
+                    f"Unable to resolve the GEMS host IP: {sbatch_hostname}"
+                )
+
         sbatch_arguments = json.loads(sbatch_arguments)
         ic.add_keyed_arguments_to_host(
             "sbatch_arguments", sbatch_hostname, sbatch_context, sbatch_arguments
