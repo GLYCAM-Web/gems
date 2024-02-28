@@ -1,6 +1,7 @@
 # GEMS note: We should not modify production configuration files automatically. It should only run in a DevEnv.
 import datetime
 import json
+import os
 from pathlib import Path
 import shutil
 from typing import Dict
@@ -74,7 +75,11 @@ class DateReversioner:
 
     def update(self) -> bool:
         """Update the file_to_version with the current date."""
-        needs_update = self.is_outdated
+        needs_update = (
+            self.is_outdated
+            or os.getenv("GEMS_FORCE_INSTANCE_RECONFIGURATION") == "True"
+        )
+
         if needs_update:
             # Backup the file_to_version.
             if self.file_to_version.exists():

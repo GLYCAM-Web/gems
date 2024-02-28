@@ -134,8 +134,8 @@ def main():
             generating_cmd = (
                 f"python3 $GEMSHOME/bin/setup-instance.py \\\n"
                 f"--add-host '{hostname};[MDaaS-RunMD];{host}:{port}' \\\n"
-                f"--set-sbatch-arguments '{hostname};MDaaS-RunMD;{json.dumps(ic['hosts'][hostname]['sbatch_arguments'])}' \\\n"
-                f"--set-local-parameters '{hostname};MDaaS-RunMD;{json.dumps(ic['hosts'][hostname]['local_parameters'])}' \\\n"
+                f"--set-sbatch-arguments '{hostname};MDaaS-RunMD;{json.dumps(ic['hosts'][hostname]['sbatch_arguments']['MDaaS-RunMD'])}' \\\n"
+                f"--set-local-parameters '{hostname};MDaaS-RunMD;{json.dumps(ic['hosts'][hostname]['local_parameters']['MDaaS-RunMD'])}' \\\n"
                 f"--set-md-cluster-filesystem-path {args.gen_remote_md_cluster_config}"
             )
 

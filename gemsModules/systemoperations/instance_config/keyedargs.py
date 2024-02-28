@@ -100,3 +100,4 @@ class KeyedArgManager(HostManager):
         if context not in self.config["hosts"][hostname][key]:
             self.config["hosts"][hostname][key][context] = {}
         self.config["hosts"][hostname][key][context].update(args)
+        print(f"Added {key} to {hostname} for context {context} via {args}.")
