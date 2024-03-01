@@ -391,6 +391,10 @@ cd gmml/ || { echo "ERROR BUILDING GEMS $0 FAILED, CANT CD INTO GMML, EXITING" ;
 ./make.sh $CLEAN -w -o $BUILD_LEVEL -j $NMP  || { echo "ERROR BUILDING GEMS $0 FAILED, EXITING" ; exit 1; }
 cd ../
 
+cd gmml2/ || { echo "ERROR BUILDING GEMS $0 FAILED, CANT CD INTO GMML2, EXITING" ; exit 1; }
+./make.sh $CLEAN -w -o $BUILD_LEVEL -j $NMP  || { echo "ERROR BUILDING GEMS $0 FAILED, EXITING" ; exit 1; }
+cd ../
+
 ################################################################
 #########              WRAP UP TO GEMS                 #########
 ################################################################
@@ -415,6 +419,22 @@ else
 	exit 1
 fi
 
+if [[ -f ./gmml2/cmakeBuild/gmml2.py && -f ./gmml2/cmakeBuild/_gmml2.so ]]; then
+	ln -sf ./gmml2/cmakeBuild/gmml2.py gmml2.py
+	ln -sf ./gmml2/cmakeBuild/_gmml2.so _gmml2.so
+else
+	if [ ! -f ./gmml2/cmakeBuild/gmml2.py ]; then
+		printf "\n!!!WARNING, gmml2.py WAS NOT GENERATED!!!\n"
+		printf "THIS IS NEEDED FOR US TO INTERACT WITH GMML USING PYTHON!\n"
+	fi
+	if [ ! -f ./gmml2/cmakeBuild/_gmml2.so ]; then
+		printf "\n!!!WARNING, _gmml2.so WAS NOT GENERATED!!!\n"
+		printf "THIS IS NEEDED FOR US TO INTERACT WITH GMML USING PYTHON!\n"
+		#Note that this can be removed once we remove the hook tests for this
+		# Will be leaving in for now, will remove when working on a branch
+		# that has a scope that includes this problem
+	fi
+fi
 #if [[ "$WRAP_GMML" != "no_wrap" ]]; then
 #
 #    check_pythonhome
