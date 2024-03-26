@@ -44,36 +44,41 @@ def build_error_response_command_line(errorcode: int, isshell: bool = True) -> s
     else:
         returnCode = errorcode
 
-    thereturn = (
-        '{\n\
-    "entity" :\n\
-    {\n\
-        "type": "CommonServices",\n\
-        "responses" :\n\
-        [\n\
-            { "fatalError" :\n\
-                { \n\
-                                    "respondingService" : "System Operations",\n\
-                                    "notice" : \n\
-                                    {\n\
-                                        "type" : "Exit",\n\
-                                        "code" : "'
-        + str(returnCode)
-        + '",\n\
-                                        "brief" : "'
-        + theBrief
-        + '",\n\
-                                        "message" : "'
-        + str(code_to_message[errorcode])
-        + '"\n\
-                                    }\n\
-                                }\n\
-            }\n\
-        ]\n\
-    }\n\
-}'
+    thereturn = json.dumps(
+        {
+            "entity": {
+                "type": "CommonServices",
+                "responses": [
+                    {
+                        "fatalError": {
+                            "respondingService": "System Operations",
+                            "notice": {
+                                "type": "Exit",
+                                "code": str(returnCode),
+                                "brief": theBrief,
+                                "message": str(code_to_message[errorcode]),
+                            },
+                        }
+                    }
+                ],
+            }
+        },
+        indent=2,
     )
+
     return thereturn
+
+
+def STRING_from_file_named_on_command_line(command_line):
+    #    from io import StringIO
+    if len(command_line) < 2:
+        return None
+    if not os.path.isfile(command_line[1]):
+        return None
+    else:
+        with open(command_line[1], "r") as content_file:
+            # with open(sys.argv[1], 'r') as content_file:
+            return content_file.read()
 
 
 def STRING_from_stdin(standard_input) -> str:
@@ -86,41 +91,27 @@ def STRING_from_stdin(standard_input) -> str:
         [],
         [],
     )[0]:
-        # if select.select([sys.stdin,],[],[],0.0)[0]:
         return standard_input.read()
-        # return sys.stdin.read()
     else:
         return None
-
-
-def STRING_from_file_named_on_command_line(command_line):
-    #    from io import StringIO
-    if len(command_line) < 2:
-        return None
-    if not os.path.isfile(command_line[1]):
-        # if not os.path.isfile(sys.argv[1]):
-        return None
-    else:
-        with open(command_line[1], "r") as content_file:
-            # with open(sys.argv[1], 'r') as content_file:
-            return content_file.read()
 
 
 def JSON_From_Command_Line(command_line, standard_input) -> tuple[str, int]:
-    # Try first to see if there is a JSON object in stdin
-    jsonObjectString = STRING_from_stdin(standard_input)
-    if jsonObjectString is not None:  # there was some stdin
-        try:
-            json.loads(jsonObjectString)
-        except:
-            return build_error_response_command_line(6), 134
-        return jsonObjectString, 0
     # Try to get the JSON from the command line
     jsonObjectString = STRING_from_file_named_on_command_line(command_line)
+
+    if jsonObjectString is None:
+        # If there is no JSON, try to get it from standard input
+        jsonObjectString = STRING_from_stdin(standard_input)
+
+    # If there is no JSON, return an error
     if jsonObjectString is None:
         return build_error_response_command_line(5), 133
+
+    # If the JSON is not a JSON object, return an error
     try:
         json.loads(jsonObjectString)
     except:
         return build_error_response_command_line(6), 134
+
     return jsonObjectString, 0
