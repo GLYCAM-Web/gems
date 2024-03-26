@@ -1,16 +1,8 @@
 #!/usr/bin/env python3
 import os
-from typing import Protocol, Dict, Optional
-from pydantic import BaseModel
-
-# from gemsModules.mmservice.mdaas.tasks import batchcompute
 from gemsModules.mmservice.mdaas.services.ProjectManagement.api import (
     ProjectManagement_Inputs,
     ProjectManagement_Outputs,
-)
-from gemsModules.mmservice.mdaas.services.ProjectManagement.resources import (
-    ProjectManagement_Resources,
-    PM_Resource,
 )
 
 from gemsModules.mmservice.mdaas.tasks import set_up_run_md_directory
@@ -26,19 +18,38 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
 
     service_outputs = ProjectManagement_Outputs()
 
+    # create output directory TODO: setup before copy_to or after?
+    os.makedirs(inputs.outputDirPath, exist_ok=True)
+
+    amber_parm7, amber_rst7 = None, None
+    # We can do this because MDaaS's RDF fills in the input Resources from RunMD.
+    # TODO: There are other notes on this. Rather than use requester, implied translator can be
+    # used to copy inputs from entity to both services.
+    for resource in inputs.resources:
+        # Copy all Resources to the output directory.
+        resource.copy_to(inputs.outputDirPath)
+
+        if resource.resourceFormat == "AMBER-7-prmtop":
+            amber_parm7 = inputs.outputDirPath + "/" + resource.filename
+        if resource.resourceFormat == "AMBER-7-restart":
+            amber_rst7 = inputs.outputDirPath + "/" + resource.filename
+
+    if not amber_parm7 or not amber_rst7:
+        raise ValueError("Missing required AMBER-7-prmtop or AMBER-7-restart resource.")
+
+    # Set up the run directory.
     set_up_run_md_directory.execute(
         protocol_files_dir=inputs.protocolFilesPath,
         output_dir_path=inputs.outputDirPath,
         # TODO: Right now, the uploads dir path is obtained from a default MDProject.
-        uploads_dir_path=inputs.inputFilesPath,
-        parm7_real_name=inputs.amber_parm7,
-        rst7_real_name=inputs.amber_rst7,
+        parm7_real_name=amber_parm7,
+        rst7_real_name=amber_rst7,
     )
 
+    # TODO: taskify
     # lets also update sim_length in the protocol here. We're given inputs.sim_length in ns, but must calculate the nstlim stepcount.
     sim_length = float(inputs.sim_length)
     nstlim = int(sim_length * 500000)  # 500k because dt=0.002
-    # TODO: edit_amber_input_file() is not yet implemented.
     with open(inputs.outputDirPath + "/10.produ.in", "r") as f:
         lines = f.readlines()
         for i in range(len(lines)):
@@ -58,14 +69,5 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
 
     # update service outputs
     service_outputs.outputDirPath = inputs.outputDirPath
-
-    # TODO: use resources to copy all input files to the output directory, such as parm7/rst7 as well.
-    for resource in inputs.resources:
-        # Copy all PM_Resources to the output directory.
-        if isinstance(resource, PM_Resource):
-            resource.copy_to(inputs.outputDirPath)
-
-    # # TODO: we can use PM_Resource.copy_to to copy the files to the output directory.
-    # service_outputs.resources = ProjectManagement_Resources(resources=resources)
 
     return service_outputs

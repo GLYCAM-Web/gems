@@ -43,7 +43,7 @@ class Resource(BaseModel):
         None, description="The thing that is described by the location and format"
     )
     notices: Notices = Field(
-        Notices(),
+        None,
         description="Notices associated with this resource",
     )
     options: dict[str, str] = Field(
@@ -54,7 +54,7 @@ class Resource(BaseModel):
     @property
     def filename(self):
         """Filename from options or File payload."""
-        if self.locationType == "File":
+        if self.locationType == "filesystem-path-unix":
             return Path(self.payload).name
         elif "filename" in self.options:
             return self.options["filename"]
@@ -81,7 +81,7 @@ class Resource(BaseModel):
         - Can override and call super from subclass to extend location types.
         - Can also override the handlers to extend functionality.
         """
-        if self.locationType == "File":
+        if self.locationType == "filesystem-path-unix":
             return self._handle_file()
         elif self.locationType == "Payload":
             return self._handle_payload()
@@ -133,6 +133,23 @@ class Resources(BaseModel):
             return []
 
         return [resource for resource in self.__root__ if resource.typename == typename]
+
+    def __getitem__(self, key):
+        return self.__root__[key]
+
+    def __setitem__(self, key, value):
+        self.__root__[key] = value
+
+    def __len__(self):
+        if self.__root__ is None:
+            return 0
+        return len(self.__root__)
+
+    def __iter__(self):
+        return iter(self.__root__)
+
+    def __repr__(self):
+        return f"{self.__root__}"
 
 
 def generateSchema():

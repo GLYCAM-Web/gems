@@ -51,16 +51,6 @@ class run_md_Resources(Resources):
 
 
 class run_md_Inputs(BaseModel):
-    amber_parm7: str = Field(
-        None,
-        title="Amber Parm7",
-        description="Name of Amber Parm7 file",
-    )
-    amber_rst7: str = Field(
-        None,
-        title="Amber Rst7",
-        description="Name of Amber Rst7 file",
-    )
     pUUID: str = Field(
         None,
         title="Project UUID",
@@ -70,11 +60,6 @@ class run_md_Inputs(BaseModel):
         None,
         title="Output Directory Path",
         description="Path to output directory",
-    )
-    inputFilesPath: str = Field(
-        None,
-        title="Input Files Directory Path",
-        description="Path to whhere the input files are stored",
     )
     protocolFilesPath: str = Field(
         None,
