@@ -6,8 +6,7 @@ import sys
 from pathlib import Path
 
 
-# append $GEMSHOME to sys path in case
-# the script is run from outside the gemsModules directory
+# append $GEMSHOME to sys path in case the script is run from outside the gemsModules directory
 if "GEMSHOME" in os.environ:
     if os.environ["GEMSHOME"] not in sys.path:
         sys.path.append(os.environ["GEMSHOME"])
@@ -59,7 +58,6 @@ def insert_file_content_to_json(
             locationType="Payload", resourceFormat=resource_format, payload=file_content
         )
 
-        # Set the file content at the JSON index
         json_dict = set_value_at_json_index(json_dict, json_index, resource.dict())
 
         return json_dict
@@ -69,7 +67,7 @@ def insert_file_content_to_json(
         return json_dict
 
 
-def main():
+def argparser():
     parser = argparse.ArgumentParser(description="JSON Request Builder")
     parser.add_argument("--resource", type=str, help="Path to the resource file")
 
@@ -91,8 +89,11 @@ def main():
         type=str,
         help="The index of the JSON object to be updated separated by periods",
     )
-    args = parser.parse_args()
+    return parser.parse_args()
 
+
+def main():
+    args = argparser()
     resource_path = args.resource
 
     if resource_path:
@@ -123,12 +124,15 @@ def main():
     updated_request = insert_file_content_to_json(
         request, args.json_index, resource_path, args.resource_format
     )
+    dumped_request = json.dumps(updated_request, indent=2)
 
     if args.output:
         with open(args.output, "w") as f:
-            f.write(json.dumps(updated_request))
+            f.write(dumped_request)
     else:
-        print(json.dumps(updated_request), end="")
+        # print(dumped_request, end="")
+        sys.stdout.write(dumped_request)
+        # sys.stdout.flush()
 
 
 if __name__ == "__main__":
