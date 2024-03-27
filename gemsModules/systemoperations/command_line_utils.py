@@ -3,8 +3,10 @@ import json
 import os
 import sys
 import traceback
+import select
 
 from gemsModules.logging.logger import Set_Up_Logging
+
 
 log = Set_Up_Logging(__name__)
 
@@ -81,19 +83,31 @@ def STRING_from_file_named_on_command_line(command_line):
             return content_file.read()
 
 
-def STRING_from_stdin(standard_input) -> str:
-    import select
+def STRING_from_stdin(
+    standard_input=sys.stdin, initial_timeout=None, extend_timeout=None
+) -> str:
+    """
+    Attempts to read from standard input with a timeout.
+    If the initial select times out, the timeout can be extended once.
 
-    if select.select(
-        [
-            standard_input,
-        ],
-        [],
-        [],
-    )[0]:
+    Args:
+    - standard_input: The input stream to read from. Defaults to sys.stdin.
+    - initial_timeout: The initial timeout in seconds.
+    - extend_timeout: Optional. An additional amount of time to wait if the initial wait times out.
+                      If None, no second attempt is made.
+
+    Returns:
+    - The read string if available within the timeout(s), or None if not.
+    """
+    ready, _, _ = select.select([standard_input], [], [], initial_timeout)
+    if ready:
         return standard_input.read()
-    else:
-        return None
+    elif extend_timeout is not None:
+        ready, _, _ = select.select([standard_input], [], [], extend_timeout)
+        if ready:
+            return standard_input.read()
+
+    return None
 
 
 def JSON_From_Command_Line(command_line, standard_input) -> tuple[str, int]:
@@ -102,7 +116,7 @@ def JSON_From_Command_Line(command_line, standard_input) -> tuple[str, int]:
 
     if jsonObjectString is None:
         # If there is no JSON, try to get it from standard input
-        jsonObjectString = STRING_from_stdin(standard_input)
+        jsonObjectString = STRING_from_stdin(standard_input, 0.0, 0.5)
 
     # If there is no JSON, return an error
     if jsonObjectString is None:
