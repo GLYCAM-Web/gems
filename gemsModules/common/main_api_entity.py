@@ -19,12 +19,12 @@ class Entity(ABC, BaseModel):
     entityType: str = Field(  # This is the only required field in all of the API
         ..., title="Type", alias="type"
     )
-    inputs: Union[Dict, Resource] = Field(
+    inputs: Union[Resource, Dict] = Field(
         None,
         title="Inputs",
         description="User-friendly, top-level inputs to the services.",
     )
-    outputs: Union[Dict, Resource] = Field(
+    outputs: Union[Resource, Dict] = Field(
         None,
         title="Inputs",
         description="User-friendly, top-level outputs from the services.",

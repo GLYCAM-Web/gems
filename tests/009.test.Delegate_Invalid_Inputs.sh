@@ -13,7 +13,7 @@ run_Invalid_Json_Input_Response_Test()
 	# pipe reponse from delegator to grep
 	# grep for "brief" : "NotAJSONObject"
 	# grep is returning a count (-c flag)
-	if [ $(cat $invalid_Json | $GEMSHOME/bin/delegate | grep -c '"brief" : "NotAJSONObject"') != '0' ] ; then
+	if [ $(cat $invalid_Json | $GEMSHOME/bin/delegate | grep -c '"brief": "NotAJSONObject"') != '0' ] ; then
 		return 1
 	fi
 	return 0

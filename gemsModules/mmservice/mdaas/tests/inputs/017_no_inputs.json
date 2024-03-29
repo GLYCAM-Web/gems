@@ -1,0 +1,13 @@
+{
+	"entity": {
+		"type": "MDaaS",
+		"services": {
+			"run_md": {
+				"type": "RunMD",
+				"givenName": "Test of RunMD",
+				"inputs": {
+				}
+			}
+		}
+	}
+}

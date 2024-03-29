@@ -4,16 +4,14 @@ from pathlib import Path
 from typing_extensions import Literal, Optional
 from pydantic import BaseModel, Field
 
-from gemsModules.logging.logger import Set_Up_Logging
+from gemsModules.common.main_api_resources import Resources
 
 from gemsModules.structurefile.PDBFile.main_api import (
     PDBFile_Service_Request,
     PDBFile_Service_Response,
 )
-from gemsModules.structurefile.PDBFile.services.ProjectManagement.resources import (
-    ProjectManagement_Resources,
-    PM_Resource,
-)
+
+from gemsModules.logging.logger import Set_Up_Logging
 
 
 log = Set_Up_Logging(__name__)
@@ -30,10 +28,10 @@ class ProjectManagement_Inputs(BaseModel):
         title="Project Directory",
         description="Full path to project directory",
     )
-    resources: list[PM_Resource] = Field(
+    resources: Resources = Field(
         title="Resources",
         description="List of resources to copy to project directory",
-        default_factory=list,
+        default_factory=Resources,
     )
 
 
@@ -43,7 +41,11 @@ class ProjectManagement_Outputs(BaseModel):
         title="Output File Path",
         description="Full path to output file",
     )
-    resources: ProjectManagement_Resources = ProjectManagement_Resources()
+    resources: Resources = Field(
+        title="Resources",
+        description="List of resources to copy to project directory",
+        default_factory=Resources,
+    )
 
 
 class ProjectManagement_Request(PDBFile_Service_Request):
