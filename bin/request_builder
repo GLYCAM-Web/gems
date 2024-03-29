@@ -1,4 +1,24 @@
 #!/usr/bin/env python3
+"""
+This script is used to update a JSON request with a resource file at a specific index. 
+
+
+Usage example:
+
+# Add two resources to a blank MDaaS RunMD request.
+cat gemsModules/mmservice/mdaas/tests/inputs/017_no_inputs.json |\
+./bin/request_builder \
+    --resource /programs/gems/tests/temp-inputs/mdinput/unminimized-t5p.parm7 \
+    --resource-format AMBER-7-prmtop \
+    --json-index entity.services.run_md.inputs.parameter-topology-file |\
+./bin/request_builder \
+    --resource /programs/gems/tests/temp-inputs/mdinput/unminimized-t5p.rst7 \
+    --resource-format AMBER-7-restart \
+    --json-index entity.services.run_md.inputs.input-coordinate-file |\
+./bin/delegate
+
+See ./bin/request_builder --help for usage information.
+"""
 import argparse
 import json
 import os
@@ -40,31 +60,11 @@ def set_value_at_json_index(json_dict, json_index, value):
 
     except KeyError:
         print(f"Invalid JSON index: {json_index}")
-        return json_dict
+        sys.exit(1)
 
     except Exception as e:
         print(f"An error occurred: {str(e)}")
-        return json_dict
-
-
-def insert_file_content_to_json(
-    json_dict, json_index, resource_path, resource_format=None
-):
-    try:
-        with open(resource_path, "r") as file:
-            file_content = file.read()
-
-        resource = Resource(
-            locationType="Payload", resourceFormat=resource_format, payload=file_content
-        )
-
-        json_dict = set_value_at_json_index(json_dict, json_index, resource.dict())
-
-        return json_dict
-
-    except FileNotFoundError:
-        print(f"File not found: {resource_path}")
-        return json_dict
+        sys.exit(1)
 
 
 def argparser():
@@ -81,13 +81,18 @@ def argparser():
     parser.add_argument(
         "--resource-format",
         type=str,
-        help="The format of the resource file (e.g. 'json', 'xml')",
+        help="The format of the resource file (e.g. 'AMBER-7-prmtop')",
         default=None,
     )
     parser.add_argument(
         "--json-index",
         type=str,
         help="The index of the JSON object to be updated separated by periods",
+    )
+    parser.add_argument(
+        "--dont-encode-mime",
+        action="store_false",
+        help="Encapsulate the resource in a MIME message",
     )
     return parser.parse_args()
 
@@ -103,7 +108,7 @@ def main():
     else:
         resource_path = None
 
-    # Read the request from stdin
+    # Read the request from stdin or file
     request_data = sys.stdin.read()
 
     if not request_data:
@@ -111,6 +116,7 @@ def main():
             with open(args.request, "r") as f:
                 request_data = f.read()
 
+    # Parse the request
     if request_data:
         try:
             request = json.loads(request_data)
@@ -121,11 +127,13 @@ def main():
         print("Error: No request data provided via stdin or --request.")
         sys.exit(1)
 
-    updated_request = insert_file_content_to_json(
-        request, args.json_index, resource_path, args.resource_format
+    resource = Resource.from_path(
+        resource_path, args.resource_format, encapulate_mime=args.dont_encode_mime
     )
+    updated_request = set_value_at_json_index(request, args.json_index, resource.dict())
     dumped_request = json.dumps(updated_request, indent=2)
 
+    # Write the updated request to stdout or file
     if args.output:
         with open(args.output, "w") as f:
             f.write(dumped_request)

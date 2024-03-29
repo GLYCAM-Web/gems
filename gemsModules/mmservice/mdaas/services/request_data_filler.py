@@ -76,7 +76,10 @@ class mdaas_Request_Data_Filler(Request_Data_Filler):
             for name, potential_resource in requester_aaop.The_AAO.inputs.items():
                 try:
                     resource = Resource.parse_obj(potential_resource)
-                    if resource.locationType == "Payload":
+                    if (
+                        resource.locationType == "Payload"
+                        and "filename" not in resource.options
+                    ):
                         resource.options["filename"] = name
                     aaop.The_AAO.inputs.resources.add_resource(resource)
                 except Exception as e:
