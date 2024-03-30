@@ -127,7 +127,7 @@ def main():
         print("Error: No request data provided via stdin or --request.")
         sys.exit(1)
 
-    resource = Resource.from_path(
+    resource = Resource.payload_from_path(
         resource_path, args.resource_format, encapulate_mime=args.dont_encode_mime
     )
     updated_request = set_value_at_json_index(request, args.json_index, resource.dict())

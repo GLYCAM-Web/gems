@@ -59,25 +59,6 @@ fi
 test_runmd
 FAILURE=$?
 
-# # This no longer works because the example config isn't configured by default. Instead,
-# # The DevEnv calls $GEMSHOME/bin/setup-instance.py to generate a working config. Because this
-# # GEMS test cannot possibly know about the DevEnv, it cannot necessarily set up the example
-# # config any better.
-# # In fact, generating an instance_config.json outside of the DevEnv will likely cause problems
-# # for anything depending on it. TODO: Come up with a better default generation. Right now, best
-# # we can do is delete and restart the dev env.
-# if [ -f $ACTUAL_CONFIG ] && ! [ diff $ACTUAL_CONFIG $EXAMPLE_CONFIG > /dev/null 2>&1 ]; then
-#     # If they're different, we need to swap them and test the default config.
-#     mv $ACTUAL_CONFIG $ACTUAL_CONFIG.bak.test017
-#     cp $EXAMPLE_CONFIG $ACTUAL_CONFIG
-
-#     test_runmd
-#     FAILURE=$(($FAILURE + $?))
-
-#     # Swap them back
-#     rm $ACTUAL_CONFIG
-#     mv $ACTUAL_CONFIG.bak.test017 $ACTUAL_CONFIG
-# fi
 
 if [ $FAILURE -ne 0 ]; then
     printf "Instance configuration test failed, if you are in a development environment, please try deleting the instance config and restarting your DevEnv!\nIf you are running in production, please check your configuration!\n"

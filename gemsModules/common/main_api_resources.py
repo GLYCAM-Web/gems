@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import email
 from email.message import EmailMessage
 import mimetypes
 from typing import Any, List
@@ -29,60 +30,44 @@ class MimeEncodableResourceMixin:
     def try_decode_mime(self, data):
         """If the payload is MIME encoded by GEMS or at all, try to decode it."""
         if self.is_mime_encoded or data.startswith(b"Content-Type:"):
-            msg = EmailMessage()
-            msg.set_content(data)
+            msg = email.parser.BytesParser().parsebytes(data)
             return msg.get_payload(decode=True)
         else:
             return data
 
     @classmethod
-    def from_payload(cls, data, resource_format):
-        return cls(
+    def payload_from_path(cls, resource_path, resource_format, encapulate_mime=False):
+        if encapulate_mime:
+            msg = EmailMessage()
+            mime_type, _ = mimetypes.guess_type(resource_path)
+            if mime_type is None:
+                mime_type = "application/octet-stream"
+
+            # Read the file content and attach it to the message
+            with open(resource_path, "rb") as file:
+                file_content = file.read()
+                msg.set_content(
+                    file_content,
+                    maintype=mime_type.split("/")[0],
+                    subtype=mime_type.split("/")[1],
+                )
+
+            content = msg.as_string()
+        else:
+            with open(resource_path, "rb") as file:
+                content = file.read()
+
+        obj = cls(
             locationType="Payload",
             resourceFormat=resource_format,
-            payload=data,
+            payload=content,
         )
-
-    @classmethod
-    def from_payload_with_mime_encapsulation(
-        cls, data, resource_format, mime_type=None, filename=None
-    ):
-        msg = EmailMessage()
-
-        maintype, subtype = (
-            mime_type.split("/") if mime_type else ("application", "octet-stream")
-        )
-        msg.set_content(
-            data,
-            maintype=maintype,
-            subtype=subtype,
-        )
-
-        encoded_content = msg.as_string()
-
-        obj = cls.from_payload(encoded_content, resource_format)
-
-        obj.options = {"is_mime_encoded": True}
-        if filename is not None:
-            obj.options["filename"] = filename
+        obj.options = {
+            "is_mime_encoded": encapulate_mime,
+            "filename": Path(resource_path).name,
+        }
 
         return obj
-
-    @classmethod
-    def from_path(cls, resource_path, resource_format, encapulate_mime=False):
-        if encapulate_mime:
-            return cls.from_payload_with_mime_encapsulation(
-                str(open(resource_path, "rb").read()),
-                resource_format,
-                mimetypes.guess_type(resource_path)[0],
-                Path(resource_path).name,
-            )
-        else:
-            return cls(
-                locationType="filesystem-path-unix",
-                resourceFormat=resource_format,
-                payload=str(resource_path),
-            )
 
 
 class Resource(BaseModel, MimeEncodableResourceMixin):
