@@ -14,42 +14,6 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
-class run_md_input_Resource(Resource):
-    """Need to write validators."""
-
-    ## Works now:
-    ##
-    ## locationType = filepath
-    ##
-    ## resourceFormat = amber_parm7 | amber_rst7 | md_path | max_hours
-    ##
-    ## payload = string containing a /path/to/file  |  integer (number of hours)
-    ##
-    ## options = none currently read
-    ##
-    pass
-
-
-class run_md_output_Resource(Resource):
-    """Need to write validators."""
-
-    ## Works now:
-    ##
-    ## locationType = filepath
-    ##
-    ## resourceFormat = amber_parm7 | amber_rst7 | amber_nc | amber_mdcrd | amber_mdout | zipfile
-    ##
-    ## payload = string containing a /path/to/file
-    ##
-    ## notices = these will surely happen
-    ##
-    pass
-
-
-class run_md_Resources(Resources):
-    __root__: List[Union[run_md_input_Resource, run_md_output_Resource]] = None
-
-
 class run_md_Inputs(BaseModel):
     pUUID: str = Field(
         None,
@@ -76,7 +40,7 @@ class run_md_Inputs(BaseModel):
         title="Control Script",
         description="Name of the script used to run the protocol",
     )
-    resources: run_md_Resources = run_md_Resources()
+    resources: Resources = Resources()
 
 
 class run_md_Outputs(BaseModel):
@@ -85,7 +49,7 @@ class run_md_Outputs(BaseModel):
         title="Output Directory Path",
         description="Path to output directory",
     )
-    resources: run_md_Resources = run_md_Resources()
+    resources: Resources = Resources()
 
 
 class run_md_Request(MDaaS_Service_Request):

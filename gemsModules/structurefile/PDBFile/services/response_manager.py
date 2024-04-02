@@ -4,9 +4,11 @@ from gemsModules.common.services.response_manager import Response_Manager
 from gemsModules.common.main_api_notices import Notices
 
 from gemsModules.structurefile.PDBFile.main_api import PDBFile_Entity
-from gemsModules.structurefile.PDBFile.tasks import create_default_entity_aaop_tree_pair
+
+from gemsModules.common.tasks import create_default_entity_aaop_tree_pair
 
 from gemsModules.logging.logger import Set_Up_Logging
+
 
 log = Set_Up_Logging(__name__)
 

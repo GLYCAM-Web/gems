@@ -179,7 +179,10 @@ class Resource(BaseModel, MimeEncodableResourceMixin):
 class Resources(BaseModel):
     __root__: list[Resource] = Field(default_factory=list)
 
-    def add_resource(self, resource: Resource):
+    def add_resource(self, resource: Resource, metadata_only=False):
+        if metadata_only:
+            resource.payload = None
+
         self.__root__.append(resource)
 
     def type_is_present(self, typename: str):
@@ -197,6 +200,10 @@ class Resources(BaseModel):
             return []
 
         return [resource for resource in self.__root__ if resource.typename == typename]
+
+    def clear_payloads(self):
+        for resource in self:
+            resource.payload = None
 
     def __getitem__(self, key):
         return self.__root__[key]
