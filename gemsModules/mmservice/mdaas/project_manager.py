@@ -57,7 +57,10 @@ class mdaas_Project_Manager(Project_Manager):
             if service.typename == "RunMD":
                 # THe problem with setting the files here is that then they have their full paths,
                 # and we still need the full paths for the RDF...
-                if service.inputs["parameter-topology-file"]["locationType"] == "File":
+                if service.inputs["parameter-topology-file"]["locationType"] in [
+                    "File",
+                    "filesystem-path-unix",
+                ]:
                     parm_path = Path(
                         service.inputs["parameter-topology-file"]["payload"]
                     )
@@ -66,9 +69,12 @@ class mdaas_Project_Manager(Project_Manager):
                     # TODO: Either set no path, or copy the payloaded input files to the project directory on run by PM.
                     # None for now
                     parm_path = None
-                    self.response_project.parm7_file_name = None
+                    self.response_project.parm7_file_name = "MdInput.parm7"
 
-                if service.inputs["input-coordinate-file"]["locationType"] == "File":
+                if service.inputs["input-coordinate-file"]["locationType"] in [
+                    "File",
+                    "filesystem-path-unix",
+                ]:
                     rst_path = Path(service.inputs["input-coordinate-file"]["payload"])
                     self.response_project.rst7_file_name = str(rst_path.name)
 
@@ -80,7 +86,7 @@ class mdaas_Project_Manager(Project_Manager):
                 else:
                     # TODO: Like above, this is just for response project metadata.
                     rst_path = None
-                    self.response_project.rst7_file_name = None
+                    self.response_project.rst7_file_name = "MdInput.rst7"
 
                 self.response_project.upload_path = str(
                     rst_path.parent
