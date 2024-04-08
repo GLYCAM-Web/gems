@@ -1,6 +1,10 @@
+# Standard python libraries
 import os 
-from mime_type import mime_type
 import json
+import magic
+
+# My module
+from mime_type import get_mime_type
 
 """ 
 First, let's generate a text file containing the output file names, sizes, and MIME types for an unreasonably small mannose build called "tenth_of_a_mannose.txt"
@@ -35,7 +39,7 @@ for seq in os.listdir("/home/sam/Desktop/GLYCAM_Dev_Env/V_2/Web_Data/userdata/se
                 props = os.stat(file)
 
                 # add file to a dictionary with file size and MIME
-                curr_dict[file] = [int(props.st_size/10), mime_type()]
+                curr_dict[file] = [int(props.st_size/10), get_mime_type(file)]
 
         
 

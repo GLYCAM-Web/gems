@@ -1,42 +1,42 @@
 File                                                            Size (Bytes)                              Type
-frcmod.glycam06_intraring_doublebond_protonatedacids                833                              MIME type
-structure.pdb                                                       193                              MIME type
-unminimized-t5p.parm7                                              68472                             MIME type
-gas_phase_minimization.log                                           69                              MIME type
-unminimized-t3p.parm7                                              42890                             MIME type
-unminimized-gas.leaplog                                             3152                             MIME type
-min-gas.mol2                                                        262                              MIME type
-Minimize.bash                                                       467                              MIME type
-min-gas.info                                                         38                              MIME type
-Run_Multi-Part_Simulation.bash                                      1070                             MIME type
-unminimized-t3p.leapin                                               37                              MIME type
-README.md                                                           141                              MIME type
-gemsAmberProject.log                                                 31                              MIME type
-min-t5p.cpptrajin                                                    9                               MIME type
-T5P-Min-Parameters.bash                                              78                              MIME type
-unminimized-t5p.leapin                                               36                              MIME type
-T3P-Min-Parameters.bash                                              78                              MIME type
-min-gas.in                                                           12                              MIME type
-unminimized-gas.parm7                                               1933                             MIME type
-Minimize.log                                                        1225                             MIME type
-min-gas.pdb                                                         197                              MIME type
-gemsAmberProject.json                                               142                              MIME type
-unminimized-t3p.leaplog                                             3256                             MIME type
-min-t5p.in                                                           20                              MIME type
-build-status.log                                                     64                              MIME type
-min-t3p.in                                                           20                              MIME type
-unminimized-gas.leapin                                               56                              MIME type
-structure.off                                                       415                              MIME type
-info.json                                                            98                              MIME type
-unminimized-t5p.leaplog                                             3232                             MIME type
-unminimized-t3p.pdb                                                17933                             MIME type
-min-gas.restrt.nc                                                   104                              MIME type
-Readme-Stopgap.md                                                   108                              MIME type
-unminimized-gas.rst7                                                 90                              MIME type
-min-gas.o                                                           822                              MIME type
-Gas-Min-Parameters.bash                                              78                              MIME type
-unminimized-t5p.pdb                                                27906                             MIME type
-min-t3p.cpptrajin                                                    9                               MIME type
-unminimized-t5p.rst7                                               14897                             MIME type
-unminimized-t3p.rst7                                                9447                             MIME type
-min-gas.cpptrajin                                                    9                               MIME type
+frcmod.glycam06_intraring_doublebond_protonatedacids                833                             text/plain
+structure.pdb                                                       193                             text/plain
+unminimized-t5p.parm7                                              68472                            text/plain
+gas_phase_minimization.log                                           69                             text/plain
+unminimized-t3p.parm7                                              42890                            text/plain
+unminimized-gas.leaplog                                             3152                            text/plain
+min-gas.mol2                                                        262                             text/plain
+Minimize.bash                                                       467                     text/x-shellscript
+min-gas.info                                                         38                             text/plain
+Run_Multi-Part_Simulation.bash                                      1070                    text/x-shellscript
+unminimized-t3p.leapin                                               37                             text/plain
+README.md                                                           141                             text/plain
+gemsAmberProject.log                                                 31                             text/plain
+min-t5p.cpptrajin                                                    9                              text/plain
+T5P-Min-Parameters.bash                                              78                     text/x-shellscript
+unminimized-t5p.leapin                                               36                             text/plain
+T3P-Min-Parameters.bash                                              78                     text/x-shellscript
+min-gas.in                                                           12                             text/plain
+unminimized-gas.parm7                                               1933                            text/plain
+Minimize.log                                                        1225                            text/plain
+min-gas.pdb                                                         197                             text/plain
+gemsAmberProject.json                                               142                       application/json
+unminimized-t3p.leaplog                                             3256                            text/plain
+min-t5p.in                                                           20                             text/plain
+build-status.log                                                     64                             text/plain
+min-t3p.in                                                           20                             text/plain
+unminimized-gas.leapin                                               56                             text/plain
+structure.off                                                       415                             text/plain
+info.json                                                            98                       application/json
+unminimized-t5p.leaplog                                             3232                            text/plain
+unminimized-t3p.pdb                                                17933                            text/plain
+min-gas.restrt.nc                                                   104                   application/x-netcdf
+Readme-Stopgap.md                                                   108                             text/plain
+unminimized-gas.rst7                                                 90                             text/plain
+min-gas.o                                                           822                             text/plain
+Gas-Min-Parameters.bash                                              78                     text/x-shellscript
+unminimized-t5p.pdb                                                27906                            text/plain
+min-t3p.cpptrajin                                                    9                              text/plain
+unminimized-t5p.rst7                                               14897                            text/plain
+unminimized-t3p.rst7                                                9447                            text/plain
+min-gas.cpptrajin                                                    9                              text/plain
