@@ -15,20 +15,19 @@ The glcomimetics tool performs the following tasks in the order they are mention
     -Required input: output of step 1
     -Output files: none
 
-3. It calls make_simulation_scripts.sh to:
+3. It calls make_simulation_scripts.sh to make necessary scripts for MD simulation:
     -Required input:
         -Output files from step 1
         -Configured directories from step 2.  
-    -Make necessary scripts for MD simulation.
     -Call Slurm to submit MD simulations and MM-GBSA analysis.
         -My scripts can submit MD simulations in the machine they are being run.
         -If the MD jobs must happen on different machines, I will need to invoke MDaaS. 
     -Output files: 
-        -This script itself does not produce output files, but the MD simulations it submits do contains output files. 
+        -This script itself does not produce output files, but the MD simulations it submits do contain output files. 
 
-4. It calls master_analysis.sh to analysis MD and MM-GBSA results.
+4. It calls master_analysis.sh to analyze MD and MM-GBSA results.
     -Required input:
         -Simulation output files from step 3. 
     -Output files:
-        -The scripts itself creates some text files that stores output values, and also prints out the most important stuff to STDOUT. 
+        -The script itself creates some text files that stores output values, and also prints out the most important stuff to STDOUT. 
         -Once integrated into GEMS, these should probably go into a JSON file. 

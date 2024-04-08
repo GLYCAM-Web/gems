@@ -1,0 +1,16 @@
+MODEL 0
+REMARK FAKE_HEAD_ATOM=C5_C4
+REMARK REAL_HEAD_ATOM=N3_N2
+REMARK DUMMY_ATOM=C5_H8_H9_H10_C4_H6_H7
+HETATM    1  N1  UNL     1       1.631   1.735   0.261  1.00  0.00     0.068 N 
+HETATM    2  N2  UNL     1       2.452   0.843   0.154  1.00  0.00    -0.168 NA
+HETATM    3  N3  UNL     1       3.274  -0.052   0.048  1.00  0.00    -0.116 NA
+HETATM    4  C4  UNL     1       4.670   0.117   0.410  1.00  0.00     0.043 C 
+HETATM    5  C5  UNL     1       5.003   1.521   0.926  1.00  0.00    -0.057 C 
+HETATM    6  H6  UNL     1       5.296  -0.094  -0.482  1.00  0.00     0.070 H 
+HETATM    7  H7  UNL     1       4.924  -0.624   1.198  1.00  0.00     0.070 H 
+HETATM    8  H8  UNL     1       4.789   2.280   0.144  1.00  0.00     0.029 H 
+HETATM    9  H9  UNL     1       6.082   1.575   1.186  1.00  0.00     0.029 H 
+HETATM   10  H10 UNL     1       4.408   1.749   1.836  1.00  0.00     0.029 H 
+TER      11      UNL     1 
+ENDMDL

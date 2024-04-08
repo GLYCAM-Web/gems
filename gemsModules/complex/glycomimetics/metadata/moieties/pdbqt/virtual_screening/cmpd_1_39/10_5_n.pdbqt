@@ -1,0 +1,29 @@
+MODEL 0
+REMARK FAKE_HEAD_ATOM=C1_N2
+REMARK REAL_HEAD_ATOM=C3_C4
+REMARK DUMMY_ATOM=H10_H11_H12_C1_N2_H13
+REMARK TORSION=H15_C3_C4_C5
+ROOT
+HETATM    1  C1  LIG     1      -9.118   2.500  -0.098  1.00  0.00     0.094 C 
+HETATM    2  N2  LIG     1      -7.665   2.538  -0.269  1.00  0.00     0.083 N 
+HETATM    3  C3  LIG     1      -7.019   1.499   0.543  1.00  0.00     0.134 C 
+HETATM    4  C4  LIG     1      -5.528   1.491   0.309  1.00  0.00    -0.030 A 
+HETATM    5  C5  LIG     1      -4.749   2.613   0.645  1.00  0.00    -0.075 A 
+HETATM    6  C6  LIG     1      -3.368   2.601   0.431  1.00  0.00    -0.082 A 
+HETATM    7  C7  LIG     1      -2.753   1.472  -0.118  1.00  0.00    -0.083 A 
+HETATM    8  C8  LIG     1      -3.519   0.352  -0.452  1.00  0.00    -0.082 A 
+HETATM    9  C9  LIG     1      -4.901   0.358  -0.239  1.00  0.00    -0.075 A 
+HETATM   10  H10 LIG     1      -9.582   3.291  -0.725  1.00  0.00     0.071 H 
+HETATM   11  H11 LIG     1      -9.396   2.682   0.963  1.00  0.00     0.071 H 
+HETATM   12  H12 LIG     1      -9.522   1.519  -0.428  1.00  0.00     0.071 H 
+HETATM   13  H13 LIG     1      -7.331   3.481   0.036  1.00  0.00     0.315 HD
+HETATM   14  H14 LIG     1      -7.445   0.507   0.271  1.00  0.00     0.086 H 
+HETATM   15  H15 LIG     1      -7.215   1.671   1.625  1.00  0.00     0.086 H 
+HETATM   16  H16 LIG     1      -5.210   3.493   1.075  1.00  0.00     0.084 H 
+HETATM   17  H17 LIG     1      -2.773   3.467   0.691  1.00  0.00     0.083 H 
+HETATM   18  H18 LIG     1      -1.683   1.465  -0.283  1.00  0.00     0.083 H 
+HETATM   19  H19 LIG     1      -3.041  -0.522  -0.876  1.00  0.00     0.083 H 
+HETATM   20  H20 LIG     1      -5.480  -0.518  -0.503  1.00  0.00     0.084 H 
+ENDROOT
+TORSDOF 3
+ENDMDL
