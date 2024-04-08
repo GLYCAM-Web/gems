@@ -1,53 +1,53 @@
 import os 
 from mime_type import mime_type
+import json
 
 """ 
-First, let's just go into the first sequence's folder and print out all the non-slurm output files and their file sizes.
+First, let's generate a text file containing the output file names, sizes, and MIME types for an unreasonably small mannose build called "tenth_of_a_mannose.txt"
 """
 # Change to the sequence's directory
 
-os.chdir("/home/sam/Dropbox/cb/Sequences/866ded1c-252e-5b3f-8264-32ab9a845628/buildStrategyID1/All_Builds/structure")
+for seq in os.listdir("/home/sam/Desktop/GLYCAM_Dev_Env/V_2/Web_Data/userdata/sequence/cb/Sequences"):
 
-outputs = os.listdir()
+    # Change to the current sequences' directory
+    
+    with open(f"/home/sam/Desktop/GLYCAM_Dev_Env/V_2/Web_Data/userdata/sequence/cb/Sequences/{seq}/evaluation.json") as f:
+        data = json.load(f)
 
-files = []
-sizes = []
-types = []
 
+    if data["entity"]["inputs"]["sequence"]["payload"] == "DManpa1-OH":
 
-# Make lists for non-slurm files and their file sizes
-for file in outputs:
-    if "slurm" in file:
-        pass
-    else:
-        files.append(file)
+        print(f"Sequence pUUID for Mannose Build: {seq} ")
+        
 
-        props = os.stat(file)
-        sizes.append(int(props.st_size/10))
+        os.chdir(f"/home/sam/Desktop/GLYCAM_Dev_Env/V_2/Web_Data/userdata/sequence/cb/Sequences/{seq}/buildStrategyID1/All_Builds/structure")
 
-        types.append(mime_type(file))
+        curr_dict = {}
+
+        outputs = os.listdir()
+
+        # Make lists for non-slurm files and their file sizes
+        for file in outputs:
+            if "slurm" in file:
+                pass
+            else:
+                # calculate file size
+                props = os.stat(file)
+
+                # add file to a dictionary with file size and MIME
+                curr_dict[file] = [int(props.st_size/10), mime_type()]
 
         
 
- # Now just take the first file in the list and assume those are the expected outputs and write them to a file
+        # Now write the contents of the dictionary to the file "tenth_of_mannose.txt"
 
-
-
-
-#aligned_text_file = open("single_seq_aligned.txt", "w")
-
-#with open("single_seq.txt")
+        with open('/home/sam/Desktop/GLYCAM_Dev_Env/V_2/Web_Programs/gems/daily_build_checker/tenth_of_mannose.txt', 'w') as f:
+            f.write(f"{'File': <60}{'Size (Bytes)' : ^20}{'Type' : >30}")
+            f.write("\n")
         
+            for file in curr_dict.keys():
 
+                f.write(f"{file: <60}{curr_dict[file][0]: ^20}{curr_dict[file][1] : >30}")
+                f.write("\n")
 
-
-with open('/home/sam/Dropbox/cb/tenth_of_a_mannose.txt', 'w') as f:
-    f.write(f"{'File': <60}{'Size (Bytes)' : ^20}{'Type' : >30}")
-    f.write("\n")
-   
-    for file, size, type in zip(files, sizes, types):
-
-        f.write(f"{file : <60}{size: ^20}{type : >30}")
-        f.write("\n")
-
-## You tried to write out bolded text, but it turns out ".txt" files do not support any other formats (different fontsize, bold, italics, etc.)
+        

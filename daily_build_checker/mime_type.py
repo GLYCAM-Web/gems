@@ -1,6 +1,7 @@
-def mime_type(file):
+def mime_type():
         
-      return "ham"
+      """Insert code below"""
+      return ("MIME type")
         
 
         
