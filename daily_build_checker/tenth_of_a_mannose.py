@@ -7,6 +7,7 @@ import magic
 from mime_type import get_mime_type
 
 """ 
+This script requires that you have made a D-Mannose build, which has a sequence folder in the user data folder.
 First, let's generate a text file containing the output file names, sizes, and MIME types for an unreasonably small mannose build called "tenth_of_a_mannose.txt"
 """
 # Change to the sequence's directory
@@ -20,9 +21,6 @@ for seq in os.listdir("/home/sam/Desktop/GLYCAM_Dev_Env/V_2/Web_Data/userdata/se
 
 
     if data["entity"]["inputs"]["sequence"]["payload"] == "DManpa1-OH":
-
-        print(f"Sequence pUUID for Mannose Build: {seq} ")
-        
 
         os.chdir(f"/home/sam/Desktop/GLYCAM_Dev_Env/V_2/Web_Data/userdata/sequence/cb/Sequences/{seq}/buildStrategyID1/All_Builds/structure")
 
