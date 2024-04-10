@@ -48,7 +48,9 @@ cd ${job_workdir_absolute}
 glycomimetic_output_dir_with_slash=\"${glycomimetic_dir}/${glycomimetic_output_dir}\"
 
 {glycomimetic_scripts_dir}/makedir.sh \${glycomimetic_output_dir_with_slash} ${simulation_dir}
-#exit 1
+
+#For GEMS testing, only do the 1st glycomimetic step. Bail here. 
+exit 1
 
 cd ${simulation_dir}
 #for i in analog_* natural; do

@@ -1,5 +1,5 @@
 ComplexPdb:3ubq_chainC_64_266.pdbqt
-OpenValence:328_C5_N5_C10-/scratch1/yao/glycomimetics/moieties/pdbqt/sigma_aldehydes/-pdbqt-328_C4_C5_N5_H5N
+OpenValence:328_C5_N5_C10-/home/yao/Documents/GLYCAM_Dev_Env/V_2/Web_Programs/gems/gemsModules/complex/glycomimetics/metadata/moieties/pdbqt/virtual_screening/sigma_aldehydes-pdbqt-328_C4_C5_N5_H5N
 Interval:30
 NumThreads:8
 OutputPath:output
