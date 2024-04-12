@@ -25,6 +25,7 @@ class Known_Entities(GemsStrEnum):
     DrawGlycan = "DrawGlycan"
     StructureFile = "StructureFile"
     PDBFile = "PDBFile"
+    Glycomimetics = "Glycomimetics"
 
 
 from gemsModules.deprecated.delegator.receive import delegate as deprecated_delegator
@@ -39,6 +40,8 @@ from gemsModules.mmservice.mdaas.receive import receive as mdaas
 
 from gemsModules.structurefile.PDBFile.receive import receive as pdbfile
 from gemsModules.status.receive import receive as status
+
+from gemsModules.complex.glycomimetics.receive import receive as glycomimetics
 
 
 Known_Entity_Reception_Modules = {
@@ -58,4 +61,5 @@ Known_Entity_Reception_Modules = {
     #'Status' : deprecated_delegator,
     "StructureFile": deprecated_delegator,
     "PDBFile": pdbfile,
+    "Glycomimetics": glycomimetics,
 }

@@ -1,0 +1,26 @@
+{
+  "entity": {
+    "type": "Glycomimetics",
+    "services": {
+      "step_one_glyco_in_silico": {
+        "type": "Build"
+      }
+    },
+    "inputs": [
+      {
+        "locationType": "filesystem-path-unix",
+        "resourceFormat": "json",
+        "payload": "/programs/gems/tests/temp-inputs/mdinput/unminimized-t5p.parm7",
+        "options": {
+          "is_json_options": true
+        }
+      },
+      {
+        "locationType": "filesystem-path-unix",
+        "resourceFormat": "chemical/pdb",
+        "payload": "/programs/gems/tests/temp-inputs/mdinput/unminimized-t5p.rst7"
+      }
+    ]
+  }
+}
+  

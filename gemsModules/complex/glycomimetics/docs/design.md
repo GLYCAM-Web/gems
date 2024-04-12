@@ -21,7 +21,7 @@ The glcomimetics tool performs the following tasks in the order they are mention
         -Configured directories from step 2.  
     -Call Slurm to submit MD simulations and MM-GBSA analysis.
         -My scripts can submit MD simulations in the machine they are being run.
-        -If the MD jobs must happen on different machines, I will need to invoke MDaaS. 
+        -If the MD jobs must happen on different machines, I will need to invoke Glycomimetics. 
     -Output files: 
         -This script itself does not produce output files, but the MD simulations it submits do contain output files. 
 
