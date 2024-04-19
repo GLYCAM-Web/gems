@@ -1,9 +1,9 @@
 from gemsModules.common.code_utils import GemsStrEnum
 
 
-class Glycomimetics_Allowed_File_Formats(GemsStrEnum):
+class Complex_Allowed_File_Formats(GemsStrEnum):
     """
-    The file formats that the mmservice meta-entity knows about.
+    The file formats that the complex meta-entity knows about and allows.
     """
 
     PDB = "PDB"

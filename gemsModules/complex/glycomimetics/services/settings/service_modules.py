@@ -6,7 +6,7 @@ from gemsModules.common.services.list_services.server import (
 )
 from gemsModules.common.services.marco.server import Serve as serve_marco
 from gemsModules.common.services.status.server import Serve as serve_status
-from gemsModules.complex.glycomimetics.services.build.server import (
+from gemsModules.complex.glycomimetics.services.Build.server import (
     Serve as serve_build,
 )
 from gemsModules.complex.glycomimetics.services.ProjectManagement.server import (
@@ -22,6 +22,8 @@ service_modules: Dict[str, Callable] = {
     "ListServices": serve_list_services,
     "Marco": serve_marco,
     "Status": serve_status,
+    # "Evaluate": serve_evaluate,
+    # "Validate": serve_validate,
     "Build": serve_build,
     "ProjectManagement": serve_ProjectManagement,
 }

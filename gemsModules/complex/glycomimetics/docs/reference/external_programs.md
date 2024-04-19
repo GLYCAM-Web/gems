@@ -1,0 +1,34 @@
+> glycomimetics_scripts_dir - any references here will need to reference tasks, likely.
+
+- scoretraj.sh -> tasks/score_trajectory.py
+    - /home/yao/programs_src/MGLTools-1.5.4/MGLToolsPckgs/AutoDockTools/Utilities24/prepare_receptor4.py
+    - ${vina_score_traj_program_dir}/scoretraj.exe
+- run_resp.sh -> tasks/unused-run_resp.py
+    - /cm/shared/apps/amber20/bin/resp
+    - gfortran
+- Run.resp -> tasks/run_resp.py
+    - espgen
+    - resp
+    - readit.f
+- extract_selected_frames.sh -> tasks/extract_selected_frames.py
+- make_gaussian_input_file.sh -> tasks/make_gaussian_input_file.py
+    - newzmat
+- make_simulation_scripts.sh -> tasks/make_simulation_scripts.py
+    - antechamber
+    - parmchk2
+    - $AMBERHOME/bin/pmemd.cuda
+    - $AMBERHOME/bin/MMPBSA.py.MPI
+    - $AMBERHOME/amber.sh
+    - simulation_Emin
+        - ${autogen_input_path}/main.exe  * / autogen_resp_input
+        - mpirun/pmemd.mpi
+        - Run.resp (which to use this or run_resp.sh?)
+        - ${interface_glycam_gaff_path}/main.exe *
+- makedirs.sh -> tasks/makedir.py
+- master_analysis.sh -> tasks/master_analysis.py
+    - yao's vina/rescoring *
+- master_submit.sh -> tasks/make_master_submission_script.py
+- tleap -> tasks/run_tleap.py and tasks/make_tleap_input.py
+    - $AMBERHOME/bin/tleap
+    - ambpdb
+    - 

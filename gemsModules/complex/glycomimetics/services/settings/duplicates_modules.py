@@ -7,7 +7,7 @@ from gemsModules.common.services.status.manage_multiples import status_Multiples
 from gemsModules.complex.glycomimetics.services.list_services.manage_multiples import (
     list_services_Multiples_Manager,
 )
-from gemsModules.complex.glycomimetics.services.build.manage_multiples import (
+from gemsModules.complex.glycomimetics.services.Build.manage_multiples import (
     Build_Multiples_Manager,
 )
 

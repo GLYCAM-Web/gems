@@ -15,6 +15,7 @@ class GemsStrEnum(str, Enum):
     since our classes interact with Pydantic.
     """
 
+    # TODO: Wait, how are these classmethods working? These look like instance getters.
     @classmethod
     def get_list(self):
         return self.get_value_list()
@@ -44,6 +45,19 @@ class GemsStrEnum(str, Enum):
         for item in self:
             theList.append(item.name)
         return theList
+
+    @classmethod
+    def from_lists(cls, *lists, name="Enum"):
+        """Create a new Enum class from a list of lists.
+
+        The first item in each list is the name, and the second is the value.
+        """
+        
+        init = []
+        for l in lists:
+            
+        
+        return cls(name, [(name, value) for name, value in l])
 
 
 class Annotated_List(list):
@@ -111,7 +125,7 @@ def find_aaop_by_id(aaop_list: List, id_string: str):
 
     Assumes unique ID_Strings.
 
-    Useful for accessing the requesting AAOP (AAOP.Requester if not None) by ID_String or 
+    Useful for accessing the requesting AAOP (AAOP.Requester if not None) by ID_String or
     it's dependent AAOPs from AAOP.Dependencies.
 
     S/N: I believe we could deprecate this if we rely on AAOP_Tree instead of bare AAOP lists.

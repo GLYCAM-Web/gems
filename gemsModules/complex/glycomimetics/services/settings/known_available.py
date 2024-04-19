@@ -4,10 +4,7 @@ from gemsModules.common.services.settings.known_available import (
     Available_Services as Common_Available_Services,
 )
 
-from gemsModules.complex.each_service.known_available import (
-    Glycomimetics_Allowed_File_Formats,
-)
-
+from gemsModules.complex.settings import Complex_Allowed_File_Formats
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -33,7 +30,7 @@ class Module_Allowed_File_Formats(GemsStrEnum):
 
 Allowed_File_Formats = GemsStrEnum(
     "Allowed_File_Formats",
-    [(avail.name, avail.value) for avail in Glycomimetics_Allowed_File_Formats]
+    [(avail.name, avail.value) for avail in Complex_Allowed_File_Formats]
     + [(avail.name, avail.value) for avail in Module_Allowed_File_Formats],
 )
 

@@ -9,7 +9,7 @@ from gemsModules.common.services.request_data_filler import Request_Data_Filler
 from gemsModules.complex.glycomimetics.main_api import Glycomimetics_Entity
 from gemsModules.complex.glycomimetics.main_api_project import GlycomimeticsProject
 
-from gemsModules.complex.glycomimetics.services.build import api as build_api
+from gemsModules.complex.glycomimetics.services.Build import api as build_api
 from gemsModules.complex.glycomimetics.services.ProjectManagement import api as pm_api
 
 from gemsModules.common.code_utils import find_aaop_by_id

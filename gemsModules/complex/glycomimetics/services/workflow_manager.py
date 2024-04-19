@@ -4,7 +4,7 @@ from gemsModules.common.action_associated_objects import AAOP
 from gemsModules.common.services.workflow_manager import Workflow_Manager
 from gemsModules.common.code_utils import Annotated_List, resolve_dependency_list
 
-from gemsModules.complex.glycomimetics.services.build.api import (
+from gemsModules.complex.glycomimetics.services.Build.api import (
     Build_Request,
 )
 from gemsModules.complex.glycomimetics.services.ProjectManagement.api import (
