@@ -9,8 +9,10 @@
 - Run.resp -> tasks/run_resp.py
     - espgen
     - resp
-    - readit.f
+    - readit.f (-> readit.py experimentation)
 - extract_selected_frames.sh -> tasks/extract_selected_frames.py
+- write_frames.sh -> tasks/write_frames.py
+    - cpptraj
 - make_gaussian_input_file.sh -> tasks/make_gaussian_input_file.py
     - newzmat
 - make_simulation_scripts.sh -> tasks/make_simulation_scripts.py
