@@ -14,7 +14,7 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
-class Build_input_Resource(Resource):
+class Validate_input_Resource(Resource):
     """Need to write validators."""
 
     ## Works now:
@@ -30,7 +30,7 @@ class Build_input_Resource(Resource):
     pass
 
 
-class Build_output_Resource(Resource):
+class Validate_output_Resource(Resource):
     """Need to write validators."""
 
     ## Works now:
@@ -46,11 +46,11 @@ class Build_output_Resource(Resource):
     pass
 
 
-class Build_Resources(Resources):
-    __root__: List[Union[Build_input_Resource, Build_output_Resource]] = None
+class Validate_Resources(Resources):
+    __root__: List[Union[Validate_input_Resource, Validate_output_Resource]] = None
 
 
-class Build_Inputs(BaseModel):
+class Validate_Inputs(BaseModel):
     amber_parm7: str = Field(
         None,
         title="Amber Parm7",
@@ -91,24 +91,24 @@ class Build_Inputs(BaseModel):
         title="Control Script",
         description="Name of the script used to run the protocol",
     )
-    resources: Build_Resources = Build_Resources()
+    resources: Validate_Resources = Validate_Resources()
 
 
-class Build_Outputs(BaseModel):
+class Validate_Outputs(BaseModel):
     outputDirPath: str = Field(
         None,
         title="Output Directory Path",
         description="Path to output directory",
     )
-    resources: Build_Resources = Build_Resources()
+    resources: Validate_Resources = Validate_Resources()
 
 
-class Build_Request(Glycomimetics_Service_Request):
-    typename: str = Field("RunMD", alias="type")
+class Validate_Request(Glycomimetics_Service_Request):
+    typename: str = Field("Validate", alias="type")
     # the following must be redefined in a child class
-    inputs: Build_Inputs = Build_Inputs()
+    inputs: Validate_Inputs = Validate_Inputs()
 
 
-class Build_Response(Glycomimetics_Service_Response):
-    typename: str = Field("RunMD", alias="type")
-    outputs: Build_Outputs = Build_Outputs()
+class Validate_Response(Glycomimetics_Service_Response):
+    typename: str = Field("Validate", alias="type")
+    outputs: Validate_Outputs = Validate_Outputs()

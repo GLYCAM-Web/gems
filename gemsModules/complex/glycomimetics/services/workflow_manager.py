@@ -1,15 +1,17 @@
 import uuid
-from gemsModules.common.main_api_resources import Resource
 from gemsModules.common.action_associated_objects import AAOP
 from gemsModules.common.services.workflow_manager import Workflow_Manager
 from gemsModules.common.code_utils import Annotated_List, resolve_dependency_list
+from gemsModules.logging.logger import Set_Up_Logging
 
 from .Build.api import Build_Request
-from .ProjectManagement.api import ProjectManagement_Request, ProjectManagement_Inputs
+from .ProjectManagement.api import ProjectManagement_Request
+from .Evaluate.api import Evaluate_Request
+from .Validate.api import Validate_Request
+from .Analyze.api import Analyze_Request
 
 # from .known_available import Module_Available_Services # for maybe keying...
 
-from gemsModules.logging.logger import Set_Up_Logging
 
 log = Set_Up_Logging(__name__)
 
@@ -76,39 +78,30 @@ class Glycomimetics_Workflow_Manager(Workflow_Manager):
 
             # TODO: the dep resolution could be more general (really a lot of this workflow manager)
             for new_dep in these_deps:
-                new_aaop = None
-                # TODO: We could probably generalize this for Entity-registered services...
-                if new_dep == "ProjectManagement":
-                    new_aaop = AAOP(
-                        AAO_Type="ProjectManagement",
-                        The_AAO=ProjectManagement_Request(),
-                        ID_String=uuid.uuid4(),
-                        Dictionary_Name="ProjectManagement_Dep_Request",
-                    )
-                elif new_dep == "Build":
-                    new_aaop = AAOP(
-                        AAO_Type="Build",
-                        The_AAO=Build_Request(),
-                        ID_String=uuid.uuid4(),
-                        Dictionary_Name="Build_Dep_Request",
-                    )
+                # resolve the cls from the dependency string
+                aao_cls = globals()[f"{new_dep}_Request"]
+                new_aaop = AAOP(
+                    AAO_Type=new_dep,
+                    The_AAO=aao_cls(),
+                    ID_String=uuid.uuid4(),
+                    Dictionary_Name=f"{new_dep}_Dep_Request",
+                )
 
-                if new_aaop:
-                    log.debug(
-                        "Adding dependency %s to aaop list before %s",
-                        new_aaop,
-                        current_aaop,
-                    )
+                log.debug(
+                    "Adding dependency %s to aaop list before %s",
+                    new_aaop,
+                    current_aaop,
+                )
 
-                    # Update the current AAOP's dependencies and set it as the requester AAOP.
-                    #   TODO: this seems like a common pattern we could lift out
-                    if current_aaop.Dependencies is None:
-                        current_aaop.Dependencies = []
-                    current_aaop.Dependencies.append(new_aaop.ID_String)
-                    new_aaop.Requester = current_aaop.ID_String
+                # Update the current AAOP's dependencies and set it as the requester AAOP.
+                #   TODO: this seems like a common pattern we could lift out
+                if current_aaop.Dependencies is None:
+                    current_aaop.Dependencies = []
+                current_aaop.Dependencies.append(new_aaop.ID_String)
+                new_aaop.Requester = current_aaop.ID_String
 
-                    # Append the new AAOP before the current AAOP.
-                    ordered.append(new_aaop)
+                # Append the new AAOP before the current AAOP.
+                ordered.append(new_aaop)
 
             # Add this aaop after we're finished with its deps
             ordered.append(current_aaop)
