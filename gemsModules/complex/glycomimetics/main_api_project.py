@@ -27,7 +27,6 @@ class GlycomimeticsProject(Project):
     requesting_agent: str = "tester"
     has_input_files: bool = True
     system_phase: constr(max_length=25) = "In solvent"
-    input_type: constr(max_length=25) = "Amber-prmtop & inpcrd"
     # TODO: input files
     u_uuid: constr(max_length=36) = " "
     sim_length: constr(max_length=5) = "100"
