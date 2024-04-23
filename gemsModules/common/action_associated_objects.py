@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-from typing import Callable, List, Dict, Literal
+from typing import Callable, List, Dict, Literal, Optional
+from dataclasses import dataclass, field
 import uuid
 
 from gemsModules.common.code_utils import Annotated_List
@@ -9,6 +10,7 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
+@dataclass
 class Action_Associated_Object_Package:
     """Package for an Action_Associated_Object (AAO)
      This class is abbreviated AAOP.
@@ -23,25 +25,13 @@ class Action_Associated_Object_Package:
     for easy and annotated nesting of the AAOP Trees within each other.
     """
 
-    def __init__(
-        self,
-        ID_String: str = uuid.uuid4(),  # free-form internal identifier, by default a UUID
-        AAO_Type: str = "Service",  # type identifier, for convenience
-        Dictionary_Name: str = None,  # name given in the dictionary, if this came from one
-        The_AAO: Callable = None,
-        Dependencies: List[
-            str
-        ] = None,  # list of ID_Strings for AAOPs that must be executed before this one
-    ) -> None:
-        self.AAO_Type = AAO_Type
-        self.ID_String = ID_String
-        self.The_AAO = The_AAO
-        self.Dictionary_Name = Dictionary_Name
-
-        self.Dependencies = Dependencies
-        self.Requester = None  # prototyping for workflows needing information from their requesting aaop.
-
-        self.child_packages = None
+    ID_String: str = field(default_factory=uuid.uuid4)
+    AAO_Type: str = "Service"
+    Dictionary_Name: Optional[str] = None
+    The_AAO: Callable = field(default=None)
+    Dependencies: List[str] = field(default_factory=list)
+    Requester: str = field(default=None, init=False)
+    child_packages: Optional[Annotated_List] = None
 
     # right now, the AAOs are all Pydantic Models, so they need to be copied using the copy() method
     # I'll try handling this in the Servicer
@@ -50,6 +40,13 @@ class Action_Associated_Object_Package:
 
     def put_The_AAO(self, new_AAO: Callable):
         self.The_AAO = new_AAO
+
+    def set_requester(self, requester: "Action_Associated_Object_Package"):
+        requester.add_dependency(self.ID_String)
+        self.Requester = requester
+
+    def add_dependency(self, dependency: str):
+        self.Dependencies.append(dependency)
 
     def create_child_package_list(
         self,

@@ -2,6 +2,10 @@ import os
 import sys
 import subprocess
 
+from gemsModules.logging.logger import Set_Up_Logging
+
+log = Set_Up_Logging(__name__)
+
 
 def check_for_restart_conditions(gaussian_opt_output):
     """

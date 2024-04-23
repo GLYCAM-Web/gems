@@ -1,6 +1,10 @@
 import os
 import subprocess
 
+from gemsModules.logging.logger import Set_Up_Logging
+
+log = Set_Up_Logging(__name__)
+
 
 def prepare_receptor(pdb_path, output_path):
     """Run prepare_receptor4.py on a PDB file."""
@@ -63,17 +67,20 @@ def execute(interval):
                             f"frames/summary/{moiety_name}.csv",
                         )
                     else:
-                        print(f"Scoring of {directory} failed, output.csv missing")
+                        log.info(f"Scoring of {directory} failed, output.csv missing")
                 else:
-                    print(f"Scoring failed for {directory}")
+                    log.warning(f"Scoring failed for {directory}")
             else:
-                print(
+                log.warning(
                     f"Warning: failed to generate cocomplex pdbqt file for {directory}. Skipping"
                 )
 
     summary_file = summarize_results("frames/summary")
     with open(summary_file) as file:
-        print(file.read())
+        summary = file.read()
+
+    log.info(f"Summary of scoring results:\n{summary}")
+    return summary
 
 
 if __name__ == "__main__":

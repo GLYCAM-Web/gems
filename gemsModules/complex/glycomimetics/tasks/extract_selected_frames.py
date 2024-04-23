@@ -2,6 +2,10 @@ import shutil
 import os
 import glob
 
+from gemsModules.logging.logger import Set_Up_Logging
+
+log = Set_Up_Logging(__name__)
+
 
 # TODO: directory prep should be handled by ProjectManagement
 def setup_directory(directory):
@@ -30,7 +34,7 @@ def copy_selected_files(source_pattern, frame_indices, destination_folder):
             source_file = f"{source_dir}/{index}.pdb"
             destination_file = f"{destination_folder}/{source_dir}_{index}.pdb"
             if os.path.exists(source_file):
-                print(f"cp {source_file} {destination_file}")
+                log.debug(f"cp {source_file} {destination_file}")
                 shutil.copy(source_file, destination_file)
 
 

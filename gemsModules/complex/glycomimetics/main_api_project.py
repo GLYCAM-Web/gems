@@ -36,6 +36,7 @@ class GlycomimeticsProject(Project):
     def add_temporary_info(self):
         ic = InstanceConfig()
 
+        # this could probably be generalized.
         self.project_dir: str = os.path.join(
             ic.get_filesystem_path("Glycomimetics"), self.pUUID
         )

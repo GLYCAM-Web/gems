@@ -3,6 +3,11 @@ import os
 import shutil
 import glob
 
+from gemsModules.logging.logger import Set_Up_Logging
+
+log = Set_Up_Logging(__name__)
+
+
 # TODO: See set_up_build_directory.py
 def setup_natural_directory(simulation_workdir):
     """
@@ -27,7 +32,7 @@ def copy_files_and_create_structure(glycomimetic_output_dir, simulation_workdir)
         clash_files = glob.glob(clash_file_pattern)
 
         if clash_files:
-            print(
+            log.info(
                 f"{ligand_file} is too large to fit in the binding site. Won't run it through MD"
             )
             continue

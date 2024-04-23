@@ -2,7 +2,9 @@ import os
 import sys
 import subprocess
 
-# Parameters and paths, assuming they could be configured here or passed to the functions
+from gemsModules.logging.logger import Set_Up_Logging
+
+log = Set_Up_Logging(__name__)
 
 
 # Determine analog name
@@ -31,7 +33,7 @@ echo "Slurm script ends"
     script_filename = f"slurm_submit_{dirname}.sh"
     with open(script_filename, "w") as file:
         file.write(script_content)
-    print(f"Slurm script created: {script_filename}")
+    log.info(f"Slurm script created: {script_filename}")
 
 
 # TODO: break down the following functions into smaller functions
@@ -304,7 +306,7 @@ def execute(dirname, num_cpus_emin, num_cpus_gbsa, num_mem_gaussian, g16root):
     analog_name = determine_analog_name(dirname)
     charges_file = f"{analog_name}_resp_charges.out"
 
-    print(f"Processing {analog_name}")
+    log.info(f"Processing {analog_name}")
     ligand_pdb = f"{analog_name}_ligand.pdb"
 
     create_slurm_submission_script(dirname, num_cpus_emin, analog_name)

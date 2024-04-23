@@ -25,7 +25,7 @@ def manage_gbsa_summary(subdirs, base_dir):
         for subdir in subdirs:
             gbsa_info = analyze_gbsa(subdir)
             f.write(f"{subdir}\t{gbsa_info}\n")
-            print(f"{subdir}\t{gbsa_info}")
+            log.info(f"{subdir}\t{gbsa_info}")
 
     sort_summary(summary_dir)
 

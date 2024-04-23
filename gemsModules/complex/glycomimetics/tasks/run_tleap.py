@@ -1,6 +1,9 @@
 import sys, subprocess
 
 from gemsModules.complex.glycomimetics.tasks.make_tleap_input import make_tleap_input
+from gemsModules.logging.logger import Set_Up_Logging
+
+log = Set_Up_Logging(__name__)
 
 
 def run_tleap():
@@ -18,7 +21,7 @@ def run_ambpdb(prmtop_file, rst_file, output_pdb):
 
 
 def execute(analog_name, glycam_gaff_frcmod_exists):
-    print(f"tleap sh analog name: {analog_name}")
+    log.info(f"tleap sh analog name: {analog_name}")
     make_tleap_input(analog_name, glycam_gaff_frcmod_exists)
     run_tleap()
     run_ambpdb(

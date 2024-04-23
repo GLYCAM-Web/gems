@@ -93,19 +93,11 @@ class Glycomimetics_Workflow_Manager(Workflow_Manager):
                     current_aaop,
                 )
 
-                # Update the current AAOP's dependencies and set it as the requester AAOP.
-                #   TODO: this seems like a common pattern we could lift out
-                if current_aaop.Dependencies is None:
-                    current_aaop.Dependencies = []
-                current_aaop.Dependencies.append(new_aaop.ID_String)
-                new_aaop.Requester = current_aaop.ID_String
-
-                # Append the new AAOP before the current AAOP.
+                new_aaop.set_requester(current_aaop)
                 ordered.append(new_aaop)
 
             # Add this aaop after we're finished with its deps
             ordered.append(current_aaop)
 
         # TODO: Prune dependency services that only need to be run once, regardless of requester.
-
         return ordered

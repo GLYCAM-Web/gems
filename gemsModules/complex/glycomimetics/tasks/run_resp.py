@@ -3,6 +3,10 @@ import os
 import sys
 import glob
 
+from gemsModules.logging.logger import Set_Up_Logging
+
+log = Set_Up_Logging(__name__)
+
 
 def run_resp_calculations(
     gaussian_log_file,
@@ -20,7 +24,7 @@ def run_resp_calculations(
 
     # List and process each Gaussian log file
     for log_file in glob.glob(gaussian_log_file):
-        print(f"Getting ESP charges on {log_file}")
+        log.info(f"Getting ESP charges on {log_file}")
 
         # Generate ESP data from Gaussian log
         subprocess.run(["espgen", "-i", log_file, "-o", "esp.dat"])
