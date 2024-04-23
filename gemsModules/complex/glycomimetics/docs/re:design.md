@@ -33,7 +33,7 @@ TODO: becomes ProjectManagement service
         - MD simulations (GEMS - use MDaaS)
         - MM-GBSA analysis (How? prob task script for now, but might be it's own Service in the future.)
     -Output files: 
-        -This script itself does not produce output files, but the MD simulations it submits do contain output files. 
+        -This script itself does not produce output files, but the MD simulations it submits do create output files. 
 
 5. It calls master_analysis.sh to analyze MD and MM-GBSA results.
     -Required input:
@@ -41,3 +41,5 @@ TODO: becomes ProjectManagement service
     -Output files:
         -The script itself creates some text files that stores output values, and also prints out the most important stuff to STDOUT. 
         -Once integrated into GEMS, these should probably go into a JSON file. 
+
+---

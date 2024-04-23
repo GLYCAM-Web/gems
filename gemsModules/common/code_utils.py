@@ -47,17 +47,17 @@ class GemsStrEnum(str, Enum):
         return theList
 
     @classmethod
-    def from_lists(cls, *lists, name="Enum"):
+    def from_lists(cls, *lists, name="Generic_GemsStrEnum"):
         """Create a new Enum class from a list of lists.
 
         The first item in each list is the name, and the second is the value.
         """
-        
+
         init = []
         for l in lists:
-            
-        
-        return cls(name, [(name, value) for name, value in l])
+            init.append((l[0], l[1]))
+
+        return cls(name, init)
 
 
 class Annotated_List(list):

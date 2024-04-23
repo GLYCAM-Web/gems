@@ -61,7 +61,7 @@
       },
       {
         "locationType": "filesystem-path-unix",
-        "resourceFormat": "json",
+        "resourceFormat": "application/json",
         "resourceRole": "execution-parameters",
         "payload": {
           "Interval": 30,

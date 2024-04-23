@@ -13,6 +13,10 @@ from gemsModules.complex.glycomimetics.services.ProjectManagement.server import 
     Serve as serve_ProjectManagement,
 )
 
+from ..Validate.server import Serve as serve_validate
+from ..Evaluate.server import Serve as serve_evaluate
+from ..Analyze.server import Serve as serve_analyze
+
 from gemsModules.logging.logger import Set_Up_Logging
 
 log = Set_Up_Logging(__name__)
@@ -22,8 +26,9 @@ service_modules: Dict[str, Callable] = {
     "ListServices": serve_list_services,
     "Marco": serve_marco,
     "Status": serve_status,
-    # "Evaluate": serve_evaluate,
-    # "Validate": serve_validate,
-    "Build": serve_build,
+    "Evaluate": serve_evaluate,
+    "Validate": serve_validate,
     "ProjectManagement": serve_ProjectManagement,
+    "Build": serve_build,
+    "Analyze": serve_analyze,
 }

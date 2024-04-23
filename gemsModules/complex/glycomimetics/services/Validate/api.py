@@ -104,11 +104,11 @@ class Build_Outputs(BaseModel):
 
 
 class Build_Request(Glycomimetics_Service_Request):
-    typename: str = Field("Build", alias="type")
+    typename: str = Field("RunMD", alias="type")
     # the following must be redefined in a child class
     inputs: Build_Inputs = Build_Inputs()
 
 
 class Build_Response(Glycomimetics_Service_Response):
-    typename: str = Field("Build", alias="type")
+    typename: str = Field("RunMD", alias="type")
     outputs: Build_Outputs = Build_Outputs()

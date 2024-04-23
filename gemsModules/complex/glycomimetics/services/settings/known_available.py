@@ -16,7 +16,7 @@ class Module_Available_Services(GemsStrEnum):
     Evaluate = "Evaluate"
     ProjectManagement = "ProjectManagement"
     Build = "Build"
-    Analysis = "Analysis"
+    Analyze = "Analyze"
 
 
 Available_Services = GemsStrEnum(

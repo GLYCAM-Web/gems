@@ -11,19 +11,50 @@ from gemsModules.complex.glycomimetics.services.ProjectManagement.api import (
     ProjectManagement_Request,
     ProjectManagement_Inputs,
 )
+
+# from .known_available import Module_Available_Services # for maybe keying...
+
 from gemsModules.logging.logger import Set_Up_Logging
 
 log = Set_Up_Logging(__name__)
 
 
 # TODO: To services.settings... ?
-Service_Dependencies = {"Build": Annotated_List(["ProjectManagement"], ordered=False)}
+# Service_Dependencies = {
+#     "Analyze": Annotated_List(
+#         ["Evaluate", "Validate", "ProjectManagement", "Build"], ordered=True
+#     ),
+#     "Build": Annotated_List(
+#         ["Evaluate", "Validate", "ProjectManagement"], ordered=True
+#     ),
+#     "ProjectManagement": Annotated_List(["Evaluate", "Validate"], ordered=True),
+#     "Evaluate": Annotated_List([], ordered=True),
+#     "Validate": Annotated_List(["Evaluate"], ordered=True),
+# }
+
+EVALUATE_DEPENDENCIES = Annotated_List([], ordered=True)
+VALIDATE_DEPENDENCIES = Annotated_List(["Evaluate"], ordered=True)
+PROJECTMANAGEMENT_DEPENDENCIES = Annotated_List(
+    VALIDATE_DEPENDENCIES + ["Validate"], ordered=True
+)
+BUILD_DEPENDENCIES = Annotated_List(
+    PROJECTMANAGEMENT_DEPENDENCIES + ["ProjectManagement"], ordered=True
+)
+ANALYZE_DEPENDENCIES = Annotated_List(BUILD_DEPENDENCIES + ["Build"], ordered=True)
+
+Service_Dependencies = {
+    "Analyze": ANALYZE_DEPENDENCIES,
+    "Build": BUILD_DEPENDENCIES,
+    "ProjectManagement": PROJECTMANAGEMENT_DEPENDENCIES,
+    "Evaluate": EVALUATE_DEPENDENCIES,
+    "Validate": VALIDATE_DEPENDENCIES,
+}
 
 
 # TODO: work_flows style or workflow_manager style?
 class Glycomimetics_Workflow_Manager(Workflow_Manager):
     def get_linear_workflow_list(self) -> list[str]:
-        return ["ProjectManagement", "Build"]
+        return ["Evaluate", "Validate", "ProjectManagement", "Build", "Analyze"]
 
     def process(self, aaop_list):
         """This function takes a list of AAOPs and returns a list of AAOPs in the order they should be executed."""
