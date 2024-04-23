@@ -105,10 +105,14 @@ class InstanceConfig(KeyedArgManager, FileSystemPathsMixin):
         return super().get_keyed_arguments(key, host, context)
 
     def get_filesystem_path(self, app="MDaaS"):
-        """Returns the filesystem path for the given name defined in the instance config's filesystem_paths dict."""
+        """Returns the filesystem path for the given name defined in the instance config's filesystem_paths dict.
+
+        TODO: Rather than simply being a key under config, this should be a dict of filesystem paths.
+            - Maintaining compatibility for now.
+        """
 
         if app in InstanceConfig.ENTITY_PATH_MAPPING:
-            return InstanceConfig.ENTITY_PATH_MAPPING[app]
+            return self.config[InstanceConfig.ENTITY_PATH_MAPPING[app]]
         else:
             log.error(
                 f"Access attempted but {app} filesystem path not set in instance_config.json."

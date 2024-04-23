@@ -39,6 +39,11 @@ class Resource(BaseModel):
         title="Resource Format",
         description="Supported formats will vary with each Entity.",
     )
+    resourceRole: str = Field(
+        None,
+        title="Resource Role",
+        description="Supported roles will vary with each Entity and Service.",
+    )
     payload: Any = Field(
         None, description="The thing that is described by the location and format"
     )
