@@ -6,15 +6,8 @@ from pydantic import BaseModel, Field
 
 from gemsModules.logging.logger import Set_Up_Logging
 
-from gemsModules.complex.glycomimetics.main_api import (
-    Glycomimetics_Service_Request,
-    Glycomimetics_Service_Response,
-)
-
-from gemsModules.complex.glycomimetics.services.ProjectManagement.resources import (
-    ProjectManagement_Resources,
-    PM_Resource,
-)
+from ...main_api import Glycomimetics_Service_Request, Glycomimetics_Service_Response
+from .resources import ProjectManagement_Resources, PM_Resource
 
 
 log = Set_Up_Logging(__name__)

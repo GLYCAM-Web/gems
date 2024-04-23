@@ -53,7 +53,7 @@
         "resourceRole": "moiety-metadata",
         "payload": {
           "token1": "328_C5_N5_C10",
-          # will be relative to metadata dir
+          # Note this will be relative to metadata dir
           "path": "moieties/pdbqt/virtual_screening/sigma_aldehydes",
           "fileType": "pdbqt",
           "token4": "328_C4_C5_N5_H5N"
@@ -66,7 +66,8 @@
         "payload": {
           "Interval": 30,
           "NumThreads": 8,
-          "OutputPath": "output", # Note this will be relative to project dir
+           # Note this will be relative to project dir (PM service)
+          "OutputPath": "output",
           "LogFile": "sample.log"
         }
       }

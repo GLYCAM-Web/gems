@@ -18,7 +18,14 @@ from . import *
 log = Set_Up_Logging(__name__)
 
 
-class InstanceConfig(KeyedArgManager):
+class FileSystemPathsMixin:
+    """A mixin for the InstanceConfig class to handle filesystem paths.
+
+    - Honestly should have a generic filesystems_paths dict in the instance config..This just avoids breaking people's DevEnv. TODO: Fix this.
+    """
+
+
+class InstanceConfig(KeyedArgManager, FileSystemPathsMixin):
     """The main GEMS class for parsing it's active instance configuration file.
 
     This class only has active GEMS instance specific methods and configuration.
@@ -35,6 +42,10 @@ class InstanceConfig(KeyedArgManager):
 
     # Not an enum so we can extend here, in the InstanceConfig class, where the most specific GEMS instance configuration is defined.
     Contexts = ContextManager.Contexts + ["MDaaS-RunMD"]
+    ENTITY_PATH_MAPPING = {
+        "Glycomimetics": "gm_cluster_filesystem_path",
+        "MDaaS": "md_cluster_filesystem_path",
+    }
 
     def __init__(
         self,
@@ -52,10 +63,13 @@ class InstanceConfig(KeyedArgManager):
             self.get_default_path(), self.get_default_path(example=True)
         )
 
-        # if the active config is outdated, lets just start with the example config instead
-        # Hopefully one day we can use this functionality to differentially update the active config.
         if self.reversioner.is_outdated:
             self.set_active_config(self.get_default_path(example=True))
+
+    def save(self) -> bool:
+        """save the instance config using a DateReversioner."""
+        self.reversioner.set_new_config_data(self.config)
+        return self.reversioner.update()
 
     @staticmethod
     def get_default_path(example=False) -> Path:
@@ -69,17 +83,12 @@ class InstanceConfig(KeyedArgManager):
 
         return Path(os.getenv("GEMSHOME", "")) / name
 
-    def save(self) -> bool:
-        """save the instance config using a DateReversioner."""
-        self.reversioner.set_new_config_data(self.config)
-        return self.reversioner.update()
-
     # TODO: Context needs an enum.
     def get_keyed_arguments(
         self,
         key: KeyedArgManager.ConfigurationKeys,
         host: str = None,
-        context: Contexts = None,
+        context: "InstanceConfig.Contexts" = None,
     ):
         if context not in self.Contexts:
             log.warning(f"Context {context} not found in {self.Contexts}.")
@@ -95,23 +104,13 @@ class InstanceConfig(KeyedArgManager):
 
         return super().get_keyed_arguments(key, host, context)
 
-    # Special Context Helpers for GEMS defined here.
-    # "MDaaS-RunMD" context - MD Cluster host helpers
-    def get_md_filesystem_path(self) -> str:
-        """Returns the filesystem path for the MD compute cluster by hostname defined in the instance config's hosts dict."""
-        if (
-            "md_cluster_filesystem_path" not in self.config
-            or len(self.config["md_cluster_filesystem_path"]) == 0
-        ):
+    def get_filesystem_path(self, app="MDaaS"):
+        """Returns the filesystem path for the given name defined in the instance config's filesystem_paths dict."""
+
+        if app in InstanceConfig.ENTITY_PATH_MAPPING:
+            return InstanceConfig.ENTITY_PATH_MAPPING[app]
+        else:
             log.error(
-                "Access attempted but MD Cluster filesystem path not set in instance_config.json."
+                f"Access attempted but {app} filesystem path not set in instance_config.json."
             )
-
-        return self.config["md_cluster_filesystem_path"]
-
-    def set_md_filesystem_path(self, path):
-        """Sets the filesystem path for the MD compute cluster by hostname defined in the instance config's hosts dict.
-
-        You probably want to save the instance config after this.
-        """
-        self.config["md_cluster_filesystem_path"] = path
+            return None

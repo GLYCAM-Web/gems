@@ -9,7 +9,7 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
-class Build_Multiples_Manager(Multiples_Manager):
+class Validate_Multiples_Manager(Multiples_Manager):
 
     def process_multiples(self) -> List[AAOP]:
         return self.process_multiples_action_First()

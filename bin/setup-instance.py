@@ -73,7 +73,7 @@ def main():
 
     SAVE = False
     if args.set_md_cluster_filesystem_path is not None:
-        ic.set_md_filesystem_path(args.set_md_cluster_filesystem_path)
+        ic._set_md_filesystem_path(args.set_md_cluster_filesystem_path)
         SAVE = True
 
     if args.add_host is not None:
