@@ -1,1 +1,1 @@
-- Just because a task was rewritten in Python doesn't mean it will necessarily be used.
+- Just because a task was rewritten in Python doesn't mean it will necessarily be used that way. Some tasks may simply wrap the original shell script with an interface for GEMS.

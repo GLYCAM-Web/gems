@@ -7,6 +7,8 @@ class Complex_Allowed_File_Formats(GemsStrEnum):
     """
 
     PDB = "PDB"
+    PDBQT = "PDBQT"
+    JSON = "JSON"
     mmCIF = "mmCIF"
     Mol2 = "Mol2"
     xyz = "xyz"

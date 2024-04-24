@@ -1,25 +1,28 @@
 The glcomimetics tool performs the following tasks in the order they are mentioned:
 
 1. It calls a C++ program to build glycomimetic compounds in silico
+    > see the TODO below.
     -Required input from website/gems: 
         -A PDB input file containing a co-complex between a receptor protein and a carbohydrate ligand. 
         -A json file specifying all the parameters that control all the details of this job. 
-    -Required metadata:
-        -A library of pre-built drug-like moieties, in the format of PDBQT.
+        -Required metadata:
+            -A library of pre-built drug-like moieties, in the format of PDBQT.
     -Output files (for each glycomimetic compound):
         -A PDB file for the receptor
         -A PDB file for the glycomimetic ligand.
         -A text file recording Pdb2Glycam matching results. 
 
-    pdb, json -> pdb, pdb, txt
+    pdb, pdbqt, json -> pdb, pdb, txt
 
 
-TODO: becomes ProjectManagement service
+
 2. It calls makedir.sh to configure working directories for MD simulation of glycomimetic compounds.
+    > Normally project directories are created before any other step. TODO: PM service's job?
     -Required input: output of step 1
     -Output files: none
 
 3. It calls make_simulation_scripts.sh to make necessary scripts for MD simulation:
+    > now tasks/make_simulation_scripts.py
     -Required input:
         -Output files from step 1
         -Configured directories from step 2.  
