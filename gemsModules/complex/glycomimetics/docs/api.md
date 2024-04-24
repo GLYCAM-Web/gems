@@ -1,15 +1,18 @@
-## GM Request using input Resources
+# GM Request using input Resources
 ```json
 {
   "entity": {
     "type": "Glycomimetics",
     "services": {
-      "step_one_glyco_in_silico": {
+      "simple_glycomimetics_request": {
         # TODO: eventual workflow, requesting Analyze actually requests, if necessary:
         # Evaluate -> Validate -> Build -> Analyze is implied.
         "type": "Analyze"
+        # Analyze implies Build, and the below input Resources will be copied by Build's implied translator.
       }
     },
+    # These inputs are primarily for Build, however, Evaluate and Validate will check them.
+    # Analyze will use the outputs of Build, likely interacting with resources from Build.
     "inputs": [
       {
         "locationType": "filesystem-path-unix",
@@ -46,6 +49,10 @@
 }
 ```
 
-# API Inputs
+### API Inputs
 
-# JSON Options
+### JSON Options
+
+# Workflow
+
+[workflow.md](workflow.md)
