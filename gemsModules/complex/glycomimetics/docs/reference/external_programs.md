@@ -26,7 +26,7 @@
         - mpirun/pmemd.mpi
         - Run.resp (which to use this or run_resp.sh?)
         - ${interface_glycam_gaff_path}/main.exe *
-- makedirs.sh -> tasks/makedir.py
+- makedirs.sh -> tasks/makedir.py (Likely to become PM service.)
 - master_analysis.sh -> tasks/master_analysis.py
     - yao's vina/rescoring *
 - master_submit.sh -> tasks/make_master_submission_script.py
