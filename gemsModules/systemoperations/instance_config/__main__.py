@@ -35,7 +35,7 @@ class FileSystemPathsMixin:
 
         if app in self.Filesystem_Paths:
             if app in self.config["filesystem_paths"]:
-                return self.config[app]
+                return self.config["filesystem_paths"][app]
             else:
                 log.error(
                     f"Access attempted but {app} filesystem path not set in instance_config.json."

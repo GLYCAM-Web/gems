@@ -85,6 +85,7 @@ class KeyedArgManager(HostManager):
 
         return args_dict
 
+    # using setdefault here:
     def add_keyed_arguments_to_host(
         self, key: ConfigurationKeys, hostname, context, args
     ):
@@ -94,10 +95,7 @@ class KeyedArgManager(HostManager):
                 f"Hostname {hostname} not found in instance_config.json."
             )
 
-        if key not in self.config["hosts"][hostname]:
-            self.config["hosts"][hostname][key] = {}
-
-        if context not in self.config["hosts"][hostname][key]:
-            self.config["hosts"][hostname][key][context] = {}
-        self.config["hosts"][hostname][key][context].update(args)
+        self.config["hosts"][hostname].setdefault(key, {}).setdefault(
+            context, {}
+        ).update(args)
         print(f"Added {key} to {hostname} for context {context} via {args}.")

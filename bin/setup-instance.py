@@ -141,7 +141,7 @@ def main():
             f"--add-host '{hostname}' '[{app}]' '{host}' '{port}' \\\n"
             f"--set-sbatch-arguments '{hostname}' '{app}' '{json.dumps(ic['hosts'][hostname]['sbatch_arguments'][app])}' \\\n"
             f"--set-local-parameters '{hostname}' '{app}' '{json.dumps(ic['hosts'][hostname]['local_parameters'][app])}' \\\n"
-            f"--set-cluster-filesystem-path {app} {ic['cluster_filesystem_paths'][app]}"
+            f"--set-cluster-filesystem-path {app} {ic['filesystem_paths'][app]}"
         )
 
         if not args.dry_run:
