@@ -44,6 +44,7 @@ class MimeEncodableResourceMixin:
         encapulate_mime=False,
     ):
         if encapulate_mime:
+            log.debug(f"Encapsulating MIME for {resource_path}")
             msg = EmailMessage()
             mime_type, _ = mimetypes.guess_type(resource_path)
             if mime_type is None:
@@ -61,7 +62,7 @@ class MimeEncodableResourceMixin:
             content = msg.as_string()
         else:
             with open(resource_path, "rb") as file:
-                content = file.read()
+                content = file.read().decode("utf-8")
 
         obj = cls(
             locationType="Payload",
