@@ -25,10 +25,11 @@ class GlycomimeticsProject(Project):
     sim_length: constr(max_length=5) = "100"
 
     # TODO: Update from mdaas inputs
-    has_input_files: bool = True
-    input_type: constr(max_length=25) = "Amber-prmtop & inpcrd"
-    parm7_file_name: constr(max_length=255) = "DGlcpa1-OH.parm7"
-    rst7_file_name: constr(max_length=255) = "DGlcpa1-OH.rst7"
+    input_type: constr(max_length=25) = (
+        "AutoDock extended PDB (chemical/pdbqt) & application/json"
+    )
+    cocomplex: constr(max_length=255) = "cocomplex.pdbqt"
+    moeity: constr(max_length=255) = "ligand.pdbqt"
 
     # TODO: convert to glycomimetics protocols
     metadataPath: str = "/programs/gems/External/GM_Utils/metadata"  # /moeties etc.

@@ -59,6 +59,23 @@ class Build_Options(BaseModel):
         title="Interval",
         description="Interval",
     )
+    NumThreads: int = (
+        Field(
+            1,
+            title="Number of Threads",
+            description="Number of Threads",
+        ),
+    )
+    OutputPath: str = Field(
+        "output",
+        title="Output Path",
+        description="Output Path",
+    )
+    LogFile: str = Field(
+        "sample.log",
+        title="Log File",
+        description="Log file filename",
+    )
 
 
 class Build_Inputs(BaseModel):
