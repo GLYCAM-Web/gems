@@ -28,7 +28,9 @@ def create_contextual_slurm_submission_script(thisSlurmJobInfo):
 
     SlurmJobDict["slurm_runscript_name"] = "slurm_submit.sh"
     SlurmJobDict["workingDirectory"] = os.path.join(
-        ic.get_md_filesystem_path(),
+        ic.get_filesystem_path(
+            "MDaaS-RunMD"
+        ),  # "md_cluster_filesystem_path" TODO: Generalize this, originally this task was created for MDaaS submission only, but probably GM can make use of it.
         SlurmJobDict["pUUID"],
     )
     # instead of passing working directory, pass pUUID only and get base mdcluster path # also this will need to have specialized function for contexts in the future. (md cluster path is only for MDaaS-RunMD)

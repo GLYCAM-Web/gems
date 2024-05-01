@@ -26,7 +26,7 @@ class FileSystemPathsMixin:
 
     Filesystem_Paths: List[str] = []
 
-    def get_filesystem_path(self, app="MDaaS"):
+    def get_filesystem_path(self, app):
         """Returns the filesystem path for the given name defined in the instance config's filesystem_paths dict.
 
         NOTE: This was changed from a single entry to a collection on 2024-4-26. Thiswill force an instance_config.json

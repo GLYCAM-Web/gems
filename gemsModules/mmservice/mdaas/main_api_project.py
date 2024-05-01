@@ -45,7 +45,9 @@ class MdProject(Project):
     def add_temporary_info(self):
         ic = InstanceConfig()
 
-        self.project_dir: str = os.path.join(ic.get_md_filesystem_path(), self.pUUID)
+        self.project_dir: str = os.path.join(
+            ic.get_filesystem_path(app="MDaaS-RunMD"), self.pUUID
+        )
         log.debug(f"MdProject location: {self.project_dir}")
 
         self.logs_dir: str = os.path.join(self.project_dir, "logs")

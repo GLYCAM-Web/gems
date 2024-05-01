@@ -22,7 +22,8 @@ def execute(inputs: run_md_Inputs) -> run_md_Outputs:
 
     initiate_build.execute(
         pUUID=inputs.pUUID,
-        outputDirPath=ic.get_md_filesystem_path(),
+        # outputDirPath=inputs.outputDirPath,
+        outputDirPath=ic.get_filesystem_path("MDaaS-RunMD"),
         use_serial=True,
     )
 
