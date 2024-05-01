@@ -1,7 +1,7 @@
 """ DOCUMENTATION ONLY """
 
 from pydantic import BaseModel
-from typing import List, Dict, Optional
+from typing import List, Dict, Literal, Optional
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -34,4 +34,4 @@ class Config(BaseModel):
     hosts: Dict[str, Host]
     default_sbatch_arguments: Dict[str, SbatchArguments]
     default_local_parameters: Dict[str, LocalParameters]
-    md_cluster_filesystem_path: str
+    cluster_filesystem_paths: Dict[Literal["MdaaS", "Glycomimetics"], str]

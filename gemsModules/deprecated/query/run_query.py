@@ -56,6 +56,24 @@ def buildQueryString(thisTransaction : Transaction):
         log.error(traceback.format_exc())
         raise error
     
+    try:
+       USERDATA = "/website/userdata/"
+       if not os.path.exists(USERDATA):
+          raise Exception("USERDATA directory does not exist. Check mounted volumes for grpc delegator.")
+       else:
+          log.debug("USERDATA directory exists")
+          TOOLS_DIR = os.path.join(USERDATA, "tools")
+          if not os.path.exists(TOOLS_DIR):
+            os.mkdir(TOOLS_DIR)
+
+          GF_DIR = os.path.join(TOOLS_DIR, "gf")
+          if not os.path.exists(GF_DIR):
+            os.mkdir(GF_DIR)
+             
+    except Exception as error:
+        log.error("Unable to create output dirs for the query module " + str(error))
+        log.error(traceback.format_exc())
+        raise error
     
     theseOptions = thisTransaction.request_dict['services'][0]['formQueryString']['options']
     if theseOptions['queryType'] == "Initial":

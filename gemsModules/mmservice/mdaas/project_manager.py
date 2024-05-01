@@ -57,18 +57,42 @@ class mdaas_Project_Manager(Project_Manager):
             if service.typename == "RunMD":
                 # THe problem with setting the files here is that then they have their full paths,
                 # and we still need the full paths for the RDF...
-                parm_path = Path(service.inputs["parameter-topology-file"]["payload"])
-                rst_path = Path(service.inputs["input-coordinate-file"]["payload"])
-
-                # Part of a temporary MdProject.upload_path hack. TODO: Remove upload path? Hardcode full file paths in project?
-                if rst_path.parent != parm_path.parent:
-                    log.warning(
-                        "Parm7/rst7 upload paths do not agree! Response upload path may be incorrect!"
+                if service.inputs["parameter-topology-file"]["locationType"] in [
+                    "File",
+                    "filesystem-path-unix",
+                ]:
+                    parm_path = Path(
+                        service.inputs["parameter-topology-file"]["payload"]
                     )
-                self.response_project.upload_path = str(rst_path.parent)
+                    self.response_project.parm7_file_name = str(parm_path.name)
+                else:
+                    # TODO: Either set no path, or copy the payloaded input files to the project directory on run by PM.
+                    # None for now
+                    parm_path = None
+                    self.response_project.parm7_file_name = "MdInput.parm7"
 
-                self.response_project.parm7_file_name = str(parm_path.name)
-                self.response_project.rst7_file_name = str(rst_path.name)
+                if service.inputs["input-coordinate-file"]["locationType"] in [
+                    "File",
+                    "filesystem-path-unix",
+                ]:
+                    rst_path = Path(service.inputs["input-coordinate-file"]["payload"])
+                    self.response_project.rst7_file_name = str(rst_path.name)
+
+                    # Part of a temporary MdProject.upload_path hack. TODO: Remove upload path? Hardcode full file paths in project?
+                    if parm_path and rst_path.parent != parm_path.parent:
+                        log.warning(
+                            "Parm7/rst7 upload paths do not agree! Response upload path may be incorrect!"
+                        )
+                else:
+                    # TODO: Like above, this is just for response project metadata.
+                    rst_path = None
+                    self.response_project.rst7_file_name = "MdInput.rst7"
+
+                self.response_project.upload_path = str(
+                    rst_path.parent
+                    if rst_path
+                    else parm_path.parent if parm_path else None
+                )
                 if hasattr(service, "options") and service.options is not None:
                     if "sim_length" in service.options:
                         self.response_project.sim_length = str(

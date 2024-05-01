@@ -4,17 +4,14 @@ from pathlib import Path
 from typing_extensions import Literal, Optional
 from pydantic import BaseModel, Field
 
-from gemsModules.logging.logger import Set_Up_Logging
+from gemsModules.common.main_api_resources import Resources
 
 from gemsModules.mmservice.mdaas.main_api import (
     MDaaS_Service_Request,
     MDaaS_Service_Response,
 )
 
-from gemsModules.mmservice.mdaas.services.ProjectManagement.resources import (
-    ProjectManagement_Resources,
-    PM_Resource,
-)
+from gemsModules.logging.logger import Set_Up_Logging
 
 
 log = Set_Up_Logging(__name__)
@@ -31,10 +28,10 @@ class ProjectManagement_Inputs(BaseModel):
         title="Project Directory",
         description="Full path to project directory",
     )
-    resources: list[PM_Resource] = Field(
+    resources: Resources = Field(
         title="Resources",
         description="List of resources to copy to project directory",
-        default_factory=list,
+        default_factory=Resources,
     )
     protocolFilesPath: Optional[str] = Field(
         None,
@@ -45,21 +42,6 @@ class ProjectManagement_Inputs(BaseModel):
         None,
         title="Output Directory Path",
         description="Full path to output directory",
-    )
-    inputFilesPath: Optional[str] = Field(
-        None,
-        title="Input Files Path",
-        description="Full path to input files directory",
-    )
-    amber_parm7: Optional[str] = Field(
-        None,
-        title="Amber Parm7",
-        description="Name of Amber Parm7 file",
-    )
-    amber_rst7: Optional[str] = Field(
-        None,
-        title="Amber Rst7",
-        description="Name of Amber Rst7 file",
     )
     sim_length: Optional[str] = Field(
         None,
@@ -74,7 +56,7 @@ class ProjectManagement_Outputs(BaseModel):
         title="Output File Path",
         description="Full path to output file",
     )
-    resources: ProjectManagement_Resources = ProjectManagement_Resources()
+    resources: Resources = Resources()
 
 
 # PM Requests should be based in common.Request, in my mind.

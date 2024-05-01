@@ -1,0 +1,147 @@
+#!/usr/bin/env python3
+"""
+This script is used to update a JSON request with a resource file at a specific index. 
+
+
+Usage example:
+
+# Add two resources to a blank MDaaS RunMD request.
+cat gemsModules/mmservice/mdaas/tests/inputs/017_no_inputs.json |\
+./bin/request_builder \
+    --resource /programs/gems/tests/temp-inputs/mdinput/unminimized-t5p.parm7 \
+    --resource-format AMBER-7-prmtop \
+    --json-index entity.services.run_md.inputs.parameter-topology-file |\
+./bin/request_builder \
+    --resource /programs/gems/tests/temp-inputs/mdinput/unminimized-t5p.rst7 \
+    --resource-format AMBER-7-restart \
+    --json-index entity.services.run_md.inputs.input-coordinate-file |\
+./bin/delegate
+
+See ./bin/request_builder --help for usage information.
+"""
+import argparse
+import json
+import os
+import sys
+from pathlib import Path
+
+
+# append $GEMSHOME to sys path in case the script is run from outside the gemsModules directory
+if "GEMSHOME" in os.environ:
+    if os.environ["GEMSHOME"] not in sys.path:
+        sys.path.append(os.environ["GEMSHOME"])
+else:
+    print("GEMSHOME not set. Exiting.")
+    sys.exit(1)
+
+from gemsModules.common.main_api_resources import Resource
+
+
+def set_value_at_json_index(json_dict, json_index, value):
+    """Using a jq-like index, set the value in a JSON dictionary.
+
+    Presumes the existence of all keys in the index.
+    """
+
+    try:
+        # Split the index into a list of keys
+        json_index, resource_name = json_index.rsplit(".", 1)
+        keys = json_index.split(".")
+
+        # Traverse the JSON dictionary using the keys
+        current_dict = json_dict
+        for key in keys:
+            current_dict = current_dict[key]
+
+        # Set the value using the resource name
+        current_dict[resource_name] = value
+
+        return json_dict
+
+    except KeyError:
+        print(f"Invalid JSON index: {json_index}")
+        sys.exit(1)
+
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+        sys.exit(1)
+
+
+def argparser():
+    parser = argparse.ArgumentParser(description="JSON Request Builder")
+    parser.add_argument("--resource", type=str, help="Path to the resource file")
+
+    # optional request flag instead of stdin
+    parser.add_argument("--request", type=str, help="Path to the request file")
+    # optional output flag instead of stdout
+    parser.add_argument(
+        "--output", type=str, help="Path to the output file", default=None
+    )
+
+    parser.add_argument(
+        "--resource-format",
+        type=str,
+        help="The format of the resource file (e.g. 'AMBER-7-prmtop')",
+        default=None,
+    )
+    parser.add_argument(
+        "--json-index",
+        type=str,
+        help="The index of the JSON object to be updated separated by periods",
+    )
+    parser.add_argument(
+        "--dont-encode-mime",
+        action="store_false",
+        help="Encapsulate the resource in a MIME message",
+    )
+    return parser.parse_args()
+
+
+def main():
+    args = argparser()
+    resource_path = args.resource
+
+    if resource_path:
+        if not os.path.isfile(resource_path):
+            print(f"Error: Resource file '{resource_path}' does not exist.")
+            sys.exit(1)
+    else:
+        resource_path = None
+
+    # Read the request from stdin or file
+    request_data = sys.stdin.read()
+
+    if not request_data:
+        if args.request:
+            with open(args.request, "r") as f:
+                request_data = f.read()
+
+    # Parse the request
+    if request_data:
+        try:
+            request = json.loads(request_data)
+        except json.JSONDecodeError:
+            print("Error: Invalid JSON input.")
+            sys.exit(1)
+    else:
+        print("Error: No request data provided via stdin or --request.")
+        sys.exit(1)
+
+    resource = Resource.payload_from_path(
+        resource_path, args.resource_format, encapulate_mime=args.dont_encode_mime
+    )
+    updated_request = set_value_at_json_index(request, args.json_index, resource.dict())
+    dumped_request = json.dumps(updated_request, indent=2)
+
+    # Write the updated request to stdout or file
+    if args.output:
+        with open(args.output, "w") as f:
+            f.write(dumped_request)
+    else:
+        # print(dumped_request, end="")
+        sys.stdout.write(dumped_request)
+        # sys.stdout.flush()
+
+
+if __name__ == "__main__":
+    main()

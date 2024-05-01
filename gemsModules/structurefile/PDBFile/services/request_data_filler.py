@@ -52,6 +52,7 @@ class PDBFile_Request_Data_Filler(Request_Data_Filler):
             self.aaop_list[i].The_AAO.inputs,
         )
 
+    # TODO: PDBFile and MDaaS PM data fillers are very similar, can we generalize them?
     def __fill_projman_aaop(self, i: int, aaop: AAOP):
         # Fill in the project management service request
         aaop.The_AAO.inputs = pm_api.ProjectManagement_Inputs(
@@ -60,13 +61,13 @@ class PDBFile_Request_Data_Filler(Request_Data_Filler):
         )
 
         # Add the resources to copy to the project management service request
-        input_json = pm_api.PM_Resource(
+        input_json = Resource(
             payload=self.transaction.incoming_string,
             resourceFormat="json",
             locationType="Payload",
             options={"filename": "input.json"},
         )
-        aaop.The_AAO.inputs.resources.append(input_json)
+        aaop.The_AAO.inputs.resources.add_resource(input_json)
 
         # Lets try to get inputs from the requesting AAOP for ProjectManagement
         if aaop.Requester is not None:
@@ -79,16 +80,16 @@ class PDBFile_Request_Data_Filler(Request_Data_Filler):
                 requester_aaop.The_AAO.inputs,
             )
 
-            input_pdb = pm_api.PM_Resource(
+            input_pdb = Resource(
                 payload=Path(requester_aaop.The_AAO.inputs["inputFilePath"])
                 / requester_aaop.The_AAO.inputs["pdb_filename"],
                 resourceFormat="pdb",
-                locationType="File",
+                locationType="filesystem-path-unix",
             )
             log.debug(
                 "Adding input_pdb resource to ProjectManagement_Inputs: %s", input_pdb
             )
-            aaop.The_AAO.inputs.resources.append(input_pdb)
+            aaop.The_AAO.inputs.resources.add_resource(input_pdb)
         else:
             log.debug(
                 "No requester found for aaop_list[%s], PM service request will not have a pdb file resource.",

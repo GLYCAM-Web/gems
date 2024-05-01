@@ -46,7 +46,7 @@ class MdProject(Project):
         ic = InstanceConfig()
 
         self.project_dir: str = os.path.join(
-            ic.get_filesystem_path(app="MDaaS"), self.pUUID
+            ic.get_filesystem_path(app="MDaaS-RunMD"), self.pUUID
         )
         log.debug(f"MdProject location: {self.project_dir}")
 
