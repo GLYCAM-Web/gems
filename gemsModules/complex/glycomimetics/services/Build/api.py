@@ -50,56 +50,43 @@ class Build_Resources(Resources):
     __root__: List[Union[Build_input_Resource, Build_output_Resource]] = None
 
 
+# TODO: update descriptions
+class Build_Options(BaseModel):
+    """Options for controlling the build's exection."""
+
+    Interval: int = Field(
+        30,
+        title="Interval",
+        description="Interval",
+    )
+
+
 class Build_Inputs(BaseModel):
-    amber_parm7: str = Field(
+    coComplex: str = Field(
         None,
-        title="Amber Parm7",
-        description="Name of Amber Parm7 file",
+        title="Complex",
+        description="Complex to build",
     )
-    amber_rst7: str = Field(
+    moietyMetadata: str = Field(
         None,
-        title="Amber Rst7",
-        description="Name of Amber Rst7 file",
+        title="Moiety Metadata PDBQT",
+        description="Metadata for moiety",
     )
+    buildOptions: Build_Options = Build_Options()
+    resources: Build_Resources = Build_Resources()
+
+
+class Build_Outputs(BaseModel):
     pUUID: str = Field(
         None,
         title="Project UUID",
         description="UUID of Project",
     )
-    outputDirPath: str = Field(
-        None,
-        title="Output Directory Path",
-        description="Path to output directory",
-    )
-    inputFilesPath: str = Field(
-        None,
-        title="Input Files Directory Path",
-        description="Path to whhere the input files are stored",
-    )
-    protocolFilesPath: str = Field(
-        None,
-        title="Protocol files directory",
-        description="Path to where the protocol files are stored",
-    )
-    use_serial: bool = Field(
-        False,
-        title="Use Serial",
-        description="Should we force the GEMS code to run in serial?",
-    )
-    control_script: str = Field(
-        "Run_Protocol.bash",
-        title="Control Script",
-        description="Name of the script used to run the protocol",
-    )
-    resources: Build_Resources = Build_Resources()
-
-
-class Build_Outputs(BaseModel):
-    outputDirPath: str = Field(
-        None,
-        title="Output Directory Path",
-        description="Path to output directory",
-    )
+    # outputDirPath: str = Field(
+    #     None,
+    #     title="Output Directory Path",
+    #     description="Path to output directory",
+    # )
     resources: Build_Resources = Build_Resources()
 
 

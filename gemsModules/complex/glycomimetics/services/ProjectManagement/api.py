@@ -19,45 +19,10 @@ class ProjectManagement_Inputs(BaseModel):
         title="Project UUID",
         description="UUID of Project",
     )
-    projectDir: Optional[str] = Field(
-        None,
-        title="Project Directory",
-        description="Full path to project directory",
-    )
     resources: list[PM_Resource] = Field(
         title="Resources",
         description="List of resources to copy to project directory",
         default_factory=list,
-    )
-    protocolFilesPath: Optional[str] = Field(
-        None,
-        title="Protocol Files Path",
-        description="Full path to protocol files directory",
-    )
-    outputDirPath: Optional[str] = Field(
-        None,
-        title="Output Directory Path",
-        description="Full path to output directory",
-    )
-    inputFilesPath: Optional[str] = Field(
-        None,
-        title="Input Files Path",
-        description="Full path to input files directory",
-    )
-    amber_parm7: Optional[str] = Field(
-        None,
-        title="Amber Parm7",
-        description="Name of Amber Parm7 file",
-    )
-    amber_rst7: Optional[str] = Field(
-        None,
-        title="Amber Rst7",
-        description="Name of Amber Rst7 file",
-    )
-    sim_length: Optional[str] = Field(
-        None,
-        title="Simulation Length",
-        description="Length of simulation in ns",
     )
 
 

@@ -6,7 +6,7 @@
     "services": {
       "simple_glycomimetics_request": {
         # TODO: eventual workflow, requesting Analyze actually requests, if necessary:
-        # Evaluate -> Validate -> Build -> Analyze is implied.
+        # Evaluate -> Validate -> ProjectManagement -> Build -> Analyze is implied.
         "type": "Analyze"
         # Analyze implies Build, and the below input Resources will be copied by Build's implied translator.
       }
