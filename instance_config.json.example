@@ -1,5 +1,5 @@
 {
-  "date": "2023-11-01T16:26:57.665784",
+  "date": "2024-04-26T20:42:11.000",
   "hosts": {
     "grpc-default": {
       "contexts": [
@@ -35,5 +35,4 @@
       "numProcs": "4"
     }
   },
-  "md_cluster_filesystem_path": "/website/userdata/mmservice/md"
 }

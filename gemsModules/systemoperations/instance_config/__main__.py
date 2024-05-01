@@ -18,7 +18,50 @@ from . import *
 log = Set_Up_Logging(__name__)
 
 
-class InstanceConfig(KeyedArgManager):
+class FileSystemPathsMixin:
+    """A mixin for the InstanceConfig class to handle filesystem paths.
+
+    - Honestly should have a generic filesystems_paths dict in the instance config..This just avoids breaking people's DevEnv. TODO: Fix this.
+    """
+
+    Filesystem_Paths: List[str] = []
+
+    def get_filesystem_path(self, app="MDaaS"):
+        """Returns the filesystem path for the given name defined in the instance config's filesystem_paths dict.
+
+        NOTE: This was changed from a single entry to a collection on 2024-4-26. Thiswill force an instance_config.json
+        update for all GEMS instances.
+        """
+
+        if app in self.Filesystem_Paths:
+            if app in self.config["filesystem_paths"]:
+                return self.config[app]
+            else:
+                log.error(
+                    f"Access attempted but {app} filesystem path not set in instance_config.json."
+                )
+
+        else:
+            log.error(
+                f"Access attempted but {app} does not have a filesystem path in instance_config.json."
+            )
+        raise KeyError(
+            f"{app} not found in instance_config.json, available: {self.config['filesystem_paths']}"
+        )
+
+    def set_filesystem_path(self, app: str, path: str):
+        """Sets the filesystem path for the given app in the instance config's filesystem_paths dict."""
+        if app in self.Filesystem_Paths:
+            if "filesystem_paths" not in self.config:
+                self.config["filesystem_paths"] = {}
+            self.config["filesystem_paths"][app] = path
+        else:
+            log.error(
+                f"Access attempted but {app} does not have a filesystem path in instance_config.json."
+            )
+
+
+class InstanceConfig(KeyedArgManager, FileSystemPathsMixin):
     """The main GEMS class for parsing it's active instance configuration file.
 
     This class only has active GEMS instance specific methods and configuration.
@@ -34,7 +77,8 @@ class InstanceConfig(KeyedArgManager):
     """
 
     # Not an enum so we can extend here, in the InstanceConfig class, where the most specific GEMS instance configuration is defined.
-    Contexts = ContextManager.Contexts + ["MDaaS-RunMD"]
+    Contexts = ["DevEnv", "Swarm", "MDaaS-RunMD"]
+    Filesystem_Paths = ["MDaaS-RunMD", "Glycomimetics"]
 
     def __init__(
         self,
@@ -94,24 +138,3 @@ class InstanceConfig(KeyedArgManager):
                 context = self.Contexts.SWARM
 
         return super().get_keyed_arguments(key, host, context)
-
-    # Special Context Helpers for GEMS defined here.
-    # "MDaaS-RunMD" context - MD Cluster host helpers
-    def get_md_filesystem_path(self) -> str:
-        """Returns the filesystem path for the MD compute cluster by hostname defined in the instance config's hosts dict."""
-        if (
-            "md_cluster_filesystem_path" not in self.config
-            or len(self.config["md_cluster_filesystem_path"]) == 0
-        ):
-            log.error(
-                "Access attempted but MD Cluster filesystem path not set in instance_config.json."
-            )
-
-        return self.config["md_cluster_filesystem_path"]
-
-    def set_md_filesystem_path(self, path):
-        """Sets the filesystem path for the MD compute cluster by hostname defined in the instance config's hosts dict.
-
-        You probably want to save the instance config after this.
-        """
-        self.config["md_cluster_filesystem_path"] = path

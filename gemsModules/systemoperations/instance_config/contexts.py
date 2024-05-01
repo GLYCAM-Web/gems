@@ -9,7 +9,7 @@ log = Set_Up_Logging(__name__)
 
 class ContextManager(ConfigManager):
     # Not an enum so we can extend. Intended to be an associated type / should probably be a Literal Union.
-    Contexts: list = ["DevEnv", "Swarm"]
+    Contexts: list = []
 
     def get_available_contexts(self, instance_hostname=None) -> list:
         """
