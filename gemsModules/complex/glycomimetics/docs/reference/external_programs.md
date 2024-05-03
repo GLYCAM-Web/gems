@@ -16,6 +16,7 @@
 - make_gaussian_input_file.sh -> tasks/make_gaussian_input_file.py
     - newzmat
 - make_simulation_scripts.sh -> tasks/make_simulation_scripts.py
+    - g16
     - antechamber
     - parmchk2
     - $AMBERHOME/bin/pmemd.cuda

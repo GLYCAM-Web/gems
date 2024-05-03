@@ -1,5 +1,6 @@
 glycomimetic_program_dir="/home/yao/glycomimetics"
-glycomimetic_scripts_dir="/home/yao/glycomimetic_simulations/scripts"
+#glycomimetic_scripts_dir="/home/yao/glycomimetic_simulations/scripts"
+glycomimetic_scripts_dir="/programs/gems/gemsModules/complex/glycomimetics/docs/tasks_reference/external_scripts_bash"
 job_workdir=$1
 cd ${job_workdir}
 job_workdir_absolute=$(pwd)

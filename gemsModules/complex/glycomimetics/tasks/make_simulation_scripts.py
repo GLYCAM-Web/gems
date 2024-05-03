@@ -6,8 +6,10 @@ from gemsModules.logging.logger import Set_Up_Logging
 
 log = Set_Up_Logging(__name__)
 
+G16_ROOT = "/programs/gaussian/16"
 
-def execute(dirname, num_cpus_emin, num_cpus_gbsa, num_mem_gaussian, g16root):
+
+def execute(dirname, num_cpus_emin=7, num_cpus_gbsa=7, num_mem_gaussian="1024MB"):
     root_dir = "/home/yao"
 
     # Get directory name from command line arguments
@@ -23,12 +25,13 @@ def execute(dirname, num_cpus_emin, num_cpus_gbsa, num_mem_gaussian, g16root):
     )
     os.environ["glycomimetic_program_dir"] = f"{root_dir}/glycomimetics"
     os.environ["glycomimetics_scripts_dir"] = (
-        f"{root_dir}/glycomimetic_simulations/scripts"
+        os.getenv("GEMSHOME")
+        + "/gemsModules/complex/glycomimetics/docs/tasks_reference/external_scripts_bash"
     )
-    os.environ["num_cpus_emin"] = "7"
-    os.environ["num_cpus_gbsa"] = "7"
-    os.environ["num_mem_gaussian"] = "1024MB"
-    os.environ["g16root"] = "/programs/gaussian/16"
+    os.environ["num_cpus_emin"] = str(num_cpus_emin)
+    os.environ["num_cpus_gbsa"] = str(num_cpus_gbsa)
+    os.environ["num_mem_gaussian"] = num_mem_gaussian
+    os.environ["g16root"] = G16_ROOT
 
     # Determine analog_name based on dirname
     if dirname == "natural_ligand":
@@ -56,3 +59,10 @@ def execute(dirname, num_cpus_emin, num_cpus_gbsa, num_mem_gaussian, g16root):
         if result.returncode != 0:
             log.warning(f"Error executing {script}")
             sys.exit(1)
+
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("Usage: python script.py <dirname>")
+    else:
+        execute(sys.argv[1])

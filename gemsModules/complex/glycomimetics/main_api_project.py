@@ -22,14 +22,13 @@ class GlycomimeticsProject(Project):
     entity_id: str = "complex/glycomimetics"
     requesting_agent: str = "tester"
     u_uuid: constr(max_length=36) = " "
-    sim_length: constr(max_length=5) = "100"
 
     # TODO: Update from mdaas inputs
     input_type: constr(max_length=25) = (
         "AutoDock extended PDB (chemical/pdbqt) & application/json"
     )
     cocomplex: constr(max_length=255) = "cocomplex.pdbqt"
-    moeity: constr(max_length=255) = "ligand.pdbqt"
+    moiety: constr(max_length=255) = "ligand.pdbqt"
 
     # TODO: convert to glycomimetics protocols
     metadataPath: str = "/programs/gems/External/GM_Utils/metadata"  # /moeties etc.

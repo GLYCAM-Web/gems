@@ -1,3 +1,8 @@
+"""
+
+Note/Fix: This and make_tleap_input replace external_bash/tleap.sh, however the simulation script delays tleap.sh's run until after slurm batching.
+"""
+
 import sys, subprocess
 
 from gemsModules.complex.glycomimetics.tasks.make_tleap_input import make_tleap_input

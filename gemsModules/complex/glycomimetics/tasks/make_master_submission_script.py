@@ -21,6 +21,7 @@ def write_slurm_script(job_workdir, glycomimetic_scripts_dir):
 source /etc/profile.d/modules.sh
 
 cd {glycomimetic_dir}
+# TODO: Does nothing, copied from reference, input file seems unused - possibly expected reference for GEMS, but input file format never used?
 # {glycomimetic_dir}/main.exe -f {glycomimetic_input_file}
 # exit 1
 

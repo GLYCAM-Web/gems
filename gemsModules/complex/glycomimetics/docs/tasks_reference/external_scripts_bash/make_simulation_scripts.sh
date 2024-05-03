@@ -3,6 +3,9 @@ autogen_input_path="/home/yao/glycomimetics/autogen_md_input_files"
 interface_glycam_gaff_path="/home/yao/glycomimetics/glycam_gaff_interfacing"
 glycomimetic_program_dir="/home/yao/glycomimetics"
 glycomimetics_scripts_dir="/home/yao/glycomimetic_simulations/scripts"
+# This should be a drop in replacement for above:
+#glycomimetic_scripts_dir="/programs/gems/gemsModules/complex/glycomimetics/docs/tasks_reference/external_scripts_bash"
+
 num_cpus_emin=7
 num_cpus_gbsa=7
 num_mem_gaussian="1024MB"
