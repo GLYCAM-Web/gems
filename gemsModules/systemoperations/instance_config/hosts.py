@@ -15,10 +15,21 @@ class HostManager(ContextManager):
 
         This is the only way to add a host to the instance_config.json.
         """
-        self.config["hosts"][hostname] = {
-            "host": host,
-            "slurmport": slurmport,
-        }
+        if hostname not in self.config["hosts"]:
+            self.config["hosts"][hostname] = {
+                "host": host,
+                "slurmport": slurmport,
+            }
+        else:
+            # slurmport or host differ, warn the user.
+            if self.config["hosts"][hostname]["host"] != host:
+                log.warning(
+                    f"Host {hostname} already exists with a different host value: {self.config['hosts'][hostname]['host']}."
+                )
+            if self.config["hosts"][hostname]["slurmport"] != slurmport:
+                log.warning(
+                    f"Host {hostname} already exists with a different slurmport value: {self.config['hosts'][hostname]['slurmport']}."
+                )
 
         if isinstance(contexts, list):
             self.add_contexts_to_host(hostname, contexts)
