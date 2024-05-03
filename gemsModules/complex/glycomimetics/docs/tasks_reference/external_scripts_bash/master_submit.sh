@@ -1,5 +1,6 @@
 glycomimetic_program_dir="/home/yao/glycomimetics"
 #glycomimetic_scripts_dir="/home/yao/glycomimetic_simulations/scripts"
+# This should be a drop in replacement for above:
 glycomimetic_scripts_dir="/programs/gems/gemsModules/complex/glycomimetics/docs/tasks_reference/external_scripts_bash"
 job_workdir=$1
 cd ${job_workdir}
@@ -7,6 +8,8 @@ job_workdir_absolute=$(pwd)
 
 glycomimetic_reldir="glycomimetics"
 glycomimetic_dir="${job_workdir_absolute}/${glycomimetic_reldir}"
+glycomimetic_output_dir="output"
+
 input_filename="sample_input_file.txt"
 #input_filename="sample_input_file_11_to_13.txt"
 #input_filename="sample_input_file_no_O2.txt"
@@ -20,7 +23,6 @@ glycomimetic_input_file="${glycomimetic_dir}/${input_filename}"
 #glycomimetic_output_dir=$(grep "OutputPath:" ${glycomimetic_input_file} | sed 's/OutputPath://')
 #num_cpus_glycomimetics=$(grep "NumThreads:" ${glycomimetic_input_file} | sed 's/NumThreads://')
 
-glycomimetic_output_dir="output"
 num_cpus_glycomimetics=4
 
 simulation_reldir="simulation"

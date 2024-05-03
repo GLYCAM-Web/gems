@@ -27,10 +27,13 @@
         - mpirun/pmemd.mpi
         - Run.resp (which to use this or run_resp.sh?)
         - ${interface_glycam_gaff_path}/main.exe *
+    - simulation_gbsa
+        - cpptraj
+        - mpirun / MMPBSA.py.MPI
 - makedirs.sh -> tasks/makedir.py (Likely to become PM service.)
 - master_analysis.sh -> tasks/master_analysis.py
     - yao's vina/rescoring *
-- master_submit.sh -> tasks/make_master_submission_script.py
+- master_submit.sh -> tasks/run_master_submit.py and  tasks/make_master_submission_script.py
 - tleap -> tasks/run_tleap.py and tasks/make_tleap_input.py
     - $AMBERHOME/bin/tleap
     - ambpdb

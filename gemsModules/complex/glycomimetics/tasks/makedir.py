@@ -21,12 +21,14 @@ def setup_natural_directory(simulation_workdir):
             os.makedirs(os.path.join(natural_dir, subdir))
 
 
-def copy_files_and_create_structure(glycomimetic_output_dir, simulation_workdir):
+def copy_files_and_create_structure(simulation_workdir):
     """
     Process ligand files, check for clash files, and copy to appropriate directory structure in simulation workdir.
     """
-    os.chdir(glycomimetic_output_dir)
-    for ligand_file in glob.glob("*_ligand.pdb"):
+
+    found_ligands = glob.glob("*_ligand.pdb")
+    log.info(f"Found {len(found_ligands)} ligands to process")
+    for ligand_file in found_ligands:
         base_name = ligand_file.replace("_ligand.pdb", "")
         clash_file_pattern = f"*{base_name}*clash*"
         clash_files = glob.glob(clash_file_pattern)
@@ -71,13 +73,17 @@ def execute(glycomimetic_output_dir, simulation_workdir):
     Main function to orchestrate directory setup and file processing.
     """
     setup_natural_directory(simulation_workdir)
-    copy_files_and_create_structure(glycomimetic_output_dir, simulation_workdir)
+
+    # Note, I do not see where in reference this directory is made, but we're creating it here for now.
+    os.makedirs(glycomimetic_output_dir, exist_ok=True)
+    os.chdir(glycomimetic_output_dir)
+    copy_files_and_create_structure(simulation_workdir)
 
 
 if __name__ == "__main__":
     import sys
 
-    if len(sys.argv) != 3:
+    if len(sys.argv) < 3:
         print("Usage: python script.py <glycomimetic_output_dir> <simulation_workdir>")
     else:
         execute(sys.argv[1], sys.argv[2])
