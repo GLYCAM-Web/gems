@@ -5,16 +5,29 @@ This script is used to update a JSON request with a resource file at a specific 
 
 Usage example:
 
-# Add two resources to a blank MDaaS RunMD request.
-cat gemsModules/mmservice/mdaas/tests/inputs/017_no_inputs.json |\
+# Add two resources to a blank MDaaS RunMD request at specific locations. (N.B. MDaaS currently does not use resourceRoles.)
+$ cat gemsModules/mmservice/mdaas/tests/inputs/017_no_inputs.json |\
 ./bin/request_builder \
-    --resource /programs/gems/tests/temp-inputs/mdinput/unminimized-t5p.parm7 \
-    --resource-format AMBER-7-prmtop \
-    --json-index entity.services.run_md.inputs.parameter-topology-file |\
+    --path /programs/gems/tests/temp-inputs/mdinput/unminimized-t5p.parm7 \
+    --format AMBER-7-prmtop \
+    --index entity.services.run_md.inputs.parameter-topology-file |\
 ./bin/request_builder \
-    --resource /programs/gems/tests/temp-inputs/mdinput/unminimized-t5p.rst7 \
-    --resource-format AMBER-7-restart \
-    --json-index entity.services.run_md.inputs.input-coordinate-file |\
+    --path /programs/gems/tests/temp-inputs/mdinput/unminimized-t5p.rst7 \
+    --format AMBER-7-restart \
+    --index entity.services.run_md.inputs.input-coordinate-file |\
+./bin/delegate
+# TODO: !! Glycomimetics will use Resources lists by default. We should generate the no inputs version from schema.
+# Append two resources to the Entity-level inputs Resources list for a blank Glycomimetics RunMD request.
+$ ./bin/request_builder \
+    --entity-name Glycomimetics \
+    --index entity.inputs \
+    --create-list \
+    --path /programs/gems/gemsModules/complex/glycomimetics/docs/reference/example_flu_3ubq_aldehyde_library/glycomimetics/3ubq_chainC_64_266.pdbqt \
+    --format chemical/pdbqt |\
+./bin/request_builder \
+    --path /programs/gems/gemsModules/complex/glycomimetics/docs/reference/example_flu_3ubq_aldehyde_library/glycomimetics/sample_input_file.json \
+    --index entity.inputs |\
+    --format application/json |\
 ./bin/delegate
 
 See ./bin/request_builder --help for usage information.
@@ -23,6 +36,7 @@ import argparse
 import json
 import os
 import sys
+import select
 from pathlib import Path
 
 
@@ -35,12 +49,23 @@ else:
     sys.exit(1)
 
 from gemsModules.common.main_api_resources import Resource
+from gemsModules.common.main_api import Common_API
+from gemsModules.common.main_api_entity import Entity
 
 
-def set_value_at_json_index(json_dict, json_index, value):
+def get_blank_entity_json(entity_name, inputs=None):
+    """Return a blank Entity JSON object."""
+    return Common_API(entity=Entity(type=entity_name, inputs=inputs)).json(
+        indent=2, by_alias=True
+    )
+
+
+def set_value_at_json_index(json_dict, json_index, value, create_list=False):
     """Using a jq-like index, set the value in a JSON dictionary.
 
     Presumes the existence of all keys in the index.
+
+    If the value is a list, append the value to the list at the index.
     """
 
     try:
@@ -53,8 +78,18 @@ def set_value_at_json_index(json_dict, json_index, value):
         for key in keys:
             current_dict = current_dict[key]
 
-        # Set the value using the resource name
-        current_dict[resource_name] = value
+        if resource_name in current_dict:
+            if isinstance(current_dict[resource_name], list):
+                current_dict[resource_name].append(value)
+            elif current_dict[resource_name]:
+                current_dict[resource_name] = [current_dict[resource_name], value]
+            else:
+                current_dict[resource_name] = [value]
+        else:
+            if create_list:
+                current_dict[resource_name] = [value]
+            else:
+                current_dict[resource_name] = value
 
         return json_dict
 
@@ -69,52 +104,78 @@ def set_value_at_json_index(json_dict, json_index, value):
 
 def argparser():
     parser = argparse.ArgumentParser(description="JSON Request Builder")
-    parser.add_argument("--resource", type=str, help="Path to the resource file")
 
-    # optional request flag instead of stdin
-    parser.add_argument("--request", type=str, help="Path to the request file")
+    parser.add_argument(
+        "--request",
+        type=str,
+        help="Path to the JSON request file to update",
+        default=None,
+    )
+
+    # if no request is provided, generate a blank JSON object for the entity
+    parser.add_argument(
+        "--entity-name",
+        type=str,
+        help="The name of the entity to generate a blank JSON object for",
+        default=None,
+    )
+
     # optional output flag instead of stdout
     parser.add_argument(
         "--output", type=str, help="Path to the output file", default=None
     )
 
     parser.add_argument(
-        "--resource-format",
+        "--path", type=str, help="Path to the resource file to add to the request"
+    )
+    parser.add_argument(
+        "--format",
         type=str,
         help="The format of the resource file (e.g. 'AMBER-7-prmtop')",
         default=None,
     )
     parser.add_argument(
-        "--json-index",
+        "--role",
         type=str,
-        help="The index of the JSON object to be updated separated by periods",
+        help="The role of the resource file (e.g. 'input-coordinate-file')",
+        default=None,
     )
     parser.add_argument(
-        "--dont-encode-mime",
-        action="store_false",
-        help="Encapsulate the resource in a MIME message",
+        "--index",
+        type=str,
+        help="The jq-like index of the JSON key to add the resource at, separated by periods",
+    )
+    parser.add_argument(
+        "--create-list",
+        action="store_true",
+        help="Create a list of resources at the specified index, if necessary",
+    )
+    parser.add_argument(
+        "--encode-mime",
+        action="store_true",
+        help="Disable the default encapsulation of a resource within a MIME message",
     )
     return parser.parse_args()
 
 
 def main():
     args = argparser()
-    resource_path = args.resource
+    resource_path = args.path
 
-    if resource_path:
-        if not os.path.isfile(resource_path):
-            print(f"Error: Resource file '{resource_path}' does not exist.")
-            sys.exit(1)
+    rlist, _, _ = select.select([sys.stdin], [], [], 0)
+    if rlist:
+        request_data = sys.stdin.read()
     else:
-        resource_path = None
-
-    # Read the request from stdin or file
-    request_data = sys.stdin.read()
-
-    if not request_data:
         if args.request:
             with open(args.request, "r") as f:
                 request_data = f.read()
+        elif args.entity_name:
+            request_data = get_blank_entity_json(args.entity_name)
+        else:
+            print(
+                "Error: No request data provided via --entity-name, stdin or --request."
+            )
+            sys.exit(1)
 
     # Parse the request
     if request_data:
@@ -127,10 +188,20 @@ def main():
         print("Error: No request data provided via stdin or --request.")
         sys.exit(1)
 
+    if not os.path.isfile(resource_path):
+        print(f"Error: Resource file '{resource_path}' does not exist.")
+        sys.exit(1)
+
     resource = Resource.payload_from_path(
-        resource_path, args.resource_format, encapulate_mime=args.dont_encode_mime
+        resource_path,
+        args.format,
+        resource_role=args.role,
+        encapulate_mime=args.encode_mime,
     )
-    updated_request = set_value_at_json_index(request, args.json_index, resource.dict())
+
+    updated_request = set_value_at_json_index(
+        request, args.index, resource.dict(), create_list=args.create_list
+    )
     dumped_request = json.dumps(updated_request, indent=2)
 
     # Write the updated request to stdout or file
@@ -138,9 +209,8 @@ def main():
         with open(args.output, "w") as f:
             f.write(dumped_request)
     else:
-        # print(dumped_request, end="")
         sys.stdout.write(dumped_request)
-        # sys.stdout.flush()
+        sys.stdout.flush()
 
 
 if __name__ == "__main__":

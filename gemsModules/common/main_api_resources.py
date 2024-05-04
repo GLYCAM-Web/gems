@@ -36,8 +36,15 @@ class MimeEncodableResourceMixin:
             return data
 
     @classmethod
-    def payload_from_path(cls, resource_path, resource_format, encapulate_mime=False):
+    def payload_from_path(
+        cls,
+        resource_path,
+        resource_format,
+        resource_role="undefined",
+        encapulate_mime=False,
+    ):
         if encapulate_mime:
+            log.debug(f"Encapsulating MIME for {resource_path}")
             msg = EmailMessage()
             mime_type, _ = mimetypes.guess_type(resource_path)
             if mime_type is None:
@@ -55,12 +62,13 @@ class MimeEncodableResourceMixin:
             content = msg.as_string()
         else:
             with open(resource_path, "rb") as file:
-                content = file.read()
+                content = file.read().decode("utf-8")
 
         obj = cls(
             locationType="Payload",
             resourceFormat=resource_format,
             payload=content,
+            resourceRole=resource_role,
         )
         obj.options = {
             "is_mime_encoded": encapulate_mime,
