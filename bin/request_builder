@@ -2,8 +2,10 @@
 """
 This script is used to update a JSON request with a resource file at a specific index. 
 
+See ./bin/request_builder --help for usage information.
 
-Usage example:
+
+Usage examples:
 
 # Add two resources to a blank MDaaS RunMD request at specific locations. (N.B. MDaaS currently does not use resourceRoles.)
 $ cat gemsModules/mmservice/mdaas/tests/inputs/017_no_inputs.json |\
@@ -16,21 +18,28 @@ $ cat gemsModules/mmservice/mdaas/tests/inputs/017_no_inputs.json |\
     --format AMBER-7-restart \
     --index entity.services.run_md.inputs.input-coordinate-file |\
 ./bin/delegate
-# TODO: !! Glycomimetics will use Resources lists by default. We should generate the no inputs version from schema.
-# Append two resources to the Entity-level inputs Resources list for a blank Glycomimetics RunMD request.
+
+
+# Append two resources to the Entity-level inputs Resources list for a blank Glycomimetics  request. (N.B. )
 $ ./bin/request_builder \
     --entity-name Glycomimetics \
     --index entity.inputs \
     --create-list \
     --path /programs/gems/gemsModules/complex/glycomimetics/docs/reference/example_flu_3ubq_aldehyde_library/glycomimetics/3ubq_chainC_64_266.pdbqt \
-    --format chemical/pdbqt |\
+    --format chemical/pdbqt \
+    --role cocomplex-input |\
 ./bin/request_builder \
-    --path /programs/gems/gemsModules/complex/glycomimetics/docs/reference/example_flu_3ubq_aldehyde_library/glycomimetics/sample_input_file.json \
-    --index entity.inputs |\
-    --format application/json |\
+    --path /programs/gems/gemsModules/complex/glycomimetics/docs/reference/example_flu_3ubq_aldehyde_library/glycomimetics/sample_input_file.txt \
+    --index entity.inputs \
+    --format application/json \
+    --role moeity-metadata |\
+./bin/request_builder \
+    --path /programs/gems/gemsModules/complex/glycomimetics/docs/reference/example_flu_3ubq_aldehyde_library/glycomimetics/sample_input_file.txt \
+    --index entity.inputs \
+    --format application/json \
+    --role execution-parameters |\
 ./bin/delegate
 
-See ./bin/request_builder --help for usage information.
 """
 import argparse
 import json
@@ -151,7 +160,7 @@ def argparser():
         help="Create a list of resources at the specified index, if necessary",
     )
     parser.add_argument(
-        "--encode-mime",
+        "--dont-encode-mime",
         action="store_true",
         help="Disable the default encapsulation of a resource within a MIME message",
     )
@@ -162,20 +171,13 @@ def main():
     args = argparser()
     resource_path = args.path
 
-    rlist, _, _ = select.select([sys.stdin], [], [], 0)
-    if rlist:
-        request_data = sys.stdin.read()
+    if args.request:
+        with open(args.request, "r") as f:
+            request_data = f.read()
+    elif args.entity_name:
+        request_data = get_blank_entity_json(args.entity_name)
     else:
-        if args.request:
-            with open(args.request, "r") as f:
-                request_data = f.read()
-        elif args.entity_name:
-            request_data = get_blank_entity_json(args.entity_name)
-        else:
-            print(
-                "Error: No request data provided via --entity-name, stdin or --request."
-            )
-            sys.exit(1)
+        request_data = sys.stdin.read()
 
     # Parse the request
     if request_data:
@@ -196,7 +198,7 @@ def main():
         resource_path,
         args.format,
         resource_role=args.role,
-        encapulate_mime=args.encode_mime,
+        encapulate_mime=not args.dont_encode_mime,
     )
 
     updated_request = set_value_at_json_index(
