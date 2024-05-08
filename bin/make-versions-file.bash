@@ -57,4 +57,20 @@ if ! cd ${GEMSHOME} ; then
 fi
 cat External/MD_Utils/VERSIONS.sh >> VERSIONS.sh
 
-
+## Set and get the GM_Utils info
+if ! cd "${GEMSHOME}/External/GM_Utils" ; then
+	echo "Could not cd to GEMSHOME/External/GM_Utils directory"
+	echo "Cannot complete acquisition of versions info."
+	exit 1
+fi
+if ! ./scripts/make-versions-file.bash ; then
+	echo "Could not generate GM_Utils versions file"
+	echo "Cannot complete acquisition of versions info."
+	exit 1
+fi
+if ! cd ${GEMSHOME} ; then
+		echo "Could not cd to GMSHOME directory the fourth time"
+		echo "How did this even happen?"
+	exit 1
+fi
+cat External/GM_Utils/VERSIONS.sh >> VERSIONS.sh
