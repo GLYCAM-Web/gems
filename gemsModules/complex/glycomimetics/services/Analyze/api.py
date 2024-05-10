@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 from typing import List, Union
 
 from gemsModules.common.main_api_resources import Resource, Resources
@@ -56,7 +56,14 @@ class Analyze_Inputs(BaseModel):
         title="Project UUID",
         description="UUID of Project",
     )
-    
+
+    # The problem here is that we would need to change request to not initialize an empty inputs.
+    # @validator("pUUID", always=True)
+    def check_uuid(cls, v):
+        if not v:
+            raise ValueError("Project UUID must be provided")
+        return v
+
     resources: Analyze_Resources = Analyze_Resources()
 
 

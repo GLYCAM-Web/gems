@@ -230,7 +230,7 @@ class Resources(BaseModel):
         return len(self.__root__)
 
     def __iter__(self):
-        return iter(self.__root__)
+        return iter(self.__root__ or [])
 
     def __repr__(self):
         return f"{self.__root__}"

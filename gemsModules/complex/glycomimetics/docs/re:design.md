@@ -54,8 +54,8 @@ The glcomimetics tool performs the following tasks in the order they are mention
 ### Thoughts on converting these steps to services:
 
 - Prior to these steps:
-    - Evaluate should ensure that the Request is valid for the Entity/Service.
-    - Validate should ensure that the the PDBFiles are run through the PdbPreprocessor and the json options are contextually valid.
+    - Validate should ensure that the Request is valid for the Entity/Service.
+    - Evaluate should ensure that the the PDBFiles are run through the PdbPreprocessor and the JSON options are scientifically valid.
 
 [See workflow](workflow.md)
 
