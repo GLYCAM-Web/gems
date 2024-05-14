@@ -4,7 +4,7 @@ import json
 import magic
 
 # My module
-from mime_type import get_mime_type
+from file_type import get_file_type
 
 """ 
 This script requires that you have made a D-Mannose build, which has a sequence folder in the user data folder.
@@ -37,7 +37,7 @@ for seq in os.listdir("/home/sam/Desktop/GLYCAM_Dev_Env/V_2/Web_Data/userdata/se
                 props = os.stat(file)
 
                 # add file to a dictionary with file size and MIME
-                curr_dict[file] = [int(props.st_size/10), get_mime_type(file)]
+                curr_dict[file] = [int(props.st_size/10), get_file_type(file)]
 
         
 
