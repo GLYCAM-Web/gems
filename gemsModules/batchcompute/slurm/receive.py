@@ -23,6 +23,7 @@ from gemsModules.batchcompute.slurm.tasks.do_slurm_submission import (
 from gemsModules.batchcompute.slurm.tasks.prepare_slurm_submission import (
     seek_correct_host,
     create_contextual_slurm_submission_script,
+    localize_working_directory,
 )
 from gemsModules.systemoperations.instance_config import InstanceConfig
 
@@ -42,6 +43,8 @@ def receive(jsonObjectString):
     """batchcompute.slurm Entity reception module.
 
     This is more or less an intermediate on the way to a proper new-style entity.
+
+    It does not have a complete API.
     """
     log.info("batchcompute.slurm.receive() was called on %s", socket.gethostname())
     log.debug(
@@ -60,16 +63,16 @@ def receive(jsonObjectString):
         thisSlurmJobInfo.incoming_dict,
     )
 
-    # Only works in dev mode, not in production, because same md cluster path is used (and mounted to volumes in the same places).
-    # create_contextual_slurm_submission_script(thisSlurmJobInfo)
-
     # Check if this is the appropriate host to submit the SLURM job on.
     # Note: GEMS hosts cannot currently be daisy-chained.
     if is_GEMS_instance_for_SLURM_submission(
         requested_ctx=thisSlurmJobInfo.incoming_dict["context"]
     ):
-        # pdb.set_trace()
-        # Necessarily, we must wait until the correct instance:
+        log.debug("This is the correct host to submit to.")
+        log.debug("thisSlurmJobInfo: %s", thisSlurmJobInfo)
+
+        # Necessarily, we must wait until the correct instance to set the working directory.
+
         create_contextual_slurm_submission_script(thisSlurmJobInfo)
 
         response = slurm_submit(thisSlurmJobInfo)

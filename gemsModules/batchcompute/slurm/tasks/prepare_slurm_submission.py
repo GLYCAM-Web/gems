@@ -14,26 +14,43 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
-# TODO: This is deeply coupled with systemoperations.instance_config.InstanceConfig / instance_config.json
-def create_contextual_slurm_submission_script(thisSlurmJobInfo):
-    """Create a slurm submission script with context-specific sbatch arguments using the InstanceConfig."""
-    SlurmJobDict = thisSlurmJobInfo.incoming_dict
-
+def update_job_from_instance_config(SlurmJobDict):
+    """Update the SlurmJobDict with context-specific sbatch arguments from the InstanceConfig."""
     ic = InstanceConfig()
+
     ic_args = ic.get_keyed_arguments(
         "sbatch_arguments", context=SlurmJobDict["context"]
     )
 
     SlurmJobDict.update(ic_args)
 
-    SlurmJobDict["slurm_runscript_name"] = "slurm_submit.sh"
-    SlurmJobDict["workingDirectory"] = os.path.join(
-        ic.get_filesystem_path(
-            "MDaaS-RunMD"
-        ),  # "md_cluster_filesystem_path" TODO: Generalize this, originally this task was created for MDaaS submission only, but probably GM can make use of it.
-        SlurmJobDict["pUUID"],
+
+def localize_working_directory(thisSlurmJobInfo):
+    """Update the working directory in the SlurmJobInfo object with the context-specific filesystem path."""
+    thisSlurmJobInfo.incoming_dict["workingDirectory"] = os.path.join(
+        InstanceConfig().get_filesystem_path(thisSlurmJobInfo.incoming_dict["context"]),
+        thisSlurmJobInfo.incoming_dict["pUUID"],
     )
-    # instead of passing working directory, pass pUUID only and get base mdcluster path # also this will need to have specialized function for contexts in the future. (md cluster path is only for MDaaS-RunMD)
+
+    return thisSlurmJobInfo
+
+
+# TODO: This is deeply coupled with systemoperations.instance_config.InstanceConfig / instance_config.json
+def create_contextual_slurm_submission_script(thisSlurmJobInfo):
+    """Create a slurm submission script with context-specific sbatch arguments using the InstanceConfig."""
+
+    # TODO: Part of decoupling batchcompute and making it a separate Entity
+    # involves creating a proper transaction. we shoudn't just modify the incoming_dict.
+    SlurmJobDict = thisSlurmJobInfo.incoming_dict
+
+    update_job_from_instance_config(SlurmJobDict)
+    localize_working_directory(thisSlurmJobInfo)
+
+    # TODO: Depending on what entity is calling this, we may need to rename the submission script.
+    SlurmJobDict["slurm_runscript_name"] = "slurm_submit.sh"
+
+    # instead of passing working directory, pass pUUID only and get base mdcluster path
+    # # also this will need to have specialized function for contexts in the future. (md cluster path is only for MDaaS-RunMD)
     SlurmJobDict["slurm_runscript_name"] = os.path.join(
         SlurmJobDict["workingDirectory"],
         SlurmJobDict["slurm_runscript_name"],
@@ -87,8 +104,7 @@ def seek_correct_host(jsonObjectString, context):
             tried.append(h)
 
     if failed:
-        # maybe should be error?
-        log.warning(
+        log.error(
             "All attempts to make a SLURM submission over gRPC failed. servers tried: %s",
             tried,
         )
