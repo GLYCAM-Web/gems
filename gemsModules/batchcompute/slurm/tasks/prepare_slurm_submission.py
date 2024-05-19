@@ -2,11 +2,10 @@
 
 import os
 import socket
-from gemsModules.mmservice.mdaas.tasks import create_slurm_submission
-
-from gemsModules.networkconnections.grpc import slurm_grpc_submit, RpcError
 
 from gemsModules.systemoperations.instance_config import InstanceConfig
+
+from ..slurm_director_settings import Known_Slurm_Submission_Builders
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -64,7 +63,6 @@ def create_contextual_slurm_submission_script(thisSlurmJobInfo):
         + "\n"
     )
 
-    # In the future, We could possibly move this down to after we know if this is the correct host to submit on.
     log.debug("Slurm runscript path: " + SlurmJobDict["slurm_runscript_name"] + "\n")
     if os.path.exists(SlurmJobDict["slurm_runscript_name"]):
         log.debug("Found existing Slurm runscript.  Refusing to clobber.")
@@ -74,11 +72,19 @@ def create_contextual_slurm_submission_script(thisSlurmJobInfo):
         log.debug("About to create runscript on %s", socket.gethostname())
         log.debug("SlurmJobDict: " + str(SlurmJobDict))
 
-    create_slurm_submission.execute(SlurmJobDict)
+    # We generate the slurm submission script here, but each entity may have different requirements.
+    # We had to wait until batchcompute/slurm ensured we were on the appropriate host to perform this, which is why we now
+    # must use Entity-specific functions to generate the script from batch compute.
+    #
+    # This is currently parallel to the Delegator's redirector_settings.py
+    if SlurmJobDict["context"] in Known_Slurm_Submission_Builders:
+        Known_Slurm_Submission_Builders[SlurmJobDict["context"]](SlurmJobDict)
 
 
 def seek_correct_host(jsonObjectString, context):
     """Using gRPC, try to reroute the request to the correct host given a context, usually the current one."""
+    from gemsModules.networkconnections.grpc import slurm_grpc_submit, RpcError
+
     addresses = InstanceConfig().get_possible_hosts_for_context(
         context, with_slurmport=True
     )
