@@ -1,30 +1,11 @@
 #!/usr/bin/env python3
-import traceback
-import os, sys, subprocess, signal
+import traceback, os, subprocess
 
 
 from gemsModules.logging.logger import Set_Up_Logging
 
 
 log = Set_Up_Logging(__name__)
-
-
-# TODO: Task's "execute" ?
-def slurm_submit(thisSlurmJobInfo):
-    """Submit a job to SLURM."""
-    response = run_slurm_submission_script(thisSlurmJobInfo)
-    if response is None:
-        log.error("Got none response")
-        # TODO: return a proper error response.
-        return "{{'Error': Got none response}}"
-    else:
-        thisSlurmJobInfo.copyJobinfoInToOut()
-        thisSlurmJobInfo.addSbatchResponseToJobinfoOut(response)
-        log.debug("The outgoing dictionary is: \n")
-        log.debug(str(thisSlurmJobInfo.outgoing_dict))
-        log.debug("\n")
-
-        return thisSlurmJobInfo.outgoing_dict
 
 
 def run_slurm_submission_script(thisSlurmJobInfo):
@@ -73,3 +54,21 @@ def run_slurm_submission_script(thisSlurmJobInfo):
         log.error("Was unable to submit the job.")
         log.error(traceback.format_exc())
         return "Was unable to submit the job."
+
+
+# TODO: Task's "execute" ?
+def execute(thisSlurmJobInfo):
+    """Submit a job to SLURM."""
+    response = run_slurm_submission_script(thisSlurmJobInfo)
+    if response is None:
+        log.error("Got none response")
+        # TODO: return a proper error response.
+        return "{{'Error': Got none response}}"
+    else:
+        thisSlurmJobInfo.copyJobinfoInToOut()
+        thisSlurmJobInfo.addSbatchResponseToJobinfoOut(response)
+        log.debug("The outgoing dictionary is: \n")
+        log.debug(str(thisSlurmJobInfo.outgoing_dict))
+        log.debug("\n")
+
+        return thisSlurmJobInfo.outgoing_dict

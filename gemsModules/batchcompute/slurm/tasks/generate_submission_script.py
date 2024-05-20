@@ -35,7 +35,7 @@ def localize_working_directory(thisSlurmJobInfo):
 
 
 # TODO: This is deeply coupled with systemoperations.instance_config.InstanceConfig / instance_config.json
-def create_contextual_slurm_submission_script(thisSlurmJobInfo):
+def execute(thisSlurmJobInfo):
     """Create a slurm submission script with context-specific sbatch arguments using the InstanceConfig."""
 
     # TODO: Part of decoupling batchcompute and making it a separate Entity
@@ -79,40 +79,3 @@ def create_contextual_slurm_submission_script(thisSlurmJobInfo):
     # This is currently parallel to the Delegator's redirector_settings.py
     if SlurmJobDict["context"] in Known_Slurm_Submission_Builders:
         Known_Slurm_Submission_Builders[SlurmJobDict["context"]](SlurmJobDict)
-
-
-def seek_correct_host(jsonObjectString, context):
-    """Using gRPC, try to reroute the request to the correct host given a context, usually the current one."""
-    from gemsModules.networkconnections.grpc import slurm_grpc_submit, RpcError
-
-    addresses = InstanceConfig().get_possible_hosts_for_context(
-        context, with_slurmport=True
-    )
-
-    failed = False
-    tried = []
-    response = None
-    while len(addresses):
-        h, p = addresses.pop().split(":")
-        try:
-            response = slurm_grpc_submit(jsonObjectString, host=h, port=p)
-            failed = False
-            break
-        except RpcError:
-            failed = True
-            log.warning(
-                "Failed to submit to %s:%s. Trying next host in list.",
-                h,
-                p,
-                exc_info=True,
-            )
-        finally:
-            tried.append(h)
-
-    if failed:
-        log.error(
-            "All attempts to make a SLURM submission over gRPC failed. servers tried: %s",
-            tried,
-        )
-
-    return response

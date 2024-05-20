@@ -1,38 +1,23 @@
 #!/usr/bin/env python3
-import pdb
-import sys, os, socket
-import traceback
-import grpc
-from datetime import datetime
+import socket
 from multiprocessing import Process
 
-import gemsModules.deprecated
-import gemsModules.deprecated.batchcompute.settings as batchcomputeSettings
-
-from gemsModules.deprecated import common
 from gemsModules.deprecated.common.services import *
 from gemsModules.deprecated.common.transaction import *  # might need whole file...
 from gemsModules.deprecated.batchcompute.slurm.dataio import *
+
+# TODO: Real batchcompute module
 from gemsModules.deprecated.batchcompute.slurm.receive import manageIncomingString
-
-
-# TODO: Make proper tasks
-from gemsModules.batchcompute.slurm.tasks.do_slurm_submission import (
-    slurm_submit,
-)
-from gemsModules.batchcompute.slurm.tasks.prepare_slurm_submission import (
-    seek_correct_host,
-    create_contextual_slurm_submission_script,
-    localize_working_directory,
-)
-from gemsModules.systemoperations.instance_config import InstanceConfig
 
 from gemsModules.networkconnections.grpc import (
     is_GEMS_instance_for_SLURM_submission,
 )
 
-from gemsModules.systemoperations.instance_config import InstanceConfig
-from gemsModules.systemoperations.environment_ops import is_GEMS_test_workflow
+from .tasks.run_submission import execute as run_submission
+from .tasks.generate_submission_script import execute as generate_submission_script
+from .tasks.seek_correct_host import execute as seek_correct_host
+
+
 from gemsModules.logging.logger import new_concurrent_logger
 
 
@@ -71,11 +56,9 @@ def receive(jsonObjectString):
         log.debug("This is the correct host to submit to.")
         log.debug("thisSlurmJobInfo: %s", thisSlurmJobInfo)
 
-        # Necessarily, we must wait until the correct instance to set the working directory.
+        generate_submission_script(thisSlurmJobInfo)
 
-        create_contextual_slurm_submission_script(thisSlurmJobInfo)
-
-        response = slurm_submit(thisSlurmJobInfo)
+        response = run_submission(thisSlurmJobInfo)
     else:
         log.debug("This is not the correct host to submit to.")
         # Otherwise, we need to seek the correct host to submit to.
