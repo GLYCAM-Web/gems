@@ -4,7 +4,7 @@ import json
 import magic
 
 # My module
-from file_type import get_file_type
+from magic_file_type import get_file_type
 
 """ 
 This script requires that you have made a D-Mannose build, which has a sequence folder in the user data folder.
