@@ -8,6 +8,7 @@ from gemsModules.complex.glycomimetics.main_api import (
     Glycomimetics_Service_Request,
     Glycomimetics_Service_Response,
 )
+from gemsModules.complex.glycomimetics.services.common_api import PDB_File_Resource
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -47,7 +48,7 @@ class Validate_output_Resource(Resource):
 
 
 class Validate_Resources(Resources):
-    __root__: List[Union[Validate_input_Resource, Validate_output_Resource]] = None
+    __root__: List[Union[PDB_File_Resource, Validate_input_Resource, Validate_output_Resource]] = None
 
 
 class Validate_Inputs(BaseModel):

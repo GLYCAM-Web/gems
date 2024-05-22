@@ -3,10 +3,16 @@ from pydantic import BaseModel, Field
 from typing import List, Union
 
 from gemsModules.common.main_api_resources import Resource, Resources
+from gemsModules.common.code_utils import GemsStrEnum
 
 from gemsModules.complex.glycomimetics.main_api import (
     Glycomimetics_Service_Request,
     Glycomimetics_Service_Response,
+)
+from gemsModules.complex.glycomimetics.services.common_api import (
+        PDB_File_Resource, 
+        Moiety_Library_Names,
+        Position_Modification_Options,
 )
 
 from gemsModules.logging.logger import Set_Up_Logging
@@ -46,8 +52,18 @@ class Evaluate_output_Resource(Resource):
     pass
 
 
-class Evaluate_Resources(Resources):
-    __root__: List[Union[Evaluate_input_Resource, Evaluate_output_Resource]] = None
+class Evaluate_Input_Resources(Resources):
+    __root__: List[Union[
+        PDB_File_Resource,
+        Evaluate_input_Resource, 
+        Evaluate_output_Resource
+        ]] = None
+
+class Evaluate_Output_Resources(Resources):
+    __root__: List[Union[
+        Evaluate_input_Resource, 
+        Evaluate_output_Resource
+        ]] = None
 
 
 class Evaluate_Inputs(BaseModel):
@@ -57,16 +73,23 @@ class Evaluate_Inputs(BaseModel):
         description="UUID of Project",
     )
     
-    resources: Evaluate_Resources = Evaluate_Resources()
+    resources: Evaluate_Input_Resources = Evaluate_Resources()
 
 
 class Evaluate_Outputs(BaseModel):
+    Available_Libraries : List[str] = Moiety_Library_Names.get_json_list()  # might need syntax adjustment
+    Available_Modification_Options : Position_Modification_Options = None
     outputDirPath: str = Field(
         None,
         title="Output Directory Path",
         description="Path to output directory",
     )
-    resources: Evaluate_Resources = Evaluate_Resources()
+    pUUID: str = Field(
+        None,
+        title="Project UUID",
+        description="UUID of Project",
+    )
+    resources: Evaluate_Output_Resources = Evaluate_Resources()
 
 
 class Evaluate_Request(Glycomimetics_Service_Request):

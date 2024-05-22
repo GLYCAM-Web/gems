@@ -4,9 +4,17 @@ from typing import List, Union
 
 from gemsModules.common.main_api_resources import Resource, Resources
 
+from gemsModules.common.code_utils import GemsStrEnum
+
 from gemsModules.complex.glycomimetics.main_api import (
     Glycomimetics_Service_Request,
     Glycomimetics_Service_Response,
+)
+
+from gemsModules.complex.glycomimetics.services.common_api import (
+        PDB_File_Resource, 
+        Moiety_Library_Names,
+        Position_Modification_Options,
 )
 
 from gemsModules.logging.logger import Set_Up_Logging
@@ -46,7 +54,12 @@ class Build_output_Resource(Resource):
     pass
 
 
-class Build_Resources(Resources):
+class Build_Input_Resources(Resources):
+    __root__: List[Union[
+        PDB_File_Resource,
+        Build_input_Resource, Build_output_Resource]] = None
+
+class Build_Output_Resources(Resources):
     __root__: List[Union[Build_input_Resource, Build_output_Resource]] = None
 
 
@@ -79,20 +92,29 @@ class Build_Options(BaseModel):
 
 
 class Build_Inputs(BaseModel):
-    coComplex: str = Field(
+    Available_Libraries : List[str] = Moiety_Library_Names.get_json_list()  # might need syntax adjustment
+    Selected_Modification_Options : Position_Modification_Options = None
+    pUUID: str = Field(
         None,
-        title="Complex",
-        description="Complex to build",
+        title="Project UUID",
+        description="UUID of Project",
     )
-    moietyMetadata: str = Field(
-        None,
-        title="Moiety Metadata PDBQT",
-        description="Metadata for moiety",
-    )
+    complex_PDB_Filename : str = None  
+    # Until we have the workflow down, the correct location for these is unclear.  
+    # For the moment, I'm assuming that they get made during the Evaluate step.
+    receptor_PDB_Filename : str = None
+    ligand_PDB_Filename : str = None
+
+#    coComplex: str = Field(
+#        None,
+#        title="Complex",
+#        description="Complex to build",
+#    )
     buildOptions: Build_Options = Build_Options()
     resources: Build_Resources = Build_Resources()
 
 
+# it will be hard to specify this before the workflow is well specified
 class Build_Outputs(BaseModel):
     pUUID: str = Field(
         None,
