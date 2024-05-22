@@ -32,4 +32,6 @@ def execute(pUUID: str, outputDirPath: str, control_script: str = "Run_Protocol.
         pUUID=pUUID, outputDirPath=outputDirPath, control_script=control_script
     )
     log.debug("The amber submission from mdaas is:\n%s", the_input)
+
+    # TODO: Delegate this instead of directly calling manageIncomingString.
     manageIncomingString(the_input)
