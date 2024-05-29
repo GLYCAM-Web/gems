@@ -7,7 +7,7 @@ from gemsModules.common.services.status.manage_multiples import status_Multiples
 from gemsModules.complex.glycomimetics.services.list_services.manage_multiples import (
     list_services_Multiples_Manager,
 )
-from gemsModules.complex.glycomimetics.services.Build.manage_multiples import (
+from gemsModules.complex.glycomimetics.services.Build_Selected_Positions.manage_multiples import (
     Build_Multiples_Manager,
 )
 
@@ -20,5 +20,5 @@ duplicates_modules: Dict[str, Callable] = {
     "ListServices": list_services_Multiples_Manager,
     "Marco": marco_Multiples_Manager,
     "Status": status_Multiples_Manager,
-    "Build": Build_Multiples_Manager,
+    "Build_Selected_Positions": Build_Multiples_Manager,
 }

@@ -73,7 +73,7 @@ class Evaluate_Inputs(BaseModel):
         description="UUID of Project",
     )
     
-    resources: Evaluate_Input_Resources = Evaluate_Resources()
+    resources: Evaluate_Input_Resources = Evaluate_Input_Resources()
 
 
 class Evaluate_Outputs(BaseModel):
@@ -89,7 +89,7 @@ class Evaluate_Outputs(BaseModel):
         title="Project UUID",
         description="UUID of Project",
     )
-    resources: Evaluate_Output_Resources = Evaluate_Resources()
+    resources: Evaluate_Output_Resources = Evaluate_Output_Resources()
 
 
 class Evaluate_Request(Glycomimetics_Service_Request):

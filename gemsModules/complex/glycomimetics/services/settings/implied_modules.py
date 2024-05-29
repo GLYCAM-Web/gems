@@ -13,7 +13,7 @@ from gemsModules.common.services.status.implied_translator import (
 from gemsModules.complex.glycomimetics.services.list_services.implied_translator import (
     list_services_Implied_Translator,
 )
-from gemsModules.complex.glycomimetics.services.Build.implied_translator import (
+from gemsModules.complex.glycomimetics.services.Build_Selected_Positions.implied_translator import (
     Build_Implied_Translator,
 )
 from gemsModules.complex.glycomimetics.services.ProjectManagement.implied_translator import (
@@ -44,6 +44,6 @@ implied_modules: Dict[str, Callable] = {
     "Evaluate": Evaluate_Implied_Translator,
     "Validate": Validate_Implied_Translator,
     "ProjectManagement": ProjectManagement_Implied_Translator,  # The PM service is mostly implied by the other services.
-    "Build": Build_Implied_Translator,
+    "Build_Selected_Positions": Build_Implied_Translator,
     "Analyze": Analyze_Implied_Translator,
 }

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # import from typing first, in case you want to import pydantic.typing
 from pathlib import Path
-from typing_extensions import Literal, Optional
+from typing import Literal, Optional
 from pydantic import BaseModel, Field
 
 from gemsModules.logging.logger import Set_Up_Logging

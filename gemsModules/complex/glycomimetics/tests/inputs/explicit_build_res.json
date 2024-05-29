@@ -3,7 +3,7 @@
       "type": "Glycomimetics",
       "services": {
         "step_one_glyco_in_silico": {
-          "type": "Build",
+          "type": "Build_Selected_Positions",
           "inputs": [
             {
               "locationType": "filesystem-path-unix",

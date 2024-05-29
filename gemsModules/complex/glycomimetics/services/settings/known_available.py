@@ -15,7 +15,7 @@ class Module_Available_Services(GemsStrEnum):
     Validate = "Validate"
     Evaluate = "Evaluate"
     ProjectManagement = "ProjectManagement"
-    Build = "Build"
+    Build = "Build_Selected_Positions"
     Analyze = "Analyze"
 
 

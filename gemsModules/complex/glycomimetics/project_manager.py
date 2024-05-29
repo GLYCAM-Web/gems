@@ -54,7 +54,7 @@ class Glycomimetics_Project_Manager(Project_Manager):
         log.debug("fill_response_project_from_response_entity %s", self.incoming_entity)
         for service in self.incoming_entity.services.__root__.values():
             log.debug("fill_response_project_from_response_entity %s", service)
-            if service.typename == "Build":
+            if service.typename == "Build_Selected_Positions":
                 ...
                 # # THe problem with setting the files here is that then they have their full paths,
                 # # and we still need the full paths for the RDF...

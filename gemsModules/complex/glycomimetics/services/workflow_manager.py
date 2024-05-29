@@ -4,7 +4,7 @@ from gemsModules.common.services.workflow_manager import Workflow_Manager
 from gemsModules.common.code_utils import Annotated_List, resolve_dependency_list
 from gemsModules.logging.logger import Set_Up_Logging
 
-from .Build.api import Build_Request
+from .Build_Selected_Positions.api import Build_Request
 from .ProjectManagement.api import ProjectManagement_Request
 from .Evaluate.api import Evaluate_Request
 from .Validate.api import Validate_Request
@@ -19,9 +19,9 @@ log = Set_Up_Logging(__name__)
 # TODO: To services.settings... ?
 # Service_Dependencies = {
 #     "Analyze": Annotated_List(
-#         ["Evaluate", "Validate", "ProjectManagement", "Build"], ordered=True
+#         ["Evaluate", "Validate", "ProjectManagement", "Build_Selected_Positions"], ordered=True
 #     ),
-#     "Build": Annotated_List(
+#     "Build_Selected_Positions": Annotated_List(
 #         ["Evaluate", "Validate", "ProjectManagement"], ordered=True
 #     ),
 #     "ProjectManagement": Annotated_List(["Evaluate", "Validate"], ordered=True),
@@ -37,11 +37,13 @@ PROJECTMANAGEMENT_DEPENDENCIES = Annotated_List(
 BUILD_DEPENDENCIES = Annotated_List(
     PROJECTMANAGEMENT_DEPENDENCIES + ["ProjectManagement"], ordered=True
 )
-ANALYZE_DEPENDENCIES = Annotated_List(BUILD_DEPENDENCIES + ["Build"], ordered=True)
+ANALYZE_DEPENDENCIES = Annotated_List(
+    BUILD_DEPENDENCIES + ["Build_Selected_Positions"], ordered=True
+)
 
 Service_Dependencies = {
     "Analyze": ANALYZE_DEPENDENCIES,
-    "Build": BUILD_DEPENDENCIES,
+    "Build_Selected_Positions": BUILD_DEPENDENCIES,
     "ProjectManagement": PROJECTMANAGEMENT_DEPENDENCIES,
     "Evaluate": EVALUATE_DEPENDENCIES,
     "Validate": VALIDATE_DEPENDENCIES,
@@ -51,7 +53,13 @@ Service_Dependencies = {
 # TODO: work_flows style or workflow_manager style?
 class Glycomimetics_Workflow_Manager(Workflow_Manager):
     def get_linear_workflow_list(self) -> list[str]:
-        return ["Evaluate", "Validate", "ProjectManagement", "Build", "Analyze"]
+        return [
+            "Evaluate",
+            "Validate",
+            "ProjectManagement",
+            "Build_Selected_Positions",
+            "Analyze",
+        ]
 
     def process(self, aaop_list):
         """This function takes a list of AAOPs and returns a list of AAOPs in the order they should be executed."""
