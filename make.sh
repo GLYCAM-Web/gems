@@ -252,7 +252,7 @@ gemshome=`pwd`
 check_gemshome $gemshome
 check_gmmldir $GEMSHOME/gmml
 check_pull_repo "MD_Utils" "https://github.com/GLYCAM-Web/MD_Utils.git" "$GEMSHOME/External" "stable" "md-test" 
-check_pull_repo "GM_Utils" "https://github.com/GLYCAM-Web/GM_Utils.git" "$GEMSHOME/External" "actual" "test"
+check_pull_repo "GM_Utils" "https://github.com/GLYCAM-Web/GM_Utils.git" "$GEMSHOME/External" "gm-actual" "gm-test"
 get_numprocs
 
 ################################################################
