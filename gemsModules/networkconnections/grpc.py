@@ -1,22 +1,14 @@
 #!/usr/bin/env python3
-import json
 import sys
 import socket
-from typing_extensions import Literal
 import grpc
 
-from pydantic import BaseModel, Field
-from pydantic.schema import schema
-from pydantic import BaseModel, Field
-
-from gemsModules.deprecated.common import transaction
 from gemsModules.deprecated.common.loggingConfig import *
-
 from gemsModules.deprecated.batchcompute.slurm.dataio import *
-
 from gemsModules.systemoperations.instance_config import InstanceConfig
 
 from gemsModules.logging.logger import Set_Up_Logging
+
 
 log = Set_Up_Logging(__name__)
 

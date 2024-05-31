@@ -1,5 +1,5 @@
 {
-  "date": "2024-04-26T20:42:11.000",
+  "date": "2024-05-29T04:52:11.000",
   "hosts": {
     "grpc-default": {
       "contexts": [
@@ -34,5 +34,9 @@
     "Default": {
       "numProcs": "4"
     }
+  },
+  "filesystem_paths": {
+    "MDaaS-RunMD": "/website/userdata/mmservice/md",
+    "Glycomimetics": "/website/userdata/complex/gm"
   }
 }
