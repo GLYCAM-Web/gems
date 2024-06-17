@@ -1,0 +1,10 @@
+{
+  "typename": "Evaluate",
+  "givenName": null,
+  "myUuid": null,
+  "inputs": {
+    "pUUID": null,
+    "resources": null
+  },
+  "options": null
+}

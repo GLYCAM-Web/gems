@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, root_validator
 from typing import List, Union
 
 from gemsModules.common.main_api_resources import Resource, Resources
@@ -21,34 +21,10 @@ log = Set_Up_Logging(__name__)
 
 
 class Evaluate_input_Resource(Resource):
-    """Need to write validators."""
-
-    ## Works now:
-    ##
-    ## locationType = filepath
-    ##
-    ## resourceFormat = amber_parm7 | amber_rst7 | md_path | max_hours
-    ##
-    ## payload = string containing a /path/to/file  |  integer (number of hours)
-    ##
-    ## options = none currently read
-    ##
     pass
 
 
 class Evaluate_output_Resource(Resource):
-    """Need to write validators."""
-
-    ## Works now:
-    ##
-    ## locationType = filepath
-    ##
-    ## resourceFormat = amber_parm7 | amber_rst7 | amber_nc | amber_mdcrd | amber_mdout | zipfile
-    ##
-    ## payload = string containing a /path/to/file
-    ##
-    ## notices = these will surely happen
-    ##
     pass
 
 
@@ -58,6 +34,15 @@ class Evaluate_Input_Resources(Resources):
         Evaluate_input_Resource, 
         Evaluate_output_Resource
         ]] = None
+
+    # We could validate at Evaluate_Inputs instead, allowing this to be an empty list, but not allowing an empty list to be instantiated there.
+    # @root_validator(pre=True)
+    def check_pdb_file_resource(cls, values):
+        resources = values.get('__root__', [])
+        if not any(isinstance(resource, PDB_File_Resource) for resource in resources):
+            raise ValueError('At least one PDB_File_Resource is required in Evaluate_Input_Resources.')
+        return values
+
 
 class Evaluate_Output_Resources(Resources):
     __root__: List[Union[
@@ -73,7 +58,7 @@ class Evaluate_Inputs(BaseModel):
         description="UUID of Project",
     )
     
-    resources: Evaluate_Input_Resources = Evaluate_Input_Resources()
+    resources: Evaluate_Input_Resources = Evaluate_Input_Resources() # Evaluate's real request always needs an input PDB, should we be able to instantiate it blank?
 
 
 class Evaluate_Outputs(BaseModel):
@@ -94,10 +79,16 @@ class Evaluate_Outputs(BaseModel):
 
 class Evaluate_Request(Glycomimetics_Service_Request):
     typename: str = Field("Evaluate", alias="type")
-    # the following must be redefined in a child class
     inputs: Evaluate_Inputs = Evaluate_Inputs()
 
 
 class Evaluate_Response(Glycomimetics_Service_Response):
     typename: str = Field("Evaluate", alias="type")
     outputs: Evaluate_Outputs = Evaluate_Outputs()
+
+
+if __name__ == "__main__":
+    # generate a blank request
+    thisRequest = Evaluate_Request()
+    with open("Blank_Evaluate_Request.json", "w") as f:
+        f.write(thisRequest.json(indent=2))

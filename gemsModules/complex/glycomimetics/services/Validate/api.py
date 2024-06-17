@@ -106,3 +106,4 @@ class Validate_Request(Glycomimetics_Service_Request):
 class Validate_Response(Glycomimetics_Service_Response):
     typename: str = Field("Validate", alias="type")
     outputs: Validate_Outputs = Validate_Outputs()
+

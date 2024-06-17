@@ -73,3 +73,13 @@ class Position_Modification_Options(BaseModel):
 # 		- Build Position
 # 			- If not included, all available libraries will be used.
 # 			- If included, only the specified libraries will be used
+
+if __name__ == "__main__":
+    with open("PDBFile_Resource_Example.json", "w") as f:
+        pdb_file_resource = PDB_File_Resource(
+            locationType="Path",
+            resourceFormat="PDB-strict",
+            resourceRole="Complex_Input",
+            payload="path/to/file.pdb",
+        )
+        f.write(pdb_file_resource.json(indent=2))

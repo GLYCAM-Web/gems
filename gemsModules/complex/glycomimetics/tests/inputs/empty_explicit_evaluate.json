@@ -1,0 +1,13 @@
+{
+    "entity": {
+      "type": "Glycomimetics",
+      "services": {
+        "empty_evaluate": {
+          "type": "Evaluate",
+          "inputs": [
+          ]
+        }
+      }
+      
+    }
+  }

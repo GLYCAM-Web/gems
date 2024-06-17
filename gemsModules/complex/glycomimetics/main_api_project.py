@@ -17,13 +17,13 @@ class GlycomimeticsProject(Project):
 
     title: str = "Initial Glycomimetics Project"
     parent_entity: str = "complex"
-    app: str = "glycomimetics"
+    app: str = "gm"
     requested_service: str = ""
+    project_type: pyLiteral["gm"] = Field("gm", title="Type", alias="type")
     entity_id: str = "complex/glycomimetics"
+    service_id: constr(max_length=25) = ""  # what should this be?
+    gm_utils_version: str = ""
     requesting_agent: str = "tester"
-    u_uuid: constr(max_length=36) = " "
-
-    # TODO: Update from mdaas inputs
     input_type: constr(max_length=25) = (
         "AutoDock extended PDB (chemical/pdbqt) & application/json"
     )
