@@ -2,10 +2,10 @@
 import argparse, os, sys, json, re
 import socket
 
-GemsPath = os.environ.get("GEMSHOME")
-sys.path.append(GemsPath)
+GEMSHOME = os.environ.get("GEMSHOME")
+sys.path.append(GEMSHOME)
 sys.path.append(
-    GemsPath + "/gemsModules"
+    GEMSHOME + "/gemsModules"
 )  # Swarm needs /gemsModules. These sys path hacks would be simplified if we used pip to install gems.
 from gemsModules.systemoperations.instance_config import InstanceConfig
 
@@ -24,46 +24,88 @@ def argparser():
     """
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--add-host",
+        "--config",
         type=str,
-        nargs=3,
-        help="Add a host to the instance_config.json. Format: 'hostname,contexts,host:port'",
+        help="Path to the JSON pre-configuration file.",
     )
-
     parser.add_argument(
-        "--set-sbatch-arguments",
-        type=str,
-        nargs=3,
-        help="Set the sbatch_arguments for a host in the instance_config.json. Format: 'hostname,context,sbatch_arguments'",
-    )
-
-    parser.add_argument(
-        "--set-local-parameters",
-        type=str,
-        nargs=3,
-        help="Set the local_parameters for a host in the instance_config.json. Format: 'hostname,context,local_parameters'",
-    )
-
-    parser.add_argument(
-        "--gen-remote-cluster-config",
-        type=str,
-        help="Generate a partial remote MD cluster config file for the MD cluster host with the given filesystem path.",
-    )
-
-    parser.add_argument(
-        "--set-cluster-filesystem-path",
-        type=str,
-        nargs=2,
-        help="Sets a particular cluster_filesystem_path for a cluster host. Ex. MDaaS or Glycomimetics",
-    )
-
-    parser.add_argument(
-        "--dry-run",
+        "--generate-preconfig",
         action="store_true",
-        help="Print out what would be done without actually doing it.",
+        help="Generate a pre-configuration file for GEMS.",
     )
 
     return parser
+
+
+def generate_preconfig():
+    config = {
+        "hosts": [],
+        "filesystem_paths": {},
+    }
+
+    for prefix in ["MD", "GM"]:
+        grpc_hostname = os.getenv(f"{prefix}_GRPC_HOSTNAME")
+        grpc_host = os.getenv(f"{prefix}_GRPC_HOST")
+        grpc_port = os.getenv(f"{prefix}_GRPC_PORT")
+        sbatch_args = json.loads(os.getenv(f"{prefix}_SBATCH_ARGS"))
+        local_parameters = json.loads(os.getenv(f"{prefix}_LOCAL_PARAMETERS"))
+        cluster_filesystem_path = os.getenv(f"{prefix}_CLUSTER_FILESYSTEM_PATH")
+
+        if prefix == "MD":
+            context = "MDaaS-RunMD"
+        elif prefix == "GM":
+            context = "Glycomimetics"
+
+        host_config = {
+            "hostname": grpc_hostname,
+            "contexts": [context],
+            "host": f"{grpc_host}:{grpc_port}",
+            "sbatch_arguments": {context: sbatch_args},
+            "local_parameters": {context: local_parameters},
+        }
+
+        config["hosts"].append(host_config)
+        config["filesystem_paths"][context] = cluster_filesystem_path
+
+        # Generate host-specific JSON configuration file
+        with open(f"{GEMSHOME}/REMOTE_{prefix}_preconfig-git-ignore-me.json", "w") as f:
+            json.dump(
+                {
+                    "hosts": [host_config],
+                    "filesystem_paths": {context: cluster_filesystem_path},
+                },
+                f,
+                indent=2,
+            )
+
+    # with open(f"{GEMSHOME}/preconfig-git-ignore-me.json", "w") as f:
+    #     json.dump(config, f, indent=2)
+
+
+def process_preconfig(ic, config):
+    for host_config in config.get("hosts", []):
+        hostname = host_config["hostname"]
+        contexts = host_config["contexts"]
+        host, port = host_config["host"].split(":")
+        print(
+            f"Adding host: {hostname} with contexts: {contexts} and host: {host}:{port}"
+        )
+        ic.add_host(hostname, host, port, contexts)
+
+        for context, sbatch_args in host_config.get("sbatch_arguments", {}).items():
+            ic.add_keyed_arguments_to_host(
+                "sbatch_arguments", hostname, context, sbatch_args
+            )
+
+        for context, local_params in host_config.get("local_parameters", {}).items():
+            ic.add_keyed_arguments_to_host(
+                "local_parameters", hostname, context, local_params
+            )
+
+    for context, path in config.get("filesystem_paths", {}).items():
+        ic.set_filesystem_path(context, path)
+
+    ic.save()
 
 
 def main():
@@ -81,97 +123,14 @@ def main():
         print("\nThis GEMS instance is already configured. Exiting.")
         return
 
-    SAVE = False
+    if args.generate_preconfig:
+        generate_preconfig()
 
-    if args.add_host is not None:
-        hostname, contexts, hostport = args.add_host
-        host, port = hostport.split(":")
-        contexts = contexts.strip("[]").split(",")
-        print(
-            f"Adding host: {hostname} with contexts: {contexts} and host: {host}:{port}"
-        )
-        ic.add_host(hostname, host, port, contexts)
-        SAVE = True
+    if args.config:
+        with open(args.config) as f:
+            config = json.load(f)
 
-    if args.set_sbatch_arguments is not None:
-        sbatch_hostname, sbatch_context, sbatch_arguments = args.set_sbatch_arguments
-
-        if ip_regex.match(sbatch_hostname):
-            print(f"Instance hostname is an IP: {sbatch_hostname}")
-            try:
-                sbatch_hostname = socket.gethostbyaddr(sbatch_hostname)[0]
-            except socket.herror:
-                raise ValueError(
-                    f"Unable to resolve the GEMS host IP: {sbatch_hostname}"
-                )
-
-        sbatch_arguments = json.loads(sbatch_arguments)
-        ic.add_keyed_arguments_to_host(
-            "sbatch_arguments", sbatch_hostname, sbatch_context, sbatch_arguments
-        )
-        SAVE = True
-
-    if args.set_local_parameters is not None:
-        local_parameters_hostname, local_parameters_context, local_parameters = (
-            args.set_local_parameters
-        )
-        local_parameters = json.loads(local_parameters)
-        ic.add_keyed_arguments_to_host(
-            "local_parameters",
-            local_parameters_hostname,
-            local_parameters_context,
-            local_parameters,
-        )
-        SAVE = True
-
-    if args.set_cluster_filesystem_path is not None:
-        app, path = args.set_cluster_filesystem_path
-        ic.set_filesystem_path(app, path)
-        SAVE = True
-
-    if args.gen_remote_cluster_config is not None:
-        if args.add_host is None:
-            raise RuntimeError(
-                "Cannot generate a remote MD cluster config without adding a host first, please try again."
-            )
-        print(args.gen_remote_cluster_config)
-        app = args.gen_remote_cluster_config
-        generating_cmd = (
-            f"python3 $GEMSHOME/bin/setup-instance.py \\\n"
-            f"--add-host '{hostname}' '[{app}]' '{host}' '{port}' \\\n"
-            f"--set-sbatch-arguments '{hostname}' '{app}' '{json.dumps(ic['hosts'][hostname]['sbatch_arguments'][app])}' \\\n"
-            f"--set-local-parameters '{hostname}' '{app}' '{json.dumps(ic['hosts'][hostname]['local_parameters'][app])}' \\\n"
-            f"--set-cluster-filesystem-path {app} {ic['filesystem_paths'][app]}"
-        )
-
-        if not args.dry_run:
-            print(
-                "Please use the following command on the MD Cluster host if you have not already synchronized your instances:\n\n"
-                f"{generating_cmd}\n\n(Ignore this message if you are in a DevEnv, it has been done for you.)\n"
-            )
-
-            with open(
-                os.path.join(
-                    GemsPath,
-                    f"REMOTE_{app}_CLUSTER_HOST_SETUP-git-ignore-me.sh",
-                ),
-                "w",
-            ) as f:
-                # write bash header - removing it just makes copy-pasting easier and we haven't chmodded it yet anyways.
-                # f.write("#!/bin/bash\n\n")
-                f.write(f"{generating_cmd}\n")
-                print(
-                    f"Wrote out $GEMSHOME/REMOTE_{app}_CLUSTER_HOST_SETUP-git-ignore-me.sh"
-                )
-        else:
-            print(
-                "Dry run: Did not write out $GEMSHOME/REMOTE_{app}_CLUSTER_HOST_SETUP-git-ignore-me.sh\nWould have written:\n"
-                f"{generating_cmd}"
-            )
-        SAVE = True
-
-    if SAVE:
-        ic.save()
+        process_preconfig(ic, config)
 
     return ic
 

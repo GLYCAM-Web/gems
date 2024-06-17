@@ -1,19 +1,41 @@
 # About
 
-the instance_config.json is currently used to configure the hosts that GEMs can connect to with SLURM.
+The Instance Configuration is used to configure the hosts that GEMs can connect to over gRPC with SLURM.
 
-## code usage
-Please see `gemsModules/systemoperations/instance_config` for a Python InstanceConfig class which provides helpers for reading the instance_config.json file.
+A GEMS instance can discern whether it can serve a request based on the contexts and hosts in the instance_config.json file. If it is not the correct context, the request can be forwarded over gRPC to the appropriate GEMS host configured in this instance's configuration file.
 
-Curently, the only request routed using this feature is "RunMD" which is used to batch MD simulations through SLURM to amber MD nodes.
+## Generating an instance_config.json file
+
+See [setup_instance.md](setup_instance.md) for more information on setting up your instance_config.json file.
+
+### DevEnv
+
+GRPC/bin/initialize.sh initializes the GEMS instance configuration. This script is run when the DevEnv is started. It can be run manually from the GRPC folder.
+
+### Manually
+
+The Development environment configures a number
+
+Also see [using_remote_hosts.md](using_remote_hosts.md) for more information on synchronizing remote host configurations.
+
+## coder details
+
+Please see `$GEMSHOME/gemsModules/systemoperations/instance_config` for the InstanceConfig Python class which provides helpers for reading and updating the instance_config.json file.
+
+Curently, the only Services which use this feature are:
+- "RunMD" GEMS requests, which are executed under MDaaS-RunMD contexts. 
+- "Glycomimetics" GEMS requests, which are executed under Glycomimetics contexts. 
+
+Both of these services utilize SLURM to batch Amber MD jobs. As an external GEMS request is generally received by the grpc-delegator, the instance_config.json file is used to determine which host the request should be forwarded over gRPC to. In the DevEnv, the configuration is trivial, as each request is forwarded to gw-slurm-head. In the Swarm, the configuration is more complex, as the requests may be forwarded to the swarm's gw-slurm-head, or other SLURM-capable "cluster hosts" such as thoreau or harper.
 
 # instance_config.json.example
-
 
 > grpc-default is ignored as a SLURM host, it's just auxilary. routes and subhosts are currently documentation only.
 
 
-The below is for reference only, please use the provided `instance_config.json.example` in the $GEMSHOME root. The `instance_config.json.wip` file is a blueprint/work in progress. 
+The below is for reference only. The actual instance_config.json file is located in your $GEMSHOME directory. A working example exists in this documentation directory.
+
+Please see [setup_instance.md](setup_instance.md) for more information on setting up your instance_config.json file.
 
 ```json
 {
@@ -50,12 +72,12 @@ The below is for reference only, please use the provided `instance_config.json.e
         "PaidTier",
         "MediumJob",
         "LongJob",
+        // specifically, a cluster host for MDaaS-RunMD
         "MDaaS-RunMD"
       ],
-      // A DevEnv situation might still want to use thoreau for MDaaS-RunMD because it's slightly different from swarm.
-      // One could create an ssh reverse tunnel and set the host to localhost, for example.
-      "host": "thoreau",
-      "slurmport": "50052",
+      "host": "thoreau", // or the ip address
+      "slurmport": "50052", // This is a gRPC-mediated port for sending GEMS requests to the SLURM host.
+      // SLURM runscripts will use these arguments
       "sbatch_arguments": {
         "MDaaS-RunMD": {
           "partition": "defq",
@@ -72,12 +94,14 @@ The below is for reference only, please use the provided `instance_config.json.e
         "PaidTier",
         "MediumJob",
         "LongJob",
+        // Our cluster host for Glycomimetics
         "Glycomimetics"
       ],
-      "host": "harper",
+      "host": "harper", // or the ip address
       "slurmport": "50052"
     }
   },
+  // When no context-specific sbatch_arguments are found, use these defaults.
   "default_sbatch_arguments": {
     // default for DevEnv context
     "DevEnv": {
@@ -91,6 +115,10 @@ The below is for reference only, please use the provided `instance_config.json.e
       "time": "120",
       "nodes": "4"
     }
+  },
+  "filesystem_paths": {
+    "MDaaS-RunMD": "/website/userdata/mmservice/md",
+    "Glycomimetics": "/website/userdata/complex/gm"
   }
 }
 ```

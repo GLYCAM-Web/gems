@@ -88,10 +88,19 @@ class DateReversioner:
                 )
                 shutil.copyfile(self.file_to_version, backup_file)
 
-            # copy the example file in place of the file_to_version
+            # copy the new version in place of the file_to_version
             with self.file_to_version.open("w") as f:
                 json.dump(self.new_version, f, indent=2)
                 print(f"\nUpdated {self.file_to_version} with new date.")
+
+            # retain only the last 3
+            backup_files = sorted(
+                self.file_to_version.parent.glob(
+                    f"{self.file_to_version.stem}.json.*-git-ignore-me.bak"
+                )
+            )
+            for backup in backup_files[:-3]:
+                backup.unlink()
         else:
             print(f"\nNo update needed for {self.file_to_version}.")
 
