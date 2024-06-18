@@ -37,25 +37,39 @@ def argparser():
     return parser
 
 
-def generate_preconfig():
+def generate_preconfig(
+    contexts,
+    grpc_hostnames,
+    grpc_hosts,
+    grpc_ports,
+    sbatch_args_list,
+    local_parameters_list,
+    cluster_filesystem_paths,
+):
+    """Preconfigs, or Remote configs are necessary to store separate from
+    the Instance Configuration so that they can be re-used on the remote host.
+
+    As a remote host can identify itself by it's hostname, it needs it's own host
+    entry to know what contexts it supports and will be requested of it by the swarm host.
+    """
     config = {
         "hosts": [],
         "filesystem_paths": {},
     }
 
-    for prefix in ["MD", "GM"]:
-        grpc_hostname = os.getenv(f"{prefix}_GRPC_HOSTNAME")
-        grpc_host = os.getenv(f"{prefix}_GRPC_HOST")
-        grpc_port = os.getenv(f"{prefix}_GRPC_PORT")
-        sbatch_args = json.loads(os.getenv(f"{prefix}_SBATCH_ARGS"))
-        local_parameters = json.loads(os.getenv(f"{prefix}_LOCAL_PARAMETERS"))
-        cluster_filesystem_path = os.getenv(f"{prefix}_CLUSTER_FILESYSTEM_PATH")
+    prefixes = list(contexts.keys())
 
-        if prefix == "MD":
-            context = "MDaaS-RunMD"
-        elif prefix == "GM":
-            context = "Glycomimetics"
+    for i, prefix in enumerate(prefixes):
+        grpc_hostname = grpc_hostnames[i]
+        grpc_host = grpc_hosts[i]
+        grpc_port = grpc_ports[i]
+        sbatch_args = sbatch_args_list[i]
+        local_parameters = local_parameters_list[i]
+        cluster_filesystem_path = cluster_filesystem_paths[i]
 
+        context = contexts[prefix]
+
+        # TODO: use instance config for validation?
         host_config = {
             "hostname": grpc_hostname,
             "contexts": [context],
@@ -68,7 +82,9 @@ def generate_preconfig():
         config["filesystem_paths"][context] = cluster_filesystem_path
 
         # Generate host-specific JSON configuration file
-        with open(f"{GEMSHOME}/REMOTE_{prefix}_preconfig-git-ignore-me.json", "w") as f:
+        with open(
+            f"{os.getenv('GEMSHOME')}/REMOTE_{prefix}_preconfig-git-ignore-me.json", "w"
+        ) as f:
             json.dump(
                 {
                     "hosts": [host_config],
@@ -78,11 +94,11 @@ def generate_preconfig():
                 indent=2,
             )
 
-    # with open(f"{GEMSHOME}/preconfig-git-ignore-me.json", "w") as f:
-    #     json.dump(config, f, indent=2)
+    return config
 
 
-def process_preconfig(ic, config):
+def update_instance_config_hosts_from_preconfig(ic, config):
+    """When we process a preconfig, or a remote config, we will update the instance config with the new hosts given."""
     for host_config in config.get("hosts", []):
         hostname = host_config["hostname"]
         contexts = host_config["contexts"]
@@ -108,6 +124,69 @@ def process_preconfig(ic, config):
     ic.save()
 
 
+def _devenv_generate_preconfig():
+    """GLYCAM-Web DevEnv specific
+
+    the gRPC image configures the Instance Configuration, as gRPC is used to route requests
+    to hosts known by the instance configuration. GLYCAM-Web's DevEnv stores its hosts
+    as environmental variables.
+
+    TODO/THOUGHT: I might want the GRPC/bin/initialize.sh script to perform this logic, but
+    it's easier in python to write json. - Grayson M.
+    """
+
+    def check_env_var(var_name):
+        value = os.getenv(var_name)
+        if not value:
+            raise RuntimeError(
+                f"Environment variable {var_name} is required but not set."
+            )
+        return value
+
+    context_mapping = check_env_var("GEMS_REMOTE_EXE_CTX_MAP")
+    contexts = json.loads(context_mapping)
+
+    grpc_hostnames = []
+    grpc_hosts = []
+    grpc_ports = []
+    sbatch_args_list = []
+    local_parameters_list = []
+    cluster_filesystem_paths = []
+
+    for prefix in contexts.keys():
+        grpc_hostnames.append(check_env_var(f"{prefix}_GRPC_HOSTNAME"))
+        grpc_hosts.append(check_env_var(f"{prefix}_GRPC_HOST"))
+        grpc_ports.append(check_env_var(f"{prefix}_GRPC_PORT"))
+
+        sbatch_args = check_env_var(f"{prefix}_SBATCH_ARGS")
+        try:
+            sbatch_args_list.append(json.loads(sbatch_args))
+        except json.JSONDecodeError:
+            raise RuntimeError(f"Invalid JSON in {prefix}_SBATCH_ARGS: {sbatch_args}")
+
+        local_parameters = check_env_var(f"{prefix}_LOCAL_PARAMETERS")
+        try:
+            local_parameters_list.append(json.loads(local_parameters))
+        except json.JSONDecodeError:
+            raise RuntimeError(
+                f"Invalid JSON in {prefix}_LOCAL_PARAMETERS: {local_parameters}"
+            )
+
+        cluster_filesystem_paths.append(
+            check_env_var(f"{prefix}_CLUSTER_FILESYSTEM_PATH")
+        )
+
+    return generate_preconfig(
+        contexts,
+        grpc_hostnames,
+        grpc_hosts,
+        grpc_ports,
+        sbatch_args_list,
+        local_parameters_list,
+        cluster_filesystem_paths,
+    )
+
+
 def main():
     """Sets up a GEMS instance for the first time.
 
@@ -123,14 +202,16 @@ def main():
         print("\nThis GEMS instance is already configured. Exiting.")
         return
 
+    # TODO/THOUGHT: If the DevEnv should run this, we would need to wrap the python script or pass arguments.
+    # Part of the reason we refactored from the granular flags version was to avoid a complicated calling convention.
     if args.generate_preconfig:
-        generate_preconfig()
+        _devenv_generate_preconfig()
 
     if args.config:
         with open(args.config) as f:
             config = json.load(f)
 
-        process_preconfig(ic, config)
+        update_instance_config_hosts_from_preconfig(ic, config)
 
     return ic
 

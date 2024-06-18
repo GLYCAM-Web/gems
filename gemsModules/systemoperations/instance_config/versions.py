@@ -60,11 +60,7 @@ class DateReversioner:
             # if no date is found, lets update to a versioned file
             return True
         else:
-            # check the template file for a date
-            # if the template is newer, lets update to a versioned file
-            # old_date = datetime.datetime.fromisoformat(self.old_version["date"])
-            # new_date = datetime.datetime.fromisoformat(self.new_version["date"])
-            # using datetime.strptime(date_string, '%Y-%m-%d').date()
+            # compare old and new version dates
             old_date = datetime.datetime.strptime(
                 self.old_version["date"], "%Y-%m-%dT%H:%M:%S.%f"
             ).date()
