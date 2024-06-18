@@ -97,7 +97,7 @@ def generate_preconfig(
     return config
 
 
-def update_instance_config_hosts_from_preconfig(ic, config):
+def update_instance_config_from_preconfig(ic, config):
     """When we process a preconfig, or a remote config, we will update the instance config with the new hosts given."""
     for host_config in config.get("hosts", []):
         hostname = host_config["hostname"]
@@ -144,7 +144,12 @@ def _devenv_generate_preconfig():
         return value
 
     context_mapping = check_env_var("GEMS_REMOTE_EXE_CTX_MAP")
-    contexts = json.loads(context_mapping)
+    try:
+        contexts = json.loads(context_mapping)
+    except json.JSONDecodeError:
+        raise RuntimeError(
+            f"Invalid JSON in GEMS_REMOTE_EXE_CTX_MAP: {context_mapping}"
+        )
 
     grpc_hostnames = []
     grpc_hosts = []
@@ -211,7 +216,7 @@ def main():
         with open(args.config) as f:
             config = json.load(f)
 
-        update_instance_config_hosts_from_preconfig(ic, config)
+        update_instance_config_from_preconfig(ic, config)
 
     return ic
 
