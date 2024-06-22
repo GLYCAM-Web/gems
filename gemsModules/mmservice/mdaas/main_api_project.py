@@ -31,6 +31,7 @@ class MdProject(Project):
     input_type: constr(max_length=25) = "Amber-prmtop & inpcrd"
     parm7_file_name: constr(max_length=255) = "DGlcpa1-OH.parm7"
     rst7_file_name: constr(max_length=255) = "DGlcpa1-OH.rst7"
+    unsolvated_parm7_file_name: constr(max_length=255) = "unminimized-gas.parm7"
     u_uuid: constr(max_length=36) = " "
     sim_length: constr(max_length=5) = "100"
     notify: bool = False
