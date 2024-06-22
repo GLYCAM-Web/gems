@@ -77,7 +77,7 @@ class InstanceConfig(KeyedArgManager, FileSystemPathsMixin):
     """
 
     # Not an enum so we can extend here, in the InstanceConfig class, where the most specific GEMS instance configuration is defined.
-    Contexts = ["DevEnv", "Swarm", "MDaaS-RunMD"]
+    Contexts = ["DevEnv", "Swarm"]
     Filesystem_Paths = ["MDaaS-RunMD", "Glycomimetics"]
 
     def __init__(
@@ -123,7 +123,7 @@ class InstanceConfig(KeyedArgManager, FileSystemPathsMixin):
         self,
         key: KeyedArgManager.ConfigurationKeys,
         host: str = None,
-        context: Contexts = None,
+        context: "InstanceConfig.Contexts" = None,
     ):
         if context not in self.Contexts:
             log.warning(f"Context {context} not found in {self.Contexts}.")
