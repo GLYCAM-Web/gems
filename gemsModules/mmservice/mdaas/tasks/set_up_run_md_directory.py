@@ -12,7 +12,6 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
-# TODO: unminimized-gas pass from project? or MD_unsolvated.parm7? Check API needs and args here.
 def execute(
     protocol_files_dir: str,
     output_dir_path: str,
@@ -23,6 +22,7 @@ def execute(
     # If you change them from here, you must change them there.
     parm7_protocol_name: str = "MdInput.parm7",
     rst7_protocol_name: str = "MdInput.rst7",
+    # TODO: unminimized-gas pass from project? or MD_unsolvated.parm7? Check API needs and args here.
 ):
     log.debug("set_up_run_md_directory.py execute() called, %s", locals())
     # ensure that the protocol files directory exists

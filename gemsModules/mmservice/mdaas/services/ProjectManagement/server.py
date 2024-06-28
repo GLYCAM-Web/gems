@@ -16,6 +16,8 @@ log = Set_Up_Logging(__name__)
 
 def Serve(service: ProjectManagement_Request) -> ProjectManagement_Response:
     response = ProjectManagement_Response()
+    log.debug(f"ProjectManagement Inputs: {service.inputs}")
+
     response.outputs = execute(service.inputs)
 
     log.debug(f"ProjectManagement prepare_pdb_Response: {response}")

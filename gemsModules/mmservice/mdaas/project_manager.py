@@ -55,7 +55,7 @@ class mdaas_Project_Manager(Project_Manager):
         for service in self.incoming_entity.services.__root__.values():
             log.debug("fill_response_project_from_response_entity %s", service)
             if service.typename == "RunMD":
-                # THe problem with setting the files here is that then they have their full paths,
+                # The problem with setting the files here is that then they have their full paths,
                 # and we still need the full paths for the RDF...
                 if service.inputs["parameter-topology-file"]["locationType"] in [
                     "File",
