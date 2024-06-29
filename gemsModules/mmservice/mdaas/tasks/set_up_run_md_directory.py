@@ -16,11 +16,13 @@ def execute(
     protocol_files_dir: str,
     output_dir_path: str,
     parm7_real_name: str,
+    # uniminimized_parm7_real_name: str,
     rst7_real_name: str,
     # NOTE: Run_Multi-Part_Protocol.bash depends on these precise default names:
     # If you change them from here, you must change them there.
     parm7_protocol_name: str = "MdInput.parm7",
     rst7_protocol_name: str = "MdInput.rst7",
+    # TODO: unminimized-gas pass from project? or MD_unsolvated.parm7? Check API needs and args here.
 ):
     log.debug("set_up_run_md_directory.py execute() called, %s", locals())
     # ensure that the protocol files directory exists
@@ -48,6 +50,20 @@ def execute(
         dest_link_label=rst7_protocol_name,
         parent_directory=output_dir_path,
     )
+
+    # make a symlink in the directory from unminimized-gas.parm7 to MD_unsolvated.parm7
+    if (Path(output_dir_path) / "unminimized-gas.parm7").exists():
+        commonlogic.make_relative_symbolic_link(
+            path_down_to_source="unminimized-gas.parm7",  # uniminimized_parm7_real_name,
+            path_down_to_dest_dir=output_dir_path,
+            dest_link_label="MD_unsolvated.parm7",
+            parent_directory=output_dir_path,
+        )
+    else:
+        # We would like to add a notice here too.
+        log.info(
+            "unminimized-gas.parm7 does not exist in the protocol files directory. Skipping symlink creation."
+        )
 
     # or maybe? deprecated.common.getGemsExecutionContext???
     if not is_GEMS_live_swarm():

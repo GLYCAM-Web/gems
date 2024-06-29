@@ -60,11 +60,7 @@ class DateReversioner:
             # if no date is found, lets update to a versioned file
             return True
         else:
-            # check the template file for a date
-            # if the template is newer, lets update to a versioned file
-            # old_date = datetime.datetime.fromisoformat(self.old_version["date"])
-            # new_date = datetime.datetime.fromisoformat(self.new_version["date"])
-            # using datetime.strptime(date_string, '%Y-%m-%d').date()
+            # compare old and new version dates
             old_date = datetime.datetime.strptime(
                 self.old_version["date"], "%Y-%m-%dT%H:%M:%S.%f"
             ).date()
@@ -88,11 +84,57 @@ class DateReversioner:
                 )
                 shutil.copyfile(self.file_to_version, backup_file)
 
-            # copy the example file in place of the file_to_version
+            # copy the new version in place of the file_to_version
             with self.file_to_version.open("w") as f:
                 json.dump(self.new_version, f, indent=2)
                 print(f"\nUpdated {self.file_to_version} with new date.")
+
+            self._keep_most_recent_backups()
         else:
             print(f"\nNo update needed for {self.file_to_version}.")
 
         return needs_update
+
+    def _keep_most_recent_backups(self):
+        """Remove all but the most recent backup per run."""
+        # sort backup files then group them by run and keep the most recent backup per run
+        backup_files = sorted(
+            self.file_to_version.parent.glob(
+                f"{self.file_to_version.stem}.json.*-git-ignore-me.bak"
+            ),
+            key=lambda x: x.stat().st_mtime,
+        )
+        runs = self._group_by_runs(backup_files)
+
+        for run in runs:
+            for file in run[:-1]:
+                file.unlink()
+
+    def _group_by_runs(self, backup_files, run_period=24 * 3600):
+        """Group backup files into runs."""
+        runs = []
+        current_run = []
+        first_file_time = None
+
+        for file in backup_files:
+            file_time = datetime.datetime.fromtimestamp(file.stat().st_mtime)
+
+            if not first_file_time:
+                # Initialize the first file time and start the first run
+                first_file_time = file_time
+                current_run.append(file)
+                continue
+
+            # If the file is within the run period, add it to the current run
+            if (first_file_time - file_time).total_seconds() < run_period:
+                current_run.append(file)
+            else:
+                # Save the current run and start a new one
+                runs.append(current_run)
+                current_run = [file]
+                first_file_time = file_time
+
+        if current_run:
+            runs.append(current_run)
+
+        return runs
