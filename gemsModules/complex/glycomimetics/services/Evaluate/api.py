@@ -10,9 +10,9 @@ from gemsModules.complex.glycomimetics.main_api import (
     Glycomimetics_Service_Response,
 )
 from gemsModules.complex.glycomimetics.services.common_api import (
-        PDB_File_Resource, 
-        Moiety_Library_Names,
-        Position_Modification_Options,
+    PDB_File_Resource,
+    Moiety_Library_Names,
+    Position_Modification_Options,
 )
 
 from gemsModules.logging.logger import Set_Up_Logging
@@ -29,26 +29,13 @@ class Evaluate_output_Resource(Resource):
 
 
 class Evaluate_Input_Resources(Resources):
-    __root__: List[Union[
-        PDB_File_Resource,
-        Evaluate_input_Resource, 
-        Evaluate_output_Resource
-        ]] = None
-
-    # We could validate at Evaluate_Inputs instead, allowing this to be an empty list, but not allowing an empty list to be instantiated there.
-    # @root_validator(pre=True)
-    def check_pdb_file_resource(cls, values):
-        resources = values.get('__root__', [])
-        if not any(isinstance(resource, PDB_File_Resource) for resource in resources):
-            raise ValueError('At least one PDB_File_Resource is required in Evaluate_Input_Resources.')
-        return values
+    __root__: List[
+        Union[PDB_File_Resource, Evaluate_input_Resource, Evaluate_output_Resource]
+    ] = None
 
 
 class Evaluate_Output_Resources(Resources):
-    __root__: List[Union[
-        Evaluate_input_Resource, 
-        Evaluate_output_Resource
-        ]] = None
+    __root__: List[Union[Evaluate_input_Resource, Evaluate_output_Resource]] = None
 
 
 class Evaluate_Inputs(BaseModel):
@@ -57,13 +44,16 @@ class Evaluate_Inputs(BaseModel):
         title="Project UUID",
         description="UUID of Project",
     )
-    
-    resources: Evaluate_Input_Resources = Evaluate_Input_Resources() # Evaluate's real request always needs an input PDB, should we be able to instantiate it blank?
+
+    # Evaluate's real request always needs an input PDB, should we be able to instantiate it blank?
+    resources: Evaluate_Input_Resources = Evaluate_Input_Resources()
 
 
 class Evaluate_Outputs(BaseModel):
-    Available_Libraries : List[str] = Moiety_Library_Names.get_json_list()  # might need syntax adjustment
-    Available_Modification_Options : Position_Modification_Options = None
+    Available_Libraries: List[str] = (
+        Moiety_Library_Names.get_json_list()
+    )  # might need syntax adjustment
+    Available_Modification_Options: Position_Modification_Options = None
     outputDirPath: str = Field(
         None,
         title="Output Directory Path",

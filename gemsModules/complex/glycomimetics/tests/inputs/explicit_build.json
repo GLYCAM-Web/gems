@@ -1,0 +1,12 @@
+{
+    "entity": {
+      "type": "Glycomimetics",
+      "services": {
+        "evaluation_of_pdb": {
+          "type": "Build_Selected_Positions",
+          "inputs": [
+          ]
+        }
+      }
+    }
+}

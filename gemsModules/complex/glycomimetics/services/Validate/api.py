@@ -48,7 +48,9 @@ class Validate_output_Resource(Resource):
 
 
 class Validate_Resources(Resources):
-    __root__: List[Union[PDB_File_Resource, Validate_input_Resource, Validate_output_Resource]] = None
+    __root__: List[
+        Union[PDB_File_Resource, Validate_input_Resource, Validate_output_Resource]
+    ] = None
 
 
 class Validate_Inputs(BaseModel):
@@ -59,37 +61,13 @@ class Validate_Inputs(BaseModel):
     )
     resources: Validate_Resources = Validate_Resources()
 
-    # Note: The problem with using a validator here is we can't easily return the results in the Response.
-    @validator("resources", always=False)
-    def check_resources(cls, v):
-        has_cocomplex_input = False
-        has_moiety_metadata = False
-        has_execution_parameters = False
-        for resource in v.__root__:
-            if resource.resourceRole == "cocomplex-input":
-                has_cocomplex_input = True
-            elif resource.resourceRole == "moiety-metadata":
-                has_moiety_metadata = True
-            elif resource.resourceRole == "execution-parameters":
-                has_execution_parameters = True
-            else:
-                log.warning(f"Unknown resource role: {resource.resourceRole}")
-
-        if not (
-            has_cocomplex_input and has_moiety_metadata and has_execution_parameters
-        ):
-            raise ValidationError(
-                "All required resources (cocomplex-input, moiety-metadata, execution-parameters) must be provided."
-            )
-        return v
-
 
 class Validate_Outputs(BaseModel):
-    outputDirPath: str = Field(
-        None,
-        title="Output Directory Path",
-        description="Path to output directory",
-    )
+    # outputDirPath: str = Field(
+    #     None,
+    #     title="Output Directory Path",
+    #     description="Path to output directory",
+    # )
     isValid: bool = Field(
         None,
         title="Is Valid",
@@ -106,4 +84,3 @@ class Validate_Request(Glycomimetics_Service_Request):
 class Validate_Response(Glycomimetics_Service_Response):
     typename: str = Field("Validate", alias="type")
     outputs: Validate_Outputs = Validate_Outputs()
-
