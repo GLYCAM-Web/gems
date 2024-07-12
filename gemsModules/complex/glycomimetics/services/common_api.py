@@ -53,6 +53,14 @@ class Modification_Position(BaseModel):
         ...,
         description="The residue identifier, typically an integer followed occasionally by a letter.",
     )
+    Residue_Name: str = Field(
+        ...,
+        description="The name of the residue.",
+    )
+    Chain_Identifier: str = Field(
+        ...,
+        description="The chain identifier for the residue.",
+    )
     Attachment_Atom: str = Field(
         ..., description="The atom in the residue to which the mods will be attached."
     )

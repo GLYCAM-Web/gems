@@ -31,8 +31,10 @@ def execute(inputs: Validate_Inputs) -> Validate_Outputs:
     if not hasReceptorResource:
         service_notices.addNotice(
             Brief="No Receptor PDB Resource",
-            Scope="Glycomimetics Services",
+            Scope="Service",
+            Messenger="Glycomimetics",
             Type="Error",
+            Code="600",
             Message="No Receptor PDB was provided to Glycomimetics.",
         )
         service_outputs.isValid = False

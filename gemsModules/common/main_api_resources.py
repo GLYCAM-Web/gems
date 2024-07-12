@@ -147,6 +147,15 @@ class Resource(BaseModel, MimeEncodableResourceMixin):
             f.write(self._get_payload())
 
         log.debug(f"Copying resource {self} to {path}...")
+        # return a resource for the new file
+        return Resource(
+            typename=self.typename,
+            locationType="filesystem-path-unix",
+            resourceFormat=self.resourceFormat,
+            resourceRole=self.resourceRole,
+            payload=str(path),
+            options={"filename": filename},
+        )
 
     def _handle_file(self):
         with open(self.payload, "rb") as f:

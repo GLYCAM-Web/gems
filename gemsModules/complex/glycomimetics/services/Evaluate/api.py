@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from pydantic import BaseModel, Field, root_validator
-from typing import List, Union
+from typing import List, Optional, Union
 
 from gemsModules.common.main_api_resources import Resource, Resources
 from gemsModules.common.code_utils import GemsStrEnum
@@ -13,6 +13,7 @@ from gemsModules.complex.glycomimetics.services.common_api import (
     PDB_File_Resource,
     Moiety_Library_Names,
     Position_Modification_Options,
+    Modification_Position, # TODO: We really should be using Position_Modification_Options, temp integration
 )
 
 from gemsModules.logging.logger import Set_Up_Logging
@@ -50,10 +51,18 @@ class Evaluate_Inputs(BaseModel):
 
 
 class Evaluate_Outputs(BaseModel):
-    Available_Libraries: List[str] = (
-        Moiety_Library_Names.get_json_list()
-    )  # might need syntax adjustment
-    Available_Modification_Options: Position_Modification_Options = None
+    # TODO/Q: Should this be here? Should we have libraries per pos or per eval?
+    Available_Libraries: List[str] = Field(
+        default_factory=Moiety_Library_Names.get_json_list,
+        title="Available Libraries",
+        description="List of available libraries",
+    )
+    Available_Modification_Options: Optional[List[Modification_Position]] = Field(
+        # None,
+        default_factory=list,
+        title="Available Modification Options",
+        description="List of available modification options",
+    )
     outputDirPath: str = Field(
         None,
         title="Output Directory Path",

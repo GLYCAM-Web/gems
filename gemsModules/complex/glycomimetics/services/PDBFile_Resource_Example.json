@@ -1,9 +1,0 @@
-{
-  "typename": "PdbFile",
-  "locationType": "Path",
-  "resourceFormat": "PDB-strict",
-  "resourceRole": "Complex_Input",
-  "payload": "path/to/file.pdb",
-  "notices": null,
-  "options": {}
-}
