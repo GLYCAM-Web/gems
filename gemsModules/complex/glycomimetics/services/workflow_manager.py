@@ -17,25 +17,13 @@ log = Set_Up_Logging(__name__)
 
 
 # TODO: To services.settings... ?
-# Service_Dependencies = {
-#     "Analyze": Annotated_List(
-#         ["Evaluate", "Validate", "ProjectManagement", "Build_Selected_Positions"], ordered=True
-#     ),
-#     "Build_Selected_Positions": Annotated_List(
-#         ["Evaluate", "Validate", "ProjectManagement"], ordered=True
-#     ),
-#     "ProjectManagement": Annotated_List(["Evaluate", "Validate"], ordered=True),
-#     "Evaluate": Annotated_List([], ordered=True),
-#     "Validate": Annotated_List(["Evaluate"], ordered=True),
-# }
-
-EVALUATE_DEPENDENCIES = Annotated_List([], ordered=True)
-VALIDATE_DEPENDENCIES = Annotated_List(["Evaluate"], ordered=True)
+VALIDATE_DEPENDENCIES = Annotated_List([], ordered=True)
 PROJECTMANAGEMENT_DEPENDENCIES = Annotated_List(
-    VALIDATE_DEPENDENCIES + ["Validate"], ordered=True
+    ["Validate"], ordered=True
 )
+EVALUATE_DEPENDENCIES = Annotated_List(PROJECTMANAGEMENT_DEPENDENCIES + ["ProjectManagement"], ordered=True)
 BUILD_DEPENDENCIES = Annotated_List(
-    PROJECTMANAGEMENT_DEPENDENCIES + ["ProjectManagement"], ordered=True
+    EVALUATE_DEPENDENCIES + ["ProjectManagement"], ordered=True
 )
 ANALYZE_DEPENDENCIES = Annotated_List(
     BUILD_DEPENDENCIES + ["Build_Selected_Positions"], ordered=True
@@ -73,6 +61,7 @@ class Glycomimetics_Workflow_Manager(Workflow_Manager):
         while len(unordered) > 0:
             # Get the next aaop
             current_aaop = unordered.pop(0)
+            log.debug(f"Resolving dependencies for {current_aaop.AAO_Type}")
 
             # TODO: resolve/unify these_deps against prior deps
             these_deps = resolve_dependency_list(
@@ -87,6 +76,7 @@ class Glycomimetics_Workflow_Manager(Workflow_Manager):
             # TODO: the dep resolution could be more general (really a lot of this workflow manager)
             for new_dep in these_deps:
                 # resolve the cls from the dependency string
+                log.debug("Resolving dependency %s", new_dep)
                 aao_cls = globals()[f"{new_dep}_Request"]
                 new_aaop = AAOP(
                     AAO_Type=new_dep,

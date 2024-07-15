@@ -11,10 +11,6 @@ from gemsModules.logging.logger import Set_Up_Logging
 from .api import Evaluate_Inputs, Evaluate_Outputs
 from ..common_api import Modification_Position
 
-# TODO: Properly include glycomimetic external programs and wrappers with DevENv.
-# We need Yao's "Validation" for this service.
-sys.path.append("/programs/gems/External/GM_Utils/external_programs/validation/evaluate_swig")
-from evaluate_pdb import evaluate_pdb
 
 log = Set_Up_Logging(__name__)
 
@@ -37,13 +33,14 @@ def execute(inputs: Evaluate_Inputs) -> Evaluate_Outputs:
             
 
     if not receptor_pdb_resource:
+        # Append a notice, we can do nothing else.
         service_notices.addNotice(
             Brief="No Receptor PDB Resource",
             Scope="Service",
             Messenger="Glycomimetics",
-            Type="Error",
+            Type="Info",
             Code="600",
-            Message="No Receptor PDB was provided to Glycomimetics.",
+            Message="No Receptor PDB was provided to Glycomimetics, nothing to do.",
         )
     else:
         # Evaluation
@@ -62,6 +59,11 @@ def execute(inputs: Evaluate_Inputs) -> Evaluate_Outputs:
             if Path(pdb_fpath).exists():
                 log.debug(f"Receptor PDB file found: {pdb_fpath}")
                 try:
+                    # TODO: Properly include glycomimetic external programs and wrappers with DevENv.
+                    # We need Yao's "Validation" for this service.
+                    sys.path.append("/programs/gems/External/GM_Utils/external_programs/validation/evaluate_swig")
+                    from evaluate_pdb import evaluate_pdb
+
                     result = evaluate_pdb(pdb_fpath)
                     for atom in result.available_atoms:
                         log.debug(f"atom: {atom}")

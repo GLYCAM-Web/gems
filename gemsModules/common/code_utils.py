@@ -74,7 +74,11 @@ class Annotated_List(list):
         items: List = None,
         ordered: bool = True,
     ) -> None:
-        super().__init__(items or [])
+        if items:
+            super().__init__(items)
+        else:
+            super().__init__()
+
         self._ordered: bool = ordered
 
     def add_item(self, item):
@@ -97,26 +101,28 @@ class Annotated_List(list):
 # These may belong somewhere else
 def resolve_dependency_list(
     service: str,
-    dependencies: dict[str, Annotated_List],
+    dependencies: dict[str, Annotated_List]
 ) -> Annotated_List:
-    """Attempts to resolve a dependency list for a service.
-
-    Currently assumes dependencies[].Annotations_Lists are unordered.
-
-    TODO
-    - [ ] Add support for ordered dependencies
-    - [ ] duplicate services with different dependencies?
-
+    """
+    Resolves a dependency list for a service, constructing a linear list of services.
     """
     log.debug("Attempting to resolve dependencies for service: %s", service)
-
     resolved = Annotated_List(ordered=True)
-    if service in dependencies.keys():
-        for dependency in dependencies[service]:
-            resolved.extend(resolve_dependency_list(dependency, dependencies))
-    else:
-        return [service]
+    to_process = [service]
+    processed = set()
 
+    while to_process:
+        current_service = to_process.pop(0)
+        if current_service not in processed:
+            processed.add(current_service)
+            if current_service in dependencies:
+                log.debug(f"Found dependencies for: {current_service}: {dependencies[current_service]}")
+                # Add dependencies to the start of to_process to maintain order
+                to_process = dependencies[current_service] + to_process
+            if current_service != service:  # Don't add the initial service to the resolved list
+                resolved.append(current_service)
+
+    log.debug(f"Resolved dependencies for {service}: {resolved}")
     return resolved
 
 

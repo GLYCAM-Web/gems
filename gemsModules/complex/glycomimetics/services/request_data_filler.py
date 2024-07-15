@@ -38,38 +38,19 @@ class Glycomimetics_Request_Data_Filler(Request_Data_Filler):
         return self.aaop_list
 
     def __fill_build_aaop(self, i: int, aaop: AAOP) -> List[AAOP]:
-        upload_dir = Path(self.response_project.upload_path)
         # Please note, if you need values from response_project, make sure they are initialized appropriately by project manager.
         aaop.The_AAO.inputs = build_api.build_Inputs(
             pUUID=self.response_project.pUUID,
             outputDirPath=self.response_project.project_dir,
-            protocolFilesPath=self.response_project.protocolFilesPath,
-            # TODO: inputsFilePath is mostly ignored by setup_build_directory.
-            # Possibly needs to be set by procedural options/env and/or doesn't make sense for GEMS to know about.
-            inputFilesPath=self.response_project.upload_path,
-            amber_parm7=str(upload_dir / self.response_project.parm7_file_name),
-            amber_rst7=str(upload_dir / self.response_project.rst7_file_name),
         )
 
         return self.aaop_list
 
     def __fill_projman_aaop(self, i: int, aaop: AAOP):
-        upload_dir = Path(self.response_project.upload_path)
-
         aaop.The_AAO.inputs = pm_api.ProjectManagement_Inputs(
             pUUID=self.response_project.pUUID,
             projectDir=self.response_project.project_dir,
-            protocolFilesPath=self.response_project.protocolFilesPath,
             outputDirPath=self.response_project.project_dir,
-            # Unfortunately, currently mostly ignored.
-            inputFilesPath=self.response_project.upload_path,
-            # It's the website's job to upload and make a request, so gems doesn't really understand
-            # upload_paths. The project field may not be necessary.
-            # For now, to avoid writing the full paths as the project filenames,
-            # we'll use upload path, as set by the project manager, to build the filenames.
-            amber_parm7=str(upload_dir / self.response_project.parm7_file_name),
-            amber_rst7=str(upload_dir / self.response_project.rst7_file_name),
-            sim_length=self.response_project.sim_length,
         )
 
         # Add the resources to copy to the project output directory by the Project Management service.

@@ -89,5 +89,5 @@ class Evaluate_Response(Glycomimetics_Service_Response):
 if __name__ == "__main__":
     # generate a blank request
     thisRequest = Evaluate_Request()
-    with open("Blank_Evaluate_Request.json", "w") as f:
+    with open("Blank_Evaluate_Request-git-ignore-me.json", "w") as f:
         f.write(thisRequest.json(indent=2))

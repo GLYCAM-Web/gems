@@ -30,8 +30,11 @@ class GlycomimeticsProject(Project):
     cocomplex: constr(max_length=255) = "cocomplex.pdbqt"
     moiety: constr(max_length=255) = "ligand.pdbqt"
 
+
+    # protocolFilesPath: constr(max_length=255) = "/website/programs/gems/External/GM_Utils/protocols"
+
     # TODO: convert to glycomimetics protocols
-    metadataPath: str = "/programs/gems/External/GM_Utils/metadata"  # /moeties etc.
+    metadataPath: constr(max_length=255) = "/programs/gems/External/GM_Utils/metadata"  # /moeties etc.
 
     def add_temporary_info(self):
         ic = InstanceConfig()
