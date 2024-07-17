@@ -10,7 +10,7 @@ log = Set_Up_Logging(__name__)
 
 
 # Error
-# @validate_arguments
+@validate_arguments
 def Serve(service: Validate_Request) -> Validate_Response:
     log.info("Serve called")
     log.info(f"service: {service}")
@@ -18,6 +18,6 @@ def Serve(service: Validate_Request) -> Validate_Response:
     log.debug(f"service.inputs: {service.inputs}")
 
     # TODO: Pydantic should automatically do this...
-    results, notices = execute(Validate_Inputs(resources=service.inputs))
+    results, notices = execute(service)
 
     return Validate_Response(outputs=results, notices=notices)

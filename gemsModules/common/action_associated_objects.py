@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Note: commented out extrqaneous debug logging from this file. TODO: Better log levelling.
 from typing import Callable, List, Dict, Literal, Optional
 from dataclasses import dataclass, field
 import uuid
@@ -148,15 +149,15 @@ class AAOP_Tree:
         # For now we assume there is only a linear list of packages.
         # We will need special iterator, eventually.
         # Need depth-first search, but each AAOP should be able to override that.
-        log.debug("in _next_AAOP. putme  = >>>>%s<<<<", str(putme))
-        log.debug(f"{self.packages=}")
+        # log.debug("in _next_AAOP. putme  = >>>>%s<<<<", str(putme))
+        # log.debug(f"{self.packages=}")
 
         self._current_AAOP_index += 1
         if self._current_AAOP_index >= len(self.packages):
-            log.debug("raising StopIteration")
+            #log.debug("raising StopIteration")
             raise StopIteration
         if putme is not None:
-            log.debug("putting putme")
+            #log.debug("putting putme")
             # TODO/Q: Should use setter?
             self.packages[self._current_AAOP_index] = putme
         else:
@@ -165,12 +166,12 @@ class AAOP_Tree:
 
     def get_next_AAOP(self):
         """Return the next AAOP in the tree.  Set that as current."""
-        log.debug("about to get_next_AAOP")
+        #log.debug("about to get_next_AAOP")
         return self._next_AAOP()
 
     def put_next_AAOP(self, putme: AAOP):
         """Write the AAOP to the next AAOP in the tree"""
-        log.debug("about to put_next_AAOP")
+        #log.debug("about to put_next_AAOP")
         self._next_AAOP(putme=putme)
 
     def get_aaop_by_id(self, id_string: str):
@@ -267,14 +268,12 @@ class AAOP_Tree_Pair:
 
     def get_next_AAOP_incoming(self):
         """Get the next AAOP in the input tree"""
-        log.debug("about to get_next_AAOP_incoming")
+        # log.debug("about to get_next_AAOP_incoming")
         current_aaop = self.input_tree.get_next_AAOP()
-        log.debug("Got the next incoming AAOP, it is: %s", str(current_aaop))
+        # log.debug("Got the next incoming AAOP, it is: %s", str(current_aaop))
         return current_aaop
 
     def put_next_AAOP_outgoing(self, putme: AAOP) -> None:
         """Put the next AAOP in the output tree"""
         self.output_tree.put_next_AAOP(putme)
-        log.debug(
-            "Put the next outgoing AAOP on the output tree, it is: %s", str(putme)
-        )
+        # log.debug("Put the next outgoing AAOP on the output tree, it is: %s", str(putme))

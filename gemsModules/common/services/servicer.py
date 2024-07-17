@@ -27,22 +27,18 @@ class Servicer(ABC):
         while I_am_done == False:
             log.debug("In servicer, about to serve")
             try:
-                log.debug("In servicer, about to get next AAOP")
                 this_request_aaop: AAOP = self.tree_pair.get_next_AAOP_incoming()
-                log.debug(f"In servicer, this_request_aaop = {this_request_aaop}")
             except StopIteration:
                 I_am_done = True
                 break
-            log.debug(f"In servicer, this_request_aaop = {this_request_aaop}")
             this_callable = self.get_module_for_this_request(this_request_aaop)
             this_request = this_request_aaop.The_AAO.copy(deep=True)
             this_response_aaop: AAOP = this_request_aaop.make_skeleton_copy()
+            log.debug(f"serving this_request_aaop = {this_request_aaop}")
             this_response = this_callable(this_request)
             this_response_aaop.The_AAO = this_response.copy(deep=True)
-            log.debug(f"In servicer, this_response_aaop = {this_response_aaop}")
+            log.debug(f"got this_response_aaop = {this_response_aaop}")
             self.tree_pair.put_next_AAOP_outgoing(this_response_aaop)
-        log.debug("In servicer, about to return this tree_pair:")
-        log.debug(self.tree_pair)
         return self.tree_pair
 
 

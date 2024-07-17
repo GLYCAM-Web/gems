@@ -62,8 +62,7 @@ class Transaction(ABC):
         initialize_out=True,  # Initialize an outgoing transaction from the incoming one
     ):
         try:
-            log.debug("incoming string is: \n~~~")
-            log.debug(in_string + "\n~~~")
+            log.debug(f"incoming string is: \n{in_string}\n")
             self.incoming_string = in_string
             if self.incoming_string is None or self.incoming_string == "":
                 log.error("incoming string was empty")
@@ -90,7 +89,7 @@ class Transaction(ABC):
 
     def populate_inputs(self, in_string: str, no_check_fields=False):
         self.inputs = self.get_API_type().parse_raw(in_string)
-        log.debug("The inputs is: ")
+        log.debug("The inputs are: ")
         log.debug(self.inputs.json(indent=2))
 
     def initialize_outputs_from_inputs(self):

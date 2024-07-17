@@ -61,7 +61,7 @@ class Glycomimetics_Request_Data_Filler(Request_Data_Filler):
             locationType="Payload",
             options={"filename": "input.json"},
         )
-        aaop.The_AAO.inputs.resources.append(input_json)
+        aaop.The_AAO.inputs.resources.add_resource(input_json)
 
         # if aaop.Requester is not None:
         #     # If we were using an AAOP_Tree we could use aaop_tree.get_aaop_by_id(aaop.Requester)

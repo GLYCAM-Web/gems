@@ -209,7 +209,7 @@ def getGemsExecutionContext() :
         return 'default'
    
 def getGemsEnvironmentForceSerialExecution() :
-    log.info("getGemsExecutionContext was called.")
+    log.info("getGemsEnvironmentForceSerialExecution was called.")
     # Currently, if this variable is set to anything at all, GEMS is
     # probably operating in support of a wabsite.
     if 'GEMS_FORCE_SERIAL_EXECUTION' in os.environ :

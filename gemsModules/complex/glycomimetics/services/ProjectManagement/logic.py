@@ -4,14 +4,7 @@ from typing import Protocol, Dict, Optional
 from pydantic import BaseModel
 
 # from gemsModules.complex.glycomimetics.tasks import batchcompute
-from gemsModules.complex.glycomimetics.services.ProjectManagement.api import (
-    ProjectManagement_Inputs,
-    ProjectManagement_Outputs,
-)
-from gemsModules.complex.glycomimetics.services.ProjectManagement.resources import (
-    ProjectManagement_Resources,
-    PM_Resource,
-)
+from .api import ProjectManagement_Inputs, ProjectManagement_Outputs, PM_Resource
 
 from gemsModules.complex.glycomimetics.tasks import set_up_build_directory
 
@@ -25,8 +18,14 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     log.debug(f"serviceInputs: {inputs}")
 
     service_outputs = ProjectManagement_Outputs()
-    service_outputs.outputDirPath = inputs.outputDirPath
-
+    #service_outputs.outputDirPath = inputs.outputDirPath
+    service_outputs.resources.add_resource(
+        PM_Resource(
+            payload=inputs.outputDirPath,
+            resourceFormat="json",
+            resourceType="output",
+        )
+    )
     # Copy all PM_Resources to the output directory.
     # for resource in inputs.resources:
     #    # Copy all PM_Resources to the output directory.
