@@ -17,8 +17,16 @@ log = Set_Up_Logging(__name__)
 
 
 # TODO: To services.settings... ?
-Service_Dependencies = {"RunMD": Annotated_List(["ProjectManagement"], ordered=False)}
+EVAL_DEPS = Annotated_List([], ordered=True)
+PRMN_DEPS = Annotated_List(EVAL_DEPS + ["Evaluate"], ordered=True)
+RNMD_DEPS = Annotated_List(PRMN_DEPS + ["ProjectManagement"], ordered=True)
 
+# TODO: To services.settings... ?
+Service_Dependencies = {
+    "Evaluate": EVAL_DEPS,
+    "ProjectManagement": PRMN_DEPS,
+    "RunMD": RNMD_DEPS
+}
 
 # TODO: work_flows style or workflow_manager style?
 class mdaas_Workflow_Manager(Workflow_Manager):

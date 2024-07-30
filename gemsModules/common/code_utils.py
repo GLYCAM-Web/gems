@@ -79,31 +79,17 @@ class Annotated_List(list):
     def set_ordered(self, ordered):
         self._ordered = ordered
 
+    def __iadd__(self, other):
+        super().__iadd__(other)
+        return self
+
 
 # These may belong somewhere else
-def resolve_dependency_list(
-    service: str,
-    dependencies: dict[str, Annotated_List],
-) -> Annotated_List:
-    """Attempts to resolve a dependency list for a service.
-
-    Currently assumes dependencies[].Annotations_Lists are unordered.
-
-    TODO
-    - [ ] Add support for ordered dependencies
-    - [ ] duplicate services with different dependencies?
-
-    """
-    log.debug("Attempting to resolve dependencies for service: %s", service)
-
-    resolved = Annotated_List(ordered=True)
-    if service in dependencies.keys():
-        for dependency in dependencies[service]:
-            resolved.extend(resolve_dependency_list(dependency, dependencies))
-    else:
-        return [service]
-
-    return resolved
+def resolve_dependency_list(service: str, Service_Dependencies: dict):
+    dependencies = Service_Dependencies.get(service)
+    if dependencies:
+        return list(dependencies)
+    return []
 
 
 def find_aaop_by_id(aaop_list: List, id_string: str):
