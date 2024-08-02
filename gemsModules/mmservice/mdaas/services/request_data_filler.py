@@ -31,16 +31,22 @@ class mdaas_Request_Data_Filler(Request_Data_Filler):
         for i, aaop in enumerate(self.aaop_list):
             log.debug(f"i: {i}, {aaop.AAO_Type=}")
 
+            # TODO: Use the settings.KnownServices dict to map AAO_Type to fillers.
             if aaop.AAO_Type == "RunMD":
                 self.__fill_run_md_aaop(i, aaop)
             elif aaop.AAO_Type == "ProjectManagement":
                 self.__fill_projman_aaop(i, aaop)
+            elif aaop.AAO_Type == "Evaluate":
+                self.__fill_evaluate_aaop(i, aaop)
 
         return self.aaop_list
 
     def __fill_run_md_aaop(self, i: int, aaop: AAOP) -> List[AAOP]:
         # TODO/N: This doesn't make much sense as the RunMD service takes a parm7 and rst7 as inputs,
         # but we don't even use run_md_Inputs in the API. See implied translator todos.
+        #
+        # N: Resources will not be available in RunMD.logic.execute() unless we add them here.
+        # This design implementation differs from the GM Entity's current conceptualization, which always has resources.
         aaop.The_AAO.inputs = run_md_api.run_md_Inputs(
             pUUID=self.response_project.pUUID,
             outputDirPath=self.response_project.project_dir,
@@ -69,6 +75,7 @@ class mdaas_Request_Data_Filler(Request_Data_Filler):
         )
         aaop.The_AAO.inputs.resources.add_resource(input_json)
 
+        # TODO/FIX: This is a job for the implied translator.
         if aaop.Requester is not None:
             requester_aaop = find_aaop_by_id(self.aaop_list, aaop.Requester)
             # copy resources over TODO: This is probably more generic than it should be, we should probably attend to the parm7/rst7 resources only
@@ -90,3 +97,21 @@ class mdaas_Request_Data_Filler(Request_Data_Filler):
             i,
             self.aaop_list[i].The_AAO.inputs,
         )
+
+    def __fill_evaluate_aaop(self, i: int, aaop: AAOP):
+        if aaop.Requester is not None:
+            requester_aaop = find_aaop_by_id(self.aaop_list, aaop.Requester)
+            # copy resources over TODO: This is probably more generic than it should be, we should probably attend to the parm7/rst7 resources only
+            # but this is fine because we're only passing those two inputs. See other implied translator todos.
+            for name, potential_resource in requester_aaop.The_AAO.inputs.items():
+                try:
+                    resource = Resource.parse_obj(potential_resource)
+                    if (
+                        resource.locationType == "Payload"
+                        and "filename" not in resource.options
+                    ):
+                        resource.options["filename"] = name
+                    aaop.The_AAO.inputs.resources.add_resource(resource)
+                    aaop.The_AAO.inputs.sim_length = self.response_project.sim_length
+                except Exception as e:
+                    log.debug(f"Error adding resource: {e}, {potential_resource}")

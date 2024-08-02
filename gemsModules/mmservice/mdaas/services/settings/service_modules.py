@@ -10,6 +10,7 @@ from gemsModules.mmservice.mdaas.services.run_md.server import Serve as serve_ru
 from gemsModules.mmservice.mdaas.services.ProjectManagement.server import (
     Serve as serve_ProjectManagement,
 )
+from gemsModules.mmservice.mdaas.services.Evaluate.server import Serve as serve_evaluate
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -21,5 +22,6 @@ service_modules: Dict[str, Callable] = {
     "Marco": serve_marco,
     "Status": serve_status,
     "RunMD": serve_run_md,
+    "Evaluate": serve_evaluate,
     "ProjectManagement": serve_ProjectManagement,
 }

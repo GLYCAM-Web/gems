@@ -198,6 +198,17 @@ class Notices(BaseModel):
             self.__root__ : List[Notice] = []
         self.__root__.append(thisNotice)
 
+    def addSimpleInfoNotice(self, message, brief="Info Message", scope="Unknown", messenger="Unknown", additionalInfo=None):
+        self.addNotice(
+            Brief=brief,
+            Scope=scope,
+            Messenger=messenger,
+            Type='Info',
+            Code='0',
+            Message=message,
+            AdditionalInfo=additionalInfo
+        )
+
 
 def generateSchema():
     from pydantic.schema import schema

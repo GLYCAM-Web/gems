@@ -9,8 +9,11 @@ from gemsModules.mmservice.mdaas.services.run_md.run_md_api import (
 )
 from gemsModules.mmservice.mdaas.services.ProjectManagement.api import (
     ProjectManagement_Request,
-    ProjectManagement_Inputs,
 )
+from gemsModules.mmservice.mdaas.services.Evaluate.api import (
+    Evaluate_Request,
+)
+
 from gemsModules.logging.logger import Set_Up_Logging
 
 log = Set_Up_Logging(__name__)
@@ -60,6 +63,7 @@ class mdaas_Workflow_Manager(Workflow_Manager):
             for new_dep in these_deps:
                 new_aaop = None
                 # TODO: We could probably generalize this for Entity-registered services...
+                # This is likely a job for the implied translator instead.
                 if new_dep == "ProjectManagement":
                     new_aaop = AAOP(
                         AAO_Type="ProjectManagement",
@@ -73,6 +77,13 @@ class mdaas_Workflow_Manager(Workflow_Manager):
                         The_AAO=run_md_Request(),
                         ID_String=uuid.uuid4(),
                         Dictionary_Name="RunMD_Dep_Request",
+                    )
+                elif new_dep == "Evaluate":
+                    new_aaop = AAOP(
+                        AAO_Type="Evaluate",
+                        The_AAO=Evaluate_Request(),
+                        ID_String=uuid.uuid4(),
+                        Dictionary_Name="Evaluate_Dep_Request",
                     )
 
                 if new_aaop:
@@ -96,5 +107,6 @@ class mdaas_Workflow_Manager(Workflow_Manager):
             ordered.append(current_aaop)
 
         # TODO: Prune dependency services that only need to be run once, regardless of requester.
+        # This is likely a job for the duplicates manager.
 
         return ordered

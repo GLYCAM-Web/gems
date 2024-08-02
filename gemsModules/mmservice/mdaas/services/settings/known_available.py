@@ -15,8 +15,9 @@ log = Set_Up_Logging(__name__)
 
 
 class Module_Available_Services(GemsStrEnum):
-    run_md = "RunMD"
+    Evaluate = "Evaluate"
     ProjectManagement = "ProjectManagement"
+    run_md = "RunMD"
 
 
 Available_Services = GemsStrEnum(

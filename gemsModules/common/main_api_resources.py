@@ -111,7 +111,7 @@ class Resource(BaseModel, MimeEncodableResourceMixin):
         description="The thing that is described by the location and format.",
     )
     notices: Notices = Field(
-        None,
+        default_factory=Notices,
         description="Notices associated with this resource",
     )
     options: dict[str, str] = Field(

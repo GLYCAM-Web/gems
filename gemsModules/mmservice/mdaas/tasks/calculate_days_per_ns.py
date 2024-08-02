@@ -1,6 +1,9 @@
 from pathlib import Path
 import re
 
+from gemsModules.logging.logger import Set_Up_Logging
+log = Set_Up_Logging(__name__)
+
 def parse_amber_parm7_pointers(content):
     """
     Parse the POINTERS section of an AMBER parm7 file.
@@ -21,14 +24,19 @@ def parse_amber_parm7_pointers(content):
     
     # Parse the format string
     num_per_line, char_per_num = map(int, re.findall(r'\d+', format_str))
-    
-    # Remove newlines and extra spaces, then split the data
-    data_str = data_str.replace('\n', '').strip()
-    data = [data_str[i:i+char_per_num].strip() for i in range(0, len(data_str), char_per_num)]
-    
+    log.debug(f"num_per_line: {num_per_line}, char_per_num: {char_per_num}")
+
+    # remove newlines
+    data_str = data_str.replace('\n', '')
+    data = [data_str[i:i+char_per_num - 1].strip() for i in range(0, len(data_str), char_per_num)]
+    log.debug(f"POINTERS data: {data}")
+
     # Convert to integers
-    pointers = list(map(int, data))
-    
+    try:
+        pointers = list(map(int, data))
+    except:
+        log.debug(f"Could not convert POINTERS data to integers: {data}")
+        raise ValueError(f"Could not convert POINTERS data to integers: {data}")
     return format_str, pointers
 
 
@@ -45,15 +53,18 @@ def parse_amber_parm7_natoms(path):
     with open(path, 'r') as f:
         content = f.read()
     
-    _, pointers = parse_amber_parm7_pointers(content)
-    
+    try:
+        _, pointers = parse_amber_parm7_pointers(content)
+    except ValueError as e:
+        log.debug(f"Could not parse the POINTERS section for file {path}")
+        raise ValueError(f"Could not parse the POINTERS section: {e}")
     # NATOMS is the first value in the POINTERS section
     natoms = pointers[0]
     
     return natoms
 
 
-def execute(parmfile: Path, sim_length: int) -> float:
+def execute(parmfile: Path, sim_length: float) -> float:
     """
     Calculate the time prediction for a given number of residues and simulation length.
 
@@ -66,9 +77,13 @@ def execute(parmfile: Path, sim_length: int) -> float:
     # Return a time prediction in days per ns.
     # N.B. This line was fit using data gathered from GLYCAM-Web around July 18, 2024.
     days_per_ns = 1.50724e-07 * number_of_particles + -0.000544733
+    log.debug(f"Predicted time: {days_per_ns:.6f} days per ns for {number_of_particles} particles")
 
-    sim_time_est = days_per_ns * sim_length
-    return sim_time_est
+    sim_time_est_days = days_per_ns * sim_length
+    sim_time_est_hours = sim_time_est_days * 24
+    #sim_time_est = sim_time_est_hours * 3600  # convert to seconds
+    #log.debug(f"Predicted time: {sim_time_est:.6f} seconds")
+    return sim_time_est_hours, number_of_particles
 
 
 # Example usage: python calculate_days_per_ns.py parm7_file_path
@@ -76,7 +91,7 @@ if __name__ == "__main__":
     import sys
     parm_file_path = Path(sys.argv[1])
     try:
-        days_per_ns = execute(parm_file_path)
+        days_per_ns = execute(parm_file_path, 10)
         print(f"Predicted time: {days_per_ns:.6f} days per ns")
     except ValueError as e:
         print(f"Error: {e}")

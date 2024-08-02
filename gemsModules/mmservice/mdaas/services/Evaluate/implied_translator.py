@@ -8,12 +8,13 @@ from gemsModules.common.services.each_service.implied_translator import Implied_
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
-class run_md_Implied_Translator(Implied_Translator):
+class Evaluate_Implied_Translator(Implied_Translator):
     """ Inspect the Implied_Services_Inputs to figure out if this service needs to be run, and if so, how many times.
         Bundle resulting services into a service request package list (List[AAOP]).
     """
 
     # there are no ways to imply this service
     def process(self, input_object : Implied_Services_Inputs) -> List[AAOP]:
+        log.debug(f"MDaaS/Evaluate implied translator: got {input_object}")
         return []
 
