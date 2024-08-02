@@ -1,13 +1,8 @@
 #!/usr/bin/env bash
-bash logs/clearLogs.sh
-
 # Run the test
-# TEST_INPUT=${1:-"/programs/gems/ct-input-git-ignore-me.json"}
-# TEST_INPUT=${1:-"/programs/gems/tests/inputs/008.0.evaluation-request.json"}
-# TEST_INPUT=${1:-"/programs/gems/gemsModules/mmservice/mdaas/tests/inputs/run_md.json"}
-#
-TEST_INPUT="/programs/gems/gemsModules/complex/glycomimetics/tests/inputs/entity_evaluate.json"
+#TEST_INPUT="/programs/gems/gemsModules/complex/glycomimetics/tests/inputs/entity_evaluate.json"
 #TEST_INPUT="/programs/gems/gemsModules/complex/glycomimetics/tests/inputs/explicit_evaluate.json"
+TEST_INPUT="/programs/gems/gemsModules/complex/glycomimetics/tests/inputs/explicit_build.json"
 
 OUTPUT=$(/programs/gems/bin/delegate $TEST_INPUT)
 
@@ -21,5 +16,5 @@ fi
 
 # Inspect as needed
 # tests/utilities/json_ripper.py --json_file ct-output-git-ignore-me.json entity
-cat ct-output-git-ignore-me.json
+# cat ct-output-git-ignore-me.json
 

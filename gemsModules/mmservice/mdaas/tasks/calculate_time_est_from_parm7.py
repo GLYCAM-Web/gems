@@ -40,7 +40,7 @@ def parse_amber_parm7_pointers(content):
     return format_str, pointers
 
 
-def parse_amber_parm7_natoms(path):
+def parse_amber_parm7_natoms(content):
     """
     Return the number of atoms (NATOMS) from an AMBER parm7 file.
     
@@ -50,8 +50,7 @@ def parse_amber_parm7_natoms(path):
     Returns:
     int: The number of atoms (NATOMS) in the system.
     """
-    with open(path, 'r') as f:
-        content = f.read()
+
     
     try:
         _, pointers = parse_amber_parm7_pointers(content)
@@ -64,7 +63,7 @@ def parse_amber_parm7_natoms(path):
     return natoms
 
 
-def execute(parmfile: Path, sim_length: float) -> float:
+def execute(content: str, sim_length: float) -> float:
     """
     Calculate the time prediction for a given number of residues and simulation length.
 
@@ -72,7 +71,7 @@ def execute(parmfile: Path, sim_length: float) -> float:
     parmfile (Path): Path to the AMBER parm7 file.
     sim_length (int): The length of the simulation in ns.
     """
-    number_of_particles = parse_amber_parm7_natoms(parmfile)
+    number_of_particles = parse_amber_parm7_natoms(content)
     
     # Return a time prediction in days per ns.
     # N.B. This line was fit using data gathered from GLYCAM-Web around July 18, 2024.
