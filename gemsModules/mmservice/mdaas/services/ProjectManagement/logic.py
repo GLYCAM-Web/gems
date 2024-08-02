@@ -17,7 +17,6 @@ log = Set_Up_Logging(__name__)
 def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     """Executes the service."""
     log.debug("Beginning MDaaS ProjectManagement")
-
     service_outputs = ProjectManagement_Outputs()
 
     # create project/output directory TODO: setup before copy_to or after?
@@ -39,10 +38,10 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
         # Copy all Resources to the output directory.
         resource.copy_to(inputs.outputDirPath)
 
-        if resource.resourceFormat == "AMBER-7-prmtop":
-            amber_parm7 = inputs.outputDirPath + "/" + resource.filename
-        if resource.resourceFormat == "AMBER-7-restart":
-            amber_rst7 = inputs.outputDirPath + "/" + resource.filename
+        if resource.resourceRole == "parameter-topology-file":
+            amber_parm7 = resource.filename
+        if resource.resourceRole == "input-coordinate-file":
+            amber_rst7 = resource.filename
 
     # TODO/PRIORITY: should be it's own resource:
     # This MUST be a temporary hack and could be replaced with an API change including a specified min-gas Resource.
