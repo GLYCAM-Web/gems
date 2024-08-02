@@ -1,0 +1,20 @@
+{
+    "entity": {
+      "type": "Glycomimetics",
+      "services": {
+        "evaluation_of_pdb": {
+          "type": "Evaluate",
+          "inputs": { 
+            "resources": [
+              {
+                "locationType": "filesystem-path-unix",
+                "resourceFormat": "chemical/pdb",
+                "resourceRole": "Receptor",
+                "payload": "/programs/gems/External/GM_Utils/external_programs/validation/1gya.pdb"
+              }
+            ] 
+          }
+        }
+      }
+    }
+  }

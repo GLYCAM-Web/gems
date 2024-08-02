@@ -6,7 +6,7 @@ from typing import Dict, Union, Optional
 from gemsModules.common.main_api_notices import Notices
 from gemsModules.common.main_api_procedural_options import Procedural_Options
 from gemsModules.common.main_api_services import Service_Requests, Service_Responses
-from gemsModules.common.main_api_resources import Resource
+from gemsModules.common.main_api_resources import Resource, Resources
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -19,12 +19,12 @@ class Entity(ABC, BaseModel):
     entityType: str = Field(  # This is the only required field in all of the API
         ..., title="Type", alias="type"
     )
-    inputs: Union[Resource, Dict] = Field(
+    inputs: Union[Dict, Resources] = Field(
         None,
         title="Inputs",
         description="User-friendly, top-level inputs to the services.",
     )
-    outputs: Union[Resource, Dict] = Field(
+    outputs: Union[Dict, Resources] = Field(
         None,
         title="Inputs",
         description="User-friendly, top-level outputs from the services.",

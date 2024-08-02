@@ -96,10 +96,13 @@ class InstanceConfig(KeyedArgManager, FileSystemPathsMixin):
             self.get_default_path(), self.get_default_path(example=True)
         )
 
-        # if the active config is outdated, lets just start with the example config instead
-        # Hopefully one day we can use this functionality to differentially update the active config.
         if self.reversioner.is_outdated:
             self.set_active_config(self.get_default_path(example=True))
+
+    def save(self) -> bool:
+        """save the instance config using a DateReversioner."""
+        self.reversioner.set_new_config_data(self.config)
+        return self.reversioner.update()
 
     @staticmethod
     def get_default_path(example=False) -> Path:
@@ -112,11 +115,6 @@ class InstanceConfig(KeyedArgManager, FileSystemPathsMixin):
             name += ".example"
 
         return Path(os.getenv("GEMSHOME", "")) / name
-
-    def save(self) -> bool:
-        """save the instance config using a DateReversioner."""
-        self.reversioner.set_new_config_data(self.config)
-        return self.reversioner.update()
 
     # TODO: Context needs an enum.
     def get_keyed_arguments(

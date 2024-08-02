@@ -1,0 +1,33 @@
+MODEL 0
+REMARK FAKE_HEAD_ATOM=C9_C8
+REMARK REAL_HEAD_ATOM=C7_C6
+REMARK DUMMY_ATOM=C9_H21_H22_H23_C8_H19_H20
+REMARK TORSION=H17_C7_C6_O5
+REMARK TORSION=C7_C6_O5_C4
+REMARK TORSION=C6_O5_C4_C3
+REMARK TORSION=O5_C4_C3_C2
+HETATM    1  O1  UNL     1       2.779   0.899  -0.894  1.00  0.00    -0.648 OA
+HETATM    2  C2  UNL     1       3.050  -0.419  -0.863  1.00  0.00     0.174 C 
+HETATM    3  C3  UNL     1       2.085  -1.354  -0.179  1.00  0.00     0.035 C 
+HETATM    4  C4  UNL     1       2.515  -2.824  -0.216  1.00  0.00     0.028 C 
+HETATM    5  O5  UNL     1       2.588  -3.263  -1.558  1.00  0.00    -0.391 OA
+HETATM    6  C6  UNL     1       2.843  -4.654  -1.619  1.00  0.00     0.019 C 
+HETATM    7  C7  UNL     1       1.532  -5.417  -1.851  1.00  0.00    -0.045 C 
+HETATM    8  C8  UNL     1       1.718  -6.941  -1.929  1.00  0.00    -0.067 C 
+HETATM    9  C9  UNL     1       2.560  -7.392  -3.122  1.00  0.00    -0.076 C 
+HETATM   10  O10 UNL     1       4.074  -0.832  -1.387  1.00  0.00    -0.648 OA
+HETATM   11  H11 UNL     1       1.089  -1.258  -0.663  1.00  0.00     0.052 H 
+HETATM   12  H12 UNL     1       1.991  -1.038   0.883  1.00  0.00     0.052 H 
+HETATM   13  H13 UNL     1       1.750  -3.406   0.347  1.00  0.00     0.075 H 
+HETATM   14  H14 UNL     1       3.506  -2.919   0.284  1.00  0.00     0.075 H 
+HETATM   15  H15 UNL     1       3.538  -4.821  -2.466  1.00  0.00     0.074 H 
+HETATM   16  H16 UNL     1       3.364  -5.047  -0.713  1.00  0.00     0.074 H 
+HETATM   17  H17 UNL     1       1.049  -5.051  -2.784  1.00  0.00     0.036 H 
+HETATM   18  H18 UNL     1       0.847  -5.203  -1.003  1.00  0.00     0.036 H 
+HETATM   19  H19 UNL     1       0.712  -7.404  -2.027  1.00  0.00     0.032 H 
+HETATM   20  H20 UNL     1       2.178  -7.312  -0.988  1.00  0.00     0.032 H 
+HETATM   21  H21 UNL     1       2.101  -7.042  -4.071  1.00  0.00     0.027 H 
+HETATM   22  H22 UNL     1       2.609  -8.501  -3.139  1.00  0.00     0.027 H 
+HETATM   23  H23 UNL     1       3.598  -7.008  -3.051  1.00  0.00     0.027 H 
+TER      24      UNL     1 
+ENDMDL

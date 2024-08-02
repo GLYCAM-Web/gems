@@ -1,0 +1,22 @@
+COMPND    UNAMED
+AUTHOR    GEERATED BY OPEN BABEL 2.3.2
+HETATM    1 C1   LIG     1      -7.784   1.558  -0.034  1.00  0.00           C  
+HETATM    2 C2   LIG     1      -6.642   2.514   0.374  1.00  0.00           C  
+HETATM    3 C3   LIG     1      -5.272   1.979  -0.099  1.00  0.00           C  
+HETATM    4 O1   LIG     1      -4.992   0.728   0.569  1.00  0.00           O  
+HETATM    5 C4   LIG     1      -3.733   0.124   0.202  1.00  0.00           C  
+HETATM    6 C5   LIG     1      -6.889   3.921  -0.210  1.00  0.00           C  
+HETATM    7 H1   LIG     1      -7.645   0.573   0.418  1.00  0.00           H  
+HETATM    8 H2   LIG     1      -7.821   1.436  -1.119  1.00  0.00           H  
+HETATM    9 H3   LIG     1      -8.748   1.947   0.302  1.00  0.00           H  
+HETATM   10 H4   LIG     1      -6.627   2.593   1.464  1.00  0.00           H  
+HETATM   11 H5   LIG     1      -4.486   2.696   0.154  1.00  0.00           H  
+HETATM   12 H6   LIG     1      -5.282   1.819  -1.182  1.00  0.00           H  
+HETATM   13 H7   LIG     1      -3.616  -0.811   0.756  1.00  0.00           H  
+HETATM   14 H8   LIG     1      -2.914   0.804   0.456  1.00  0.00           H  
+HETATM   15 H9   LIG     1      -3.727  -0.084  -0.871  1.00  0.00           H  
+HETATM   16 H10  LIG     1      -6.911   3.891  -1.302  1.00  0.00           H  
+HETATM   17 H11  LIG     1      -6.100   4.609   0.101  1.00  0.00           H  
+HETATM   18 H12  LIG     1      -7.843   4.320   0.143  1.00  0.00           H  
+MASTER       0    0    0    0    0    0    0    0   18    0   18    0
+END

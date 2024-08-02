@@ -106,6 +106,11 @@ class Resource(BaseModel, MimeEncodableResourceMixin):
         title="Resource Format",
         description="Supported formats will vary with each Entity.",
     )
+    resourceRole: str = Field(
+        None,
+        title="Resource Role",
+        description="Supported roles will vary with each Entity and Service.",
+    )
     payload: Any = Field(
         None,
         description="The thing that is described by the location and format.",
@@ -142,6 +147,15 @@ class Resource(BaseModel, MimeEncodableResourceMixin):
             f.write(self._get_payload())
 
         log.debug(f"Copying resource {self} to {path}...")
+        # return a resource for the new file
+        return Resource(
+            typename=self.typename,
+            locationType="filesystem-path-unix",
+            resourceFormat=self.resourceFormat,
+            resourceRole=self.resourceRole,
+            payload=str(path),
+            options={"filename": filename},
+        )
 
     def _handle_file(self):
         with open(self.payload, "rb") as f:
@@ -225,7 +239,7 @@ class Resources(BaseModel):
         return len(self.__root__)
 
     def __iter__(self):
-        return iter(self.__root__)
+        return iter(self.__root__ or [])
 
     def __repr__(self):
         return f"{self.__root__}"

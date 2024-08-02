@@ -1,0 +1,50 @@
+MODEL 0
+REMARK FAKE_HEAD_ATOM=C1_C2
+REMARK REAL_HEAD_ATOM=C3_C4
+REMARK DUMMY_ATOM=C1_H13_H14_H15_C2_H16_H17
+REMARK TORSION=H18_C3_C4_C5
+REMARK TORSION=C3_C4_C5_S6
+REMARK TORSION=C4_C5_S6_C7
+REMARK TORSION=C5_S6_C7_C8
+REMARK TORSION=S6_C7_C8_C9
+REMARK TORSION=C7_C8_C9_C10
+REMARK TORSION=C8_C9_C10_C11
+REMARK TORSION=C9_C10_C11_C12
+HETATM    1  C1  UNL     1       2.342   0.460   1.873  1.00  0.00    -0.077 C 
+HETATM    2  C2  UNL     1       3.113   0.161   0.591  1.00  0.00    -0.069 C 
+HETATM    3  C3  UNL     1       2.856  -1.277   0.118  1.00  0.00    -0.065 C 
+HETATM    4  C4  UNL     1       3.554  -1.616  -1.209  1.00  0.00    -0.057 C 
+HETATM    5  C5  UNL     1       5.083  -1.593  -1.119  1.00  0.00    -0.023 C 
+HETATM    6  S6  UNL     1       5.781  -2.104  -2.726  1.00  0.00    -0.169 SA
+HETATM    7  C7  UNL     1       7.510  -2.191  -2.146  1.00  0.00    -0.023 C 
+HETATM    8  C8  UNL     1       8.346  -2.946  -3.180  1.00  0.00    -0.057 C 
+HETATM    9  C9  UNL     1       9.810  -3.062  -2.739  1.00  0.00    -0.064 C 
+HETATM   10  C10 UNL     1      10.631  -3.841  -3.774  1.00  0.00    -0.065 C 
+HETATM   11  C11 UNL     1      12.095  -3.968  -3.337  1.00  0.00    -0.069 C 
+HETATM   12  C12 UNL     1      12.908  -4.752  -4.363  1.00  0.00    -0.077 C 
+HETATM   13  H13 UNL     1       1.250   0.340   1.705  1.00  0.00     0.027 H 
+HETATM   14  H14 UNL     1       2.539   1.505   2.192  1.00  0.00     0.027 H 
+HETATM   15  H15 UNL     1       2.663  -0.227   2.686  1.00  0.00     0.027 H 
+HETATM   16  H16 UNL     1       2.787   0.875  -0.197  1.00  0.00     0.032 H 
+HETATM   17  H17 UNL     1       4.193   0.316   0.792  1.00  0.00     0.032 H 
+HETATM   18  H18 UNL     1       1.762  -1.404  -0.038  1.00  0.00     0.033 H 
+HETATM   19  H19 UNL     1       3.180  -1.997   0.901  1.00  0.00     0.033 H 
+HETATM   20  H20 UNL     1       3.213  -0.913  -2.000  1.00  0.00     0.034 H 
+HETATM   21  H21 UNL     1       3.241  -2.643  -1.499  1.00  0.00     0.034 H 
+HETATM   22  H22 UNL     1       5.395  -2.313  -0.331  1.00  0.00     0.048 H 
+HETATM   23  H23 UNL     1       5.441  -0.570  -0.884  1.00  0.00     0.048 H 
+HETATM   24  H24 UNL     1       7.560  -2.751  -1.187  1.00  0.00     0.048 H 
+HETATM   25  H25 UNL     1       7.909  -1.162  -2.019  1.00  0.00     0.048 H 
+HETATM   26  H26 UNL     1       8.296  -2.411  -4.153  1.00  0.00     0.034 H 
+HETATM   27  H27 UNL     1       7.922  -3.967  -3.310  1.00  0.00     0.034 H 
+HETATM   28  H28 UNL     1      10.240  -2.043  -2.616  1.00  0.00     0.033 H 
+HETATM   29  H29 UNL     1       9.858  -3.592  -1.761  1.00  0.00     0.033 H 
+HETATM   30  H30 UNL     1      10.584  -3.314  -4.753  1.00  0.00     0.033 H 
+HETATM   31  H31 UNL     1      10.197  -4.858  -3.894  1.00  0.00     0.033 H 
+HETATM   32  H32 UNL     1      12.540  -2.955  -3.222  1.00  0.00     0.032 H 
+HETATM   33  H33 UNL     1      12.149  -4.495  -2.359  1.00  0.00     0.032 H 
+HETATM   34  H34 UNL     1      12.889  -4.237  -5.347  1.00  0.00     0.027 H 
+HETATM   35  H35 UNL     1      12.497  -5.777  -4.480  1.00  0.00     0.027 H 
+HETATM   36  H36 UNL     1      13.962  -4.829  -4.023  1.00  0.00     0.027 H 
+TER      37      UNL     1 
+ENDMDL

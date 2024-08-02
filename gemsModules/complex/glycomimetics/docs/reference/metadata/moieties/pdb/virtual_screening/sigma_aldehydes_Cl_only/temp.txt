@@ -1,0 +1,14 @@
+aldehyde_100.pdb:2
+aldehyde_101.pdb:2
+aldehyde_106.pdb:2
+aldehyde_171.pdb:2
+aldehyde_180.pdb:2
+aldehyde_181.pdb:2
+aldehyde_188.pdb:2
+aldehyde_189.pdb:2
+aldehyde_234.pdb:2
+aldehyde_341.pdb:3
+aldehyde_381.pdb:2
+aldehyde_415.pdb:2
+aldehyde_426.pdb:2
+aldehyde_94.pdb:2

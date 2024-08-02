@@ -48,6 +48,7 @@ class mdaas_Workflow_Manager(Workflow_Manager):
         while len(unordered) > 0:
             # Get the next aaop
             current_aaop = unordered.pop(0)
+            log.debug(f"Resolving dependencies for {current_aaop.AAO_Type}")
 
             # TODO: resolve/unify these_deps against prior deps
             these_deps = resolve_dependency_list(
@@ -61,6 +62,8 @@ class mdaas_Workflow_Manager(Workflow_Manager):
 
             # TODO: the dep resolution could be more general (really a lot of this workflow manager)
             for new_dep in these_deps:
+                log.debug("Resolving dependency %s", new_dep)
+                
                 new_aaop = None
                 # TODO: We could probably generalize this for Entity-registered services...
                 # This is likely a job for the implied translator instead.

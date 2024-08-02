@@ -1,0 +1,14 @@
+{
+    "entity": {
+      "type": "Glycomimetics",
+      "services": {
+        "step_one_glyco_in_silico": {
+          "type": "Validate",
+          "inputs": [
+          
+          ]
+        }
+      }
+      
+    }
+  }
