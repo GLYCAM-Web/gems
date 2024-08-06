@@ -4,7 +4,9 @@ import re
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
-def parse_amber_parm7_pointers(content):
+
+# TODO: Where should this go? systemoperations seems like the spot until you consider this is an amber specific function. Tasks might be better interpreted as common library utilities for an Entity.
+def parse_amber_parm7_pointers(content, flag_section="POINTERS"):
     """
     Parse the POINTERS section of an AMBER parm7 file.
     
@@ -14,7 +16,7 @@ def parse_amber_parm7_pointers(content):
     Returns:
     tuple: A tuple containing (format_string, parsed_data_list)
     """
-    pointers_regex = re.compile(r'%FLAG POINTERS\s*\n%FORMAT\s*\((\d+[Ii]\d+)\)\s*(.*?)(?=\n%FLAG|\Z)', re.DOTALL)
+    pointers_regex = re.compile(f'%FLAG {flag_section}' + r'\s*\n%FORMAT\s*\((\d+[Ii]\d+)\)\s*(.*?)(?=\n%FLAG|\Z)', re.DOTALL)
     
     match = pointers_regex.search(content)
     if not match:
@@ -53,9 +55,9 @@ def parse_amber_parm7_natoms(content):
 
     
     try:
-        _, pointers = parse_amber_parm7_pointers(content)
+        _, pointers = parse_amber_parm7_pointers(content, flag_section="POINTERS")
     except ValueError as e:
-        log.debug(f"Could not parse the POINTERS section for file {path}")
+        log.debug(f"Could not parse the POINTERS section for the content.")
         raise ValueError(f"Could not parse the POINTERS section: {e}")
     # NATOMS is the first value in the POINTERS section
     natoms = pointers[0]

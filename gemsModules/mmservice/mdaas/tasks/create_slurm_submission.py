@@ -4,23 +4,11 @@ import traceback
 from gemsModules.systemoperations.environment_ops import is_GEMS_test_workflow
 from gemsModules.systemoperations.instance_config import InstanceConfig
 from gemsModules.systemoperations import filesystem_ops
+# from .calculate_time_est_from_parm7 import parse_amber_parm7_pointers
 
 from gemsModules.logging.logger import Set_Up_Logging
 
 log = Set_Up_Logging(__name__)
-
-
-# TODO: Where should this go? systemoperations seems like the spot until you consider this is an amber specific function. Tasks might be better interpreted as common library utilities for an Entity.
-def get_residues_from_parm7(parm7_file) -> int:
-    with open(parm7_file, "r") as f:
-        for line in f:
-            if "FLAG SOLVENT_POINTERS" in line:
-                # Skip the next line
-                next(f)
-                # Read the third line after the matched line
-                target_line = next(f).strip()
-                return int(target_line.split()[0])
-    return 0  # "FLAG SOLVENT_POINTERS" not found in file
 
 
 def make_slurm_submission_script(SlurmJobDict):
@@ -82,17 +70,19 @@ def update_slurm_job(SlurmJobDict):
 
     # could be part of a "update_slurm_job" task.
     # gpu toggle must update both local params and slurm script.
-    requires_gpu = False
+    wants_gpu = False
     if "gres" in SlurmJobDict:
-        requires_gpu = SlurmJobDict["gres"] is not None
+        wants_gpu = SlurmJobDict["gres"] is not None
 
     # Note: This was part of a CPU selection fix to handle Amber's small box problem on GPU.
-    # can_use_gpu = get_residues_from_parm7(amber_input_file) > 3
-    if requires_gpu:  # and can_use_gpu:
+    # with open(amber_input_file, r) as f:
+    #     will_use_gpu = parse_amber_parm7_pointers(f) > 3
+
+    if wants_gpu:  # and will_use_gpu:
         SlurmJobDict["use_gpu"] = True
     else:
         SlurmJobDict["use_gpu"] = False
-    log.debug(f"requires_gpu=%s", requires_gpu)
+    log.debug(f"wants_gpu=%s", wants_gpu)
 
 
 def execute(SlurmJobDict):
