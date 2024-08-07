@@ -25,12 +25,8 @@ def execute(inputs: Evaluate_Inputs) -> Evaluate_Outputs:
 
     for resource in inputs.resources:
         if resource.resourceRole == "parameter-topology-file":
-            content = None
-            if resource.locationType == "Payload":
-                content = resource.payload
-            elif resource.locationType == "filesystem-path-unix":
-                with open(resource.payload, 'r') as f:
-                    content = f.read()
+            content = resource.get_payload(decode=True)
+            log.debug(f"MDaaS/Evaluate parameter-topology-file content: {type(content)}")
                 
             time_est_hours, num_particles = calculate_time_est_from_parm7.execute(content, float(inputs.sim_length))
             r = Resource(

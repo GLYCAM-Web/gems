@@ -147,6 +147,8 @@ class Transaction_Manager(ABC):
         # update transaction response project
         if self.response_project is not None:
             self.transaction.outputs.project = self.response_project.copy(deep=True)
+        else:
+            log.debug("response project is None!")
 
         log.debug("\tthe transaction outputs are: ")
         log.debug(self.transaction.outputs.json(indent=2, by_alias=True))

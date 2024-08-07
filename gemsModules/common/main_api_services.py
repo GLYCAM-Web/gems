@@ -36,7 +36,7 @@ class Service_Request(BaseModel):
         title="My UUID",
         description="ID to allow correlations between services and responses.",
     )
-    inputs: typing.Any = None
+    inputs: typing.Any = None # [Dict | Resources]
     options: Dict[str, str] = Field(
         None,
         description="Key-value pairs that are specific to each entity, service, etc",

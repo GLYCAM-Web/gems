@@ -12,6 +12,7 @@ from gemsModules.mmservice.mdaas.main_api_project import MdProject
 
 from gemsModules.mmservice.mdaas.services.run_md import run_md_api
 from gemsModules.mmservice.mdaas.services.ProjectManagement import api as pm_api
+from gemsModules.mmservice.mdaas.services.Evaluate import api as evaluate_api
 
 from gemsModules.common.code_utils import find_aaop_by_id
 
@@ -53,6 +54,15 @@ class mdaas_Request_Data_Filler(Request_Data_Filler):
             protocolFilesPath=self.response_project.protocolFilesPath,
         )
 
+        log.debug(f"RUNMD AAOP {aaop}")
+        # Add the parameter-topology and restart files as resources.
+        parm7 = Resource(
+            payload=aaop,
+            resourceFormat="AMBER-7-prmtop",
+            resourceRole="parameter-topology-file",
+            locationType="filesystem-path-unix",
+        )
+
         return self.aaop_list
 
     # TODO: PDBFile and MDaaS PM data fillers are very similar, can we generalize them?
@@ -75,23 +85,12 @@ class mdaas_Request_Data_Filler(Request_Data_Filler):
         )
         aaop.The_AAO.inputs.resources.add_resource(input_json)
 
-        # TODO/FIX: This is a job for the implied translator.
+        # TODO/FIX: Could be more generic/lifted.
         if aaop.Requester is not None:
             requester_aaop = find_aaop_by_id(self.aaop_list, aaop.Requester)
-            # copy resources over TODO: This is probably more generic than it should be, we should probably attend to the parm7/rst7 resources only
-            # but this is fine because we're only passing those two inputs. See other implied translator todos.
-            for name, potential_resource in requester_aaop.The_AAO.inputs.items():
-                try:
-                    resource = Resource.parse_obj(potential_resource)
-                    if (
-                        resource.locationType == "Payload"
-                        and "filename" not in resource.options
-                    ):
-                        resource.options["filename"] = name
-                    aaop.The_AAO.inputs.resources.add_resource(resource)
-                except Exception as e:
-                    log.debug(f"Error adding resource: {e}, {potential_resource}")
-
+            for resource in requester_aaop.The_AAO.inputs.resources:
+                aaop.The_AAO.inputs.resources.add_resource(resource)
+    
         log.debug(
             "\tFinished building ProjectManagement_Inputs, aaop_list[%s].inputs filled with %s",
             i,
@@ -99,19 +98,16 @@ class mdaas_Request_Data_Filler(Request_Data_Filler):
         )
 
     def __fill_evaluate_aaop(self, i: int, aaop: AAOP):
+        # Same as in __fill_projman_aaop.
+
+        aaop.The_AAO.inputs = evaluate_api.Evaluate_Inputs(
+            pUUID=self.response_project.pUUID,
+            projectDir=self.response_project.project_dir,
+            protocolFilesPath=self.response_project.protocolFilesPath,
+            outputDirPath=self.response_project.project_dir,
+            sim_length=self.response_project.sim_length,
+        )
         if aaop.Requester is not None:
             requester_aaop = find_aaop_by_id(self.aaop_list, aaop.Requester)
-            # copy resources over TODO: This is probably more generic than it should be, we should probably attend to the parm7/rst7 resources only
-            # but this is fine because we're only passing those two inputs. See other implied translator todos.
-            for name, potential_resource in requester_aaop.The_AAO.inputs.items():
-                try:
-                    resource = Resource.parse_obj(potential_resource)
-                    if (
-                        resource.locationType == "Payload"
-                        and "filename" not in resource.options
-                    ):
-                        resource.options["filename"] = name
-                    aaop.The_AAO.inputs.resources.add_resource(resource)
-                    aaop.The_AAO.inputs.sim_length = self.response_project.sim_length
-                except Exception as e:
-                    log.debug(f"Error adding resource: {e}, {potential_resource}")
+            for resource in requester_aaop.The_AAO.inputs.resources:
+                aaop.The_AAO.inputs.resources.add_resource(resource)

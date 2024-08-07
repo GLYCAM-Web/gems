@@ -4,7 +4,7 @@ from typing import List, Union
 
 from gemsModules.common.main_api_resources import Resource, Resources
 
-from gemsModules.mmservice.mdaas.main_api import (
+from gemsModules.mmservice.mdaas.main_api_common import (
     MDaaS_Service_Request,
     MDaaS_Service_Response,
 )
@@ -40,8 +40,11 @@ class run_md_Inputs(BaseModel):
         title="Control Script",
         description="Name of the script used to run the protocol",
     )
-    resources: Resources = Resources()
-
+    resources: Resources = Field(
+        title="Resources",
+        description="List of input resources",
+        default_factory=Resources,
+    )
 
 class run_md_Outputs(BaseModel):
     outputDirPath: str = Field(
@@ -49,8 +52,11 @@ class run_md_Outputs(BaseModel):
         title="Output Directory Path",
         description="Path to output directory",
     )
-    resources: Resources = Resources()
-
+    resources: Resources = Field(
+        title="Resources",
+        description="List of resources to copy to project directory",
+        default_factory=Resources,
+    )
 
 class run_md_Request(MDaaS_Service_Request):
     typename: str = Field("RunMD", alias="type")

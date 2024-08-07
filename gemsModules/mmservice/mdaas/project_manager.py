@@ -54,9 +54,13 @@ class mdaas_Project_Manager(Project_Manager):
         # Note: incoming entity may be wrong to use here.
         for service in self.incoming_entity.services.__root__.values():
             log.debug("fill_response_project_from_response_entity %s", service)
-            # This may belong part of the WM, IT, or RDF.
+            
+            #  Note: This may belong part of the WM, IT, or RDF.
             if service.typename == "RunMD":
+                # TODO: Validate the service correctly within GEMS architecture...
                self.__handle_runmd_service(service)
+
+            # Add request options to resposne project
             if hasattr(service, "options") and service.options is not None:
                 if "sim_length" in service.options:
                     if not self.response_project.sim_length:
@@ -65,28 +69,40 @@ class mdaas_Project_Manager(Project_Manager):
                         )
 
     def __handle_runmd_service(self, service):
-        # The problem with setting the files here is that then they have their full paths,
-        # and we still need the full paths for the RDF...
-        if service.inputs["parameter-topology-file"]["locationType"] in [
-            "File",
-            "filesystem-path-unix",
-        ]:
-            parm_path = Path(
-                service.inputs["parameter-topology-file"]["payload"]
-            )
-            self.response_project.parm7_file_name = str(parm_path.name)
+        # TODO: We don't do any actual fs operations until we finally service ProjectManagement.
+        # There is a problem here in that files have their full paths throughout much of GEMS execution.
+        # We currently have the full paths for the RDF which makes convenient use of them. 
+
+        log.debug(f"project manager about to handle service: {service}")
+        rst_path, parm_path = self.__handle_runmd_service_resources(service)
+
+        if rst_path is None or parm_path is None:
+            log.warning("RunMD service did not provide input resources, checking direct inputs...")
+            rst_path, parm_path = self.__handle_runmd_service_inputs(service)
+
+        self.response_project.upload_path = str(
+            Path(rst_path).parent
+            if rst_path
+            else Path(parm_path).parent if parm_path else None
+        )
+    
+    def __handle_runmd_service_inputs(self, service):
+        # TODO/I: service.inputs aren't properly validated. This is not run_md_Inputs and it doesn't have these fields. It should be and it should define them.
+        # TODO: This logic probably belongs in the Implicit Translator and should be translated to resources.
+        log.debug(f"runmd inputs: {service.inputs}")
+        if hasattr(service.inputs, "parameter-topology-file"):
+            parm_path = Path(service.inputs["parameter-topology-file"])
+            self.response_project.parm7_file_name = parm_path
         else:
             # TODO: Either set no path, or copy the payloaded input files to the project directory on run by PM.
-            # None for now
+            # We should be depending on Resource methods for this sort of logic.
             parm_path = None
             self.response_project.parm7_file_name = "MdInput.parm7"
+            
 
-        if service.inputs["input-coordinate-file"]["locationType"] in [
-            "File",
-            "filesystem-path-unix",
-        ]:
-            rst_path = Path(service.inputs["input-coordinate-file"]["payload"])
-            self.response_project.rst7_file_name = str(rst_path.name)
+        if hasattr(service.inputs, "input-coordinate-file"):
+            rst_path = Path(service.inputs["input-coordinate-file"])
+            self.response_project.rst7_file_name = rst_path
 
             # Part of a temporary MdProject.upload_path hack. TODO: Remove upload path? Hardcode full file paths in project?
             if parm_path and rst_path.parent != parm_path.parent:
@@ -98,10 +114,20 @@ class mdaas_Project_Manager(Project_Manager):
             rst_path = None
             self.response_project.rst7_file_name = "MdInput.rst7"
 
-        self.response_project.upload_path = str(
-            rst_path.parent
-            if rst_path
-            else parm_path.parent if parm_path else None
+        return rst_path, parm_path
+    
+    def __handle_runmd_service_resources(self, service):
+        for resource in service.inputs.resources:
+            if resource.resourceRole == "parameter-topology-file":
+                self.response_project.parm7_file_name = resource.filename
+            if resource.resourceRole == "input-coordinate-file":
+                self.response_project.rst7_file_name = resource.filename
+            if resource.resourceRole == "unminimized-gas":
+                self.response_project.unsolvated_parm7_file_name = resource.filename
+
+        return (
+            self.response_project.rst7_file_name,
+            self.response_project.parm7_file_name,
         )
 
 def testme() -> MdProject:

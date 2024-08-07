@@ -4,7 +4,7 @@ from typing import List, Union, Optional
 
 from gemsModules.common.main_api_resources import Resource, Resources
 
-from gemsModules.mmservice.mdaas.main_api import (
+from gemsModules.mmservice.mdaas.main_api_common import (
     MDaaS_Service_Request,
     MDaaS_Service_Response,
 )
@@ -57,7 +57,11 @@ class Evaluate_Outputs(BaseModel):
         title="Output Directory Path",
         description="Path to output directory",
     )
-    resources: Resources = Resources()
+    resources: Resources = Field(
+        title="Resources",
+        description="List of resources to copy to project directory",
+        default_factory=Resources,
+    )
 
 
 class Evaluate_Request(MDaaS_Service_Request):

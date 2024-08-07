@@ -6,9 +6,15 @@ echo "Testing $0..."
 ACTUAL_CONFIG="$GEMSHOME/instance_config.json"
 EXAMPLE_CONFIG="$ACTUAL_CONFIG.example"
 
-DELEGATE_TEST_INPUT="$GEMSHOME/gemsModules/mmservice/mdaas/tests/inputs/run_md.json"
+TEST_INPUTS=(
+    "/programs/gems/gemsModules/mmservice/mdaas/tests/inputs/017.test.with-all-resources-list.json"
+    "$GEMSHOME/gemsModules/mmservice/mdaas/tests/inputs/017.test.json" 
+    "$GEMSHOME/gemsModules/mmservice/mdaas/tests/inputs/017.test.with-unmin-gas-and-options.json"
+)
 
-function test_runmd() {    
+# with args now
+function test_runmd() {
+    DELEGATE_TEST_INPUT=$1
     response="$(cat $DELEGATE_TEST_INPUT | $GEMSHOME/bin/delegate)"
     notices="$(echo $response | $GEMSHOME/tests/utilities/json_ripper.py notices)"
     
@@ -21,7 +27,7 @@ function test_runmd() {
     echo $project_dir
 
     retries=24
-    sleeptime=5
+    sleeptime=3
     sleepsofar=0
     echo "waiting a maximum of $((sleeptime*retries)) seconds for the project to finish."
     while [ $retries -gt 0 ]; do
@@ -36,8 +42,9 @@ function test_runmd() {
                 break
             else
                 sleep 5
-		sleepsofar="$((sleepsofar+sleeptime))"
-		echo "total wait time so far: ${sleepsofar}"
+		        sleepsofar="$((sleepsofar+sleeptime))"
+                # delete and reprint this line so it updates without scrolling
+                echo -e "\033[1A\033[Kwaiting a maximum of $((sleeptime*retries)) seconds for the project to finish. (waited $sleepsofar seconds)"
             fi
         fi
     done
@@ -45,7 +52,6 @@ function test_runmd() {
 
     return 1
 }
-
 
 # if ACTUAL_CONFIG doesn't exist, warn and fail
 if ! [ -f $ACTUAL_CONFIG ]; then
@@ -55,12 +61,17 @@ if ! [ -f $ACTUAL_CONFIG ]; then
     # return 1
 fi
 
-# Using RunMD will generate a default configuration if one does not exist.
-test_runmd
-FAILURE=$?
+FAILED=false
+for TEST_INPUT in "${TEST_INPUTS[@]}"; do
+    test_runmd $TEST_INPUT
+    FAILURE=$?
+    if [ $FAILURE -ne 0 ]; then
+        printf "MDaaS tests failed with input: $TEST_INPUT\n"
+        FAILED=true
+    fi
+done
 
-
-if [ $FAILURE -ne 0 ]; then
-    printf "Instance configuration test failed, if you are in a development environment, please try deleting the instance config and restarting your DevEnv!\nIf you are running in production, please check your configuration!\n"
+if [ $FAILED = true ]; then
+    printf "One or more MDaaS tests failed.\n"
     return 1
 fi

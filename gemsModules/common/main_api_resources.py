@@ -2,7 +2,7 @@
 import email
 from email.message import EmailMessage
 import mimetypes
-from typing import Any, List
+from typing import Any, List, Optional
 from pydantic import BaseModel, Field
 from pathlib import Path
 import urllib.request
@@ -115,13 +115,13 @@ class Resource(BaseModel, MimeEncodableResourceMixin):
         None,
         description="The thing that is described by the location and format.",
     )
-    notices: Notices = Field(
-        default_factory=Notices,
-        description="Notices associated with this resource",
-    )
     options: dict[str, str] = Field(
         default_factory=dict,
         description="Key-value pairs that are specific to each entity, service, etc",
+    )
+    notices: Optional[Notices] = Field(
+        default_factory=Notices,
+        description="Notices associated with this resource",
     )
 
     @property
@@ -136,6 +136,26 @@ class Resource(BaseModel, MimeEncodableResourceMixin):
                 "No filename specified, please set it with options['filename'] or use a File payload."
             )
 
+    def get_payload(self, decode=False):
+        """Return the data from the payload.
+
+        - Can override and call super from subclass to extend location types.
+        - Can also override the handlers to extend functionality.
+        """
+        if self.locationType == "filesystem-path-unix" or self.locationType == "File":
+            payload = self._handle_file()
+        elif self.locationType == "Payload" or self.locationType == "String":
+            payload = self._handle_payload()
+        elif self.locationType == "URL":
+            payload = self._handle_url()
+        else:
+            raise ValueError(f"Unknown locationType {self.locationType}")
+
+        if decode:
+            return payload.decode("utf-8")
+        else:
+            return payload
+    
     def copy_to(self, parent_dir: Path, filename=None):
         """Copy this resource to the destination directory."""
         filename = filename or self.filename
@@ -144,7 +164,7 @@ class Resource(BaseModel, MimeEncodableResourceMixin):
             path = Path(parent_dir) / filename
 
         with open(path, "wb") as f:
-            f.write(self._get_payload())
+            f.write(self.get_payload())
 
         log.debug(f"Copying resource {self} to {path}...")
         # return a resource for the new file
@@ -170,22 +190,7 @@ class Resource(BaseModel, MimeEncodableResourceMixin):
         with urllib.request.urlopen(self.payload) as f:
             return self.try_decode_mime(f.read())
 
-    def _get_payload(self):
-        """Return the data from the payload.
 
-        - Can override and call super from subclass to extend location types.
-        - Can also override the handlers to extend functionality.
-        """
-        if self.locationType == "filesystem-path-unix" or self.locationType == "File":
-            payload = self._handle_file()
-        elif self.locationType == "Payload" or self.locationType == "String":
-            payload = self._handle_payload()
-        elif self.locationType == "URL":
-            payload = self._handle_url()
-        else:
-            raise ValueError(f"Unknown locationType {self.locationType}")
-
-        return payload
 
     def convert_resource_format(self, resourceFormat: str):
         pass

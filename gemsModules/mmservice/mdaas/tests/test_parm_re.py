@@ -1,7 +1,7 @@
 import re
 import logging 
 
-from gemsModules.mmservice.mdaas.tasks.calculate_days_per_ns import parse_amber_parm7_natoms, parse_amber_parm7_pointers
+from gemsModules.mmservice.mdaas.tasks.calculate_time_est_from_parm7 import parse_amber_parm7_natoms, parse_amber_parm7_pointers
 
 logging.basicConfig(level=logging.DEBUG)
 # Example usage

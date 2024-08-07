@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 
 from gemsModules.common.main_api_resources import Resources
 
-from gemsModules.mmservice.mdaas.main_api import (
+from gemsModules.mmservice.mdaas.main_api_common import (
     MDaaS_Service_Request,
     MDaaS_Service_Response,
 )
@@ -56,7 +56,11 @@ class ProjectManagement_Outputs(BaseModel):
         title="Output File Path",
         description="Full path to output file",
     )
-    resources: Resources = Resources()
+    resources: Resources = Field(
+        title="Resources",
+        description="List of resources used",
+        default_factory=Resources,
+    )
 
 
 # PM Requests should be based in common.Request, in my mind.
