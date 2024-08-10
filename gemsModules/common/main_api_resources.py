@@ -115,7 +115,7 @@ class Resource(BaseModel, MimeEncodableResourceMixin):
         None,
         description="The thing that is described by the location and format.",
     )
-    options: dict[str, str] = Field(
+    options: Optional[dict[str, str]] = Field(
         default_factory=dict,
         description="Key-value pairs that are specific to each entity, service, etc",
     )

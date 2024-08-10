@@ -29,7 +29,9 @@ class mdaas_Request_Data_Filler(Request_Data_Filler):
     # No data to fill here.
     def process(self) -> list[AAOP]:
         """Fill in any data required in the service request aaop_list."""
-        for i, aaop in enumerate(self.aaop_list):
+        
+        # TODO: Ordering and workflow manager compatibility
+        for i, aaop in enumerate(reversed(self.aaop_list)):
             log.debug(f"i: {i}, {aaop.AAO_Type=}")
 
             # TODO: Use the settings.KnownServices dict to map AAO_Type to fillers.
@@ -48,33 +50,46 @@ class mdaas_Request_Data_Filler(Request_Data_Filler):
         #
         # N: Resources will not be available in RunMD.logic.execute() unless we add them here.
         # This design implementation differs from the GM Entity's current conceptualization, which always has resources.
-        aaop.The_AAO.inputs = run_md_api.run_md_Inputs(
-            pUUID=self.response_project.pUUID,
-            outputDirPath=self.response_project.project_dir,
-            protocolFilesPath=self.response_project.protocolFilesPath,
-        )
+        aaop.The_AAO.inputs.pUUID = self.response_project.pUUID
+        aaop.The_AAO.inputs.outputDirPath = self.response_project.project_dir
+        aaop.The_AAO.inputs.protocolFilesPath = self.response_project.protocolFilesPath
 
         log.debug(f"RUNMD AAOP {aaop}")
-        # Add the parameter-topology and restart files as resources.
-        parm7 = Resource(
-            payload=aaop,
-            resourceFormat="AMBER-7-prmtop",
-            resourceRole="parameter-topology-file",
-            locationType="filesystem-path-unix",
-        )
-
+        if aaop.The_AAO.inputs.parameter_topology_file is not None:
+            parm7 = Resource(
+                payload=aaop.The_AAO.inputs.parameter_topology_file,
+                resourceFormat="AMBER-7-prmtop",
+                resourceRole="parameter-topology",
+                locationType="filesystem-path-unix"
+            )
+            aaop.The_AAO.inputs.resources.add_resource(parm7)
+        if aaop.The_AAO.inputs.input_coordinate_file is not None:
+            rst7 = Resource(
+                payload=aaop.The_AAO.inputs.input_coordinate_file,
+                resourceFormat="AMBER-7-restart",
+                resourceRole="input-coordinate",
+                locationType="filesystem-path-unix"
+            )
+            aaop.The_AAO.inputs.resources.add_resource(rst7)
+        if aaop.The_AAO.inputs.unminimized_gas_file is not None:
+            gas = Resource(
+                payload=aaop.The_AAO.inputs.unminimized_gas_file,
+                resourceFormat="AMBER-7-prmtop",
+                resourceRole="unminimized-gas",
+                locationType="filesystem-path-unix"
+            )
+            aaop.The_AAO.inputs.resources.add_resource(gas)
+            
+        log.debug(f"RUNMD AAOP FILLED: {aaop}")
         return self.aaop_list
 
     # TODO: PDBFile and MDaaS PM data fillers are very similar, can we generalize them?
-    def __fill_projman_aaop(self, i: int, aaop: AAOP):
-
-        aaop.The_AAO.inputs = pm_api.ProjectManagement_Inputs(
-            pUUID=self.response_project.pUUID,
-            projectDir=self.response_project.project_dir,
-            protocolFilesPath=self.response_project.protocolFilesPath,
-            outputDirPath=self.response_project.project_dir,
-            sim_length=self.response_project.sim_length,
-        )
+    def __fill_projman_aaop(self, i: int, aaop: AAOP):        
+        aaop.The_AAO.inputs.pUUID = self.response_project.pUUID
+        aaop.The_AAO.inputs.projectDir = self.response_project.project_dir
+        aaop.The_AAO.inputs.protocolFilesPath = self.response_project.protocolFilesPath
+        aaop.The_AAO.inputs.outputDirPath = self.response_project.project_dir
+        aaop.The_AAO.inputs.sim_length = self.response_project.sim_length
 
         # Add the input request as a json file resource.
         input_json = Resource(
@@ -84,30 +99,26 @@ class mdaas_Request_Data_Filler(Request_Data_Filler):
             options={"filename": "input.json"},
         )
         aaop.The_AAO.inputs.resources.add_resource(input_json)
+        
 
         # TODO/FIX: Could be more generic/lifted.
+        # Are we certain that RunMD will always have all resources filled first?
         if aaop.Requester is not None:
-            requester_aaop = find_aaop_by_id(self.aaop_list, aaop.Requester)
+            log.debug(f"MDaaS/ProjectManagement requester: {aaop.Requester}")
+            requester_aaop = find_aaop_by_id(self.aaop_list, aaop.Requester) 
+            log.debug(f"resources: {requester_aaop.The_AAO.inputs.resources}")
             for resource in requester_aaop.The_AAO.inputs.resources:
                 aaop.The_AAO.inputs.resources.add_resource(resource)
-    
-        log.debug(
-            "\tFinished building ProjectManagement_Inputs, aaop_list[%s].inputs filled with %s",
-            i,
-            self.aaop_list[i].The_AAO.inputs,
-        )
 
     def __fill_evaluate_aaop(self, i: int, aaop: AAOP):
-        # Same as in __fill_projman_aaop.
+        aaop.The_AAO.inputs.pUUID = self.response_project.pUUID
+        aaop.The_AAO.inputs.projectDir = self.response_project.project_dir
+        aaop.The_AAO.inputs.protocolFilesPath = self.response_project.protocolFilesPath
+        aaop.The_AAO.inputs.outputDirPath = self.response_project.project_dir
+        aaop.The_AAO.inputs.sim_length = self.response_project.sim_length
 
-        aaop.The_AAO.inputs = evaluate_api.Evaluate_Inputs(
-            pUUID=self.response_project.pUUID,
-            projectDir=self.response_project.project_dir,
-            protocolFilesPath=self.response_project.protocolFilesPath,
-            outputDirPath=self.response_project.project_dir,
-            sim_length=self.response_project.sim_length,
-        )
         if aaop.Requester is not None:
             requester_aaop = find_aaop_by_id(self.aaop_list, aaop.Requester)
             for resource in requester_aaop.The_AAO.inputs.resources:
                 aaop.The_AAO.inputs.resources.add_resource(resource)
+                

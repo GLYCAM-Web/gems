@@ -7,7 +7,7 @@ ACTUAL_CONFIG="$GEMSHOME/instance_config.json"
 EXAMPLE_CONFIG="$ACTUAL_CONFIG.example"
 
 TEST_INPUTS=(
-    "/programs/gems/gemsModules/mmservice/mdaas/tests/inputs/017.test.with-all-resources-list.json"
+    "$GEMSHOME/gemsModules/mmservice/mdaas/tests/inputs/017.test.with-all-resources-list.json"
     "$GEMSHOME/gemsModules/mmservice/mdaas/tests/inputs/017.test.json" 
     "$GEMSHOME/gemsModules/mmservice/mdaas/tests/inputs/017.test.with-unmin-gas-and-options.json"
 )
@@ -15,19 +15,26 @@ TEST_INPUTS=(
 # with args now
 function test_runmd() {
     DELEGATE_TEST_INPUT=$1
+    echo "Running test with input: $DELEGATE_TEST_INPUT"
+
     response="$(cat $DELEGATE_TEST_INPUT | $GEMSHOME/bin/delegate)"
     notices="$(echo $response | $GEMSHOME/tests/utilities/json_ripper.py notices)"
     
     if [ "$notices" != "{}" ]; then
+        # TODO/N.B: This will not be a reliable test for much longer.
         printf "Failure: Notices are not empty.\n$notices\n\n"
         return 1
     fi
 
-    project_dir="$(echo $response | grep -Po '"projectDir"\s*:\s*"\K[^"]*')"
-    echo $project_dir
+    project_dir="$(echo $response | grep -Po '"project_dir"\s*:\s*"\K[^"]*')"
+    if [ -z "$project_dir" ]; then
+        printf "Failure: project_dir is empty.\n\n"
+        printf "The Response:\n$response\n\n"
+        return 1
+    fi
 
-    retries=24
-    sleeptime=3
+    retries=20
+    sleeptime=5
     sleepsofar=0
     echo "waiting a maximum of $((sleeptime*retries)) seconds for the project to finish."
     while [ $retries -gt 0 ]; do
@@ -41,14 +48,14 @@ function test_runmd() {
                 echo "DID NOT FIND ${project_dir}/10.produ.o and ${project_dir}/status.log after multiple checks"
                 break
             else
-                sleep 5
+                sleep $sleeptime
 		        sleepsofar="$((sleepsofar+sleeptime))"
-                # delete and reprint this line so it updates without scrolling
-                echo -e "\033[1A\033[Kwaiting a maximum of $((sleeptime*retries)) seconds for the project to finish. (waited $sleepsofar seconds)"
+                if [ $((retries % 3)) -eq 0 ]; then
+                    echo "waiting up to $((sleeptime*retries)) more seconds for the project to finish."
+                fi
             fi
         fi
     done
-
 
     return 1
 }

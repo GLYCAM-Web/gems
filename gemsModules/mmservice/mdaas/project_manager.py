@@ -118,9 +118,9 @@ class mdaas_Project_Manager(Project_Manager):
     
     def __handle_runmd_service_resources(self, service):
         for resource in service.inputs.resources:
-            if resource.resourceRole == "parameter-topology-file":
+            if resource.resourceRole == "parameter-topology":
                 self.response_project.parm7_file_name = resource.filename
-            if resource.resourceRole == "input-coordinate-file":
+            if resource.resourceRole == "input-coordinate":
                 self.response_project.rst7_file_name = resource.filename
             if resource.resourceRole == "unminimized-gas":
                 self.response_project.unsolvated_parm7_file_name = resource.filename

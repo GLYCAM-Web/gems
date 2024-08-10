@@ -40,6 +40,18 @@ class run_md_Inputs(BaseModel):
         title="Control Script",
         description="Name of the script used to run the protocol",
     )
+    parameter_topology_file: str = Field(
+        None,
+        alias="parameter-topology-file",
+    )
+    input_coordinate_file: str = Field(
+        None,
+        alias="input-coordinate-file",
+    )
+    unminimized_gas_file: str = Field(
+        None,
+        alias="unminimized-gas-file",
+    )
     resources: Resources = Field(
         title="Resources",
         description="List of input resources",

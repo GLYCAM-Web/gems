@@ -24,7 +24,7 @@ def execute(inputs: Evaluate_Inputs) -> Evaluate_Outputs:
     service_outputs = Evaluate_Outputs()
 
     for resource in inputs.resources:
-        if resource.resourceRole == "parameter-topology-file":
+        if resource.resourceRole == "parameter-topology":
             content = resource.get_payload(decode=True)
             log.debug(f"MDaaS/Evaluate parameter-topology-file content: {type(content)}")
                 

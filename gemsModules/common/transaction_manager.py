@@ -75,8 +75,6 @@ class Transaction_Manager(ABC):
 
         log.debug("\tthe aaop request list is: %s", self.aaop_request_list)
 
-    # TODO: Move to end of request_manager.process?
-
     def generate_aaop_tree_pair(self):
         """Generate the AAOP Tree Pair from the AAOP Request List."""
         log.debug("about to generate aaop tree pair")

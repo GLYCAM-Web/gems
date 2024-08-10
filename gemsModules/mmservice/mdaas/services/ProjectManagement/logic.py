@@ -16,7 +16,8 @@ log = Set_Up_Logging(__name__)
 
 def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     """Executes the service."""
-    log.debug("Beginning MDaaS ProjectManagement")
+    log.debug(f"Beginning MDaaS ProjectManagement")
+    log.debug(f"Got resources: {inputs.resources}")
     service_outputs = ProjectManagement_Outputs()
 
     # create project/output directory TODO: setup before copy_to or after?
@@ -28,26 +29,22 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
         # Copy all Resources to the output directory.
         copy = False
 
-        if resource.resourceRole == "parameter-topology-file":
+        if resource.resourceRole == "parameter-topology":
             amber_parm7 = resource.filename
             copy = True
-        if resource.resourceRole == "input-coordinate-file":
+        if resource.resourceRole == "input-coordinate":
             amber_rst7 = resource.filename
             copy = True
         if resource.resourceRole == "unminimized-gas":
             log.debug(f"unminimized-gas: {resource.filename}")
-            unmin_gas = resource
+            unmin_gas = resource.filename
             copy = True
 
         if copy:
             resource.copy_to(inputs.outputDirPath)
 
     if not amber_parm7 or not amber_rst7:
-        raise ValueError("Missing required AMBER-7-prmtop or AMBER-7-restart resource.")
-
-    if unmin_gas:
-        log.debug(f"Copying unminimized-gas: {unmin_gas.filename}")
-        unmin_gas.copy_to(inputs.outputDirPath)
+        raise ValueError(f"Missing required AMBER-7-prmtop or AMBER-7-restart resource. got {amber_parm7=} {amber_rst7=} {unmin_gas=}")
         
     # Set up the run directory.
     set_up_run_md_directory.execute(
