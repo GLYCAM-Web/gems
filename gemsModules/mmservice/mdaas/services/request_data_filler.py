@@ -44,15 +44,13 @@ class mdaas_Request_Data_Filler(Request_Data_Filler):
 
         return self.aaop_list
 
+    # TODO: Generalize these fillers a bit, think about a better way to handle this.
     def __fill_run_md_aaop(self, i: int, aaop: AAOP) -> List[AAOP]:
-        # TODO/N: This doesn't make much sense as the RunMD service takes a parm7 and rst7 as inputs,
-        # but we don't even use run_md_Inputs in the API. See implied translator todos.
-        #
-        # N: Resources will not be available in RunMD.logic.execute() unless we add them here.
-        # This design implementation differs from the GM Entity's current conceptualization, which always has resources.
         aaop.The_AAO.inputs.pUUID = self.response_project.pUUID
-        aaop.The_AAO.inputs.outputDirPath = self.response_project.project_dir
+        aaop.The_AAO.inputs.projectDir = self.response_project.project_dir
         aaop.The_AAO.inputs.protocolFilesPath = self.response_project.protocolFilesPath
+        aaop.The_AAO.inputs.outputDirPath = self.response_project.project_dir
+        aaop.The_AAO.inputs.sim_length = self.response_project.sim_length
 
         log.debug(f"RUNMD AAOP {aaop}")
         if aaop.The_AAO.inputs.parameter_topology_file is not None:

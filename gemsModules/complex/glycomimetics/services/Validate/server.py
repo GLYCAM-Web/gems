@@ -18,6 +18,6 @@ def Serve(service: Validate_Request) -> Validate_Response:
     log.debug(f"service.inputs: {service.inputs}")
 
     # TODO: Pydantic should automatically do this...
-    results, notices = execute(service)
+    results, notices = execute(service.inputs)
 
     return Validate_Response(outputs=results, notices=notices)

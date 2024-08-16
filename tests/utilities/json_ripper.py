@@ -30,7 +30,13 @@ def main():
     keys = args.json_index.split(".")
     current_object = json_object
     for key in keys:
-        current_object = current_object[key]
+        # check for [index] in key 
+        if "[" in key and "]" in key:
+            key, index = key.split("[")
+            index = index.replace("]", "")
+            current_object = current_object[key][int(index)]
+        else:
+            current_object = current_object[key]
 
     print(current_object, end="")
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from pydantic import BaseModel, Field
-from typing import List, Union
+from typing import List, Optional, Union
 
 from gemsModules.common.main_api_resources import Resource, Resources
 
@@ -30,6 +30,11 @@ class run_md_Inputs(BaseModel):
         title="Protocol files directory",
         description="Path to where the protocol files are stored",
     )
+    projectDir: Optional[str] = Field(
+        None,
+        title="Project Directory",
+        description="Full path to project directory",
+    )
     use_serial: bool = Field(
         False,
         title="Use Serial",
@@ -40,6 +45,7 @@ class run_md_Inputs(BaseModel):
         title="Control Script",
         description="Name of the script used to run the protocol",
     )
+    
     parameter_topology_file: str = Field(
         None,
         alias="parameter-topology-file",
@@ -52,12 +58,16 @@ class run_md_Inputs(BaseModel):
         None,
         alias="unminimized-gas-file",
     )
+    sim_length: Optional[str] = Field(
+        None,
+        title="Simulation Length",
+        description="Length of simulation in ns",
+    )
     resources: Resources = Field(
         title="Resources",
         description="List of input resources",
         default_factory=Resources,
     )
-
 class run_md_Outputs(BaseModel):
     outputDirPath: str = Field(
         None,

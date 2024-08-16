@@ -65,11 +65,11 @@ class Evaluate_Outputs(BaseModel):
 
 
 class Evaluate_Request(MDaaS_Service_Request):
-    typename: str = Field("RunMD", alias="type")
+    typename: str = Field("Evaluate", alias="type")
     # the following must be redefined in a child class
     inputs: Evaluate_Inputs = Evaluate_Inputs()
 
 
 class Evaluate_Response(MDaaS_Service_Response):
-    typename: str = Field("RunMD", alias="type")
+    typename: str = Field("Evaluate", alias="type")
     outputs: Evaluate_Outputs = Evaluate_Outputs()

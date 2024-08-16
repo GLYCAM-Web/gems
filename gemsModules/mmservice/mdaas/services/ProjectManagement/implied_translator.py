@@ -4,11 +4,7 @@ import uuid
 
 from gemsModules.common.action_associated_objects import AAOP
 
-# from gemsModules.common.services.implied_requests import Implied_Services_Inputs
-from gemsModules.mmservice.mdaas.services.ProjectManagement.api import (
-    ProjectManagement_Request,
-    ProjectManagement_Inputs,
-)
+
 from gemsModules.common.services.each_service.implied_translator import (
     Implied_Translator,
 )
@@ -23,6 +19,7 @@ class ProjectManagement_Implied_Translator(Implied_Translator):
     Bundle resulting services into a service request package list (List[AAOP]).
     """
 
-    def process(self, input_object: ProjectManagement_Inputs) -> List[AAOP]:
+    def process(self, input_object) -> List[AAOP]:
+        log.debug("In ProjectManagement_Implied_Translator.process, input_object is type: %s", type(input_object))
         self.aaop_list = []
         return self.get_aaop_list()

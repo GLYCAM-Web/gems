@@ -75,6 +75,15 @@ def execute(inputs: Evaluate_Inputs) -> Evaluate_Outputs:
                             Replaced_Atom=atom.atom_to_replace_,
                         )
                         service_outputs.Available_Modification_Options.append(posmod)
+                except ImportError as e:
+                    service_notices.addNotice(
+                        Brief="Error during Evaluation",
+                        Scope="Service",
+                        Messenger="Glycomimetics",
+                        Type="Error",
+                        Code="603",
+                        Message=f"Currently unable to Evaluate PDB because this feature is not implemented.",
+                    )
                 except Exception as e:
                     service_notices.addNotice(
                         Brief="Error during Evaluation",

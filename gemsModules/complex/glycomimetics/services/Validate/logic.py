@@ -12,10 +12,8 @@ from .api import Validate_Inputs, Validate_Outputs
 log = Set_Up_Logging(__name__)
 
 
-# Not working.
-@validate_arguments
 def execute(inputs: Validate_Inputs) -> Validate_Outputs:
-    log.debug(f"serviceInputs: {inputs}")
+    log.debug(f"Validate resources at servicing: {inputs}")
     service_outputs = Validate_Outputs()
     service_notices = Notices()
 

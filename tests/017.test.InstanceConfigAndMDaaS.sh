@@ -34,7 +34,7 @@ function test_runmd() {
     fi
 
     retries=20
-    sleeptime=5
+    sleeptime=3
     sleepsofar=0
     echo "waiting a maximum of $((sleeptime*retries)) seconds for the project to finish."
     while [ $retries -gt 0 ]; do

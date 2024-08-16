@@ -69,24 +69,24 @@ class mdaas_Workflow_Manager(Workflow_Manager):
                 # This is likely a job for the implied translator instead.
                 if new_dep == "ProjectManagement":
                     new_aaop = AAOP(
-                        AAO_Type="ProjectManagement",
+                        AAO_Type=new_dep,
                         The_AAO=ProjectManagement_Request(),
                         ID_String=uuid.uuid4(),
-                        Dictionary_Name="ProjectManagement_Dep_Request",
+                        Dictionary_Name=f"{new_dep}_Dep_Request",
                     )
                 elif new_dep == "RunMD":
                     new_aaop = AAOP(
-                        AAO_Type="RunMD",
+                        AAO_Type=new_dep,
                         The_AAO=run_md_Request(),
                         ID_String=uuid.uuid4(),
-                        Dictionary_Name="RunMD_Dep_Request",
+                        Dictionary_Name=f"{new_dep}_Dep_Request",
                     )
                 elif new_dep == "Evaluate":
                     new_aaop = AAOP(
-                        AAO_Type="Evaluate",
+                        AAO_Type=new_dep,
                         The_AAO=Evaluate_Request(),
                         ID_String=uuid.uuid4(),
-                        Dictionary_Name="Evaluate_Dep_Request",
+                        Dictionary_Name=f"{new_dep}_Dep_Request",
                     )
 
                 if new_aaop:
