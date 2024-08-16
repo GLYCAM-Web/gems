@@ -7,6 +7,8 @@ from gemsModules.common.main_api import Transaction
 from gemsModules.common.main_api_entity import Entity
 from gemsModules.project.main_api import Project
 
+from gemsModules.common.code_utils import find_aaop_by_id
+
 from gemsModules.logging.logger import Set_Up_Logging
 
 log = Set_Up_Logging(__name__)
@@ -26,6 +28,15 @@ class Request_Data_Filler(ABC):
     @abstractmethod
     def process(self) -> List[AAOP]:
         pass
+
+    def fill_resources_from_requester_if_exists(self, aaop):
+        """ If this aaop has a requester, copy the resources from the requester to this aaop. """
+        # TODO: optional filter by resourceRoles.
+        if aaop.Requester is not None:
+            requester_aaop = find_aaop_by_id(self.aaop_list, aaop.Requester) 
+            log.debug(f"resources: {requester_aaop.The_AAO.inputs.resources}")
+            for resource in requester_aaop.The_AAO.inputs.resources:
+                aaop.The_AAO.inputs.resources.add_resource(resource)
 
 
 class common_Request_Data_Filler(Request_Data_Filler):

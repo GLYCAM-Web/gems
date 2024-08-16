@@ -2,7 +2,7 @@
 import email
 from email.message import EmailMessage
 import mimetypes
-from typing import Any, List, Optional
+from typing import Any, List, Literal, Optional
 from pydantic import BaseModel, Field
 from pathlib import Path
 import urllib.request
@@ -88,6 +88,7 @@ class Resource(BaseModel, MimeEncodableResourceMixin):
     the payload would be the actual info and not the address of the info.
 
     What to do with the info will vary a lot depending on the needs of the service.
+    The resourceRole can be used by an Entity
     """
 
     typename: str = Field(
@@ -96,7 +97,7 @@ class Resource(BaseModel, MimeEncodableResourceMixin):
         title="Resource type",
         description="The name of the type of Resource.",
     )
-    locationType: str = Field(  # Literal['URL', 'File', 'Payload']
+    locationType: Literal['Payload', 'URL', 'File', 'filesystem-path-unix'] = Field( 
         None,
         title="Location Type",
         description="Supported locations will vary with each Entity.",
@@ -109,7 +110,7 @@ class Resource(BaseModel, MimeEncodableResourceMixin):
     resourceRole: str = Field(
         None,
         title="Resource Role",
-        description="Supported roles will vary with each Entity and Service.",
+        description="Roles indicate the function or purpose of a Resource.",
     )
     payload: Any = Field(
         None,
@@ -228,9 +229,11 @@ class Resources(BaseModel):
 
         return [resource for resource in self.__root__ if resource.typename == typename]
 
-    def clear_payloads(self):
+    def clear_payloads(self, verbose_api=False):
         for resource in self:
             resource.payload = None
+            if verbose_api:
+                resource.options['cleared_payload'] = True
 
     def __getitem__(self, key):
         return self.__root__[key]

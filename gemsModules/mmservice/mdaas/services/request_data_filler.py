@@ -98,15 +98,8 @@ class mdaas_Request_Data_Filler(Request_Data_Filler):
         )
         aaop.The_AAO.inputs.resources.add_resource(input_json)
         
-
-        # TODO/FIX: Could be more generic/lifted.
-        # Are we certain that RunMD will always have all resources filled first?
-        if aaop.Requester is not None:
-            log.debug(f"MDaaS/ProjectManagement requester: {aaop.Requester}")
-            requester_aaop = find_aaop_by_id(self.aaop_list, aaop.Requester) 
-            log.debug(f"resources: {requester_aaop.The_AAO.inputs.resources}")
-            for resource in requester_aaop.The_AAO.inputs.resources:
-                aaop.The_AAO.inputs.resources.add_resource(resource)
+        # For now, we will simply copy all resources from RunMD if it requested this service.
+        self.fill_resources_from_requester_if_exists(aaop)
 
     def __fill_evaluate_aaop(self, i: int, aaop: AAOP):
         aaop.The_AAO.inputs.pUUID = self.response_project.pUUID

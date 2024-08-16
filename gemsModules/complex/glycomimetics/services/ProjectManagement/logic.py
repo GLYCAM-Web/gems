@@ -26,11 +26,15 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
             resourceType="output",
         )
     )
+    
+    log.debug("GM/ProjectManagement: about to copy resources to project dir")
+    log.debug(f"GM/ProjectManagement: resources: {inputs.resources}")
+    
     # Copy all PM_Resources to the output directory.
-    # for resource in inputs.resources:
-    #    # Copy all PM_Resources to the output directory.
-    #    if isinstance(resource, PM_Resource):
-    #        resource.copy_to(inputs.outputDirPath)
+    for resource in inputs.resources:
+        # Copy all PM_Resources to the output directory.
+        # if isinstance(resource, PM_Resource):
+        resource.copy_to(inputs.outputDirPath)
 
     # # TODO: we can use PM_Resource.copy_to to copy the files to the output directory.
     # service_outputs.resources = ProjectManagement_Resources(resources=resources)

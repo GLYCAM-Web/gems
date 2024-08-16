@@ -62,20 +62,8 @@ class Glycomimetics_Request_Data_Filler(Request_Data_Filler):
             options={"filename": "input.json"},
         )
         aaop.The_AAO.inputs.resources.add_resource(input_json)
-
-        # if aaop.Requester is not None:
-        #     # If we were using an AAOP_Tree we could use aaop_tree.get_aaop_by_id(aaop.Requester)
-        #     requester_aaop = find_aaop_by_id(self.aaop_list, aaop.Requester)
-        #     log.debug("Found requester aaop[%s]", requester_aaop)
-        #     log.debug(
-        #         "for aaop_list[%s], %s",
-        #         i, requester_aaop.The_AAO.inputs,
-        #     )
-        # else:
-        #     log.debug(
-        #         "No requester found for aaop_list[%s], PM service request will not have a pdb file resource.", i,
-        #     )
-
+        
+        self.fill_resources_from_requester_if_exists(aaop)
         log.debug(
             "\tFinished building ProjectManagement_Inputs, aaop_list[%s].inputs filled with %s",
             i,
