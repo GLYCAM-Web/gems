@@ -46,5 +46,5 @@ def Serve(service_request: run_md_Request) -> run_md_Response:
         if docake == True:
             response.outputs.info = cake.execute(cake_inputs)
 
-    response.outputs.outputDirPath = service_request.inputs.outputDirPath
+    response.outputs.projectDir = service_request.inputs.projectDir
     return response

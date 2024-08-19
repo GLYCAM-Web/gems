@@ -21,7 +21,7 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     service_outputs = ProjectManagement_Outputs()
 
     # create project/output directory TODO: setup before copy_to or after?
-    os.makedirs(inputs.outputDirPath, exist_ok=True)
+    os.makedirs(inputs.projectDir, exist_ok=True)
 
     amber_parm7, amber_rst7, unmin_gas = None, None, None
 
@@ -41,7 +41,9 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
             copy = True
 
         if copy:
-            resource.copy_to(inputs.outputDirPath)
+            file_resource = resource.copy_to(inputs.projectDir)
+            service_outputs.resources.add_resource(file_resource)
+
 
     if not amber_parm7 or not amber_rst7:
         raise ValueError(f"Missing required AMBER-7-prmtop or AMBER-7-restart resource. got {amber_parm7=} {amber_rst7=} {unmin_gas=}")
@@ -49,16 +51,16 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     # Set up the run directory.
     set_up_run_md_directory.execute(
         protocol_files_dir=inputs.protocolFilesPath,
-        output_dir_path=inputs.outputDirPath,
+        output_dir_path=inputs.projectDir,
         # TODO: Right now, the uploads dir path is obtained from a default MDProject.
         parm7_real_name=amber_parm7,
         rst7_real_name=amber_rst7,
     )
 
     # Update the production.in file with the simulation length from the request
-    update_10_produ_in_sim_length.execute(inputs.outputDirPath, inputs.sim_length)
+    update_10_produ_in_sim_length.execute(inputs.projectDir, inputs.sim_length)
 
     # update service outputs
-    service_outputs.outputDirPath = inputs.outputDirPath
+    service_outputs.projectDir = inputs.projectDir
 
     return service_outputs

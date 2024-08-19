@@ -93,15 +93,17 @@ class Build_Options(BaseModel):
 
 
 class Build_Inputs(BaseModel):
-    Available_Libraries: List[str] = (
-        Moiety_Library_Names.get_json_list()
-    )  # might need syntax adjustment
-    Selected_Modification_Options: Position_Modification_Options = None
     pUUID: str = Field(
         None,
         title="Project UUID",
         description="UUID of Project",
     )
+    
+    Available_Libraries: List[str] = (
+        Moiety_Library_Names.get_json_list()
+    )  # might need syntax adjustment
+    Selected_Modification_Options: Position_Modification_Options = None
+
     complex_PDB_Filename: str = None
     # Until we have the workflow down, the correct location for these is unclear.
     # For the moment, I'm assuming that they get made during the Evaluate step.
@@ -114,8 +116,10 @@ class Build_Inputs(BaseModel):
     #        description="Complex to build",
     #    )
     buildOptions: Build_Options = Build_Options()
-    resources: Build_Input_Resources = Build_Input_Resources()
-
+    
+    # TODO: Fix the complications
+    #resources: Build_Input_Resources = Build_Input_Resources()
+    resources: Resources = Resources()
 
 # it will be hard to specify this before the workflow is well specified
 class Build_Outputs(BaseModel):

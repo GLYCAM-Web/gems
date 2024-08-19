@@ -63,48 +63,22 @@ class mdaas_Workflow_Manager(Workflow_Manager):
             # TODO: the dep resolution could be more general (really a lot of this workflow manager)
             for new_dep in these_deps:
                 log.debug("Resolving dependency %s", new_dep)
+                aao_cls = globals()[f"{new_dep}_Request"]
                 
-                new_aaop = None
-                # TODO: We could probably generalize this for Entity-registered services...
-                # This is likely a job for the implied translator instead.
-                if new_dep == "ProjectManagement":
-                    new_aaop = AAOP(
-                        AAO_Type=new_dep,
-                        The_AAO=ProjectManagement_Request(),
-                        ID_String=uuid.uuid4(),
-                        Dictionary_Name=f"{new_dep}_Dep_Request",
-                    )
-                elif new_dep == "RunMD":
-                    new_aaop = AAOP(
-                        AAO_Type=new_dep,
-                        The_AAO=run_md_Request(),
-                        ID_String=uuid.uuid4(),
-                        Dictionary_Name=f"{new_dep}_Dep_Request",
-                    )
-                elif new_dep == "Evaluate":
-                    new_aaop = AAOP(
-                        AAO_Type=new_dep,
-                        The_AAO=Evaluate_Request(),
-                        ID_String=uuid.uuid4(),
-                        Dictionary_Name=f"{new_dep}_Dep_Request",
-                    )
+                new_aaop = AAOP(
+                    AAO_Type=new_dep,
+                    The_AAO=aao_cls(),
+                    ID_String=uuid.uuid4(),
+                    Dictionary_Name=f"{new_dep}_Dep_Request",
+                )
+                new_aaop.set_requester(current_aaop)
 
-                if new_aaop:
-                    log.debug(
-                        "Adding dependency %s to aaop list before %s",
-                        new_aaop,
-                        current_aaop,
-                    )
-
-                    # Update the current AAOP's dependencies and set it as the requester AAOP.
-                    #   TODO: this seems like a common pattern we could lift out
-                    if current_aaop.Dependencies is None:
-                        current_aaop.Dependencies = []
-                    current_aaop.Dependencies.append(new_aaop.ID_String)
-                    new_aaop.Requester = current_aaop.ID_String
-
-                    # Append the new AAOP before the current AAOP.
-                    ordered.append(new_aaop)
+                log.debug(
+                    "Adding dependency %s to aaop list before %s",
+                    new_aaop,
+                    current_aaop,
+                )                
+                ordered.append(new_aaop)
 
             # Add this aaop after we're finished with its deps
             ordered.append(current_aaop)

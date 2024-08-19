@@ -83,8 +83,8 @@ class Request_Manager(ABC):
         self.set_explicit_aaops()
         self.remove_unknown_services()
         self.gather_implicit_services()
-        self.manage_duplicates()
         self.resolve_dependencies()
+        self.manage_duplicates()
 
         return self.deduplicated_aaop_list
 
@@ -146,11 +146,11 @@ class Request_Manager(ABC):
             return
 
         self.workflow_manager = self.workflow_manager_type(entity=self.entity)
-        self.deduplicated_aaop_list = self.workflow_manager.process(
-            self.deduplicated_aaop_list
+        self.aaop_list = self.workflow_manager.process(
+            self.aaop_list
         )
 
-        log.debug("\tthe ordered aaop request list is: %s", self.deduplicated_aaop_list)
+        log.debug("\tthe ordered aaop request list is: %s", self.aaop_list)
 
     def fill_request_data_needs(self, transaction):
         log.debug("about to fill request data needs")

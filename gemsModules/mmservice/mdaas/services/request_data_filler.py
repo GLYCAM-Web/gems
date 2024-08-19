@@ -49,7 +49,6 @@ class mdaas_Request_Data_Filler(Request_Data_Filler):
         aaop.The_AAO.inputs.pUUID = self.response_project.pUUID
         aaop.The_AAO.inputs.projectDir = self.response_project.project_dir
         aaop.The_AAO.inputs.protocolFilesPath = self.response_project.protocolFilesPath
-        aaop.The_AAO.inputs.outputDirPath = self.response_project.project_dir
         aaop.The_AAO.inputs.sim_length = self.response_project.sim_length
 
         log.debug(f"RUNMD AAOP {aaop}")
@@ -86,7 +85,6 @@ class mdaas_Request_Data_Filler(Request_Data_Filler):
         aaop.The_AAO.inputs.pUUID = self.response_project.pUUID
         aaop.The_AAO.inputs.projectDir = self.response_project.project_dir
         aaop.The_AAO.inputs.protocolFilesPath = self.response_project.protocolFilesPath
-        aaop.The_AAO.inputs.outputDirPath = self.response_project.project_dir
         aaop.The_AAO.inputs.sim_length = self.response_project.sim_length
 
         # Add the input request as a json file resource.
@@ -105,7 +103,6 @@ class mdaas_Request_Data_Filler(Request_Data_Filler):
         aaop.The_AAO.inputs.pUUID = self.response_project.pUUID
         aaop.The_AAO.inputs.projectDir = self.response_project.project_dir
         aaop.The_AAO.inputs.protocolFilesPath = self.response_project.protocolFilesPath
-        aaop.The_AAO.inputs.outputDirPath = self.response_project.project_dir
         aaop.The_AAO.inputs.sim_length = self.response_project.sim_length
 
         if aaop.Requester is not None:

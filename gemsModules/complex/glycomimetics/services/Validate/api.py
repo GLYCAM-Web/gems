@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from pydantic import BaseModel, Field, ValidationError, validator
-from typing import List, Union
+from typing import List, Optional, Union
 
 from gemsModules.common.main_api_resources import Resource, Resources
 
@@ -59,15 +59,18 @@ class Validate_Inputs(BaseModel):
         title="Project UUID",
         description="UUID of Project",
     )
-    resources: Validate_Resources = Validate_Resources()
+    
+    receptor: Optional[str] = Field(
+        None,
+        title="Receptor",
+        description="Receptor PDB file",
+    )
 
+    # TODO: see Build.api too and fix this
+    # resources: Validate_Resources = Validate_Resources()
+    resources: Resources = Resources()
 
 class Validate_Outputs(BaseModel):
-    # outputDirPath: str = Field(
-    #     None,
-    #     title="Output Directory Path",
-    #     description="Path to output directory",
-    # )
     isValid: bool = Field(
         None,
         title="Is Valid",

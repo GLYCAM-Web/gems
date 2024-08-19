@@ -20,25 +20,15 @@ class run_md_Inputs(BaseModel):
         title="Project UUID",
         description="UUID of Project",
     )
-    outputDirPath: str = Field(
-        None,
-        title="Output Directory Path",
-        description="Path to output directory",
-    )
-    protocolFilesPath: str = Field(
-        None,
-        title="Protocol files directory",
-        description="Path to where the protocol files are stored",
-    )
     projectDir: Optional[str] = Field(
         None,
         title="Project Directory",
         description="Full path to project directory",
     )
-    use_serial: bool = Field(
-        False,
-        title="Use Serial",
-        description="Should we force the GEMS code to run in serial?",
+    protocolFilesPath: str = Field(
+        None,
+        title="Protocol files directory",
+        description="Path to where the protocol files are stored",
     )
     control_script: str = Field(
         "Run_Protocol.bash",
@@ -46,6 +36,7 @@ class run_md_Inputs(BaseModel):
         description="Name of the script used to run the protocol",
     )
     
+    # Explicit inputs; copied to resources for internal use.
     parameter_topology_file: str = Field(
         None,
         alias="parameter-topology-file",
@@ -58,18 +49,28 @@ class run_md_Inputs(BaseModel):
         None,
         alias="unminimized-gas-file",
     )
+    
+    # Options
     sim_length: Optional[str] = Field(
         None,
         title="Simulation Length",
         description="Length of simulation in ns",
     )
+    use_serial: bool = Field(
+        False,
+        title="Use Serial",
+        description="Should we force the GEMS code to run in serial?",
+    )
+    
     resources: Resources = Field(
         title="Resources",
         description="List of input resources",
         default_factory=Resources,
     )
+    
+    
 class run_md_Outputs(BaseModel):
-    outputDirPath: str = Field(
+    projectDir: str = Field(
         None,
         title="Output Directory Path",
         description="Path to output directory",

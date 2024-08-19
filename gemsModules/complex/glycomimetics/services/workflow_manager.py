@@ -73,11 +73,10 @@ class Glycomimetics_Workflow_Manager(Workflow_Manager):
                 these_deps,
             )
 
-            # TODO: the dep resolution could be more general (really a lot of this workflow manager)
             for new_dep in these_deps:
-                # resolve the cls from the dependency string
                 log.debug("Resolving dependency %s", new_dep)
                 aao_cls = globals()[f"{new_dep}_Request"]
+                
                 new_aaop = AAOP(
                     AAO_Type=new_dep,
                     The_AAO=aao_cls(),
@@ -85,13 +84,14 @@ class Glycomimetics_Workflow_Manager(Workflow_Manager):
                     Dictionary_Name=f"{new_dep}_Dep_Request",
                 )
 
+                new_aaop.set_requester(current_aaop)
+                log.debug(f"Requester for {new_aaop.AAO_Type} is {current_aaop.AAO_Type}")
+                
                 log.debug(
                     "Adding dependency %s to aaop list before %s",
                     new_aaop,
                     current_aaop,
                 )
-
-                new_aaop.set_requester(current_aaop)
                 ordered.append(new_aaop)
 
             # Add this aaop after we're finished with its deps

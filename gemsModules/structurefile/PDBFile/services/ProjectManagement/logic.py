@@ -25,6 +25,7 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     log.debug("ProjectManagement Resource list: " + str(inputs.resources))
     for resource in inputs.resources:
         log.debug(f"Copying resource: {resource} to project directory.")
-        resource.copy_to(inputs.projectDir)
+        file_resource = resource.copy_to(inputs.projectDir)
+        service_outputs.resources.add_resource(file_resource)
 
     return service_outputs

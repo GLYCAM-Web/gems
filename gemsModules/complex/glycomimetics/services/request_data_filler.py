@@ -9,8 +9,10 @@ from gemsModules.common.services.request_data_filler import Request_Data_Filler
 from gemsModules.complex.glycomimetics.main_api import Glycomimetics_Entity
 from gemsModules.complex.glycomimetics.main_api_project import GlycomimeticsProject
 
-from gemsModules.complex.glycomimetics.services.Build_Selected_Positions import api as build_api
-from gemsModules.complex.glycomimetics.services.ProjectManagement import api as pm_api
+from .Build_Selected_Positions import api as build_api
+from .ProjectManagement import api as pm_api
+from .Evaluate import api as evaluate_api
+from .Validate import api as validate_api
 
 from gemsModules.common.code_utils import find_aaop_by_id
 
@@ -30,29 +32,30 @@ class Glycomimetics_Request_Data_Filler(Request_Data_Filler):
         for i, aaop in enumerate(self.aaop_list):
             log.debug(f"i: {i}, {aaop.AAO_Type=}")
 
-            if aaop.AAO_Type == "RunMD":
+            if aaop.AAO_Type == "Build_Selected_Positions":
+                log.debug(f"BUILD AAOP: {aaop}")
                 self.__fill_build_aaop(i, aaop)
             elif aaop.AAO_Type == "ProjectManagement":
                 self.__fill_projman_aaop(i, aaop)
+            elif aaop.AAO_Type == "Evaluate":
+                self.__fill_evaluate_aaop(i, aaop)
+            elif aaop.AAO_Type == "Validate":
+                self.__fill_validate_aaop(i, aaop)
 
         return self.aaop_list
 
     def __fill_build_aaop(self, i: int, aaop: AAOP) -> List[AAOP]:
         # Please note, if you need values from response_project, make sure they are initialized appropriately by project manager.
-        aaop.The_AAO.inputs = build_api.build_Inputs(
-            pUUID=self.response_project.pUUID,
-            outputDirPath=self.response_project.project_dir,
-        )
-
+        aaop.The_AAO.inputs.pUUID = self.response_project.pUUID
+        aaop.The_AAO.inputs.projectDir = self.response_project.project_dir
+        aaop.The_AAO.inputs.outputDirPath = self.response_project.project_dir
+        
         return self.aaop_list
 
     def __fill_projman_aaop(self, i: int, aaop: AAOP):
-        aaop.The_AAO.inputs = pm_api.ProjectManagement_Inputs(
-            pUUID=self.response_project.pUUID,
-            projectDir=self.response_project.project_dir,
-            outputDirPath=self.response_project.project_dir,
-        )
-
+        aaop.The_AAO.inputs.pUUID = self.response_project.pUUID
+        aaop.The_AAO.inputs.projectDir = self.response_project.project_dir
+        
         # Add the resources to copy to the project output directory by the Project Management service.
         # TODO: copy parm7/rst7 this way.
         input_json = pm_api.PM_Resource(
@@ -63,9 +66,25 @@ class Glycomimetics_Request_Data_Filler(Request_Data_Filler):
         )
         aaop.The_AAO.inputs.resources.add_resource(input_json)
         
+        # TODO: need to handle the case of direct inputs that are not resources.
         self.fill_resources_from_requester_if_exists(aaop)
         log.debug(
             "\tFinished building ProjectManagement_Inputs, aaop_list[%s].inputs filled with %s",
             i,
             self.aaop_list[i].The_AAO.inputs,
         )
+
+    def __fill_evaluate_aaop(self, i: int, aaop: AAOP) -> List[AAOP]:
+        aaop.The_AAO.inputs.pUUID = self.response_project.pUUID
+        
+        # TODO: need to handle the case of direct inputs that are not resources.
+        self.fill_resources_from_requester_if_exists(aaop)
+        # Add the resources to copy to the project output directory by the Project Management service.
+        
+    def __fill_validate_aaop(self, i: int, aaop: AAOP) -> List[AAOP]:
+        aaop.The_AAO.inputs.pUUID = self.response_project.pUUID
+        
+        # We always copy the "Receptor" resource to the project output directory.
+        
+        # TODO: need to handle the case of direct inputs that are not resources.
+        self.fill_resources_from_requester_if_exists(aaop)

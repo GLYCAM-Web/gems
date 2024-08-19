@@ -37,7 +37,7 @@ class ProjectManagement_Inputs(BaseModel):
         title="Project UUID",
         description="UUID of Project",
     )
-    outputDirPath: str = Field(
+    projectDir: str = Field(
         None,
         title="Output File Path",
         description="Full path to output file",

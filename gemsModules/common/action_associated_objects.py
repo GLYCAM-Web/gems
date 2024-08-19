@@ -44,7 +44,7 @@ class Action_Associated_Object_Package:
 
     def set_requester(self, requester: "Action_Associated_Object_Package"):
         requester.add_dependency(self.ID_String)
-        self.Requester = requester
+        self.Requester = requester.ID_String
 
     def add_dependency(self, dependency: str):
         self.Dependencies.append(dependency)

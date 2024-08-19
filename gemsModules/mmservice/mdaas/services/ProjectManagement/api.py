@@ -38,11 +38,6 @@ class ProjectManagement_Inputs(BaseModel):
         title="Protocol Files Path",
         description="Full path to protocol files directory",
     )
-    outputDirPath: Optional[str] = Field(
-        None,
-        title="Output Directory Path",
-        description="Full path to output directory",
-    )
     sim_length: Optional[str] = Field(
         None,
         title="Simulation Length",
@@ -51,7 +46,7 @@ class ProjectManagement_Inputs(BaseModel):
 
 
 class ProjectManagement_Outputs(BaseModel):
-    outputDirPath: str = Field(
+    projectDir: str = Field(
         None,
         title="Output File Path",
         description="Full path to output file",

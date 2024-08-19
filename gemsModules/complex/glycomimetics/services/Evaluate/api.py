@@ -45,6 +45,12 @@ class Evaluate_Inputs(BaseModel):
         title="Project UUID",
         description="UUID of Project",
     )
+    
+    receptor_path: Optional[str] = Field(
+        None,
+        title="Receptor",
+        description="Receptor PDB file",
+    )
 
     # Evaluate's real request always needs an input PDB, should we be able to instantiate it blank?
     resources: Evaluate_Input_Resources = Evaluate_Input_Resources()
@@ -57,6 +63,7 @@ class Evaluate_Outputs(BaseModel):
         title="Available Libraries",
         description="List of available libraries",
     )
+    # TODO: Use Position_Modification_Options instead.
     Available_Modification_Options: Optional[List[Modification_Position]] = Field(
         # None,
         default_factory=list,

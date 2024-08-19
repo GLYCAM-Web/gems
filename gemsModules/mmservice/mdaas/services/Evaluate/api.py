@@ -30,33 +30,30 @@ class Evaluate_Inputs(BaseModel):
         title="Project Directory",
         description="Full path to project directory",
     )
-    resources: Resources = Field(
-        title="Resources",
-        description="List of resources to copy to project directory",
-        default_factory=Resources,
-    )
     protocolFilesPath: Optional[str] = Field(
         None,
         title="Protocol Files Path",
         description="Full path to protocol files directory",
-    )
-    outputDirPath: Optional[str] = Field(
-        None,
-        title="Output Directory Path",
-        description="Full path to output directory",
     )
     sim_length: Optional[str] = Field(
         None,
         title="Simulation Length",
         description="Length of simulation in ns",
     )
+    
+    resources: Resources = Field(
+        title="Resources",
+        description="List of resources to copy to project directory",
+        default_factory=Resources,
+    )
 
 class Evaluate_Outputs(BaseModel):
-    outputDirPath: str = Field(
+    timeEstimateHours: Optional[float] = Field(
         None,
-        title="Output Directory Path",
-        description="Path to output directory",
+        title="Time Estimate Hours",
+        description="Estimated time to run in hours",
     )
+    
     resources: Resources = Field(
         title="Resources",
         description="List of resources to copy to project directory",

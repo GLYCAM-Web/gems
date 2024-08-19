@@ -6,13 +6,15 @@
           "type": "Evaluate"
         }
       },
-      "inputs": [
-        {
-            "locationType": "filesystem-path-unix",
-            "resourceFormat": "chemical/pdb",
-            "resourceRole": "Receptor",
-            "payload": "/programs/gems/gemsModules/complex/glycomimetics/docs/reference/example_flu_3ubq_aldehyde_library/glycomimetics/3ubq_chainC_64_266.pdbqt"
-        }
-      ]
+      "inputs": { 
+        "resources" : [
+          {
+              "locationType": "filesystem-path-unix",
+              "resourceFormat": "chemical/pdb",
+              "resourceRole": "Receptor",
+              "payload": "/programs/gems/gemsModules/complex/glycomimetics/docs/reference/example_flu_3ubq_aldehyde_library/glycomimetics/3ubq_chainC_64_266.pdbqt"
+          }
+        ]
+      }
     }
   }

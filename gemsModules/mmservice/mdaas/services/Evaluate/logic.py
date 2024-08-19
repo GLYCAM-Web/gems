@@ -23,12 +23,14 @@ def execute(inputs: Evaluate_Inputs) -> Evaluate_Outputs:
     log.debug(f"MDaaS/Evaluate input resources: {inputs.resources}")
     service_outputs = Evaluate_Outputs()
 
+    # TODO: Ensure we copy explicit inputs to resources before this.
     for resource in inputs.resources:
         if resource.resourceRole == "parameter-topology":
             content = resource.get_payload(decode=True)
-            log.debug(f"MDaaS/Evaluate parameter-topology-file content: {type(content)}")
                 
             time_est_hours, num_particles = calculate_time_est_from_parm7.execute(content, float(inputs.sim_length))
+            service_outputs.timeEstimateHours = time_est_hours
+            
             r = Resource(
                     payload=time_est_hours,
                     resourceFormat="float",
@@ -39,4 +41,8 @@ def execute(inputs: Evaluate_Inputs) -> Evaluate_Outputs:
                 f"Estimated time to run: {time_est_hours} hours to simulate {num_particles} particles for {inputs.sim_length} ns."
             )
             service_outputs.resources.add_resource(r)
+            
+            log.debug(f"MDaaS/Evaluate: Added time estimate resource: {r}")
+            break
+        
     return service_outputs

@@ -84,8 +84,8 @@ class Transaction_Manager(ABC):
         )
         self.aaop_tree_pair: AAOP_Tree_Pair = self.aaop_tree_pair_manager.process()
 
-        # log.debug("\tthe tree pair is: ")
-        # log.debug(self.aaop_tree_pair)
+        log.debug("\tthe tree pair is: ")
+        log.debug(self.aaop_tree_pair)
 
     def manage_project(self):
         """Manage the Response project using information from the incoming Entity and incoming Project."""

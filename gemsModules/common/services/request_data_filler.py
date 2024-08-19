@@ -34,9 +34,15 @@ class Request_Data_Filler(ABC):
         # TODO: optional filter by resourceRoles.
         if aaop.Requester is not None:
             requester_aaop = find_aaop_by_id(self.aaop_list, aaop.Requester) 
+            if requester_aaop is None:
+                log.error(f"Requester AAOP not found for {aaop=}")
+                return
+            
             log.debug(f"resources: {requester_aaop.The_AAO.inputs.resources}")
             for resource in requester_aaop.The_AAO.inputs.resources:
                 aaop.The_AAO.inputs.resources.add_resource(resource)
+        else:
+            log.debug(f"No requester for {aaop=}")
 
 
 class common_Request_Data_Filler(Request_Data_Filler):

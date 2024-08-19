@@ -16,5 +16,4 @@ def Serve(service_request: Evaluate_Request) -> Evaluate_Response:
     response = Evaluate_Response()
     response.outputs = execute(service_request.inputs)
 
-    response.outputs.outputDirPath = service_request.inputs.outputDirPath
     return response

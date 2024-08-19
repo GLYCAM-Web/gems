@@ -18,23 +18,27 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     log.debug(f"serviceInputs: {inputs}")
 
     service_outputs = ProjectManagement_Outputs()
-    #service_outputs.outputDirPath = inputs.outputDirPath
+    #service_outputs.projectDir = inputs.projectDir
     service_outputs.resources.add_resource(
         PM_Resource(
-            payload=inputs.outputDirPath,
-            resourceFormat="json",
+            payload=inputs.projectDir,
+            resourceFormat="string",
             resourceType="output",
         )
     )
     
+    # Setup project directory, TODO: Taskify
+    log.debug("GM/ProjectManagement: about to create project directory")
+    os.makedirs(inputs.projectDir, exist_ok=True)
+    
     log.debug("GM/ProjectManagement: about to copy resources to project dir")
     log.debug(f"GM/ProjectManagement: resources: {inputs.resources}")
-    
     # Copy all PM_Resources to the output directory.
     for resource in inputs.resources:
         # Copy all PM_Resources to the output directory.
         # if isinstance(resource, PM_Resource):
-        resource.copy_to(inputs.outputDirPath)
+        file_resource = resource.copy_to(inputs.projectDir)
+        service_outputs.resources.add_resource(file_resource)
 
     # # TODO: we can use PM_Resource.copy_to to copy the files to the output directory.
     # service_outputs.resources = ProjectManagement_Resources(resources=resources)

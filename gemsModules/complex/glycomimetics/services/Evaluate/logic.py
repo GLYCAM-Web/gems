@@ -22,16 +22,12 @@ def execute(inputs: Evaluate_Inputs) -> Evaluate_Outputs:
     service_outputs = Evaluate_Outputs()
     service_notices = Notices()
 
-    # TODO: Handle pUUID
-    # if inputs.pUUID:
-    #     pass
-
     receptor_pdb_resource = None
     for resource in inputs.resources:
         if resource.resourceRole == "Receptor":
             receptor_pdb_resource = resource
+            break
             
-
     if not receptor_pdb_resource:
         # Append a notice, we can do nothing else.
         service_notices.addNotice(
