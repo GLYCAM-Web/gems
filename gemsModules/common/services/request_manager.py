@@ -83,9 +83,10 @@ class Request_Manager(ABC):
         self.set_explicit_aaops()
         self.remove_unknown_services()
         self.gather_implicit_services()
-        self.resolve_dependencies()
         self.manage_duplicates()
-
+        # TODO: Resolve before duplicates.
+        self.resolve_dependencies()
+        
         return self.deduplicated_aaop_list
 
     def set_explicit_aaops(self):
@@ -119,6 +120,24 @@ class Request_Manager(ABC):
         self.aaop_list = self.implicit_aaops + self.managed_explicit_aaops
         log.debug("the current aaop list is: %s", self.aaop_list)
 
+    def resolve_dependencies(self):
+        """Service Requests may have Service dependencies which need to be run first for the service to complete successfully."""
+        log.debug("about to resolve dependencies")
+
+        if self.workflow_manager_type is None:
+            log.warning("No workflow manager type set, skipping dependency resolution.")
+            return
+
+        self.workflow_manager = self.workflow_manager_type(entity=self.entity)
+        # self.aaop_list = self.workflow_manager.process(
+        #     self.aaop_list
+        # )
+        #log.debug("\tthe ordered aaop request list is: %s", self.aaop_list)
+        
+        self.deduplicated_aaop_list = self.workflow_manager.process(
+            self.deduplicated_aaop_list
+        )
+        
     def manage_duplicates(self):
         log.debug("about to manage duplicates")
 
@@ -136,21 +155,6 @@ class Request_Manager(ABC):
             AAOP
         ] = self.default_manager.get_default_services_aaops()
         return self.default_aaops
-
-    def resolve_dependencies(self):
-        """Service Requests may have Service dependencies which need to be run first for the service to complete successfully."""
-        log.debug("about to resolve dependencies")
-
-        if self.workflow_manager_type is None:
-            log.warning("No workflow manager type set, skipping dependency resolution.")
-            return
-
-        self.workflow_manager = self.workflow_manager_type(entity=self.entity)
-        self.aaop_list = self.workflow_manager.process(
-            self.aaop_list
-        )
-
-        log.debug("\tthe ordered aaop request list is: %s", self.aaop_list)
 
     def fill_request_data_needs(self, transaction):
         log.debug("about to fill request data needs")

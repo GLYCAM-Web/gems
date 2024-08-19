@@ -21,7 +21,7 @@ log = Set_Up_Logging(__name__)
 class PDBFile_Request_Data_Filler(Request_Data_Filler):
     def process(self) -> list[AAOP]:
         """Fill in any data required in the service request aaop_list."""
-        for i, aaop in enumerate(self.aaop_list):
+        for i, aaop in enumerate(reversed(self.aaop_list)):
             log.debug(f"i: {i}, {aaop.AAO_Type=}")
 
             if aaop.AAO_Type == "AmberMDPrep":
@@ -33,19 +33,14 @@ class PDBFile_Request_Data_Filler(Request_Data_Filler):
 
     def __fill_ambermdprep_aaop(self, i: int, aaop: AAOP):
         root = self.response_project.project_dir
-        if (
-            "inputFilePath" in aaop.The_AAO.inputs
-            and aaop.The_AAO.inputs["inputFilePath"] is not None
-        ):
-            root = aaop.The_AAO.inputs["inputFilePath"]
+        if aaop.The_AAO.inputs.inputFilePath is not None:
+            root = aaop.The_AAO.inputs.inputFilePath
 
-        self.aaop_list[i].The_AAO.inputs = mdprep_api.AmberMDPrep_Inputs(
-            pdb_file=aaop.The_AAO.inputs["pdb_filename"],
-            outputFileName=f"preprocessed.{aaop.The_AAO.inputs['pdb_filename']}",
-            outputFilePath=self.response_project.project_dir,
-            inputFilePath=root,
-        )
-
+        # TODO: "projectDir" API instead
+        aaop.The_AAO.inputs.outputFilePath = self.response_project.project_dir
+        aaop.The_AAO.inputs.inputFilePath = root
+        aaop.The_AAO.inputs.outputFileName = f"preprocessed.{aaop.The_AAO.inputs.pdb_filename}"
+        
         log.debug(
             "\tFinished building AmberMDPrep_Inputs, aaop_list[%s].The_AAO.inputs: %s",
             i,
@@ -55,11 +50,9 @@ class PDBFile_Request_Data_Filler(Request_Data_Filler):
     # TODO: PDBFile and MDaaS PM data fillers are very similar, can we generalize them?
     def __fill_projman_aaop(self, i: int, aaop: AAOP):
         # Fill in the project management service request
-        aaop.The_AAO.inputs = pm_api.ProjectManagement_Inputs(
-            pUUID=self.response_project.pUUID,
-            projectDir=self.response_project.project_dir,
-        )
-
+        aaop.The_AAO.inputs.pUUID = self.response_project.pUUID
+        aaop.The_AAO.inputs.projectDir = self.response_project.project_dir
+        
         # Add the resources to copy to the project management service request
         input_json = Resource(
             payload=self.transaction.incoming_string,
@@ -74,17 +67,18 @@ class PDBFile_Request_Data_Filler(Request_Data_Filler):
             # If we were using an AAOP_Tree we could use aaop_tree.get_aaop_by_id(aaop.Requester)
             requester_aaop = find_aaop_by_id(self.aaop_list, aaop.Requester)
             log.debug(
-                "Found requester aaop[%s] for aaop_list[%s], %s",
+                "Found requester aaop[%s] for aaopreversed_list[%s], %s",
                 requester_aaop,
                 i,
                 requester_aaop.The_AAO.inputs,
             )
 
             input_pdb = Resource(
-                payload=Path(requester_aaop.The_AAO.inputs["inputFilePath"])
-                / requester_aaop.The_AAO.inputs["pdb_filename"],
-                resourceFormat="pdb",
+                payload=Path(requester_aaop.The_AAO.inputs.inputFilePath)
+                / requester_aaop.The_AAO.inputs.pdb_filename,
+                resourceFormat="chemical/pdb",
                 locationType="filesystem-path-unix",
+                resourceRole="input-pdb"
             )
             log.debug(
                 "Adding input_pdb resource to ProjectManagement_Inputs: %s", input_pdb

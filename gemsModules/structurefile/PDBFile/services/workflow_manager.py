@@ -18,7 +18,8 @@ log = Set_Up_Logging(__name__)
 
 # TODO: To services.settings... ?
 Service_Dependencies = {
-    "AmberMDPrep": Annotated_List(["ProjectManagement"], ordered=False)
+    "ProjectManagement": Annotated_List([], ordered=True),
+    "AmberMDPrep": Annotated_List(["ProjectManagement"], ordered=True)
 }
 
 
@@ -75,11 +76,7 @@ class PDBFile_Workflow_Manager(Workflow_Manager):
                     )
 
                     # Update the current AAOP's dependencies and set it as the requester AAOP.
-                    #   TODO: this seems like a common pattern we could lift out
-                    if current_aaop.Dependencies is None:
-                        current_aaop.Dependencies = []
-                    current_aaop.Dependencies.append(new_aaop.ID_String)
-                    new_aaop.Requester = current_aaop.ID_String
+                    new_aaop.set_requester(current_aaop)
 
                     # Append the new AAOP before the current AAOP.
                     ordered.append(new_aaop)
@@ -87,6 +84,5 @@ class PDBFile_Workflow_Manager(Workflow_Manager):
             # Add this aaop after we're finished with its deps
             ordered.append(current_aaop)
 
-        # TODO: Prune dependency services that only need to be run once, regardless of requester.
-
+        log.debug("\tthe ordered workflow aaop request list is: %s", ordered)
         return ordered

@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 from gemsModules.common.action_associated_objects import AAOP
 from gemsModules.common.main_api_resources import Resource, Resources
 
-from gemsModules.structurefile.PDBFile.main_api import (
+from gemsModules.structurefile.PDBFile.main_api_common import (
     PDBFile_Service_Request,
     PDBFile_Service_Response,
 )
@@ -35,9 +35,8 @@ class AmberMDPrep_Resources(Resources):
 
 
 class AmberMDPrep_Inputs(BaseModel):
-    pdb_file: str = Field(
-        # Note: This should be a required field, but the way Request instantiates an empty Inputs disallows this.
-        ...,
+    pdb_filename: str = Field(
+        None,
         title="PDB File",
         description="Name of PDB file to preprocess.",
     )
@@ -78,11 +77,10 @@ class AmberMDPrep_Outputs(BaseModel):
     )
     resources: AmberMDPrep_Resources = AmberMDPrep_Resources()
 
-
 class AmberMDPrep_Request(PDBFile_Service_Request):
     typename: str = Field("AmberMDPrep", alias="type")
     # the following must be redefined in a child class
-    inputs: AmberMDPrep_Inputs = None
+    inputs: AmberMDPrep_Inputs = AmberMDPrep_Inputs()
 
 
 class AmberMDPrep_Response(PDBFile_Service_Response):

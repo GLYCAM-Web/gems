@@ -1,3 +1,4 @@
+from pathlib import Path
 import gmml
 import os
 
@@ -35,6 +36,12 @@ def preprocess_and_write_pdb(
     Returns the ppInfo and the cds_PdbFile objects.
     """
     pp_info, pdb_file = preprocess(input_pdb_path, options)
+    # check if parent path exists:
+    if not Path(output_pdb_path).parent.exists():
+        log.warning(
+            f"Parent directory of {output_pdb_path} does not exist? PM should run before this"
+        )
+        
     log.debug(f"Attempting to writing a preprocessed PDB file to {output_pdb_path}...")
     pdb_file.raw.Write(output_pdb_path)
     if not os.path.exists(output_pdb_path):

@@ -60,7 +60,6 @@ class mdaas_Workflow_Manager(Workflow_Manager):
                 these_deps,
             )
 
-            # TODO: the dep resolution could be more general (really a lot of this workflow manager)
             for new_dep in these_deps:
                 log.debug("Resolving dependency %s", new_dep)
                 aao_cls = globals()[f"{new_dep}_Request"]

@@ -73,12 +73,10 @@ class Build_Options(BaseModel):
         title="Interval",
         description="Interval",
     )
-    NumThreads: int = (
-        Field(
-            1,
-            title="Number of Threads",
-            description="Number of Threads",
-        ),
+    NumThreads: int = Field(
+        1,
+        title="Number of Threads",
+        description="Number of Threads",
     )
     OutputPath: str = Field(
         "output",
@@ -129,19 +127,19 @@ class Build_Outputs(BaseModel):
         description="UUID of Project",
     )
     # outputDirPath: str = Field(
-    #     None,
+    #     None, 
     #     title="Output Directory Path",
     #     description="Path to output directory",
     # )
     resources: Build_Output_Resources = Build_Output_Resources()
 
 
-class Build_Request(Glycomimetics_Service_Request):
+class Build_Selected_Positions_Request(Glycomimetics_Service_Request):
     typename: str = Field("Build_Selected_Positions", alias="type")
     # the following must be redefined in a child class
     inputs: Build_Inputs = Build_Inputs()
 
 
-class Build_Response(Glycomimetics_Service_Response):
+class Build_Selected_Positions_Response(Glycomimetics_Service_Response):
     typename: str = Field("Build_Selected_Positions", alias="type")
     outputs: Build_Outputs = Build_Outputs()

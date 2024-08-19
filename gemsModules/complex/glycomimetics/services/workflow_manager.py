@@ -4,7 +4,7 @@ from gemsModules.common.services.workflow_manager import Workflow_Manager
 from gemsModules.common.code_utils import Annotated_List, resolve_dependency_list
 from gemsModules.logging.logger import Set_Up_Logging
 
-from .Build_Selected_Positions.api import Build_Request
+from .Build_Selected_Positions.api import Build_Selected_Positions_Request
 from .ProjectManagement.api import ProjectManagement_Request
 from .Evaluate.api import Evaluate_Request
 from .Validate.api import Validate_Request

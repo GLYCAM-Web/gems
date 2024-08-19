@@ -2,7 +2,7 @@
 import os
 
 from pydantic import constr, Field
-from pydantic.typing import Literal as pyLiteral
+from typing import Literal 
 
 from gemsModules.project.main_api import Project
 from gemsModules.systemoperations.instance_config import InstanceConfig
@@ -19,7 +19,7 @@ class GlycomimeticsProject(Project):
     parent_entity: str = "complex"
     app: str = "gm"
     requested_service: str = ""
-    project_type: pyLiteral["gm"] = Field("gm", title="Type", alias="type")
+    project_type: Literal["gm"] = Field("gm", title="Type", alias="type")
     entity_id: str = "complex/glycomimetics"
     service_id: constr(max_length=25) = ""  # what should this be?
     gm_utils_version: str = ""
@@ -27,9 +27,13 @@ class GlycomimeticsProject(Project):
     input_type: constr(max_length=25) = (
         "AutoDock extended PDB (chemical/pdbqt) & application/json"
     )
+    
+    pUUID: constr(max_length=36) = ""
+    projectDir: constr(max_length=255) = ""
+    
     cocomplex: constr(max_length=255) = "cocomplex.pdbqt"
-    moiety: constr(max_length=255) = "ligand.pdbqt"
-
+    receptor: constr(max_length=255) = "receptor.pdbqt"
+    ligand: constr(max_length=255) = "ligand.pdbqt"
 
     # protocolFilesPath: constr(max_length=255) = "/website/programs/gems/External/GM_Utils/protocols"
 

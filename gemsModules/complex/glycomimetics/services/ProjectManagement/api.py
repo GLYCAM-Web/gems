@@ -42,10 +42,10 @@ class ProjectManagement_Inputs(BaseModel):
         title="Output File Path",
         description="Full path to output file",
     )
-    resources: PM_Input_Resources = Field(
+    resources: Resources = Field(
         title="Resources",
         description="List of resources to copy to project directory",
-        default_factory=PM_Input_Resources,
+        default_factory=Resources,
     )
 
 

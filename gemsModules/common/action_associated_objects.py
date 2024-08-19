@@ -25,13 +25,15 @@ class Action_Associated_Object_Package:
     components will be child_packages, ID_String and Dependencies.  This allows
     for easy and annotated nesting of the AAOP Trees within each other.
     """
-
     ID_String: str = field(default_factory=uuid.uuid4)
-    AAO_Type: str = "Service"
     Dictionary_Name: Optional[str] = None
+    
+    AAO_Type: str = "Service"
     The_AAO: Callable = field(default=None)
+    
     Dependencies: List[str] = field(default_factory=list)
     Requester: str = field(default=None, init=False)
+    
     child_packages: Optional[Annotated_List] = None
 
     # right now, the AAOs are all Pydantic Models, so they need to be copied using the copy() method

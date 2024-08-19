@@ -1,7 +1,7 @@
-def execute(outputDirPath: str, sim_length: str):
+def execute(projectDir: str, sim_length: str):
     sim_length = float(sim_length)
     nstlim = int(sim_length * 500000)  # 500k because dt=0.002
-    with open(outputDirPath + "/10.produ.in", "r") as f:
+    with open(projectDir + "/10.produ.in", "r") as f:
         lines = f.readlines()
         for i in range(len(lines)):
             if "nstlim" in lines[i]:
@@ -15,5 +15,5 @@ def execute(outputDirPath: str, sim_length: str):
             if "ntwr" in lines[i]:
                 lines[i] = f"  ntwr = -{int(nstlim * 0.1)},\n"
 
-    with open(outputDirPath + "/10.produ.in", "w") as f:
+    with open(projectDir + "/10.produ.in", "w") as f:
         f.writelines(lines)

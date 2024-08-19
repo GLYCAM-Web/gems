@@ -52,29 +52,41 @@ class Glycomimetics_Project_Manager(Project_Manager):
     def fill_response_project_from_response_entity(self):
         # Lets try updating from Build inputs for now... # TODO: incoming entity may be wrong to use here.
         log.debug("fill_response_project_from_response_entity %s", self.incoming_entity)
+        
+        # TODO: Ensure the IT fills inputs from resources before the PM? and ignore resources here?
+        inputs_needed=["pUUID", "projectDir", "cocomplex", "receptor", "ligand"]
         for service in self.incoming_entity.services.__root__.values():
             log.debug("fill_response_project_from_response_entity %s", service)
-            if service.typename == "Build_Selected_Positions":
-                ...
-                # # THe problem with setting the files here is that then they have their full paths,
-                # # and we still need the full paths for the RDF...
-                # parm_path = Path(service.inputs["parameter-topology-file"]["payload"])
-                # rst_path = Path(service.inputs["input-coordinate-file"]["payload"])
-
-                # # Part of a temporary GlycomimeticsProject.upload_path hack. TODO: Remove upload path? Hardcode full file paths in project?
-                # if rst_path.parent != parm_path.parent:
-                #     log.warning(
-                #         "Parm7/rst7 upload paths do not agree! Response upload path may be incorrect!"
-                #     )
-                # self.response_project.upload_path = str(rst_path.parent)
-
-                # self.response_project.parm7_file_name = str(parm_path.name)
-                # self.response_project.rst7_file_name = str(rst_path.name)
-                # if hasattr(service, "options") and service.options is not None:
-                #     if "sim_length" in service.options:
-                #         self.response_project.sim_length = str(
-                #             service.options["sim_length"]
-                #        )
+            if hasattr(service.inputs, "complex_PDB_Filename"):
+                self.response_project.cocomplex = service.inputs.complex_PDB_Filename
+                inputs_needed.remove("cocomplex")
+            if hasattr(service.inputs, "receptor_PDB_Filename"):
+                self.response_project.receptor = service.inputs.receptor_PDB_Filename
+                inputs_needed.remove("receptor")
+            if hasattr(service.inputs, "ligand_PDB_Filename"):
+                self.response_project.ligand = service.inputs.ligand_PDB_Filename
+                inputs_needed.remove("ligand")
+            if hasattr(service.inputs, "projectDir"):
+                self.response_project.projectDir = service.inputs.projectDir
+                inputs_needed.remove("projectDir")
+            if hasattr(service.inputs, "pUUID"):
+                self.response_project.pUUID = service.inputs.pUUID
+                inputs_needed.remove("pUUID")
+            if not len(inputs_needed):
+                break
+            
+        if len(inputs_needed):
+            # try to get from inputs.resources. # Need to handle various resource payloads
+            # for resource in service.inputs.resources.__root__:
+            #     if resource.resourceRole == "cocomplex":
+            #         self.response_project.cocomplex = resource.payload
+            #         inputs_needed.remove("cocomplex")
+            #     elif resource.resourceRole == "moiety":
+            #         self.response_project.moiety = resource.payload
+            #         inputs_needed.remove("moiety")
+            #     if not len(inputs_needed):
+            #         break
+            log.warning(f"Could not find all inputs: {inputs_needed}. ")
 
 
 def testme() -> GlycomimeticsProject:

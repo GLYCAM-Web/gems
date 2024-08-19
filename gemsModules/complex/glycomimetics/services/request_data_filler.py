@@ -5,6 +5,7 @@ from pathlib import Path
 
 from gemsModules.common.action_associated_objects import AAOP
 from gemsModules.common.services.request_data_filler import Request_Data_Filler
+from gemsModules.common.main_api_resources import Resource
 
 from gemsModules.complex.glycomimetics.main_api import Glycomimetics_Entity
 from gemsModules.complex.glycomimetics.main_api_project import GlycomimeticsProject
@@ -29,11 +30,10 @@ class Glycomimetics_Request_Data_Filler(Request_Data_Filler):
     # No data to fill here.
     def process(self) -> list[AAOP]:
         """Fill in any data required in the service request aaop_list."""
-        for i, aaop in enumerate(self.aaop_list):
-            log.debug(f"i: {i}, {aaop.AAO_Type=}")
+        for i, aaop in enumerate(reversed(self.aaop_list)):
+            log.debug(f"i: {i}, {aaop.AAO_Type}={aaop}")
 
             if aaop.AAO_Type == "Build_Selected_Positions":
-                log.debug(f"BUILD AAOP: {aaop}")
                 self.__fill_build_aaop(i, aaop)
             elif aaop.AAO_Type == "ProjectManagement":
                 self.__fill_projman_aaop(i, aaop)
@@ -46,10 +46,36 @@ class Glycomimetics_Request_Data_Filler(Request_Data_Filler):
 
     def __fill_build_aaop(self, i: int, aaop: AAOP) -> List[AAOP]:
         # Please note, if you need values from response_project, make sure they are initialized appropriately by project manager.
+        
         aaop.The_AAO.inputs.pUUID = self.response_project.pUUID
         aaop.The_AAO.inputs.projectDir = self.response_project.project_dir
         aaop.The_AAO.inputs.outputDirPath = self.response_project.project_dir
         
+        if aaop.The_AAO.inputs.complex_PDB_Filename is not None:
+            pdb = Resource(
+                payload=aaop.The_AAO.inputs.complex_PDB_Filename,
+                resourceFormat="chemical/pdb",
+                resourceRole="complex",
+                locationType="filesystem-path-unix"
+            )
+            aaop.The_AAO.inputs.resources.add_resource(pdb)
+        if aaop.The_AAO.inputs.ligand_PDB_Filename is not None:
+            pdb = Resource(
+                payload=aaop.The_AAO.inputs.ligand_PDB_Filename,
+                resourceFormat="chemical/pdb",
+                resourceRole="ligand",
+                locationType="filesystem-path-unix"
+            )
+            aaop.The_AAO.inputs.resources.add_resource(pdb)
+        if aaop.The_AAO.inputs.receptor_PDB_Filename is not None:
+            pdb = Resource(
+                payload=aaop.The_AAO.inputs.receptor_PDB_Filename,
+                resourceFormat="chemical/pdb",
+                resourceRole="receptor",
+                locationType="filesystem-path-unix"
+            )
+            aaop.The_AAO.inputs.resources.add_resource(pdb)
+            
         return self.aaop_list
 
     def __fill_projman_aaop(self, i: int, aaop: AAOP):
@@ -68,11 +94,6 @@ class Glycomimetics_Request_Data_Filler(Request_Data_Filler):
         
         # TODO: need to handle the case of direct inputs that are not resources.
         self.fill_resources_from_requester_if_exists(aaop)
-        log.debug(
-            "\tFinished building ProjectManagement_Inputs, aaop_list[%s].inputs filled with %s",
-            i,
-            self.aaop_list[i].The_AAO.inputs,
-        )
 
     def __fill_evaluate_aaop(self, i: int, aaop: AAOP) -> List[AAOP]:
         aaop.The_AAO.inputs.pUUID = self.response_project.pUUID
@@ -83,8 +104,6 @@ class Glycomimetics_Request_Data_Filler(Request_Data_Filler):
         
     def __fill_validate_aaop(self, i: int, aaop: AAOP) -> List[AAOP]:
         aaop.The_AAO.inputs.pUUID = self.response_project.pUUID
-        
-        # We always copy the "Receptor" resource to the project output directory.
-        
+                
         # TODO: need to handle the case of direct inputs that are not resources.
         self.fill_resources_from_requester_if_exists(aaop)

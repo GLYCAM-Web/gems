@@ -53,8 +53,8 @@ class Evaluate_Inputs(BaseModel):
     )
 
     # Evaluate's real request always needs an input PDB, should we be able to instantiate it blank?
-    resources: Evaluate_Input_Resources = Evaluate_Input_Resources()
-
+    # resources: Evaluate_Input_Resources = Evaluate_Input_Resources()
+    resources: Resources = Resources()
 
 class Evaluate_Outputs(BaseModel):
     # TODO/Q: Should this be here? Should we have libraries per pos or per eval?

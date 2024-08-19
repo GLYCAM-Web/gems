@@ -31,6 +31,8 @@ class Request_Data_Filler(ABC):
 
     def fill_resources_from_requester_if_exists(self, aaop):
         """ If this aaop has a requester, copy the resources from the requester to this aaop. """
+        log.debug(f"About to fill resources from requester for {aaop=}")
+        
         # TODO: optional filter by resourceRoles.
         if aaop.Requester is not None:
             requester_aaop = find_aaop_by_id(self.aaop_list, aaop.Requester) 
