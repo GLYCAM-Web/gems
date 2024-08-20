@@ -126,11 +126,11 @@ class Build_Outputs(BaseModel):
         title="Project UUID",
         description="UUID of Project",
     )
-    # outputDirPath: str = Field(
-    #     None, 
-    #     title="Output Directory Path",
-    #     description="Path to output directory",
-    # )
+    projectDir: str = Field(
+        None, 
+        title="Output Directory Path",
+        description="Path to output directory",
+    )
     resources: Build_Output_Resources = Build_Output_Resources()
 
 

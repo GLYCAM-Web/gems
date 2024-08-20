@@ -48,8 +48,8 @@ class Glycomimetics_Request_Data_Filler(Request_Data_Filler):
         # Please note, if you need values from response_project, make sure they are initialized appropriately by project manager.
         
         aaop.The_AAO.inputs.pUUID = self.response_project.pUUID
-        aaop.The_AAO.inputs.projectDir = self.response_project.project_dir
-        aaop.The_AAO.inputs.outputDirPath = self.response_project.project_dir
+        #aaop.The_AAO.inputs.projectDir = self.response_project.project_dir
+        #aaop.The_AAO.inputs.outputDirPath = self.response_project.project_dir
         
         if aaop.The_AAO.inputs.complex_PDB_Filename is not None:
             pdb = Resource(

@@ -10,7 +10,7 @@
                 "locationType": "filesystem-path-unix",
                 "resourceFormat": "chemical/pdb",
                 "resourceRole": "Receptor",
-                "payload": "/programs/gems/gemsModules/complex/glycomimetics/tests/inputs/explicit_build.json"
+                "payload": "/programs/gems/External/GM_Utils/external_programs/validation/1gya.pdb"
             }
           ]
         }
