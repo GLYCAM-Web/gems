@@ -21,9 +21,8 @@ class MimeEncodableResourceMixin:
     @property
     def is_mime_encoded(self):
         """Check if the payload is MIME encoded by GEMS."""
-        # check
-        if "is_mime_encoded" in self.options and self.options["is_mime_encoded"]:
-            return True
+        if self.options is not None and "is_mime_encoded" in self.options:
+            return self.options["is_mime_encoded"] in ["True", "true", True]
 
         return False
 
