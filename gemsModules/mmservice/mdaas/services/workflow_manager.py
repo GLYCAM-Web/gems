@@ -62,6 +62,8 @@ class mdaas_Workflow_Manager(Workflow_Manager):
 
             for new_dep in these_deps:
                 log.debug("Resolving dependency %s", new_dep)
+                # TODO: You can probably put the Service classes in the dependency dict 
+                # itself and construct the class directly.
                 aao_cls = globals()[f"{new_dep}_Request"]
                 
                 new_aaop = AAOP(
@@ -81,8 +83,5 @@ class mdaas_Workflow_Manager(Workflow_Manager):
 
             # Add this aaop after we're finished with its deps
             ordered.append(current_aaop)
-
-        # TODO: Prune dependency services that only need to be run once, regardless of requester.
-        # This is likely a job for the duplicates manager.
-
         return ordered
+

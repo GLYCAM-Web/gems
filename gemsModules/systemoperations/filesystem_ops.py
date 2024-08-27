@@ -11,6 +11,9 @@ def get_current_working_directory() -> str:
     return os.getcwd()
 
 
+def build_fs_path(*parts: str) -> str:
+    return str(Path(*parts))
+
 def build_filesystem_path(*path_parts: str):
     """Builds an operating-system-specific path string from its parts as strings."""
     log.info("build_filesystem_path was called")

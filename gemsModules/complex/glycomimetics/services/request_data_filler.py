@@ -30,7 +30,7 @@ class Glycomimetics_Request_Data_Filler(Request_Data_Filler):
     # No data to fill here.
     def process(self) -> list[AAOP]:
         """Fill in any data required in the service request aaop_list."""
-        for i, aaop in enumerate(reversed(self.aaop_list)):
+        for i, aaop in enumerate(self.aaop_list):
             log.debug(f"i: {i}, {aaop.AAO_Type}={aaop}")
 
             if aaop.AAO_Type == "Build_Selected_Positions":
@@ -50,28 +50,46 @@ class Glycomimetics_Request_Data_Filler(Request_Data_Filler):
         aaop.The_AAO.inputs.pUUID = self.response_project.pUUID
         #aaop.The_AAO.inputs.projectDir = self.response_project.project_dir
         #aaop.The_AAO.inputs.outputDirPath = self.response_project.project_dir
+               
+        complex_filename, ligand_filename, receptor_filename = None, None, None
         
-        if aaop.The_AAO.inputs.complex_PDB_Filename is not None:
+        if aaop.The_AAO.inputs.complex_PDB_Filename:
+            complex_filename = aaop.The_AAO.inputs.complex_PDB_Filename
+        else:
+            complex_filename = self.response_project.complex 
+        if aaop.The_AAO.inputs.ligand_PDB_Filename:
+            ligand_filename = aaop.The_AAO.inputs.ligand_PDB_Filename
+        else:
+            ligand_filename = self.response_project.ligand
+        if aaop.The_AAO.inputs.receptor_PDB_Filename:
+            receptor_filename = aaop.The_AAO.inputs.receptor_PDB_Filename
+        else:
+            receptor_filename = self.response_project.receptor   
+        
+        # add project directory to the filenames; project management will ensure the files are there.
+        # TODO/Note: as we simlink the PDBs, we could always use those names.
+
+        if complex_filename:
             pdb = Resource(
-                payload=aaop.The_AAO.inputs.complex_PDB_Filename,
+                payload=complex_filename,
                 resourceFormat="chemical/pdb",
-                resourceRole="complex",
+                resourceRole="Complex",
                 locationType="filesystem-path-unix"
             )
             aaop.The_AAO.inputs.resources.add_resource(pdb)
-        if aaop.The_AAO.inputs.ligand_PDB_Filename is not None:
+        if ligand_filename:   
             pdb = Resource(
-                payload=aaop.The_AAO.inputs.ligand_PDB_Filename,
+                payload=ligand_filename,
                 resourceFormat="chemical/pdb",
-                resourceRole="ligand",
+                resourceRole="Ligand",
                 locationType="filesystem-path-unix"
             )
             aaop.The_AAO.inputs.resources.add_resource(pdb)
-        if aaop.The_AAO.inputs.receptor_PDB_Filename is not None:
+        if receptor_filename:
             pdb = Resource(
-                payload=aaop.The_AAO.inputs.receptor_PDB_Filename,
+                payload=receptor_filename,
                 resourceFormat="chemical/pdb",
-                resourceRole="receptor",
+                resourceRole="Receptor",
                 locationType="filesystem-path-unix"
             )
             aaop.The_AAO.inputs.resources.add_resource(pdb)
@@ -88,13 +106,19 @@ class Glycomimetics_Request_Data_Filler(Request_Data_Filler):
             payload=self.transaction.incoming_string,
             resourceFormat="json",
             locationType="Payload",
-            options={"filename": "input.json"},
+            options={"filename": "request.json"},
         )
         aaop.The_AAO.inputs.resources.add_resource(input_json)
         
         # TODO: need to handle the case of direct inputs that are not resources.
         self.fill_resources_from_requester_if_exists(aaop)
-
+        
+        # TODO: "modify"
+        for r in aaop.The_AAO.inputs.resources:
+            if r.resourceRole == "Receptor" or r.resourceRole == "Complex" or r.resourceRole == "Ligand":
+                r.payload = str(Path(self.response_project.project_dir) / r.payload)
+                log.debug(f"GM/RequestDataFiller: {r.resourceRole} prepended project_dir to Receptor payload: {r.payload}")
+                
     def __fill_evaluate_aaop(self, i: int, aaop: AAOP) -> List[AAOP]:
         aaop.The_AAO.inputs.pUUID = self.response_project.pUUID
         

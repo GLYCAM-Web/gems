@@ -29,11 +29,12 @@ class GlycomimeticsProject(Project):
     )
     
     pUUID: constr(max_length=36) = ""
-    projectDir: constr(max_length=255) = ""
+    project_dir: constr(max_length=255) = ""
     
-    cocomplex: constr(max_length=255) = "cocomplex.pdbqt"
-    receptor: constr(max_length=255) = "receptor.pdbqt"
-    ligand: constr(max_length=255) = "ligand.pdbqt"
+    # TODO: Better names, also, snake_case
+    complex: constr(max_length=255) = "Complex.pdb"
+    receptor: constr(max_length=255) = "Receptor.pdb"
+    ligand: constr(max_length=255) = "Ligand.pdb"
 
     # protocolFilesPath: constr(max_length=255) = "/website/programs/gems/External/GM_Utils/protocols"
 

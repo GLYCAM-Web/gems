@@ -50,33 +50,28 @@ class Glycomimetics_Project_Manager(Project_Manager):
                     log.warning("Key %s not in response project", key)
 
     def fill_response_project_from_response_entity(self):
-        # Lets try updating from Build inputs for now... # TODO: incoming entity may be wrong to use here.
+        # TODO: incoming entity may be wrong to use here.
         log.debug("fill_response_project_from_response_entity %s", self.incoming_entity)
         
-        # TODO: Ensure the IT fills inputs from resources before the PM? and ignore resources here?
-        inputs_needed=["pUUID", "projectDir", "cocomplex", "receptor", "ligand"]
+        # Bad hack... # TODO: Ensure the IT fills inputs from resources before the PM? and ignore resources here?
+        inputs_needed=["complex", "receptor", "ligand"]
         for service in self.incoming_entity.services.__root__.values():
             log.debug("fill_response_project_from_response_entity %s", service)
             if hasattr(service.inputs, "complex_PDB_Filename"):
-                self.response_project.cocomplex = service.inputs.complex_PDB_Filename
-                inputs_needed.remove("cocomplex")
+                self.response_project.complex = service.inputs.complex_PDB_Filename
+                inputs_needed.remove("complex")
             if hasattr(service.inputs, "receptor_PDB_Filename"):
                 self.response_project.receptor = service.inputs.receptor_PDB_Filename
                 inputs_needed.remove("receptor")
             if hasattr(service.inputs, "ligand_PDB_Filename"):
                 self.response_project.ligand = service.inputs.ligand_PDB_Filename
                 inputs_needed.remove("ligand")
-            if hasattr(service.inputs, "projectDir"):
-                self.response_project.projectDir = service.inputs.projectDir
-                inputs_needed.remove("projectDir")
-            if hasattr(service.inputs, "pUUID"):
-                self.response_project.pUUID = service.inputs.pUUID
-                inputs_needed.remove("pUUID")
             if not len(inputs_needed):
                 break
             
+            
         if len(inputs_needed):
-            # try to get from inputs.resources. # Need to handle various resource payloads
+            # Do we need to try to get from inputs.resources?
             # for resource in service.inputs.resources.__root__:
             #     if resource.resourceRole == "cocomplex":
             #         self.response_project.cocomplex = resource.payload

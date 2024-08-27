@@ -23,7 +23,7 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
         PM_Resource(
             payload=inputs.projectDir,
             resourceFormat="string",
-            resourceType="output",
+            resourceRole="ProjectDirectory",
         )
     )
     
@@ -35,9 +35,15 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     log.debug(f"GM/ProjectManagement: resources: {inputs.resources}")
     # Copy all PM_Resources to the output directory.
     for resource in inputs.resources:
-        # Copy all PM_Resources to the output directory.
+        # TODO: Typify and copy all PM_Resources to the output directory appropriately.
         # if isinstance(resource, PM_Resource):
         file_resource = resource.copy_to(inputs.projectDir)
+        
+        # If it's main pdb, symlink it to projectDir/Receptor.pdb 
+        # TODO/Q: Should it be Receptor and not CoComplex? # Yao's Evaluation likes sugars.
+        if resource.resourceRole == "Receptor":
+            # TODO: use the GM project's `complex` field for this.
+            os.symlink(file_resource.payload, os.path.join(inputs.projectDir, "Receptor.pdb"))
         service_outputs.resources.add_resource(file_resource)
 
     # # TODO: we can use PM_Resource.copy_to to copy the files to the output directory.

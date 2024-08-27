@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 from pathlib import Path
 import sys
 from typing import Protocol, Dict, Optional
@@ -52,8 +53,11 @@ def execute(inputs: Evaluate_Inputs) -> Evaluate_Outputs:
             )
         else:   
             pdb_fpath = receptor_pdb_resource.payload
+            
             if Path(pdb_fpath).exists():
-                log.debug(f"Receptor PDB file found: {pdb_fpath}")
+                working_dir = str(Path(pdb_fpath).parent)
+
+                log.debug(f"Receptor PDB file found: {pdb_fpath}, working_dir: {working_dir}")                
                 try:
                     # TODO: Properly include glycomimetic external programs and wrappers with DevENv.
                     # We need Yao's "Validation" for this service.
@@ -61,6 +65,7 @@ def execute(inputs: Evaluate_Inputs) -> Evaluate_Outputs:
                     from evaluate_pdb import evaluate_pdb
 
                     result = evaluate_pdb(pdb_fpath)
+                    
                     for atom in result.available_atoms:
                         log.debug(f"atom: {atom}")
                         posmod = Modification_Position(
@@ -71,6 +76,7 @@ def execute(inputs: Evaluate_Inputs) -> Evaluate_Outputs:
                             Replaced_Atom=atom.atom_to_replace_,
                         )
                         service_outputs.Available_Modification_Options.append(posmod)
+                    log.debug(f"Available_Modification_Options: {service_outputs.Available_Modification_Options}")
                 except ImportError as e:
                     service_notices.addNotice(
                         Brief="Error during Evaluation",
