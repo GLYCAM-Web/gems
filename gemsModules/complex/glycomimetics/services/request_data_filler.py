@@ -23,11 +23,6 @@ log = Set_Up_Logging(__name__)
 
 
 class Glycomimetics_Request_Data_Filler(Request_Data_Filler):
-    # self.aaop_list = aaop_list
-    # self.entity = entity
-    # self.project = project
-
-    # No data to fill here.
     def process(self) -> list[AAOP]:
         """Fill in any data required in the service request aaop_list."""
         
@@ -61,7 +56,6 @@ class Glycomimetics_Request_Data_Filler(Request_Data_Filler):
         return self.aaop_list
 
     def __post_process_fill(self, update_proj_dirs: List[AAOP]):
-        
         # TODO/FIX: Hack, but easiest/cheapest way to get all project resources to have the project_dir prepended.
         roles_to_find = ["Complex", "Ligand", "Receptor"]
         for aaop in update_proj_dirs:
@@ -82,8 +76,6 @@ class Glycomimetics_Request_Data_Filler(Request_Data_Filler):
                     roles_to_find.remove(r.resourceRole)
                     break
                 
-                
-
     def __fill_build_aaop(self, i: int, aaop: AAOP) -> List[AAOP]:
         # Please note, if you need values from response_project, make sure they are initialized appropriately by project manager.
 
@@ -93,6 +85,7 @@ class Glycomimetics_Request_Data_Filler(Request_Data_Filler):
 
         complex_filename, ligand_filename, receptor_filename = None, None, None
 
+        # TODO: need a helper for this / TODO: Validate and Evaluate need to work directly.
         if aaop.The_AAO.inputs.complex_PDB_Filename:
             complex_filename = aaop.The_AAO.inputs.complex_PDB_Filename
         else:
@@ -148,7 +141,7 @@ class Glycomimetics_Request_Data_Filler(Request_Data_Filler):
         aaop.The_AAO.inputs.resources.add_resource(input_json)
 
         # TODO: need to handle the case of direct inputs that are not resources.
-        self.fill_resources_from_requester_if_exists(aaop)
+        self.fill_resources_from_requester_if_exists(aaop, deep_copy=True)
 
     def __fill_evaluate_aaop(self, i: int, aaop: AAOP) -> List[AAOP]:
         aaop.The_AAO.inputs.pUUID = self.response_project.pUUID

@@ -66,10 +66,13 @@ def execute(inputs: Evaluate_Inputs) -> Evaluate_Outputs:
                     sys.path.append(
                         "/programs/gems/External/GM_Utils/external_programs/validation/evaluate_swig"
                     )
-                    from evaluate_pdb import evaluate_pdb
+                    from evaluate_pdb import evaluate_pdb, change_working_directory
 
-
-
+                    # To ensure ring_conformations.txt is written to the appropriate locations.
+                    parent_dir = str(Path(pdb_fpath).parent)
+                    change_working_directory(parent_dir)
+                    os.chdir(parent_dir)
+                    
                     result = evaluate_pdb(pdb_fpath)
 
                     for atom in result.available_atoms:

@@ -28,7 +28,7 @@ class MimeEncodableResourceMixin:
 
     def try_decode_mime(self, data):
         """If the payload is MIME encoded by GEMS or at all, try to decode it."""
-        if self.is_mime_encoded or data.startswith(b"Content-Type:"):
+        if self.is_mime_encoded or isinstance(data, bytes) and data.startswith(b"Content-Type:"):
             msg = email.parser.BytesParser().parsebytes(data)
             return msg.get_payload(decode=True)
         else:
@@ -86,10 +86,13 @@ class FileSystemHelpersMixin:
         if isinstance(parent_dir, str):
             path = Path(parent_dir) / filename
 
-        with open(path, "wb") as f:
-            f.write(self.get_payload())
+        payload = self.get_payload()
+        maybe_binary = "b" if isinstance(payload, bytes) else ""
 
         log.debug(f"Copying resource {self} to {path}...")
+        with open(path, "w" + maybe_binary) as f:
+            f.write(payload)
+            
         # return a resource for the new file
         return Resource(
             typename=self.typename,
@@ -97,7 +100,7 @@ class FileSystemHelpersMixin:
             resourceFormat=self.resourceFormat,
             resourceRole=self.resourceRole,
             payload=str(path),
-            options={"filename": filename},
+            options={"filename": filename, "binary": False}
         )
         
 class Resource(BaseModel, MimeEncodableResourceMixin, FileSystemHelpersMixin):
@@ -174,13 +177,13 @@ class Resource(BaseModel, MimeEncodableResourceMixin, FileSystemHelpersMixin):
         else:
             raise ValueError(f"Unknown locationType {self.locationType}")
 
-        if decode:
+        if isinstance(payload, bytes) and decode:
             return payload.decode("utf-8")
         else:
             return payload
 
     def _handle_file(self):
-        with open(self.payload, "rb") as f:
+        with open(self.payload, "rb" if isinstance(self.payload, bytes) else "r") as f:
             file = f.read()
 
         return self.try_decode_mime(file)

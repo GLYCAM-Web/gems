@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from abc import ABC, abstractmethod
 from typing import List
-
+from copy import deepcopy
 from gemsModules.common.action_associated_objects import AAOP
 from gemsModules.common.main_api import Transaction
 from gemsModules.common.main_api_entity import Entity
@@ -29,7 +29,7 @@ class Request_Data_Filler(ABC):
     def process(self) -> List[AAOP]:
         pass
 
-    def fill_resources_from_requester_if_exists(self, aaop):
+    def fill_resources_from_requester_if_exists(self, aaop, deep_copy=False):
         """ If this aaop has a requester, copy the resources from the requester to this aaop. """
         log.debug(f"About to fill resources from requester for {aaop=}")
         
@@ -42,7 +42,11 @@ class Request_Data_Filler(ABC):
             
             log.debug(f"resources: {requester_aaop.The_AAO.inputs.resources}")
             for resource in requester_aaop.The_AAO.inputs.resources:
-                aaop.The_AAO.inputs.resources.add_resource(resource)
+                if deep_copy:
+                    log.debug(f"Deep copying resource {resource=}")
+                    aaop.The_AAO.inputs.resources.add_resource(deepcopy(resource))
+                else:
+                    aaop.The_AAO.inputs.resources.add_resource(resource)
         else:
             log.debug(f"No requester for {aaop=}")
 
