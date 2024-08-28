@@ -18,7 +18,6 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     log.debug(f"serviceInputs: {inputs}")
 
     service_outputs = ProjectManagement_Outputs()
-    #service_outputs.projectDir = inputs.projectDir
     service_outputs.resources.add_resource(
         PM_Resource(
             payload=inputs.projectDir,

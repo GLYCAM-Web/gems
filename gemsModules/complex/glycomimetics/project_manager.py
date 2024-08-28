@@ -52,36 +52,35 @@ class Glycomimetics_Project_Manager(Project_Manager):
     def fill_response_project_from_response_entity(self):
         # TODO: incoming entity may be wrong to use here.
         log.debug("fill_response_project_from_response_entity %s", self.incoming_entity)
-        
-        # Bad hack... # TODO: Ensure the IT fills inputs from resources before the PM? and ignore resources here?
-        inputs_needed=["complex", "receptor", "ligand"]
-        for service in self.incoming_entity.services.__root__.values():
-            log.debug("fill_response_project_from_response_entity %s", service)
-            if hasattr(service.inputs, "complex_PDB_Filename"):
-                self.response_project.complex = service.inputs.complex_PDB_Filename
-                inputs_needed.remove("complex")
-            if hasattr(service.inputs, "receptor_PDB_Filename"):
-                self.response_project.receptor = service.inputs.receptor_PDB_Filename
-                inputs_needed.remove("receptor")
-            if hasattr(service.inputs, "ligand_PDB_Filename"):
-                self.response_project.ligand = service.inputs.ligand_PDB_Filename
-                inputs_needed.remove("ligand")
-            if not len(inputs_needed):
-                break
-            
-            
-        if len(inputs_needed):
-            # Do we need to try to get from inputs.resources?
-            # for resource in service.inputs.resources.__root__:
-            #     if resource.resourceRole == "cocomplex":
-            #         self.response_project.cocomplex = resource.payload
-            #         inputs_needed.remove("cocomplex")
-            #     elif resource.resourceRole == "moiety":
-            #         self.response_project.moiety = resource.payload
-            #         inputs_needed.remove("moiety")
-            #     if not len(inputs_needed):
-            #         break
-            log.warning(f"Could not find all inputs: {inputs_needed}. ")
+
+        # # Bad hack... # TODO: Ensure the IT fills inputs from resources before the PM? and ignore resources here?
+        # inputs_needed = ["complex", "receptor", "ligand"]
+        # for service in self.incoming_entity.services.__root__.values():
+        #     log.debug("fill_response_project_from_response_entity %s", service)
+        #     if hasattr(service.inputs, "complex_PDB_Filename"):
+        #         self.response_project.complex = service.inputs.complex_PDB_Filename
+        #         inputs_needed.remove("complex")
+        #     if hasattr(service.inputs, "receptor_PDB_Filename"):
+        #         self.response_project.receptor = service.inputs.receptor_PDB_Filename
+        #         inputs_needed.remove("receptor")
+        #     if hasattr(service.inputs, "ligand_PDB_Filename"):
+        #         self.response_project.ligand = service.inputs.ligand_PDB_Filename
+        #         inputs_needed.remove("ligand")
+        #     if not len(inputs_needed):
+        #         break
+
+        # if len(inputs_needed):
+        #     # Do we need to try to get from inputs.resources?
+        #     # for resource in service.inputs.resources.__root__:
+        #     #     if resource.resourceRole == "cocomplex":
+        #     #         self.response_project.cocomplex = resource.payload
+        #     #         inputs_needed.remove("cocomplex")
+        #     #     elif resource.resourceRole == "moiety":
+        #     #         self.response_project.moiety = resource.payload
+        #     #         inputs_needed.remove("moiety")
+        #     #     if not len(inputs_needed):
+        #     #         break
+        #     log.warning(f"Could not find all inputs: {inputs_needed}. ")
 
 
 def testme() -> GlycomimeticsProject:

@@ -77,7 +77,30 @@ class MimeEncodableResourceMixin:
         return obj
 
 
-class Resource(BaseModel, MimeEncodableResourceMixin):
+# TODO: Generalize/Handle more than filesystem paths.
+class FileSystemHelpersMixin:
+    def copy_to(self, parent_dir: Path, filename=None):
+        """Copy this resource to the destination directory."""
+        filename = filename or self.filename
+
+        if isinstance(parent_dir, str):
+            path = Path(parent_dir) / filename
+
+        with open(path, "wb") as f:
+            f.write(self.get_payload())
+
+        log.debug(f"Copying resource {self} to {path}...")
+        # return a resource for the new file
+        return Resource(
+            typename=self.typename,
+            locationType="filesystem-path-unix",
+            resourceFormat=self.resourceFormat,
+            resourceRole=self.resourceRole,
+            payload=str(path),
+            options={"filename": filename},
+        )
+        
+class Resource(BaseModel, MimeEncodableResourceMixin, FileSystemHelpersMixin):
     """Information describing a resource containing data.
 
     Payload could be a filesystem path or a download URL or an HTML header or
@@ -155,27 +178,6 @@ class Resource(BaseModel, MimeEncodableResourceMixin):
             return payload.decode("utf-8")
         else:
             return payload
-    
-    def copy_to(self, parent_dir: Path, filename=None):
-        """Copy this resource to the destination directory."""
-        filename = filename or self.filename
-
-        if isinstance(parent_dir, str):
-            path = Path(parent_dir) / filename
-
-        with open(path, "wb") as f:
-            f.write(self.get_payload())
-
-        log.debug(f"Copying resource {self} to {path}...")
-        # return a resource for the new file
-        return Resource(
-            typename=self.typename,
-            locationType="filesystem-path-unix",
-            resourceFormat=self.resourceFormat,
-            resourceRole=self.resourceRole,
-            payload=str(path),
-            options={"filename": filename},
-        )
 
     def _handle_file(self):
         with open(self.payload, "rb") as f:
@@ -189,7 +191,6 @@ class Resource(BaseModel, MimeEncodableResourceMixin):
     def _handle_url(self):
         with urllib.request.urlopen(self.payload) as f:
             return self.try_decode_mime(f.read())
-
 
 
     def convert_resource_format(self, resourceFormat: str):

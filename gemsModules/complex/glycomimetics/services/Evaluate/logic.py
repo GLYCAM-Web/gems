@@ -28,7 +28,7 @@ def execute(inputs: Evaluate_Inputs) -> Evaluate_Outputs:
         if resource.resourceRole == "Receptor":
             receptor_pdb_resource = resource
             break
-            
+
     if not receptor_pdb_resource:
         # Append a notice, we can do nothing else.
         service_notices.addNotice(
@@ -51,21 +51,27 @@ def execute(inputs: Evaluate_Inputs) -> Evaluate_Outputs:
                 Code="601",
                 Message="Receptor PDB Resource must be a filesystem path.",
             )
-        else:   
+        else:
             pdb_fpath = receptor_pdb_resource.payload
-            
+
             if Path(pdb_fpath).exists():
                 working_dir = str(Path(pdb_fpath).parent)
 
-                log.debug(f"Receptor PDB file found: {pdb_fpath}, working_dir: {working_dir}")                
+                log.debug(
+                    f"Receptor PDB file found: {pdb_fpath}, working_dir: {working_dir}"
+                )
                 try:
                     # TODO: Properly include glycomimetic external programs and wrappers with DevENv.
                     # We need Yao's "Validation" for this service.
-                    sys.path.append("/programs/gems/External/GM_Utils/external_programs/validation/evaluate_swig")
+                    sys.path.append(
+                        "/programs/gems/External/GM_Utils/external_programs/validation/evaluate_swig"
+                    )
                     from evaluate_pdb import evaluate_pdb
 
+
+
                     result = evaluate_pdb(pdb_fpath)
-                    
+
                     for atom in result.available_atoms:
                         log.debug(f"atom: {atom}")
                         posmod = Modification_Position(
@@ -76,7 +82,9 @@ def execute(inputs: Evaluate_Inputs) -> Evaluate_Outputs:
                             Replaced_Atom=atom.atom_to_replace_,
                         )
                         service_outputs.Available_Modification_Options.append(posmod)
-                    log.debug(f"Available_Modification_Options: {service_outputs.Available_Modification_Options}")
+                    log.debug(
+                        f"Available_Modification_Options: {service_outputs.Available_Modification_Options}"
+                    )
                 except ImportError as e:
                     service_notices.addNotice(
                         Brief="Error during Evaluation",

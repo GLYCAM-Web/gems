@@ -5,6 +5,7 @@ from gemsModules.complex.glycomimetics.services.settings.known_available import 
     Available_Services,
 )
 
+
 class Glycomimetics_Service_Request(main_api_services.Service_Request):
     typename: Available_Services = Field(
         "Marco",

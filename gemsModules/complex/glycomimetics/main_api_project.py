@@ -2,7 +2,7 @@
 import os
 
 from pydantic import constr, Field
-from typing import Literal 
+from typing import Literal
 
 from gemsModules.project.main_api import Project
 from gemsModules.systemoperations.instance_config import InstanceConfig
@@ -27,10 +27,10 @@ class GlycomimeticsProject(Project):
     input_type: constr(max_length=25) = (
         "AutoDock extended PDB (chemical/pdbqt) & application/json"
     )
-    
+
     pUUID: constr(max_length=36) = ""
     project_dir: constr(max_length=255) = ""
-    
+
     # TODO: Better names, also, snake_case
     complex: constr(max_length=255) = "Complex.pdb"
     receptor: constr(max_length=255) = "Receptor.pdb"
@@ -39,7 +39,9 @@ class GlycomimeticsProject(Project):
     # protocolFilesPath: constr(max_length=255) = "/website/programs/gems/External/GM_Utils/protocols"
 
     # TODO: convert to glycomimetics protocols
-    metadataPath: constr(max_length=255) = "/programs/gems/External/GM_Utils/metadata"  # /moeties etc.
+    metadataPath: constr(max_length=255) = (
+        "/programs/gems/External/GM_Utils/metadata"  # /moeties etc.
+    )
 
     def add_temporary_info(self):
         ic = InstanceConfig()

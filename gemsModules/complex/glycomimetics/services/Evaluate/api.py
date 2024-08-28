@@ -13,7 +13,7 @@ from gemsModules.complex.glycomimetics.services.common_api import (
     PDB_File_Resource,
     Moiety_Library_Names,
     Position_Modification_Options,
-    Modification_Position, # TODO: We really should be using Position_Modification_Options, temp integration
+    Modification_Position,  # TODO: We really should be using Position_Modification_Options, temp integration
 )
 
 from gemsModules.logging.logger import Set_Up_Logging
@@ -45,7 +45,7 @@ class Evaluate_Inputs(BaseModel):
         title="Project UUID",
         description="UUID of Project",
     )
-    
+
     receptor_path: Optional[str] = Field(
         None,
         title="Receptor",
@@ -55,6 +55,7 @@ class Evaluate_Inputs(BaseModel):
     # Evaluate's real request always needs an input PDB, should we be able to instantiate it blank?
     # resources: Evaluate_Input_Resources = Evaluate_Input_Resources()
     resources: Resources = Resources()
+
 
 class Evaluate_Outputs(BaseModel):
     # TODO/Q: Should this be here? Should we have libraries per pos or per eval?

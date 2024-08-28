@@ -13,6 +13,5 @@ log = Set_Up_Logging(__name__)
 
 
 # TODO: Refer to MDaaS
-def execute(
-):
+def execute():
     pass

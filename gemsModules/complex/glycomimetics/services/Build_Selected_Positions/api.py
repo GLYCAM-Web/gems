@@ -96,7 +96,7 @@ class Build_Inputs(BaseModel):
         title="Project UUID",
         description="UUID of Project",
     )
-    
+
     Available_Libraries: List[str] = (
         Moiety_Library_Names.get_json_list()
     )  # might need syntax adjustment
@@ -114,10 +114,11 @@ class Build_Inputs(BaseModel):
     #        description="Complex to build",
     #    )
     buildOptions: Build_Options = Build_Options()
-    
+
     # TODO: Fix the complications
-    #resources: Build_Input_Resources = Build_Input_Resources()
+    # resources: Build_Input_Resources = Build_Input_Resources()
     resources: Resources = Resources()
+
 
 # it will be hard to specify this before the workflow is well specified
 class Build_Outputs(BaseModel):
@@ -127,7 +128,7 @@ class Build_Outputs(BaseModel):
         description="UUID of Project",
     )
     projectDir: str = Field(
-        None, 
+        None,
         title="Output Directory Path",
         description="Path to output directory",
     )

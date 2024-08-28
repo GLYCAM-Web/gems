@@ -30,33 +30,73 @@ class Glycomimetics_Request_Data_Filler(Request_Data_Filler):
     # No data to fill here.
     def process(self) -> list[AAOP]:
         """Fill in any data required in the service request aaop_list."""
+        
+        # We will fill all AAOPs in order, ensuring PM aaop exists before we depend on project paths.
+        update_proj_dirs = []
+        do_proj_dir_update = False
         for i, aaop in enumerate(self.aaop_list):
             log.debug(f"i: {i}, {aaop.AAO_Type}={aaop}")
 
             if aaop.AAO_Type == "Build_Selected_Positions":
                 self.__fill_build_aaop(i, aaop)
+                update_proj_dirs.append(aaop)
             elif aaop.AAO_Type == "ProjectManagement":
                 self.__fill_projman_aaop(i, aaop)
+                do_proj_dir_update = True
             elif aaop.AAO_Type == "Evaluate":
                 self.__fill_evaluate_aaop(i, aaop)
+                update_proj_dirs.append(aaop)
             elif aaop.AAO_Type == "Validate":
                 self.__fill_validate_aaop(i, aaop)
+                update_proj_dirs.append(aaop)
+            else:
+                log.warning(f"GM/RequestDataFiller: I don't know how to data fill for {aaop.AAO_Type}")
+
+        if not do_proj_dir_update:
+            log.warning("GM/RequestDataFiller: No ProjectManagement AAOP found to update project directories.")
+            log.warning("This WILL cause problems with the service execution.")
+        else:   
+            self.__post_process_fill(update_proj_dirs)
 
         return self.aaop_list
 
+    def __post_process_fill(self, update_proj_dirs: List[AAOP]):
+        
+        # TODO/FIX: Hack, but easiest/cheapest way to get all project resources to have the project_dir prepended.
+        roles_to_find = ["Complex", "Ligand", "Receptor"]
+        for aaop in update_proj_dirs:
+            log.debug(f"GM/RequestDataFiller: Prepending project_dir to resources for {aaop.AAO_Type}")
+            for r in aaop.The_AAO.inputs.resources:
+                if not roles_to_find:
+                    break
+                if (
+                    r.resourceRole in roles_to_find
+                    and r.locationType == "filesystem-path-unix"
+                ):
+                    # extract filename from payload
+                    r.payload = str(Path(self.response_project.project_dir) / Path(r.payload).name)
+                    log.debug(
+                        f"GM/RequestDataFiller: {r.resourceRole} prepended project_dir to Receptor payload: {r.payload}"
+                    )
+                    
+                    roles_to_find.remove(r.resourceRole)
+                    break
+                
+                
+
     def __fill_build_aaop(self, i: int, aaop: AAOP) -> List[AAOP]:
         # Please note, if you need values from response_project, make sure they are initialized appropriately by project manager.
-        
+
         aaop.The_AAO.inputs.pUUID = self.response_project.pUUID
-        #aaop.The_AAO.inputs.projectDir = self.response_project.project_dir
-        #aaop.The_AAO.inputs.outputDirPath = self.response_project.project_dir
-               
+        # aaop.The_AAO.inputs.projectDir = self.response_project.project_dir
+        # aaop.The_AAO.inputs.outputDirPath = self.response_project.project_dir
+
         complex_filename, ligand_filename, receptor_filename = None, None, None
-        
+
         if aaop.The_AAO.inputs.complex_PDB_Filename:
             complex_filename = aaop.The_AAO.inputs.complex_PDB_Filename
         else:
-            complex_filename = self.response_project.complex 
+            complex_filename = self.response_project.complex
         if aaop.The_AAO.inputs.ligand_PDB_Filename:
             ligand_filename = aaop.The_AAO.inputs.ligand_PDB_Filename
         else:
@@ -64,25 +104,22 @@ class Glycomimetics_Request_Data_Filler(Request_Data_Filler):
         if aaop.The_AAO.inputs.receptor_PDB_Filename:
             receptor_filename = aaop.The_AAO.inputs.receptor_PDB_Filename
         else:
-            receptor_filename = self.response_project.receptor   
-        
-        # add project directory to the filenames; project management will ensure the files are there.
-        # TODO/Note: as we simlink the PDBs, we could always use those names.
+            receptor_filename = self.response_project.receptor
 
         if complex_filename:
             pdb = Resource(
                 payload=complex_filename,
                 resourceFormat="chemical/pdb",
                 resourceRole="Complex",
-                locationType="filesystem-path-unix"
+                locationType="filesystem-path-unix",
             )
             aaop.The_AAO.inputs.resources.add_resource(pdb)
-        if ligand_filename:   
+        if ligand_filename:
             pdb = Resource(
                 payload=ligand_filename,
                 resourceFormat="chemical/pdb",
                 resourceRole="Ligand",
-                locationType="filesystem-path-unix"
+                locationType="filesystem-path-unix",
             )
             aaop.The_AAO.inputs.resources.add_resource(pdb)
         if receptor_filename:
@@ -90,16 +127,16 @@ class Glycomimetics_Request_Data_Filler(Request_Data_Filler):
                 payload=receptor_filename,
                 resourceFormat="chemical/pdb",
                 resourceRole="Receptor",
-                locationType="filesystem-path-unix"
+                locationType="filesystem-path-unix",
             )
             aaop.The_AAO.inputs.resources.add_resource(pdb)
-            
+
         return self.aaop_list
 
     def __fill_projman_aaop(self, i: int, aaop: AAOP):
         aaop.The_AAO.inputs.pUUID = self.response_project.pUUID
         aaop.The_AAO.inputs.projectDir = self.response_project.project_dir
-        
+
         # Add the resources to copy to the project output directory by the Project Management service.
         # TODO: copy parm7/rst7 this way.
         input_json = pm_api.PM_Resource(
@@ -109,25 +146,19 @@ class Glycomimetics_Request_Data_Filler(Request_Data_Filler):
             options={"filename": "request.json"},
         )
         aaop.The_AAO.inputs.resources.add_resource(input_json)
-        
+
         # TODO: need to handle the case of direct inputs that are not resources.
         self.fill_resources_from_requester_if_exists(aaop)
-        
-        # TODO: "modify"
-        for r in aaop.The_AAO.inputs.resources:
-            if r.resourceRole == "Receptor" or r.resourceRole == "Complex" or r.resourceRole == "Ligand":
-                r.payload = str(Path(self.response_project.project_dir) / r.payload)
-                log.debug(f"GM/RequestDataFiller: {r.resourceRole} prepended project_dir to Receptor payload: {r.payload}")
-                
+
     def __fill_evaluate_aaop(self, i: int, aaop: AAOP) -> List[AAOP]:
         aaop.The_AAO.inputs.pUUID = self.response_project.pUUID
-        
+
         # TODO: need to handle the case of direct inputs that are not resources.
         self.fill_resources_from_requester_if_exists(aaop)
         # Add the resources to copy to the project output directory by the Project Management service.
-        
+
     def __fill_validate_aaop(self, i: int, aaop: AAOP) -> List[AAOP]:
         aaop.The_AAO.inputs.pUUID = self.response_project.pUUID
-                
+
         # TODO: need to handle the case of direct inputs that are not resources.
         self.fill_resources_from_requester_if_exists(aaop)

@@ -18,13 +18,11 @@ log = Set_Up_Logging(__name__)
 
 # TODO: To services.settings... ?
 VALIDATE_DEPENDENCIES = Annotated_List([], ordered=True)
-PROJECTMANAGEMENT_DEPENDENCIES = Annotated_List(
-    ["Validate"], ordered=True
+PROJECTMANAGEMENT_DEPENDENCIES = Annotated_List(["Validate"], ordered=True)
+EVALUATE_DEPENDENCIES = Annotated_List(
+    PROJECTMANAGEMENT_DEPENDENCIES + ["ProjectManagement"], ordered=True
 )
-EVALUATE_DEPENDENCIES = Annotated_List(PROJECTMANAGEMENT_DEPENDENCIES + ["ProjectManagement"], ordered=True)
-BUILD_DEPENDENCIES = Annotated_List(
-    EVALUATE_DEPENDENCIES + ["Evaluate"], ordered=True
-)
+BUILD_DEPENDENCIES = Annotated_List(EVALUATE_DEPENDENCIES + ["Evaluate"], ordered=True)
 ANALYZE_DEPENDENCIES = Annotated_List(
     BUILD_DEPENDENCIES + ["Build_Selected_Positions"], ordered=True
 )
@@ -76,7 +74,7 @@ class Glycomimetics_Workflow_Manager(Workflow_Manager):
             for new_dep in these_deps:
                 log.debug("Resolving dependency %s", new_dep)
                 aao_cls = globals()[f"{new_dep}_Request"]
-                
+
                 new_aaop = AAOP(
                     AAO_Type=new_dep,
                     The_AAO=aao_cls(),
@@ -85,8 +83,10 @@ class Glycomimetics_Workflow_Manager(Workflow_Manager):
                 )
 
                 new_aaop.set_requester(current_aaop)
-                log.debug(f"Requester for {new_aaop.AAO_Type} is {current_aaop.AAO_Type}")
-                
+                log.debug(
+                    f"Requester for {new_aaop.AAO_Type} is {current_aaop.AAO_Type}"
+                )
+
                 log.debug(
                     "Adding dependency %s to aaop list before %s",
                     new_aaop,

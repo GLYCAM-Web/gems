@@ -59,7 +59,7 @@ class Validate_Inputs(BaseModel):
         title="Project UUID",
         description="UUID of Project",
     )
-    
+
     receptor: Optional[str] = Field(
         None,
         title="Receptor",
@@ -69,6 +69,7 @@ class Validate_Inputs(BaseModel):
     # TODO: see Build.api too and fix this
     # resources: Validate_Resources = Validate_Resources()
     resources: Resources = Resources()
+
 
 class Validate_Outputs(BaseModel):
     isValid: bool = Field(

@@ -12,24 +12,30 @@ from gemsModules.complex.glycomimetics.services.common_api import PDB_File_Resou
 
 log = Set_Up_Logging(__name__)
 
+
 class PM_Resource(Resource):
     pass
+
 
 class PM_Input_Resource(PM_Resource):
     pass
 
+
 class PM_Output_Resource(PM_Resource):
     pass
+
 
 class PM_Input_Resources(Resources):
     __root__: Union[PDB_File_Resource, PM_Input_Resource, PM_Output_Resource] = Field(
         default_factory=list,
     )
 
+
 class PM_Output_Resources(Resources):
     __root__: Union[PM_Input_Resource, PM_Output_Resource] = Field(
         default_factory=list,
     )
+
 
 class ProjectManagement_Inputs(BaseModel):
     pUUID: Optional[str] = Field(
