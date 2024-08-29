@@ -15,6 +15,7 @@ from gemsModules.complex.glycomimetics.services.common_api import (
     PDB_File_Resource,
     Moiety_Library_Names,
     Position_Modification_Options,
+    Modification_Position
 )
 
 from gemsModules.logging.logger import Set_Up_Logging
@@ -144,3 +145,51 @@ class Build_Selected_Positions_Request(Glycomimetics_Service_Request):
 class Build_Selected_Positions_Response(Glycomimetics_Service_Response):
     typename: str = Field("Build_Selected_Positions", alias="type")
     outputs: Build_Outputs = Build_Outputs()
+
+
+if __name__ == "__main__":
+    # very simple request to demonstrate:
+    request = Build_Selected_Positions_Request(
+        inputs=Build_Inputs(
+            Available_Libraries=[""],
+            Selected_Modification_Options=Position_Modification_Options(
+                Position=Modification_Position(
+                    Residue_Identifier="1",
+                    Residue_Name="GLY",
+                    Chain_Identifier="A",
+                    Attachment_Atom="N",
+                    Replaced_Atom="O"
+                ),
+                Libraries=[Moiety_Library_Names.aldehydes, Moiety_Library_Names.ketones, Moiety_Library_Names.sulfonyl_halides]
+            ),
+            buildOptions=Build_Options(
+                Interval=30,
+                NumThreads=1,
+                OutputPath="output",
+                LogFile="sample.log",
+            ),
+            resources=Resources(
+                __root__=[
+                    PDB_File_Resource(
+                        locationType="Path",
+                        resourceFormat="PDB-unknown",
+                        resourceRole="Complex_Input",
+                        payload="/path/to/file",
+                    ),
+                    Build_input_Resource(
+                        locationType="File",
+                        resourceFormat="PDB-unknown",
+                        payload="/path/to/file",
+                    ),
+                    Build_output_Resource(
+                        locationType="File",
+                        resourceFormat="PDB-unknown",
+                        payload="/path/to/file",
+                    ),
+                ]
+            ),
+        )
+    )
+    # dump to file
+    with open("build_selected_positions_request-git-ignore-me.json", "w") as f:
+        f.write(request.json(indent=2))
