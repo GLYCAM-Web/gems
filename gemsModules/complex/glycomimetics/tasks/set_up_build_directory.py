@@ -12,6 +12,5 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
-# TODO: Refer to MDaaS
 def execute():
     pass

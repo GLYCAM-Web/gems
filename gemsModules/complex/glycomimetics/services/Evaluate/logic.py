@@ -61,16 +61,18 @@ def execute(inputs: Evaluate_Inputs) -> Evaluate_Outputs:
                     f"Receptor PDB file found: {pdb_fpath}, working_dir: {working_dir}"
                 )
                 try:
-                    # TODO: Properly include glycomimetic external programs and wrappers with DevENv.
+                    # TODO: Properly include glycomimetic external programs and wrappers with DevEnv.
                     # We need Yao's "Validation" for this service.
                     sys.path.append(
                         "/programs/gems/External/GM_Utils/external_programs/validation/evaluate_swig"
                     )
+                    # TODO: If we modify the new glycomimeticsWebtool repo (and have perms to compile), we can use this on harper:
+                    # sys.path.append("/programs/glycomimeticsWebtool/internal/glycomimetics/validation")
                     from evaluate_pdb import evaluate_pdb, change_working_directory
 
                     # To ensure ring_conformations.txt is written to the appropriate locations.
                     parent_dir = str(Path(pdb_fpath).parent)
-                    change_working_directory(parent_dir)
+                    change_working_directory(parent_dir) # chdir doesn't seem to affect C++ code.
                     os.chdir(parent_dir)
                     
                     result = evaluate_pdb(pdb_fpath)

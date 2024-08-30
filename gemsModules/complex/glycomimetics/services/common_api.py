@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from pydantic import BaseModel, Field
-from typing import List, Literal, Union, Any
+from typing import List, Literal, Optional, Union, Any
 
 from gemsModules.common.main_api_resources import Resource
 from gemsModules.common.code_utils import GemsStrEnum
@@ -72,15 +72,15 @@ class Modification_Position(BaseModel):
 
 class Position_Modification_Options(BaseModel):
     Position: Modification_Position = ...
-    Libraries: List[Moiety_Library_Names] = []
-
-
-# 		- Evaluation:
-# 			- If included, these are the libraries available at this position.  Must be a subset of All R Group Libraries
-# 			- If not included, then this position can use any of the available libraries specified above.
-# 		- Build Position
-# 			- If not included, all available libraries will be used.
-# 			- If included, only the specified libraries will be used
+    Libraries: Optional[List[Moiety_Library_Names]] = None
+    """
+		- Evaluation:
+			- If included, these are the libraries available at this position.  Must be a subset of All R Group Libraries
+			- If not included, then this position can use any of the available libraries specified above.
+		- Build Position
+			- If not included, all available libraries will be used.
+			- If included, only the specified libraries will be used
+    """
 
 if __name__ == "__main__":
     with open("PDBFile_Resource_Example.json", "w") as f:
