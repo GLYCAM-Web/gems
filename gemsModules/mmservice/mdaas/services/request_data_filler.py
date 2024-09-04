@@ -52,30 +52,7 @@ class mdaas_Request_Data_Filler(Request_Data_Filler):
         aaop.The_AAO.inputs.sim_length = self.response_project.sim_length
 
         log.debug(f"RUNMD AAOP {aaop}")
-        if aaop.The_AAO.inputs.parameter_topology_file is not None:
-            parm7 = Resource(
-                payload=aaop.The_AAO.inputs.parameter_topology_file,
-                resourceFormat="AMBER-7-prmtop",
-                resourceRole="parameter-topology",
-                locationType="filesystem-path-unix"
-            )
-            aaop.The_AAO.inputs.resources.add_resource(parm7)
-        if aaop.The_AAO.inputs.input_coordinate_file is not None:
-            rst7 = Resource(
-                payload=aaop.The_AAO.inputs.input_coordinate_file,
-                resourceFormat="AMBER-7-restart",
-                resourceRole="input-coordinate",
-                locationType="filesystem-path-unix"
-            )
-            aaop.The_AAO.inputs.resources.add_resource(rst7)
-        if aaop.The_AAO.inputs.unminimized_gas_file is not None:
-            gas = Resource(
-                payload=aaop.The_AAO.inputs.unminimized_gas_file,
-                resourceFormat="AMBER-7-prmtop",
-                resourceRole="unminimized-gas",
-                locationType="filesystem-path-unix"
-            )
-            aaop.The_AAO.inputs.resources.add_resource(gas)
+        self.__fill_input_resources(aaop)
             
         log.debug(f"RUNMD AAOP FILLED: {aaop}")
         return self.aaop_list
@@ -105,4 +82,33 @@ class mdaas_Request_Data_Filler(Request_Data_Filler):
         aaop.The_AAO.inputs.protocolFilesPath = self.response_project.protocolFilesPath
         aaop.The_AAO.inputs.sim_length = self.response_project.sim_length
 
-        self.fill_resources_from_requester_if_exists(aaop)
+        if not self.fill_resources_from_requester_if_exists(aaop):
+            self.__fill_input_resources(aaop)
+        
+    def __fill_input_resources(self, aaop: AAOP):
+        if aaop.The_AAO.inputs.parameter_topology_file is not None:
+            parm7 = Resource(
+                payload=aaop.The_AAO.inputs.parameter_topology_file,
+                resourceFormat="AMBER-7-prmtop",
+                resourceRole="parameter-topology",
+                locationType="filesystem-path-unix"
+            )
+            aaop.The_AAO.inputs.resources.add_resource(parm7)
+        if aaop.The_AAO.inputs.input_coordinate_file is not None:
+            rst7 = Resource(
+                payload=aaop.The_AAO.inputs.input_coordinate_file,
+                resourceFormat="AMBER-7-restart",
+                resourceRole="input-coordinate",
+                locationType="filesystem-path-unix"
+            )
+            aaop.The_AAO.inputs.resources.add_resource(rst7)
+        if aaop.The_AAO.inputs.unminimized_gas_file is not None:
+            gas = Resource(
+                payload=aaop.The_AAO.inputs.unminimized_gas_file,
+                resourceFormat="AMBER-7-prmtop",
+                resourceRole="unminimized-gas",
+                locationType="filesystem-path-unix"
+            )
+            aaop.The_AAO.inputs.resources.add_resource(gas)
+            
+        return aaop

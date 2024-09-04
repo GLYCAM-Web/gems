@@ -29,8 +29,16 @@ class Request_Data_Filler(ABC):
     def process(self) -> List[AAOP]:
         pass
 
-    def fill_resources_from_requester_if_exists(self, aaop, deep_copy=False):
-        """ If this aaop has a requester, copy the resources from the requester to this aaop. """
+    def fill_resources_from_requester_if_exists(self, aaop, deep_copy=False) -> bool:
+        """ If this aaop has a requester, copy the resources from the requester to this aaop. 
+
+        Args:
+            aaop (AAOP): The aaop to fill resources for.
+            deep_copy (bool, optional): If True, deep copy the resources. Defaults to False.
+            
+        Returns:
+            bool: True if resources were copied, False otherwise.
+        """
         log.debug(f"About to fill resources from requester for {aaop=}")
         
         # TODO: optional filter by resourceRoles.
@@ -47,6 +55,8 @@ class Request_Data_Filler(ABC):
                     aaop.The_AAO.inputs.resources.add_resource(deepcopy(resource))
                 else:
                     aaop.The_AAO.inputs.resources.add_resource(resource)
+            
+            return True
         else:
             log.debug(f"No requester for {aaop=}")
 
