@@ -12,6 +12,7 @@ from gemsModules.logging.logger import Set_Up_Logging
 from .api import Evaluate_Inputs, Evaluate_Outputs
 from ..common_api import Modification_Position
 
+from ...tasks import evaluate_wrapper
 
 log = Set_Up_Logging(__name__)
 
@@ -61,43 +62,16 @@ def execute(inputs: Evaluate_Inputs) -> Evaluate_Outputs:
                     f"Receptor PDB file found: {pdb_fpath}, working_dir: {working_dir}"
                 )
                 try:
-                    # TODO: Properly include glycomimetic external programs and wrappers with DevEnv.
-                    # We need Yao's "Validation" for this service.
-                    sys.path.append(
-                        "/programs/gems/External/GM_Utils/external_programs/validation/evaluate_swig"
-                    )
-                    # TODO: If we modify the new glycomimeticsWebtool repo (and have perms to compile), we can use this on harper:
-                    # sys.path.append("/programs/glycomimeticsWebtool/internal/glycomimetics/validation")
-                    from evaluate_pdb import evaluate_pdb, change_working_directory
-
-                    # To ensure ring_conformations.txt is written to the appropriate locations.
+                    # To ensure various output files are written to the correct directory.
                     parent_dir = str(Path(pdb_fpath).parent)
-                    change_working_directory(parent_dir) # chdir doesn't seem to affect C++ code.
-                    os.chdir(parent_dir)
+                    pdb_filename = Path(pdb_fpath).name
                     
-                    result = evaluate_pdb(pdb_fpath)
+                    available_positions = evaluate_wrapper.execute(parent_dir, pdb_filename)
 
-                    for atom in result.available_atoms:
-                        log.debug(f"atom: {atom}")
-                        posmod = Modification_Position(
-                            Residue_Identifier=atom.residue_index_str_,
-                            Residue_Name=atom.resname_,
-                            Chain_Identifier=atom.chain_id_,
-                            Attachment_Atom=atom.atom_name_,
-                            Replaced_Atom=atom.atom_to_replace_,
-                        )
-                        service_outputs.Available_Modification_Options.append(posmod)
+                    for pos in available_positions:
+                        service_outputs.Available_Modification_Options.append(pos)
                     log.debug(
                         f"Available_Modification_Options: {service_outputs.Available_Modification_Options}"
-                    )
-                except ImportError as e:
-                    service_notices.addNotice(
-                        Brief="Error during Evaluation",
-                        Scope="Service",
-                        Messenger="Glycomimetics",
-                        Type="Error",
-                        Code="603",
-                        Message=f"Currently unable to Evaluate PDB because this feature is not implemented.",
                     )
                 except Exception as e:
                     service_notices.addNotice(
@@ -108,7 +82,9 @@ def execute(inputs: Evaluate_Inputs) -> Evaluate_Outputs:
                         Code="602",
                         Message=f"Error during Evaluation: {e}",
                     )
-                log.debug(f"Evaluation Result: {result}")
+                    
+                # TODO: swig wrap or recover results from evaluation.log
+                log.debug(f"Evaluation Result: {None}")
             else:
                 log.debug(f"Receptor PDB file not found: {pdb_fpath}")
 

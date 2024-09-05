@@ -17,6 +17,9 @@ def execute(position: Modification_Position, project_dir: Path): # , libraries: 
     naturalCharge:-1
     ```
     """
+    if position is None:
+        raise RuntimeError("No valid Position selected.")
+    
     # Something like this maybe? libraries_str = "-".join([f"/programs/glycomimetic/library/{lib}" for lib in position.Moiety_Library_Names])
     libraries_str = "/programs/glycomimetic/library/test1-pdbqt"
     charge_str = "-1"
