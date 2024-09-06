@@ -18,7 +18,7 @@ class DateReversioner:
 
         self._new_version = new_config
         self._new_version_data = new_config_data
-
+        
     @property
     def old_version(self):
         """Return the old version data."""
@@ -69,9 +69,9 @@ class DateReversioner:
             ).date()
             return new_date > old_date
 
-    def update(self) -> bool:
+    def update(self, force_update=False) -> bool:
         """Update the file_to_version with the current date."""
-        needs_update = (
+        needs_update = (force_update and not os.getenv("SWARM") == "true") or (
             self.is_outdated
             or os.getenv("GEMS_FORCE_INSTANCE_RECONFIGURATION") == "True"
         )

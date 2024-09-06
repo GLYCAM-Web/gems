@@ -1,0 +1,41 @@
+{
+  "date": "2024-09-06T04:52:11.000",
+  "hosts": {
+    "grpc-default": {
+      "contexts": [
+        "DevEnv"
+      ],
+      "host": "gw-grpc-delegator",
+      "routes": [
+        "swarm"
+      ]
+    },
+    "swarm": {
+      "contexts": [
+        "ShortJob",
+        "Swarm",
+        "FreeTier",
+        "Sequence-Build3DStructure",
+        "DevEnv"
+      ],
+      "host": "gw-slurm-head",
+      "slurmport": "50052",
+      "sbatch_arguments": {},
+      "local_parameters": {}
+    }
+  },
+  "default_sbatch_arguments": {
+    "Default": {
+      "partition": "amber",
+      "time": "120",
+      "nodes": "1",
+      "tasks-per-node": "4"
+    }
+  },
+  "default_local_parameters": {
+    "Default": {
+      "numProcs": "4"
+    }
+  },
+  "filesystem_paths": {}
+}

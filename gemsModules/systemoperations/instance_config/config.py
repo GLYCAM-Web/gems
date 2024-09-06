@@ -62,7 +62,7 @@ class ConfigManager(ABC):
             config_path = self.get_default_path()
 
         if not config_path.exists():
-            config_path = self.get_default_path(example=True)
+            config_path = self.get_default_path(template=True)
 
         self._config = self.load(config_path=config_path)
 
@@ -70,7 +70,7 @@ class ConfigManager(ABC):
         self._config = config
 
     @abstractmethod
-    def get_default_path(example=False) -> Path:
+    def get_default_path(template=False) -> Path:
         """Must be overridden to return the default path for the instance config file."""
         raise NotImplementedError("Must be overridden to return the default path.")
 

@@ -15,7 +15,7 @@ class Test_InstanceConfig(unittest.TestCase):
         Set up for testing InstanceConfig.
         """
         # copy instance_config.json.example to temporarily test.
-        example_path = InstanceConfig.get_default_path(example=True)
+        example_path = InstanceConfig.get_default_path(template=True)
         self.test_ic_path = pathlib.Path(os.getcwd()) / example_path.name.replace(
             ".example", ""
         )

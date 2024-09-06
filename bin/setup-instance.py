@@ -146,7 +146,7 @@ def update_instance_config_from_preconfig(ic, config):
     for context, path in config.get("filesystem_paths", {}).items():
         ic.set_filesystem_path(context, path)
 
-    ic.save()
+    ic.save(force_update=True)
 
 
 def main():

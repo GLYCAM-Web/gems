@@ -77,7 +77,8 @@ class InstanceConfig(KeyedArgManager, FileSystemPathsMixin):
     """
 
     # Not an enum so we can extend here, in the InstanceConfig class, where the most specific GEMS instance configuration is defined.
-    Contexts = ["DevEnv", "Swarm", "Glycomimetics"]
+    # TODO: remove gm/md from contexts here
+    Contexts = ["DevEnv", "Swarm", "Glycomimetics", "MDaaS-RunMD"]
     Filesystem_Paths = ["MDaaS-RunMD", "Glycomimetics"]
 
     def __init__(
@@ -89,30 +90,31 @@ class InstanceConfig(KeyedArgManager, FileSystemPathsMixin):
     ):
         super().__init__(config, config_path, reinitialize, **kwargs)
         if len(self.config) and "date" not in self.config:
-            self.set_active_config(self.get_default_path(example=True))
+            self.set_active_config(self.get_default_path(template=True))
 
         # compare the active config to the example config
         self.reversioner = DateReversioner(
-            self.get_default_path(), self.get_default_path(example=True)
+            self.get_default_path(), self.get_default_path(template=True)
         )
 
         if self.reversioner.is_outdated:
-            self.set_active_config(self.get_default_path(example=True))
+            self.set_active_config(self.get_default_path(template=True))
 
-    def save(self) -> bool:
+    def save(self, force_update=False) -> bool:
         """save the instance config using a DateReversioner."""
         self.reversioner.set_new_config_data(self.config)
-        return self.reversioner.update()
+        return self.reversioner.update(force_update=force_update)
 
     @staticmethod
-    def get_default_path(example=False) -> Path:
+    def get_default_path(template=False) -> Path:
         """The default path is the active GEMS instance configuration.
 
         TODO: change to active_path property.
         """
-        name = "instance_config.json"
-        if example:
-            name += ".example"
+        name = "instance_config"
+        if template:
+            name += ".template"
+        name += ".json"
 
         return Path(os.getenv("GEMSHOME", "")) / name
 
