@@ -17,6 +17,7 @@ GlycoWebtool_path = Path("/programs/glycomimeticsWebtool")
 
 
 def execute(inputs: Build_Inputs) -> Build_Outputs:
+    log.debug("Executing Build_Selected_Positions")
     service_outputs = Build_Outputs(pUUID=inputs.pUUID)
 
     # Normally the Project builds this path. TODO: better helper 
@@ -39,8 +40,18 @@ def execute(inputs: Build_Inputs) -> Build_Outputs:
     
         # Run glycomimetics
         log.debug("Running Glycomimetics now...")
-        run_all_glyco.execute(inputs.pUUID, project_dir, GlycoWebtool_path)
-        
+        try:
+            run_all_glyco.execute(inputs.pUUID, project_dir, GlycoWebtool_path)
+        except Exception as e:
+            log.exception(f"Error running Glycomimetics: {e}")
+            service_outputs.notices.addNotice(
+            Brief="Glycomimetics RUN_ALL Error",
+            Scope="Build_Selected_Positions",
+            Messenger="Glycomimetics",
+            Type="Error",
+            Code="603",
+            Message=f"Error running Glycomimetics RUN_ALL: {e}",
+        ) 
     service_outputs.projectDir = str(project_dir)
     
     return service_outputs

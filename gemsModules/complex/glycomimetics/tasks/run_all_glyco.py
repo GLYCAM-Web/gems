@@ -19,7 +19,7 @@ def execute(pUUID, project_dir: Path, GlycoWebtool_path: Path, use_serial: bool 
     run_all_script = project_dir / "scripts/00.RUN_ALL.bash"
     
     # execute in project directory
-    log.debug(f"Running {run_all_script} in {project_dir}") 
+    log.debug(f"About to execute {run_all_script} in {project_dir}") 
     
     # TODO: gRPC/swarm->remote execution
     #subprocess.Popen([run_all_script, "Complex.pdb", "input.txt", "systemInfo.txt"], cwd=project_dir)
