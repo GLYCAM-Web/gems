@@ -91,6 +91,8 @@ class FileSystemHelpersMixin:
 
         log.debug(f"Copying resource {self} to {path}...")
         with open(path, "w" + maybe_binary) as f:
+            if isinstance(payload, dict):
+                payload = str(payload)
             f.write(payload)
             
         # return a resource for the new file
@@ -158,9 +160,14 @@ class Resource(BaseModel, MimeEncodableResourceMixin, FileSystemHelpersMixin):
         elif "filename" in self.options:
             return self.options["filename"]
         else:
-            raise ValueError(
-                "No filename specified, please set it with options['filename'] or use a File payload."
-            )
+            log.warning("Has no filename, attempting to use resourceRole")
+            if self.resourceRole:
+                return self.resourceRole
+            else:
+                # Maybe just append a notice here..
+                raise ValueError(
+                    "No filename specified, please set it with options['filename'] or use a File payload."
+                )
 
     def get_payload(self, decode=False):
         """Return the data from the payload.
@@ -178,7 +185,7 @@ class Resource(BaseModel, MimeEncodableResourceMixin, FileSystemHelpersMixin):
             raise ValueError(f"Unknown locationType {self.locationType}")
 
         if isinstance(payload, bytes) and decode:
-            return payload.decode("utf-8")
+            return payload.decode("utf-8")            
         else:
             return payload
 
@@ -189,6 +196,9 @@ class Resource(BaseModel, MimeEncodableResourceMixin, FileSystemHelpersMixin):
         return self.try_decode_mime(file)
 
     def _handle_payload(self):
+        if isinstance(self.payload, dict):
+            return self.payload
+        
         return self.try_decode_mime(self.payload.encode("utf-8"))
 
     def _handle_url(self):

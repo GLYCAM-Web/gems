@@ -2,15 +2,29 @@
   "entity": {
     "type": "Glycomimetics",
     "services": {
-      "evaluation_of_pdb": {
+      "GlycoBuildOne": {
         "type": "Build_Selected_Positions",
         "inputs": { 
           "resources": [
             {
-                "locationType": "filesystem-path-unix",
-                "resourceFormat": "chemical/pdb",
-                "resourceRole": "Receptor",
-                "payload": "$GEMSHOME/tests/inputs/1gya.pdb"
+              "resourceRole": "Receptor",
+              "locationType": "filesystem-path-unix",
+              "resourceFormat": "chemical/pdb",
+              "payload": "$GEMSHOME/tests/inputs/1gya.pdb"
+            },
+            {
+              "resourceRole": "Selected_Modification_Options",
+              "locationType": "Payload",
+              "resourceFormat": "python-dict",
+              "payload": {
+                "Position": {
+                  "Residue_Identifier": "112",
+                  "Residue_Name": "MAN",
+                  "Chain_Identifier": "B",
+                  "Attachment_Atom": "C3",
+                  "Replaced_Atom": "O3"
+                }
+              }      
             }
           ]
         }
