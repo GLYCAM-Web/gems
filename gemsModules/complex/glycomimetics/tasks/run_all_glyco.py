@@ -9,7 +9,7 @@ from .amber_submit import execute as execute_amber_submit
 log = Set_Up_Logging(__name__)
 
 
-def execute(pUUID, project_dir: Path, GlycoWebtool_path: Path, use_serial: bool = False, use_project_dir: bool = False):
+def execute(pUUID, project_dir: Path, GlycoWebtool_path: Path, use_serial: bool = True, use_project_dir: bool = False):
     """"""
     """
     ./programs/glycomimeticsWebtool/scripts/00.RUN_ALL.bash 3PHZ.pdb  input.txt  systemInfo.txt
@@ -41,7 +41,7 @@ def execute(pUUID, project_dir: Path, GlycoWebtool_path: Path, use_serial: bool 
         def withArgs():
             execute_amber_submit(pUUID=pUUID, projectDir=str(project_dir), control_script=str(run_all_script), control_args=["Complex.pdb", "input.txt", "systemInfo.txt"])
        
-        detached_build = multiprocessing.Process(target=commonlogic.spawnDaemon, args=(withArgs))
+        detached_build = multiprocessing.Process(target=commonlogic.spawnDaemon, args=(withArgs,))
         detached_build.daemon = True
         detached_build.start()
         
