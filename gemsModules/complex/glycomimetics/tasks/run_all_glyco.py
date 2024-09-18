@@ -9,7 +9,7 @@ from .amber_submit import execute as execute_amber_submit
 log = Set_Up_Logging(__name__)
 
 
-def execute(pUUID, project_dir: Path, GlycoWebtool_path: Path, use_serial: bool = False):
+def execute(pUUID, project_dir: Path, GlycoWebtool_path: Path, use_serial: bool = True):
     """"""
     """
     ./programs/glycomimeticsWebtool/scripts/00.RUN_ALL.bash 3PHZ.pdb  input.txt  systemInfo.txt
@@ -29,11 +29,15 @@ def execute(pUUID, project_dir: Path, GlycoWebtool_path: Path, use_serial: bool 
     
    # first we need to call 
     if use_serial:
-        execute_amber_submit(pUUID=pUUID, projectDir=project_dir, control_script=run_all_script)
+        execute_amber_submit(pUUID=pUUID, projectDir=project_dir, control_script=run_all_script, control_args=["Complex.pdb", "input.txt", "systemInfo.txt"])
     else:
         import multiprocessing
-       
+        from gemsModules.deprecated.common import logic as commonlogic
+
         def withArgs():
-            execute_amber_submit(pUUID=pUUID, projectDir=project_dir, control_script=run_all_script, control_args=["Complex.pdb", "input.txt", "systemInfo.txt"])
+            execute_amber_submit(pUUID=pUUID, projectDir=str(project_dir), control_script=str(run_all_script), control_args=["Complex.pdb", "input.txt", "systemInfo.txt"])
        
-        multiprocessing.Process(target=withArgs, daemon=False).start()
+        detached_build = multiprocessing.Process(target=commonlogic.spawnDaemon, args=(withArgs))
+        detached_build.daemon = True
+        detached_build.start()
+        

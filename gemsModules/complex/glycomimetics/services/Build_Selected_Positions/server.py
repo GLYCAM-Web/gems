@@ -47,7 +47,7 @@ def Serve(
             Message="Glycomimetics ran successfully"
         )
     except Exception as e:
-        log.error(f"Error running Glycomimetics: {e}")
+        log.exception(f"Error running Glycomimetics: {e}")
         # append notice
         response.notices.addNotice(
             Brief="Error running Glycomimetics",

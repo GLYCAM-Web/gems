@@ -17,12 +17,12 @@ def make_input(pUUID: str, projectDir: str, control_script: str, control_args: l
             "molecularSystemType": "Solvated System",
             "molecularModelingJobType": "Roe Protocol",
             "jobID": pUUID,
-            "localWorkingDirectory": projectDir,
+            "localWorkingDirectory": str(projectDir),
             "submissionName": f"gm-{pUUID}",
             "context": "Glycomimetics",
-            "simulationControlScriptPath": control_script,
-            "simulationControlScriptArguments": control_args,
-            "simulationWorkingDirectory": projectDir,
+            "simulationControlScriptPath": str(control_script),
+            "simulationControlScriptArguments": " ".join(control_args) if control_args else None,
+            "simulationWorkingDirectory": str(projectDir),
             "comment": "initiated by gemsModules/complex/glycomimetics",
         }
     )

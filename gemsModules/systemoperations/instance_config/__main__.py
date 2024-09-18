@@ -77,7 +77,7 @@ class InstanceConfig(KeyedArgManager, FileSystemPathsMixin):
     """
 
     # Not an enum so we can extend here, in the InstanceConfig class, where the most specific GEMS instance configuration is defined.
-    Contexts = ["DevEnv", "Swarm"]
+    Contexts = ["DevEnv", "Swarm", "Glycomimetics"]
     Filesystem_Paths = ["MDaaS-RunMD", "Glycomimetics"]
 
     def __init__(

@@ -25,6 +25,7 @@ def manageIncomingString(jsonObjectString: str):
 
     try:
         # This is technically when the project directory first gets created.
+        # TODO: select project per entity
         amber_job = mdaas_io.amberProject(**input_json_dict)
     except:
         log.warning("Could not get mdaas_amber reception to work correctly.")
@@ -38,7 +39,7 @@ def manageIncomingString(jsonObjectString: str):
             "name": amber_job.submissionName,
             "workingDirectory": amber_job.simulationWorkingDirectory,
             "sbatchArgument": amber_job.simulationControlScriptPath,
-            "mainScriptArguments": " ".join(amber_job.simulationControlScriptArguments),
+            "mainScriptArguments": amber_job.simulationControlScriptArguments,
             # TODO: THis all needs to be made proper newstyle gemsModules...:(
             "context": input_json_dict["context"],
         }

@@ -42,7 +42,7 @@ def make_slurm_submission_script(SlurmJobDict):
         script += "export MDUtilsTestRunWorkflow=Yes\n\n"
 
     # This argument is set to the script we want slurm to execute.
-    script += SlurmJobDict["sbatchArgument"] + f" {SlurmJobDict['mainScriptArguments']}\n"
+    script += SlurmJobDict["sbatchArgument"].strip() + f" {SlurmJobDict['mainScriptArguments']}\n"
     log.debug("Our slurm submission script is:\n" + script + "\n")
 
     return script
