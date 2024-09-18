@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import sys
 import socket
-import grpc
 
 from gemsModules.deprecated.common.loggingConfig import *
 from gemsModules.deprecated.batchcompute.slurm.dataio import *
@@ -11,9 +10,6 @@ from gemsModules.logging.logger import Set_Up_Logging
 
 
 log = Set_Up_Logging(__name__)
-
-# just re-exposing grpc.RpcError so we don't need to import grpc for it.
-RpcError = grpc.RpcError
 
 
 def should_use_GRPC():

@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 import traceback
 import os, sys, subprocess, signal
+import grpc 
 
-from gemsModules.networkconnections.grpc import slurm_grpc_submit, RpcError
+from gemsModules.networkconnections.grpc import slurm_grpc_submit
 from gemsModules.systemoperations.instance_config import InstanceConfig
 
 from gemsModules.logging.logger import Set_Up_Logging
@@ -27,7 +28,7 @@ def execute(jsonObjectString, context):
             response = slurm_grpc_submit(jsonObjectString, host=h, port=p)
             failed = False
             break
-        except RpcError:
+        except grpc.RpcError:
             failed = True
             log.warning(
                 "Failed to submit to %s:%s. Trying next host in list.",

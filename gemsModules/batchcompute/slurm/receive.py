@@ -15,7 +15,6 @@ from gemsModules.networkconnections.grpc import (
 
 from .tasks.run_submission import execute as run_submission
 from .tasks.generate_submission_script import execute as generate_submission_script
-from .tasks.seek_correct_host import execute as seek_correct_host
 
 
 from gemsModules.logging.logger import new_concurrent_logger
@@ -60,6 +59,9 @@ def receive(jsonObjectString):
 
         response = run_submission(thisSlurmJobInfo)
     else:
+        # Delay import so that grpc is not required when bare-metal delegating on target host.
+        from .tasks.seek_correct_host import execute as seek_correct_host
+
         log.debug("This is not the correct host to submit to.")
         # Otherwise, we need to seek the correct host to submit to.
         p = Process(

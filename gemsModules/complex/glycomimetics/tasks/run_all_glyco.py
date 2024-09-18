@@ -28,12 +28,12 @@ def execute(pUUID, project_dir: Path, GlycoWebtool_path: Path, use_serial: bool 
     #     raise RuntimeError(f"Error running {run_all_script} in {project_dir}: {result}")
     
    # first we need to call 
-   if use_serial:
-       execute_amber_submit(pUUID=pUUID, projectDir=project_dir, control_script=run_all_script)
-   else:
-       import multiprocessing
+    if use_serial:
+        execute_amber_submit(pUUID=pUUID, projectDir=project_dir, control_script=run_all_script)
+    else:
+        import multiprocessing
        
-       def withArgs():
-           execute_amber_submit(pUUID=pUUID, projectDir=project_dir, control_script=run_all_script, control_args=["Complex.pdb", "input.txt", "systemInfo.txt"])
+        def withArgs():
+            execute_amber_submit(pUUID=pUUID, projectDir=project_dir, control_script=run_all_script, control_args=["Complex.pdb", "input.txt", "systemInfo.txt"])
        
-       multiprocessing.Process(target=withArgs, daemon=False).start()
+        multiprocessing.Process(target=withArgs, daemon=False).start()
