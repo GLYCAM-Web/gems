@@ -78,4 +78,5 @@ def execute(thisSlurmJobInfo):
     #
     # This is currently parallel to the Delegator's redirector_settings.py
     if SlurmJobDict["context"] in Known_Slurm_Submission_Builders:
+        log.debug("About to create main submission script...")
         Known_Slurm_Submission_Builders[SlurmJobDict["context"]](SlurmJobDict)

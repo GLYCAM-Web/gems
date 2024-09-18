@@ -39,7 +39,7 @@ def execute(inputs: Build_Inputs) -> Build_Outputs:
     
         # Run glycomimetics
         log.debug("Running Glycomimetics now...")
-        run_all_glyco.execute(project_dir, GlycoWebtool_path)
+        run_all_glyco.execute(inputs.pUUID, project_dir, GlycoWebtool_path)
         
     service_outputs.projectDir = str(project_dir)
     
