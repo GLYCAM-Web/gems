@@ -13,6 +13,7 @@ def execute(position: Modification_Position, project_dir: Path): # , libraries: 
     Ex.
     
     ```
+    ComplexPdb:cocomplex.pdbqt
     OpenValence:3_C4_O4_H4-/programs/glycomimetic/library/test1-pdbqt  
     naturalCharge:-1
     ```
@@ -20,12 +21,15 @@ def execute(position: Modification_Position, project_dir: Path): # , libraries: 
     if position is None:
         raise RuntimeError("No valid Position selected.")
     
+    # TODO: Libraries from API
     # Something like this maybe? libraries_str = "-".join([f"/programs/glycomimetic/library/{lib}" for lib in position.Moiety_Library_Names])
     libraries_str = "/programs/glycomimetic/library/test1-pdbqt"
+    # TODO: Charge from... Ask Yao/Oliver 
     charge_str = "-1"
     
     # Glycomimetics input file format is two lines:
-    open_valence = f"OpenValence:{position.Residue_Identifier}_{position.Residue_Name}_{position.Chain_Identifier}-{libraries_str}"
+    complex_str = "ComplexPdb:cocomplex.pdbqt"
+    open_valence = f"OpenValence:{position.Residue_Identifier}_{position.Attachment_Atom}_{position.Replaced_Atom}_H4-{libraries_str}"
     natural_charge = f"naturalCharge:{charge_str}"
     
     # warn if the input file already exists
@@ -33,4 +37,4 @@ def execute(position: Modification_Position, project_dir: Path): # , libraries: 
         log.warning(f"Warning: {project_dir}/input.txt already exists. Overwriting.")
             
     with open(Path(project_dir) / "input.txt", "w") as f:
-        f.write(f"{open_valence}\n{natural_charge}\n")
+        f.write(f"{complex_str}\n{open_valence}\n{natural_charge}\n")

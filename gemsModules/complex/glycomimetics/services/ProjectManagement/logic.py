@@ -39,10 +39,9 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
         file_resource = resource.copy_to(inputs.projectDir)
         
         # If it's main pdb, symlink it to projectDir/Receptor.pdb 
-        # TODO/Q: Should it be Receptor and not CoComplex? # Yao's Evaluation likes sugars.
-        if resource.resourceRole == "Receptor":
+        if resource.resourceRole == "Complex":
             # TODO: use the GM project's `complex` field for this.
-            os.symlink(file_resource.payload, os.path.join(inputs.projectDir, "Receptor.pdb"))
+            os.symlink(file_resource.payload, os.path.join(inputs.projectDir, "Complex.pdb"))
         service_outputs.resources.add_resource(file_resource)
 
     # # TODO: we can use PM_Resource.copy_to to copy the files to the output directory.

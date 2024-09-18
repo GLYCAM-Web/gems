@@ -38,6 +38,14 @@ def Serve(
         
     try:
         response.outputs = execute(service.inputs)
+        response.notices.addNotice(
+            Brief="Glycomimetics ran successfully",
+            Scope="Build_Selected_Positions",
+            Messenger="Glycomimetics",
+            Type="Info",
+            Code="0",
+            Message="Glycomimetics ran successfully"
+        )
     except Exception as e:
         log.error(f"Error running Glycomimetics: {e}")
         # append notice

@@ -17,27 +17,23 @@ def execute(inputs: Validate_Inputs) -> Validate_Outputs:
     service_outputs = Validate_Outputs()
     service_notices = Notices()
 
-    # TODO: Handle pUUID
-    # if inputs.pUUID:
-    #     pass
-
-    hasReceptorResource = False
+    hasComplexResource = False
     for resource in inputs.resources:
-        if resource.resourceRole == "Receptor":
-            hasReceptorResource = True
+        if resource.resourceRole == "Complex":
+            hasComplexResource = True
 
-    if not hasReceptorResource:
+    if not hasComplexResource:
         service_notices.addNotice(
-            Brief="No Receptor PDB Resource",
+            Brief="No Complex PDB Resource",
             Scope="Service",
             Messenger="Glycomimetics",
             Type="Error",
             Code="600",
-            Message="No Receptor PDB was provided to Glycomimetics.",
+            Message="No Complex PDB was provided to Glycomimetics.",
         )
         service_outputs.isValid = False
     else:
-        # TODO: We need to check it's an actual PDB now. PDB Preprocessor?
+        # TODO: Use PDB Preprocessor or similar to check PDB
         service_outputs.isValid = True
 
     log.debug(f"service_outputs: {service_outputs}")

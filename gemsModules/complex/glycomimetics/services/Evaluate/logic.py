@@ -24,42 +24,42 @@ def execute(inputs: Evaluate_Inputs) -> Evaluate_Outputs:
     service_outputs = Evaluate_Outputs()
     service_notices = Notices()
 
-    receptor_pdb_resource = None
+    complex_pdb_resource = None
     for resource in inputs.resources:
-        if resource.resourceRole == "Receptor":
-            receptor_pdb_resource = resource
+        if resource.resourceRole == "Complex":
+            complex_pdb_resource = resource
             break
 
-    if not receptor_pdb_resource:
+    if not complex_pdb_resource:
         # Append a notice, we can do nothing else.
         service_notices.addNotice(
-            Brief="No Receptor PDB Resource",
+            Brief="No Complex PDB Resource",
             Scope="Service",
             Messenger="Glycomimetics",
             Type="Info",
             Code="600",
-            Message="No Receptor PDB was provided to Glycomimetics, nothing to do.",
+            Message="No Complex PDB was provided to Glycomimetics, nothing to do.",
         )
     else:
         # Evaluation
         result = None
-        if receptor_pdb_resource.locationType != "filesystem-path-unix":
+        if complex_pdb_resource.locationType != "filesystem-path-unix":
             service_notices.addNotice(
-                Brief="current Receptor PDB Resource Location type not supported",
+                Brief="current Complex PDB Resource Location type not supported",
                 Scope="Service",
                 Messenger="Glycomimetics",
                 Type="Error",
                 Code="601",
-                Message="Receptor PDB Resource must be a filesystem path.",
+                Message="Complex PDB Resource must be a filesystem path.",
             )
         else:
-            pdb_fpath = receptor_pdb_resource.payload
+            pdb_fpath = complex_pdb_resource.payload
 
             if Path(pdb_fpath).exists():
                 working_dir = str(Path(pdb_fpath).parent)
 
                 log.debug(
-                    f"Receptor PDB file found: {pdb_fpath}, working_dir: {working_dir}"
+                    f"Complex PDB file found: {pdb_fpath}, working_dir: {working_dir}"
                 )
                 try:
                     # To ensure various output files are written to the correct directory.
@@ -86,7 +86,7 @@ def execute(inputs: Evaluate_Inputs) -> Evaluate_Outputs:
                 # TODO: swig wrap or recover results from evaluation.log
                 log.debug(f"Evaluation Result: {None}")
             else:
-                log.debug(f"Receptor PDB file not found: {pdb_fpath}")
+                log.debug(f"Complex PDB file not found: {pdb_fpath}")
 
     log.debug(f"service_outputs: {service_outputs}")
     return service_outputs, service_notices

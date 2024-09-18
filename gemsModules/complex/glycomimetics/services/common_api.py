@@ -49,6 +49,7 @@ class Moiety_Library_Names(GemsStrEnum):
 
 
 class Modification_Position(BaseModel):
+    # TODO: Should be Residue_Number
     Residue_Identifier: str = Field(
         ...,
         description="The residue identifier, typically an integer followed occasionally by a letter.",
