@@ -1,0 +1,20 @@
+{
+  "entity": {
+    "type": "Glycomimetics",
+    "services": {
+      "evaluation_of_pdb": {
+        "type": "Build_Selected_Positions",
+        "inputs": { 
+          "resources": [
+            {
+                "locationType": "filesystem-path-unix",
+                "resourceFormat": "chemical/pdb",
+                "resourceRole": "Receptor",
+                "payload": "$GEMSHOME/tests/inputs/1gya.pdb"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

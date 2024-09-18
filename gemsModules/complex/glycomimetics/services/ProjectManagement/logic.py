@@ -27,7 +27,7 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     )
     
     # Setup project directory, TODO: Taskify
-    log.debug("GM/ProjectManagement: about to create project directory")
+    log.debug(f"GM/ProjectManagement: about to create project directory: {inputs.projectDir}")
     os.makedirs(inputs.projectDir, exist_ok=True)
     
     log.debug("GM/ProjectManagement: about to copy resources to project dir")

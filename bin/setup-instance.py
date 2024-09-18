@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+""" This script is used to configure the current GEMS installation.
+
+This configuration is primarily used by GEMS for request routing and filesystem mappings.
+"""
+
 import argparse, os, sys, json
 
 
@@ -12,11 +17,37 @@ from gemsModules.systemoperations.instance_config import InstanceConfig
 
 def argparser():
     """
+    
+    Example from the DevEnv:
     ```bash
-        $ python3 "${GEMSHOME}/bin/setup-instance.py" --add-host "${MD_GRPC_HOSTNAME}" "[MDaaS-RunMD]" "${MD_GRPC_HOST}" "${MD_GRPC_PORT}"
-        $ python3 "${GEMSHOME}/bin/setup-instance.py" --set-sbatch-arguments "${MD_GRPC_HOSTNAME}" "MDaaS-RunMD" "${SBATCH_ARGS}"
-        $ python3 "${GEMSHOME}/bin/setup-instance.py" --set-cluster-filesystem-path "MDaaS-RunMD" "$MD_CLUSTER_FILESYSTEM_PATH"
-        $ python3 "${GEMSHOME}/bin/setup-instance.py" --gen-remote-cluster-config "MDaaS-RunMD"
+    MD_GRPC_HOST='gw-slurm-head'
+	MD_GRPC_HOSTNAME='swarm'
+	MD_GRPC_PORT=50052
+    MD_SBATCH_ARGS='{ "partition": "amber", "time": "120", "nodes": "1", "tasks-per-node": "4" }'
+    MD_LOCAL_PARAMETERS='{ "numProcs": "4" }'
+    MD_LOCAL_CLUSTER_PATH="/website/userdata/mmservice/md"
+    MD_REMOTE_CLUSTER_PATH=${MD_LOCAL_CLUSTER_PATH} # WILL NOT BE THE SAME IF REALLY A REMOTE.
+    
+    # ... Similar arguments for GM configured by DevEnv ... 
+    
+    MD_PRECONFIG_NAME="MDaaS-RunMD_preconfig-git-ignore-me.json"
+    GM_PRECONFIG_NAME="Glycomimetics_preconfig-git-ignore-me.json"
+    MD_LOCAL_PRECONFIG_PATH="${GEMSHOME}/local.${MD_PRECONFIG_NAME}"
+    GM_LOCAL_PRECONFIG_PATH="${GEMSHOME}/local.${GM_PRECONFIG_NAME}"
+    MD_REMOTE_PRECONFIG_PATH="${GEMSHOME}/remote.${MD_PRECONFIG_NAME}"
+    GM_REMOTE_PRECONFIG_PATH="${GEMSHOME}/remote.${GM_PRECONFIG_NAME}"
+
+    python3 "${GEMSHOME}/bin/setup-instance.py" --generate-preconfig MDaaS-RunMD "${MD_LOCAL_PRECONFIG_PATH}" "${MD_GRPC_HOSTNAME}" "${MD_GRPC_HOST}" "${MD_GRPC_PORT}" "${MD_SBATCH_ARGS}" "${MD_LOCAL_PARAMETERS}" "${MD_LOCAL_CLUSTER_PATH}"
+    python3 "${GEMSHOME}/bin/setup-instance.py" --config "${MD_LOCAL_PRECONFIG_PATH}"
+
+    python3 "${GEMSHOME}/bin/setup-instance.py" --generate-preconfig  Glycomimetics "${GM_LOCAL_PRECONFIG_PATH}" "${GM_GRPC_HOSTNAME}" "${GM_GRPC_HOST}" "${GM_GRPC_PORT}" "${GM_SBATCH_ARGS}" "${GM_LOCAL_PARAMETERS}" "${GM_LOCAL_CLUSTER_PATH}"
+    python3 "${GEMSHOME}/bin/setup-instance.py" --config "${GM_LOCAL_PRECONFIG_PATH}"
+
+    python3 "${GEMSHOME}/bin/setup-instance.py" --generate-preconfig MDaaS-RunMD "${MD_REMOTE_PRECONFIG_PATH}" "${MD_GRPC_HOSTNAME}" "${MD_GRPC_HOST}" "${MD_GRPC_PORT}" "${MD_SBATCH_ARGS}" "${MD_LOCAL_PARAMETERS}" "${MD_REMOTE_CLUSTER_PATH}"
+    python3 "${GEMSHOME}/bin/setup-instance.py" --generate-preconfig Glycomimetics "${GM_REMOTE_PRECONFIG_PATH}" "${GM_GRPC_HOSTNAME}" "${GM_GRPC_HOST}" "${GM_GRPC_PORT}" "${GM_SBATCH_ARGS}" "${GM_LOCAL_PARAMETERS}" "${GM_REMOTE_CLUSTER_PATH}"
+    
+    # scp the remote preconfigs (last two generated) to the remote host 
+    # then run setup-instance.py --config on them on the remote host
     ```
     """
     parser = argparse.ArgumentParser()
