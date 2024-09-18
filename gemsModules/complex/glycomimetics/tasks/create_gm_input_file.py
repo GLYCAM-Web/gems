@@ -7,7 +7,7 @@ from ..services.common_api import Modification_Position
 log = Set_Up_Logging(__name__)
 
 
-def execute(position: Modification_Position, project_dir: Path): # , libraries: list, charge: int):
+def execute(position: Modification_Position, project_dir: Path, GlycoWebtool_Path): # , libraries: list, charge: int):
     """ Constructs and writes the input file for the Glycomimetics service.
     
     Ex.
@@ -21,9 +21,10 @@ def execute(position: Modification_Position, project_dir: Path): # , libraries: 
     if position is None:
         raise RuntimeError("No valid Position selected.")
     
-    # TODO: Libraries from API
-    # Something like this maybe? libraries_str = "-".join([f"/programs/glycomimetic/library/{lib}" for lib in position.Moiety_Library_Names])
-    libraries_str = "/programs/glycomimetic/library/test1-pdbqt"
+    # TODO: Libraries from API Something like this maybe? 
+    #   libraries_str = "-".join([str(GW_Path / "/library/{lib}") for lib in position.Moiety_Library_Names])
+    # This is based off an example input from the GM Webtool.
+    libraries_str = str(GlycoWebtool_Path / "library/test1-pdbqt")
     # TODO: Charge from... Ask Yao/Oliver 
     charge_str = "-1"
     

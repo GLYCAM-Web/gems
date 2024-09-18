@@ -26,17 +26,17 @@ def execute(inputs: Build_Inputs) -> Build_Outputs:
         log.debug(f"Warning: Project directory {project_dir} does not exist at time of Build_Selected_Positions.")
         raise RuntimeError("No project directory found, cannot run Glycomimetics/Build_Selected_Positions")
     else:
-        log.debug("Copying scripts")
-        os.system(f"cp -r {GlycoWebtool_path}/scripts {project_dir}")
+        # log.debug("Copying scripts")
+        # os.system(f"cp -r {GlycoWebtool_path}/scripts {project_dir}")
     
         # Create the input.txt for the Glycomimetics service.
         # Note: We only allow one Selected Position at a time in the API for now.
         log.debug("Creating Glycomimetics Run_ALL input.txt")
-        create_gm_input_file.execute(inputs.Selected_Modification_Options.Position, project_dir)
+        create_gm_input_file.execute(inputs.Selected_Modification_Options.Position, project_dir, GlycoWebtool_path)
         
         # Create the systemInfo.txt
         log.debug("Creating systemInfo.txt")
-        create_system_info_file.execute(project_dir)
+        create_system_info_file.execute(project_dir, GlycoWebtool_path)
     
         # Run glycomimetics
         log.debug("Running Glycomimetics now...")

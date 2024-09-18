@@ -7,10 +7,10 @@ TEST_INPUT="/programs/gems/gemsModules/complex/glycomimetics/tests/inputs/explic
 OUTPUT=$(/programs/gems/bin/delegate $TEST_INPUT)
 
 # Check the output is a valid JSON
-echo $OUTPUT | python -m json.tool > ct-output-git-ignore-me.json
+echo $OUTPUT | python -m json.tool > test-20-output-git-ignore-me.json
 if [ $? -ne 0 ]; then
   echo "Output is not a valid JSON"
-  echo $OUTPUT > ct-invalid-output-git-ignore-me.json
+  echo $OUTPUT > test-20-invalid-output-git-ignore-me.json
   exit 1
 fi
 

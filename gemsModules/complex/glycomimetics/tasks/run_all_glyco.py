@@ -9,14 +9,18 @@ from .amber_submit import execute as execute_amber_submit
 log = Set_Up_Logging(__name__)
 
 
-def execute(pUUID, project_dir: Path, GlycoWebtool_path: Path, use_serial: bool = True):
+def execute(pUUID, project_dir: Path, GlycoWebtool_path: Path, use_serial: bool = False, use_project_dir: bool = False):
     """"""
     """
     ./programs/glycomimeticsWebtool/scripts/00.RUN_ALL.bash 3PHZ.pdb  input.txt  systemInfo.txt
 
     """
-    # TODO: Change this when copying script into project directory
-    run_all_script = project_dir / "scripts/00.RUN_ALL.bash"
+    # We're not copying scripts to the project for now, but this may be possible one day:
+    if use_project_dir:
+        log.debug("Running Glycomimetics scripts from the project directory.")
+        run_all_script = project_dir / "scripts/00.RUN_ALL.bash"
+    else:
+        run_all_script = GlycoWebtool_path / "scripts/00.RUN_ALL.bash"
     
     # execute in project directory
     log.debug(f"About to execute {run_all_script} in {project_dir}") 
@@ -40,4 +44,5 @@ def execute(pUUID, project_dir: Path, GlycoWebtool_path: Path, use_serial: bool 
         detached_build = multiprocessing.Process(target=commonlogic.spawnDaemon, args=(withArgs))
         detached_build.daemon = True
         detached_build.start()
+        
         
