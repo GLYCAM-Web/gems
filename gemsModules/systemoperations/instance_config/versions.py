@@ -5,7 +5,9 @@ import os
 from pathlib import Path
 import shutil
 from typing import Dict
+from gemsModules.logging.logger import Set_Up_Logging
 
+log = Set_Up_Logging(__name__)
 
 class DateReversioner:
     """A class to version a json file based on a timestamp."""
@@ -50,15 +52,16 @@ class DateReversioner:
     @property
     def is_outdated(self) -> bool:
         """Return True if the file_to_version is older than the new_version."""
+        is_outdated = False
         if not self.file_to_version.exists():
-            return True
+            is_outdated = True
 
         if "date" not in self.new_version:
             raise RuntimeError("Template file does not have a date, cannot update.")
 
         if "date" not in self.old_version:
             # if no date is found, lets update to a versioned file
-            return True
+            is_outdated = True
         else:
             # compare old and new version dates
             old_date = datetime.datetime.strptime(
@@ -67,7 +70,10 @@ class DateReversioner:
             new_date = datetime.datetime.strptime(
                 self.new_version["date"], "%Y-%m-%dT%H:%M:%S.%f"
             ).date()
-            return new_date > old_date
+            is_outdated = new_date > old_date
+        
+        log.debug(is_outdated)
+        return is_outdated
 
     def update(self, force_update=False) -> bool:
         """Update the file_to_version with the current date."""

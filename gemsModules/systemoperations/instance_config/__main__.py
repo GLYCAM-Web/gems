@@ -98,7 +98,9 @@ class InstanceConfig(KeyedArgManager, FileSystemPathsMixin):
         )
 
         if self.reversioner.is_outdated:
-            self.set_active_config(self.get_default_path(template=True))
+            log.warning("Detected old configuration template, if you have any issues, try regenerating your instance config.")
+            
+        log.debug(f"Active config: {self.config}")
 
     def save(self, force_update=False) -> bool:
         """save the instance config using a DateReversioner."""
