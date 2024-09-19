@@ -58,15 +58,16 @@ class mdaas_Project_Manager(Project_Manager):
             #  Note: This may belong part of the WM, IT, or RDF.
             if service.typename == "RunMD":
                 # TODO: Validate the service correctly within GEMS architecture...
-               self.__handle_runmd_service(service)
+                log.debug(f"Found RunMD service, it has {service.options=}")
+                self.__handle_runmd_service(service)
 
             # Add request options to resposne project
             if hasattr(service, "options") and service.options is not None:
+                log.debug(f"Found MDaaS service.options: {service.options}")
                 if "sim_length" in service.options:
-                    if not self.response_project.sim_length:
-                        self.response_project.sim_length = str(
-                            service.options["sim_length"]
-                        )
+                    self.response_project.sim_length = str(
+                        service.options["sim_length"]
+                    )
 
     def __handle_runmd_service(self, service):
         # TODO: We don't do any actual fs operations until we finally service ProjectManagement.
