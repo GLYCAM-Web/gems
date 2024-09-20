@@ -32,12 +32,16 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
         if resource.resourceRole == "parameter-topology":
             amber_parm7 = resource.filename
             copy = True
-        if resource.resourceRole == "input-coordinate":
+        elif resource.resourceRole == "input-coordinate":
             amber_rst7 = resource.filename
             copy = True
-        if resource.resourceRole == "unminimized-gas":
+        elif resource.resourceRole == "unminimized-gas":
             log.debug(f"unminimized-gas: {resource.filename}")
             unmin_gas = resource.filename
+            copy = True
+        
+        if resource.resourceRole == "input-request":
+            log.debug(f"input-request: {resource.filename}")
             copy = True
 
         if copy:

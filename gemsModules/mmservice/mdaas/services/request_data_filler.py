@@ -68,6 +68,7 @@ class mdaas_Request_Data_Filler(Request_Data_Filler):
         input_json = Resource(
             payload=self.transaction.incoming_string,
             resourceFormat="json",
+            resourceRole="input-request",
             locationType="Payload",
             options={"filename": "input.json"},
         )
