@@ -65,10 +65,10 @@ def parse_amber_parm7_natoms(content):
     return natoms
 
 
-def execute(content: str, sim_length: float) -> float:
+def execute(content: str, sim_length: float) -> tuple[float, int]:
     """
     Calculate the time prediction for a given number of residues and simulation length.
-
+    
     Args:
     parmfile (Path): Path to the AMBER parm7 file.
     sim_length (int): The length of the simulation in ns.
@@ -77,14 +77,14 @@ def execute(content: str, sim_length: float) -> float:
     
     # Return a time prediction in days per ns.
     # N.B. This line was fit using data gathered from GLYCAM-Web around July 18, 2024.
-    days_per_ns = 1.50724e-07 * number_of_particles + -0.000544733
+    days_per_ns = 1.50724e-7 * number_of_particles - 0.000544733
     log.debug(f"Predicted time: {days_per_ns:.6f} days per ns for {number_of_particles} particles")
 
     sim_time_est_days = days_per_ns * sim_length
     sim_time_est_hours = sim_time_est_days * 24
-    #sim_time_est = sim_time_est_hours * 3600  # convert to seconds
-    #log.debug(f"Predicted time: {sim_time_est:.6f} seconds")
-    return sim_time_est_hours, number_of_particles
+    #sim_time_est_minutes = sim_time_est_hours * 60  # convert to minutes
+    
+    return max(0, sim_time_est_hours), number_of_particles
 
 
 # Example usage: python calculate_days_per_ns.py parm7_file_path
