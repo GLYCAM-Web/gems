@@ -14,7 +14,7 @@ def execute(position: Modification_Position, project_dir: Path, GlycoWebtool_Pat
     
     ```
     ComplexPdb:cocomplex.pdbqt
-    OpenValence:3_C4_O4_H4-/programs/glycomimetic/library/test1-pdbqt  
+    OpenValence:3_A_O4_H4-/programs/glycomimetic/library/test1-pdbqt  
     naturalCharge:-1
     ```
     """
@@ -30,7 +30,7 @@ def execute(position: Modification_Position, project_dir: Path, GlycoWebtool_Pat
     
     # Glycomimetics input file format is two lines:
     complex_str = "ComplexPdb:cocomplex.pdbqt"
-    open_valence = f"OpenValence:{position.Residue_Identifier}_{position.Attachment_Atom}_{position.Replaced_Atom}_H4-{libraries_str}"
+    open_valence = f"OpenValence:{position.Residue_Identifier}_{position.Chain_Identifier}_{position.Attachment_Atom}_{position.Replaced_Atom}-{libraries_str}"
     natural_charge = f"naturalCharge:{charge_str}"
     
     # warn if the input file already exists

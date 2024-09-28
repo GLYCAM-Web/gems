@@ -21,8 +21,8 @@
                   "Residue_Identifier": "241",
                   "Residue_Name": "SIA",
                   "Chain_Identifier": "A",
-                  "Attachment_Atom": "C4",
-                  "Replaced_Atom": "04"
+                  "Attachment_Atom": "C9",
+                  "Replaced_Atom": "O9"
                 }
               }      
             }
