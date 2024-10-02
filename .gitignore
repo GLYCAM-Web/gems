@@ -1,8 +1,8 @@
 ## GEMS-specfic things to ignore
 gmml2
 gmml
-_gmml.so
-gmml.py
+_gmml*.so
+gmml*.py
 gmml_wrap.cxx
 gmml_wrap.o
 log.log
