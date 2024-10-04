@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import gmml
+import gmml2
 from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
 from gemsModules.deprecated.common.settings import generateCommonParserNotice
 from gemsModules.deprecated.sequence import io as sequenceio
@@ -15,12 +15,12 @@ else:
 
 
 def getLinkageOptionsFromGmmlcbBuilder(sequence):
-    # log.info("getLinkageOptionsFromGmmlcbBuilder() was called.\n")
-    # log.debug("sequence: " + sequence)
+    log.info("getLinkageOptionsFromGmmlcbBuilder() was called.\n")
+    log.debug("sequence: " + sequence)
     from gemsModules.deprecated.sequence import build
     cbBuilder = build.getCbBuilderForSequence(sequence)
     gmmllinkageOptionsVector = cbBuilder.GenerateUserOptionsDataStruct()
-    # log.debug("gmmllinkageOptionsVector: " + repr(gmmllinkageOptionsVector))
+    log.debug("gmmllinkageOptionsVector: " + repr(gmmllinkageOptionsVector))
 
     gemsLinkageGeometryOptions = sequenceio.AllLinkageRotamerInfo()
     gemsLinkageGeometryOptions.totalPossibleRotamers = cbBuilder.GetNumberOfShapes()
@@ -74,7 +74,7 @@ def get_index_ordered_sequene(validatedSequence: str):
     # ##
     # ##  This function assumes that the validity of the sequence was determined elsewhere
     # ##
-    this_sequence = gmml.Sequence(validatedSequence)
+    this_sequence = gmml2.Sequence(validatedSequence)
     return this_sequence.getIndexOrdered()
 
 
@@ -87,7 +87,7 @@ def getSequenceVariants(validatedSequence: str):
     # ##  This function assumes that the validity of the sequence was determined elsewhere
     # ##
     Sequences = sequenceio.TheSequenceVariants()
-    this_sequence = gmml.Sequence(validatedSequence)
+    this_sequence = gmml2.Sequence(validatedSequence)
     Sequences.userOrdered = this_sequence.getInterpretedSequence()
     Sequences.indexOrdered = this_sequence.getIndexOrdered()
     Sequences.longestChainOrdered = "Currently unavailble in gmml. Request if needed!"

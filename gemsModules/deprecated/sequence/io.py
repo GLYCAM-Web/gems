@@ -185,7 +185,7 @@ class Single3DStructureBuildDetails(BaseModel):
     #  flexibility:  sequenceConformation : List[RotamerConformation] = None
     #  Oliver says this:
     #      Would be nice to just directly use the gmml level class like this:
-    #      gmmlConformerInfo : gmml.single_rotamer_info_vector = None
+    #      gmmlConformerInfo : gmml2.single_rotamer_info_vector = None
     sequenceConformation: List = []
     #  When there are multiple structures, one is chosen for the default.
     #  The very first combination (typically the all-gg, all-t structure) 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import os
-import gmml
+import gmml2
 from gemsModules.deprecated.project import projectUtilPydantic as projectUtils
 from gemsModules.deprecated.sequence import io as sequenceio
 from gemsModules.deprecated.common import services as commonservices
@@ -272,11 +272,11 @@ def populateGMMLConformerInfoStruct(
     # example buildState.sequenceConformation:
     # ('6', 'h', '-g', '6', 'o', 'gg', '9', 'h', '-g', '9', 'o', 'gg', '10', 'o', 'gg', '13', 'h', '-g', '13', 'o', 'gg', '14', 'o', 'tg', '16', 'h', '-g', '16', 'o', 'tg')
     try:
-        gmmlConformerInfo = gmml.single_rotamer_info_vector()
+        gmmlConformerInfo = gmml2.single_rotamer_info_vector()
         log.debug("buildState.sequenceConformation, is : ")
         log.debug(buildState.sequenceConformation)
         for rotList in divideListIntoChunks(buildState.sequenceConformation, 3):
-            singleRotamerInfo = gmml.SingleRotamerInfo()
+            singleRotamerInfo = gmml2.SingleRotamerInfo()
             singleRotamerInfo.linkageIndex = rotList[0]
             singleRotamerInfo.dihedralName = rotList[1]
             singleRotamerInfo.selectedRotamer = rotList[2]
@@ -318,7 +318,7 @@ def divideListIntoChunks(l, n):
 def getCbBuilderForSequence(sequence: str):
     # log.info("getCbBuilderForSequence() was called.\n")
     log.debug("Instantiating the carbohydrateBuilder.")
-    builder = gmml.carbohydrateBuilder(sequence)
+    builder = gmml2.carbohydrateBuilder(sequence)
     return builder    
 
 def main():
