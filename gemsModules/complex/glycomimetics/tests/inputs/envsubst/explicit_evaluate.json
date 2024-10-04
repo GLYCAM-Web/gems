@@ -9,7 +9,7 @@
               {
                 "locationType": "filesystem-path-unix",
                 "resourceFormat": "chemical/pdb",
-                "resourceRole": "Receptor",
+                "resourceRole": "Complex",
                 "payload": "$GEMSHOME/tests/inputs/1gya.pdb"
               }
             ] 
