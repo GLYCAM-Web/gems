@@ -9,9 +9,8 @@
               {
                 "locationType": "filesystem-path-unix",
                 "resourceFormat": "chemical/pdb",
-                "resourceRole": "Receptor",
-                "payload": "/programs/gems/tests/inputs/1BUY_modified.pdb",
-                "options": null
+                "resourceRole": "Complex",
+                "payload": "/programs/gems/tests/inputs/1BUY_modified.pdb"
               }
             ] 
           }

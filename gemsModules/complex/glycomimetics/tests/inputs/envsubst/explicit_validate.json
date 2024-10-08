@@ -9,7 +9,7 @@
               {
                 "locationType": "filesystem-path-unix",
                 "resourceFormat": "chemical/pdb",
-                "resourceRole": "Receptor",
+                "resourceRole": "Complex",
                 "payload": "$GEMSHOME/gemsModules/complex/glycomimetics/docs/reference/example_flu_3ubq_aldehyde_library/glycomimetics/3ubq_chainC_64_266.pdbqt"
               }
             ]

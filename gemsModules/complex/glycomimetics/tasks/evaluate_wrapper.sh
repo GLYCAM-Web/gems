@@ -5,7 +5,9 @@
 PROJECT_DIR=$1
 PDB_FILE=$2
 #EVALUATE_EXE=$3
-EVALUATE_EXE="$GLYCOMIMETICS_WEBTOOL/internal/glycomimetics/validation/main.exe"
+
+# Default webtool path is valid on harper.
+EVALUATE_EXE="${GEMS_GLYCOMIMETICS_WEBTOOL_PATH:=/programs/glycomimeticsWebtool}/internal/glycomimetics/validation/main.exe"
 if [ ! -f $EVALUATE_EXE ]; then
     exit 2
 fi 
