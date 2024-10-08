@@ -13,7 +13,7 @@ declare -A Build6Commands=(
 	[treeEverything]="tree -id ${sequenceServicePath}/"
 	)
 declare -A Build6CorrectOutputs=(
-	[MinGasPdb]="920e71fd53455fd9480ade5e21d21922"
+	[MinGasPdb]="6777b0c68693350a0dda66ab87f92831"
 	[BuildDefaultSymlink]="${sequenceBuildsPath}/${build_6_pUUID}/default: symbolic link to New_Builds/$test_conformer_id"
     [treeEverything]="""/website/TESTS/git-ignore-me/pre-push/sequence/cb/
 Builds

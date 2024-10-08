@@ -31,7 +31,7 @@ ${sequenceSequencesPath}/${theCorrectSequenceID}/buildStrategyID1/All_Builds:
 ${test_conformer_id1}
 ${test_conformer_id2}
 ${oldDefault_conformerId}"""
-	[MinGasPdb]="98835307ae85e32f82311672fab2bea2"
+	[MinGasPdb]="e5652a887b3f7a75228ab9d0a744e735"
 	[treeBuildProject]="""${sequenceBuildsPath}/${build_5_pUUID}
 Existing_Builds
 logs

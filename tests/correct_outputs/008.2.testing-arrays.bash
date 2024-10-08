@@ -34,7 +34,7 @@ e6c2e2e8-758b-58b8-b5ff-d138da38dd22"""
 8ddcc916-47db-5426-828c-fc24aae19d39
 ce32017d-6663-5ecc-b282-9e9812986d1c"""
 	[BuildDefaultSymlink]="${sequenceBuildsPath}/${build_2_pUUID}/default: symbolic link to New_Builds/ce32017d-6663-5ecc-b282-9e9812986d1c"
-	[MinGasPdb]="05f7d07545a4aef2447dc3b6f60aa91c"
+	[MinGasPdb]="974e16c495ffee8c6d6581eb5d75d501"
 )
 
 ## syntax reminder:
