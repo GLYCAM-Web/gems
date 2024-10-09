@@ -1,7 +1,7 @@
 import json
 import os
 import traceback
-from gemsModules.systemoperations.environment_ops import is_GEMS_test_workflow
+from gemsModules.systemoperations.environment_ops import is_GEMS_test_workflow, get_GEMS_test_workflow_steps
 from gemsModules.systemoperations.instance_config import InstanceConfig
 from gemsModules.systemoperations import filesystem_ops
 # from .calculate_time_est_from_parm7 import parse_amber_parm7_pointers
@@ -36,8 +36,10 @@ def make_slurm_submission_script(SlurmJobDict):
 
     script += "\n"
 
+    # TODO: Put this in Local_Run_Parameters instead.
     if is_GEMS_test_workflow():
-        script += "export MDUtilsTestRunWorkflow=Yes\n\n"
+        steps = get_GEMS_test_workflow_steps()
+        script += f"export MDUtilsTestRunWorkflow={steps}\n\n"
 
     # This argument is set to the script we want slurm to execute.
     script += SlurmJobDict["sbatchArgument"] + "\n"
@@ -52,6 +54,11 @@ def update_local_parameters_file(SlurmJobDict):
     local_param_file = os.path.join(
         SlurmJobDict["workingDirectory"], "Local_Run_Parameters.bash"
     )
+    if not os.path.exists(local_param_file):
+        log.warning(
+            "Local_Run_Parameters.bash does not exist.  Skipping update of local parameters."
+        )
+        return
 
     # update MPI/CUDA settings if using GPU.
     if SlurmJobDict["use_gpu"]:

@@ -29,31 +29,43 @@ def is_GEMS_live_swarm() -> bool:
 
     This is different from getGemsExecutionContext in that it returns false if unset.
 
-    TODO: merge with procedural options.
+    TODO: merge with procedural options or deprecate.
     """
     try:
-        GEMS_MD_LIVE_SWARM = os.getenv("GEMS_MD_LIVE_SWARM", False)
-        log.debug("got GEMS_MD_LIVE_SWARM and it is:  " + str(GEMS_MD_LIVE_SWARM))
+        LIVE_SWARM = os.path.exists(os.path.join(get_gems_path(), "..", "..", "LIVE_SWARM"))
+        log.debug("got LIVE_SWARM and it is:  " + str(LIVE_SWARM))
     except Exception as error:
         log.error("Cannnot determine swarm status.")
         log.error("Error type: " + str(type(error)))
         log.error(traceback.format_exc())
     finally:
-        return GEMS_MD_LIVE_SWARM
+        return LIVE_SWARM
 
 
-def is_GEMS_test_workflow() -> bool:
+def get_GEMS_test_workflow_steps() -> str:
     try:
-        GEMS_MD_TEST_WORKFLOW = os.getenv("GEMS_MD_TEST_WORKFLOW", "False") == "True"
+        GEMS_MD_TEST_WORKFLOW = os.getenv("GEMS_MD_TEST_WORKFLOW", "False")
         log.debug("got GEMS_MD_TEST_WORKFLOW and it is:  " + str(GEMS_MD_TEST_WORKFLOW))
     except Exception as error:
         log.error("Cannnot determine workflow status.")
         log.error("Error type: " + str(type(error)))
         log.error(traceback.format_exc())
     finally:
-        return GEMS_MD_TEST_WORKFLOW
+        if GEMS_MD_TEST_WORKFLOW.lower() in ["true", "yes"]:
+            return 2
+        elif GEMS_MD_TEST_WORKFLOW.isdigit():
+            return int(GEMS_MD_TEST_WORKFLOW)
+        else:
+            return 0
 
-
+def is_GEMS_test_workflow() -> bool:
+    steps = get_GEMS_test_workflow_steps()
+    if steps:
+        return True
+    else:
+        return False
+    
+    
 def get_default_GEMS_procs() -> int:
     """Not robust. Currently recycles GEMSMAKEPROCS environment variable."""
     return int(os.getenv("GEMSMAKEPROCS", 1))
