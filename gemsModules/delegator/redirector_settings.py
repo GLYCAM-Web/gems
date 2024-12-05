@@ -27,6 +27,7 @@ class Known_Entities(GemsStrEnum):
     PDBFile = "PDBFile"
     Glycomimetics = "Glycomimetics"
     AntibodyDocking = "AntibodyDocking"
+    GpBuilder = "GpBuilder"
 
 
 from gemsModules.deprecated.delegator.receive import delegate as deprecated_delegator
@@ -44,7 +45,7 @@ from gemsModules.status.receive import receive as status
 
 from gemsModules.complex.glycomimetics.receive import receive as glycomimetics
 from gemsModules.complex.antibody.receive import receive as antibody
-
+from gemsModules.GpBuilder.receive import receive as gp_builder
 
 Known_Entity_Reception_Modules = {
     #'BatchCompute' : batchcompute, # for now, still deprecated
@@ -64,5 +65,6 @@ Known_Entity_Reception_Modules = {
     "StructureFile": deprecated_delegator,
     "PDBFile": pdbfile,
     "Glycomimetics": glycomimetics,
+    "GpBuilder": gp_builder,
     "AntibodyDocking": antibody
 }

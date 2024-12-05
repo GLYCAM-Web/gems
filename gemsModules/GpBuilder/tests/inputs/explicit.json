@@ -1,0 +1,10 @@
+{
+    "entity": {
+        "type": "GpBuilder",
+        "services": {
+            "default_Build": {
+                "type": "Build"
+            }
+        }
+    }
+}
