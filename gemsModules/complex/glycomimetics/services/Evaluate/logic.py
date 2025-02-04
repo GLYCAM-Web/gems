@@ -22,6 +22,7 @@ def execute(inputs: Evaluate_Inputs) -> tuple[Evaluate_Outputs, Notices]:
     log.debug(f"serviceInputs: {inputs}")
     service_outputs = Evaluate_Outputs()
     service_notices = Notices()
+    valid, reason = None, None
 
     complex_pdb_resource = None
     for resource in inputs.resources:
@@ -75,15 +76,34 @@ def execute(inputs: Evaluate_Inputs) -> tuple[Evaluate_Outputs, Notices]:
                     parent_dir = str(Path(pdb_fpath).parent)
                     pdb_filename = Path(pdb_fpath).name
                     
-                    condensed_sequences, available_positions = evaluate_wrapper.execute(parent_dir, pdb_filename)
+                    valid, reason, condensed_sequences, all_available_positions = evaluate_wrapper.execute(parent_dir, pdb_filename)
                     # For now, we are only returning the first condensed sequence.
-                    service_outputs.Condensed_Sequence = condensed_sequences[0]
-                    service_outputs.Available_Modification_Options.extend(available_positions)
+                    first_seq = condensed_sequences[0]
+                    service_outputs.Condensed_Sequence = first_seq
+                    service_outputs.Available_Modification_Options.extend(all_available_positions[first_seq])
                     
                     log.debug(f"Got {len(condensed_sequences)} condensed sequences. Note: only returning the first.")
                     log.debug(f"Condensed_Sequence: {service_outputs.Condensed_Sequence}")
                     log.debug(
                         f"Available_Modification_Options: {service_outputs.Available_Modification_Options}"
+                    )
+                    
+                    # attach valid/reason to service_notices
+                    service_notices.addNotice(
+                        Brief="Evaluation Valid",
+                        Scope="Service",
+                        Messenger="Glycomimetics",
+                        Type="Info",
+                        Code="605",
+                        Message=f"{valid}",
+                    )
+                    service_notices.addNotice(
+                        Brief="Evaluation Reason",
+                        Scope="Service",
+                        Messenger="Glycomimetics",
+                        Type="Info",
+                        Code="606",
+                        Message=f"{reason}",
                     )
                 except Exception as e:
                     log.error(f"Error caught during Evaluation: {e}")
@@ -125,7 +145,7 @@ def execute(inputs: Evaluate_Inputs) -> tuple[Evaluate_Outputs, Notices]:
             else:
                 log.debug(f"Complex PDB file not found: {pdb_fpath}")
 
-    if not len(service_notices):
+    if all([n.Type != "Error" for n in service_notices]):
         service_notices.addNotice(
             Brief="Evaluation Successful",
             Scope="Service",
