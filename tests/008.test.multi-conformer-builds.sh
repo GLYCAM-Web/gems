@@ -160,7 +160,7 @@ if [ "${ALL_TESTS_PASSED}" == "false" ] ; then
 fi
 ## Clean up.
 deleteTestOutputFolders
-if [ ${GEMS_KEEP_BAD_OUTPUTS} != "True" ] ; then
+if [ "${GEMS_KEEP_BAD_OUTPUTS}" != "True" ] ; then
 	remove_file_if_found ${badOutput}
 fi
 return 0;
