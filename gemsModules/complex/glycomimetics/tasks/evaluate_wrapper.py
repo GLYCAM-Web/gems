@@ -20,15 +20,15 @@ class NoPositionsFoundError(Exception):
 
 
 def parse_eval_output(buffer):
+    valid, reason, condensed_sequences = False, None, []
+
     # line 1 should indica(te if valid or not
-    valid = False
     if buffer[0].startswith("Valid"):
         valid = buffer[0].split(":")[1].strip() == "True"
     else:
         raise ValueError("Unexpected data format during GM/Evaluation step, missing valid flag")
     
     # line 2 should be a Reason: message
-    reason = None
     if buffer[1].startswith("Reason"):
         reason = buffer[1].split(":")[1].strip()
     else:
@@ -37,12 +37,14 @@ def parse_eval_output(buffer):
     # from line 3 onwards, we need to delimit by "Oligosaccharide" to take the condensed sequences with their modification positions.
     cbuffer = buffer[2:]
 
-    condensed_sequences = []
     # split at lines containing "Oligosaccharide"
     oligo_lines = []
     for idx, line in enumerate(cbuffer):
         if line.startswith("Oligosaccharide"):
             oligo_lines.append(idx)
+            
+    if len(oligo_lines) == 0:
+        raise ValueError("Unexpected data format during GM/Evaluation step, missing condensed sequence")
     
     # grab all lines between two "Oligosaccharide" lines
     for i, idx  in enumerate(oligo_lines):
@@ -93,7 +95,7 @@ def execute(parent_dir: str, pdb_filename: str) -> tuple[list[CondensedSequence]
     result = subprocess.run([EVALUATE_WRAPPER, parent_dir, pdb_filename])
     if result.returncode != 0:
         log.debug(f"Error running GM/Evaluation step, return code: {result.returncode}")
-        # raise RuntimeError(f"Error running GM/Evaluation step, return code: {result.returncode}")
+        raise RuntimeError(f"Error running GM/Evaluation step, return code: {result.returncode}")
     
     # Check if the output file is present
     output_file = os.path.join(parent_dir, "available_atoms.txt")
