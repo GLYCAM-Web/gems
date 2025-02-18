@@ -92,11 +92,13 @@ def execute(parent_dir: str, pdb_filename: str) -> tuple[list[CondensedSequence]
     os.chdir(parent_dir)
     
     # Run the GM/Evaluation step
-    result = subprocess.run([EVALUATE_WRAPPER, parent_dir, pdb_filename])
-    if result.returncode != 0:
-        log.debug(f"Error running GM/Evaluation step, return code: {result.returncode}")
-        raise RuntimeError(f"Error running GM/Evaluation step, return code: {result.returncode}")
-    
+    try:
+        result = subprocess.run([EVALUATE_WRAPPER, parent_dir, pdb_filename])
+    finally:
+        if result.returncode != 0:
+            log.debug(f"Error running GM/Evaluation step, return code: {result.returncode}")
+            raise RuntimeError(f"Error running GM/Evaluation step, return code: {result.returncode}")
+        
     # Check if the output file is present
     output_file = os.path.join(parent_dir, "available_atoms.txt")
     if not os.path.exists(output_file):
