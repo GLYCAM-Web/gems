@@ -79,7 +79,8 @@ class InstanceConfig(KeyedArgManager, FileSystemPathsMixin):
     # Not an enum so we can extend here, in the InstanceConfig class, where the most specific GEMS instance configuration is defined.
     # TODO: remove gm/md from contexts here
     Contexts = ["DevEnv", "Swarm", "Glycomimetics", "MDaaS-RunMD"]
-    Filesystem_Paths = ["MDaaS-RunMD", "Glycomimetics"]
+    # TODO: DevEnv/GRPC/initialize.sh needs to update this list.
+    Filesystem_Paths = ["MDaaS-RunMD", "Glycomimetics", "AntibodyDocking"]
 
     def __init__(
         self,

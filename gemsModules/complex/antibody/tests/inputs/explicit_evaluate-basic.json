@@ -1,0 +1,26 @@
+{
+    "entity": {
+      "type": "AntibodyDocking",
+      "services": {
+        "evaluation_of_pdb": {
+          "type": "Evaluate",
+          "inputs": { 
+            "resources": [
+              {
+                "locationType": "filesystem-path-unix",
+                "resourceFormat": "chemical/pdb",
+                "resourceRole": "Antibody",
+                "payload": "/programs/gems/tests/inputs/UPLOADED_2H1_PDB_MONOMER_.pdb"
+              },
+              {
+                "locationType": "filesystem-path-unix",
+                "resourceFormat": "chemical/pdb",
+                "resourceRole": "Ligand",
+                "payload": "/programs/gems/tests/inputs/DManpa1-8DNeup5Acb2-4DFrufa2-OH_structure.pdb"
+              }
+            ] 
+          }
+        }
+      }
+    }
+  }
