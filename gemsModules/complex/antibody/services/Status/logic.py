@@ -5,15 +5,15 @@ from pathlib import Path
 
 from gemsModules.common.main_api_notices import Notices
 from gemsModules.systemoperations.instance_config import InstanceConfig
+
 from gemsModules.logging.logger import Set_Up_Logging
-from gemsModules.systemoperations.instance_config import InstanceConfig
 
 from .api import Status_Inputs, Status_Outputs
 
 
 log = Set_Up_Logging(__name__)
 
-GLYCOMIMETICS_PROJECTS_ROOT = InstanceConfig().get_filesystem_path("Glycomimetics")
+GLYCOMIMETICS_PROJECTS_ROOT = InstanceConfig().get_filesystem_path("AntibodyDocking")
 
 # TODO: Determine project type, and return status of that project type
 def execute(inputs: Status_Inputs) -> Status_Outputs:
@@ -21,14 +21,8 @@ def execute(inputs: Status_Inputs) -> Status_Outputs:
     service_outputs = Status_Outputs()
     service_notices = Notices()
 
-    # Check if the project exists
-    project_path = Path(GLYCOMIMETICS_PROJECTS_ROOT, inputs.pUUID)
-    if not project_path.exists():
-        service_outputs.status = "NotFound"
-        service_outputs.details = f"Project not found at {project_path}"
-        return service_outputs, service_notices
-        
-    main_status_txt = project_path / "status.txt"
+    return service_outputs, service_notices
+    # DEPRECATED:
     
     # check for errors during evaluation
     evaluate_err = project_path / "evaluate.err"

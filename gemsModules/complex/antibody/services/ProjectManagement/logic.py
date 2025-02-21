@@ -39,10 +39,9 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
         file_resource = resource.copy_to(inputs.projectDir)
         
         # If it's the input pdb, symlink it at projectDir/Complex.pdb 
-        if resource.resourceRole == "Complex":
-            # TODO: use the GM project's `complex` field for this.
+        if resource.resourceRole == "Antibody":
             source = os.path.relpath(file_resource.payload, inputs.projectDir)
-            target = os.path.join(inputs.projectDir, "Complex.pdb")
+            target = os.path.join(inputs.projectDir, "protein.pdb") # AD default pdb name for Antibody
             os.symlink(source, target)
         service_outputs.resources.add_resource(file_resource)
 

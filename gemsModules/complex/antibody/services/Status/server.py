@@ -20,4 +20,4 @@ def Serve(service: Status_Request) -> Status_Response:
     # TODO: Pydantic should automatically do this...
     results, notices = execute(service.inputs)
 
-    return Status_Response(outputs=results, notices=notices)
+    return Status_Response(details=results, notices=notices)

@@ -32,16 +32,15 @@ class AntibodyProject(Project):
     project_dir: constr(max_length=255) = ""
 
     # TODO: Better names, also, snake_case
-    complex: constr(max_length=255) = "Complex.pdb"
-    receptor: constr(max_length=255) = "Receptor.pdb"
-    ligand: constr(max_length=255) = "Ligand.pdb"
+    protein: constr(max_length=255) = "protein.pdb"
+    ligand: constr(max_length=255) = "ligand.pdb"
 
     # protocolFilesPath: constr(max_length=255) = "/website/programs/gems/External/GM_Utils/protocols"
 
-    # TODO: convert to antibody protocols
-    metadataPath: constr(max_length=255) = (
-        "/programs/gems/External/GM_Utils/metadata"  # /moeties etc.
-    )
+    # # TODO: convert to antibody protocols
+    # metadataPath: constr(max_length=255) = (
+    #     "/programs/gems/External/GM_Utils/metadata"  # /moeties etc.
+    # )
 
     def add_temporary_info(self):
         ic = InstanceConfig()

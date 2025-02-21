@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field, ValidationError, validator
 from typing import List, Optional, Union
 
 from gemsModules.common.main_api_resources import Resource, Resources
+from gemsModules.common.main_api_notices import Notices
 
 # from gemsModules.complex.glycomimetics.main_api import (
 #     Glycomimetics_Service_Request,
@@ -65,6 +66,7 @@ class Status_Outputs(BaseModel):
         title="Details",
         description="Details about the project status",
     )
+    notices: Optional[Notices] = Notices()
         
 
 class Status_Request(Service_Request):
