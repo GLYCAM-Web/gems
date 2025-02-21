@@ -12,7 +12,8 @@ from gemsModules.complex.antibody.main_api_project import AntibodyProject
 
 from .ProjectManagement import api as pm_api
 from .Evaluate import api as evaluate_api
-from .Validate import api as validate_api
+from .Build import api as build_api
+from .Analyze import api as analyze_api
 
 from gemsModules.common.code_utils import find_aaop_by_id
 
@@ -86,27 +87,27 @@ class Antibody_Request_Data_Filler(Request_Data_Filler):
         # aaop.The_AAO.inputs.projectDir = self.response_project.project_dir
         # aaop.The_AAO.inputs.outputDirPath = self.response_project.project_dir
 
-        complex_filename, ligand_filename, receptor_filename = None, None, None
+        antibody_filename, ligand_filename, ad2config_filename = None, None, None
 
         # TODO: need a helper for this / TODO: Validate and Evaluate need to work directly.
         if aaop.The_AAO.inputs.complex_PDB_Filename:
-            complex_filename = aaop.The_AAO.inputs.complex_PDB_Filename
+            antibody_filename = aaop.The_AAO.inputs.complex_PDB_Filename
         else:
-            complex_filename = self.response_project.complex
+            antibody_filename = self.response_project.complex
         if aaop.The_AAO.inputs.ligand_PDB_Filename:
             ligand_filename = aaop.The_AAO.inputs.ligand_PDB_Filename
         else:
             ligand_filename = self.response_project.ligand
         if aaop.The_AAO.inputs.receptor_PDB_Filename:
-            receptor_filename = aaop.The_AAO.inputs.receptor_PDB_Filename
+            ad2config_filename = aaop.The_AAO.inputs.receptor_PDB_Filename
         else:
-            receptor_filename = self.response_project.receptor
+            ad2config_filename = self.response_project.receptor
 
-        if complex_filename:
+        if antibody_filename:
             pdb = Resource(
-                payload=complex_filename,
+                payload=antibody_filename,
                 resourceFormat="chemical/pdb",
-                resourceRole="Complex",
+                resourceRole="Antibody",
                 locationType="filesystem-path-unix",
             )
             aaop.The_AAO.inputs.resources.add_resource(pdb)
@@ -118,11 +119,11 @@ class Antibody_Request_Data_Filler(Request_Data_Filler):
                 locationType="filesystem-path-unix",
             )
             aaop.The_AAO.inputs.resources.add_resource(pdb)
-        if receptor_filename:
+        if ad2config_filename:
             pdb = Resource(
-                payload=receptor_filename,
-                resourceFormat="chemical/pdb",
-                resourceRole="Receptor",
+                payload=ad2config_filename,
+                resourceFormat="text/plain",
+                resourceRole="ad2config",
                 locationType="filesystem-path-unix",
             )
             aaop.The_AAO.inputs.resources.add_resource(pdb)

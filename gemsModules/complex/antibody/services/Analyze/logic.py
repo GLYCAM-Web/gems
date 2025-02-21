@@ -6,15 +6,15 @@ from gemsModules.common.main_api_notices import Notices
 from gemsModules.systemoperations.instance_config import InstanceConfig
 from gemsModules.logging.logger import Set_Up_Logging
 
-from .api import Validate_Inputs, Validate_Outputs
+from .api import Analyze_Inputs, Analyze_Outputs
 
 
 log = Set_Up_Logging(__name__)
 
 
-def execute(inputs: Validate_Inputs) -> Validate_Outputs:
-    log.debug(f"Validate resources at servicing: {inputs}")
-    service_outputs = Validate_Outputs()
+def execute(inputs: Analyze_Inputs) -> Analyze_Outputs:
+    log.debug(f"Analyze resources at servicing: {inputs}")
+    service_outputs = Analyze_Outputs()
     service_notices = Notices()
 
     hasComplexResource = False

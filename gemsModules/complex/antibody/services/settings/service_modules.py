@@ -6,15 +6,17 @@ from gemsModules.common.services.list_services.server import (
 )
 from gemsModules.common.services.marco.server import Serve as serve_marco
 
-
 from ..ProjectManagement.server import Serve as serve_ProjectManagement
-from ..Validate.server import Serve as serve_validate
 from ..Evaluate.server import Serve as serve_evaluate
+from ..Analyze.server import Serve as serve_validate
+from ..Build.server import Serve as serve_validate
 from ..Status.server import Serve as serve_status
 
 from gemsModules.logging.logger import Set_Up_Logging
 
+
 log = Set_Up_Logging(__name__)
+
 
 service_modules: Dict[str, Callable] = {
     "Error": serve_error,
@@ -22,6 +24,7 @@ service_modules: Dict[str, Callable] = {
     "Marco": serve_marco,
     "Status": serve_status,
     "Evaluate": serve_evaluate,
-    "Validate": serve_validate,
+    "Build": serve_validate,
+    "Analyze": serve_validate,
     "ProjectManagement": serve_ProjectManagement,
 }

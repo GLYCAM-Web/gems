@@ -12,9 +12,10 @@ log = Set_Up_Logging(__name__)
 
 
 class Module_Available_Services(GemsStrEnum):
-    Validate = "Validate"
-    Evaluate = "Evaluate"
     ProjectManagement = "ProjectManagement"
+    Evaluate = "Evaluate"
+    Build = "Build"
+    Analyze = "Analyze"
     Status = "Status"
 
 

@@ -15,7 +15,7 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
-class Validate_input_Resource(Resource):
+class Analyze_input_Resource(Resource):
     """Need to write validators."""
 
     ## Works now:
@@ -31,7 +31,7 @@ class Validate_input_Resource(Resource):
     pass
 
 
-class Validate_output_Resource(Resource):
+class Analyze_output_Resource(Resource):
     """Need to write validators."""
 
     ## Works now:
@@ -47,13 +47,13 @@ class Validate_output_Resource(Resource):
     pass
 
 
-class Validate_Resources(Resources):
+class Analyze_Resources(Resources):
     __root__: List[
-        Union[PDB_File_Resource, Validate_input_Resource, Validate_output_Resource]
+        Union[PDB_File_Resource, Analyze_input_Resource, Analyze_output_Resource]
     ] = None
 
 
-class Validate_Inputs(BaseModel):
+class Analyze_Inputs(BaseModel):
     pUUID: str = Field(
         None,
         title="Project UUID",
@@ -68,11 +68,11 @@ class Validate_Inputs(BaseModel):
     )
 
     # TODO: see Build.api too, we need to use service specific resources for better constraints.
-    # resources: Validate_Resources = Validate_Resources()
+    # resources: Analyze_Resources = Analyze_Resources()
     resources: Resources = Resources()
 
 
-class Validate_Outputs(BaseModel):
+class Analyze_Outputs(BaseModel):
     isValid: bool = Field(
         None,
         title="Is Valid",
@@ -80,12 +80,12 @@ class Validate_Outputs(BaseModel):
     )
 
 
-class Validate_Request(Antibody_Service_Request):
-    typename: str = Field("Validate", alias="type")
+class Analyze_Request(Antibody_Service_Request):
+    typename: str = Field("Analyze", alias="type")
     # the following must be redefined in a child class
-    inputs: Validate_Inputs = Validate_Inputs()
+    inputs: Analyze_Inputs = Analyze_Inputs()
 
 
-class Validate_Response(Antibody_Service_Response):
-    typename: str = Field("Validate", alias="type")
-    outputs: Validate_Outputs = Validate_Outputs()
+class Analyze_Response(Antibody_Service_Response):
+    typename: str = Field("Analyze", alias="type")
+    outputs: Analyze_Outputs = Analyze_Outputs()

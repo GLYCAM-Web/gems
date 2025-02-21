@@ -6,7 +6,9 @@ from gemsModules.logging.logger import Set_Up_Logging
 
 from .ProjectManagement.api import ProjectManagement_Request
 from .Evaluate.api import Evaluate_Request
-from .Validate.api import Validate_Request
+from .Analyze.api import Analyze_Request
+from .Build.api import Build_Request
+
 
 # from .known_available import Module_Available_Services # for maybe keying...
 
@@ -15,22 +17,20 @@ log = Set_Up_Logging(__name__)
 
 
 # TODO: To services.settings... ?
-VALIDATE_DEPENDENCIES = Annotated_List([], ordered=True)
-PROJECTMANAGEMENT_DEPENDENCIES = Annotated_List(["Validate"], ordered=True)
+PROJECTMANAGEMENT_DEPENDENCIES = Annotated_List([], ordered=True)
 EVALUATE_DEPENDENCIES = Annotated_List(
     PROJECTMANAGEMENT_DEPENDENCIES + ["ProjectManagement"], ordered=True
 )
-BUILD_DEPENDENCIES = Annotated_List(EVALUATE_DEPENDENCIES + ["Evaluate"], ordered=True)
+BUILD_DEPENDENCIES = Annotated_List(EVALUATE_DEPENDENCIES + ["Analyze"], ordered=True)
 ANALYZE_DEPENDENCIES = Annotated_List(
-    BUILD_DEPENDENCIES + ["Build_Selected_Positions"], ordered=True
+    BUILD_DEPENDENCIES + ["Build"], ordered=True
 )
 
 Service_Dependencies = {
-    "Analyze": ANALYZE_DEPENDENCIES,
-    "Build_Selected_Positions": BUILD_DEPENDENCIES,
     "ProjectManagement": PROJECTMANAGEMENT_DEPENDENCIES,
     "Evaluate": EVALUATE_DEPENDENCIES,
-    "Validate": VALIDATE_DEPENDENCIES,
+    "Build": BUILD_DEPENDENCIES,
+    "Analyze": ANALYZE_DEPENDENCIES,
 }
 
 
@@ -38,10 +38,9 @@ Service_Dependencies = {
 class Antibody_Workflow_Manager(Workflow_Manager):
     def get_linear_workflow_list(self) -> list[str]:
         return [
-            "Evaluate",
-            "Validate",
             "ProjectManagement",
-            "Build_Selected_Positions",
+            "Evaluate", # TODO: Use Status to get results of Evaluate, Build, and Analyze
+            "Build",
             "Analyze",
         ]
 

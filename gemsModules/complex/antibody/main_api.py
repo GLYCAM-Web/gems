@@ -14,7 +14,8 @@ from .main_api_common import (
     Antibody_Service_Response,
 )
 
-from .services.Validate.api import Validate_Request, Validate_Response
+from .services.Analyze.api import Analyze_Request, Analyze_Response
+from .services.Build.api import Build_Request, Build_Response
 from .services.Evaluate.api import Evaluate_Request, Evaluate_Response
 from .services.ProjectManagement.api import (
     ProjectManagement_Request,
@@ -29,7 +30,8 @@ log = Set_Up_Logging(__name__)
 class Antibody_Service_Requests(main_api_services.Service_Requests):
     __root__: dict[
         str,
-        Validate_Request,
+        Analyze_Request,
+        Build_Request,
         Evaluate_Request,
         ProjectManagement_Request,
         Antibody_Service_Request,
