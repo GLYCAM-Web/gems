@@ -43,7 +43,14 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
             source = os.path.relpath(file_resource.payload, inputs.projectDir)
             target = os.path.join(inputs.projectDir, "protein.pdb") # AD default pdb name for Antibody
             os.symlink(source, target)
+        elif resource.resourceRole == "Ligand":
+            source = os.path.relpath(file_resource.payload, inputs.projectDir)
+            target = os.path.join(inputs.projectDir, "ligand.pdb")
+            os.symlink(source, target)
         service_outputs.resources.add_resource(file_resource)
+        
+        # TODO: Run External/AAD2/0.configure/setup_AD_directory
+        
 
     # # TODO: we can use PM_Resource.copy_to to copy the files to the output directory.
     # service_outputs.resources = ProjectManagement_Resources(resources=resources)

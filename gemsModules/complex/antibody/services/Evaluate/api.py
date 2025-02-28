@@ -65,27 +65,6 @@ class Evaluate_Inputs(BaseModel):
 
 
 class Evaluate_Outputs(BaseModel):
-    # TODO/Q: Should this be here?
-    Available_Libraries: List[str] = Field(
-        default_factory=Moiety_Library_Names.get_json_list,
-        title="Available Libraries",
-        description="List of available libraries",
-    )
-    Condensed_Sequence: Optional[str] = Field(
-        None,
-        title="Condensed Sequence",
-        description="GLYCAM condensed sequence representing the ligand in the protein co-complex",
-    )
-    Available_Modification_Options: Optional[List[Modification_Position]] = Field(
-        default_factory=list,
-        title="Available Modification Options",
-        description="List of available modification options",
-    )
-    outputDirPath: str = Field(
-        None,
-        title="Output Directory Path",
-        description="Path to output directory",
-    )
     pUUID: str = Field(
         None,
         title="Project UUID",

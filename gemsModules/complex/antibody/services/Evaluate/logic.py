@@ -21,7 +21,9 @@ def execute(inputs: Evaluate_Inputs) -> tuple[Evaluate_Outputs, Notices]:
     service_outputs = Evaluate_Outputs()
     service_notices = Notices()
 
-    # TODO: Call AD_Evaluate on thoreau here.
+    # TODO: Fix ligand.pdb by adding an END card at the end of file if not present
+    # TODO: Call gmml/detect_sugars on ligand.pdb to generate glycan_ring_atoms.txt
+    # TODO: Call AD_Evaluate over gRPC here.
 
     if not len(service_notices):
         service_notices.addNotice(

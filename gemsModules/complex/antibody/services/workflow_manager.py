@@ -25,12 +25,14 @@ BUILD_DEPENDENCIES = Annotated_List(EVALUATE_DEPENDENCIES + ["Analyze"], ordered
 ANALYZE_DEPENDENCIES = Annotated_List(
     BUILD_DEPENDENCIES + ["Build"], ordered=True
 )
+STATUS_DEPENDENCIES = Annotated_List([], ordered=True)
 
 Service_Dependencies = {
     "ProjectManagement": PROJECTMANAGEMENT_DEPENDENCIES,
     "Evaluate": EVALUATE_DEPENDENCIES,
     "Build": BUILD_DEPENDENCIES,
     "Analyze": ANALYZE_DEPENDENCIES,
+    "Status": STATUS_DEPENDENCIES,
 }
 
 
