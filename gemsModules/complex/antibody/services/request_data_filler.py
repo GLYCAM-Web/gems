@@ -45,10 +45,10 @@ class Antibody_Request_Data_Filler(Request_Data_Filler):
                 self.__fill_analyze_aaop(i, aaop)
                 update_proj_dirs.append(aaop)
             else:
-                log.warning(f"GM/RequestDataFiller: I don't know how to data fill for {aaop.AAO_Type}")
+                log.warning(f"AD/RequestDataFiller: I don't know how to data fill for {aaop.AAO_Type}")
 
         if not do_proj_dir_update:
-            log.warning("GM/RequestDataFiller: No ProjectManagement AAOP found to update project directories.")
+            log.warning("AD/RequestDataFiller: No ProjectManagement AAOP found to update project directories.")
             log.warning("This WILL cause problems with the service execution.")
         else:   
             self.__post_process_fill(update_proj_dirs)
@@ -77,48 +77,8 @@ class Antibody_Request_Data_Filler(Request_Data_Filler):
                     break
         
         if roles_to_find:
-            log.warning(f"GM/RequestDataFiller: Could not find resources for roles: {roles_to_find}")
+            log.warning(f"AD/RequestDataFiller: Could not find resources for roles: {roles_to_find}")
         return False
-    
-    def __fill_build_aaop(self, i: int, aaop: AAOP) -> List[AAOP]:
-        # Please note, if you need values from response_project, make sure they are initialized appropriately by project manager.
-
-        aaop.The_AAO.inputs.pUUID = self.response_project.pUUID
-        # aaop.The_AAO.inputs.projectDir = self.response_project.project_dir
-        # aaop.The_AAO.inputs.outputDirPath = self.response_project.project_dir
-
-        antibody_filename, ligand_filename, ad2config_filename = None, None, None
-
-        # TODO: need a helper for this / TODO: Validate and Evaluate need to work directly.
-        if aaop.The_AAO.inputs.antibody_path:
-            antibody_filename = aaop.The_AAO.inputs.antibody_path
-        else:
-            antibody_filename = self.response_project.antibody
-            
-        if aaop.The_AAO.inputs.ligand_path:
-            ligand_filename = aaop.The_AAO.inputs.ligand_path
-        else:
-            ligand_filename = self.response_project.ligand
-    
-
-        if antibody_filename:
-            pdb = Resource(
-                payload=antibody_filename,
-                resourceFormat="chemical/pdb",
-                resourceRole="Antibody",
-                locationType="filesystem-path-unix",
-            )
-            aaop.The_AAO.inputs.resources.add_resource(pdb)
-        if ligand_filename:
-            pdb = Resource(
-                payload=ligand_filename,
-                resourceFormat="chemical/pdb",
-                resourceRole="Ligand",
-                locationType="filesystem-path-unix",
-            )
-            aaop.The_AAO.inputs.resources.add_resource(pdb)
-
-        return self.aaop_list
 
     def __fill_projman_aaop(self, i: int, aaop: AAOP):
         aaop.The_AAO.inputs.pUUID = self.response_project.pUUID
@@ -139,10 +99,61 @@ class Antibody_Request_Data_Filler(Request_Data_Filler):
 
     def __fill_evaluate_aaop(self, i: int, aaop: AAOP) -> List[AAOP]:
         aaop.The_AAO.inputs.pUUID = self.response_project.pUUID
-
+        
         # TODO: need to handle the case of direct inputs that are not resources.
-        self.fill_resources_from_requester_if_exists(aaop)
+        if not self.fill_resources_from_requester_if_exists(aaop):
+            self.__fill_input_pdb_resources(aaop)
+        
+        self.__fill_pdb_inputs_from_resources(aaop)
         # Add the resources to copy to the project output directory by the Project Management service.
 
-    def __fill_analyze_aaop(self, i: int, aaop: AAOP) -> List[AAOP]:
+    def __fill_build_aaop(self, i: int, aaop: AAOP) -> List[AAOP]:
         aaop.The_AAO.inputs.pUUID = self.response_project.pUUID
+  
+        if not self.fill_resources_from_requester_if_exists(aaop):
+            self.__fill_input_pdb_resources(aaop)
+        
+        self.__fill_pdb_inputs_from_resources(aaop)
+
+        return self.aaop_list
+    
+    def __fill_analyze_aaop(self, i: int, aaop: AAOP) -> List[AAOP]:
+        pass 
+            
+    def __fill_input_pdb_resources(self, aaop):
+        if aaop.AAO_Type not in ["Build", "Evaluate"]:
+            log.warning(f"AD/RequestDataFiller.fill_input_resources: I don't know how to fill input resources for {aaop.AAO_Type}")
+            return
+        
+        antibody_filename = aaop.The_AAO.inputs.antibody_path
+        ligand_filename = aaop.The_AAO.inputs.ligand_path
+
+        if antibody_filename:
+            pdb = Resource(
+                payload=antibody_filename,
+                resourceFormat="chemical/pdb",
+                resourceRole="Antibody",
+                locationType="filesystem-path-unix",
+            )
+            aaop.The_AAO.inputs.resources.add_resource(pdb)
+        if ligand_filename:
+            pdb = Resource(
+                payload=ligand_filename,
+                resourceFormat="chemical/pdb",
+                resourceRole="Ligand",
+                locationType="filesystem-path-unix",
+            )
+            aaop.The_AAO.inputs.resources.add_resource(pdb)
+            
+    def __fill_pdb_inputs_from_resources(self, aaop):
+        if aaop.AAO_Type not in ["Build", "Evaluate"]:
+            log.warning(f"AD/RequestDataFiller.fill_inputs_from_resources: I don't know how to fill inputs from resources for {aaop.AAO_Type}")
+            return
+        
+        for resource in aaop.The_AAO.inputs.resources:
+            if resource.resourceRole == "Antibody":
+                aaop.The_AAO.inputs.antibody_path = resource.payload
+            elif resource.resourceRole == "Ligand":
+                aaop.The_AAO.inputs.ligand_path = resource.payload
+            else:
+                log.warning(f"AD/RequestDataFiller.fill_inputs_from_resources: I don't know how to fill input from resource {resource.resourceRole}")

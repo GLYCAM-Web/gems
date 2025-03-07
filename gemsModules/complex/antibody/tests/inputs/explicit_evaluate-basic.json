@@ -2,7 +2,7 @@
     "entity": {
       "type": "AntibodyDocking",
       "services": {
-        "evaluation_of_pdb": {
+        "ab_eval_test": {
           "type": "Evaluate",
           "inputs": { 
             "resources": [

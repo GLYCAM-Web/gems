@@ -30,10 +30,10 @@ log = Set_Up_Logging(__name__)
 class Antibody_Service_Requests(main_api_services.Service_Requests):
     __root__: dict[
         str,
-        Analyze_Request,
-        Build_Request,
         Evaluate_Request,
+        Build_Request,
         ProjectManagement_Request,
+        Analyze_Request,
         Antibody_Service_Request,
     ] = None
 

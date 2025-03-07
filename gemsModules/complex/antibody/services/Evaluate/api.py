@@ -12,9 +12,6 @@ from gemsModules.complex.antibody.main_api import (
 )
 from gemsModules.complex.antibody.services.common_api import (
     PDB_File_Resource,
-    Moiety_Library_Names,
-    Position_Modification_Options,
-    Modification_Position,  # TODO: We really should be using Position_Modification_Options, temp integration
 )
 
 from gemsModules.logging.logger import Set_Up_Logging

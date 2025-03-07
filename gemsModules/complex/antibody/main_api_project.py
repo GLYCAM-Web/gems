@@ -17,9 +17,9 @@ class AntibodyProject(Project):
 
     title: str = "Initial Antibody Project"
     parent_entity: str = "complex"
-    app: str = "gm"
+    app: str = "ad"
     requested_service: str = ""
-    project_type: Literal["gm"] = Field("gm", title="Type", alias="type")
+    project_type: Literal["ad"] = Field("ad", title="Type", alias="type")
     entity_id: str = "complex/antibody"
     service_id: constr(max_length=25) = ""  # what should this be?
     gm_utils_version: str = ""
@@ -35,12 +35,6 @@ class AntibodyProject(Project):
     protein: constr(max_length=255) = "protein.pdb"
     ligand: constr(max_length=255) = "ligand.pdb"
 
-    # protocolFilesPath: constr(max_length=255) = "/website/programs/gems/External/GM_Utils/protocols"
-
-    # # TODO: convert to antibody protocols
-    # metadataPath: constr(max_length=255) = (
-    #     "/programs/gems/External/GM_Utils/metadata"  # /moeties etc.
-    # )
 
     def add_temporary_info(self):
         ic = InstanceConfig()

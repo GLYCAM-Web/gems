@@ -24,8 +24,8 @@ def execute(inputs: Evaluate_Inputs) -> tuple[Evaluate_Outputs, Notices]:
     service_notices = Notices()
 
     # TODO: Fix ligand.pdb by adding an END card at the end of file if not present
-    # needed_fix = fix_glycam_glycan.execute(inputs.ligand_path)
-    # log.debug(f"Fixed ligand.pdb: {needed_fix=}")
+    needed_fix = fix_glycam_glycan.execute(inputs.ligand_path)
+    log.debug(f"Fixed ligand.pdb: {needed_fix=}")
     
     # TODO: Call gmml/detect_sugars on ligand.pdb to generate glycan_ring_atoms.txt
     # gmml_detect_sugars.execute(inputs.ligand_pdb) # TODO: Filename might be different
