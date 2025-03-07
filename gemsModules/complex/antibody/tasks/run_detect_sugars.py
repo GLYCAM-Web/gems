@@ -13,7 +13,7 @@ def execute(pdb_path, workdir):
     
     # Run detect_sugars on ligand.pdb to generate glycan_ring_atoms.txt
     # detect_sugars ligand.pdb | tee > glycan_ring_atoms.txt (use an io buffer to both write stodout to file and return it)
-    with open("glycan_ring_atoms.txt", "w") as f:
+    with open(f"{workdir}/glycan_ring_atoms.txt", "w") as f:
         try:
             subprocess.run([DETECT_SUGARS_BIN, pdb_path], stdout=f, cwd=workdir, check=True)
         except subprocess.CalledProcessError as e:

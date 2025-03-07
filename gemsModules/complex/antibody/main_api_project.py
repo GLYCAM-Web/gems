@@ -35,11 +35,11 @@ class AntibodyProject(Project):
     protein: constr(max_length=255) = "protein.pdb"
     ligand: constr(max_length=255) = "ligand.pdb"
 
+    @staticmethod
+    def get_project_dir_from_pUUID(pUUID: str):
+        return os.path.join(
+            InstanceConfig().get_filesystem_path("AntibodyDocking"), pUUID
+        )
 
     def add_temporary_info(self):
-        ic = InstanceConfig()
-
-        # this could probably be generalized.
-        self.project_dir: str = os.path.join(
-            ic.get_filesystem_path("AntibodyDocking"), self.pUUID
-        )
+        self.project_dir: str = self.get_project_dir_from_pUUID(self.pUUID)

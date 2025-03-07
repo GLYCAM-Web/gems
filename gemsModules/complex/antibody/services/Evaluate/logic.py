@@ -10,8 +10,9 @@ from gemsModules.systemoperations.instance_config import InstanceConfig
 from gemsModules.logging.logger import Set_Up_Logging
 
 from .api import Evaluate_Inputs, Evaluate_Outputs
+from ...main_api_project import AntibodyProject
 
-from  ...tasks import fix_glycam_glycan
+from  ...tasks import fix_glycam_glycan, run_detect_sugars
 
 
 log = Set_Up_Logging(__name__)
@@ -23,12 +24,27 @@ def execute(inputs: Evaluate_Inputs) -> tuple[Evaluate_Outputs, Notices]:
     service_outputs = Evaluate_Outputs()
     service_notices = Notices()
 
-    # TODO: Fix ligand.pdb by adding an END card at the end of file if not present
+    workdir = AntibodyProject.get_project_dir_from_pUUID(inputs.pUUID)
+    log.debug(f"workdir: {workdir}")
+    if not workdir:
+        service_notices.addNotice(
+            Brief="Project not found",
+            Scope="Service",
+            Messenger="AntibodyDocking",
+            Type="Error",
+            Code="400",
+            Message="Project not found",
+        )
+        return service_outputs, service_notices
+    
+    # Fix ligand.pdb by adding an END card at the end of file if not present
     needed_fix = fix_glycam_glycan.execute(inputs.ligand_path)
     log.debug(f"Fixed ligand.pdb: {needed_fix=}")
     
-    # TODO: Call gmml/detect_sugars on ligand.pdb to generate glycan_ring_atoms.txt
-    # gmml_detect_sugars.execute(inputs.ligand_pdb) # TODO: Filename might be different
+    # Call gmml/detect_sugars on ligand.pdb to generate glycan_ring_atoms.txt
+    # TODO: Delay until gRPC too? (It's a little slow)
+    run_detect_sugars.execute(inputs.ligand_path, workdir) 
+    
     # TODO: Call AD_Evaluate over gRPC here.
 
     if not len(service_notices):

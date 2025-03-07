@@ -1,0 +1,29 @@
+import subprocess
+
+from pathlib import Path
+
+from gemsModules.logging.logger import Set_Up_Logging
+
+from .amber_submit import execute as execute_amber_submit
+
+log = Set_Up_Logging(__name__)
+
+
+def execute(pUUID, project_dir: Path, GlycoWebtool_path: Path, use_serial: bool = True):
+    run_all_script = "PATH=\"/programs/website_aad2/test/bin:$PATH\" AD_Evaluate"
+    
+   # first we need to call 
+    if use_serial:
+        execute_amber_submit(pUUID=pUUID, projectDir=project_dir, control_script=run_all_script, control_args=["Complex.pdb", "input.txt", "systemInfo.txt"])
+    else:
+        import multiprocessing
+        from gemsModules.deprecated.common import logic as commonlogic
+
+        def withArgs():
+            execute_amber_submit(pUUID=pUUID, projectDir=str(project_dir), control_script=str(run_all_script), control_args=["Complex.pdb", "input.txt", "systemInfo.txt"])
+       
+        detached_build = multiprocessing.Process(target=commonlogic.spawnDaemon, args=(withArgs,))
+        detached_build.daemon = True
+        detached_build.start()
+        
+        

@@ -51,7 +51,7 @@ def separate_path_and_filename(File_Path: str) -> tuple[str, str]:
 def copy_file_from_A_to_B(A: str, B: str):
     # Make me more resilient one day
     log.info(f"copy_file_from_A_to_B was called with A={A} and B={B}.")
-    shutil.copy(A, B)
+    return shutil.copy(A, B)
 
 
 def copy_all_files_from_dir_A_to_dir_B(
