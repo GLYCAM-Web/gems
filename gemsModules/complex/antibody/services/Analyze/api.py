@@ -57,14 +57,7 @@ class Analyze_Inputs(BaseModel):
     pUUID: str = Field(
         None,
         title="Project UUID",
-        description="UUID of Project",
-    )
-
-    # TODO: should be receptor_path which is a local fs path
-    receptor: Optional[str] = Field(
-        None,
-        title="Receptor",
-        description="Receptor PDB file",
+        description="UUID of Project to be analyzed",
     )
 
     # TODO: see Build.api too, we need to use service specific resources for better constraints.

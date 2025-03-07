@@ -21,11 +21,18 @@ PROJECTMANAGEMENT_DEPENDENCIES = Annotated_List([], ordered=True)
 EVALUATE_DEPENDENCIES = Annotated_List(
     PROJECTMANAGEMENT_DEPENDENCIES + ["ProjectManagement"], ordered=True
 )
-BUILD_DEPENDENCIES = Annotated_List(EVALUATE_DEPENDENCIES + ["Analyze"], ordered=True)
-ANALYZE_DEPENDENCIES = Annotated_List(
-    BUILD_DEPENDENCIES + ["Build"], ordered=True
+
+# TODO: Workflow these services, but ensure we do not re-run Evaluate/Build if they have already been run on that pUUID.
+
+BUILD_DEPENDENCIES = Annotated_List(
+    [] # EVALUATE_DEPENDENCIES + ["Analyze"], ordered=True
 )
-STATUS_DEPENDENCIES = Annotated_List([], ordered=True)
+ANALYZE_DEPENDENCIES = Annotated_List(
+    [] # BUILD_DEPENDENCIES + ["Build"], ordered=True
+)
+STATUS_DEPENDENCIES = Annotated_List(
+    [] # BUILD or ANALYZE or EVALUATE, ordered=True
+)
 
 Service_Dependencies = {
     "ProjectManagement": PROJECTMANAGEMENT_DEPENDENCIES,

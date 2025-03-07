@@ -11,6 +11,8 @@ from gemsModules.logging.logger import Set_Up_Logging
 
 from .api import Evaluate_Inputs, Evaluate_Outputs
 
+from  ...tasks import fix_glycam_glycan
+
 
 log = Set_Up_Logging(__name__)
 
@@ -22,7 +24,11 @@ def execute(inputs: Evaluate_Inputs) -> tuple[Evaluate_Outputs, Notices]:
     service_notices = Notices()
 
     # TODO: Fix ligand.pdb by adding an END card at the end of file if not present
+    # needed_fix = fix_glycam_glycan.execute(inputs.ligand_path)
+    # log.debug(f"Fixed ligand.pdb: {needed_fix=}")
+    
     # TODO: Call gmml/detect_sugars on ligand.pdb to generate glycan_ring_atoms.txt
+    # gmml_detect_sugars.execute(inputs.ligand_pdb) # TODO: Filename might be different
     # TODO: Call AD_Evaluate over gRPC here.
 
     if not len(service_notices):

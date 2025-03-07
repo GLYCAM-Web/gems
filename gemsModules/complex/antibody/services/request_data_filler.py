@@ -32,7 +32,7 @@ class Antibody_Request_Data_Filler(Request_Data_Filler):
         for i, aaop in enumerate(self.aaop_list):
             log.debug(f"i: {i}, {aaop.AAO_Type}={aaop}")
 
-            if aaop.AAO_Type == "Build_Selected_Positions":
+            if aaop.AAO_Type == "Build":
                 self.__fill_build_aaop(i, aaop)
                 update_proj_dirs.append(aaop)
             elif aaop.AAO_Type == "ProjectManagement":
@@ -41,8 +41,8 @@ class Antibody_Request_Data_Filler(Request_Data_Filler):
             elif aaop.AAO_Type == "Evaluate":
                 self.__fill_evaluate_aaop(i, aaop)
                 update_proj_dirs.append(aaop)
-            elif aaop.AAO_Type == "Validate":
-                self.__fill_validate_aaop(i, aaop)
+            elif aaop.AAO_Type == "Analyze":
+                self.__fill_analyze_aaop(i, aaop)
                 update_proj_dirs.append(aaop)
             else:
                 log.warning(f"GM/RequestDataFiller: I don't know how to data fill for {aaop.AAO_Type}")
@@ -57,9 +57,9 @@ class Antibody_Request_Data_Filler(Request_Data_Filler):
 
     def __post_process_fill(self, update_proj_dirs: List[AAOP]):
         # TODO/FIX: Hack, but easiest/cheapest way to get all project resources to have the project_dir prepended.
-        roles_to_find = ["Complex", "Ligand", "Receptor"]
+        roles_to_find = ["Antibody", "Ligand"]
         for aaop in update_proj_dirs:
-            log.debug(f"GM/RequestDataFiller: Prepending project_dir to resources for {aaop.AAO_Type}")
+            log.debug(f"AD/RequestDataFiller: Prepending project_dir to resources for {aaop.AAO_Type}")
             for r in aaop.The_AAO.inputs.resources:
                 if not roles_to_find:
                     return True
@@ -70,7 +70,7 @@ class Antibody_Request_Data_Filler(Request_Data_Filler):
                     # extract filename from payload
                     r.payload = str(Path(self.response_project.project_dir) / Path(r.payload).name)
                     log.debug(
-                        f"GM/RequestDataFiller: {r.resourceRole} prepended project_dir to Receptor payload: {r.payload}"
+                        f"AD/RequestDataFiller: {r.resourceRole} prepended project_dir to Receptor payload: {r.payload}"
                     )
                     
                     roles_to_find.remove(r.resourceRole)
@@ -90,18 +90,16 @@ class Antibody_Request_Data_Filler(Request_Data_Filler):
         antibody_filename, ligand_filename, ad2config_filename = None, None, None
 
         # TODO: need a helper for this / TODO: Validate and Evaluate need to work directly.
-        if aaop.The_AAO.inputs.complex_PDB_Filename:
-            antibody_filename = aaop.The_AAO.inputs.complex_PDB_Filename
+        if aaop.The_AAO.inputs.antibody_path:
+            antibody_filename = aaop.The_AAO.inputs.antibody_path
         else:
-            antibody_filename = self.response_project.complex
-        if aaop.The_AAO.inputs.ligand_PDB_Filename:
-            ligand_filename = aaop.The_AAO.inputs.ligand_PDB_Filename
+            antibody_filename = self.response_project.antibody
+            
+        if aaop.The_AAO.inputs.ligand_path:
+            ligand_filename = aaop.The_AAO.inputs.ligand_path
         else:
             ligand_filename = self.response_project.ligand
-        if aaop.The_AAO.inputs.receptor_PDB_Filename:
-            ad2config_filename = aaop.The_AAO.inputs.receptor_PDB_Filename
-        else:
-            ad2config_filename = self.response_project.receptor
+    
 
         if antibody_filename:
             pdb = Resource(
@@ -116,14 +114,6 @@ class Antibody_Request_Data_Filler(Request_Data_Filler):
                 payload=ligand_filename,
                 resourceFormat="chemical/pdb",
                 resourceRole="Ligand",
-                locationType="filesystem-path-unix",
-            )
-            aaop.The_AAO.inputs.resources.add_resource(pdb)
-        if ad2config_filename:
-            pdb = Resource(
-                payload=ad2config_filename,
-                resourceFormat="text/plain",
-                resourceRole="ad2config",
                 locationType="filesystem-path-unix",
             )
             aaop.The_AAO.inputs.resources.add_resource(pdb)
@@ -154,8 +144,5 @@ class Antibody_Request_Data_Filler(Request_Data_Filler):
         self.fill_resources_from_requester_if_exists(aaop)
         # Add the resources to copy to the project output directory by the Project Management service.
 
-    def __fill_validate_aaop(self, i: int, aaop: AAOP) -> List[AAOP]:
+    def __fill_analyze_aaop(self, i: int, aaop: AAOP) -> List[AAOP]:
         aaop.The_AAO.inputs.pUUID = self.response_project.pUUID
-
-        # TODO: need to handle the case of direct inputs that are not resources.
-        self.fill_resources_from_requester_if_exists(aaop)

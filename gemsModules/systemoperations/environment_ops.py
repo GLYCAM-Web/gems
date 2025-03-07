@@ -9,7 +9,11 @@ log = Set_Up_Logging(__name__)
 
 
 def get_gems_path() -> str:
-    return os.environ.get("GEMSHOME")
+    path = os.environ.get("GEMSHOME")
+    if not os.path.exists(path):
+        log.error("The current GEMSHOME does not exist.")
+        log.error("GEMSHOME: " + path)
+    return path
 
 
 def gemsModules_is_findable() -> bool:
