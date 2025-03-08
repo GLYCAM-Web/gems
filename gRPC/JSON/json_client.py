@@ -4,9 +4,9 @@ import os, sys
 import json_pb2
 import json_pb2_grpc
 
-from gemsModules.logging.logger import new_concurrent_logger
+from gemsModules.logging.logger import Set_Up_Logging
 
-log = new_concurrent_logger(__name__)
+log = Set_Up_Logging(__name__)
 
 
 class JSONClient():
@@ -38,6 +38,5 @@ class JSONClient():
 
 
 if __name__ == '__main__':
-    logging.basicConfig()
-    json_client = JSONClient(json="{ \"hello\": \"hello world!\" }")
+    json_client = JSONClient(json="{ \"hello\": \"hello world!\" }", host="localhost", port="42099")
     print(json_client.response)
