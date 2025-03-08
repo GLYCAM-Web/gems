@@ -2,15 +2,17 @@
 
 from concurrent import futures
 import time
-import logging
 
 import grpc
-import os,sys,subprocess,signal
+import os,sys,subprocess
 from subprocess import *
 
 import json
 import json_pb2
 import json_pb2_grpc
+
+from gemsModules.logging.logger import new_concurrent_logger
+log = new_concurrent_logger(__name__, force_dirty=True)
 
 brief_to_code = {
     'GemsHomeNotSet' :              1 ,
@@ -129,7 +131,12 @@ def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     json_pb2_grpc.add_JSONServicer_to_server(JSON_Delegator(), server)
     # server.add_insecure_port(os.getenv('GRPC_DELEGATOR_HOST') + ':' + os.getenv('GRPC_DELEGATOR_PORT'))
-    server.add_insecure_port('[::]:50051')
+    thePort = os.getenv('GRPC_DELEGATOR_PORT')
+    if thePort is None:
+        thePort = '50051'
+        log.debug("The gRPC/JSON server port is not defined.  Using default port 50051.")
+        
+    server.add_insecure_port(f'[::]:{thePort}')
     server.start()
     try:
         while True:
