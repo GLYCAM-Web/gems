@@ -61,7 +61,7 @@ def naive_is_GEMS_instance_for_SLURM_submission():
     return useSLURM
 
 
-def import_grpc_client():
+def import_grpc_slurm_client():
     global gems_grpc_slurm_client
     gemsPath = os.environ.get("GEMSHOME")
     if gemsPath is None:
@@ -70,10 +70,17 @@ def import_grpc_client():
     sys.path.append(f"{gemsPath}/gRPC/SLURM")
     import gems_grpc_slurm_client
 
+def import_grpc_delegator_client():
+    global gems_json_client
+    gemsPath = os.environ.get("GEMSHOME")
+    if gemsPath is None:
+        log.warning("GEMSHOME is not set.  Cannot submit via gRPC.")
+    sys.path.append(f"{gemsPath}/gRPC/JSON")
+    import json_client as gems_json_client
 
 def slurm_grpc_submit(jsonObjectString, host=None, port=None):
     """Submit a SLURM request to the gRPC server for delegation on another GEMs instance."""
-    import_grpc_client()
+    import_grpc_slurm_client()
 
     log.debug(
         "Sending SLURM request over gRPC to %s:%s... Request: %s",
@@ -82,6 +89,22 @@ def slurm_grpc_submit(jsonObjectString, host=None, port=None):
         jsonObjectString,
     )
     submission = gems_grpc_slurm_client.GemsGrpcSlurmClient(
+        json=jsonObjectString, host=host, port=port
+    )
+    return submission.response
+
+
+def json_grpc_submit(jsonObjectString, host=None, port=None):
+    """Submit a JSON request to the gRPC server for delegation on another GEMs instance."""
+    import_grpc_delegator_client()
+
+    log.debug(
+        "Sending JSON request over gRPC to %s:%s... Request: %s",
+        host,
+        port,
+        jsonObjectString,
+    )
+    submission = gems_json_client.JSONClient(
         json=jsonObjectString, host=host, port=port
     )
     return submission.response

@@ -14,7 +14,7 @@ class JSONClient():
         self.json = json
         self.response = self.run(theHost=host, thePort=port)
 
-    def run(self):
+    def run(self, theHost=None, thePort=None):
         if theHost is None:
             theHost = os.getenv('GRPC_DELEGATOR_HOST')
             if theHost is None:

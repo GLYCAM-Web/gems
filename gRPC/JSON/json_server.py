@@ -71,8 +71,7 @@ def JSON_Error_Response(theBrief,theExitCode,theStdout,theStderr,theExceptionErr
 
     return thereturn
 
-_ONE_DAY_IN_SECONDS = 60 * 60 * 24
-print("Hello from json_server.py JSON_Error_Response()")
+print("Hello from json_server.py")
 
 class JSON_Delegator(json_pb2_grpc.JSONServicer):
 
@@ -135,13 +134,13 @@ def serve():
     if thePort is None:
         thePort = '50051'
         log.debug("The gRPC/JSON server port is not defined.  Using default port 50051.")
-        
+
     server.add_insecure_port(f'[::]:{thePort}')
     server.start()
+    print(f"Server started on port: {thePort}")
+
     try:
-        while True:
-            print("Starting sleepytime.")
-            time.sleep(_ONE_DAY_IN_SECONDS)
+        server.wait_for_termination()
     except KeyboardInterrupt:
         print("Caught keyboard interrupt")
         server.stop(0)

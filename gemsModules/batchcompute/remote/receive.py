@@ -60,7 +60,7 @@ def receive(jsonObjectString):
         response = run_submission(thisSlurmJobInfo)
     else:
         # Delay import so that grpc is not required when bare-metal delegating on target host.
-        from gemsModules.networkconnections.seek_correct_host import execute as seek_correct_host
+        from .tasks.seek_correct_host import execute as seek_correct_host
 
         log.debug("This is not the correct host to submit to.")
         # Otherwise, we need to seek the correct host to submit to.
