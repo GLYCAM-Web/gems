@@ -34,7 +34,7 @@ def manageIncomingString(jsonObjectString: str):
     outgoing_json_str = json.dumps(
         {
             "pUUID": amber_job.jobID,
-            "partition": "glycomimetics",  # TODO: None? Probably invalid in most cases. The IC will handle this after the submission arrives on the correct remote host for execution.
+            "partition": "",  # TODO: None? Probably invalid in most cases. The IC will handle this after the submission arrives on the correct remote host for execution.
             "user": "webdev",  # TODO: We could remove this and obtain it on demand. This is coupled to our DevEnv/Swarm.
             "name": amber_job.submissionName,
             "workingDirectory": amber_job.simulationWorkingDirectory,

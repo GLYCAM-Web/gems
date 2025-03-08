@@ -65,11 +65,28 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     }
     replace_bash_variable_in_file(f"{inputs.projectDir}/ad2config", replacements)
 
-    # Create ad2cliconfig (different from AD2config)
-    create_ad2cliconfig.execute(inputs.projectDir)
+    # Create ad2cliconfig (different from AD2config) Note: Not needed for AD to run
+    # create_ad2cliconfig.execute(inputs.projectDir)
     
     # Move ad2dockerconfig.example to ad2dockerconfig and update it approriately
-    # TODO 
+    shutil.move(f"{inputs.projectDir}/ad2dockerconfig.example", f"{inputs.projectDir}/ad2dockerconfig")
+    replacements = {
+        "CONTAINER_NAME_PREFIX": f"AntibodyDocking-{inputs.pUUID}"
+    }
+    replace_bash_variable_in_file(f"{inputs.projectDir}/ad2dockerconfig", replacements)
+    
+    # gwconfig from /programs/gems/External/GW_Stack_for_AAD2/gwconfig.example
+    gwconfig_example = f"{GEMSHOME}/External/GW_Stack_for_AAD2/gwconfig.example"
+    gwconfig = f"{inputs.projectDir}/gwconfig"
+    shutil.copy(gwconfig_example, gwconfig)
+    replacements = {
+        "pUUID": inputs.pUUID
+    }
+    replace_bash_variable_in_file(gwconfig, replacements)
+    
+    # slurm_submit_docking /programs/gems/External/GW_Stack_for_AAD2/submit_docking_to_slurm_with_docker.bash
+    slurm_submit_docking = f"{GEMSHOME}/External/GW_Stack_for_AAD2/submit_docking_to_slurm_with_docker.bash"
+    shutil.copy(slurm_submit_docking, inputs.projectDir)
     
     # # TODO: we can use PM_Resource.copy_to to copy the files to the output directory.
     # service_outputs.resources = ProjectManagement_Resources(resources=resources)

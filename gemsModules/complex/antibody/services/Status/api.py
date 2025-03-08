@@ -6,10 +6,7 @@ from typing import List, Optional, Union
 from gemsModules.common.main_api_resources import Resource, Resources
 from gemsModules.common.main_api_notices import Notices
 
-# from gemsModules.complex.glycomimetics.main_api import (
-#     Glycomimetics_Service_Request,
-#     Glycomimetics_Service_Response,
-# )
+
 from gemsModules.common.main_api_services import (
     Service_Request,
     Service_Response,

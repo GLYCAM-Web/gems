@@ -33,7 +33,7 @@ def execute(pUUID: str, projectDir: str, control_script: str = "scripts/00.RUN_A
     the_input = make_input(
         pUUID=pUUID, projectDir=projectDir, control_script=control_script, control_args=control_args
     )
-    log.debug("The amber submission from glycomimetics is:\n%s", the_input)
+    log.debug("The remote submission for glycomimetics is:\n%s", the_input)
 
     # TODO: Delegate this instead of directly calling manageIncomingString.
     manageIncomingString(the_input)

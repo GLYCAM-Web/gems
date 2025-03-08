@@ -11,38 +11,40 @@ from gemsModules.logging.logger import Set_Up_Logging
 
 log = Set_Up_Logging(__name__)
 
-# In the case of complex/glycomimetics, this merely wraps the main control script.
+# TODO: AD does SLURM itself, this may only be tangentially useful in that we have to write an sbatch script at some point.
 def make_slurm_submission_script(SlurmJobDict):
-    log.debug("SlurmJobDict: " + str(SlurmJobDict))
-    script = (
-        "#!/bin/bash\n"
-        f"#SBATCH --chdir={SlurmJobDict['workingDirectory']}\n"
-        f"#SBATCH --error=slurm_%x-%A.err\n"
-        f"#SBATCH --output=slurm_%x-%A.out\n"
-        f"#SBATCH --get-user-env\n"
-        f"#SBATCH --job-name={SlurmJobDict['name']}\n"
-        f"#SBATCH --nodes={SlurmJobDict['nodes']}\n"
-        f"#SBATCH --partition={SlurmJobDict['partition']}\n"
-        f"#SBATCH --time={SlurmJobDict['time']}\n"
-    )
+    # log.debug("SlurmJobDict: " + str(SlurmJobDict))
+    # script = (
+    #     "#!/bin/bash\n"
+    #     f"#SBATCH --chdir={SlurmJobDict['workingDirectory']}\n"
+    #     f"#SBATCH --error=slurm_%x-%A.err\n"
+    #     f"#SBATCH --output=slurm_%x-%A.out\n"
+    #     f"#SBATCH --get-user-env\n"
+    #     f"#SBATCH --job-name={SlurmJobDict['name']}\n"
+    #     f"#SBATCH --nodes={SlurmJobDict['nodes']}\n"
+    #     f"#SBATCH --partition={SlurmJobDict['partition']}\n"
+    #     f"#SBATCH --time={SlurmJobDict['time']}\n"
+    #     )
 
-    # Not setting these may be desirable, so they are optional entries in the instance_config.
-    if "tasks-per-node" in SlurmJobDict:
-        script += f"#SBATCH --tasks-per-node={SlurmJobDict['tasks-per-node']}\n"
-    if "cpus-per-task" in SlurmJobDict:
-        script += f"#SBATCH --cpus-per-task={SlurmJobDict['cpus-per-task']}\n"
+    # # Not setting these may be desirable, so they are optional entries in the instance_config.
+    # if "tasks-per-node" in SlurmJobDict:
+    #     script += f"#SBATCH --tasks-per-node={SlurmJobDict['tasks-per-node']}\n"
+    # if "cpus-per-task" in SlurmJobDict:
+    #     script += f"#SBATCH --cpus-per-task={SlurmJobDict['cpus-per-task']}\n"
 
-    if SlurmJobDict["use_gpu"]:
-        script += f"#SBATCH --gres={SlurmJobDict['gres']}\n"
+    # if SlurmJobDict["use_gpu"]:
+    #     script += f"#SBATCH --gres={SlurmJobDict['gres']}\n"
 
-    script += "\n"
+    #script += "\n"
+    
+    script = ""
 
-    if is_GEMS_test_workflow():
-        # TODO: New env flag; should we be using MDUtils for Glycomimetics?
-        script += "export MDUtilsTestRunWorkflow=Yes\n\n"
+    # if is_GEMS_test_workflow():
+    #     # TODO: New env flag; should we be using MDUtils for Glycomimetics?
+    #     script += "export MDUtilsTestRunWorkflow=Yes\n\n"
 
-    # This argument is set to the script we want slurm to execute.
-    script += SlurmJobDict["sbatchArgument"].strip() + f" {SlurmJobDict['mainScriptArguments']}\n"
+    # In Antbody docking, we pass control_lines instead to write to the script
+    script += SlurmJobDict["sbatchArgument"].strip()
     log.debug("Our slurm submission script is:\n" + script + "\n")
 
     return script
