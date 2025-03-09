@@ -1,7 +1,12 @@
 #!/bin/bash
-export PATH="$AAD2_BIN:$PATH"
+cd ${WD}
+source ad2dockerconfig
+export CONTAINER_NAME_PREFIX
+export AAD2_DOCKER_HOME="/programs/website_aad2/test/AAD2_Docker"
+export PATH="/programs/website_aad2/test/bin:$PATH"
 
-bash /programs/website_aad2/test/GW_Stack_for_AAD2/set_thoreau_node_docker_modules.bash
+source /programs/website_aad2/test/GW_Stack_for_AAD2/node_setup.bash
 
-cd $1
-submit_and_spawn_monitor
+cd ${AAD2_DOCKER_HOME}
+COMMAND="bash bin/run_aad2_command.bash ${WD} submit_and_spawn_monitor"
+eval ${COMMAND}
