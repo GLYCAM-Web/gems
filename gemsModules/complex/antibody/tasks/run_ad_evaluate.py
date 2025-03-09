@@ -8,10 +8,14 @@ from .amber_submit import execute as execute_amber_submit
 
 log = Set_Up_Logging(__name__)
 
+WRAPPER = Path(__file__).parent / "run_ad_evaluate.sh"
+
 
 def execute(pUUID, project_dir: Path, AAD2_BIN: Path = "/programs/website_aad2/test/bin", use_serial: bool = True):
-    ad_evaluate_cmd = [f'cd {project_dir}', f'export PATH=\"{AAD2_BIN}:$PATH\"', "AD_Evaluate"]
-    log.debug("Mocking AD_Evaluate call: %s", ad_evaluate_cmd)
+    """Execute the AD_Evaluate task."""
+    
+    results = subprocess.run(WRAPPER, cwd=project_dir, env={"AAD2_BIN": str(AAD2_BIN), "WD": project_dir, "USE_SERIAL": str(use_serial)}, capture_output=True)
+    log.debug(f"results: {results}")
     
     # TODO: Instead of gRPC here, we are forwarding any AntibodyDocking calls directly to thoreau before servicing.
     # if use_serial:

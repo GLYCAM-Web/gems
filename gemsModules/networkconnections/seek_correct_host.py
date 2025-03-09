@@ -65,7 +65,7 @@ def execute(jsonObjectString, context, submission_fn_type: Literal["slurm", "jso
 
     if isinstance(response, dict):
         response = json.dumps(response)
-    if hasattr(response, "SerializeToString"):
+    elif hasattr(response, "output"):
         # JSONResponse and GemsGrpcSlurmResponse both have output attributes.
         response = response.output
         

@@ -37,6 +37,8 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     log.debug("GM/ProjectManagement: about to copy resources to project dir")
     log.debug(f"GM/ProjectManagement: resources: {inputs.resources}")
     # Copy all PM_Resources to the output directory.
+    
+    antibody_name, ligand_name = None, None
     for resource in inputs.resources:
         # TODO: Typify and copy all PM_Resources to the output directory appropriately.
         # if isinstance(resource, PM_Resource):
@@ -44,24 +46,26 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
         
         # If it's the input pdb, symlink it at projectDir/Complex.pdb 
         if resource.resourceRole == "Antibody":
-            source = os.path.relpath(file_resource.payload, inputs.projectDir)
-            target = os.path.join(inputs.projectDir, "protein.pdb") # AD default pdb name for Antibody
-            os.symlink(source, target)
+            antibody_name = os.path.relpath(file_resource.payload, inputs.projectDir)
+            # target = os.path.join(inputs.projectDir, "protein.pdb") # AD default pdb name for Antibody
+            # os.symlink(source, target)
         elif resource.resourceRole == "Ligand":
-            source = os.path.relpath(file_resource.payload, inputs.projectDir)
-            target = os.path.join(inputs.projectDir, "ligand.pdb")
-            os.symlink(source, target)
+            ligand_name = os.path.relpath(file_resource.payload, inputs.projectDir)
+            # target = os.path.join(inputs.projectDir, "ligand.pdb")
+            # os.symlink(source, target)
         service_outputs.resources.add_resource(file_resource)
         
-    # TODO: Run External/AAD2/0.configure/setup_AD_directory, then update ad2config
+    # Run External/AAD2/0.configure/setup_AD_directory, then update ad2config
     #GEMSHOME = os.environ.get("GEMSHOME")/External/AAD2
     subprocess.run([f"/programs/website_aad2/test/AAD2_Docker/image/AAD2/0.configure/setup_AD_Directory"], cwd=inputs.projectDir)
 
     # move ad2config.example to ad2config and modify it
     shutil.move(f"{inputs.projectDir}/ad2config.example", f"{inputs.projectDir}/ad2config")
     replacements = {
-        "Antibody_File_Name": "protein.pdb",
-        "Glycan_File_Name": "ligand.pdb",
+        "Antibody_File_Name": antibody_name,
+        "Glycan_File_Name": ligand_name,
+        "CONTAINER_NAME_PREFIX": f"{inputs.pUUID[:6]}-antibody-docking"
+
     }
     replace_bash_variable_in_file(f"{inputs.projectDir}/ad2config", replacements)
 
@@ -70,8 +74,20 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     
     # Move ad2dockerconfig.example to ad2dockerconfig and update it approriately
     shutil.move(f"{inputs.projectDir}/ad2dockerconfig.example", f"{inputs.projectDir}/ad2dockerconfig")
+    
+    # TODO: Read Image settings from some AAD2_Docker/settings.sh
+    with open("/programs/website_aad2/test/AAD2_Docker/settings.sh", "r") as f:
+        ad2dockerconfig = f.readlines()
+        # export AAD2_IMAGE_NAME="antibody-docking"
+        # export AAD2_TAG_NAME="2025-03-05-09-36-blf
+        for line in ad2dockerconfig:
+            if "AAD2_IMAGE_NAME" in line:
+                image_name = line.split("=")[1].strip().strip('"')
+            if "AAD2_TAG_NAME" in line:
+                tag_name = line.split("=")[1].strip().strip('"')
+
     replacements = {
-        "CONTAINER_NAME_PREFIX": f"AntibodyDocking-{inputs.pUUID}"
+        "Image": f"{image_name}:{tag_name}",
     }
     replace_bash_variable_in_file(f"{inputs.projectDir}/ad2dockerconfig", replacements)
     

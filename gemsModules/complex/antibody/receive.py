@@ -22,7 +22,11 @@ def receive(incomingString: str) -> str:
     # Note: Hardcoded thoreau check; This is because AD2 can only work there for now.
     if not is_correct_GEMS_instance_for_AAD2(requested_ctx=WhoIAm, requested_instance="thoreau"):
         log.info("This is not the correct host to submit to.")
-        return seek_correct_host(incomingString, WhoIAm, submission_fn_type="json")
+        response = seek_correct_host(incomingString, WhoIAm, submission_fn_type="json")
+        # replace the paths in the response from thoreau with the correct paths for the website. TODO: Fix these hacks. help me
+        # These replacements correspond to instance config's filesystem paths as per thoreau and swarm paths.
+        response = response.replace("/scratch2/thoreau-web/complex/ad/", "/website/userdata/complex/ad/")
+        return response
     else:
         log.info("This is the correct host to submit to.")
     
