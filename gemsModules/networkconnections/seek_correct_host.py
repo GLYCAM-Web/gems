@@ -17,17 +17,23 @@ log = Set_Up_Logging(__name__)
 
 def execute(jsonObjectString, context, submission_fn_type: Literal["slurm", "json"]="slurm"):
     """Using gRPC, try to reroute the request to the correct host given a context, usually the current one."""
+    
+    submission_fn = None
+    addresses = []
+    
     if submission_fn_type == "slurm":
         submission_fn = slurm_grpc_submit
+        addresses = InstanceConfig().get_possible_hosts_for_context(
+            context, with_slurmport=True
+        )
     elif submission_fn_type == "json":
         submission_fn = json_grpc_submit
+        addresses = InstanceConfig().get_possible_hosts_for_context(
+            context, with_jsonport=True
+        )
     else:
         log.error("Invalid submission_fn_type: %s", submission_fn_type)
         raise ValueError(f"Invalid submission_fn_type: {submission_fn_type}")
-
-    addresses = InstanceConfig().get_possible_hosts_for_context(
-        context, with_slurmport=True
-    )
 
     failed = False
     tried = []

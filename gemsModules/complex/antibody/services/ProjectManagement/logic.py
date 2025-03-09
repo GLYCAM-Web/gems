@@ -54,8 +54,8 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
         service_outputs.resources.add_resource(file_resource)
         
     # TODO: Run External/AAD2/0.configure/setup_AD_directory, then update ad2config
-    GEMSHOME = os.environ.get("GEMSHOME")
-    subprocess.run([f"{GEMSHOME}/External/AAD2/0.configure/setup_AD_Directory"], cwd=inputs.projectDir)
+    #GEMSHOME = os.environ.get("GEMSHOME")/External/AAD2
+    subprocess.run([f"/programs/website_aad2/test/AAD2_Docker/image/AAD2/0.configure/setup_AD_Directory"], cwd=inputs.projectDir)
 
     # move ad2config.example to ad2config and modify it
     shutil.move(f"{inputs.projectDir}/ad2config.example", f"{inputs.projectDir}/ad2config")
@@ -76,7 +76,7 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     replace_bash_variable_in_file(f"{inputs.projectDir}/ad2dockerconfig", replacements)
     
     # gwconfig from /programs/gems/External/GW_Stack_for_AAD2/gwconfig.example
-    gwconfig_example = f"{GEMSHOME}/External/GW_Stack_for_AAD2/gwconfig.example"
+    gwconfig_example = f"/programs/website_aad2/test/GW_Stack_for_AAD2/gwconfig.example"
     gwconfig = f"{inputs.projectDir}/gwconfig"
     shutil.copy(gwconfig_example, gwconfig)
     replacements = {
@@ -85,7 +85,7 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     replace_bash_variable_in_file(gwconfig, replacements)
     
     # slurm_submit_docking /programs/gems/External/GW_Stack_for_AAD2/submit_docking_to_slurm_with_docker.bash
-    slurm_submit_docking = f"{GEMSHOME}/External/GW_Stack_for_AAD2/submit_docking_to_slurm_with_docker.bash"
+    slurm_submit_docking = f"/programs/website_aad2/test/GW_Stack_for_AAD2/submit_docking_to_slurm_with_docker.bash"
     shutil.copy(slurm_submit_docking, inputs.projectDir)
     
     # # TODO: we can use PM_Resource.copy_to to copy the files to the output directory.

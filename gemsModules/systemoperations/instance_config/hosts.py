@@ -45,11 +45,12 @@ class HostManager(ContextManager):
         )
 
     def get_possible_hosts_for_context(
-        self, context: str, with_slurmport=False, return_names=False
+        self, context: str, with_slurmport=False, with_jsonport=False, return_names=False
     ) -> list:
         """
         Returns a list of possible hosts for a given context.
         """
+        assert with_jsonport == False or with_slurmport == False, "Cannot have both with_jsonport and with_slurmport set to True."
         possible_hosts = []
         for name, host in self.config["hosts"].items():
             for host_context in host["contexts"]:
@@ -57,8 +58,10 @@ class HostManager(ContextManager):
                     if return_names:
                         possible_hosts.append(name)
                     else:
-                        if with_slurmport:
+                        if with_slurmport and "slurmport" in host:
                             possible_hosts.append(f"{host['host']}:{host['slurmport']}")
+                        elif with_jsonport and "jsonport" in host:
+                            possible_hosts.append(f"{host['host']}:{host['jsonport']}")
                         else:
                             possible_hosts.append(host["host"])
         return possible_hosts
