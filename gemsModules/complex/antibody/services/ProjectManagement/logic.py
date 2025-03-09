@@ -76,7 +76,7 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     shutil.move(f"{inputs.projectDir}/ad2dockerconfig.example", f"{inputs.projectDir}/ad2dockerconfig")
     
     # TODO: Read Image settings from some AAD2_Docker/settings.sh
-    with open("/programs/website_aad2/test/AAD2_Docker/settings.sh", "r") as f:
+    with open("/programs/website_aad2/test/AAD2_Docker/settings.bash", "r") as f:
         ad2dockerconfig = f.readlines()
         # export AAD2_IMAGE_NAME="antibody-docking"
         # export AAD2_TAG_NAME="2025-03-05-09-36-blf
