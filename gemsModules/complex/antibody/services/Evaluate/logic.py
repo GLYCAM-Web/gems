@@ -1,14 +1,7 @@
 #!/usr/bin/env python3
-import os
-from pathlib import Path
-import sys
-from typing import Protocol, Dict, Optional
-from pydantic import BaseModel, validate_arguments
+from pydantic import validate_arguments
 
 from gemsModules.common.main_api_notices import Notices
-from gemsModules.systemoperations.instance_config import InstanceConfig
-from gemsModules.systemoperations.environment_ops import is_GEMS_live_swarm
-
 from gemsModules.logging.logger import Set_Up_Logging
 
 from .api import Evaluate_Inputs, Evaluate_Outputs
@@ -49,12 +42,16 @@ def execute(inputs: Evaluate_Inputs) -> tuple[Evaluate_Outputs, Notices]:
     
     # if is_correct_GEMS_instance_for_AAD2():
         # TODO: Call AD_Evaluate over gRPC here.
-    run_ad_evaluate.execute(inputs.pUUID, workdir, AAD2_BIN=Path("/programs/website_aad2/test/bin"), use_serial=True)
-        # pass
-    # else:
-        # Mock?
-        # seek_correct_host running json_server.py
-        # pass
+    results = run_ad_evaluate.execute(inputs.pUUID, workdir)
+    if results.returncode:
+        service_notices.addNotice(
+            Brief="Evaluation Failed",
+            Scope="Service",
+            Messenger="AntibodyDocking",
+            Type="Error",
+            Code="500",
+            Message=f"Evaluation Failed: {results.stderr}",
+        )
 
     if not len(service_notices):
         service_notices.addNotice(

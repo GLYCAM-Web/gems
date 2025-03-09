@@ -16,3 +16,4 @@ def execute(pUUID, project_dir: Path, AAD2_BIN: Path = None, use_serial: bool = 
     
     results = subprocess.run(WRAPPER, cwd=project_dir, env={"AAD2_BIN": str("/programs/website_aad2/test/bin"), "WD": project_dir, "USE_SERIAL": str(use_serial)}, capture_output=True)
     log.debug(f"results: {results}")
+    return results

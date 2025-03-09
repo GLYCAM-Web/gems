@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
-import os
-from pathlib import Path
-import sys
-from typing import Protocol, Dict, Optional
-from pydantic import BaseModel, validate_arguments
+from pydantic import validate_arguments
 
 from gemsModules.common.main_api_notices import Notices
-from gemsModules.systemoperations.instance_config import InstanceConfig
 from gemsModules.logging.logger import Set_Up_Logging
+
+from ...main_api_project import AntibodyProject
+from ...tasks import run_ad_build
 
 from .api import Build_Inputs, Build_Outputs
 
@@ -21,8 +19,21 @@ def execute(inputs: Build_Inputs) -> tuple[Build_Outputs, Notices]:
     service_outputs = Build_Outputs()
     service_notices = Notices()
 
-    # TODO: Call AD_Build on thoreau here.
-
+    workdir = AntibodyProject.get_project_dir_from_pUUID(inputs.pUUID)
+    log.debug(f"workdir: {workdir}")
+    
+    results = run_ad_build.execute(inputs.pUUID, workdir)
+    if results.returncode:
+        service_notices.addNotice(
+            Brief="Build Failed",
+            Scope="Service",
+            Messenger="AntibodyDocking",
+            Type="Error",
+            Code="500",
+            Message=f"Build Failed: {results.stderr}",
+        )
+        return service_outputs, service_notices
+    
     if not len(service_notices):
         service_notices.addNotice(
             Brief="Build Successful",

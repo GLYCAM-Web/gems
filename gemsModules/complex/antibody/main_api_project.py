@@ -32,8 +32,8 @@ class AntibodyProject(Project):
     project_dir: constr(max_length=255) = ""
 
     # TODO: Better names, also, snake_case
-    protein: constr(max_length=255) = "protein.pdb"
-    ligand: constr(max_length=255) = "ligand.pdb"
+    protein: constr(max_length=255) = ""
+    ligand: constr(max_length=255) = ""
 
     @staticmethod
     def get_project_dir_from_pUUID(pUUID: str):
