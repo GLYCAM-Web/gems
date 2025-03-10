@@ -101,7 +101,8 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     gwconfig = f"{inputs.projectDir}/gwconfig"
     shutil.copy(gwconfig_example, gwconfig)
     replacements = {
-        "pUUID": inputs.pUUID
+        "pUUID": inputs.pUUID,
+        "DOCKING_REPLICA_CPUS": "56",
     }
     replace_bash_variable_in_file(gwconfig, replacements)
     
