@@ -118,15 +118,17 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     
     # slurm_submit_docking /programs/gems/External/GW_Stack_for_AAD2/submit_docking_to_slurm_with_docker.bash
     slurm_submit_docking = f"/programs/website_aad2/test/GW_Stack_for_AAD2/submit_docking_to_slurm_with_docker.bash"
-    shutil.copy(slurm_submit_docking, inputs.projectDir)
+    actual_submit_docking = shutil.copy(slurm_submit_docking, inputs.projectDir)
     # change #SBATCH --cpus-per-task=${DOCKING_REPLICA_CPUS}
     # to #SBATCH --cpus-per-task=56
-    with open(slurm_submit_docking, "r") as f:
+    with open(actual_submit_docking, "r") as f:
         lines = f.readlines()
-    with open(slurm_submit_docking, "w") as f:
+    with open(actual_submit_docking, "w") as f:
         for line in lines:
             if "#SBATCH --cpus-per-task=${DOCKING_REPLICA_CPUS}" in line:
                 f.write("#SBATCH --cpus-per-task=56\n")
+            else:
+                f.write(line)
 
     
     # # TODO: we can use PM_Resource.copy_to to copy the files to the output directory.
