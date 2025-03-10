@@ -1,4 +1,6 @@
 #!/bin/bash
+source ~/.bash_profile
+
 cd ${WD}
 source ad2dockerconfig
 export CONTAINER_NAME_PREFIX
