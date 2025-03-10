@@ -57,6 +57,7 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
         
     # Run External/AAD2/0.configure/setup_AD_directory, then update ad2config
     #GEMSHOME = os.environ.get("GEMSHOME")/External/AAD2
+    # TODO: use GW_DOMAIN to change test/actual/dev
     subprocess.run([f"/programs/website_aad2/test/AAD2_Docker/image/AAD2/0.configure/setup_AD_Directory"], cwd=inputs.projectDir)
 
     # move ad2config.example to ad2config and modify it
