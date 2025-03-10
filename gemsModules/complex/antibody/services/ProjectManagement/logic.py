@@ -65,7 +65,8 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     replacements = {
         "Antibody_File_Name": antibody_name,
         "Glycan_File_Name": ligand_name,
-        "CONTAINER_NAME_PREFIX": f"{inputs.pUUID[:6]}-antibody-docking",
+        #"CONTAINER_NAME_PREFIX": f"{inputs.pUUID[:6]}-antibody-docking",
+        "CONTAINER_NAME_PREFIX": "",
         "Computing_Mode": "Batch",
         "Use_Docker": "True",
         "AD2_Docking_Batch_Script": "submit_docking_to_slurm_with_docker.bash",
