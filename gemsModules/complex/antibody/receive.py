@@ -32,16 +32,22 @@ def receive(incomingString: str) -> str:
             uploads_dir = "/website/USERDATA/LiveDev/uploads"
         else:
             uploads_dir = "/website/USERDATA/LiveTest/uploads"
-            
+        
+        log.debug(f"Original Incoming string: {incomingString}")
         incomingString.replace("/website/uploads", uploads_dir)
+        log.debug(f"The replaced uploads_dir: {uploads_dir}")
+        log.debug(f"Modified Incoming string: {incomingString}")
 
         
         response = seek_correct_host(incomingString, WhoIAm, submission_fn_type="json")
-        
         # replace the paths in the response from thoreau with the correct paths for the website. TODO: Fix these hacks. help me
         # These replacements correspond to instance config's filesystem paths as per thoreau and swarm paths.
+        
+        log.debug(f"Original Response: {response}")
         response = response.replace("/scratch2/thoreau-web/complex/ad/", "/website/userdata/complex/ad/")
         response = response.replace(uploads_dir, "/website/uploads")
+        log.debug(f"Modified Response: {response}")
+        
         return response
     else:
         log.info("This is the correct host to submit to.")
