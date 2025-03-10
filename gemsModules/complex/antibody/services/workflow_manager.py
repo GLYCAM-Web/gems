@@ -22,7 +22,7 @@ EVALUATE_DEPENDENCIES = Annotated_List(
     PROJECTMANAGEMENT_DEPENDENCIES + ["ProjectManagement"], ordered=True
 )
 BUILD_DEPENDENCIES = Annotated_List(
-    EVALUATE_DEPENDENCIES + ["Evaluate"], ordered=True
+    [] # EVALUATE_DEPENDENCIES + ["Evaluate"], ordered=True
 )
 ANALYZE_DEPENDENCIES = Annotated_List(
     [] # BUILD_DEPENDENCIES + ["Build"], ordered=True
