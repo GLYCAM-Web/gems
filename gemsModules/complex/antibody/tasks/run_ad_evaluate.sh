@@ -3,7 +3,7 @@ cd ${WD}
 source ad2dockerconfig
 export CONTAINER_NAME_PREFIX
 export GW_STACK_PATH_PREFIX
-
+export WD 
 export AAD2_DOCKER_HOME="$GW_STACK_PATH_PREFIX/AAD2_Docker"
 export PATH="$GW_STACK_PATH_PREFIX/bin:$PATH"
 
