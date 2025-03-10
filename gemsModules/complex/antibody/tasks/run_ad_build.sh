@@ -14,6 +14,6 @@ module load iptables/1.8.7
 module load docker/24.0.7 
 bash ensure_image_is_present.bash 
 
-cd ${AAD2_DOCKER_HOME}
-COMMAND="bash bin/run_aad2_command.bash ${WD} submit_and_spawn_monitor"
+cd ${WD}
+COMMAND="bash submit_and_spawn_monitor"
 eval ${COMMAND}
