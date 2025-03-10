@@ -11,9 +11,9 @@ log = Set_Up_Logging(__name__)
 WRAPPER = Path(__file__).parent / "run_ad_build.sh"
 
 
-def execute(pUUID, project_dir: Path, AAD2_BIN: Path = None, use_serial: bool = True):
+def execute(pUUID, project_dir: Path, use_serial: bool = True):
     """Execute the AD_Evaluate task."""
     
-    results = subprocess.run(WRAPPER, cwd=project_dir, env={"AAD2_BIN": str("/programs/website_aad2/test/bin"), "WD": project_dir, "USE_SERIAL": str(use_serial)}, capture_output=True)
+    results = subprocess.run(WRAPPER, cwd=project_dir, env={"GW_STACK_PATH_PREFIX": "/programs/website_aad2/test", "WD": project_dir, "USE_SERIAL": str(use_serial)}, capture_output=True)
     log.debug(f"results: {results}")
     return results

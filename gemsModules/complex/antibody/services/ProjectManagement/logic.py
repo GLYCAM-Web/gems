@@ -65,8 +65,12 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     replacements = {
         "Antibody_File_Name": antibody_name,
         "Glycan_File_Name": ligand_name,
-        "CONTAINER_NAME_PREFIX": f"{inputs.pUUID[:6]}-antibody-docking"
-
+        "CONTAINER_NAME_PREFIX": f"{inputs.pUUID[:6]}-antibody-docking",
+        "Computing_Mode": "Batch",
+        "Use_Docker": "True",
+        "AD2_Docking_Batch_Script": "submit_docking_to_slurm_with_docker.bash",
+        "AD2_Docking_Local_Script": "gwconfig"
+        # "GLYCAM_FLEXIBILITY": "Partial",
     }
     replace_bash_variable_in_file(f"{inputs.projectDir}/ad2config", replacements)
 
@@ -75,8 +79,7 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     
     # Move ad2dockerconfig.example to ad2dockerconfig and update it approriately
     shutil.move(f"{inputs.projectDir}/ad2dockerconfig.example", f"{inputs.projectDir}/ad2dockerconfig")
-    
-    # TODO: Read Image settings from some AAD2_Docker/settings.sh
+
     with open("/programs/website_aad2/test/AAD2_Docker/settings.bash", "r") as f:
         ad2dockerconfig = f.readlines()
         # export AAD2_IMAGE_NAME="antibody-docking"
@@ -89,6 +92,7 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
 
     replacements = {
         "Image": f"{image_name}:{tag_name}",
+        "AAD2_DOCKER_HOME": "/programs/website_aad2/test/AAD2_Docker",
     }
     replace_bash_variable_in_file(f"{inputs.projectDir}/ad2dockerconfig", replacements)
     
