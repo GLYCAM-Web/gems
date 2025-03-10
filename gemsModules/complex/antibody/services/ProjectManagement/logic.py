@@ -73,7 +73,17 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
         # "GLYCAM_FLEXIBILITY": "Partial",
     }
     replace_bash_variable_in_file(f"{inputs.projectDir}/ad2config", replacements)
-
+    
+    # remove AD2_Random_Seeds=.*EOF from ad2config
+    with open(f"{inputs.projectDir}/ad2config", "r") as f:
+        lines = f.readlines()
+    with open(f"{inputs.projectDir}/ad2config", "w") as f:
+        for line in lines:
+            if "AD2_Random_Seeds" not in line:
+                f.write(line)
+            else:
+                break
+            
     # Create ad2cliconfig (different from AD2config) Note: Not needed for AD to run
     # create_ad2cliconfig.execute(inputs.projectDir)
     
