@@ -34,7 +34,7 @@ def receive(incomingString: str) -> str:
             uploads_dir = "/website/USERDATA/LiveTest/uploads"
         
         log.debug(f"Original Incoming string: {incomingString}")
-        incomingString.replace("/website/uploads", uploads_dir)
+        incomingString = incomingString.replace("/website/uploads", uploads_dir)
         log.debug(f"The replaced uploads_dir: {uploads_dir}")
         log.debug(f"Modified Incoming string: {incomingString}")
 
