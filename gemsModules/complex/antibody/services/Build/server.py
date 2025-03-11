@@ -13,7 +13,7 @@ log = Set_Up_Logging(__name__)
 def Serve(service: Build_Request) -> Build_Response:
     log.info("Serve called")
     log.info(f"service: {service}")
-    log.debug(f"Eval service.inputs: {service.inputs}")
+    log.debug(f"Build service.inputs: {service.inputs}")
     service_response = Build_Response()
 
     service_response.outputs, service_notices = execute(service.inputs)

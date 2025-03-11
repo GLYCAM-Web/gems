@@ -108,7 +108,8 @@ class Antibody_Request_Data_Filler(Request_Data_Filler):
         # Add the resources to copy to the project output directory by the Project Management service.
 
     def __fill_build_aaop(self, i: int, aaop: AAOP) -> List[AAOP]:
-        aaop.The_AAO.inputs.pUUID = self.response_project.pUUID
+        # Do not fill this, we read it later.
+        # aaop.The_AAO.inputs.pUUID = self.response_project.pUUID
   
         if not self.fill_resources_from_requester_if_exists(aaop):
             self.__fill_input_pdb_resources(aaop)
