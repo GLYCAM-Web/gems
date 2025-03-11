@@ -19,9 +19,6 @@ def execute(inputs: Build_Inputs) -> tuple[Build_Outputs, Notices]:
     service_outputs = Build_Outputs()
     service_notices = Notices()
 
-    workdir = AntibodyProject.get_project_dir_from_pUUID(inputs.pUUID)
-    log.debug(f"workdir: {workdir}")
-    
     if inputs.pUUID is None:
         service_notices.addNotice(
             Brief="pUUID not provided",
@@ -33,8 +30,10 @@ def execute(inputs: Build_Inputs) -> tuple[Build_Outputs, Notices]:
         )
         return service_outputs, service_notices
     
-    results = run_ad_build.execute(inputs.pUUID, workdir)
+    workdir = AntibodyProject.get_project_dir_from_pUUID(inputs.pUUID)
+    log.debug(f"workdir: {workdir}")
     
+    results = run_ad_build.execute(inputs.pUUID, workdir)
     if results.returncode:
         service_notices.addNotice(
             Brief="Build Failed",
