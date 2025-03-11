@@ -22,7 +22,19 @@ def execute(inputs: Build_Inputs) -> tuple[Build_Outputs, Notices]:
     workdir = AntibodyProject.get_project_dir_from_pUUID(inputs.pUUID)
     log.debug(f"workdir: {workdir}")
     
+    if inputs.pUUID is None:
+        service_notices.addNotice(
+            Brief="pUUID not provided",
+            Scope="Service",
+            Messenger="AntibodyDocking",
+            Type="Error",
+            Code="400",
+            Message="Project could not be found without an input pUUID to the Build service",
+        )
+        return service_outputs, service_notices
+    
     results = run_ad_build.execute(inputs.pUUID, workdir)
+    
     if results.returncode:
         service_notices.addNotice(
             Brief="Build Failed",
@@ -41,7 +53,7 @@ def execute(inputs: Build_Inputs) -> tuple[Build_Outputs, Notices]:
             Messenger="AntibodyDocking",
             Type="Info",
             Code="600",
-            Message="Evaluation Successful",
+            Message="Build Successful",
         )
 
     log.debug(f"service_outputs: {service_outputs}")
