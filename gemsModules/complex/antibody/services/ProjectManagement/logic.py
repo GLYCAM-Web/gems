@@ -6,6 +6,7 @@ from typing import Protocol, Dict, Optional
 from pydantic import BaseModel
 
 from gemsModules.systemoperations.filesystem_ops import replace_bash_variable_in_file
+from gemsModules.systemoperations.environment_ops import get_site_version
 
 # from gemsModules.complex.antibody.tasks import batchcompute
 from .api import ProjectManagement_Inputs, ProjectManagement_Outputs, PM_Resource
@@ -55,10 +56,12 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
             # os.symlink(source, target)
         service_outputs.resources.add_resource(file_resource)
         
-    # Run External/AAD2/0.configure/setup_AD_directory, then update ad2config
-    #GEMSHOME = os.environ.get("GEMSHOME")/External/AAD2
+    # Run AAD2/0.configure/setup_AD_directory, then update ad2config
+    # Note: AAD2 is not in the DevEnv yet, otherwise - perhaps:
+    # GEMSHOME = os.environ.get("GEMSHOME")/External/AAD2
     # TODO: use GW_DOMAIN to change test/actual/dev
-    subprocess.run([f"/programs/website_aad2/test/AAD2_Docker/image/AAD2/0.configure/setup_AD_Directory"], cwd=inputs.projectDir)
+    site_version = get_site_version()
+    subprocess.run([f"/programs/website_aad2/{site_version}/AAD2_Docker/image/AAD2/0.configure/setup_AD_Directory"], cwd=inputs.projectDir)
 
     # move ad2config.example to ad2config and modify it
     shutil.move(f"{inputs.projectDir}/ad2config.example", f"{inputs.projectDir}/ad2config")
@@ -91,7 +94,7 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     # Move ad2dockerconfig.example to ad2dockerconfig and update it approriately
     shutil.move(f"{inputs.projectDir}/ad2dockerconfig.example", f"{inputs.projectDir}/ad2dockerconfig")
 
-    with open("/programs/website_aad2/test/AAD2_Docker/settings.bash", "r") as f:
+    with open(f"/programs/website_aad2/{site_version}/AAD2_Docker/settings.bash", "r") as f:
         ad2dockerconfig = f.readlines()
         # export AAD2_IMAGE_NAME="antibody-docking"
         # export AAD2_TAG_NAME="2025-03-05-09-36-blf
@@ -103,12 +106,13 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
 
     replacements = {
         "Image": f"{image_name}:{tag_name}",
-        "AAD2_DOCKER_HOME": "/programs/website_aad2/test/AAD2_Docker",
+        "AAD2_DOCKER_HOME": f"/programs/website_aad2/{site_version}/AAD2_Docker",
     }
     replace_bash_variable_in_file(f"{inputs.projectDir}/ad2dockerconfig", replacements)
     
+    # Note: Not in DevEnv for now:
     # gwconfig from /programs/gems/External/GW_Stack_for_AAD2/gwconfig.example
-    gwconfig_example = f"/programs/website_aad2/test/GW_Stack_for_AAD2/gwconfig.example"
+    gwconfig_example = f"/programs/website_aad2/{site_version}/GW_Stack_for_AAD2/gwconfig.example"
     gwconfig = f"{inputs.projectDir}/gwconfig"
     shutil.copy(gwconfig_example, gwconfig)
     replacements = {
@@ -118,7 +122,7 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     replace_bash_variable_in_file(gwconfig, replacements)
     
     # slurm_submit_docking /programs/gems/External/GW_Stack_for_AAD2/submit_docking_to_slurm_with_docker.bash
-    slurm_submit_docking = f"/programs/website_aad2/test/GW_Stack_for_AAD2/submit_docking_to_slurm_with_docker.bash"
+    slurm_submit_docking = f"/programs/website_aad2/{site_version}/GW_Stack_for_AAD2/submit_docking_to_slurm_with_docker.bash"
     actual_submit_docking = shutil.copy(slurm_submit_docking, inputs.projectDir)
     # change #SBATCH --cpus-per-task=${DOCKING_REPLICA_CPUS}
     # to #SBATCH --cpus-per-task=56

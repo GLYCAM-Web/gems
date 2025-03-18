@@ -21,6 +21,20 @@ def gemsModules_is_findable() -> bool:
         return True
     else:
         return False
+    
+def get_site_version() -> str:
+    GW_DOMAIN = os.getenv("GW_DOMAIN") or ""
+    site_version = "test"
+    if "actual" in GW_DOMAIN:
+        site_version = "actual"
+    elif "dev" in GW_DOMAIN:
+        site_version = "dev"
+    elif "test" in GW_DOMAIN:
+        site_version = "test"
+        
+    log.debug(f"Site version is: {site_version}")
+    return site_version
+        
 
 
 def add_gems_to_python_path() -> None:

@@ -1,6 +1,7 @@
 import os
 from gemsModules.systemoperations.filesystem_ops import copy_file_from_A_to_B, replace_bash_variable_in_file
 
+# Note: Using thoreau's path to AAD2, not including AAD2 in DevEnv.
 #GEMSHOME = os.environ.get("GEMSHOME")/External/AAD2
 EXAMPLE_FILE = f"/programs/website_aad2/test/AAD2_Docker/image/AAD2/99.cluster_utilities/ad2cliconfig.example"
 
