@@ -30,6 +30,8 @@ def receive(incomingString: str) -> str:
             uploads_dir = "/website/USERDATA/Actual/uploads"
         elif "dev" in GW_DOMAIN:
             uploads_dir = "/website/USERDATA/LiveDev/uploads"
+        elif "swarmtest" in GW_DOMAIN:
+            uploads_dir = "/website/USERDATA/swarmtest/uploads"
         else:
             uploads_dir = "/website/USERDATA/LiveTest/uploads"
         
