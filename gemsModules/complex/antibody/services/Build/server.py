@@ -16,7 +16,7 @@ def Serve(service: Build_Request) -> Build_Response:
     log.debug(f"Build service.inputs: {service.inputs}")
     service_response = Build_Response()
 
-    service_response.outputs, service_notices = execute(service.inputs)
+    service_response.outputs, service_notices = execute(service.inputs, service.options)
     service_response.notices.extend(service_notices)
     
     return service_response

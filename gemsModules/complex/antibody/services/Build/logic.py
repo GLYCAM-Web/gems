@@ -14,7 +14,7 @@ log = Set_Up_Logging(__name__)
 
 
 @validate_arguments
-def execute(inputs: Build_Inputs) -> tuple[Build_Outputs, Notices]:
+def execute(inputs: Build_Inputs, options: dict) -> tuple[Build_Outputs, Notices]:
     log.debug(f"serviceInputs: {inputs}")
     service_outputs = Build_Outputs()
     service_notices = Notices()
