@@ -12,6 +12,7 @@ External
 UserSpace
 site
 *VERSIONS.sh
+versions-info.txt
 
 ## general things to ignore
 *.obsidian
