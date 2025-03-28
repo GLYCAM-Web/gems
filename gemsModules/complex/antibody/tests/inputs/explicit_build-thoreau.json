@@ -8,8 +8,8 @@
             "pUUID": "${pUUID}"
           },
           "options": {
-            "flexibility": "rigid",
-            "count": 5
+            "flexibility": "Rigid",
+            "count": 2
           }
         }
       }

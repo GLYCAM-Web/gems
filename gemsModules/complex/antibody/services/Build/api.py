@@ -73,6 +73,7 @@ class Build_Outputs(BaseModel):
 class Build_Request(Antibody_Service_Request):
     typename: str = Field("Build", alias="type")
     inputs: Build_Inputs = Build_Inputs()
+    # TODO: build options with typing - i.e options.flexibiilty: Literal['Partial', "Rigid", "Flexible"]
 
 
 class Build_Response(Antibody_Service_Response):

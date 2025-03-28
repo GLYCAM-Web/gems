@@ -33,6 +33,7 @@ def execute(inputs: Build_Inputs, options: dict) -> tuple[Build_Outputs, Notices
     workdir = AntibodyProject.get_project_dir_from_pUUID(inputs.pUUID)
     log.debug(f"workdir: {workdir}")
     
+    # As we pass the options to build, must update them rather than initializing with PM.
     update_build_options.execute(workdir, options)
     
     results = run_ad_build.execute(workdir)
