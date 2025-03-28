@@ -18,7 +18,16 @@ if [ $? -ne 0 ]; then
   echo $OUTPUT > test-20-invalid-output-git-ignore-me.json
   exit 1
 else
-  echo "Output is a valid JSON"
+  # Check that Evaluation worked.
+  echo $OUTPUT | grep "Evaluation Successful" || exit 1
+
+  # Check that Build is running.
+  echo $OUTPUT | grep "Glycomimetics is running" || exit 1
+
+
+  # grab "projectect_dir": "<dir>" with grep
+  PROJECT_DIR=$(echo $OUTPUT | grep -Po '"project_dir":\s*"\K[^"]*')
+  echo "project_dir: $PROJECT_DIR"
 fi
 
 # Inspect as needed

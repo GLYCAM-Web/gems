@@ -31,3 +31,5 @@ queryLog.txt
 # instance config stuffs
 instance_config.json
 *.json.bak
+
+bin/*.exe
