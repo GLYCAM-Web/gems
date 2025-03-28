@@ -34,7 +34,7 @@ def execute(inputs: Build_Inputs, options: dict) -> tuple[Build_Outputs, Notices
     log.debug(f"workdir: {workdir}")
     
     # As we pass the options to build, must update them rather than initializing with PM.
-    update_build_options.execute(workdir, options)
+    update_build_options.execute(options, workdir)
     
     results = run_ad_build.execute(workdir)
     if results.returncode:

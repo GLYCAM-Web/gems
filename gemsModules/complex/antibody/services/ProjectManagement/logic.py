@@ -60,7 +60,7 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     # Note: AAD2 is not in the DevEnv yet, otherwise - perhaps:
     # GEMSHOME = os.environ.get("GEMSHOME")/External/AAD2
     # TODO: use GW_DOMAIN to change test/actual/dev
-    site_version = get_site_version()
+    site_version = "swarmtest" # get_site_version() # Note: We are currently using swarmtest explicitly for all AAD2 dev.
     subprocess.run([f"/programs/website_aad2/{site_version}/AAD2_Docker/image/AAD2/0.configure/setup_AD_Directory"], cwd=inputs.projectDir)
 
     # move ad2config.example to ad2config and modify it
