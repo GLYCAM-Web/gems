@@ -184,14 +184,17 @@ def generateCommonParserNotice(
     if exitMessage is None :
         exitMessage = ExitMessages[noticeBrief],
 
+    print(f"{exitType=}, {exitCode=}, {exitMessage=}")
     # Build the notice for newer code
     thisNotice = common.io.Notice()
+    print(f"{thisNotice=}")
     thisNotice.noticeType=exitType
     thisNotice.noticeCode=exitCode
     thisNotice.noticeBrief=noticeBrief
     thisNotice.noticeScope=scope
     thisNotice.noticeMessage=exitMessage
     thisNotice.messagingEntity=messagingEntity
+    print(thisNotice)
     if additionalInfo is not None : 
         thisNotice.additionalInfo=additionalInfo
 

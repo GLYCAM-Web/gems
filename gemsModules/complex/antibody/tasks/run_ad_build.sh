@@ -1,5 +1,6 @@
 #!/bin/bash
 source ~/.bash_profile
+set -e
 
 cd ${WD}
 source ad2dockerconfig

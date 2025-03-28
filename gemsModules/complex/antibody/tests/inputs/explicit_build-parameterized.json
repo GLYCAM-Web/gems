@@ -6,6 +6,10 @@
           "type": "Build",
           "inputs": { 
             "pUUID": "${pUUID}"
+          },
+          "options": {
+            "flexibility": "${flexibility}",
+            "count": "${count}"
           }
         }
       }

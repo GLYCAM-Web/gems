@@ -5,7 +5,7 @@ from gemsModules.common.main_api_notices import Notices
 from gemsModules.logging.logger import Set_Up_Logging
 
 from ...main_api_project import AntibodyProject
-from ...tasks import run_ad_build
+from ...tasks import run_ad_build, update_build_options
 
 from .api import Build_Inputs, Build_Outputs
 
@@ -33,7 +33,9 @@ def execute(inputs: Build_Inputs, options: dict) -> tuple[Build_Outputs, Notices
     workdir = AntibodyProject.get_project_dir_from_pUUID(inputs.pUUID)
     log.debug(f"workdir: {workdir}")
     
-    results = run_ad_build.execute(inputs.pUUID, workdir)
+    update_build_options.execute(workdir, options)
+    
+    results = run_ad_build.execute(workdir)
     if results.returncode:
         service_notices.addNotice(
             Brief="Build Failed",

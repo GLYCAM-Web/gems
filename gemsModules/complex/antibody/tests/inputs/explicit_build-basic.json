@@ -19,6 +19,10 @@
                 "payload": "/programs/gems/tests/inputs/DManpa1-8DNeup5Acb2-4DFrufa2-OH_structure.pdb"
               }
             ] 
+          },
+          "options": {
+            "flexibility": "rigid",
+            "count": 5
           }
         }
       }

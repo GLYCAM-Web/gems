@@ -21,6 +21,9 @@ else
   echo "Output is a valid JSON"
 fi
 
+# Check that it's a GEMS response - look for "entity"
+echo $OUTPUT | grep "entity" || { echo "Error: Output is not a GEMS response"; exit 1; }
+
 # Inspect as needed
 # tests/utilities/json_ripper.py --json_file ct-output-git-ignore-me.json entity
 # cat ct-output-git-ignore-me.json
