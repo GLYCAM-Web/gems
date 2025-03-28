@@ -388,13 +388,23 @@ printf "WRAP_GMML: TRUE\n\n"
 #########                  COMPILE GMML                #########
 ################################################################
 
+# Compile gmml
 cd gmml/ || { echo "ERROR BUILDING GEMS $0 FAILED, CANT CD INTO GMML, EXITING" ; exit 1; }
 ./make.sh $CLEAN -w -o $BUILD_LEVEL -j $NMP  || { echo "ERROR BUILDING GEMS $0 FAILED, EXITING" ; exit 1; }
+
 # Build detect_sugars for Antibody Docking.
+echo
+echo "Building detect_sugars for Antibody Docking"
 GMML_ROOT_DIR=$(git rev-parse --show-toplevel) 
-g++ -std=c++17 -I "${GMML_ROOT_DIR}" -L"${GMML_ROOT_DIR}"/bin/ -Wl,-rpath,"${GMML_ROOT_DIR}"/bin/ "${GMML_ROOT_DIR}"/tests/tests/007.detectSugars.cc -lgmml -lstdc++fs -pthread -o "${GMML_ROOT_DIR}"/bin/detect_sugars    
+# Note: gmml2 has changed the lib paths from bin to lib.
+g++ -std=c++17 -I "${GMML_ROOT_DIR}" -L"${GMML_ROOT_DIR}"/bin/ -Wl,-rpath,"${GMML_ROOT_DIR}"/bin/ \
+    "${GEMSHOME}"/bin/src/detectSugars.cc -lgmml -lstdc++fs -pthread -o "${GEMSHOME}"/bin/detect_sugars.exe \
+    || { echo "ERROR BUILDING detect_sugars, EXITING" ; exit 1; }
+echo "detect_sugars built successfully"
+echo
 cd ../
 
+# Compile gmml2
 cd gmml2/ || { echo "ERROR BUILDING GEMS $0 FAILED, CANT CD INTO GMML2, EXITING" ; exit 1; }
 ./make.sh $CLEAN -w -o $BUILD_LEVEL -j $NMP  || { echo "ERROR BUILDING GEMS $0 FAILED, EXITING" ; exit 1; }
 cd ../
