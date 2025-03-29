@@ -60,9 +60,9 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     # TODO: use GW_DOMAIN to change test/actual/dev
     site_version = "swarmtest" # get_site_version() # Note: We are currently using swarmtest explicitly for all AAD2 dev.
     
-    create_gwconfig(inputs.projectDir+"gwconfig", inputs.pUUID)
+    create_gwconfig(inputs.projectDir+"/gwconfig", inputs.pUUID)
             
-    create_ad2config(inputs.projectDir+"ad2config", antibody_name, ligand_name)
+    create_ad2config(inputs.projectDir+"/ad2config", antibody_name, ligand_name)
     image_name, tag_name = None, None
     with open(f"/programs/website_aad2/{site_version}/AAD2_Docker/settings.bash", "r") as f:
         settings = f.readlines()

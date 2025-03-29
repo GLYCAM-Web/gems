@@ -17,7 +17,7 @@ def create_ad2config(path, antibodytibody, glycan, siteversion="swarmtest", imag
     DOCKING_REPLICA_LOG_FILE="docking.log" 
     DOCKING_REPLICA_JOB_LOG="ad2_job.log"  
 
-    Antibody_File_Name="{antibodytibody}
+    Antibody_File_Name="{antibodytibody}"
     Glycan_File_Name="{glycan}"
     Glycan_Flexibility=""
     Number_of_Replicas=""
@@ -51,7 +51,7 @@ def create_gwconfig(path, puuid):
     SUBMIT_FILE_NAME="slurm_submit.bash"
     CLUSTER_EXE_NAME="run_docking_with_docker_on_cluster_node.bash"
 
-    pUUID='{puuid}'
+    pUUID="{puuid}"
     """)
     
     with open(path, "w") as f:
