@@ -31,12 +31,12 @@ if ! pgrep -f "ssh -L 42099:localhost:42099 -N webdev@thoreau" > /dev/null; then
 fi
 
 echo "Now requesting the evaluation..."
-PROJECT_DIR=$(./bin/delegate gemsModules/complex/antibody/tests/inputs/explicit_evaluate-thoreau.json | tee ad2_remote_test_eval_output-gitignoreme.txt | grep -Po '"project_dir":\s*"\K[^"]*')\
+PROJECT_DIR=$(./bin/delegate gemsModules/complex/antibody/tests/inputs/explicit_evaluate-thoreau.json | tee ad2_remote_test_eval_output-git-ignore-me.txt | grep -Po '"project_dir":\s*"\K[^"]*')\
   || { echo "Failed to get project_dir from Evaluation delegation, do we have connection?"; exit 1; }
 
 PUUID=$(echo "$PROJECT_DIR" | awk -F'/' '{print $NF}')
 if [ -z "$PUUID" ]; then
-    echo "Failed to get PUUID from project_dir..."
+    echo "Failed to get pUUID from project_dir..."
     cat ad2_remote_test_eval_output-git-ignore-me.txt
     exit 1
 else
