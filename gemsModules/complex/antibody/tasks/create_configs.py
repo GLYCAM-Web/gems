@@ -20,7 +20,7 @@ def create_ad2config(path, antibodytibody, glycan, siteversion="swarmtest", imag
     Antibody_File_Name="{antibodytibody}"
     Glycan_File_Name="{glycan}"
     Glycan_Flexibility="Partial"
-    Number_of_Replicas=""
+    Number_of_Replicas="5"
     Computing_Mode="Batch"
 
     AD2_Docking_CPUS="28"
@@ -56,7 +56,25 @@ def create_gwconfig(path, puuid):
     
     with open(path, "w") as f:
         f.write(Default_GW_CONFIG)
-        
+
+def create_vcconfig(path):
+    Default_VC_CONFIG = textwrap.dedent(f"""\
+    receptor = protein.pdbqt
+    ligand = ligand.pdbqt
+    center_x = 0.0
+    center_y = 0.0
+    center_z = 11.0
+    size_x = 32.0
+    size_y = 32.0
+    size_z = 36.0
+    energy_range = 10
+    num_modes = 20
+    chi_coeff=1
+    chi_cutoff=2
+    """)
+
+    with open(path, "w") as f:
+        f.write(Default_VC_CONFIG)
         
 def create_vccconfig(path):
     pass

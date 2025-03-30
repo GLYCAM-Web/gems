@@ -11,7 +11,7 @@ from gemsModules.systemoperations.environment_ops import get_site_version
 # from gemsModules.complex.antibody.tasks import batchcompute
 from .api import ProjectManagement_Inputs, ProjectManagement_Outputs, PM_Resource
 
-from gemsModules.complex.antibody.tasks.create_configs import create_ad2config, create_gwconfig
+from gemsModules.complex.antibody.tasks.create_configs import create_ad2config, create_gwconfig, create_vcconfig
 from gemsModules.logging.logger import Set_Up_Logging
 
 log = Set_Up_Logging(__name__)
@@ -59,6 +59,8 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     # GEMSHOME = os.environ.get("GEMSHOME")/External/AAD2
     # TODO: use GW_DOMAIN to change test/actual/dev
     site_version = "swarmtest" # get_site_version() # Note: We are currently using swarmtest explicitly for all AAD2 dev.
+    
+    create_vcconfig(inputs.projectDir+"/vcconfig")
     
     create_gwconfig(inputs.projectDir+"/gwconfig", inputs.pUUID)
             
