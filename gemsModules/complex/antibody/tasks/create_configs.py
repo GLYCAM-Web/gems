@@ -19,7 +19,7 @@ def create_ad2config(path, antibodytibody, glycan, siteversion="swarmtest", imag
 
     Antibody_File_Name="{antibodytibody}"
     Glycan_File_Name="{glycan}"
-    Glycan_Flexibility=""
+    Glycan_Flexibility="Partial"
     Number_of_Replicas=""
     Computing_Mode="Batch"
 
