@@ -73,14 +73,13 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
                 image_name = line.split("=")[1].strip().strip('"\'')
             if "AAD2_TAG_NAME" in line:
                 tag_name = line.split("=")[1].strip().strip('"\'')
-
     replacements = {
         "AAD2_DOCKER_HOME": f"/programs/website_aad2/{site_version}/AAD2_Docker",
     }
     if image_name and tag_name:
         replacements["Image"] = f"{image_name}:{tag_name}"
     replace_bash_variable_in_file(f"{inputs.projectDir}/ad2config", replacements)
-
+    log.debug(f"The AD2 image is: '{image_name}:{tag_name}'")
         
     # slurm_submit_docking /programs/gems/External/GW_Stack_for_AAD2/submit_docking_to_slurm_with_docker.bash
     slurm_submit_docking = f"/programs/website_aad2/{site_version}/AAD2_Docker/image/AAD2/bin/submit_docking_to_slurm_with_docker.bash"

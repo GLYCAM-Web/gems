@@ -21,7 +21,7 @@ class Antibody_Project_Manager(Project_Manager):
         # log.debug("incoming_project: %s", self.incoming_project)
         
         self.instantiate_response_project()
-        # Broken:
+        # Broken: TODO/fixme: But useful for correcting Build.project_dir when it should come from Evaluation.project_dir.
         # self.fill_response_project_from_incoming_project()
         self.fill_response_project_from_response_entity()
 
