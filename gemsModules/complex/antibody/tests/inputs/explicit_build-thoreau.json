@@ -8,8 +8,8 @@
             "pUUID": "${pUUID}"
           },
           "options": {
-            "flexibility": "Partial",
-            "count": 2
+            "Glycan_Flexibility": "Partial",
+            "Number_of_Replicas": 2
           }
         }
       }

@@ -34,7 +34,19 @@ def execute(inputs: Build_Inputs, options: dict) -> tuple[Build_Outputs, Notices
     log.debug(f"workdir: {workdir}")
     
     # As we pass the options to build, must update them rather than initializing with PM.
-    update_build_options.execute(options, workdir)
+    try:
+        update_build_options.execute(options, workdir)
+    except ValueError as e:
+        service_notices.addNotice(
+            Brief="Invalid Build Options",
+            Scope="Service",
+            Messenger="AntibodyDocking",
+            Type="Error",
+            Code="450",
+            Message=f"Cannot run Build: failed to update the build options. Please check that Number_of_Replicas and Glycan_Flexibility are valid. {e}",
+        )
+        return service_outputs, service_notices
+    
     
     results = run_ad_build.execute(workdir)
     if results.returncode:
