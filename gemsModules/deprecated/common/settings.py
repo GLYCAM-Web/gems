@@ -192,7 +192,6 @@ def generateCommonParserNotice(
     thisNotice.noticeScope=scope
     thisNotice.noticeMessage=exitMessage
     thisNotice.messagingEntity=messagingEntity
-    print(thisNotice)
     if additionalInfo is not None : 
         thisNotice.additionalInfo=additionalInfo
 
