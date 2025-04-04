@@ -53,6 +53,9 @@ class DateReversioner:
     def is_outdated(self) -> bool:
         """Return True if the file_to_version is older than the new_version."""
         is_outdated = False
+        return is_outdated
+        
+        # N.B. Disabled in favor of sysadmin level, more explicit updating and synchronization.
         if not self.file_to_version.exists():
             is_outdated = True
 
