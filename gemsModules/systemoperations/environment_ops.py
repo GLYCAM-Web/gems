@@ -31,6 +31,8 @@ def get_site_version() -> str:
         site_version = "dev"
     elif "test" in GW_DOMAIN:
         site_version = "test"
+    elif "swarmtest" in GW_DOMAIN:
+        site_version = "swarmtest"
         
     log.debug(f"Site version is: {site_version}")
     return site_version
