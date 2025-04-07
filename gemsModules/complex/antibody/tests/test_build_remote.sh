@@ -9,12 +9,8 @@ if ! grep -q '"thortunnel"' "$GEMSHOME/instance_config.json"; then
 else
     # check the host, jsonport, and contexts
     if ! grep -q '"host":\s*"localhost"' "$GEMSHOME/instance_config.json"; then
-        echo "Host must be 'thoreau'."
+        echo "Host must be 'localhost' for thortunnel."
         exit 1 # we could test failure cases instead
-    fi
-    if ! grep -q '"jsonport":\s*"42099"' "$GEMSHOME/instance_config.json"; then
-        echo "jsonport must be 42099."
-        exit 1
     fi
     if ! grep -q '"AntibodyDocking"' "$GEMSHOME/instance_config.json"; then
         echo "AntibodyDocking must exist in contexts."

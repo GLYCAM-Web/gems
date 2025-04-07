@@ -24,16 +24,19 @@ def gemsModules_is_findable() -> bool:
     
 def get_site_version() -> str:
     GW_DOMAIN = os.getenv("GW_DOMAIN") or ""
+    GW_DOMAIN = GW_DOMAIN.lower().strip()
+    log.debug(f"GW_DOMAIN is: {GW_DOMAIN}")
+    
     site_version = "test"
-    if "actual" in GW_DOMAIN:
-        site_version = "actual"
-    elif "dev" in GW_DOMAIN:
+    if "dev" in GW_DOMAIN:
         site_version = "dev"
     elif "test" in GW_DOMAIN:
         site_version = "test"
     elif "swarmtest" in GW_DOMAIN:
         site_version = "swarmtest"
-        
+    elif "glycam.org" == GW_DOMAIN:
+        site_version = "actual"
+ 
     log.debug(f"Site version is: {site_version}")
     return site_version
         
