@@ -1,5 +1,6 @@
 import os, glob, shutil
 from pathlib import Path
+from typing import Union, List
 
 
 from gemsModules.logging.logger import Set_Up_Logging
@@ -13,6 +14,7 @@ def get_current_working_directory() -> str:
 
 def build_fs_path(*parts: str) -> str:
     return str(Path(*parts))
+
 
 def build_filesystem_path(*path_parts: str):
     """Builds an operating-system-specific path string from its parts as strings."""
@@ -46,6 +48,35 @@ def check_make_directory(Dir_Path: str):
 def separate_path_and_filename(File_Path: str) -> tuple[str, str]:
     this_dir, this_filename = os.path.split(File_Path)
     return this_dir, this_filename
+
+
+def check_if_files_exist(paths: list, parent_dir: str = None, return_found: bool = False, any_exist: bool = False) -> Union[List, bool]:
+    """Check if files exist in the given paths.
+
+    Args:
+        paths (list): List of file paths to check.
+        parent_dir (str): Parent directory to check for files. If None, check the paths directly.
+                            If not None, the paths will be joined with the parent directory.
+        return_found (bool): If True, return the list of found files. If False, return True if all files exist, otherwise False.
+        any_exist (bool): If True, return True if any file exists, otherwise False if any file is missing.
+    
+    Returns:
+        list | bool: List of found files if return_found is True, otherwise True if all files exist, otherwise False.
+    """
+    if parent_dir is not None:
+        paths = [os.path.join(parent_dir, path) for path in paths]
+        
+    found = []
+    for path in paths:
+        if os.path.exists(path):
+            found.append(path)
+            
+    if return_found:
+        return found
+    if any_exist:
+        return len(found) > 0
+    else:
+        return len(found) == len(paths)
 
 
 def copy_file_from_A_to_B(A: str, B: str):

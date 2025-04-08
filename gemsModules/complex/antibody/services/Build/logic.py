@@ -3,6 +3,8 @@ from pydantic import validate_arguments
 
 from gemsModules.common.main_api_notices import Notices
 from gemsModules.logging.logger import Set_Up_Logging
+from gemsModules.systemoperations.filesystem_ops import check_if_files_exist
+
 
 from ...main_api_project import AntibodyProject
 from ...tasks import run_ad_build, update_build_options
@@ -31,8 +33,26 @@ def execute(inputs: Build_Inputs, options: dict) -> tuple[Build_Outputs, Notices
         return service_outputs, service_notices
     
     workdir = AntibodyProject.get_project_dir_from_pUUID(inputs.pUUID)
-    log.debug(f"workdir: {workdir}")
+    log.debug(f"AD/Build active workdir: {workdir}")
+    # check if there is a .zip and .png file in the workdir and assume build already ran if they exist
+    files = [f"AD_project_{inputs.pUUID[:5]}.zip", "histogram_sorted.png"]
+    files_exist = check_if_files_exist(files, parent_dir=workdir)
     
+    # Do not clobber if no_clobber is set to True and files exist
+    NO_CLOBBER_DEFAULT = True
+    no_clobber_project = options.get("no_clobber", NO_CLOBBER_DEFAULT)
+    log.debug(f"AD2/Build: {no_clobber_project=}")
+    if no_clobber_project and files_exist:
+        service_notices.addNotice(
+            Brief="Build already ran",
+            Scope="Service",
+            Messenger="AntibodyDocking",
+            Type="Error",
+            Code="400",
+            Message=f"Build already ran, refusing to clobber."
+        )
+        return service_outputs, service_notices    
+   
     # As we pass the options to build, must update them rather than initializing with PM.
     try:
         update_build_options.execute(options, workdir)
