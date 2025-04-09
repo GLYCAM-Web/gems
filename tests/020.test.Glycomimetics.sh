@@ -19,15 +19,15 @@ if [ $? -ne 0 ]; then
   exit 1
 else
   # Check that Evaluation worked.
-  echo $OUTPUT | grep "Evaluation Successful" || exit 1
+  echo $OUTPUT | grep "Evaluation Successful">/dev/null || exit 1
 
   # Check that Build is running.
-  echo $OUTPUT | grep "Glycomimetics is running" || exit 1
+  echo $OUTPUT | grep "Glycomimetics is running">/dev/null || exit 1
 
 
   # grab "projectect_dir": "<dir>" with grep
   PROJECT_DIR=$(echo $OUTPUT | grep -Po '"project_dir":\s*"\K[^"]*')
-  echo "project_dir: $PROJECT_DIR"
+  echo "GM/Build project_dir: $PROJECT_DIR"
 fi
 
 # Inspect as needed
