@@ -178,11 +178,11 @@ def generateCommonParserNotice(
     if scope is None :
         scope : str = ExitScopes[noticeBrief]
     if exitType is None :
-        exitType = ExitTypes[noticeBrief],
+        exitType = ExitTypes[noticeBrief]
     if exitCode is None :
-        exitCode = ExitCodes[noticeBrief],
+        exitCode = ExitCodes[noticeBrief]
     if exitMessage is None :
-        exitMessage = ExitMessages[noticeBrief],
+        exitMessage = ExitMessages[noticeBrief]
 
     # Build the notice for newer code
     thisNotice = common.io.Notice()
