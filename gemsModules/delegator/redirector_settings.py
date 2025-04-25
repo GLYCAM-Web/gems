@@ -45,7 +45,7 @@ from gemsModules.status.receive import receive as status
 
 from gemsModules.complex.glycomimetics.receive import receive as glycomimetics
 from gemsModules.complex.antibody.receive import receive as antibody
-from gemsModules.GpBuilder.receive import receive as gp_builder
+from gemsModules.complex.GpBuilder.receive import receive as gpbuilder
 
 Known_Entity_Reception_Modules = {
     #'BatchCompute' : batchcompute, # for now, still deprecated
@@ -65,6 +65,6 @@ Known_Entity_Reception_Modules = {
     "StructureFile": deprecated_delegator,
     "PDBFile": pdbfile,
     "Glycomimetics": glycomimetics,
-    "GpBuilder": gp_builder,
+    "GpBuilder": gpbuilder,
     "AntibodyDocking": antibody
 }
