@@ -9,7 +9,7 @@ from gemsModules.complex.GpBuilder.main_settings import WhoIAm
 from gemsModules.complex.GpBuilder.main_api_project import Gpbuilder_Project
 from gemsModules.complex.GpBuilder.services.settings.known_available import Available_Services
 from gemsModules.complex.GpBuilder.services.Build.api import BuildService_Request, BuildService_Response
-from gemsModules.complex.GpBuilder.main_api_common import Gpbuilder_Service_Request, GpBuilder_Service_Response
+from gemsModules.complex.GpBuilder.main_api_common import GpBuilder_Service_Request, GpBuilder_Service_Response
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -18,7 +18,7 @@ log = Set_Up_Logging(__name__)
 
 
 class Gpbuilder_Service_Requests(main_api_services.Service_Requests):
-    __root__ : dict[str, BuildService_Request, Gpbuilder_Service_Request] = None
+    __root__ : dict[str, BuildService_Request, GpBuilder_Service_Request] = None
 
 
 class GpBuilder_Service_Responses(main_api_services.Service_Responses):

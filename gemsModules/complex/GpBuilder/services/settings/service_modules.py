@@ -5,6 +5,7 @@ from gemsModules.common.services.list_services.server import Serve as serve_list
 from gemsModules.common.services.marco.server import Serve as serve_marco
 from gemsModules.common.services.status.server import Serve as serve_status
 
+from gemsModules.complex.GpBuilder.services.ProjectManagement.server import Serve as serve_pm
 from gemsModules.complex.GpBuilder.services.Build.server  import Serve as serve_Build
 
 from gemsModules.logging.logger import Set_Up_Logging
@@ -15,5 +16,6 @@ service_modules : Dict[str, Callable] = {
     'ListServices': serve_list_services, 
     'Marco': serve_marco, 
     'Status': serve_status,
+    'ProjectManagement': serve_pm,
     'Build' : serve_Build
     }

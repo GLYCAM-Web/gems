@@ -1,7 +1,7 @@
 import datetime
 import json, os, glob, shutil, socket
 from pathlib import Path
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union
 from abc import ABC, abstractmethod
 
 from gemsModules.systemoperations.instance_config.versions import DateReversioner
@@ -33,32 +33,27 @@ class FileSystemPathsMixin:
         update for all GEMS instances.
         """
 
-        if app in self.Filesystem_Paths:
-            if app in self.config["filesystem_paths"]:
-                return self.config["filesystem_paths"][app]
-            else:
-                log.error(
-                    f"Access attempted but {app} filesystem path not set in instance_config.json."
-                )
-
+        if app in self.config["filesystem_paths"]:
+            return self.config["filesystem_paths"][app]
         else:
             log.error(
-                f"Access attempted but {app} does not have a filesystem path in instance_config.json."
+                f"Access attempted but {app} filesystem path not set in instance_config.json."
             )
-        raise KeyError(
-            f"{app} not found in instance_config.json, available: {self.config['filesystem_paths']}"
-        )
+            raise KeyError(
+                f"{app} not found in instance_config.json, available: {self.config['filesystem_paths']}"
+            )
 
     def set_filesystem_path(self, app: str, path: str):
         """Sets the filesystem path for the given app in the instance config's filesystem_paths dict."""
-        if app in self.Filesystem_Paths:
-            if "filesystem_paths" not in self.config:
-                self.config["filesystem_paths"] = {}
-            self.config["filesystem_paths"][app] = path
-        else:
-            log.error(
-                f"Access attempted but {app} does not have a filesystem path in instance_config.json."
+        if "filesystem_paths" not in self.config:
+            self.config["filesystem_paths"] = {}
+        elif app in self.config["filesystem_paths"]:
+            log.warning(
+                f"Overwriting existing filesystem path for {app} in instance_config.json. Old path: {self.config['filesystem_paths'][app]}"
             )
+            
+        self.config["filesystem_paths"][app] = path
+          
 
 
 class InstanceConfig(KeyedArgManager, FileSystemPathsMixin):
@@ -77,10 +72,7 @@ class InstanceConfig(KeyedArgManager, FileSystemPathsMixin):
     """
 
     # Not an enum so we can extend here, in the InstanceConfig class, where the most specific GEMS instance configuration is defined.
-    # TODO: remove gm/md from contexts here
-    Contexts = ["DevEnv", "Swarm", "Glycomimetics", "MDaaS-RunMD"]
-    # TODO: DevEnv/GRPC/initialize.sh needs to update this list.
-    Filesystem_Paths = ["MDaaS-RunMD", "Glycomimetics", "AntibodyDocking"]
+    Contexts = ["DevEnv", "Swarm"]
 
     def __init__(
         self,
@@ -126,7 +118,7 @@ class InstanceConfig(KeyedArgManager, FileSystemPathsMixin):
         self,
         key: KeyedArgManager.ConfigurationKeys,
         host: str = None,
-        context: "InstanceConfig.Contexts" = None,
+        context: Optional[str] = None,
     ):
         if context not in self.Contexts:
             log.warning(f"Context {context} not found in {self.Contexts}.")

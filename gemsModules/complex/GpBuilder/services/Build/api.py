@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 from typing   import List, Union, Optional
 
 from gemsModules.common.main_api_resources import Resource, Resources
-from gemsModules.complex.GpBuilder.main_api_common import Gpbuilder_Service_Request, GpBuilder_Service_Response
+from gemsModules.complex.GpBuilder.main_api_common import GpBuilder_Service_Request, GpBuilder_Service_Response
 
 from gemsModules.logging.logger import Set_Up_Logging 
 
@@ -72,7 +72,7 @@ class BuildService_Outputs(BaseModel) :
     )
 
 
-class BuildService_Request(Gpbuilder_Service_Request) :
+class BuildService_Request(GpBuilder_Service_Request) :
     typename : str  = Field(
         "Build",  
         alias='type'

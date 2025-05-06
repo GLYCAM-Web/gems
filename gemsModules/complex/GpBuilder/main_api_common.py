@@ -11,7 +11,7 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
-class Gpbuilder_Service_Request(main_api_services.Service_Request):
+class GpBuilder_Service_Request(main_api_services.Service_Request):
     typename : Available_Services = Field(
         'Build',
         alias='type',

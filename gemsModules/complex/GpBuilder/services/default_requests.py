@@ -5,7 +5,7 @@ import uuid
 from gemsModules.common.action_associated_objects import AAOP
 from gemsModules.common.services.default_requests import Default_Service_Request_Manager
 
-from gemsModules.complex.GpBuilder.main_api import Gpbuilder_Service_Request
+from gemsModules.complex.GpBuilder.main_api import GpBuilder_Service_Request
                    
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
@@ -13,7 +13,7 @@ log = Set_Up_Logging(__name__)
 class Gpbuilder_Default_Service_Request_Manager(Default_Service_Request_Manager):
 
     def get_default_services_aaops(self) -> List[AAOP]:
-        this_service = Gpbuilder_Service_Request()
+        this_service = GpBuilder_Service_Request()
         this_aaop = AAOP(
             AAO_Type="Build",
             The_AAO=this_service,

@@ -9,7 +9,7 @@ ic = InstanceConfig()
 
 def execute(input_file: Path, project_dir: Path):
     try:
-        project_dir = Path(ic.get_filesystem_path("Glycomimetics")) / job_id
+        project_dir = Path(ic.get_filesystem_path("GpBuilder")) / job_id
         if not project_dir.exists():
             project_dir.mkdir()
             

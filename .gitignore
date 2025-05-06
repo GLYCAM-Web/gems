@@ -16,6 +16,7 @@ site
 ## general things to ignore
 *.obsidian
 *__pycache__
+*.exe
 *.pyc
 *.pyo
 *.swp

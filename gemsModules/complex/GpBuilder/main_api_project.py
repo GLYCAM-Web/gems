@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
-from typing import Literal
 import os
-
 from pydantic import constr, Field
+from typing import Literal
 
 from gemsModules.project.main_api import Project
+from gemsModules.systemoperations.instance_config import InstanceConfig
 
 from gemsModules.logging.logger import Set_Up_Logging
+
+
 log = Set_Up_Logging(__name__)
+
 
 class Gpbuilder_Project(Project):
     """ GpBuilder project for making new entities. """
@@ -32,11 +35,7 @@ class Gpbuilder_Project(Project):
             )
 
     def add_temporary_info(self): 
-        self.project_dir : str = os.path.join(self.filesystem_path,
-                self.service_dir,
-                self.project_type,
-                self.pUUID)
-        self.compute_cluster_filesystem_path : str = self.project_dir
-        self.logs_dir : str = os.path.join(self.project_dir, "logs")
-        self.site_mode : str = "proof-of-concept"
-        self.versions_file_path : str = os.path.join(self.project_dir, "VERSIONS.sh")
+        ic = InstanceConfig()
+        self.project_dir : str = os.path.join(
+            ic.get_filesystem_path(app="GpBuilder"), self.pUUID
+        )
