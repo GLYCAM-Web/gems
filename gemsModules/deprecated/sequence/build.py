@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 import os
+import subprocess
+from pathlib import Path
+
 import gmml2
 from gemsModules.deprecated.project import projectUtilPydantic as projectUtils
 from gemsModules.deprecated.sequence import io as sequenceio
@@ -10,12 +13,29 @@ from gemsModules.deprecated.common.loggingConfig import loggers, createLogger
 
 from gemsModules.deprecated.sequence import projects as sequenceProjects
 
+
 if loggers.get(__name__):
     pass
 else:
     log = createLogger(__name__)
 
 
+def zip_toplevel_dir_wrapper(project_dir: str, project_zipname: str, include_paths: list=None, exclude_patterns: list=None):
+    log.debug("zip_toplevel_dir_wrapper() was called.")
+    log.debug(f"project_dir: {project_dir}")
+    log.debug(f"project_zipname: {project_zipname}")
+    wrapper_script = Path(__file__).parent / "zip_wrapper.sh"
+    
+    # execute the wrapper script with the provided arguments using subprocess
+    result = subprocess.run([str(wrapper_script), project_dir, project_zipname], check=True)
+    log.debug(f"Zip creation script executed with return code: {result.returncode}")
+    
+    # Check if the zip file was created successfully
+    zip_path = os.path.join(project_dir, project_zipname)
+    if os.path.exists(zip_path):
+        log.debug(f"Zip file created successfully: {zip_path}")
+        
+        
 def buildEach3DStructureInStructureInfo(thisTransaction: sequenceio.Transaction):
     log.info("buildEach3DStructureInStructureInfo() was called.")
     needToInstantiateCarbohydrateBuilder = True
@@ -87,6 +107,7 @@ def buildEach3DStructureInStructureInfo(thisTransaction: sequenceio.Transaction)
             sequenceProjects.addBuildFolderSymLinkToExistingConformer(
                 thisServiceDir, thisSeqID, thisBuildStrategyID, thisPuuID, subDirectory
             )
+            zip_toplevel_dir_wrapper(thisProjectDir, f"CB_project_{thisPuuID[:8]}_all.zip.1", include_paths=["Requested_Builds", "logs"], exclude_patterns=["*.zip"])
         else:  # Doesn't already exist.
             log.debug("Need to build this structure: " + subDirectory)
             if needToInstantiateCarbohydrateBuilder:
