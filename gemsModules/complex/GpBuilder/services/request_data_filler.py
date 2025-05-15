@@ -4,6 +4,7 @@ from typing import List
 
 from gemsModules.common.action_associated_objects import AAOP
 from gemsModules.common.services.request_data_filler import Request_Data_Filler
+from gemsModules.common.main_api_resources import Resource
 
 from gemsModules.complex.GpBuilder.main_api import Gpbuilder_Entity
 from gemsModules.complex.GpBuilder.main_api_project import Gpbuilder_Project
@@ -15,22 +16,49 @@ log = Set_Up_Logging(__name__)
 
 
 class Gpbuilder_Request_Data_Filler(Request_Data_Filler):
-
-        # self.aaop_list = aaop_list
-        # self.entity = entity
-        # self.project = project
-
-    # No data to fill here.
     def process(self) -> List[AAOP]:        
-        this_Project : Gpbuilder_Project = self.project
+        this_Project : Gpbuilder_Project = self.response_project
         
         log.debug(f"GpB/Request_Data_Filler now filling data for the request.")
-        for aaop in self.aaop_list:
-            if aaop.Dictionary_Name=='Build':
-                aaop.The_AAO.inputs.pUUID=this_Project.pUUID
-            elif aaop.Dictionary_Name=='ProjectManagement':
-                log.debug(f"GpB/ProjectManagement AAOP {aaop}")
+        log.debug(f"GpB/Request_Data_Filler: {this_Project.project_dir=}")
+        # We fill in the data in reverse, as dependents are at the end of the list.
+        for i, aaop in enumerate(reversed(self.aaop_list)):
+            log.debug(f"GpB/Request_Data_Filler: {i}: {aaop.AAO_Type=}")
+            
+            if aaop.AAO_Type=='Build':
+                aaop.The_AAO.inputs.pUUID = this_Project.pUUID
                 aaop.The_AAO.inputs.projectDir = this_Project.project_dir
-                aaop.The_AAO.inputs.pUUID=this_Project.pUUID
-
+                
+                # copy inputs to resources
+                self.__fill_input_resources(aaop)
+            elif aaop.AAO_Type=='ProjectManagement':
+                aaop.The_AAO.inputs.pUUID = this_Project.pUUID
+                aaop.The_AAO.inputs.projectDir = this_Project.project_dir
+                
+                # copy resources from requester
+                self.fill_resources_from_requester_if_exists(aaop, deep_copy=True)
+                
+            log.debug(f"GpB/Request_Data_Filler filled: {aaop.The_AAO.inputs=}")
+        
         return self.aaop_list
+
+    def __fill_input_resources(self, aaop: AAOP):
+        log.debug(f" Filling input resources for {aaop=}")
+        if aaop.The_AAO.inputs.protein_file is not None:
+            protein = Resource(
+                payload=aaop.The_AAO.inputs.protein_file,
+                resourceFormat="PDB",
+                resourceRole="protein-file",
+                locationType="filesystem-path-unix"
+            )
+            aaop.The_AAO.inputs.resources.add_resource(protein)
+        if aaop.The_AAO.inputs.glycan_mappings is not None:
+            mappings = Resource(
+                payload=aaop.The_AAO.inputs.glycan_mappings,
+                resourceFormat="python-dict",
+                resourceRole="glycan-mappings",
+                locationType="Payload"
+            )
+            aaop.The_AAO.inputs.resources.add_resource(mappings)
+
+            

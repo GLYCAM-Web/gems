@@ -140,6 +140,7 @@ class Transaction_Manager(ABC):
 
         # get transaction outputs from response entity
         this_json = {"entity": self.response_entity.dict(by_alias=True)}
+        log.debug(f"{this_json=}")
         self.transaction.outputs = self.transaction.get_API_type().parse_obj(this_json)
 
         # update transaction response project

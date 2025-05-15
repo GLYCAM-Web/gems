@@ -12,7 +12,7 @@ def execute(job_dir, inputs, options) -> Path:
         f.write(f"Protein:{inputs.protein_file}\n")
         f.write(f"numberOfSamples:{options.number_of_samples}\n")
         f.write(f"persistCycles:{options.persist_cycles}\n")
-        f.write(f"seed:{options.seed}\n\n")
+        f.write(f"rngSeed:{options.seed}\n\n")
         
         f.write("ProteinResidue, GlycanName:\n")
         for mapping in inputs.glycan_mappings:

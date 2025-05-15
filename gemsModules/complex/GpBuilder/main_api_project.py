@@ -18,22 +18,17 @@ class Gpbuilder_Project(Project):
     parent_entity : str = ""
     app : str = "GpBuilder"
     requested_service : str = "Build"
-    entity_id : str = "GpBuilder"
-    service_id : str = "Build"
-    filesystem_path : str = "/some/path/"
-    service_dir : str = "Build_dir"
+    project_type : Literal["gp"] = Field("gp", title="Type", alias="type")
+    entity_id : str = "complex/GpBuilder"
+    service_id : str = ""
     requesting_agent : str = ""
-    has_input_files : bool = True
-    u_uuid : constr(max_length=36) = " "
-    notify : bool = False
-    upload_path : constr(max_length=255)  = "/path/to/Build_dir"
-    
-    project_type : Literal['GpBuilder'] = Field(  
-            'GpBuilder',
-            title='Type',
-            alias='type'
-            )
+    input_type : constr(max_length=25) = "PDB (chemical/pdb) & Glycan Mappings (application/json)"
 
+    pUUID: constr(max_length=36) = ""
+    project_dir: constr(max_length=255) = ""
+
+    gpbuilder_input_file: constr(max_length=255) = "the_input.txt"
+    
     def add_temporary_info(self): 
         ic = InstanceConfig()
         self.project_dir : str = os.path.join(

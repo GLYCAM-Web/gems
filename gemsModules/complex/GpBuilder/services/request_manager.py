@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
 from gemsModules.common.services.request_manager import Request_Manager
-from gemsModules.common.services.explicit_requests import Explicit_Service_Request_Manager
 from gemsModules.common.services.service_packages_list import Services_Package_List_Utilities
 from gemsModules.complex.GpBuilder.services.implied_requests import GpBuilder_Implied_Services_Request_Manager 
 from gemsModules.complex.GpBuilder.services.default_requests import Gpbuilder_Default_Service_Request_Manager
+from gemsModules.complex.GpBuilder.services.explicit_requests import GpBuilder_Explicit_Request_Manager
 from gemsModules.complex.GpBuilder.services.duplicate_requests import Gpbuilder_Duplicate_Requests_Manager
 from gemsModules.complex.GpBuilder.services.request_data_filler import Gpbuilder_Request_Data_Filler
 from gemsModules.complex.GpBuilder.services.workflow_manager import GpBuilder_Workflow_Manager
@@ -16,7 +16,7 @@ log = Set_Up_Logging(__name__)
 class Gpbuilder_Request_Manager(Request_Manager):
     
     def set_local_modules(self):
-        self.explicit_manager_type = Explicit_Service_Request_Manager
+        self.explicit_manager_type = GpBuilder_Explicit_Request_Manager
         self.unknown_manager_type = Services_Package_List_Utilities
         self.implied_manager_type = GpBuilder_Implied_Services_Request_Manager
         self.duplicate_manager_type = Gpbuilder_Duplicate_Requests_Manager

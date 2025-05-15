@@ -5,7 +5,7 @@
             "default_Build": {
                 "type": "Build",
                 "inputs": {
-                    "protein_file": "/programs/gems/gmml2/tests/inputs/017.GlycoproteinBuilder/1eer_eop_Asn.pdb",
+                    "protein_file": "/programs/gems/gmml2/tests/tests/inputs/017.GlycoproteinBuilder/1eer_eop_Asn.pdb",
                     "glycan_mappings": [
                         ["A_24", "DManpa1-2DManpa1-6[DManpa1-2DManpa1-3]DManpa1-6[DManpa1-2DManpa1-2DManpa1-3]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH"],
                         ["A_38", "DManpa1-6[DManpa1-2DManpa1-2DManpa1-3]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH"],

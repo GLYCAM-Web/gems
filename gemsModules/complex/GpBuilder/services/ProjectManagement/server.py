@@ -8,13 +8,14 @@ from gemsModules.systemoperations.filesystem_ops import separate_path_and_filena
 
 # from gemsModules.complex.glycomimetics.tasks import set_up_build_directory
 # from gemsModules.complex.glycomimetics.tasks import initiate_build
-from gemsModules.complex.glycomimetics.services.ProjectManagement.logic import execute
+from gemsModules.complex.GpBuilder.services.ProjectManagement.logic import execute
 from gemsModules.logging.logger import Set_Up_Logging
 
 log = Set_Up_Logging(__name__)
 
 
 def Serve(service: ProjectManagement_Request) -> ProjectManagement_Response:
+    log.debug(f"GpB/ProjectManagement service: {service.inputs=}")
     response = ProjectManagement_Response()
     response.outputs = execute(service.inputs)
 

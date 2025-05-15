@@ -20,7 +20,7 @@ class BuildService_output_Resource(Resource):
     pass
 
 class BuildService_Resources(Resources):
-    __root__ : List[Union[BuildService_input_Resource, BuildService_output_Resource]] = None
+    __root__ : List[Union[BuildService_input_Resource, BuildService_output_Resource]] = Field(default_factory=list)
 
 
 # TODO: To structurefile/common_api.py?
@@ -46,6 +46,17 @@ class BuildOptions(BaseModel):
 
     
 class BuildService_Inputs(BaseModel):
+    pUUID: Optional[str] = Field(
+        None,
+        title="Project UUID",
+        description="UUID for this GpBuilder Project, assigned automatically by GEMS",
+    )
+    projectDir: str = Field(
+        None,
+        title="Project Directory",
+        description="Full path to the project directory",
+    )
+    
     protein_file: str = Field(..., description="Path to the protein PDB file")
     glycan_mappings: List[GlycanMapping] = Field(
         ..., description="List of residue to glycan sequence mappings"
