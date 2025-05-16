@@ -1,0 +1,13 @@
+{
+    "entity": {
+        "type": "GpBuilder",
+        "services": {
+            "default_Evaluate": {
+                "type": "Evaluate",
+                "inputs": {
+                    "protein_file": "/programs/gems/gmml2/tests/tests/inputs/017.GlycoproteinBuilder/1eer_eop_Asn.pdb"
+                }
+            }
+        }
+    }
+}

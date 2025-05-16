@@ -30,7 +30,7 @@ class Gpbuilder_Request_Data_Filler(Request_Data_Filler):
                 aaop.The_AAO.inputs.projectDir = this_Project.project_dir
                 
                 # copy inputs to resources
-                self.__fill_input_resources(aaop)
+                self.__fill_build_input_resources(aaop)
             elif aaop.AAO_Type=='ProjectManagement':
                 aaop.The_AAO.inputs.pUUID = this_Project.pUUID
                 aaop.The_AAO.inputs.projectDir = this_Project.project_dir
@@ -42,7 +42,7 @@ class Gpbuilder_Request_Data_Filler(Request_Data_Filler):
         
         return self.aaop_list
 
-    def __fill_input_resources(self, aaop: AAOP):
+    def __fill_build_input_resources(self, aaop: AAOP):
         log.debug(f" Filling input resources for {aaop=}")
         if aaop.The_AAO.inputs.protein_file is not None:
             protein = Resource(

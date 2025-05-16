@@ -13,7 +13,7 @@ log = Set_Up_Logging(__name__)
 
 class GpBuilder_Service_Request(main_api_services.Service_Request):
     typename : Available_Services = Field(
-        'Build',
+        None,
         alias='type',
         title='Services Offered by GpBuilder',
         description='The service requested of the GpBuilder'

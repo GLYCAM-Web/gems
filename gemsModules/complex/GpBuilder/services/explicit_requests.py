@@ -10,8 +10,8 @@ log = Set_Up_Logging(__name__)
 
 class GpBuilder_Explicit_Request_Manager(Explicit_Service_Request_Manager):
     def validate_service_request(self, service_request):
-        # TODO/FIX: this is inefficient, we should be validating the service_request appropriately by more internal GEMS structure.
+        log.debug("validating GpB service request: {}, typename:{}".format(service_request, service_request.typename))
         validated = explicit_modules[service_request.typename].parse_obj(service_request)
-        log.debug("validated mdaas service request:")
+        log.debug("validated GpB service request:")
         log.debug(validated)
         return validated

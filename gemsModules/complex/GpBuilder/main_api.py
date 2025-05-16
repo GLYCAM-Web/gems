@@ -20,11 +20,11 @@ log = Set_Up_Logging(__name__)
 
 
 class Gpbuilder_Service_Requests(main_api_services.Service_Requests):
-    __root__ : dict[str, ProjectManagement_Request, BuildService_Request, GpBuilder_Service_Request] = None
-
+    __root__ : dict[str, BuildService_Request, ProjectManagement_Request, GpBuilder_Service_Request] = None
+    #__root__ : dict[str, GpBuilder_Service_Request] = None
 
 class GpBuilder_Service_Responses(main_api_services.Service_Responses):
-    __root__ : dict[str, BuildService_Response, ProjectManagement_Response, GpBuilder_Service_Response] = None
+    __root__ : dict[str, GpBuilder_Service_Response] = None
 
 
 class Gpbuilder_Entity(main_api_entity.Entity) :
