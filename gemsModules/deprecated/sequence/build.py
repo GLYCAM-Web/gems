@@ -35,20 +35,38 @@ def zip_toplevel_dir_wrapper(project_dir: str, project_zipname: str, include_pat
     if os.path.exists(zip_path):
         log.debug(f"Zip file created successfully: {zip_path}")
         
-        
-def buildEach3DStructureInStructureInfo(thisTransaction: sequenceio.Transaction):
-    log.info("buildEach3DStructureInStructureInfo() was called.")
-    needToInstantiateCarbohydrateBuilder = True
+def updateBuild(buildState, buildDir, subDirectory, thisProjectDir, thisServiceDir, thisSeqID, thisBuildStrategyID, thisTransaction):
+    # buildDir is either New_Builds/ or Existing_Builds/
+    sequenceProjects.createSymLinkInRequestedStructures(
+        thisProjectDir, buildDir, subDirectory
+    )
+
+    if buildState.isDefaultStructure:
+        sequenceProjects.addBuildFolderSymLinkForDefaultConformer(
+            thisProjectDir, buildDir, subDirectory
+        )
+
+    if buildState.isGlobalDefaultStructure:
+        sequenceProjects.addSequenceFolderSymLinkToDefaultBuild(
+            thisServiceDir, thisSeqID, thisBuildStrategyID, subDirectory
+        )
+
+        sequenceProjects.addSequenceBuildStrategyFolderSymLinkToDefaultBuild(
+            thisServiceDir, thisSeqID, thisBuildStrategyID, subDirectory
+        )
+
+    # Needs to be Requested_Structres/. Need to add conformerID separately.
+    # sequenceProjects.addResponse(buildState, thisTransaction, conformerID, buildState.conformerLabel)
+    # This probably needs work
+    sequenceProjects.registerBuild(buildState, thisTransaction)
+
+def checkBuilds(thisTransaction):
     # get info from the transaction and check sanity
+    
     log.debug("About to get build informaion from the transaction")
     log.debug("Working on the Build States now.")
-    buildStatesOK = True
     theseBuildStates = thisTransaction.getIndividualBuildDetailsOut()
-    if theseBuildStates is None:
-        buildStatesOK = False
-    if theseBuildStates == []:
-        buildStatesOK = False
-    if buildStatesOK is False:
+    if theseBuildStates is None or not len(theseBuildStates):
         log.error(
             "Got all the way to buildEach3DStructureInStructureInfo without any buildStates"
         )
@@ -58,8 +76,18 @@ def buildEach3DStructureInStructureInfo(thisTransaction: sequenceio.Transaction)
                 "hint": "No buildStates accessible from structureBuildDetails"
             },
         )
-        return
+        return False
+    else:
+        return theseBuildStates
 
+
+def buildEach3DStructureInStructureInfo(thisTransaction: sequenceio.Transaction):
+    log.info("buildEach3DStructureInStructureInfo() was called.")
+    needToInstantiateCarbohydrateBuilder = True
+    theseBuildStates = checkBuilds(thisTransaction)
+    if not theseBuildStates:
+        return
+    
     log.debug("Working on getting other data now.")
     try:
         theStructureBuildInfo = thisTransaction.getStructureBuildInfoOut()
@@ -78,6 +106,8 @@ def buildEach3DStructureInStructureInfo(thisTransaction: sequenceio.Transaction)
             return
         thisPuuID = thisTransaction.getPuuIDOut()
         thisProjectDir = thisTransaction.getProjectDirOut()
+        thisProject = thisTransaction.transaction_out.project
+        thisServiceDir = thisProject.service_dir
     except Exception as error:
         message = "Something went wrong getting the other data.  The following is from Python."
         log.error(message)
@@ -88,114 +118,124 @@ def buildEach3DStructureInStructureInfo(thisTransaction: sequenceio.Transaction)
             edict = {"error": str(error), "message": message}
         raise error
 
-    thisProject = thisTransaction.transaction_out.project
-    thisServiceDir = thisProject.service_dir
-
+    # Process the build states, updating Existing Builds first.
+    newBuildsOnly = []
+    log.debug("About to process the build states.")
     for buildState in theseBuildStates:
         log.debug("Checking if a structure has been built in this buildState: ")
         log.debug("buildState: ")
         log.debug(buildState.json(indent=2))
-        # May return "default" or a conformerID ## should only return conformerID?
-        subDirectory = buildState.structureDirectoryName
 
         if sequenceProjects.currentBuildStructureExists(buildState, thisTransaction):
             #        if sequenceProjects.structureExists(buildState, thisTransaction, thisBuildStrategyID):
             # Nothing in Sequence/ needs to change. In Builds/ProjectID/
             # add symLink in Existing to Sequences/SequenceID/defaults/All_builds/conformerID.
-            log.debug("Found an existing structure for " + subDirectory)
+            log.debug("Found an existing structure for " + buildState.structureDirectoryName)
             buildDir = "Existing_Builds/"
             sequenceProjects.addBuildFolderSymLinkToExistingConformer(
-                thisServiceDir, thisSeqID, thisBuildStrategyID, thisPuuID, subDirectory
+                thisServiceDir, thisSeqID, thisBuildStrategyID, thisPuuID, buildState.structureDirectoryName
             )
-            zip_toplevel_dir_wrapper(thisProjectDir, f"CB_project_{thisPuuID[:8]}_all.zip.1", include_paths=["Requested_Builds", "logs"], exclude_patterns=["*.zip"])
-        else:  # Doesn't already exist.
-            log.debug("Need to build this structure: " + subDirectory)
-            if needToInstantiateCarbohydrateBuilder:
-                # Only ever do this once.
-                needToInstantiateCarbohydrateBuilder = False
-                # ## the following should probably use the indexOrdered sequence, but that doesn't work...
-                inputSequence = thisTransaction.getSequenceVariantOut("indexOrdered")
-                log.debug("About to getCbBuilderForSequence: " + inputSequence)
-                try:
-                    builder = getCbBuilderForSequence(inputSequence)
-                except Exception as error:
-                    message = (
-                        "Something went wrong in gems when creating the carbohydrate."
-                    )
-                    log.error(message)
-                    log.error(error)
-                    with open(
-                        os.path.join(
-                            buildState.getAbsoluteConformerPath(), "error.json"
-                        )
-                    ) as f:
-                        edict = {"error": str(error), "message": message}
-                    raise error
-
-            buildDir = "New_Builds/"
-            buildState.setIsNewBuild(True)
-            outputDirPath = buildState.getAbsoluteConformerPath()
-            sequenceProjects.createConformerDirectoryInBuildsDirectory(
-                thisProjectDir, subDirectory
+            updateBuild(
+                buildState,
+                buildDir,
+                buildState.structureDirectoryName,
+                thisProjectDir,
+                thisServiceDir,
+                thisSeqID,
+                thisBuildStrategyID,
+                thisTransaction
             )
-            # TODO - one day, the path on a compute node might differ from the website path
-            log.debug(
-                "Absolute Conformer Path for this New Build: "
-                + buildState.getAbsoluteConformerPath()
-            )
-            theJsonObject = buildState.json(indent=2, by_alias=True)
-            log.debug("The build state for this New Build, after initializing, is  ")
-            log.debug(theJsonObject)
+        else:
+            newBuildsOnly.append(buildState)
+        
+    # All existing builds have been processed, write the zip file now in case there are no new builds.
+    log.debug("About to zip the top level directory.")
+    zip_toplevel_dir_wrapper(
+        thisProjectDir,
+        f"CB_project_{thisSeqID[:8]}_all.zip", # TODO: remove -gm when ListRBuild test is satisfied.
+    )
+    # TODO: Also write to zip-details.log here.
+    
+    # Now go through the new builds.
+    log.debug("Now processing the new builds.")    
+    for buildState in newBuildsOnly:
+        log.debug("Processing a new buildState: ")
+        log.debug("buildState: ")
+        log.debug(buildState.json(indent=2))    
+        log.debug("Need to build this structure: " + buildState.structureDirectoryName)
+        if needToInstantiateCarbohydrateBuilder:
+            # Only ever do this once.
+            needToInstantiateCarbohydrateBuilder = False
+            # ## the following should probably use the indexOrdered sequence, but that doesn't work...
+            inputSequence = thisTransaction.getSequenceVariantOut("indexOrdered")
+            log.debug("About to getCbBuilderForSequence: " + inputSequence)
             try:
-                writeStringToFile(
-                    theJsonObject, os.path.join(outputDirPath, "info.json")
-                )
+                builder = getCbBuilderForSequence(inputSequence)
             except Exception as error:
-                message = "There was an error writing the build state to a file: "
+                message = (
+                    "Something went wrong in gems when creating the carbohydrate."
+                )
+                log.error(message)
                 log.error(error)
                 with open(
-                    os.path.join(buildState.getAbsoluteConformerPath(), "error.json")
+                    os.path.join(
+                        buildState.getAbsoluteConformerPath(), "error.json"
+                    )
                 ) as f:
                     edict = {"error": str(error), "message": message}
                 raise error
-            build3DStructure(buildState, thisTransaction, outputDirPath, builder)
-            log.debug("just wrote info.json.")
-            log.debug(
-                "The value of mdMinimise in transaction_in is: "
-                + str(thisTransaction.transaction_in.mdMinimize)
-            )
-            if thisTransaction.transaction_in.mdMinimize is True:
-                sequenceProjects.addSequenceFolderSymLinkToNewBuild(
-                    thisServiceDir,
-                    thisSeqID,
-                    thisBuildStrategyID,
-                    thisPuuID,
-                    subDirectory,
-                )
 
-        # buildDir is either New_Builds/ or Existing_Builds/
-        sequenceProjects.createSymLinkInRequestedStructures(
-            thisProjectDir, buildDir, subDirectory
+        buildDir = "New_Builds/"
+        buildState.setIsNewBuild(True)
+        outputDirPath = buildState.getAbsoluteConformerPath()
+        sequenceProjects.createConformerDirectoryInBuildsDirectory(
+            thisProjectDir, buildState.structureDirectoryName
         )
-
-        if buildState.isDefaultStructure:
-            sequenceProjects.addBuildFolderSymLinkForDefaultConformer(
-                thisProjectDir, buildDir, subDirectory
+        # TODO - one day, the path on a compute node might differ from the website path
+        log.debug(
+            "Absolute Conformer Path for this New Build: "
+            + buildState.getAbsoluteConformerPath()
+        )
+        theJsonObject = buildState.json(indent=2, by_alias=True)
+        log.debug("The build state for this New Build, after initializing, is  ")
+        log.debug(theJsonObject)
+        try:
+            writeStringToFile(
+                theJsonObject, os.path.join(outputDirPath, "info.json")
             )
-
-        if buildState.isGlobalDefaultStructure:
-            sequenceProjects.addSequenceFolderSymLinkToDefaultBuild(
-                thisServiceDir, thisSeqID, thisBuildStrategyID, subDirectory
+        except Exception as error:
+            message = "There was an error writing the build state to a file: "
+            log.error(error)
+            with open(
+                os.path.join(buildState.getAbsoluteConformerPath(), "error.json")
+            ) as f:
+                edict = {"error": str(error), "message": message}
+            raise error
+        
+        build3DStructure(buildState, thisTransaction, outputDirPath, builder)
+        log.debug("just wrote info.json.")
+        log.debug(
+            "The value of mdMinimise in transaction_in is: "
+            + str(thisTransaction.transaction_in.mdMinimize)
+        )
+        if thisTransaction.transaction_in.mdMinimize is True:
+            sequenceProjects.addSequenceFolderSymLinkToNewBuild(
+                thisServiceDir,
+                thisSeqID,
+                thisBuildStrategyID,
+                thisPuuID,
+                buildState.structureDirectoryName,
             )
-
-            sequenceProjects.addSequenceBuildStrategyFolderSymLinkToDefaultBuild(
-                thisServiceDir, thisSeqID, thisBuildStrategyID, subDirectory
-            )
-
-        # Needs to be Requested_Structres/. Need to add conformerID separately.
-        # sequenceProjects.addResponse(buildState, thisTransaction, conformerID, buildState.conformerLabel)
-        # This probably needs work
-        sequenceProjects.registerBuild(buildState, thisTransaction)
+        updateBuild(
+            buildState,
+            buildDir,
+            buildState.structureDirectoryName,
+            thisProjectDir,
+            thisServiceDir,
+            thisSeqID,
+            thisBuildStrategyID,
+            thisTransaction
+        )
 
 
 # TODO: Replace this with more generically useful: build3DStructure(transaction, service)
