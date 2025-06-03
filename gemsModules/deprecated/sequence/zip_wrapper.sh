@@ -8,19 +8,21 @@ fi
 
 project_dir_name="$(basename ${project_dir})"
 
-# cd to parent of project_dir
-OLDPWD=$(pwd)
 cd $(dirname ${project_dir})
-#cd ${project_dir_name}
 if [ $? -ne 0 ]; then
-    cd ${OLDPWD}
     exit 2
 fi
 
-echo "INFO: Zipping ${project_dir_name} to ${project_zipname}" >> ${project_dir}/logs/zip.log
 zip -ru ${project_dir_name}/${project_zipname} ${project_dir_name}/Requested_Builds ${project_dir_name}/logs -x "/*.zip"
-if [ $? -ne 0 ]; then
-    cd ${OLDPWD}
-    exit 3
+EXIT_CODE=$?
+if [ EXIT_CODE -ne 0 ]; then
+    echo "Failed to create the project level zip" >> ${project_dir}/zip-status.log
+    echo "[ERROR] : $(date) : Failed to zip project" >> ${project_dir}/zip-details.log
+else
+    # See: https://github.com/GLYCAM-Web/MD_Utils/blob/feature_add-zipfile-creation/protocols/Glycan/Prep_and_Minimization/Sequence-Prep.bash#L339
+    # For info on where these patterns come from.
+    echo "Processing completed on $(date) " >> ${project_dir}/zip-status.log
+    echo "[INFO] : $(date) : Project completed" >> ${project_dir}/zip-details.log
 fi
-cd ${OLDPWD}
+
+exit ${EXIT_CODE}
