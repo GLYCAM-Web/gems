@@ -22,8 +22,8 @@ Requested_Builds
 Sequence_Repository
 default
 logs
-zip-details.log
-zip-status.log
+zip_details.log
+zip_status.log
 
 ${sequenceBuildsPath}/${eval_2_pUUID}/Existing_Builds:
 e6c2e2e8-758b-58b8-b5ff-d138da38dd22
