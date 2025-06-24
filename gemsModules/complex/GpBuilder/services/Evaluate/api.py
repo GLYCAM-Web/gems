@@ -11,41 +11,19 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
-class BuildService_input_Resource(Resource):
+class EvaluateService_input_Resource(Resource):
     """ Need to write validators. """
     pass
 
-class BuildService_output_Resource(Resource):
+class EvaluateService_output_Resource(Resource):
     """ Need to write validators. """
     pass
 
-class BuildService_Resources(Resources):
-    __root__ : List[Union[BuildService_input_Resource, BuildService_output_Resource]] = Field(default_factory=list)
-
-
-# TODO: To structurefile/common_api.py?
-class GlycanMapping(BaseModel):
-    residue: str
-    sequence: str
-
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
-
-    @classmethod
-    def validate(cls, v):
-        if isinstance(v, list) and len(v) == 2:
-            return cls(residue=v[0], sequence=v[1])
-        return v
-    
-
-class BuildOptions(BaseModel):
-    number_of_samples: Optional[int] = Field(2, ge=1, description="Number of output structures")
-    persist_cycles: Optional[int] = Field(5, ge=1, description="Number of persist cycles")
-    seed: Optional[int] = Field(0, description="Random seed") # TODO: If not set, randomize.
+class EvaluateService_Resources(Resources):
+    __root__ : List[Union[EvaluateService_input_Resource, EvaluateService_output_Resource]] = Field(default_factory=list)
 
     
-class BuildService_Inputs(BaseModel):
+class EvaluateService_Inputs(BaseModel):
     pUUID: Optional[str] = Field(
         None,
         title="Project UUID",
@@ -58,48 +36,44 @@ class BuildService_Inputs(BaseModel):
     )
     
     protein_file: str = Field(..., description="Path to the protein PDB file")
-    glycan_mappings: List[GlycanMapping] = Field(
-        ..., description="List of residue to glycan sequence mappings"
-    )
     
     # TODO: Could this be generalized to an Inputs superclass? Internally we should be manipulating resources, not inputs.
-    resources : Optional[BuildService_Resources] = Field(
+    resources : Optional[EvaluateService_Resources] = Field(
         title='Resources',
         description='Resources for Build',
-        default_factory=BuildService_Resources
+        default_factory=EvaluateService_Resources
     )
     
     
-class BuildService_Outputs(BaseModel) :
+class EvaluateService_Outputs(BaseModel) :
     message : str = Field(
         "",
-        title='Build response',
+        title='Evaluate response',
         description='A nice message to return.',
     )
-    resources : Optional[BuildService_Resources] = Field(
+    resources : Optional[EvaluateService_Resources] = Field(
         title='Resources',
         description='Resources for Build',
-        default_factory=BuildService_Resources
+        default_factory=EvaluateService_Resources
     )
 
 
-class BuildService_Request(GpBuilder_Service_Request) :
+class EvaluateService_Request(GpBuilder_Service_Request) :
     typename : str  = Field(
         "Build",  
         alias='type'
     )
     # the following must be redefined in a child class
-    inputs: BuildService_Inputs = Field(
+    inputs: EvaluateService_Inputs = Field(
         ...,
         title='Inputs',
         description='Inputs for Build'
     )
-    options: Optional[BuildOptions] = BuildOptions()
 
 
-class BuildService_Response(GpBuilder_Service_Response) :
+class EvaluateService_Response(GpBuilder_Service_Response) :
     typename : str  = Field(
         "Build",   
         alias='type'
     )
-    outputs : BuildService_Outputs = BuildService_Outputs()
+    outputs : EvaluateService_Outputs = EvaluateService_Outputs()

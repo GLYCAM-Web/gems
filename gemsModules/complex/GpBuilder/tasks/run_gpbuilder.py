@@ -9,13 +9,17 @@ ic = InstanceConfig()
 
 
 def execute(input_file: Path, project_dir: Path):
+    GP_BUILDER = "/programs/gems/gmml2/bin/gpBuilder"
+
     try:
+        # TODO: use job_id from GEMS request.
         #project_dir = Path(ic.get_filesystem_path("GpBuilder")) / job_id
                     
         # TODO: Use $GEMSHOME
-        GP_BUILDER = "/programs/gems/gmml2/bin/gpBuilder"
-        
-        cmd = [GP_BUILDER, str(input_file), str(project_dir)]
+        outputs_dir = test_project_dir / "outputs"
+        outputs_dir.mkdir(exist_ok=True)
+
+        cmd = [GP_BUILDER, str(input_file), str(outputs_dir)]
         log.info(f"Running command: {' '.join(cmd)}")
         
         log_file = project_dir / "gpbuilder.log"
@@ -76,12 +80,10 @@ if __name__ == "__main__":
     # handle inputs and project dirs
     test_input_pdb = Path("/programs/gems/gmml2/tests/tests/inputs/017.GlycoproteinBuilder/1eer_eop_Asn.pdb")
     test_project_dir = Path("test_project_dir")
-    outputs_dir = test_project_dir / "outputs"
     possible_glycosylation_sites = test_project_dir / Path("possible_sites.csv")
     test_input_file = test_project_dir / "builder_input.txt"
 
     test_project_dir.mkdir(exist_ok=True)
-    outputs_dir.mkdir(exist_ok=True)
     
     # Generate the input file with GpBuilderTable
     gpbt_wrapper(test_input_pdb, possible_glycosylation_sites)
@@ -113,6 +115,6 @@ if __name__ == "__main__":
     generate_input_file(test_project_dir, inputs, options)
     
     # Run GpBuilder with the generated input file        
-    execute(test_input_file, outputs_dir)
+    execute(test_input_file, test_project_dir)
     
     

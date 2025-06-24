@@ -59,3 +59,20 @@ def parse_input_file(file_path: Path):
             })
     
     return config
+
+
+if __name__ == "__main__":
+    # Example usage
+    job_dir = Path(".") / "gpbuilder_job"
+    job_dir.mkdir(parents=True, exist_ok=True)
+    
+    inputs = {
+        "protein_file": "/programs/gems/gmml2/tests/tests/inputs/017.GlycoproteinBuilder/1eer_eop_Asn.pdb",
+    }
+    options = {
+        "number_of_samples": 2,
+        "seed": 42
+    }
+    
+    input_file = execute(job_dir, inputs, options)
+    print(f"Input file created at: {input_file}")
