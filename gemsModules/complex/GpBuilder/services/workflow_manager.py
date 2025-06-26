@@ -28,6 +28,7 @@ ANALYZE_DEPENDENCIES = Annotated_List([], ordered=True)
 Service_Dependencies = {
     "Analyze": ANALYZE_DEPENDENCIES,
     "Build": BUILD_DEPENDENCIES,
+    "Evaluate": EVALUATE_DEPENDENCIES,
     "ProjectManagement": PROJECTMANAGEMENT_DEPENDENCIES
 }
 

@@ -1,10 +1,13 @@
 from pydantic import validate_arguments
+from pathlib import Path
 
 from gemsModules.common.main_api_notices import Notices
+from gemsModules.common.main_api_resources import Resource
+from gemsModules.logging.logger import Set_Up_Logging
+
 from .api import Build_Inputs, Build_Outputs, BuildOptions
 from ...main_api_project import GpBuilderProject
-from ...tasks import run_gpbuilder
-from gemsModules.logging.logger import Set_Up_Logging
+from ...tasks import run_gpbuilder, generate_input_file
 
 log = Set_Up_Logging(__name__)
 
@@ -27,6 +30,17 @@ def execute(inputs: Build_Inputs, options: BuildOptions) -> tuple[Build_Outputs,
             Message="Project not found",
         )
         return service_outputs, service_notices
+
+    # generate the input file for GpBuilder
+    input_file = Path(workdir) / "the_input.txt"
+    
+    generate_input_file.execute(input_file, inputs, options)
+    service_outputs.resources.append(Resource(
+        locationType="filesystem-path-unix",
+        resourceRole="gpbuilder-input-file",
+        resourceFormat="text/plain",
+        payload=workdir / "the_input.txt"
+    ))
 
     job_dir = GpBuilderProject.get_project_dir_from_pUUID(inputs.pUUID)
     run_gpbuilder.execute_gpb(job_dir / "the_input.txt", job_dir)

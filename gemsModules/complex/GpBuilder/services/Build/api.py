@@ -52,7 +52,7 @@ class Build_Inputs(BaseModel):
         description="UUID for this GpBuilder Project, assigned automatically by GEMS",
     )
     
-    protein_file: str = Field(..., description="Path to the protein PDB file")
+    protein_file: Optional[str] = Field(..., description="Path to the protein PDB file")
     glycan_mappings: List[GlycanMapping] = Field(
         ..., description="List of residue to glycan sequence mappings"
     )

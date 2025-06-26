@@ -4,6 +4,8 @@ from typing import List
 
 from gemsModules.common.action_associated_objects import AAOP
 from gemsModules.common.services.request_data_filler import Request_Data_Filler
+
+# TODO: Replace with PM_Resource
 from gemsModules.common.main_api_resources import Resource
 
 from gemsModules.complex.GpBuilder.main_api import Gpbuilder_Entity
@@ -38,6 +40,7 @@ class Gpbuilder_Request_Data_Filler(Request_Data_Filler):
                 aaop.The_AAO.inputs.pUUID = this_Project.pUUID
                 aaop.The_AAO.inputs.projectDir = this_Project.project_dir
                 
+                self.__fill_projectman_input_resources(aaop)
                 # copy resources from requester
                 self.fill_resources_from_requester_if_exists(aaop, deep_copy=True)
             
@@ -74,3 +77,14 @@ class Gpbuilder_Request_Data_Filler(Request_Data_Filler):
                 locationType="filesystem-path-unix"
             )
             aaop.The_AAO.inputs.resources.add_resource(protein)
+        
+    def __fill_projectman_input_resources(self, aaop: AAOP):
+        log.debug(f" Filling project management input resources for {aaop=}")
+
+        input_json = Resource(
+            payload=self.transaction.incoming_string,
+            resourceFormat="json",
+            locationType="Payload",
+            options={"filename": "request.json"},
+        )
+        aaop.The_AAO.inputs.resources.add_resource(input_json)

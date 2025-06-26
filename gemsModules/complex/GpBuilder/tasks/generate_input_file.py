@@ -2,11 +2,14 @@ from pydantic import BaseModel, Field
 from typing import List
 from pathlib import Path
 
+from gemsModules.logging.logger import Set_Up_Logging
+
+log = Set_Up_Logging(__name__)
 
 
 
-def execute(job_dir, inputs, options) -> Path:
-    input_file = Path(job_dir) / "the_input.txt"
+def execute(input_file, inputs, options) -> Path:
+    log.debug(f"Creating GP Builder input file at: {input_file}")
 
     with input_file.open("w") as f:
         f.write(f"Protein:{inputs.protein_file}\n")

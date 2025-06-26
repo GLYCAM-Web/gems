@@ -38,7 +38,7 @@ def execute_gpb(input_file: Path, project_dir: Path):
 
 
 
-def execute_gpbt_wrapper(project_pdb_file: Path, output_txt_file: Path):
+def execute_gpbt_wrapper(project_pdb_file: Path, output_file: Path):
     """
     Wrapper function to execute the gpBuilderTable process.
     
@@ -54,13 +54,13 @@ def execute_gpbt_wrapper(project_pdb_file: Path, output_txt_file: Path):
     
     cmd = [GP_BUILDER_TABLE, str(project_pdb_file), "--format", "csv"]
     log.info(f"Running command: {' '.join(cmd)}")
-    with open(output_txt_file, "w") as out_file:
+    with open(output_file, "w") as out_file:
         result = subprocess.run(
             cmd,
             check=True,
             stdout=out_file,
         )
-    log.info(f"gpBuilderTable completed successfully, output written to {output_txt_file}")
+    log.info(f"gpBuilderTable completed successfully, output written to {output_file}")
     
     
 if __name__ == "__main__":

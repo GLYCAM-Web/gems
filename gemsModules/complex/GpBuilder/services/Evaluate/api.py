@@ -74,7 +74,7 @@ class Evaluate_Outputs(BaseModel) :
 
 class EvaluateService_Request(GpBuilder_Service_Request) :
     typename : str  = Field(
-        "Build",  
+        "Evaluate",  
         alias='type'
     )
     # the following must be redefined in a child class
@@ -87,7 +87,7 @@ class EvaluateService_Request(GpBuilder_Service_Request) :
 
 class EvaluateService_Response(GpBuilder_Service_Response) :
     typename : str  = Field(
-        "Build",   
+        "Evaluate",   
         alias='type'
     )
     outputs : Evaluate_Outputs = Evaluate_Outputs()

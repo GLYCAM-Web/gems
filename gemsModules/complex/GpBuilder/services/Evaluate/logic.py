@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 from typing import Optional
+from pathlib import Path
 from pydantic import validate_arguments
 
 from gemsModules.common.main_api_notices import Notices
+from gemsModules.common.main_api_resources import Resource
 from gemsModules.logging.logger import Set_Up_Logging
 
 from .api import Evaluate_Inputs, Evaluate_Outputs, Evaluate_Options, Glycosite
@@ -34,15 +36,17 @@ def execute(inputs: Evaluate_Inputs, options: Optional[Evaluate_Options]) -> tup
         )
         return service_outputs, service_notices
     
-    results = None
-    # Todo: Possibly move this to projectmanagement service.
-    generate_input_file.execute(workdir, inputs, options)
-    
+    gpbt_failed = False
+            
+    # This generates the glycosites to choose from for GpBuilder
     output_csv = workdir / "the_glycosites.csv"
     execute_gpbt_wrapper(
-        input_file=workdir / "the_input.txt",
-        output_file=output_csv
+        # TODO: ensure we're using pdb file from the project directory
+        inputs.protein_file,
+        output_csv,
     )
+    
+    # Update the glycosites in the api response from the output CSV
     service_outputs.csv_path = str(output_csv)
     with open(output_csv, 'r') as f:
         for line in f:
@@ -59,15 +63,16 @@ def execute(inputs: Evaluate_Inputs, options: Optional[Evaluate_Options]) -> tup
                 Tags=parts[4] if len(parts) > 4 else ""
             )
             service_outputs.glycosites.append(glycosite)
+    log.debug(f"Found {len(service_outputs.glycosites)} glycosites in the CSV.")
 
-    if results:
+    if gpbt_failed:
         service_notices.addNotice(
             Brief="Evaluation Failed",
             Scope="Service",
             Messenger="GpBuilder",
             Type="Error",
             Code="500",
-            Message=f"Evaluation Failed: {results.stderr}",
+            Message=f"Evaluation Failed: {gpbt_failed.stderr}",
         )
 
     if not len(service_notices):
