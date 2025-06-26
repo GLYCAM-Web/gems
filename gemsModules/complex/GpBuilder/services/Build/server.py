@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-from gemsModules.complex.GpBuilder.services.Build.api import BuildService_Request, BuildService_Response
-
-from gemsModules.complex.GpBuilder.tasks import generate_input_file, run_gpbuilder
-
 from gemsModules.logging.logger import Set_Up_Logging 
+
+from ...services.Build.api import BuildService_Request, BuildService_Response
+from ...tasks import run_gpbuilder
+from ...main_api_project import GpBuilderProject
+
+from .logic import execute
 log = Set_Up_Logging(__name__)
 
 
@@ -11,10 +13,7 @@ def Serve(service : BuildService_Request) -> BuildService_Response:
     log.debug(f"GpB/Build serving service request: {service=}")
     response = BuildService_Response()
     
-    
-    # TODO: Should be done by an implied ProjectManagementRequest
-    job_dir = "/programs/gems/testGpBuilder-git-ignore-me"
-    generate_input_file.execute(job_dir, service.inputs, service.options)
+    response.outputs, response.notices = execute(service.inputs, service.options)
     
     return response
 

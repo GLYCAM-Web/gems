@@ -2,7 +2,7 @@
 from pydantic import  Field
 from gemsModules.common import main_api_services
 
-from gemsModules.complex.GpBuilder.main_api_project import Gpbuilder_Project
+from gemsModules.complex.GpBuilder.main_api_project import GpBuilderProject
 from gemsModules.complex.GpBuilder.services.settings.known_available import Available_Services
 
 from gemsModules.logging.logger import Set_Up_Logging

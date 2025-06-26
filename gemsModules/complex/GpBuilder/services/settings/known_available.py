@@ -8,6 +8,7 @@ log = Set_Up_Logging(__name__)
 
 class Module_Available_Services(GemsStrEnum):
     ProjectManagement = "ProjectManagement"
+    Evaluate = "Evaluate"
     Build = 'Build'
     
 

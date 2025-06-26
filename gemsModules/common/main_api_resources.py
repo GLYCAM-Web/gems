@@ -83,16 +83,19 @@ class FileSystemHelpersMixin:
         """Copy this resource to the destination directory."""
         filename = filename or self.filename
 
-        if isinstance(parent_dir, str):
-            path = Path(parent_dir) / filename
+        path = Path(parent_dir) / filename
 
         payload = self.get_payload()
         maybe_binary = "b" if isinstance(payload, bytes) else ""
 
         log.debug(f"Copying resource {self} to {path}...")
         with open(path, "w" + maybe_binary) as f:
+            # TODO: handle these composite payloads better.
             if isinstance(payload, dict):
                 payload = str(payload)
+            elif isinstance(payload, list):
+                payload = "\n".join(str(item) for item in payload)
+                
             f.write(payload)
             
         # return a resource for the new file
@@ -198,6 +201,9 @@ class Resource(BaseModel, MimeEncodableResourceMixin, FileSystemHelpersMixin):
     def _handle_payload(self):
         if isinstance(self.payload, dict):
             return self.payload
+        elif isinstance(self.payload, list):
+            return [self.try_decode_mime(item) for item in self.payload]
+       
         
         return self.try_decode_mime(self.payload.encode("utf-8"))
 

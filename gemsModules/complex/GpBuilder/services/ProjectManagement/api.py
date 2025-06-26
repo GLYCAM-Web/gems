@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # import from typing first, in case you want to import pydantic.typing
 from pathlib import Path
-from typing import Literal, Optional, Union
+from typing import Literal, Optional, Union, List
 from pydantic import BaseModel, Field
 
 from gemsModules.logging.logger import Set_Up_Logging
@@ -26,13 +26,13 @@ class PM_Output_Resource(PM_Resource):
 
 
 class PM_Input_Resources(Resources):
-    __root__: Union[PDB_File_Resource, PM_Input_Resource, PM_Output_Resource] = Field(
+    __root__: List[Union[PDB_File_Resource, PM_Input_Resource, PM_Output_Resource]] = Field(
         default_factory=list,
     )
 
 
 class PM_Output_Resources(Resources):
-    __root__: Union[PM_Input_Resource, PM_Output_Resource] = Field(
+    __root__: List[Union[PM_Input_Resource, PM_Output_Resource]] = Field(
         default_factory=list,
     )
 
@@ -48,7 +48,7 @@ class ProjectManagement_Inputs(BaseModel):
         title="Output File Path",
         description="Full path to output file",
     )
-    resources: Resources = Field(
+    resources: Optional[Resources] = Field(
         title="Resources",
         description="List of resources to copy to project directory",
         default_factory=Resources,
@@ -56,7 +56,11 @@ class ProjectManagement_Inputs(BaseModel):
 
 
 class ProjectManagement_Outputs(BaseModel):
-    resources: PM_Output_Resources = PM_Output_Resources()
+    resources: Optional[PM_Output_Resources] = Field(
+        title="Resources",
+        description="Resources created by the Project Management service",
+        default_factory=PM_Output_Resources,
+    )
 
 
 # PM Requests should be based in common.Request, in my mind.

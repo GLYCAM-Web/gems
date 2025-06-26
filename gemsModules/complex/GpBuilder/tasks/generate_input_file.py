@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 def execute(job_dir, inputs, options) -> Path:
-    input_file = Path(job_dir) / "builder_input.txt"
+    input_file = Path(job_dir) / "the_input.txt"
 
     with input_file.open("w") as f:
         f.write(f"Protein:{inputs.protein_file}\n")

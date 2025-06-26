@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-import os
 from pydantic import constr, Field
 from typing import Literal
+from pathlib import Path
 
 from gemsModules.project.main_api import Project
 from gemsModules.systemoperations.instance_config import InstanceConfig
@@ -12,7 +12,7 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
-class Gpbuilder_Project(Project):
+class GpBuilderProject(Project):
     """ GpBuilder project for making new entities. """
     title : str = "GpBuilder project"
     parent_entity : str = ""
@@ -30,7 +30,10 @@ class Gpbuilder_Project(Project):
     gpbuilder_input_file: constr(max_length=255) = "the_input.txt"
     
     def add_temporary_info(self): 
-        ic = InstanceConfig()
-        self.project_dir : str = os.path.join(
-            ic.get_filesystem_path(app="GpBuilder"), self.pUUID
+        self.project_dir : str = str(self.get_project_dir_from_pUUID(self.pUUID))
+
+    @staticmethod
+    def get_project_dir_from_pUUID(pUUID: str):
+        return Path(
+            InstanceConfig().get_filesystem_path(app="GpBuilder"), pUUID
         )

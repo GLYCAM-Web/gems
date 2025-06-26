@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 import os
-from typing import Protocol, Dict, Optional
-from pydantic import BaseModel
+from pathlib import Path
 
 # from gemsModules.complex.glycomimetics.tasks import batchcompute
 from .api import ProjectManagement_Inputs, ProjectManagement_Outputs, PM_Resource
-
-from gemsModules.complex.glycomimetics.tasks import set_up_build_directory
+#from ...tasks import set_up_build_directory
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -27,16 +25,21 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     )
     
     # Setup project directory, TODO: Taskify
-    log.debug(f"GpB/ProjectManagement: about to create project directory: {inputs.projectDir}")
-    os.makedirs(inputs.projectDir, exist_ok=True)
-    
-    log.debug("GpB/ProjectManagement: about to copy resources to project dir")
-    log.debug(f"GpB/ProjectManagement: resources: {inputs.resources}")
-    # Copy all PM_Resources to the output directory.
-    for resource in inputs.resources:
-        pass
+    project_dir = Path(inputs.projectDir)
+    if os.path.exists(project_dir / "outputs"):
+        log.debug(f"GpB/ProjectManagement: project directory already exists: {inputs.projectDir}, skipping creation.")
+    else:
+        log.debug(f"GpB/ProjectManagement: about to create project directory: {inputs.projectDir}")
+        os.makedirs(project_dir, exist_ok=True)
+        os.makedirs(project_dir / "outputs", exist_ok=True)
+        
+        log.debug("GpB/ProjectManagement: about to copy resources to project dir")
+        log.debug(f"GpB/ProjectManagement: resources: {inputs.resources}")
+        # Copy all PM_Resources to the output directory.
+        for resource in inputs.resources:
+            resource.copy_to(project_dir)
 
-    # # TODO: we can use PM_Resource.copy_to to copy the files to the output directory.
-    # service_outputs.resources = ProjectManagement_Resources(resources=resources)
+        # # TODO: we can use PM_Resource.copy_to to copy the files to the output directory.
+        # service_outputs.resources = ProjectManagement_Resources(resources=resources)
 
     return service_outputs

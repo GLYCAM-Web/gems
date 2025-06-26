@@ -7,9 +7,8 @@ from gemsModules.common.services.status.server import Serve as serve_status
 
 from gemsModules.complex.GpBuilder.services.ProjectManagement.server import Serve as serve_pm
 from gemsModules.complex.GpBuilder.services.Build.server  import Serve as serve_Build
+from gemsModules.complex.GpBuilder.services.Evaluate.server import Serve as serve_evaluate
 
-from gemsModules.logging.logger import Set_Up_Logging
-log = Set_Up_Logging(__name__)
 
 service_modules : Dict[str, Callable] = {
     'Error' : serve_error,
@@ -17,5 +16,6 @@ service_modules : Dict[str, Callable] = {
     'Marco': serve_marco, 
     'Status': serve_status,
     'ProjectManagement': serve_pm,
+    'Evaluate': serve_evaluate,  # Assuming serve_evaluate is defined elsewhere
     'Build' : serve_Build
-    }
+}

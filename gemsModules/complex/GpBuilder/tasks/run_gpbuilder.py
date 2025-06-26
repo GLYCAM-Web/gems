@@ -3,48 +3,42 @@ import logging
 from pathlib import Path
 
 from gemsModules.systemoperations.instance_config import InstanceConfig
+from gemsModules.logging.logger import Set_Up_Logging
 
-log = logging.getLogger(__name__)
+log = Set_Up_Logging(__name__)
+
 ic = InstanceConfig()
 
 
-def execute(input_file: Path, project_dir: Path):
+def execute_gpb(input_file: Path, project_dir: Path):
     GP_BUILDER = "/programs/gems/gmml2/bin/gpBuilder"
 
-    try:
-        # TODO: use job_id from GEMS request.
-        #project_dir = Path(ic.get_filesystem_path("GpBuilder")) / job_id
-                    
-        # TODO: Use $GEMSHOME
-        outputs_dir = test_project_dir / "outputs"
-        outputs_dir.mkdir(exist_ok=True)
+    outputs_dir = project_dir / "outputs"
+    outputs_dir.mkdir(exist_ok=True)
 
-        cmd = [GP_BUILDER, str(input_file), str(outputs_dir)]
-        log.info(f"Running command: {' '.join(cmd)}")
-        
-        log_file = project_dir / "gpbuilder.log"
-        err_file = project_dir / "gpbuilder.err"
-        with open(log_file, "w") as log_out, open(err_file, "w") as err_out:
-            result = subprocess.run(
-                cmd,
-                check=True,
-                stdout=log_out,
-                stderr=err_out,
-                timeout=120,
-            )
-        log.info(f"gpBuilder output: {result.stdout.decode()}")
-        log.info(f"gpBuilder error: {result.stderr.decode()}")
+    cmd = [GP_BUILDER,str(input_file), str(outputs_dir)]
+    log.info(f"Running command: {' '.join(cmd)}")
     
-    except subprocess.CalledProcessError as e:
-        # Handle process errors
-        error_message = "Process error"
-        if err_file.exists():
-            error_message += f": {err_file.read_text()}"
-        if log_file.exists():
-            error_message += f"\nLog output: {log_file.read_text()}"
-        log.error(error_message)
+    log_file = project_dir / "gpbuilder.log"
+    err_file = project_dir / "gpbuilder.err"
+    with open(log_file, "w") as log_out, open(err_file, "w") as err_out:
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            timeout=120,
+        )
+        log_out.write(result.stdout.decode())
+        if result.stderr:
+            err_out.write(result.stderr.decode())
+            
+    if result.returncode != 0:
+        log.error(f"gpBuilder failed with return code {result.returncode}. Check {err_file} for details.")
+    else:
+        log.info(f"gpBuilder completed successfully.")
 
-def gpbt_wrapper(project_pdb_file: Path, output_txt_file: Path):
+
+
+def execute_gpbt_wrapper(project_pdb_file: Path, output_txt_file: Path):
     """
     Wrapper function to execute the gpBuilderTable process.
     
@@ -65,9 +59,8 @@ def gpbt_wrapper(project_pdb_file: Path, output_txt_file: Path):
             cmd,
             check=True,
             stdout=out_file,
-            stderr=subprocess.PIPE
         )
-    log.info(f"gpBuilderTable error: {result.stderr.decode()}") 
+    log.info(f"gpBuilderTable completed successfully, output written to {output_txt_file}")
     
     
 if __name__ == "__main__":
@@ -75,18 +68,18 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     
     from gemsModules.complex.GpBuilder.tasks.generate_input_file import execute as generate_input_file
-    from gemsModules.complex.GpBuilder.services.Build.api import BuildService_Inputs, BuildOptions, GlycanMapping
+    from gemsModules.complex.GpBuilder.services.Build.api import Build_Inputs, BuildOptions, GlycanMapping
     
     # handle inputs and project dirs
     test_input_pdb = Path("/programs/gems/gmml2/tests/tests/inputs/017.GlycoproteinBuilder/1eer_eop_Asn.pdb")
     test_project_dir = Path("test_project_dir")
     possible_glycosylation_sites = test_project_dir / Path("possible_sites.csv")
-    test_input_file = test_project_dir / "builder_input.txt"
+    test_input_file = test_project_dir / "the_input.txt"
 
     test_project_dir.mkdir(exist_ok=True)
     
     # Generate the input file with GpBuilderTable
-    gpbt_wrapper(test_input_pdb, possible_glycosylation_sites)
+    execute_gpbt_wrapper(test_input_pdb, possible_glycosylation_sites)
     
     # select the first 3 possible glycosylation sites
     sites_to_select = 3
@@ -99,7 +92,7 @@ if __name__ == "__main__":
             
     # Note: The website will have to allow users to select sites and 
     # generate the sequences and send them to us.
-    inputs = BuildService_Inputs(
+    inputs = Build_Inputs(
         protein_file=str(test_input_pdb),
         glycan_mappings=[
             GlycanMapping(residue=site, sequence="DManpa1-OH") for site in sites
@@ -115,6 +108,6 @@ if __name__ == "__main__":
     generate_input_file(test_project_dir, inputs, options)
     
     # Run GpBuilder with the generated input file        
-    execute(test_input_file, test_project_dir)
+    execute_gpb(test_input_file, test_project_dir)
     
     

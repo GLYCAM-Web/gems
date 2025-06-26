@@ -6,19 +6,19 @@ from abc import ABC, abstractmethod
 from gemsModules.common.project_manager import Project_Manager
 
 from gemsModules.complex.GpBuilder.main_api import Gpbuilder_Entity
-from gemsModules.complex.GpBuilder.main_api_project import Gpbuilder_Project
+from gemsModules.complex.GpBuilder.main_api_project import GpBuilderProject
 
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 class Gpbuilder_Project_Manager(Project_Manager):
 
-    def process(self) -> Gpbuilder_Project:
-        self.response_project = Gpbuilder_Project()
+    def process(self) -> GpBuilderProject:
+        self.response_project = GpBuilderProject()
         self.instantiate_response_project()
         return self.response_project
 
-    def instantiate_response_project(self) -> Gpbuilder_Project:
+    def instantiate_response_project(self) -> GpBuilderProject:
         self.response_project.add_temporary_info()
 
     def fill_response_project_from_incoming_project(self):
@@ -28,9 +28,9 @@ class Gpbuilder_Project_Manager(Project_Manager):
         pass
 
 
-def testme() -> Gpbuilder_Project :
+def testme() -> GpBuilderProject :
     the_entity=Gpbuilder_Entity(type="GpBuilder")
-    the_project=Gpbuilder_Project()
+    the_project=GpBuilderProject()
     the_manager=Gpbuilder_Project_Manager(entity=the_entity, project=the_project)
     return the_manager.instantiate_new_project()
 

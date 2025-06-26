@@ -45,16 +45,11 @@ class BuildOptions(BaseModel):
     seed: Optional[int] = Field(0, description="Random seed") # TODO: If not set, randomize.
 
     
-class BuildService_Inputs(BaseModel):
+class Build_Inputs(BaseModel):
     pUUID: Optional[str] = Field(
         None,
         title="Project UUID",
         description="UUID for this GpBuilder Project, assigned automatically by GEMS",
-    )
-    projectDir: str = Field(
-        None,
-        title="Project Directory",
-        description="Full path to the project directory",
     )
     
     protein_file: str = Field(..., description="Path to the protein PDB file")
@@ -70,7 +65,7 @@ class BuildService_Inputs(BaseModel):
     )
     
     
-class BuildService_Outputs(BaseModel) :
+class Build_Outputs(BaseModel) :
     message : str = Field(
         "",
         title='Build response',
@@ -89,7 +84,7 @@ class BuildService_Request(GpBuilder_Service_Request) :
         alias='type'
     )
     # the following must be redefined in a child class
-    inputs: BuildService_Inputs = Field(
+    inputs: Build_Inputs = Field(
         ...,
         title='Inputs',
         description='Inputs for Build'
@@ -102,4 +97,4 @@ class BuildService_Response(GpBuilder_Service_Response) :
         "Build",   
         alias='type'
     )
-    outputs : BuildService_Outputs = BuildService_Outputs()
+    outputs : Build_Outputs = Build_Outputs()

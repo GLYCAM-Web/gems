@@ -19,13 +19,11 @@ log = Set_Up_Logging(__name__)
 # TODO: To services.settings... ?
 # VALIDATE_DEPENDENCIES = Annotated_List([], ordered=True)
 PROJECTMANAGEMENT_DEPENDENCIES = Annotated_List([], ordered=True)
-# EVALUATE_DEPENDENCIES = Annotated_List(
-#     ["ProjectManagement"], ordered=True
-# )
-BUILD_DEPENDENCIES = Annotated_List(["ProjectManagement"], ordered=True)
-ANALYZE_DEPENDENCIES = Annotated_List(
-    BUILD_DEPENDENCIES + ["Build"], ordered=True
+EVALUATE_DEPENDENCIES = Annotated_List(
+    ["ProjectManagement"], ordered=True
 )
+BUILD_DEPENDENCIES = Annotated_List(["ProjectManagement"], ordered=True)
+ANALYZE_DEPENDENCIES = Annotated_List([], ordered=True)
 
 Service_Dependencies = {
     "Analyze": ANALYZE_DEPENDENCIES,
@@ -37,7 +35,7 @@ Service_Dependencies = {
 class GpBuilder_Workflow_Manager(Workflow_Manager):
     def get_linear_workflow_list(self) -> list[str]:
         return [
-            # "Evaluate",
+            "Evaluate",
             # "Validate",
             "ProjectManagement",
             "Build",

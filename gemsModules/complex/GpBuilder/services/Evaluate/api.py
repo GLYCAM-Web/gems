@@ -22,17 +22,17 @@ class EvaluateService_output_Resource(Resource):
 class EvaluateService_Resources(Resources):
     __root__ : List[Union[EvaluateService_input_Resource, EvaluateService_output_Resource]] = Field(default_factory=list)
 
-    
-class EvaluateService_Inputs(BaseModel):
+
+class Evaluate_Options(BaseModel):
+    """ Options for the Evaluate service. """
+    pass
+
+
+class Evaluate_Inputs(BaseModel):
     pUUID: Optional[str] = Field(
         None,
         title="Project UUID",
         description="UUID for this GpBuilder Project, assigned automatically by GEMS",
-    )
-    projectDir: str = Field(
-        None,
-        title="Project Directory",
-        description="Full path to the project directory",
     )
     
     protein_file: str = Field(..., description="Path to the protein PDB file")
@@ -44,12 +44,26 @@ class EvaluateService_Inputs(BaseModel):
         default_factory=EvaluateService_Resources
     )
     
+
+class Glycosite(BaseModel):
+    """ Represents a glycosylation site in a protein structure. """
+    Chain: str = Field(..., description="Chain identifier")
+    ResidueNumber: str = Field(..., description="Residue number in the chain")
+    InsertionCode: str = Field("", description="Insertion code, if any")
+    SequenceContext: str = Field(..., description="Sequence context around the glycosylation site")
+    Tags: str = Field("", description="Tags associated with the glycosylation site")
     
-class EvaluateService_Outputs(BaseModel) :
-    message : str = Field(
-        "",
-        title='Evaluate response',
-        description='A nice message to return.',
+    
+class Evaluate_Outputs(BaseModel) :
+    csv_path: str = Field(
+        None,
+        title="CSV Path",
+        description="CSV Data with possible glycosylation sites",
+    )
+    glycosites: List[Glycosite] = Field(
+        default_factory=list,
+        title="Glycosites",
+        description="Possible sites for glycosylation"
     )
     resources : Optional[EvaluateService_Resources] = Field(
         title='Resources',
@@ -64,7 +78,7 @@ class EvaluateService_Request(GpBuilder_Service_Request) :
         alias='type'
     )
     # the following must be redefined in a child class
-    inputs: EvaluateService_Inputs = Field(
+    inputs: Evaluate_Inputs = Field(
         ...,
         title='Inputs',
         description='Inputs for Build'
@@ -76,4 +90,4 @@ class EvaluateService_Response(GpBuilder_Service_Response) :
         "Build",   
         alias='type'
     )
-    outputs : EvaluateService_Outputs = EvaluateService_Outputs()
+    outputs : Evaluate_Outputs = Evaluate_Outputs()

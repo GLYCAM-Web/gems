@@ -7,8 +7,11 @@ from gemsModules.common.services.status.implied_translator import status_Implied
 from gemsModules.complex.GpBuilder.services.list_services.implied_translator import list_services_Implied_Translator 
 from gemsModules.complex.GpBuilder.services.Build.implied_translator import Build_Implied_Translator
 from gemsModules.complex.GpBuilder.services.ProjectManagement.implied_translator import ProjectManagement_Implied_Translator
+from gemsModules.complex.GpBuilder.services.Evaluate.implied_translator import Evaluate_Implied_Translator
 
 from gemsModules.logging.logger import Set_Up_Logging
+
+
 log = Set_Up_Logging(__name__)
 
 implied_modules : Dict[str, Callable] = {
@@ -17,5 +20,6 @@ implied_modules : Dict[str, Callable] = {
     'Marco': marco_Implied_Translator, 
     'Status': status_Implied_Translator,
     "ProjectManagement": ProjectManagement_Implied_Translator,
+    "Evaluate": Evaluate_Implied_Translator,  # Assuming Evaluate_Implied_Translator is defined elsewhere
     'Build': Build_Implied_Translator
     }

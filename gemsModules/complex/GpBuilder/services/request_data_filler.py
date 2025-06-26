@@ -7,7 +7,7 @@ from gemsModules.common.services.request_data_filler import Request_Data_Filler
 from gemsModules.common.main_api_resources import Resource
 
 from gemsModules.complex.GpBuilder.main_api import Gpbuilder_Entity
-from gemsModules.complex.GpBuilder.main_api_project import Gpbuilder_Project
+from gemsModules.complex.GpBuilder.main_api_project import GpBuilderProject
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -17,7 +17,7 @@ log = Set_Up_Logging(__name__)
 
 class Gpbuilder_Request_Data_Filler(Request_Data_Filler):
     def process(self) -> List[AAOP]:        
-        this_Project : Gpbuilder_Project = self.response_project
+        this_Project : GpBuilderProject = self.response_project
         
         log.debug(f"GpB/Request_Data_Filler now filling data for the request.")
         log.debug(f"GpB/Request_Data_Filler: {this_Project.project_dir=}")
@@ -27,23 +27,26 @@ class Gpbuilder_Request_Data_Filler(Request_Data_Filler):
             
             if aaop.AAO_Type=='Build':
                 aaop.The_AAO.inputs.pUUID = this_Project.pUUID
-                aaop.The_AAO.inputs.projectDir = this_Project.project_dir
                 
                 # copy inputs to resources
                 self.__fill_build_input_resources(aaop)
+            elif aaop.AAO_Type=='Evaluate':
+                aaop.The_AAO.inputs.pUUID = this_Project.pUUID
+                
+                self.__fill_evaluate_input_resources(aaop)
             elif aaop.AAO_Type=='ProjectManagement':
                 aaop.The_AAO.inputs.pUUID = this_Project.pUUID
                 aaop.The_AAO.inputs.projectDir = this_Project.project_dir
                 
                 # copy resources from requester
                 self.fill_resources_from_requester_if_exists(aaop, deep_copy=True)
-                
+            
             log.debug(f"GpB/Request_Data_Filler filled: {aaop.The_AAO.inputs=}")
         
         return self.aaop_list
 
     def __fill_build_input_resources(self, aaop: AAOP):
-        log.debug(f" Filling input resources for {aaop=}")
+        log.debug(f" Filling build input resources for {aaop=}")
         if aaop.The_AAO.inputs.protein_file is not None:
             protein = Resource(
                 payload=aaop.The_AAO.inputs.protein_file,
@@ -61,4 +64,13 @@ class Gpbuilder_Request_Data_Filler(Request_Data_Filler):
             )
             aaop.The_AAO.inputs.resources.add_resource(mappings)
 
-            
+    def __fill_evaluate_input_resources(self, aaop: AAOP):
+        log.debug(f" Filling evaluate input resources for {aaop=}")
+        if aaop.The_AAO.inputs.protein_file is not None:
+            protein = Resource(
+                payload=aaop.The_AAO.inputs.protein_file,
+                resourceFormat="PDB",
+                resourceRole="protein-file",
+                locationType="filesystem-path-unix"
+            )
+            aaop.The_AAO.inputs.resources.add_resource(protein)
