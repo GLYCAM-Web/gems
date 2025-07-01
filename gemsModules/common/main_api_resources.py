@@ -2,7 +2,7 @@
 import email
 from email.message import EmailMessage
 import mimetypes
-from typing import Any, List, Literal, Optional
+from typing import Any, List, Literal, Optional, Union
 from pydantic import BaseModel, Field
 from pathlib import Path
 import urllib.request
@@ -253,7 +253,21 @@ class Resources(BaseModel):
             resource.payload = None
             if verbose_api:
                 resource.options['cleared_payload'] = True
+                
+    def append(self, resource: Resource):
+        """Append a Resource to the list."""
+        if not isinstance(resource, Resource):
+            raise TypeError("Only Resource instances can be appended.")
+        self.__root__.append(resource)
 
+    def extend(self, resources: Union[List[Resource], 'Resources']):
+        """Extend the list with multiple Resources."""
+        if isinstance(resources, self.__class__):
+            resources = resources.__root__
+        elif not all(isinstance(r, Resource) for r in resources):
+            raise TypeError("Only a list of Resource instances can be extended.")
+        
+        self.__root__.extend(resources)
     def __getitem__(self, key):
         return self.__root__[key]
 

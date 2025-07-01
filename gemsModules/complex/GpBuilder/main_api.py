@@ -54,26 +54,26 @@ class Gpbuilder_Service_Requests(main_api_services.Service_Requests):
 class GpBuilder_Service_Responses(main_api_services.Service_Responses):
     __root__: dict[str, GpResponses] = None
     
-    # @validator('__root__', pre=True, each_item=True)
-    # @classmethod
-    # def validate_service_response(cls, v):
-    #     if not isinstance(v, dict):
-    #         return v
+    @validator('__root__', pre=True, each_item=True)
+    @classmethod
+    def validate_service_response(cls, v):
+        if not isinstance(v, dict):
+            return v
         
-    #     typename = v.get('typename') or v.get('type')
+        typename = v.get('typename') or v.get('type')
         
-    #     # Only validate with the class that matches the typename
-    #     log.debug(f"Validating service response with typename: {typename}")
-    #     if typename == 'Evaluate':
-    #         return EvaluateService_Response.parse_obj(v)
-    #     elif typename == 'Build':
-    #         return BuildService_Response.parse_obj(v)
-    #     elif typename == 'ProjectManagement':
-    #         return ProjectManagement_Response.parse_obj(v)
-    #     elif typename == 'GpBuilder':
-    #         return GpBuilder_Service_Response.parse_obj(v)
-    #     else:
-    #         raise ValueError(f"Unknown service typename: {typename}")
+        # Only validate with the class that matches the typename
+        log.debug(f"Validating service response with typename: {typename}")
+        if typename == 'Evaluate':
+            return EvaluateService_Response.parse_obj(v)
+        elif typename == 'Build':
+            return BuildService_Response.parse_obj(v)
+        elif typename == 'ProjectManagement':
+            return ProjectManagement_Response.parse_obj(v)
+        elif typename == 'GpBuilder':
+            return GpBuilder_Service_Response.parse_obj(v)
+        else:
+            raise ValueError(f"Unknown service typename: {typename}")
         
 
 class Gpbuilder_Entity(main_api_entity.Entity) :

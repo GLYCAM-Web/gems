@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import random
 from pydantic import BaseModel, Field
 from typing   import List, Union, Optional
 
@@ -23,7 +24,8 @@ class BuildService_Resources(Resources):
     __root__ : List[Union[BuildService_input_Resource, BuildService_output_Resource]] = Field(default_factory=list)
 
 
-# TODO: To structurefile/common_api.py?
+# TODO: To structurefile/common_api.py? 
+# TODO: Needs to be Evaluate/Glycosites.
 class GlycanMapping(BaseModel):
     residue: str
     sequence: str
@@ -42,8 +44,8 @@ class GlycanMapping(BaseModel):
 class BuildOptions(BaseModel):
     number_of_samples: Optional[int] = Field(2, ge=1, description="Number of output structures")
     persist_cycles: Optional[int] = Field(5, ge=1, description="Number of persist cycles")
-    seed: Optional[int] = Field(0, description="Random seed") # TODO: If not set, randomize.
-
+    seed: Optional[int] = Field(default=random.randint(0,1e9), description="Random seed for reproducibility")
+    
     
 class Build_Inputs(BaseModel):
     pUUID: Optional[str] = Field(
@@ -89,7 +91,10 @@ class BuildService_Request(GpBuilder_Service_Request) :
         title='Inputs',
         description='Inputs for Build'
     )
-    options: Optional[BuildOptions] = BuildOptions()
+    options: Optional[BuildOptions] = Field(
+        default_factory=BuildOptions,
+        title='Options',
+    )
 
 
 class BuildService_Response(GpBuilder_Service_Response) :
