@@ -49,7 +49,9 @@ def execute(inputs: Evaluate_Inputs, options: Optional[Evaluate_Options]) -> tup
     # Update the glycosites in the api response from the output CSV
     service_outputs.csv_path = str(output_csv)
     with open(output_csv, 'r') as f:
-        for line in f:
+        for line in f: 
+            if any([x in line for x in ["Chain", "ResidueNumber", "InsertionCode", "SequenceContext", "Tags"]]):
+                continue # Skip the header line safely. (In case it's not generated)
             if line.startswith("#"):
                 continue
             parts = line.strip().split(",")
