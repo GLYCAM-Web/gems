@@ -3,7 +3,7 @@ import os
 import socket
 
 from pydantic import constr, Field
-from pydantic.typing import Literal as pyLiteral
+from pydantic.typing import Literal as PyLiteral
 
 from gemsModules.project.main_api import Project
 from gemsModules.systemoperations.instance_config import InstanceConfig
@@ -38,7 +38,7 @@ class MdProject(Project):
     # TODO: Currently ignored by set_up_run_md_directory.
     upload_path: constr(max_length=255) = "/programs/gems/tests/temp-inputs/mdinput"
 
-    project_type: pyLiteral["md"] = Field("md", title="Type", alias="type")
+    project_type: PyLiteral["md"] = Field("md", title="Type", alias="type")
 
     # TODO need protocol file in mdproject
     protocolFilesPath: str = "/programs/gems/External/MD_Utils/protocols/RoeProtocol"

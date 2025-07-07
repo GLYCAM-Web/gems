@@ -18,9 +18,9 @@ def execute(inputs: Build_Inputs, options: BuildOptions) -> tuple[Build_Outputs,
     service_outputs = Build_Outputs()
     service_notices = Notices()
 
-    workdir = GpBuilderProject.get_project_dir_from_pUUID(inputs.pUUID)
-    log.debug(f"workdir: {workdir}")
-    if not workdir:
+    job_dir = GpBuilderProject.get_project_dir_from_pUUID(inputs.pUUID)
+    log.debug(f"workdir: {job_dir}")
+    if not job_dir:
         service_notices.addNotice(
             Brief="Project not found",
             Scope="Service",
@@ -32,17 +32,16 @@ def execute(inputs: Build_Inputs, options: BuildOptions) -> tuple[Build_Outputs,
         return service_outputs, service_notices
 
     # generate the input file for GpBuilder
-    input_file = Path(workdir) / "the_input.txt"
+    input_file = Path(job_dir) / "the_input.txt"
     
     generate_input_file.execute(input_file, inputs, options)
     service_outputs.resources.append(Resource(
         locationType="filesystem-path-unix",
         resourceRole="gpbuilder-input-file",
         resourceFormat="text/plain",
-        payload=workdir / "the_input.txt"
+        payload=job_dir / "the_input.txt"
     ))
 
-    job_dir = GpBuilderProject.get_project_dir_from_pUUID(inputs.pUUID)
     run_gpbuilder.execute_gpb(job_dir / "the_input.txt", job_dir)
     log.debug(f"GPB run completed.")
     # TODO: archive afterwards

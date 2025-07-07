@@ -22,7 +22,9 @@ PROJECTMANAGEMENT_DEPENDENCIES = Annotated_List([], ordered=True)
 EVALUATE_DEPENDENCIES = Annotated_List(
     ["ProjectManagement"], ordered=True
 )
-BUILD_DEPENDENCIES = Annotated_List(["ProjectManagement"], ordered=True)
+# TODO: Build also needs to depend on Evaluate, but if given a pUUID, not to start a new job. Build also needs PM.
+BUILD_DEPENDENCIES = Annotated_List([], ordered=True)
+
 ANALYZE_DEPENDENCIES = Annotated_List([], ordered=True)
 
 Service_Dependencies = {

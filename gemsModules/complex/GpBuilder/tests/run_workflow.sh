@@ -1,5 +1,8 @@
 #!/bin/bash
 
+set -euo pipefail
+
+
 # 1. Evaluate request
 EVALUATE_REQUEST="/programs/gems/gemsModules/complex/GpBuilder/tests/inputs/explicit_evaluate.json"
 
@@ -22,3 +25,4 @@ echo "$BUILD_REQUEST_JSON"
 BUILD_RESPONSE=$(echo $BUILD_REQUEST_JSON | $GEMSHOME/bin/delegate)
 echo "BUILD_RESPONSE:"
 echo "$BUILD_RESPONSE"
+

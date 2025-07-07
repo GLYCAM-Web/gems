@@ -28,8 +28,12 @@ class Gpbuilder_Request_Data_Filler(Request_Data_Filler):
             log.debug(f"GpB/Request_Data_Filler: {i}: {aaop.AAO_Type=}")
             
             if aaop.AAO_Type=='Build':
-                aaop.The_AAO.inputs.pUUID = this_Project.pUUID
-                
+                if aaop.The_AAO.inputs.pUUID is None:
+                    aaop.The_AAO.inputs.pUUID = this_Project.pUUID
+                else:
+                    this_Project.pUUID = aaop.The_AAO.inputs.pUUID
+                    this_Project.add_temporary_info()
+                    
                 # copy inputs to resources
                 self.__fill_build_input_resources(aaop)
             elif aaop.AAO_Type=='Evaluate':

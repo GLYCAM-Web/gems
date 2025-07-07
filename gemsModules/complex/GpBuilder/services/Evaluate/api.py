@@ -50,7 +50,7 @@ class Glycosite(BaseModel):
     Chain: str = Field(..., description="Chain identifier")
     ResidueNumber: str = Field(..., description="Residue number in the chain")
     InsertionCode: str = Field("", description="Insertion code, if any")
-    SequenceContext: str = Field(..., description="Sequence context around the glycosylation site")
+    Sequence: str = Field(..., description="Sequence context around the glycosylation site")
     Tags: str = Field("", description="Tags associated with the glycosylation site")
     
     

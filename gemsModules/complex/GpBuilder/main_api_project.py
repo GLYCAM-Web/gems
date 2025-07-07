@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from pydantic import constr, Field
+from pydantic.typing import Literal as PyLiteral
 from typing import Literal
 from pathlib import Path
 
@@ -18,7 +19,7 @@ class GpBuilderProject(Project):
     parent_entity : str = ""
     app : str = "GpBuilder"
     requested_service : str = "Build"
-    project_type : Literal["gp"] = Field("gp", title="Type", alias="type")
+    project_type : PyLiteral["gp"] = Field("gp", title="Type", alias="type")
     entity_id : str = "complex/GpBuilder"
     service_id : str = ""
     requesting_agent : str = ""
