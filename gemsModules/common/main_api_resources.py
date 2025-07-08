@@ -268,6 +268,14 @@ class Resources(BaseModel):
             raise TypeError("Only a list of Resource instances can be extended.")
         
         self.__root__.extend(resources)
+        
+    def remove_resource_by_role(self, resourceRole: str):
+        """Remove a Resource by its role."""
+        if self.__root__ is None:
+            return
+        
+        self.__root__ = [r for r in self.__root__ if r.resourceRole != resourceRole]
+        
     def __getitem__(self, key):
         return self.__root__[key]
 

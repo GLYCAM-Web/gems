@@ -35,12 +35,10 @@ def execute(inputs: Evaluate_Inputs, options: Optional[Evaluate_Options]) -> tup
             Message="Project not found",
         )
         return service_outputs, service_notices
-    
-    gpbt_failed = False
-            
+                
     # This generates the glycosites to choose from for GpBuilder
     output_csv = workdir / "the_glycosites.csv"
-    execute_gpbt_wrapper(
+    gpbt_failed = execute_gpbt_wrapper(
         # TODO: ensure we're using pdb file from the project directory
         inputs.protein_file,
         output_csv,

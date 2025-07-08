@@ -36,9 +36,28 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
         log.debug("GpB/ProjectManagement: about to copy resources to project dir")
         log.debug(f"GpB/ProjectManagement: resources: {inputs.resources}")
         # Copy all PM_Resources to the output directory.
+        resources_to_replace_by_role = {}
         for resource in inputs.resources:
-            resource.copy_to(project_dir)
-
+            new_resource = resource.copy_to(project_dir)
+            if new_resource.resourceRole == "protein-file":
+                # also create a symbolic link to the protein file at top-level
+                protein_link = project_dir / "Default.pdb"
+                if not protein_link.exists():
+                    log.debug(f"GpB/ProjectManagement: creating symbolic link for protein file: {protein_link}")
+                    if resource.locationType == "filesystem-path-unix":
+                        protein_link.symlink_to(new_resource.payload)
+                    else:
+                        log.warning(f"GpB/ProjectManagement: Cannot create symbolic link for protein file, unsupported location type: {resource.locationType}")
+                resources_to_replace_by_role[new_resource.resourceRole] = new_resource
+            elif new_resource.resourceRole == "glycan-mappings":
+                pass
+            
+        for role, resource in resources_to_replace_by_role.items():
+            # pop the original resource from the inputs.resources
+            inputs.resources.remove_resource_by_role(role)
+            # and add the new resource to the service outputs
+            service_outputs.resources.add_resource(resource)
+            
         # # TODO: we can use PM_Resource.copy_to to copy the files to the output directory.
         # service_outputs.resources = ProjectManagement_Resources(resources=resources)
 

@@ -42,7 +42,18 @@ def execute(inputs: Build_Inputs, options: BuildOptions) -> tuple[Build_Outputs,
         payload=job_dir / "the_input.txt"
     ))
 
-    run_gpbuilder.execute_gpb(job_dir / "the_input.txt", job_dir)
+    failed = run_gpbuilder.execute_gpb(job_dir / "the_input.txt", job_dir)
+    if failed:
+        service_notices.addNotice(
+            Brief="GpBuilder execution failed",
+            Scope="Service",
+            Messenger="GpBuilder",
+            Type="Error",
+            Code="500",
+            Message="GpBuilder execution failed.",
+        )
+        log.error("GpBuilder execution failed.")
+        return service_outputs, service_notices
     log.debug(f"GPB run completed.")
     # TODO: archive afterwards
     # archive_project.execute(job_dir, inputs.pUUID)

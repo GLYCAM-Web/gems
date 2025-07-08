@@ -33,6 +33,7 @@ def execute_gpb(input_file: Path, project_dir: Path):
             
     if result.returncode != 0:
         log.error(f"gpBuilder failed with return code {result.returncode}. Check {err_file} for details.")
+        return True  # Indicate failure
     else:
         log.info(f"gpBuilder completed successfully.")
 
@@ -62,6 +63,8 @@ def execute_gpbt_wrapper(project_pdb_file: Path, output_file: Path):
         )
     log.info(f"gpBuilderTable completed successfully, output written to {output_file}")
     
+    failed = result.returncode != 0
+    return failed
     
 if __name__ == "__main__":
     """Simplification of the GpBuilder workflow for testing purposes."""
