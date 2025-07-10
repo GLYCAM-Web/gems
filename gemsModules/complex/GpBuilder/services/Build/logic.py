@@ -42,6 +42,8 @@ def execute(inputs: Build_Inputs, options: BuildOptions) -> tuple[Build_Outputs,
         payload=job_dir / "the_input.txt"
     ))
 
+    # TODO: Write status.log with "GpBuilder finished with: Success|Failure" afterwards or make this a backgrounded process.
+    # If backgrounded, write "Submitted".
     failed = run_gpbuilder.execute_gpb(job_dir / "the_input.txt", job_dir)
     if failed:
         service_notices.addNotice(
@@ -55,7 +57,10 @@ def execute(inputs: Build_Inputs, options: BuildOptions) -> tuple[Build_Outputs,
         log.error("GpBuilder execution failed.")
         return service_outputs, service_notices
     log.debug(f"GPB run completed.")
-    # TODO: archive afterwards
+    
+    # TODO: archive afterwards - this could probably be PM's job in a future version.
+    # TODO: write status.log with "Archival complete"
     # archive_project.execute(job_dir, inputs.pUUID)
     
+    # TODO: write status.log with "All complete"
     return service_outputs, service_notices

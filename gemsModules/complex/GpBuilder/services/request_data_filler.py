@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from pathlib import Path
 from abc import ABC, abstractmethod
 from typing import List
 
@@ -35,7 +36,7 @@ class Gpbuilder_Request_Data_Filler(Request_Data_Filler):
                     this_Project.add_temporary_info()
                     
                 # copy inputs to resources
-                self.__fill_build_input_resources(aaop)
+                self.__fill_build_input_resources(aaop, this_Project.project_dir)
             elif aaop.AAO_Type=='Evaluate':
                 aaop.The_AAO.inputs.pUUID = this_Project.pUUID
                 
@@ -52,9 +53,11 @@ class Gpbuilder_Request_Data_Filler(Request_Data_Filler):
         
         return self.aaop_list
 
-    def __fill_build_input_resources(self, aaop: AAOP):
+    def __fill_build_input_resources(self, aaop: AAOP, project_dir: str):
         log.debug(f" Filling build input resources for {aaop=}")
-        if aaop.The_AAO.inputs.protein_file is not None:
+        if aaop.The_AAO.inputs.protein_file not in (None, ""):
+            log.debug(f"Protein file found in inputs: {aaop.The_AAO.inputs.protein_file}")
+            # if the protein file is set, we add it as a resource
             protein = Resource(
                 payload=aaop.The_AAO.inputs.protein_file,
                 resourceFormat="PDB",
@@ -62,6 +65,26 @@ class Gpbuilder_Request_Data_Filler(Request_Data_Filler):
                 locationType="filesystem-path-unix"
             )
             aaop.The_AAO.inputs.resources.add_resource(protein)
+        else:
+            log.debug(f"Protein file not set in inputs, trying to find Default.pdb in project directory {project_dir}.")
+            # try to grab from the project dir by seeing what Default.pdb points to
+            default_pdb = Path(project_dir) / "Default.pdb"
+            if default_pdb.exists():
+                # resolve the symlink to get the actual file
+                if default_pdb.is_symlink():
+                    default_pdb = default_pdb.resolve()
+                log.debug(f"Default.pdb found at {default_pdb}, setting as protein file.")
+                protein = Resource(
+                    payload=default_pdb,
+                    resourceFormat="PDB",
+                    resourceRole="protein-file",
+                    locationType="filesystem-path-unix"
+                )
+                aaop.The_AAO.inputs.resources.add_resource(protein)
+                aaop.The_AAO.inputs.protein_file = str(default_pdb)
+                log.debug(f"Set protein file to {aaop.The_AAO.inputs.protein_file} from Default.pdb.")
+            else:
+                log.warning(f"Default.pdb not found in project directory {project_dir}, protein file will not be set.")
         if aaop.The_AAO.inputs.glycan_mappings is not None:
             mappings = Resource(
                 payload=aaop.The_AAO.inputs.glycan_mappings,

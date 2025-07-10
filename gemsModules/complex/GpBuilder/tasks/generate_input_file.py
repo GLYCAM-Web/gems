@@ -14,7 +14,7 @@ def execute(input_file, inputs, options) -> Path:
     with input_file.open("w") as f:
         # we don't use inputs.protein_file here to simplify v1 considering the website must execute evaluate for it's own reasons first.
         # When we do start using the protein file, we will need to ensure to use it's filename, but path modified to the job directory after we copy the upload for them.
-        f.write(f"Protein:Default.pdb\n")
+        f.write(f"Protein:{inputs.protein_file}\n")
         f.write(f"numberOfSamples:{options.number_of_samples}\n")
         f.write(f"persistCycles:{options.persist_cycles}\n")
         f.write(f"rngSeed:{options.seed}\n\n")
