@@ -23,9 +23,11 @@ def execute(inputs: Evaluate_Inputs, options: Optional[Evaluate_Options]) -> tup
     service_outputs = Evaluate_Outputs()
     service_notices = Notices()
 
-    workdir = GpBuilderProject.get_project_dir_from_pUUID(inputs.pUUID)
-    log.debug(f"workdir: {workdir}")
-    if not workdir:
+    project_dir = GpBuilderProject.get_project_dir_from_pUUID(inputs.pUUID)
+    status_log_path = project_dir / "status.log"
+    
+    log.debug(f"workdir: {project_dir}")
+    if not project_dir:
         service_notices.addNotice(
             Brief="Project not found",
             Scope="Service",
@@ -37,12 +39,27 @@ def execute(inputs: Evaluate_Inputs, options: Optional[Evaluate_Options]) -> tup
         return service_outputs, service_notices
                 
     # This generates the glycosites to choose from for GpBuilder
-    output_csv = workdir / "the_glycosites.csv"
+    output_csv = project_dir / "the_glycosites.csv"
     gpbt_failed = execute_gpbt_wrapper(
         # TODO: ensure we're using pdb file from the project directory
         inputs.protein_file,
         output_csv,
     )
+    with open(status_log_path, "a") as status_out:
+        if gpbt_failed or not output_csv.exists():
+            failure_msg = gpbt_failed.stderr if gpbt_failed else "No output CSV generated."
+            log.error(f"GpB Evaluation failed: {failure_msg}")
+            status_out.write(f"GpB Evaluation failed: {failure_msg}\n")
+            service_notices.addNotice(
+                Brief="Evaluation Failed",
+                Scope="Service",
+                Messenger="GpBuilder",
+                Type="Error",
+                Code="500",
+                Message=f"Evaluation Failed: {failure_msg}",
+            )
+        else:
+            status_out.write(f"Evaluation completed successfully.\n")
     
     # Update the glycosites in the api response from the output CSV
     service_outputs.csv_path = str(output_csv)

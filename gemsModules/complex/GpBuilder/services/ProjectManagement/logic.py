@@ -27,19 +27,21 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     # Setup project directory, TODO: Taskify
     project_dir = Path(inputs.projectDir)
     if os.path.exists(project_dir / "outputs"):
-        log.debug(f"GpB/ProjectManagement: project directory already exists: {inputs.projectDir}, skipping creation.")
+        log.warning(f"GpB/ProjectManagement: project directory already exists: {inputs.projectDir}, skipping creation.")
     else:
         log.debug(f"GpB/ProjectManagement: about to create project directory: {inputs.projectDir}")
+        
         os.makedirs(project_dir, exist_ok=True)
         os.makedirs(project_dir / "outputs", exist_ok=True)
+        
         status_log_path = project_dir / "status.log"
-                # Now lets touch the status.log file
         if not status_log_path.exists():
             log.debug(f"GpB/ProjectManagement: creating status.log file at {status_log_path}")
-            status_log_path.touch()  # Create the status log file if it does not exist
+            status_log_path.touch()
         
         log.debug("GpB/ProjectManagement: about to copy resources to project dir")
         log.debug(f"GpB/ProjectManagement: resources: {inputs.resources}")
+        
         # Copy all PM_Resources to the output directory.
         resources_to_replace_by_role = {}
         for resource in inputs.resources:
@@ -50,7 +52,9 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
                 if not protein_link.exists():
                     log.debug(f"GpB/ProjectManagement: creating symbolic link for protein file: {protein_link}")
                     if resource.locationType == "filesystem-path-unix":
-                        protein_link.symlink_to(new_resource.payload)
+                        #protein_link.symlink_to(new_resource.payload)
+                        rel_path = os.path.relpath(new_resource.payload, start=protein_link.parent)
+                        protein_link.symlink_to(rel_path)
                         with open(status_log_path, 'a') as f:
                             f.write(f"Default PDB file at {protein_link}\n")
                     else:
@@ -66,6 +70,6 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
             service_outputs.resources.add_resource(resource)
             
         with open(status_log_path, 'a') as f:
-            f.write("Project directory initialized,n")
+            f.write("Project directory initialized.\n")
             
     return service_outputs

@@ -66,6 +66,7 @@ class Gpbuilder_Request_Data_Filler(Request_Data_Filler):
             )
             aaop.The_AAO.inputs.resources.add_resource(protein)
         else:
+            # TODO: May need a better way of finding the default protein file if not supplied. (e.g. Build service on a project that has been Evaluated)
             log.debug(f"Protein file not set in inputs, trying to find Default.pdb in project directory {project_dir}.")
             # try to grab from the project dir by seeing what Default.pdb points to
             default_pdb = Path(project_dir) / "Default.pdb"

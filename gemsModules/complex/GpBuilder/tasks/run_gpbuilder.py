@@ -38,7 +38,7 @@ def execute_gpb(input_file: Path, project_dir: Path):
             
     # Status logging for website
     status_file = project_dir / "status.log"
-    with open(status_file, "w") as status_out:
+    with open(status_file, "a") as status_out:
         # TODO/Note: We cannot do this when we run in the background, it will have to be part of the separate backgrounded task.
         if "Program got to end ok" in result.stdout.decode():
             status_out.write("GpBuilder finished with: Success\n")
