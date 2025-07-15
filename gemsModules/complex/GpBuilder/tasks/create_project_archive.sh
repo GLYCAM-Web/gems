@@ -23,7 +23,11 @@ archive_name="GP_project_${archive_pUUID:0:8}_all.zip"
 # Create the archive
 archive_path="${project_dir}/${archive_name}"
 
-if zip -r "$archive_path" "$project_dir" -x "*.zip"; then
+# Change to parent directory and zip just the folder name to avoid full path
+parent_dir="$(dirname "$project_dir")"
+folder_name="$(basename "$project_dir")"
+
+if (cd "$parent_dir" && zip -r "$archive_path" "$folder_name" -x "*.zip"); then
     echo "Project archive created successfully." >> "${project_dir}/status.log"
 else
     echo "Failed to create project archive." >> "${project_dir}/status.log"
