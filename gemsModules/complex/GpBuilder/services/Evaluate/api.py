@@ -45,12 +45,13 @@ class Evaluate_Inputs(BaseModel):
     )
     
 
+# TODO: Belongs in main_api_common.py 
 class Glycosite(BaseModel):
     """ Represents a glycosylation site in a protein structure. """
     Chain: str = Field(..., description="Chain identifier")
     ResidueNumber: str = Field(..., description="Residue number in the chain")
     InsertionCode: str = Field("", description="Insertion code, if any")
-    Sequence: str = Field(..., description="Sequence context around the glycosylation site")
+    SequenceContext: str = Field(..., description="Sequence context around the glycosylation site")
     Tags: str = Field("", description="Tags associated with the glycosylation site")
     
     

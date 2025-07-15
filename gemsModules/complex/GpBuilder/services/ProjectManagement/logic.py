@@ -32,6 +32,11 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
         log.debug(f"GpB/ProjectManagement: about to create project directory: {inputs.projectDir}")
         os.makedirs(project_dir, exist_ok=True)
         os.makedirs(project_dir / "outputs", exist_ok=True)
+        status_log_path = project_dir / "status.log"
+                # Now lets touch the status.log file
+        if not status_log_path.exists():
+            log.debug(f"GpB/ProjectManagement: creating status.log file at {status_log_path}")
+            status_log_path.touch()  # Create the status log file if it does not exist
         
         log.debug("GpB/ProjectManagement: about to copy resources to project dir")
         log.debug(f"GpB/ProjectManagement: resources: {inputs.resources}")
@@ -46,6 +51,8 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
                     log.debug(f"GpB/ProjectManagement: creating symbolic link for protein file: {protein_link}")
                     if resource.locationType == "filesystem-path-unix":
                         protein_link.symlink_to(new_resource.payload)
+                        with open(status_log_path, 'a') as f:
+                            f.write(f"Default PDB file at {protein_link}\n")
                     else:
                         log.warning(f"GpB/ProjectManagement: Cannot create symbolic link for protein file, unsupported location type: {resource.locationType}")
                 resources_to_replace_by_role[new_resource.resourceRole] = new_resource
@@ -58,7 +65,7 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
             # and add the new resource to the service outputs
             service_outputs.resources.add_resource(resource)
             
-        # # TODO: we can use PM_Resource.copy_to to copy the files to the output directory.
-        # service_outputs.resources = ProjectManagement_Resources(resources=resources)
-
+        with open(status_log_path, 'a') as f:
+            f.write("Project directory initialized,n")
+            
     return service_outputs

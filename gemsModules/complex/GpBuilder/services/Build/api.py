@@ -28,18 +28,22 @@ class BuildService_Resources(Resources):
 # TODO: To structurefile/common_api.py? 
 # TODO: Needs to be Evaluate/Glycosites.
 class GlycanMapping(BaseModel):
-    residue: str
-    sequence: str
+    Chain: str
+    ResidueNumber: str
+    Sequence: str
+    SequenceContext: Optional[str] = Field("", description="Sequence context around the glycan mapping, if given")
+    InsertionCode: Optional[str] = Field("", description="Insertion code, if any")
+    Tags: Optional[str] = Field("", description="Tags associated with the glycan mapping, if given")
 
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
+    # @classmethod
+    # def __get_validators__(cls):
+    #     yield cls.validate
 
-    @classmethod
-    def validate(cls, v):
-        if isinstance(v, list) and len(v) == 2:
-            return cls(residue=v[0], sequence=v[1])
-        return v
+    # @classmethod
+    # def validate(cls, v):
+    #     if isinstance(v, list) and len(v) == 2:
+    #         return cls(residue=v[0], sequence=v[1])
+    #     return v
     
 
 class BuildOptions(BaseModel):
@@ -56,7 +60,7 @@ class Build_Inputs(BaseModel):
     )
     
     protein_file: Optional[str] = Field("", description="Path to the protein PDB file")
-    glycan_mappings: List[Glycosite] = Field(
+    glycan_mappings: List[GlycanMapping] = Field(
         ..., description="List of residue to glycan sequence mappings"
     )
     

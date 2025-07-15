@@ -59,7 +59,7 @@ def execute(inputs: Evaluate_Inputs, options: Optional[Evaluate_Options]) -> tup
                 Chain=parts[0],
                 ResidueNumber=parts[1],
                 InsertionCode=parts[2] if len(parts) > 2 else "",
-                Sequence=parts[3] if len(parts) > 3 else "",
+                SequenceContext=parts[3] if len(parts) > 3 else "",
                 Tags=parts[4] if len(parts) > 4 else ""
             )
             service_outputs.glycosites.append(glycosite)

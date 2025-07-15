@@ -13,14 +13,19 @@ ic = InstanceConfig()
 def execute_gpb(input_file: Path, project_dir: Path):
     GP_BUILDER = "/programs/gems/gmml2/bin/gpBuilder"
 
+    # Create an outputs directory if it doesn't exist
+    # TODO: for multiple runs, do we need a default outputs and per run outputs?
     outputs_dir = project_dir / "outputs"
     outputs_dir.mkdir(exist_ok=True)
 
+    # Construct the command to run GpBuilder
     cmd = [GP_BUILDER,str(input_file), str(outputs_dir)]
     log.info(f"Running command: {' '.join(cmd)}")
     
+    # Run the command and capture output
     log_file = project_dir / "gpbuilder.log"
     err_file = project_dir / "gpbuilder.err"
+    # TODO: we need to background this and not wait for it in v2+.
     with open(log_file, "w") as log_out, open(err_file, "w") as err_out:
         result = subprocess.run(
             cmd,
@@ -30,6 +35,15 @@ def execute_gpb(input_file: Path, project_dir: Path):
         log_out.write(result.stdout.decode())
         if result.stderr:
             err_out.write(result.stderr.decode())
+            
+    # Status logging for website
+    status_file = project_dir / "status.log"
+    with open(status_file, "w") as status_out:
+        # TODO/Note: We cannot do this when we run in the background, it will have to be part of the separate backgrounded task.
+        if "Program got to end ok" in result.stdout.decode():
+            status_out.write("GpBuilder finished with: Success\n")
+        else:
+            status_out.write("GpBuilder finished with: Failure\n")
             
     if result.returncode != 0:
         log.error(f"gpBuilder failed with return code {result.returncode}. Check {err_file} for details.")
