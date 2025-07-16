@@ -15,12 +15,15 @@ EvaluationCommands=(
 declare -A EvaluationCorrectOutputs
 EvaluationCorrectOutputs=(
     [ListRBuild]="""${sequenceBuildsPath}/${eval_2_pUUID}:
+CB_project_${eval_2_pUUID:0:8}_all.zip
 Existing_Builds
 New_Builds
 Requested_Builds
 Sequence_Repository
 default
 logs
+zip_details.log
+zip_status.log
 
 ${sequenceBuildsPath}/${eval_2_pUUID}/Existing_Builds:
 e6c2e2e8-758b-58b8-b5ff-d138da38dd22

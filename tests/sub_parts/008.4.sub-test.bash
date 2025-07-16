@@ -17,6 +17,9 @@ check_file="${sequenceBuildsPath}/${eval_2_pUUID}/logs/response.json"
 echo "About to wait for output files to appear." | tee -a ${badOutput}
 echo "the file(s) we await : ${check_file}" >> ${badOutput}
 wait_for_files ${check_file}
+
+zip_file=("${sequenceBuildsPath}/${eval_2_pUUID}/CB_*.zip"); zip_file="${zip_file[0]}"
+wait_for_files ${zip_file}
 result=$?
 if [ "${result}" -ne "0" ] ; then
 	echo "Timed out before files appeared.  Test FAILED." | tee -a ${badOutput}
@@ -24,6 +27,7 @@ if [ "${result}" -ne "0" ] ; then
 	ALL_TESTS_PASSED='false'
 	return 1
 fi
+sleep 3
 
 all_evaluation_passed='true'
 echo "Running ${#EvaluationTests[@]} sub-tests for the evaluation"

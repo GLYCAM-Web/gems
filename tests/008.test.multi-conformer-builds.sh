@@ -152,7 +152,7 @@ fi
 
 
 if [ "${ALL_JSON_ARE_GOOD}" == "false" ] ; then
-        echo "The builds worked, but one or more JSON delegations FAILED."
+	echo "The builds worked, but one or more JSON delegations FAILED."
 	ALL_TESTS_PASSED='false'
 fi
 if [ "${ALL_TESTS_PASSED}" == "false" ] ; then
