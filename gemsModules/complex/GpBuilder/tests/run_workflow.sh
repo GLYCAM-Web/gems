@@ -8,6 +8,8 @@ EVALUATE_REQUEST="/programs/gems/gemsModules/complex/GpBuilder/tests/inputs/expl
 
 # 2. Build Request 
 BUILD_REQUEST="/programs/gems/gemsModules/complex/GpBuilder/tests/inputs/explicit_build_paramaterized.json"
+# Really, glycan mappings should be produced from Eval request and some sequences
+
 
 echo "We are using these requests:"
 echo "EVALUATE: $EVALUATE_REQUEST"

@@ -1,3 +1,4 @@
+import os
 import subprocess
 import logging
 from pathlib import Path
@@ -10,8 +11,26 @@ log = Set_Up_Logging(__name__)
 ic = InstanceConfig()
 
 
-def execute_gpb(input_file: Path, project_dir: Path):
-    GP_BUILDER = "/programs/gems/gmml2/bin/gpBuilder"
+def execute_gpb(input_file: Path, project_dir: Path) -> bool:
+    """
+    Executes the GpBuilder process using the provided input file and project directory.
+    
+    Args:
+        input_file (Path): The path to the input file for GpBuilder.
+        project_dir (Path): The directory where the project files are located.
+        
+    Returns:
+        bool: True if the process failed, False if it succeeded.
+    """
+    log.debug(f"Executing GpBuilder with input file: {input_file} in project directory: {project_dir}")
+    
+    GEMSHOME = os.getenv("GEMSHOME")
+    if not GEMSHOME:
+        log.error("GEMSHOME environment variable is not set. Please set it.")
+        return True
+    GP_BUILDER = f"{GEMSHOME}/gmml2/bin/gpBuilder"
+    # resolve variable if it is set
+    
 
     # Create an outputs directory if it doesn't exist
     # TODO: for multiple runs, do we need a default outputs and per run outputs?
