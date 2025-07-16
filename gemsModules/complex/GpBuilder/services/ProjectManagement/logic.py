@@ -46,7 +46,7 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
             new_resource = resource.copy_to(project_dir)
             if new_resource.resourceRole == "protein-file":
                 # also create a symbolic link to the protein file at top-level
-                protein_link = project_dir / "Default.pdb"
+                protein_link = project_dir / "OriginalInput.pdb"
                 if not protein_link.exists():
                     log.debug(f"GpB/ProjectManagement: creating symbolic link for protein file: {protein_link}")
                     if resource.locationType == "filesystem-path-unix":

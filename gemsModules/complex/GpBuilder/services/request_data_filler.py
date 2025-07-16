@@ -66,14 +66,14 @@ class Gpbuilder_Request_Data_Filler(Request_Data_Filler):
             )
             aaop.The_AAO.inputs.resources.add_resource(protein)
         else:
-            log.debug(f"Protein file not set in inputs, trying to find Default.pdb in project directory {project_dir}.")
-            # try to grab from the project dir by seeing what Default.pdb points to
-            default_pdb = Path(project_dir) / "Default.pdb"
+            log.debug(f"Protein file not set in inputs, trying to find OriginalInput.pdb in project directory {project_dir}.")
+            # try to grab from the project dir by seeing what OriginalInput.pdb points to
+            default_pdb = Path(project_dir) / "OriginalInput.pdb"
             if default_pdb.exists():
                 # resolve the symlink to get the actual file
                 if default_pdb.is_symlink():
                     default_pdb = default_pdb.resolve()
-                log.debug(f"Default.pdb found at {default_pdb}, setting as protein file.")
+                log.debug(f"OriginalInput.pdb found at {default_pdb}, setting as protein file.")
                 protein = Resource(
                     payload=default_pdb,
                     resourceFormat="PDB",
@@ -82,9 +82,9 @@ class Gpbuilder_Request_Data_Filler(Request_Data_Filler):
                 )
                 aaop.The_AAO.inputs.resources.add_resource(protein)
                 aaop.The_AAO.inputs.protein_file = str(default_pdb)
-                log.debug(f"Set protein file to {aaop.The_AAO.inputs.protein_file} from Default.pdb.")
+                log.debug(f"Set protein file to {aaop.The_AAO.inputs.protein_file} from OriginalInput.pdb.")
             else:
-                log.warning(f"Default.pdb not found in project directory {project_dir}, protein file will not be set.")
+                log.warning(f"OriginalInput.pdb not found in project directory {project_dir}, protein file will not be set.")
         if aaop.The_AAO.inputs.glycan_mappings is not None:
             mappings = Resource(
                 payload=aaop.The_AAO.inputs.glycan_mappings,
