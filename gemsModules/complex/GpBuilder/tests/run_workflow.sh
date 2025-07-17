@@ -28,3 +28,11 @@ BUILD_RESPONSE=$(echo $BUILD_REQUEST_JSON | $GEMSHOME/bin/delegate)
 echo "BUILD_RESPONSE:"
 echo "$BUILD_RESPONSE"
 
+# Find "Success" and echo the line if it exists by using json.tool to format the JSON response
+if echo "$BUILD_RESPONSE" | python3 -m json.tool | grep success; then
+    echo "Build was successful."
+else
+    echo "Build failed. Response:"
+    echo "$BUILD_RESPONSE" | python3 -m json.tool
+    exit 1
+fi

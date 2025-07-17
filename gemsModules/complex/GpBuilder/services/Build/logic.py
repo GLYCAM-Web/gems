@@ -59,19 +59,22 @@ def execute(inputs: Build_Inputs, options: BuildOptions) -> tuple[Build_Outputs,
             Message="GpBuilder execution failed.",
         )
         log.error("GpBuilder execution failed.")
-        return service_outputs, service_notices
     else:
+        service_notices.addNotice(
+            Brief="GpBuilder success!",
+            Scope="Service",
+            Messenger="GpBuilder",
+            Type="Info",
+            Code="200",
+            Message="GpBuilder execution succeeded.",
+        )
         log.debug("GpBuilder execution succeeded.")
-    log.debug(f"GPB run completed.")
+  
+        archive_project.execute(job_dir, inputs.pUUID)
+        log.debug(f"Project {inputs.pUUID} just archived.")
     
-    # TODO: archive afterwards - this could probably be PM's job in a future version.
-    # TODO: write status.log with "Archival complete"
-    archive_project.execute(job_dir, inputs.pUUID)
-    log.debug(f"Project {inputs.pUUID} just archived.")
- 
-    # This is redundant for now, but when GpB is no longer blocking we will need to write this with the background task.
-    with open(status_log_path, "a") as status_out:
-        status_out.write("All complete\n")
-    
-    # TODO: write status.log with "All complete"
+        # This is redundant for now, but when GpB is no longer blocking we will need to write this with the background task.
+        with open(status_log_path, "a") as status_out:
+            status_out.write("All complete\n")
+                
     return service_outputs, service_notices

@@ -4,6 +4,8 @@ from pathlib import Path
 
 from gemsModules.logging.logger import Set_Up_Logging
 
+from ..services.Build.api import Build_Inputs, BuildOptions, GlycanMapping
+
 log = Set_Up_Logging(__name__)
 
 
@@ -17,7 +19,10 @@ def execute(input_file, inputs, options) -> Path:
         f.write(f"Protein:{inputs.protein_file}\n")
         f.write(f"numberOfSamples:{options.number_of_samples}\n")
         f.write(f"persistCycles:{options.persist_cycles}\n")
-        f.write(f"rngSeed:{options.seed}\n\n")
+        f.write(f"rngSeed:{options.seed}\n")
+        f.write(f"prepareForMD:{str(options.prepare_for_md).lower()}\n")
+        f.write(f"useInitialGlycositeResidueConformation:{str(options.use_initial_glycosite_residue_conformation).lower()}\n")
+        f.write(f"moveOverlappingSidechains:{str(options.move_overlapping_sidechains).lower()}\n\n")
         
         f.write("ProteinResidue, GlycanName:\n")
         for mapping in inputs.glycan_mappings:
@@ -33,9 +38,8 @@ def parse_input_file(file_path: Path):
     with open(file_path) as f:
         lines = f.readlines()
 
-    config = {
-        "glycan_mappings": []
-    }
+    b_inputs = Build_Inputs()
+    b_options = BuildOptions()
     
     in_mappings = False
     
@@ -47,23 +51,37 @@ def parse_input_file(file_path: Path):
         if ":" in line:
             key, value = line.split(":", 1)
             if key == "Protein":
-                config["protein_file"] = value.strip()
+                b_options.protein_file = value.strip()
             elif key == "numberOfSamples":
-                config["number_of_samples"] = int(value)
+                b_options.number_of_samples = int(value)
             elif key == "persistCycles":
-                config["persist_cycles"] = int(value)
-            elif key == "seed":
-                config["seed"] = int(value)
+                b_options.persist_cycles = int(value)
+            elif key == "rngSeed":
+                b_options.seed = int(value)
+            elif key == "prepareForMD":
+                b_options.prepare_for_md = value.strip().lower() == "true"
+            elif key == "useInitialGlycositeResidueConformation":
+                b_options.use_initial_glycosite_residue_conformation = value.strip().lower() == "true"
+            elif key == "moveOverlappingSidechains":
+                b_options.move_overlapping_sidechains = value.strip().lower() == "true"
             elif key == "ProteinResidue, GlycanName":
                 in_mappings = True
+            continue
         elif in_mappings and "|" in line:
             residue, sequence = line.split("|", 1)
-            config["glycan_mappings"].append({
-                "residue": residue.strip(),
-                "sequence": sequence.strip()
-            })
-    
-    return config
+            residue_parts = residue.split("_")
+            if len(residue_parts) == 2:
+                chain, residue_number = residue_parts
+                glycan_mapping = GlycanMapping(
+                    Chain=chain,
+                    ResidueNumber=residue_number,
+                    Sequence=sequence.strip()
+                )
+                b_inputs.glycan_mappings.append(glycan_mapping)
+        else:
+            log.warning(f"Unrecognized line in GP Builder input file: {line}")
+        
+    return b_inputs, b_options
 
 
 if __name__ == "__main__":
@@ -71,13 +89,8 @@ if __name__ == "__main__":
     job_dir = Path(".") / "gpbuilder_job"
     job_dir.mkdir(parents=True, exist_ok=True)
     
-    inputs = {
-        "protein_file": "/programs/gems/gmml2/tests/tests/inputs/017.GlycoproteinBuilder/1eer_eop_Asn.pdb",
-    }
-    options = {
-        "number_of_samples": 2,
-        "seed": 42
-    }
+    inputs = Build_Inputs(protein_file="/programs/gems/gmml2/tests/tests/inputs/017.GlycoproteinBuilder/1eer_eop_Asn.pdb")
+    options = BuildOptions(number_of_samples=2, seed=42)
     
     input_file = execute(job_dir, inputs, options)
     print(f"Input file created at: {input_file}")

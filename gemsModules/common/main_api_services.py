@@ -69,7 +69,9 @@ class Service_Response(BaseModel):
         description="ID to allow correlations between services and responses.",
     )
     outputs: typing.Any = None
-    notices: Optional[Notices] = Notices()
+    notices: Optional[Notices] = Field(
+        default_factory=Notices
+    )
 
     class Config:
         title = "Response"

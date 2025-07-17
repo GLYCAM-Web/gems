@@ -39,6 +39,7 @@ class Gpbuilder_Service_Requests(main_api_services.Service_Requests):
         
         # Only validate with the class that matches the typename
         log.debug(f"Validating service request with typename: {typename}")
+        log.debug(f"Service request content: {v}")
         if typename == 'Evaluate':
             return EvaluateService_Request.parse_obj(v)
         elif typename == 'Build':

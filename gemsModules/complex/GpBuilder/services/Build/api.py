@@ -47,10 +47,16 @@ class GlycanMapping(BaseModel):
     
 
 class BuildOptions(BaseModel):
-    number_of_samples: Optional[int] = Field(2, ge=1, description="Number of output structures")
+    number_of_samples: Optional[int] = Field(2, ge=0, description="Number of output structures")
     persist_cycles: Optional[int] = Field(5, ge=1, description="Number of persist cycles")
-    seed: Optional[int] = Field(default=random.randint(0,1e9), description="Random seed for reproducibility")
-    
+    seed: Optional[int] = Field(default_factory=lambda: random.randint(0,1e9), description="Random seed for reproducibility")
+    prepare_for_md: Optional[bool] = Field(False, description="Prepare for MD simulation")
+    use_initial_glycosite_residue_conformation: Optional[bool] = Field(
+        False, description="Use initial glycosite residue conformation"
+    )
+    move_overlapping_sidechains: Optional[bool] = Field(
+        False, description="Move overlapping sidechains"
+    )
     
 class Build_Inputs(BaseModel):
     pUUID: Optional[str] = Field(
@@ -107,4 +113,4 @@ class BuildService_Response(GpBuilder_Service_Response) :
         "Build",   
         alias='type'
     )
-    outputs : Build_Outputs = Build_Outputs()
+    outputs : Build_Outputs = Field(default_factory=Build_Outputs, title='Outputs')

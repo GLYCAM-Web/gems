@@ -18,13 +18,11 @@ BUILD_REQUEST="$GEMSHOME/gemsModules/complex/GpBuilder/tests/inputs/explicit_bui
 
 
 # --- Workflow Execution ---
-
 # Run the evaluation delegate
 EVALUATE_RESPONSE=$($GEMSHOME/bin/delegate "$EVALUATE_REQUEST")
 
 # Step 1: Extract the project directory path from the JSON response.
 # We grep for the 'project_dir' line and use cut to get the value.
-# If grep doesn't find a match, it will exit with an error, and `set -e` will stop the script here.
 PROJECT_DIR_PATH=$(echo "$EVALUATE_RESPONSE" | grep -o '"project_dir": *"[^"]*' | cut -d'"' -f4)
 
 # Add an explicit check for an empty path to provide a better error message.
@@ -35,12 +33,9 @@ if [ -z "$PROJECT_DIR_PATH" ]; then
 fi
 
 # Step 2: Get the basename of the path.
-# This is now a standalone command. If it fails, `set -e` will stop the script.
 PUUID=$(basename "$PROJECT_DIR_PATH")
 
 # Step 3: Substitute the pUUID into the build request template.
-# This uses sed to replace the placeholder.
-# Note the improved syntax: `sed ... file` is preferred over `cat file | sed ...`
 BUILD_REQUEST_JSON=$(sed "s/<pUUID>/$PUUID/" "$BUILD_REQUEST")
 
 # Run the build delegate with the now-complete request JSON.
@@ -51,7 +46,14 @@ echo "$BUILD_RESPONSE" | python -m json.tool > test-22-output-git-ignore-me.json
 if [ $? -ne 0 ]; then
   echo "Output is not a valid JSON"
   echo "$BUILD_RESPONSE" > test-22-invalid-output-git-ignore-me.json
-  exit 1
+  exit 2
 else
-  echo "Output is a valid JSON"
+  # check that "success" is in the response
+  if echo "$BUILD_RESPONSE" | grep success; then
+      echo "Build was successful."
+  else
+      echo "Build failed. No success notice found in the response." >&2
+      echo "$BUILD_RESPONSE" > test-22-invalid-output-git-ignore-me.json
+      exit 3
+  fi
 fi

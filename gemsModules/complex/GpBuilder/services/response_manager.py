@@ -27,7 +27,6 @@ class Gpbuilder_Response_Manager(Response_Manager):
         for aaop in response_aaop_list: 
             this_response = aaop.The_AAO.copy(deep=True)
             this_response.myUuid = aaop.ID_String
-            this_response.notices = Notices()
             self.response_entity.responses.add_response(key_string=aaop.Dictionary_Name, response=this_response)
 
         log.debug("the response entity is: ")
