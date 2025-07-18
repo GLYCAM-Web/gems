@@ -32,8 +32,8 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
         log.debug(f"GpB/ProjectManagement: about to create project directory: {inputs.projectDir}")
         os.makedirs(project_dir, exist_ok=True)
         os.makedirs(project_dir / "outputs", exist_ok=True)
+        
         status_log_path = project_dir / "status.log"
-                # Now lets touch the status.log file
         if not status_log_path.exists():
             log.debug(f"GpB/ProjectManagement: creating status.log file at {status_log_path}")
             status_log_path.touch()  # Create the status log file if it does not exist
@@ -66,6 +66,6 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
             service_outputs.resources.add_resource(resource)
             
         with open(status_log_path, 'a') as f:
-            f.write("Project directory initialized,n")
+            f.write("Project directory initialized\n")
             
     return service_outputs

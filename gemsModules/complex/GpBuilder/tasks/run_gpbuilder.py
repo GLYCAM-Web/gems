@@ -29,8 +29,8 @@ def execute_gpb(input_file: Path, project_dir: Path) -> bool:
         log.error("GEMSHOME environment variable is not set. Please set it.")
         return True
     GP_BUILDER = f"{GEMSHOME}/gmml2/bin/gpBuilder"
-    # resolve variable if it is set
     
+    status_file = project_dir / "status.log"
 
     # Create an outputs directory if it doesn't exist
     # TODO: for multiple runs, do we need a default outputs and per run outputs?
@@ -38,27 +38,35 @@ def execute_gpb(input_file: Path, project_dir: Path) -> bool:
     outputs_dir.mkdir(exist_ok=True)
 
     # Construct the command to run GpBuilder
-    cmd = [GP_BUILDER,str(input_file), str(outputs_dir)]
+    # --overwrite-existing-files or change outputs dir per build run
+    cmd = [GP_BUILDER, str(input_file), str(outputs_dir)]
     log.info(f"Running command: {' '.join(cmd)}")
     
     # Run the command and capture output
     log_file = project_dir / "gpbuilder.log"
     err_file = project_dir / "gpbuilder.err"
     # TODO: we need to background this and not wait for it in v2+.
-    with open(log_file, "w") as log_out, open(err_file, "w") as err_out:
+    with open(log_file, "a") as log_out, open(err_file, "a") as err_out:
+        log_out.write(f"Running command: {' '.join(cmd)}\n")
+        log_out.write(f"Working directory: {project_dir}\n")
+        err_out.write("GpBuilder execution started.\n")
+        with open(status_file, "a") as status_out:
+            status_out.write("GpBuilder execution started.\n")
+        
+        # TODO: Use a timeout or background process for long-running tasks and return notice of submission.
         result = subprocess.run(
             cmd,
             capture_output=True,
             timeout=120,
         )
+        
         log_out.write(result.stdout.decode())
         if result.stderr:
             err_out.write(result.stderr.decode())
             
     # Status logging for website
-    status_file = project_dir / "status.log"
-    with open(status_file, "w") as status_out:
-        # TODO/Note: We cannot do this when we run in the background, it will have to be part of the separate backgrounded task.
+    # TODO/Note: We cannot do this when we run in the background, it will have to be part of the separate backgrounded task.
+    with open(status_file, "a") as status_out:
         if "Program got to end ok" in result.stdout.decode():
             status_out.write("GpBuilder finished with: Success\n")
         else:
