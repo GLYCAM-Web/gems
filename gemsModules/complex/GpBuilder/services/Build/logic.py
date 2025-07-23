@@ -48,7 +48,7 @@ def execute(inputs: Build_Inputs, options: BuildOptions) -> tuple[Build_Outputs,
 
     # TODO: Write status.log with "GpBuilder finished with: Success|Failure" afterwards or make this a backgrounded process.
     # If backgrounded, write "Submitted".
-    failed = run_gpbuilder.execute_gpb(job_dir / "the_input.txt", job_dir)
+    failed = run_gpbuilder.execute_gpb(job_dir / "the_input.txt", job_dir, inputs.pUUID)
     if failed:
         service_notices.addNotice(
             Brief="GpBuilder execution failed",
@@ -61,20 +61,20 @@ def execute(inputs: Build_Inputs, options: BuildOptions) -> tuple[Build_Outputs,
         log.error("GpBuilder execution failed.")
     else:
         service_notices.addNotice(
-            Brief="GpBuilder success!",
+            Brief="GpBuilder running",
             Scope="Service",
             Messenger="GpBuilder",
             Type="Info",
             Code="200",
-            Message="GpBuilder execution succeeded.",
+            Message="GpBuilder execution started.",
         )
-        log.debug("GpBuilder execution succeeded.")
+        log.debug("GpBuilder execution started, see project logs for details.")
   
-        archive_project.execute(job_dir, inputs.pUUID)
-        log.debug(f"Project {inputs.pUUID} just archived.")
+        # archive_project.execute(job_dir, inputs.pUUID)
+        # log.debug(f"Project {inputs.pUUID} just archived.")
     
         # This is redundant for now, but when GpB is no longer blocking we will need to write this with the background task.
-        with open(status_log_path, "a") as status_out:
-            status_out.write("All complete\n")
+        # with open(status_log_path, "a") as status_out:
+        #    status_out.write("All complete\n")
                 
     return service_outputs, service_notices

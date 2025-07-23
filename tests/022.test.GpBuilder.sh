@@ -49,7 +49,7 @@ if [ $? -ne 0 ]; then
   exit 2
 else
   # check that "success" is in the response
-  if echo "$BUILD_RESPONSE" | grep success; then
+  if echo "$BUILD_RESPONSE" | grep started; then
       echo "Build was successful."
   else
       echo "Build failed. No success notice found in the response." >&2
