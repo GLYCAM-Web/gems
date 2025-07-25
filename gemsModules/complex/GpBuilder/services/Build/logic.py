@@ -18,6 +18,19 @@ def execute(inputs: Build_Inputs, options: BuildOptions) -> tuple[Build_Outputs,
     service_outputs = Build_Outputs()
     service_notices = Notices()
 
+    # TODO: Handle this more gracefully.
+    if not inputs.pUUID:
+        service_notices.addNotice(
+            Brief="pUUID missing",
+            Scope="Service",
+            Messenger="GpBuilder",
+            Type="Error",
+            Code="400",
+            Message="pUUID missing, current project not found"
+        )
+        log.error("pUUID missing, cannot execute GpBuilder.")
+        return service_outputs, service_notices
+
     job_dir = GpBuilderProject.get_project_dir_from_pUUID(inputs.pUUID)
     status_log_path = job_dir / "status.log"
     
@@ -31,6 +44,7 @@ def execute(inputs: Build_Inputs, options: BuildOptions) -> tuple[Build_Outputs,
             Code="400",
             Message="Project not found",
         )
+        log.error("Project not found, cannot execute GpBuilder.")
         return service_outputs, service_notices
 
     # generate the input file for GpBuilder
@@ -48,7 +62,7 @@ def execute(inputs: Build_Inputs, options: BuildOptions) -> tuple[Build_Outputs,
 
     # TODO: Write status.log with "GpBuilder finished with: Success|Failure" afterwards or make this a backgrounded process.
     # If backgrounded, write "Submitted".
-    failed = run_gpbuilder.execute_gpb(job_dir / "the_input.txt", job_dir, inputs.pUUID)
+    failed = run_gpbuilder.execute_gpb(job_dir, inputs.pUUID)
     if failed:
         service_notices.addNotice(
             Brief="GpBuilder execution failed",

@@ -11,7 +11,7 @@ log = Set_Up_Logging(__name__)
 ic = InstanceConfig()
 
 
-def execute_gpb(input_file: Path, project_dir: Path, pUUID) -> bool:
+def execute_gpb(project_dir: Path, pUUID) -> bool:
     """
     Executes the GpBuilder process using the provided input file and project directory.
 
@@ -20,11 +20,11 @@ def execute_gpb(input_file: Path, project_dir: Path, pUUID) -> bool:
         project_dir (Path): The directory where the project files are located.
 
     Returns:
-        bool: Always returns False (success) since we don't wait for completion.
+        bool: Returns True if something failed while trying to run GpBuilder.
               Check produced status.log file for execution status.
     """
     log.debug(
-        f"Executing GpBuilder with input file: {input_file} in project directory: {project_dir}"
+        f"Executing GpBuilder for this project directory: {project_dir}"
     )
 
     GEMSHOME = os.getenv("GEMSHOME")
@@ -33,6 +33,10 @@ def execute_gpb(input_file: Path, project_dir: Path, pUUID) -> bool:
         return True
     GP_BUILDER = f"{GEMSHOME}/gmml2/bin/gpBuilder"
 
+    input_file = project_dir / "the_input.txt"
+    if not input_file.exists():
+        log.error(f"Input file does not exist: {input_file}")
+        return True
     status_file = project_dir / "status.log"
 
     # Create an outputs directory if it doesn't exist
@@ -94,7 +98,6 @@ exit $exit_code
     )
 
     log.info("GpBuilder submitted to background execution")
-    return False  # Return immediately indicating successful submission
 
 
 def execute_gpbt_wrapper(project_pdb_file: Path, output_file: Path):
