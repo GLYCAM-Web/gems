@@ -44,8 +44,8 @@ def execute_gpb(project_dir: Path, pUUID) -> bool:
 
     # Set up log files
     status_file = project_dir / "status.log"
-    log_file = project_dir / "gpbuilder.log"
-    err_file = project_dir / "gpbuilder.err"
+    log_file = project_dir / "gpBuilder.log"
+    err_file = project_dir / "gpBuilder.err"
 
     # Create bash script to run GpBuilder in background
     # TODO: parameterize/don't write to project dir
@@ -61,9 +61,12 @@ echo "GpBuilder execution started." >>"{status_file}"
 {gpbuilder_cmd} >>"{log_file}" 2>>"{err_file}"
 exit_code=$?
 
+bash "$GEMSHOME/gemsModules/complex/GpBuilder/tasks/write_README.sh" "{project_dir}"
+
 # Check for success message in log
 if grep -q "Program got to end ok" "{log_file}"; then
     echo "GpBuilder finished with: Success" >>"{status_file}"
+
 
     # Archive project
     bash "$GEMSHOME/gemsModules/complex/GpBuilder/tasks/create_project_archive.sh" "{project_dir}" "{pUUID}"
@@ -73,7 +76,7 @@ if grep -q "Program got to end ok" "{log_file}"; then
         exit $zip_error
     else
         echo "Project archive completed." >>"{status_file}"
-    fi
+    fi    
 
     # Final status message
     echo "All complete" >>"{status_file}"
