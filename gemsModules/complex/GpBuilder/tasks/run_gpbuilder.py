@@ -37,44 +37,52 @@ def execute_gpb(project_dir: Path, pUUID) -> bool:
     if not input_file.exists():
         log.error(f"Input file does not exist: {input_file}")
         return True
-    status_file = project_dir / "status.log"
 
     # Create an outputs directory if it doesn't exist
     outputs_dir = project_dir / "outputs"
     outputs_dir.mkdir(exist_ok=True)
 
     # Set up log files
+    status_file = project_dir / "status.log"
     log_file = project_dir / "gpbuilder.log"
     err_file = project_dir / "gpbuilder.err"
 
     # Create bash script to run GpBuilder in background
     # TODO: parameterize/don't write to project dir
     bash_script = project_dir / "start_build.sh"
+    
+    gpbuilder_cmd = f"{GP_BUILDER} \"{input_file}\" \"{outputs_dir}\""
     script_content = f"""#!/bin/bash
-echo "Running command: {GP_BUILDER} {input_file} {outputs_dir}" >> "{log_file}"
-echo "Working directory: {project_dir}" >> "{log_file}"
-echo "GpBuilder execution started." >> "{err_file}"
-echo "GpBuilder execution started." >> "{status_file}"
+echo "Running command: {gpbuilder_cmd}" >>"{log_file}"
+echo "Working directory: {project_dir}" >>"{log_file}"
+echo "GpBuilder execution started." >>"{status_file}"
 
 # Run GpBuilder and capture output
-"{GP_BUILDER}" "{input_file}" "{outputs_dir}" >> "{log_file}" 2>> "{err_file}"
+{gpbuilder_cmd} >>"{log_file}" 2>>"{err_file}"
 exit_code=$?
 
 # Check for success message in log
 if grep -q "Program got to end ok" "{log_file}"; then
-    echo "GpBuilder finished with: Success" >> "{status_file}"
+    echo "GpBuilder finished with: Success" >>"{status_file}"
+
+    # Archive project
+    bash "$GEMSHOME/gemsModules/complex/GpBuilder/tasks/create_project_archive.sh" "{project_dir}" "{pUUID}"
+    zip_error=$?
+    if [ $zip_error -ne 0 ]; then
+        echo "Failed to create project archive." >>"{status_file}"
+        exit $zip_error
+    else
+        echo "Project archive completed." >>"{status_file}"
+    fi
+
+    # Final status message
+    echo "All complete" >>"{status_file}"
 else
-    echo "GpBuilder finished with: Failure" >> "{status_file}"
+    echo "GpBuilder finished with: Failure" >>"{status_file}"
+    echo "Completed with errors. Check the gpbuilder.log file for details." >>"{status_file}"
+    
+    echo "GpBuilder exit code: $exit_code" >>"{err_file}"
 fi
-
-# Archive project
-bash "$GEMSHOME/gemsModules/complex/GpBuilder/tasks/create_project_archive.sh" "{project_dir}" "{pUUID}"
-
-# Write "Project archive completed."
-echo "Project archive completed." >> "{status_file}"
-
-# Write All complete to status log
-echo "All complete" >> "{status_file}"
 
 exit $exit_code
 """
