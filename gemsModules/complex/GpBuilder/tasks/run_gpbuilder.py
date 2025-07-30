@@ -52,9 +52,10 @@ def execute_gpb(project_dir: Path, pUUID) -> bool:
     bash_script = project_dir / "start_build.sh"
     
     gpbuilder_cmd = f"{GP_BUILDER} \"{input_file}\" \"{outputs_dir}\""
-    script_content = f"""#!/bin/bash
-echo "Running command: {gpbuilder_cmd}" >>"{log_file}"
+    build_script_str = f"""#!/bin/bash
+# GpBuilder program execution script
 echo "Working directory: {project_dir}" >>"{log_file}"
+echo "Running command: {gpbuilder_cmd}" >>"{log_file}"
 echo "GpBuilder execution started." >>"{status_file}"
 
 # Run GpBuilder and capture output
@@ -63,35 +64,37 @@ exit_code=$?
 
 bash "$GEMSHOME/gemsModules/complex/GpBuilder/tasks/write_README.sh" "{project_dir}"
 
-# Check for success message in log
+# Check for success message in run log
 if grep -q "Program got to end ok" "{log_file}"; then
     echo "GpBuilder finished with: Success" >>"{status_file}"
-
-
-    # Archive project
-    bash "$GEMSHOME/gemsModules/complex/GpBuilder/tasks/create_project_archive.sh" "{project_dir}" "{pUUID}"
-    zip_error=$?
-    if [ $zip_error -ne 0 ]; then
-        echo "Failed to create project archive." >>"{status_file}"
-        exit $zip_error
-    else
-        echo "Project archive completed." >>"{status_file}"
-    fi    
-
-    # Final status message
-    echo "All complete" >>"{status_file}"
 else
     echo "GpBuilder finished with: Failure" >>"{status_file}"
-    echo "Completed with errors. Check the gpbuilder.log file for details." >>"{status_file}"
     
     echo "GpBuilder exit code: $exit_code" >>"{err_file}"
+fi
+
+# Archive project
+bash "$GEMSHOME/gemsModules/complex/GpBuilder/tasks/create_project_archive.sh" "{project_dir}" "{pUUID}"
+zip_error=$?
+if [ $zip_error -ne 0 ]; then
+    echo "Failed to create project archive." >>"{status_file}"
+    exit_code=$((exit_code + zip_error))
+else
+    echo "Project archive completed." >>"{status_file}"
+fi    
+
+# Final status message (Bug: The archive will not include these final messages.)
+if [ $exit_code -eq 0 ]; then
+    echo "All complete" >>"{status_file}"
+else
+    echo "Completed with errors. ($exit_code)" >>"{status_file}"
 fi
 
 exit $exit_code
 """
 
     with open(bash_script, "w") as f:
-        f.write(script_content)
+        f.write(build_script_str)
 
     bash_script.chmod(0o755)
 

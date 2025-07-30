@@ -17,19 +17,10 @@ if [ ! -d "$project_dir" ]; then
     exit 2
 fi
 
-# Based on File Naming Conventions in DevEnv's mkdocs.
-archive_name="GP_project_${archive_pUUID:0:8}_all.zip"
-
 # Create the archive
-archive_path="${project_dir}/${archive_name}"
-
-# Change to parent directory and zip just the folder name to avoid full path
-parent_dir="$(dirname "$project_dir")"
+# Based on File Naming Conventions in DevEnv's mkdocs.
 folder_name="$(basename "$project_dir")"
+archive_name="${project_dir}/GP_project_${archive_pUUID:0:8}_all.zip"
 
-if (cd "$parent_dir" && zip -r "$archive_path" "$folder_name" -x "*.zip"); then
-    echo "Project archive created successfully." >> "${project_dir}/status.log"
-else
-    echo "Failed to create project archive." >> "${project_dir}/status.log"
-    exit 3
-fi
+cd "$(dirname "$project_dir")" || exit 3
+zip -r "$archive_name" "$archive_pUUID" -x "*.zip" || exit 4
