@@ -14,15 +14,16 @@ def execute(input_file, inputs, options) -> Path:
     log.debug(f"Creating GP Builder input file at: {input_file}")
 
     with input_file.open("w") as f:
-        # we don't use inputs.protein_file here to simplify v1 considering the website must execute evaluate for it's own reasons first.
-        # When we do start using the protein file, we will need to ensure to use it's filename, but path modified to the job directory after we copy the upload for them.
         f.write(f"Protein:{inputs.protein_file}\n")
         f.write(f"numberOfSamples:{options.number_of_samples}\n")
         f.write(f"persistCycles:{options.persist_cycles}\n")
-        f.write(f"rngSeed:{options.seed}\n")
+        f.write(f"rngSeed:{options.rng_seed}\n")
+        f.write(f"overlapRejectionThreshold:{options.overlap_rejection_threshold}\n")
         f.write(f"prepareForMD:{str(options.prepare_for_md).lower()}\n")
         f.write(f"useInitialGlycositeResidueConformation:{str(options.use_initial_glycosite_residue_conformation).lower()}\n")
-        f.write(f"moveOverlappingSidechains:{str(options.move_overlapping_sidechains).lower()}\n\n")
+        f.write(f"moveOverlappingSidechains:{str(options.move_overlapping_sidechains).lower()}\n")
+        f.write(f"deleteUnresolvableGlycosites:{str(options.delete_unresolvable_glycosites).lower()}\n")
+        f.write("\n")
         
         f.write("ProteinResidue, GlycanName:\n")
         for mapping in inputs.glycan_mappings:

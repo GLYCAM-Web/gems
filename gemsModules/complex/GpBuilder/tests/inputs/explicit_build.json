@@ -5,7 +5,7 @@
             "default_Build": {
                 "type": "Build",
                 "inputs": {
-                    "protein_file": "/programs/gems/gmml2/tests/tests/inputs/017.GlycoproteinBuilder/1eer_eop_Asn.pdb",
+                    "protein_file": "/programs/gems/gemsModules/complex/GpBuilder/tests/inputs/pdbs/1eer_eop_Asn.pdb",
                     "glycan_mappings": [
                         {"Chain": "A", "ResidueNumber": "24", "InsertionCode": "", "Sequence": "DManpa1-2DManpa1-6[DManpa1-2DManpa1-3]DManpa1-6[DManpa1-2DManpa1-2DManpa1-3]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH", "Tags": ""},
                         {"Chain": "A", "ResidueNumber": "38", "InsertionCode": "", "Sequence": "DManpa1-6[DManpa1-2DManpa1-2DManpa1-3]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH", "Tags": ""},

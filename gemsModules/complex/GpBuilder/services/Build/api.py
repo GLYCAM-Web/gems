@@ -34,29 +34,36 @@ class GlycanMapping(BaseModel):
     SequenceContext: Optional[str] = Field("", description="Sequence context around the glycan mapping, if given")
     InsertionCode: Optional[str] = Field("", description="Insertion code, if any")
     Tags: Optional[str] = Field("", description="Tags associated with the glycan mapping, if given")
-
-    # @classmethod
-    # def __get_validators__(cls):
-    #     yield cls.validate
-
-    # @classmethod
-    # def validate(cls, v):
-    #     if isinstance(v, list) and len(v) == 2:
-    #         return cls(residue=v[0], sequence=v[1])
-    #     return v
     
 
 class BuildOptions(BaseModel):
-    number_of_samples: Optional[int] = Field(2, ge=0, description="Number of output structures")
-    persist_cycles: Optional[int] = Field(5, ge=1, description="Number of persist cycles")
-    seed: Optional[int] = Field(default_factory=lambda: random.randint(0,1e9), description="Random seed for reproducibility")
-    prepare_for_md: Optional[bool] = Field(False, description="Prepare for MD simulation")
+    number_of_samples: Optional[int] = Field(
+        1, ge=0, description="Number of structure samples to create in addition to the default structure"
+    )
+    persist_cycles: Optional[int] = Field(
+        5, ge=1, description="How long the algorithm persists in looking for a solution with a lower number of overlaps"
+    )
+    rng_seed: Optional[int] = Field(
+        default_factory=lambda: random.randint(0, int(1e9)),
+        description="Random number generator seed for reproducibility"
+    )
+    overlap_rejection_threshold: Optional[float] = Field(
+        0.0, ge=0.0, description="LJ repulsive potential threshold for glycan atoms; samples exceeding this are rejected"
+    )
+    prepare_for_md: Optional[bool] = Field(
+        False, 
+        description="Prepare for MD simulation (creates OFF files for each output structure)"
+    )
     use_initial_glycosite_residue_conformation: Optional[bool] = Field(
-        False, description="Use initial glycosite residue conformation"
+        False, description="Preserve chi1 and chi2 angles of protein-glycan linkages according to their initial shape"
     )
     move_overlapping_sidechains: Optional[bool] = Field(
-        False, description="Move overlapping sidechains"
+        False, description="Adjust protein sidechains if it reduces glycan overlap or increases glycan shape range"
     )
+    delete_unresolvable_glycosites: Optional[bool] = Field(
+        False, description="Delete glycans in samples exceeding overlap threshold to produce structures with no overlaps"
+    )
+    
     
 class Build_Inputs(BaseModel):
     pUUID: Optional[str] = Field(
