@@ -48,8 +48,8 @@ if [ $? -ne 0 ]; then
   echo "Output is not a valid JSON"
   echo "$BUILD_RESPONSE" > test-22-invalid-output-git-ignore-me.json
   exit 2
-elif echo "$BUILD_RESPONSE" | grep started; then
-      echo "Build was started."
+elif echo "$BUILD_RESPONSE" | grep started -q; then
+      echo "Build was started, project directory: $PROJECT_DIR_PATH"
       tries=0
       max_tries=30
       wait_duration=2
@@ -70,7 +70,8 @@ elif echo "$BUILD_RESPONSE" | grep started; then
                       echo "$BUILD_RESPONSE" > test-22-invalid-output-git-ignore-me.json
                       exit 4
                   else
-                      echo "Build completed successfully."
+                      echo "Build completed successfully, status:"
+                      cat "$STATUS_FILE"
                       # rm -r "$PROJECT_DIR_PATH"
                       exit 0
                   fi

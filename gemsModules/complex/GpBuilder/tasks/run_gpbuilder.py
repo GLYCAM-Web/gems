@@ -26,12 +26,8 @@ def execute_gpb(project_dir: Path, pUUID) -> bool:
     log.debug(
         f"Executing GpBuilder for this project directory: {project_dir}"
     )
-
-    GEMSHOME = os.getenv("GEMSHOME")
-    if not GEMSHOME:
-        log.error("GEMSHOME environment variable is not set. Please set it.")
-        return True
-    GP_BUILDER = f"{GEMSHOME}/gmml2/bin/gpBuilder"
+    
+    GP_BUILDER = f"$GEMSHOME/gmml2/bin/gpBuilder"
 
     input_file = project_dir / "the_input.txt"
     if not input_file.exists():
@@ -57,6 +53,13 @@ def execute_gpb(project_dir: Path, pUUID) -> bool:
 echo "Working directory: {project_dir}" >>"{log_file}"
 echo "Running command: {gpbuilder_cmd}" >>"{log_file}"
 echo "GpBuilder execution started." >>"{status_file}"
+
+# ensure $GEMSHOME is set
+if [ -z "$GEMSHOME" ]; then
+    echo "GEMSHOME environment variable is not set." >>"{err_file}"
+    echo "Cannot run GpBuilder without GEMSHOME, please set it and run this script again." >>"{status_file}"
+    exit 1
+fi
 
 # Run GpBuilder and capture output
 {gpbuilder_cmd} >>"{log_file}" 2>>"{err_file}"
@@ -99,7 +102,7 @@ exit $exit_code
     bash_script.chmod(0o755)
 
     log.info(
-        f"Submitting command to background: {GP_BUILDER} {input_file} {outputs_dir}"
+        f"Submitting command to background: {gpbuilder_cmd}"
     )
 
     # Run the bash script in background, detached from parent
@@ -125,8 +128,7 @@ def execute_gpbt_wrapper(project_pdb_file: Path, output_file: Path):
 
     ./bin/gpBuilderTable /programs/gems/gmml2/tests/tests/inputs/018.4mbzEdit.pdb --format csv > someout.txt
     """
-    # TODO: Use $GEMSHOME
-    GP_BUILDER_TABLE = "/programs/gems/gmml2/bin/gpBuilderTable"
+    GP_BUILDER_TABLE = os.path.expandvars("$GEMSHOME/gmml2/bin/gpBuilderTable")
 
     cmd = [GP_BUILDER_TABLE, str(project_pdb_file), "--format", "csv"]
     log.info(f"Running command: {' '.join(cmd)}")
@@ -136,9 +138,14 @@ def execute_gpbt_wrapper(project_pdb_file: Path, output_file: Path):
             check=True,
             stdout=out_file,
         )
-    log.info(f"gpBuilderTable completed successfully, output written to {output_file}")
 
     failed = result.returncode != 0
+    
+    if failed:
+        log.error(f"gpBuilderTable failed with return code {result.returncode}")
+    else:
+        log.info(f"gpBuilderTable completed successfully, output written to {output_file}")
+        
     return failed
 
 
