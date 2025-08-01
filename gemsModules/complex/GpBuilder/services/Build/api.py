@@ -35,7 +35,7 @@ class GlycanMapping(BaseModel):
     InsertionCode: Optional[str] = Field("", description="Insertion code, if any")
     Tags: Optional[str] = Field("", description="Tags associated with the glycan mapping, if given")
     
-
+UINT64_MAX = 2**64 - 1 # sys.maxsize is platform-dependent, so we use a fixed value for UINT64_MAX
 class BuildOptions(BaseModel):
     number_of_samples: Optional[int] = Field(
         1, ge=0, description="Number of structure samples to create in addition to the default structure"
@@ -44,7 +44,8 @@ class BuildOptions(BaseModel):
         5, ge=1, description="How long the algorithm persists in looking for a solution with a lower number of overlaps"
     )
     rng_seed: Optional[int] = Field(
-        default_factory=lambda: random.randint(0, int(1e9)),
+        default_factory=lambda: random.randint(0, UINT64_MAX),  # Use a random seed by default
+        ge=0, le=UINT64_MAX,
         description="Random number generator seed for reproducibility"
     )
     overlap_rejection_threshold: Optional[float] = Field(
