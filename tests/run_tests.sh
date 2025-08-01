@@ -37,7 +37,7 @@ if [ "${1}zzz" != "zzz" ] ; then
 	fi
 	if run_test ${1} ; then 
 		echo "The test passed."
-        if [ "${GEMS_KEEP_BAD_OUTPUTS}" != "True" ] ; then
+        if [ "${GEMS_KEEP_BAD_OUTPUTS}" != "True"] ; then
 	    echo "GEMS_KEEP_BAD_OUTPUTS is ${GEMS_KEEP_BAD_OUTPUTS}"
             echo "removing bad outputs directory"
             rm -rf ${badOutDir}

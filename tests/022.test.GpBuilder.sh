@@ -12,48 +12,106 @@
 #
 # Returns:
 #   - 0 on success
-#   - 1 if the evaluation response does not contain a project directory
+#   - 1 if input files are missing or the evaluation response does not contain a project directory
 #   - 2 if the build response is not valid JSON
 #   - 3 if no zip file is found in the project directory
 #   - 4 if the zip file is empty
 #   - 5 if the build execution failed
 #   - 6 if the build completed with errors
 
+# --- Environment Setup ---
 set -euo pipefail
 
+exit_handler() {
+  exit_code=$?
+
+  echo $EVALUATE_REQUEST >bad_outputs/$(date +%Y%m%d_%H%M)-test-022-evaluate-request-git-ignore-me.json
+  if [ -n "${EVALUATE_RESPONSE:-}" ]; then
+    echo "$EVALUATE_RESPONSE" >bad_outputs/$(date +%Y%m%d_%H%M)-test-022-evaluate-response-git-ignore-me.json
+  fi
+  if [ -n "${BUILD_REQUEST:-}" ]; then
+    echo "$BUILD_REQUEST" >bad_outputs/$(date +%Y%m%d_%H%M)-test-022-build-request-git-ignore-me.json
+  fi
+  if [ -n "${BUILD_RESPONSE:-}" ]; then
+    echo "$BUILD_RESPONSE" >bad_outputs/$(date +%Y%m%d_%H%M)-test-022-build-response-git-ignore-me.json
+  fi
+
+  if [ $exit_code -ne 0 ]; then
+    echo "❌ An error occurred, saving bad outputs to bad_outputs directory. ($exit_code)"
+    echo -e "\tCheck $GEMSHOME/tests/bad_outputs directory for details." >&2
+  else
+    echo "✅ Test 022 Build completed successfully, status file: $STATUS_FILE"
+
+    if [[ "${GEMS_KEEP_BAD_OUTPUTS:-}" == "True" ]]; then
+      echo -e "\tGEMS_KEEP_BAD_OUTPUTS is truthy, keeping bad outputs."
+    else
+      echo -e "\tGEMS_KEEP_BAD_OUTPUTS is not truthy, removing bad outputs."
+      rm -rf bad_outputs/*-test-022-*
+    fi
+
+    if [[ "${GEMS_REMOVE_TEST_PROJECT:-}" == "true" || "${GEMS_REMOVE_TEST_PROJECT:-}" == "1" ]]; then
+      rm -rf "$PROJECT_DIR_PATH"
+      echo -e "\tRemoved test project directory, to prevent this set GEMS_REMOVE_TEST_PROJECT to false."
+    else
+      echo -e "\tGEMS_REMOVE_TEST_PROJECT is not set to true, the project directory will be kept."
+    fi
+  fi
+}
+trap exit_handler EXIT
+
+
 # --- Input Files ---
-EVALUATE_REQUEST="$GEMSHOME/gemsModules/complex/GpBuilder/tests/inputs/explicit_evaluate.json"
+PDB_FILE="$GEMSHOME/gemsModules/complex/GpBuilder/tests/inputs/pdbs/1eer_eop_Asn.pdb"
+
+EVALUATE_REQUEST_TEMPLATE="$GEMSHOME/gemsModules/complex/GpBuilder/tests/inputs/explicit_evaluate_parameterized.json"
 BUILD_REQUEST_TEMPLATE="$GEMSHOME/gemsModules/complex/GpBuilder/tests/inputs/explicit_build_parameterized.json"
+
+if [ ! -f "$PDB_FILE" ]; then
+  echo "PDB file not found: $PDB_FILE" >&2
+  exit 1
+fi
+
+if [ ! -f "$EVALUATE_REQUEST_TEMPLATE" ]; then
+  echo "Evaluate request template not found: $EVALUATE_REQUEST_TEMPLATE" >&2
+  exit 1
+fi
+
+if [ ! -f "$BUILD_REQUEST_TEMPLATE" ]; then
+  echo "Build request template not found: $BUILD_REQUEST_TEMPLATE" >&2
+  exit 1
+fi
 
 
 # --- Workflow Execution ---
 # Delegate the evaluation request.
-EVALUATE_RESPONSE=$($GEMSHOME/bin/delegate "$EVALUATE_REQUEST")
+EVALUATE_REQUEST=$(sed "s|<protein_file>|${PDB_FILE}|" "$EVALUATE_REQUEST_TEMPLATE")
+EVALUATE_RESPONSE=$(echo "$EVALUATE_REQUEST" | $GEMSHOME/bin/delegate)
 
-# Extract the project directory path from the evaluation response.
+# Extract the project directory and pUUID path from the evaluation response.
 PROJECT_DIR_PATH=$(echo "$EVALUATE_RESPONSE" | grep -o '"project_dir": *"[^"]*' | cut -d'"' -f4)
+PUUID=$(echo "$EVALUATE_RESPONSE" | grep -o '"pUUID": *"[^"]*' | cut -d'"' -f4 | head -n 1)
 if [ -z "$PROJECT_DIR_PATH" ]; then
   echo -e "Error: Could not find 'project_dir' in the evaluation response.\nCheck the bad_outputs dir for more info." >&2
-  echo $EVALUATE_RESPONSE >bad_outputs/$(date +%Y%m%d_%H%M)-test-022-evaluate-response-git-ignore-me.json
+  exit 1
+elif [ -z "$PUUID" ]; then
+  echo -e "Error: Could not find 'pUUID' in the evaluation response.\nCheck the bad_outputs dir for more info." >&2
   exit 1
 fi
 
 # Substitute the pUUID from the evaluation response into the build request template.
-PUUID=$(basename "$PROJECT_DIR_PATH")
 BUILD_REQUEST=$(sed "s/<pUUID>/$PUUID/" "$BUILD_REQUEST_TEMPLATE")
 
 # Delegate the prepared build request to start the GpBuilder Build service.
 BUILD_RESPONSE=$(echo "$BUILD_REQUEST" | $GEMSHOME/bin/delegate)
 
 
-# Check results.
+# --- Check results ---
 echo "$BUILD_RESPONSE" | python -m json.tool >/dev/null 2>&1
 if [ $? -ne 0 ]; then
   echo -e "Output is not a valid JSON response.\nCheck the bad_outputs dir for more info." >&2
-  echo "$BUILD_RESPONSE" > bad_outputs/$(date +%Y%m%d_%H%M)-test-022-build-response-git-ignore-me.json
   exit 2
 elif echo "$BUILD_RESPONSE" | grep started -q; then
-  STATUS_FILE="$PROJECT_DIR_PATH/status.log"
+  STATUS_FILE="${PROJECT_DIR_PATH}/status.log"
   echo "Build starting, active project directory: $PROJECT_DIR_PATH"
   tries=0
   max_tries=30
@@ -72,27 +130,30 @@ elif echo "$BUILD_RESPONSE" | grep started -q; then
           echo "Zip file is empty." >&2
           exit 4
         else
-          echo "Build completed successfully, status file: $STATUS_FILE"
-          # rm -r "$PROJECT_DIR_PATH"
           exit 0
         fi
       fi
-    elif grep -q "GpBuilder execution started" "$STATUS_FILE"; then
-      echo "GpBuilder/Build started."
     elif grep -q "GpBuilder execution failed" "$STATUS_FILE"; then
       echo "GpBuilder execution failed, check the status file: $STATUS_FILE" >&2
       exit 5
-    elif grep -q "Completed with errors" "$STATUS_FILE"; then
+    elif grep -q "Completed with errors" "${STATUS_FILE}"; then
       echo "Build completed with errors." >&2
       echo "See status file: $STATUS_FILE for more details." >&2
       exit 6
+    elif grep -q "GpBuilder execution started" "$STATUS_FILE"; then
+      echo "GpBuilder/Build started."
     fi
-    remaining_time=$(( (max_tries - tries) * wait_duration ))
-    echo "Waiting for build to complete... (wait time remaining: ${remaining_time} seconds)"
 
+    remaining_time=$(( (max_tries - tries) * wait_duration ))
     tries=$((tries + 1))
+    echo "Waiting for build to complete... (wait time remaining: ${remaining_time} seconds)"
     sleep $wait_duration
   done
+
+  if [ $tries -ge $max_tries ]; then
+    echo "Build did not complete within the expected time." >&2
+    exit 6
+  fi
 else
   echo "Build failed. No submission notice found in the response." >&2
   exit 5
