@@ -9,6 +9,7 @@ from .ProjectManagement.api import ProjectManagement_Request
 # from .Evaluate.api import Evaluate_Request
 # from .Validate.api import Validate_Request
 # from .Analyze.api import Analyze_Request
+# from .Status.api import Status_Request
 
 # from .known_available import Module_Available_Services # for maybe keying...
 
@@ -24,14 +25,15 @@ EVALUATE_DEPENDENCIES = Annotated_List(
 )
 # TODO: Build also needs to depend on Evaluate, but if given a pUUID, not to start a new job. Build also needs PM.
 BUILD_DEPENDENCIES = Annotated_List([], ordered=True)
-
 ANALYZE_DEPENDENCIES = Annotated_List([], ordered=True)
+STATUS_DEPENDENCIES = Annotated_List([], ordered=True)
 
 Service_Dependencies = {
     "Analyze": ANALYZE_DEPENDENCIES,
     "Build": BUILD_DEPENDENCIES,
     "Evaluate": EVALUATE_DEPENDENCIES,
-    "ProjectManagement": PROJECTMANAGEMENT_DEPENDENCIES
+    "ProjectManagement": PROJECTMANAGEMENT_DEPENDENCIES,
+    "Status": STATUS_DEPENDENCIES,
 }
 
 # TODO: work_flows style or workflow_manager style?
@@ -42,6 +44,7 @@ class GpBuilder_Workflow_Manager(Workflow_Manager):
             # "Validate",
             "ProjectManagement",
             "Build",
+            "Status",
             # "Analyze",
         ]
 

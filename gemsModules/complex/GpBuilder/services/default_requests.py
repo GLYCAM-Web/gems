@@ -15,9 +15,9 @@ class Gpbuilder_Default_Service_Request_Manager(Default_Service_Request_Manager)
     def get_default_services_aaops(self) -> List[AAOP]:
         this_service = GpBuilder_Service_Request()
         this_aaop = AAOP(
-            AAO_Type="Build",
+            AAO_Type="Status",
             The_AAO=this_service,
             ID_String=uuid.uuid4(),
-            Dictionary_Name="default_Build",
+            Dictionary_Name="default_Status",
             )
         return [this_aaop]

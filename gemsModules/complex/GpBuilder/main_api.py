@@ -9,11 +9,11 @@ from gemsModules.complex.GpBuilder.main_settings import WhoIAm
 from gemsModules.complex.GpBuilder.main_api_project import GpBuilderProject
 from gemsModules.complex.GpBuilder.services.settings.known_available import Available_Services
 
+from gemsModules.complex.GpBuilder.main_api_common import GpBuilder_Service_Request, GpBuilder_Service_Response
 from gemsModules.complex.GpBuilder.services.ProjectManagement.api import ProjectManagement_Request, ProjectManagement_Response
 from gemsModules.complex.GpBuilder.services.Build.api import BuildService_Request, BuildService_Response
 from gemsModules.complex.GpBuilder.services.Evaluate.api import EvaluateService_Request, EvaluateService_Response
-from gemsModules.complex.GpBuilder.main_api_common import GpBuilder_Service_Request, GpBuilder_Service_Response
-
+from gemsModules.complex.GpBuilder.services.Status.api import StatusService_Request, StatusService_Response
 from gemsModules.logging.logger import Set_Up_Logging
 
 
@@ -22,8 +22,8 @@ log = Set_Up_Logging(__name__)
 
 
 # Remove discriminator and add custom validator
-GpRequests = Union[EvaluateService_Request, BuildService_Request, ProjectManagement_Request, GpBuilder_Service_Request]
-GpResponses = Union[EvaluateService_Response, BuildService_Response, ProjectManagement_Response, GpBuilder_Service_Response]
+GpRequests = Union[EvaluateService_Request, BuildService_Request, ProjectManagement_Request, StatusService_Request, GpBuilder_Service_Request]
+GpResponses = Union[EvaluateService_Response, BuildService_Response, ProjectManagement_Response, StatusService_Response, GpBuilder_Service_Response]
 
 
 class Gpbuilder_Service_Requests(main_api_services.Service_Requests):
@@ -40,16 +40,11 @@ class Gpbuilder_Service_Requests(main_api_services.Service_Requests):
         # Only validate with the class that matches the typename
         log.debug(f"Validating service request with typename: {typename}")
         log.debug(f"Service request content: {v}")
-        if typename == 'Evaluate':
-            return EvaluateService_Request.parse_obj(v)
-        elif typename == 'Build':
-            return BuildService_Request.parse_obj(v)
-        elif typename == 'ProjectManagement':
-            return ProjectManagement_Request.parse_obj(v)
-        elif typename == 'GpBuilder':
-            return GpBuilder_Service_Request.parse_obj(v)
-        else:
-            raise ValueError(f"Unknown service typename: {typename}")
+        for request in GpRequests.__args__:
+            if f"{typename}".lower() in request.__name__.lower():
+                log.debug(f"Matched request type: {request.__name__}")
+                return request.parse_obj(v)
+        raise ValueError(f"Unknown service typename: {typename}")
 
 
 class GpBuilder_Service_Responses(main_api_services.Service_Responses):

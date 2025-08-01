@@ -1,0 +1,13 @@
+{
+    "entity": {
+        "type": "GpBuilder",
+        "services": {
+            "explicit_Status": {
+                "type": "Status",
+                "inputs": {
+                    "pUUID": "<pUUID>"
+                }
+            }
+        }
+    }
+}
