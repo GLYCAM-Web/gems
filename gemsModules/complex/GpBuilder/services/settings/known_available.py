@@ -24,7 +24,7 @@ Available_Services = GemsStrEnum(
 def testme():
     """ Ensure that the settings info is complete.
     >>> testme()
-    ['Error', 'Marco', 'Status', 'ListServices', 'Build']
+    ['ProjectManagement', 'Evaluate', 'Build', 'Status']
 
     """
     print(Available_Services.get_json_list())

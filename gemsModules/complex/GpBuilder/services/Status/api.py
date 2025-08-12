@@ -34,6 +34,11 @@ class Status_Inputs(BaseModel):
         title="Project UUID",
         description="UUID for this GpBuilder Project, assigned automatically by GEMS",
     )
+    projectDir: Optional[str] = Field(
+        None,
+        title="Project Directory",
+        description="Directory where the GpBuilder project is located (auto-filled)",
+    )
     
 
 class Status_Outputs(BaseModel):

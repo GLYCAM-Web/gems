@@ -29,7 +29,7 @@ GpResponses = Union[EvaluateService_Response, BuildService_Response, ProjectMana
 class Gpbuilder_Service_Requests(main_api_services.Service_Requests):
     __root__: dict[str, GpRequests] = None
     
-    @validator('__root__', pre=True, each_item=True)
+    @validator('__root__', pre=False, each_item=True)
     @classmethod
     def validate_service_request(cls, v):
         if not isinstance(v, dict):
@@ -50,7 +50,7 @@ class Gpbuilder_Service_Requests(main_api_services.Service_Requests):
 class GpBuilder_Service_Responses(main_api_services.Service_Responses):
     __root__: dict[str, GpResponses] = None
     
-    @validator('__root__', pre=True, each_item=True)
+    @validator('__root__', pre=False, each_item=True)
     @classmethod
     def validate_service_response(cls, v):
         if not isinstance(v, dict):
@@ -60,17 +60,12 @@ class GpBuilder_Service_Responses(main_api_services.Service_Responses):
         
         # Only validate with the class that matches the typename
         log.debug(f"Validating service response with typename: {typename}")
-        if typename == 'Evaluate':
-            return EvaluateService_Response.parse_obj(v)
-        elif typename == 'Build':
-            return BuildService_Response.parse_obj(v)
-        elif typename == 'ProjectManagement':
-            return ProjectManagement_Response.parse_obj(v)
-        elif typename == 'GpBuilder':
-            return GpBuilder_Service_Response.parse_obj(v)
-        else:
-            raise ValueError(f"Unknown service typename: {typename}")
-        
+        log.debug(f"Service response content: {v}")
+        for response in GpResponses.__args__:
+            if f"{typename}".lower() in response.__name__.lower():
+                log.debug(f"Matched response type: {response.__name__}")
+                return response.parse_obj(v)
+        raise ValueError(f"Unknown service typename: {typename}")
 
 class Gpbuilder_Entity(main_api_entity.Entity) :
     entityType : Literal['GpBuilder'] = Field(  # This is the only required field in all of the API

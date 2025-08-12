@@ -49,6 +49,14 @@ class Gpbuilder_Request_Data_Filler(Request_Data_Filler):
                 self.__fill_projectman_input_resources(aaop)
                 # copy resources from requester
                 self.fill_resources_from_requester_if_exists(aaop, deep_copy=True)
+            elif aaop.AAO_Type=='Status':
+                if aaop.The_AAO.inputs.pUUID is None:
+                    log.error("GpB/Request_Data_Filler: Status service requires pUUID to be set.")
+                    raise ValueError("GpB/Request_Data_Filler: Status service requires pUUID to be set.")
+                else:
+                    this_Project.pUUID = aaop.The_AAO.inputs.pUUID
+                    this_Project.add_temporary_info()
+                    aaop.The_AAO.inputs.projectDir = this_Project.project_dir
             
             log.debug(f"GpB/Request_Data_Filler filled: {aaop.The_AAO.inputs=}")
         

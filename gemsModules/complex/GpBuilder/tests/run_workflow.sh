@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -euo pipefail
-
+bash $GEMSHOME/logs/clearLogs.sh
 
 # 1. Evaluate request
 EVALUATE_REQUEST="/programs/gems/gemsModules/complex/GpBuilder/tests/inputs/explicit_evaluate.json"
@@ -36,6 +36,7 @@ echo "$BUILD_RESPONSE"
 if echo "$BUILD_RESPONSE" | python3 -m json.tool | grep "execution started"; then
     echo "Build was started."
     while true; do
+        sleep 3
         STATUS_RESPONSE=$(echo $STATUS_REQUEST_JSON | $GEMSHOME/bin/delegate)
         
         if echo "$STATUS_RESPONSE" | python3 -m json.tool | grep "All complete"; then
@@ -45,11 +46,12 @@ if echo "$BUILD_RESPONSE" | python3 -m json.tool | grep "execution started"; the
             echo "Build failed. Check the logs for more details."
             exit 1
         else
-            clear
-            echo "$STATUS_RESPONSE" | python3 -m json.tool
+            #clear
+            #echo "$STATUS_RESPONSE" | show-sub-dict
+            # only show sub dictionary that matches {"explicit_Status":.*}
+            echo "$STATUS_RESPONSE" | python3 -m json.tool | grep -e '"explicit_Status":' -A 10 -B 10
             echo "Waiting for build to complete..."
         fi
-        sleep 1 
     done
 else
     echo "Build failed. Response:"
