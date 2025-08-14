@@ -13,22 +13,6 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
-def handle_protein_file_resource(resource, project_dir: Path, status_log_path: Path):
-    # Create a constant symbolic link to this Build's protein file at top-level
-    protein_link = project_dir / "OriginalInput.pdb"
-    if not protein_link.exists():
-        log.debug(f"GpB/ProjectManagement: creating symbolic link for protein file: {protein_link}")
-        if resource.locationType == "filesystem-path-unix":
-            protein_link.symlink_to(resource.payload)
-            
-            # Log the creation of the symbolic link
-            with open(status_log_path, 'a') as f:
-                f.write(f"Default PDB file at {protein_link}\n")
-        else:
-            log.warning(f"GpB/ProjectManagement: Cannot create symbolic link for protein file, unsupported location type: {resource.locationType}")
-            log.error(f"Unsupported location type for protein file: {resource.locationType}")
-    
-    
 def make_resources_project_specific(inputs_resources: Resources, output_resources: Resources, project_dir: Path, status_log_path: Path) -> Resources:
     """ Updates the resources to be project-specific by copying them to the project directory.
     
@@ -38,9 +22,21 @@ def make_resources_project_specific(inputs_resources: Resources, output_resource
         if input_resource.resourceRole == "protein-file":
             # Copy the resource to the project directory
             project_resource = input_resource.copy_to(project_dir)
-            
-            handle_protein_file_resource(project_resource, project_dir, status_log_path)
+            protein_link = project_dir / "OriginalInput.pdb"
+            if not protein_link.exists():
+                log.debug(f"GpB/ProjectManagement: creating symbolic link for protein file: {protein_link}")
+                if project_resource.locationType == "filesystem-path-unix":
+                    protein_link.symlink_to(project_resource.payload)
+                    
+                    # Log the creation of the symbolic link
+                    with open(status_log_path, 'a') as f:
+                        f.write(f"Default PDB file at {protein_link}\n")
+                else:
+                    log.error(f"GpB/ProjectManagement: Cannot create symbolic link for protein file, unsupported location type: {project_resource.locationType}")
+            else:
+                log.debug(f"GpB/ProjectManagement: symbolic link for protein file already exists: {protein_link}")
             output_resources.add_resource(project_resource)
+            
         elif input_resource.resourceRole == "rcsb-id":
             log.debug("Creating PDB file and resource from RCSB ID resource.")
             # Need to update it for protein-file
@@ -61,7 +57,6 @@ def make_resources_project_specific(inputs_resources: Resources, output_resource
         else:
             log.warning(f"GpB/ProjectManagement: Unhandled resource role: {input_resource.resourceRole}")
         
-    
 
 def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     """Executes the service."""

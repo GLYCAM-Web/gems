@@ -72,6 +72,7 @@ EVALUATE_REQUEST_TEMPLATE_FILE="$GEMSHOME/gemsModules/complex/GpBuilder/tests/in
 EVALUATE_RCSB_REQUEST_FILE="$GEMSHOME/gemsModules/complex/GpBuilder/tests/inputs/explicit_evaluate_rcsb.json"
 
 BUILD_REQUEST_TEMPLATE_FILE="$GEMSHOME/gemsModules/complex/GpBuilder/tests/inputs/explicit_build_parameterized.json"
+BUILD_RCSB_REQUEST_FILE="$GEMSHOME/gemsModules/complex/GpBuilder/tests/inputs/explicit_build_rcsb_param.json"
 
 if [ ! -f "$PDB_FILE" ]; then
   echo "PDB file not found: $PDB_FILE" >&2
@@ -91,15 +92,17 @@ fi
 
 # --- Workflow Execution ---
 # Delegate the evaluation request.
-EVALUATE_REQUEST=$(sed "s|<protein_file>|${PDB_FILE}|" "$EVALUATE_REQUEST_TEMPLATE_FILE")
 if [[ "${RCSB_EVALUATION:-}" == "true" ]] || [[ "${RCSB_EVALUATION:-}" == "1" ]]; then
   echo "Using RCSB evaluation request instead of default protein_file."
   EVALUATE_REQUEST=$(cat "$EVALUATE_RCSB_REQUEST_FILE")
+else
+  EVALUATE_REQUEST=$(sed "s|<protein_file>|${PDB_FILE}|" "$EVALUATE_REQUEST_TEMPLATE_FILE")
 fi
 debug_log "Evaluation Request: ${EVALUATE_REQUEST}"
 
 EVALUATE_RESPONSE=$(echo "$EVALUATE_REQUEST" | $GEMSHOME/bin/delegate)
 debug_log "Evaluation Response: ${EVALUATE_RESPONSE}"
+# TODO: Extract glycosites and update build request with them for RCSB evaluation.
 
 # Extract the project directory and pUUID path from the evaluation response.
 PROJECT_DIR_PATH=$(echo "$EVALUATE_RESPONSE" | grep -o '"project_dir": *"[^"]*' | cut -d'"' -f4)
@@ -115,7 +118,14 @@ elif [ -z "$PUUID" ]; then
 fi
 
 # Substitute the pUUID from the evaluation response into the build request template.
-BUILD_REQUEST=$(sed "s/<pUUID>/$PUUID/" "$BUILD_REQUEST_TEMPLATE_FILE")
+if [[ "${RCSB_EVALUATION:-}" == "true" ]] || [[ "${RCSB_EVALUATION:-}" == "1" ]]; then
+  echo "Using RCSB build request."
+  BUILD_TEMPLATE="$BUILD_RCSB_REQUEST_FILE"
+else
+  BUILD_TEMPLATE="$BUILD_REQUEST_TEMPLATE_FILE"
+fi
+BUILD_REQUEST=$(sed "s/<pUUID>/$PUUID/" "$BUILD_TEMPLATE")
+
 debug_log "Build Request: ${BUILD_REQUEST}"
 
 # Delegate the prepared build request to start the GpBuilder Build service.

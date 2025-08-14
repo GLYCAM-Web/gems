@@ -37,16 +37,34 @@ def execute(inputs: Evaluate_Inputs, options: Optional[Evaluate_Options]) -> tup
         return service_outputs, service_notices
     
     if inputs.protein_file is None:
-        service_notices.addNotice(
-            Brief="Missing protein file",
-            Scope="Service",
-            Messenger="GpBuilder",
-            Type="Error",
-            Code="400",
-            Message="Protein file is required for evaluation.",
-        )
-        log.error("Protein file is required for evaluation.")
-        return service_outputs, service_notices
+        if inputs.rcsb_id is None:
+            # If no protein file or RCSB ID is provided, we cannot proceed.
+            service_notices.addNotice(
+                Brief="Missing RCSB ID and protein file",
+                Scope="Service",
+                Messenger="GpBuilder",
+                Type="Warning",
+                Code="400",
+                Message="RCSB ID is required for evaluation if no protein_file is given.",
+            )
+            log.error("RCSB ID is required for evaluation if no protein_file is given.")
+            return service_outputs, service_notices
+        else:
+            default_pdb = str(workdir / "OriginalInput.pdb")
+            if Path(default_pdb).exists():
+                log.debug(f"Using default protein file: {default_pdb}")
+                inputs.protein_file = default_pdb
+            else:
+                service_notices.addNotice(
+                    Brief="Missing protein file",
+                    Scope="Service",
+                    Messenger="GpBuilder",
+                    Type="Error",
+                    Code="400",
+                    Message="Protein file is required for evaluation.",
+                )
+                log.error("Protein file is required for evaluation.")
+                return service_outputs, service_notices
                 
     # This generates the glycosites to choose from for GpBuilder
     output_csv = workdir / "the_glycosites.csv"
