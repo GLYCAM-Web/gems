@@ -280,6 +280,12 @@ class Resources(BaseModel):
         """Remove a specific Resource instance."""
         self.__root__.remove(resource)
         
+    def pop(self, index: int = -1) -> Resource:
+        """Pop a Resource from the list by index."""
+        if len(self.__root__) == 0:
+            return None
+        return self.__root__.pop(index)
+        
     def __getitem__(self, key):
         return self.__root__[key]
 

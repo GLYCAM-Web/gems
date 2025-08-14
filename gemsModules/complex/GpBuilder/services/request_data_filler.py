@@ -100,12 +100,15 @@ class Gpbuilder_Request_Data_Filler(Request_Data_Filler):
         log.debug(f" Filling evaluate input resources for {aaop=}")
         
         rcsb_id = aaop.The_AAO.inputs.rcsb_id
+        if rcsb_id:
+            rcsb_id = rcsb_id.strip().lower()
+        
         given_protein_file = aaop.The_AAO.inputs.protein_file
         
         if given_protein_file is None and rcsb_id is None:
             log.warning("Neither protein_file nor rcsb_id is set in inputs, no protein file will be set in resources.")
         else:
-            log.warning("Both protein_file and rcsb_id are set in inputs, using protein_file as the primary resource.")
+            log.warning("Both protein_file and rcsb_id are set in inputs, keeping RCSB ID and updating protein_file.")
 
         if rcsb_id:
             log.debug(f"RCSB ID found in inputs: {rcsb_id}")
@@ -115,18 +118,19 @@ class Gpbuilder_Request_Data_Filler(Request_Data_Filler):
                     payload=rcsb_id,
                     resourceFormat="RCSB-ID",
                     resourceRole="rcsb-id",
-                    locationType="RCSB"
+                    locationType="Payload"
                 )
             )
+            given_protein_file = None
             
         if given_protein_file:
             log.debug(f"Protein file found in inputs: {given_protein_file}")
             aaop.The_AAO.inputs.resources.add_resource(
                 Resource(
-                payload=given_protein_file,
-                resourceFormat="PDB",
-                resourceRole="protein-file",
-                locationType="filesystem-path-unix"
+                    payload=given_protein_file,
+                    resourceFormat="PDB",
+                    resourceRole="protein-file",
+                    locationType="filesystem-path-unix"
                 )
             )
 

@@ -29,7 +29,7 @@ def execute(pdb_id: str, output_dir, compressed: bool = False) -> Optional[Path]
     ext = ".pdb.gz" if compressed else ".pdb"
     filename = f"{pdb_id}{ext}"
     url = urljoin(RCSB_DOWNLOAD_BASE, filename)
-    output_path = output_dir / filename
+    output_path = Path(output_dir) / filename
     
     try:
         with urlopen(url, timeout=30) as response:

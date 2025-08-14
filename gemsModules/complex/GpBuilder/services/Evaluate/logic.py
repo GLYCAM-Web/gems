@@ -35,6 +35,18 @@ def execute(inputs: Evaluate_Inputs, options: Optional[Evaluate_Options]) -> tup
             Message="Project not found",
         )
         return service_outputs, service_notices
+    
+    if inputs.protein_file is None:
+        service_notices.addNotice(
+            Brief="Missing protein file",
+            Scope="Service",
+            Messenger="GpBuilder",
+            Type="Error",
+            Code="400",
+            Message="Protein file is required for evaluation.",
+        )
+        log.error("Protein file is required for evaluation.")
+        return service_outputs, service_notices
                 
     # This generates the glycosites to choose from for GpBuilder
     output_csv = workdir / "the_glycosites.csv"

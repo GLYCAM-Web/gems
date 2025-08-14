@@ -5,7 +5,7 @@ from pathlib import Path
 # from gemsModules.complex.glycomimetics.tasks import batchcompute
 from gemsModules.common.main_api_resources import Resource, Resources
 from .api import ProjectManagement_Inputs, ProjectManagement_Outputs, PM_Resource, PM_Output_Resources
-#from ...tasks import set_up_build_directory
+from ...tasks import download_pdb_from_rcsb_by_id
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -34,38 +34,34 @@ def make_resources_project_specific(inputs_resources: Resources, output_resource
     
     Also handles specific resource roles behaviour.
     """
-    
-    updated_resources = {}
-    updated_service_resources = PM_Output_Resources()
-    
-    for input_resource in inputs_resources:
+    while input_resource := inputs_resources.pop():
         if input_resource.resourceRole == "protein-file":
             # Copy the resource to the project directory
             project_resource = input_resource.copy_to(project_dir)
             
             handle_protein_file_resource(project_resource, project_dir, status_log_path)
-            
-            # update the resources
-            this_role = project_resource.resourceRole
-            if this_role in updated_resources:
-                log.warning(f"GpB/ProjectManagement: Multiple protein files found, replacing existing one for role: {this_role}")        
-                log.debug(f"The resource was: {updated_resources[this_role]=}")
-            updated_resources[this_role] = input_resource, project_resource
-            log.debug(f"GpB/ProjectManagement: Updated resource for role {this_role}: {updated_resources[this_role]}")
+            output_resources.add_resource(project_resource)
         elif input_resource.resourceRole == "rcsb-id":
+            log.debug("Creating PDB file and resource from RCSB ID resource.")
             # Need to update it for protein-file
-            pass
+            download_path = download_pdb_from_rcsb_by_id.execute(
+                pdb_id=input_resource.payload,
+                output_dir="/website/uploads",
+                compressed=False
+            )
+            
+            # Create a new resource for the downloaded file
+            project_resource = Resource(
+                payload=download_path,
+                resourceFormat="PDB",
+                resourceRole="protein-file",
+                locationType="filesystem-path-unix"
+            )
+            inputs_resources.add_resource(project_resource)
+        else:
+            log.warning(f"GpB/ProjectManagement: Unhandled resource role: {input_resource.resourceRole}")
         
-    # Remove the original resources from inputs.resources now that we're done iterating them.
-    # Also add the new resources to the updated_service_resources.
-    for role, (input_resource, project_resource) in updated_resources.items():
-        # pop the original resource from the inputs.resources
-        # inputs.resources.remove_resource_by_role(role)
-        inputs_resources.remove(input_resource)
-        updated_service_resources.add_resource(project_resource)
     
-    output_resources.extend(updated_service_resources)
-
 
 def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     """Executes the service."""

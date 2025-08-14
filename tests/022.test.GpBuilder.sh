@@ -68,30 +68,36 @@ trap exit_handler EXIT
 
 # --- Input Files ---
 PDB_FILE="$GEMSHOME/gemsModules/complex/GpBuilder/tests/inputs/pdbs/1eer_eop_Asn.pdb"
+EVALUATE_REQUEST_TEMPLATE_FILE="$GEMSHOME/gemsModules/complex/GpBuilder/tests/inputs/explicit_evaluate_parameterized.json"
+EVALUATE_RCSB_REQUEST_FILE="$GEMSHOME/gemsModules/complex/GpBuilder/tests/inputs/explicit_evaluate_rcsb.json"
 
-EVALUATE_REQUEST_TEMPLATE="$GEMSHOME/gemsModules/complex/GpBuilder/tests/inputs/explicit_evaluate_parameterized.json"
-BUILD_REQUEST_TEMPLATE="$GEMSHOME/gemsModules/complex/GpBuilder/tests/inputs/explicit_build_parameterized.json"
+BUILD_REQUEST_TEMPLATE_FILE="$GEMSHOME/gemsModules/complex/GpBuilder/tests/inputs/explicit_build_parameterized.json"
 
 if [ ! -f "$PDB_FILE" ]; then
   echo "PDB file not found: $PDB_FILE" >&2
   exit 1
 fi
 
-if [ ! -f "$EVALUATE_REQUEST_TEMPLATE" ]; then
-  echo "Evaluate request template not found: $EVALUATE_REQUEST_TEMPLATE" >&2
+if [ ! -f "$EVALUATE_REQUEST_TEMPLATE_FILE" ]; then
+  echo "Evaluate request template not found: $EVALUATE_REQUEST_TEMPLATE_FILE" >&2
   exit 1
 fi
 
-if [ ! -f "$BUILD_REQUEST_TEMPLATE" ]; then
-  echo "Build request template not found: $BUILD_REQUEST_TEMPLATE" >&2
+if [ ! -f "$BUILD_REQUEST_TEMPLATE_FILE" ]; then
+  echo "Build request template not found: $BUILD_REQUEST_TEMPLATE_FILE" >&2
   exit 1
 fi
 
 
 # --- Workflow Execution ---
 # Delegate the evaluation request.
-EVALUATE_REQUEST=$(sed "s|<protein_file>|${PDB_FILE}|" "$EVALUATE_REQUEST_TEMPLATE")
+EVALUATE_REQUEST=$(sed "s|<protein_file>|${PDB_FILE}|" "$EVALUATE_REQUEST_TEMPLATE_FILE")
+if [[ "${RCSB_EVALUATION:-}" == "true" ]] || [[ "${RCSB_EVALUATION:-}" == "1" ]]; then
+  echo "Using RCSB evaluation request instead of default protein_file."
+  EVALUATE_REQUEST=$(cat "$EVALUATE_RCSB_REQUEST_FILE")
+fi
 debug_log "Evaluation Request: ${EVALUATE_REQUEST}"
+
 EVALUATE_RESPONSE=$(echo "$EVALUATE_REQUEST" | $GEMSHOME/bin/delegate)
 debug_log "Evaluation Response: ${EVALUATE_RESPONSE}"
 
@@ -109,7 +115,7 @@ elif [ -z "$PUUID" ]; then
 fi
 
 # Substitute the pUUID from the evaluation response into the build request template.
-BUILD_REQUEST=$(sed "s/<pUUID>/$PUUID/" "$BUILD_REQUEST_TEMPLATE")
+BUILD_REQUEST=$(sed "s/<pUUID>/$PUUID/" "$BUILD_REQUEST_TEMPLATE_FILE")
 debug_log "Build Request: ${BUILD_REQUEST}"
 
 # Delegate the prepared build request to start the GpBuilder Build service.
