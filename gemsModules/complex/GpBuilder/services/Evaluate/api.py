@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 from typing   import List, Union, Optional
 
 from gemsModules.common.main_api_resources import Resource, Resources
@@ -35,7 +35,12 @@ class Evaluate_Inputs(BaseModel):
         description="UUID for this GpBuilder Project, assigned automatically by GEMS",
     )
     
-    protein_file: str = Field(..., description="Path to the protein PDB file")
+    protein_file: Optional[str] = Field(..., description="Path to the protein PDB file")
+    rcsb_id: Optional[str] = Field(
+        None,
+        title="RCSB ID",
+        description="RCSB ID to sideload the protein structure",
+    )
     
     # TODO: Could this be generalized to an Inputs superclass? Internally we should be manipulating resources, not inputs.
     resources : Optional[EvaluateService_Resources] = Field(
@@ -43,6 +48,15 @@ class Evaluate_Inputs(BaseModel):
         description='Resources for Build',
         default_factory=EvaluateService_Resources
     )
+
+    @validator('protein_file', pre=True, always=True)
+    def check_protein_input(cls, v, values, field):
+        # ensure at least one of protein_file or rcsb_id is provided
+        if not v and not values.get('rcsb_id'):
+            raise ValueError("Either protein_file or rcsb_id must be provided.")
+        return v
+    
+    
     
 
 # TODO: Belongs in main_api_common.py 

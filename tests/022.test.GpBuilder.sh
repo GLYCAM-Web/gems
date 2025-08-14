@@ -21,6 +21,12 @@
 
 # --- Environment Setup ---
 set -euo pipefail
+DEBUG=${DEBUG:-false}
+debug_log() {
+  if [ "$DEBUG" = true ]; then
+    echo "DEBUG: $*"
+  fi
+}
 
 exit_handler() {
   exit_code=$?
@@ -85,11 +91,15 @@ fi
 # --- Workflow Execution ---
 # Delegate the evaluation request.
 EVALUATE_REQUEST=$(sed "s|<protein_file>|${PDB_FILE}|" "$EVALUATE_REQUEST_TEMPLATE")
+debug_log "Evaluation Request: ${EVALUATE_REQUEST}"
 EVALUATE_RESPONSE=$(echo "$EVALUATE_REQUEST" | $GEMSHOME/bin/delegate)
+debug_log "Evaluation Response: ${EVALUATE_RESPONSE}"
 
 # Extract the project directory and pUUID path from the evaluation response.
 PROJECT_DIR_PATH=$(echo "$EVALUATE_RESPONSE" | grep -o '"project_dir": *"[^"]*' | cut -d'"' -f4)
 PUUID=$(echo "$EVALUATE_RESPONSE" | grep -o '"pUUID": *"[^"]*' | cut -d'"' -f4 | head -n 1)
+debug_log "pUUID: $PUUID"
+debug_log "Project Directory Path: ${PROJECT_DIR_PATH}"
 if [ -z "$PROJECT_DIR_PATH" ]; then
   echo -e "Error: Could not find 'project_dir' in the evaluation response.\nCheck the bad_outputs dir for more info." >&2
   exit 1
@@ -100,10 +110,11 @@ fi
 
 # Substitute the pUUID from the evaluation response into the build request template.
 BUILD_REQUEST=$(sed "s/<pUUID>/$PUUID/" "$BUILD_REQUEST_TEMPLATE")
+debug_log "Build Request: ${BUILD_REQUEST}"
 
 # Delegate the prepared build request to start the GpBuilder Build service.
 BUILD_RESPONSE=$(echo "$BUILD_REQUEST" | $GEMSHOME/bin/delegate)
-
+debug_log "Build Response: ${BUILD_RESPONSE}"
 
 # --- Check results ---
 echo "$BUILD_RESPONSE" | python -m json.tool >/dev/null 2>&1
@@ -112,6 +123,7 @@ if [ $? -ne 0 ]; then
   exit 2
 elif echo "$BUILD_RESPONSE" | grep started -q; then
   STATUS_FILE="${PROJECT_DIR_PATH}/status.log"
+  debug_log "Status File: ${STATUS_FILE}"
   echo "Build starting, active project directory: $PROJECT_DIR_PATH"
   tries=0
   max_tries=30

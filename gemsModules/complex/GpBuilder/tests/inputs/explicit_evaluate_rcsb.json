@@ -1,0 +1,13 @@
+{
+    "entity": {
+        "type": "GpBuilder",
+        "services": {
+            "default_Evaluate": {
+                "type": "Evaluate",
+                "inputs": {
+                    "rscb_id": "6K9V"
+                }
+            }
+        }
+    }
+}

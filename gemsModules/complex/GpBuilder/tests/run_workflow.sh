@@ -5,9 +5,10 @@ set -euo pipefail
 
 # 1. Evaluate request
 EVALUATE_REQUEST="/programs/gems/gemsModules/complex/GpBuilder/tests/inputs/explicit_evaluate.json"
+# EVALUATE_REQUEST="/programs/gems/gemsModules/complex/GpBuilder/tests/inputs/explicit_evaluate_rcsb.json"
 
 # 2. Build Request 
-BUILD_REQUEST="/programs/gems/gemsModules/complex/GpBuilder/tests/inputs/explicit_build_paramaterized.json"
+BUILD_REQUEST="/programs/gems/gemsModules/complex/GpBuilder/tests/inputs/explicit_build_parameterized.json"
 # Really, glycan mappings should be produced from Eval request and some sequences
 
 
