@@ -78,7 +78,7 @@ def createLogger(name):
 
         ##Formatters
         formatter = logging.Formatter(
-            "%(hostname)s %(asctime)s - %(name)s - %(levelname)s - %(message)s",
+            "%(hostname)s %(asctime)s - %(name)s:%(lineno)s - %(levelname)s - %(message)s",
             datefmt="%Y-%m-%d %I:%M:%S %p",
         )
         errorFileHandler.setFormatter(formatter)
