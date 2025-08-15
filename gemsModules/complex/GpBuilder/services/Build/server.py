@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
+from pydantic import validate_arguments
 from gemsModules.logging.logger import Set_Up_Logging 
 
 from ...services.Build.api import BuildService_Request, BuildService_Response
-from ...tasks import run_gpbuilder
-from ...main_api_project import GpBuilderProject
 
 from .logic import execute
 log = Set_Up_Logging(__name__)

@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import validate_arguments
 from pathlib import Path
 
