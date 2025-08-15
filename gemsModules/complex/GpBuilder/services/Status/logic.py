@@ -17,7 +17,7 @@ def execute(inputs: Status_Inputs, options: Optional[Status_Options]) -> tuple[S
     service_outputs = Status_Outputs()
     service_notices = Notices()
     
-    status_file = inputs.projectDir + "/status.txt"
+    status_file = inputs.projectDir + "/status.log"
     status_greps = { "Build finished": "All complete", "Build finished with errors": "with errors"}
     try:
         with open(status_file, 'r') as f:

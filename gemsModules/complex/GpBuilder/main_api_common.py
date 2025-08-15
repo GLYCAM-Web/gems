@@ -2,13 +2,7 @@
 from pydantic import  Field
 from gemsModules.common import main_api_services
 
-from gemsModules.complex.GpBuilder.main_api_project import GpBuilderProject
 from gemsModules.complex.GpBuilder.services.settings.known_available import Available_Services
-
-from gemsModules.logging.logger import Set_Up_Logging
-
-
-log = Set_Up_Logging(__name__)
 
 
 class GpBuilder_Service_Request(main_api_services.Service_Request):

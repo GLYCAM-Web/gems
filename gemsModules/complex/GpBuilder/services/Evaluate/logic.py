@@ -53,6 +53,7 @@ def execute(inputs: Evaluate_Inputs, options: Optional[Evaluate_Options]) -> tup
             default_pdb = str(workdir / "OriginalInput.pdb")
             if Path(default_pdb).exists():
                 log.debug(f"Using default protein file: {default_pdb}")
+                # We update input here because PM service resolved the RCSB ID to a protein file.
                 inputs.protein_file = default_pdb
             else:
                 service_notices.addNotice(

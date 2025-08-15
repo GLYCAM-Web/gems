@@ -40,10 +40,7 @@ class Json_String_Manager(ABC):
                     self.transaction
                 )
                 self.transaction = self.transaction_manager.process()
-                # Should this return a good response here?
-                # return self.transaction.get_outgoing_string()
         except (ValueError, ValidationError, Exception) as e:
-            # Could use use a NamedTuple here.
             if isinstance(e, ValueError):
                 brief = "InvalidInput", e
             elif isinstance(e, ValidationError):

@@ -22,7 +22,7 @@ class BuildService_output_Resource(Resource):
     pass
 
 class BuildService_Resources(Resources):
-    __root__ : List[Union[BuildService_input_Resource, BuildService_output_Resource]] = Field(default_factory=list)
+    __root__ : list[Union[BuildService_input_Resource, BuildService_output_Resource]] = Field(default_factory=list)
 
 
 # TODO: To structurefile/common_api.py? 
@@ -34,6 +34,7 @@ class GlycanMapping(BaseModel):
     SequenceContext: Optional[str] = Field("", description="Sequence context around the glycan mapping, if given")
     InsertionCode: Optional[str] = Field("", description="Insertion code, if any")
     Tags: Optional[str] = Field("", description="Tags associated with the glycan mapping, if given")
+    
     
 UINT64_MAX = 2**64 - 1 # sys.maxsize is platform-dependent, so we use a fixed value for UINT64_MAX
 class BuildOptions(BaseModel):

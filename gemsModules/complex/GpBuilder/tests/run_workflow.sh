@@ -35,9 +35,11 @@ echo "$BUILD_RESPONSE"
 # Find "Success" and echo the line if it exists by using json.tool to format the JSON response
 if echo "$BUILD_RESPONSE" | python3 -m json.tool | grep "execution started"; then
     echo "Build was started."
+    echo "STATUS_REQUEST_JSON: $STATUS_REQUEST_JSON"
     while true; do
         sleep 3
         STATUS_RESPONSE=$(echo $STATUS_REQUEST_JSON | $GEMSHOME/bin/delegate)
+        echo
         
         if echo "$STATUS_RESPONSE" | python3 -m json.tool | grep "All complete"; then
             echo "Build completed successfully."
