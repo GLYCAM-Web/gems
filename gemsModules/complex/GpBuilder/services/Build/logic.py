@@ -56,7 +56,7 @@ def execute(inputs: Build_Inputs, options: BuildOptions) -> tuple[Build_Outputs,
         locationType="filesystem-path-unix",
         resourceRole="gpbuilder-input-file",
         resourceFormat="text/plain",
-        payload=job_dir / "the_input.txt"
+        payload=str(input_file),
     ))
     with open(status_log_path, "a") as status_out:
         status_out.write(f"GpB Input file created.\n")
@@ -74,6 +74,8 @@ def execute(inputs: Build_Inputs, options: BuildOptions) -> tuple[Build_Outputs,
             Message="GpBuilder execution failed.",
         )
         log.error("GpBuilder execution failed.")
+        with open(status_log_path, "a") as status_out:
+            status_out.write("GpBuilder execution failed.\n")
     else:
         service_notices.addNotice(
             Brief="GpBuilder running",
@@ -84,12 +86,9 @@ def execute(inputs: Build_Inputs, options: BuildOptions) -> tuple[Build_Outputs,
             Message="GpBuilder execution started.",
         )
         log.debug("GpBuilder execution started, see project logs for details.")
-  
-        # archive_project.execute(job_dir, inputs.pUUID)
-        # log.debug(f"Project {inputs.pUUID} just archived.")
-    
-        # This is redundant for now, but when GpB is no longer blocking we will need to write this with the background task.
+        # The start_build.sh writes this to the status.log, so we don't need to do it here.
         # with open(status_log_path, "a") as status_out:
-        #    status_out.write("All complete\n")
+        #     status_out.write("GpBuilder execution started.\n")
+
                 
     return service_outputs, service_notices
