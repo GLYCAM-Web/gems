@@ -5,10 +5,15 @@
 # then it crafts the build request using the project UUID from the evaluation response,
 # and finally it delegates the build request to the GpBuilder service.
 #
-# It waits for the build to complete, checking the status file for completion,
+# It waits for the build to complete, checking the status service for completion,
 # and verifies that the resulting zip file is non-empty.
 # 
 # Usage: cd $GEMSHOME/tests && ./run_tests.sh 022.test.GpBuilder.sh
+# 
+# RCSB_EVALUATION can be set to true or 1 to use the RCSB evaluation request instead of the default protein_file.
+# DEBUG can be set to true to enable debug logging.
+# GEMS_KEEP_BAD_OUTPUTS can be set to True to keep the bad outputs in the bad_outputs directory.
+# GEMS_REMOVE_TEST_PROJECT can be set to true or 1 to remove the test project directory after the test completes.
 #
 # Returns:
 #   - 0 on success
@@ -41,12 +46,15 @@ exit_handler() {
   if [ -n "${BUILD_RESPONSE:-}" ]; then
     echo "$BUILD_RESPONSE" >bad_outputs/$(date +%Y%m%d_%H%M)-test-022-build-response-git-ignore-me.json
   fi
+  if [ -n "${STATUS_RESPONSES:-}" ]; then
+    echo "$STATUS_RESPONSES" >bad_outputs/$(date +%Y%m%d_%H%M)-test-022-status-responses-git-ignore-me.json
+  fi
 
   if [ $exit_code -ne 0 ]; then
     echo "❌ An error occurred, saving bad outputs to bad_outputs directory. ($exit_code)"
     echo -e "\tCheck $GEMSHOME/tests/bad_outputs directory for details." >&2
   else
-    echo "✅ Test 022 Build completed successfully, status file: $STATUS_FILE"
+    echo "✅ Test 022 Build completed successfully, final status: $FINAL_STATUS"
 
     if [[ "${GEMS_KEEP_BAD_OUTPUTS:-}" == "True" ]]; then
       echo -e "\tGEMS_KEEP_BAD_OUTPUTS is truthy, keeping bad outputs."
@@ -74,6 +82,8 @@ EVALUATE_RCSB_REQUEST_FILE="$GEMSHOME/gemsModules/complex/GpBuilder/tests/inputs
 BUILD_REQUEST_TEMPLATE_FILE="$GEMSHOME/gemsModules/complex/GpBuilder/tests/inputs/explicit_build_parameterized.json"
 BUILD_RCSB_REQUEST_FILE="$GEMSHOME/gemsModules/complex/GpBuilder/tests/inputs/explicit_build_rcsb_param.json"
 
+STATUS_REQUEST_TEMPLATE_FILE="$GEMSHOME/gemsModules/complex/GpBuilder/tests/inputs/explicit_status_parameterized.json"
+
 if [ ! -f "$PDB_FILE" ]; then
   echo "PDB file not found: $PDB_FILE" >&2
   exit 1
@@ -86,6 +96,11 @@ fi
 
 if [ ! -f "$BUILD_REQUEST_TEMPLATE_FILE" ]; then
   echo "Build request template not found: $BUILD_REQUEST_TEMPLATE_FILE" >&2
+  exit 1
+fi
+
+if [ ! -f "$STATUS_REQUEST_TEMPLATE_FILE" ]; then
+  echo "Status request template not found: $STATUS_REQUEST_TEMPLATE_FILE" >&2
   exit 1
 fi
 
@@ -138,16 +153,35 @@ if [ $? -ne 0 ]; then
   echo -e "Output is not a valid JSON response.\nCheck the bad_outputs dir for more info." >&2
   exit 2
 elif echo "$BUILD_RESPONSE" | grep started -q; then
-  STATUS_FILE="${PROJECT_DIR_PATH}/status.log"
-  debug_log "Status File: ${STATUS_FILE}"
+  # Create the status request by substituting the pUUID
+  STATUS_REQUEST=$(sed "s/<pUUID>/$PUUID/" "$STATUS_REQUEST_TEMPLATE_FILE")
+  debug_log "Status Request: ${STATUS_REQUEST}"
+  
   echo "Build starting, active project directory: $PROJECT_DIR_PATH"
+  STATUS_RESPONSES=""
   tries=0
   max_tries=30
   wait_duration=2
+  
   while [ $tries -lt $max_tries ]; do
-    if [ ! -f "$STATUS_FILE" ]; then
-      echo "Status file not found yet, waiting..."
-    elif grep -q "All complete" "$STATUS_FILE"; then
+    # Call the status service
+    STATUS_RESPONSE=$(echo "$STATUS_REQUEST" | $GEMSHOME/bin/delegate)
+    debug_log "Status Response: ${STATUS_RESPONSE}"
+    
+    # Append to status responses for debugging
+    if [ -z "$STATUS_RESPONSES" ]; then
+      STATUS_RESPONSES="[$STATUS_RESPONSE"
+    else
+      STATUS_RESPONSES="$STATUS_RESPONSES,$STATUS_RESPONSE"
+    fi
+    
+    # Extract the status from the response
+    CURRENT_STATUS=$(echo "$STATUS_RESPONSE" | grep -o '"status": *"[^"]*' | cut -d'"' -f4)
+    debug_log "Current Status: $CURRENT_STATUS"
+    
+    if [[ "$CURRENT_STATUS" == "All complete" ]]; then
+      FINAL_STATUS="$CURRENT_STATUS"
+      STATUS_RESPONSES="$STATUS_RESPONSES]"
       ZIP_FILE=$(find "$PROJECT_DIR_PATH" -maxdepth 1 -name "GP_project_*.zip" -print -quit)
       if [ ! -n "$ZIP_FILE" ]; then
         echo "No zip file found in the project directory." >&2
@@ -161,15 +195,19 @@ elif echo "$BUILD_RESPONSE" | grep started -q; then
           exit 0
         fi
       fi
-    elif grep -q "GpBuilder execution failed" "$STATUS_FILE"; then
-      echo "GpBuilder execution failed, check the status file: $STATUS_FILE" >&2
+    elif [[ "$CURRENT_STATUS" == *"GpBuilder execution failed"* ]] || [[ "$CURRENT_STATUS" == *"execution failed"* ]]; then
+      echo "GpBuilder execution failed, final status: $CURRENT_STATUS" >&2
+      STATUS_RESPONSES="$STATUS_RESPONSES]"
       exit 5
-    elif grep -q "Completed with errors" "${STATUS_FILE}"; then
+    elif [[ "$CURRENT_STATUS" == *"Completed with errors"* ]] || [[ "$CURRENT_STATUS" == *"with errors"* ]]; then
       echo "Build completed with errors." >&2
-      echo "See status file: $STATUS_FILE for more details." >&2
+      echo "Final status: $CURRENT_STATUS" >&2
+      STATUS_RESPONSES="$STATUS_RESPONSES]"
       exit 6
-    elif grep -q "GpBuilder execution started" "$STATUS_FILE"; then
+    elif [[ "$CURRENT_STATUS" == *"GpBuilder execution started"* ]] || [[ "$CURRENT_STATUS" == *"execution started"* ]]; then
       echo "GpBuilder/Build started."
+    elif [[ "$CURRENT_STATUS" == "Status file not found" ]]; then
+      echo "Status file not found yet, waiting..."
     fi
 
     remaining_time=$(( (max_tries - tries) * wait_duration ))
@@ -178,6 +216,7 @@ elif echo "$BUILD_RESPONSE" | grep started -q; then
     sleep $wait_duration
   done
 
+  STATUS_RESPONSES="$STATUS_RESPONSES]"
   if [ $tries -ge $max_tries ]; then
     echo "Build did not complete within the expected time." >&2
     exit 6
