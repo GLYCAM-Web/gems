@@ -27,7 +27,7 @@ def execute(input_file, inputs, options) -> Path:
         
         f.write("ProteinResidue, GlycanName:\n")
         for mapping in inputs.glycan_mappings:
-            f.write(f"{mapping.Chain}_{mapping.ResidueNumber}|{mapping.Sequence}\n")
+            f.write(f"{mapping.Chain}_{mapping.ResidueNumber}{mapping.InsertionCode}|{mapping.Sequence}\n")
         f.write("END\n")
 
     return input_file
