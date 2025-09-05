@@ -27,7 +27,7 @@ def execute_gpb(project_dir: Path, pUUID) -> bool:
         f"Executing GpBuilder for this project directory: {project_dir}"
     )
     
-    GP_BUILDER = f"$GEMSHOME/gmml2/bin/gpBuilder"
+    GP_BUILDER = f"$GEMSHOME/gmml2/bin/glycoproteinBuilder"
 
     input_file = project_dir / "the_input.txt"
     if not input_file.exists():
@@ -119,16 +119,16 @@ exit $exit_code
 
 def execute_gpbt_wrapper(project_pdb_file: Path, output_file: Path):
     """
-    Wrapper function to execute the gpBuilderTable program.
+    Wrapper function to execute the glycosylationSiteFinder program.
 
     This is used to generate the possible glycosylation sites for
     the given PDB file. We choose to output as csv here.
 
     This will be requested by the website.
 
-    ./bin/gpBuilderTable /programs/gems/gmml2/tests/tests/inputs/018.4mbzEdit.pdb --format csv > someout.txt
+    ./bin/glycosylationSiteFinder /programs/gems/gmml2/tests/tests/inputs/018.4mbzEdit.pdb --format csv > someout.txt
     """
-    GP_BUILDER_TABLE = os.path.expandvars("$GEMSHOME/gmml2/bin/gpBuilderTable")
+    GP_BUILDER_TABLE = os.path.expandvars("$GEMSHOME/gmml2/bin/glycosylationSiteFinder")
 
     cmd = [GP_BUILDER_TABLE, str(project_pdb_file), "--format", "csv"]
     log.info(f"Running command: {' '.join(cmd)}")
@@ -142,9 +142,9 @@ def execute_gpbt_wrapper(project_pdb_file: Path, output_file: Path):
     failed = result.returncode != 0
     
     if failed:
-        log.error(f"gpBuilderTable failed with return code {result.returncode}")
+        log.error(f"glycosylationSiteFinder failed with return code {result.returncode}")
     else:
-        log.info(f"gpBuilderTable completed successfully, output written to {output_file}")
+        log.info(f"glycosylationSiteFinder completed successfully, output written to {output_file}")
         
     return failed
 
@@ -172,7 +172,7 @@ if __name__ == "__main__":
 
     test_project_dir.mkdir(exist_ok=True)
 
-    # Generate the input file with GpBuilderTable
+    # Generate the input file with glycosylationSiteFinder
     execute_gpbt_wrapper(test_input_pdb, possible_glycosylation_sites)
 
     # select the first 3 possible glycosylation sites
