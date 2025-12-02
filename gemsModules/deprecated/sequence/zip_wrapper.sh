@@ -13,9 +13,9 @@ if [ $? -ne 0 ]; then
     exit 2
 fi
 
-zip -ru ${project_dir_name}/${project_zipname} ${project_dir_name}/Requested_Builds ${project_dir_name}/logs -x "/*.zip"
+zip -ru ${project_dir_name}/${project_zipname} ${project_dir_name}/Requested_Builds ${project_dir_name}/logs -x "/*.zip" > ${project_dir_name}/zip_details.log 2>&1
 EXIT_CODE=$?
-if [ EXIT_CODE -ne 0 ]; then
+if [ "${EXIT_CODE}" -ne "0" ]; then
     echo "Failed to create the project level zip" >> ${project_dir}/zip_details.log
     echo "[ERROR] : $(date) : Failed to zip project" >> ${project_dir}/zip_status.log
 else

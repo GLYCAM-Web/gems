@@ -148,8 +148,10 @@ class amberProject(BaseModel):
             raise FileNotFoundError(self.localWorkingDirectory)
 
         # Check that the protocolSourceLocation is probably a git repo
-        if os.path.isdir(self.protocolSourceLocation + "/.git") == False:
-            warnings.warn(self.protocolSourceLocation + " is not a git repo")
+        # Note that the path is a directory for a normal repo, but is just a
+        # file if it is a submodule. So, we just check for 'exists'.
+        if os.path.exists(self.protocolSourceLocation + "/.git") == False:
+            log.error(self.protocolSourceLocation + " is not a git repo. Cannot record git hash.")
 
         # If it appears to be one, grab the branch and hash
         else:
@@ -165,6 +167,7 @@ class amberProject(BaseModel):
             p = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
             (output, err) = p.communicate()
             self.protocolSourceHash = output.decode().rstrip()
+            log.debug("branch : hash are -- " + self.protocolSourceBranch + " : " + self.protocolSourceHash)
 
         # If protocolDirectory does not already exist, generate the path name.
         # Note : These utilities assume that the protocols are in specific
@@ -251,6 +254,46 @@ class amberProject(BaseModel):
             + "\n"
         )
         file.close()
+
+        # If USE_AMBER_CONDA is True then add info to relevant files that are called by Minimize.bash 
+        # Note that Minimize.bash which is now a sym link to Sequence-Prep.bash
+        log.debug("About to check for conda use.")
+        if os.environ.get("USE_AMBER_CONDA")=='True':
+            log.debug("Conda is in use for amber.")
+            ## Adding info to:
+            #    Minimize-Parameters.bash 
+            thisMinimizeParameters = self.localWorkingDirectory + "/Minimize-Parameters.bash"
+            # Check whether this file already exists
+            if os.path.isfile(thisMinimizeParameters) == True:
+                log.debug(thisMinimizeParameters + " already exists. Appending info for USE_AMBER_CONDA. Existing data might be overruled.")
+            try:
+                file = open(thisMinimizeParameters, "a")
+            except OSError:
+                log.error("Cannot open file for appending:  " + thisMinimizeParameters)
+                raise
+            file.write(
+                      "source \"/programs/conda/etc/profile.d/conda.sh\"\n"
+                      + "conda activate AmberTools25\n"
+                      + "AMBERHOME=\"${CONDA_PREFIX}\"\n"
+            )
+    
+            file.close()
+            ## Adding info to:
+            #    Amber-Prolog.bash
+            thisAmberProlog = self.localWorkingDirectory + "/Amber-Prolog.bash"
+            # Check whether this file already exists
+            if os.path.isfile(thisAmberProlog) == True:
+                log.debug(thisAmberProlog + " already exists. Appending info for USE_AMBER_CONDA. Existing data might be overruled.")
+            try:
+                file = open(thisAmberProlog, "a")
+            except OSError:
+                log.error("Cannot open file for appending:  " + thisAmberProlog)
+                raise
+            file.write(
+                      "conda deactivate\n"
+            )
+            file.close()
+
 
         # If the simulationWorkingDirectory is not specified, guess its name and issue a warning.
         log.debug("1st - simulationWorkingDirectory is : " + self.localWorkingDirectory)

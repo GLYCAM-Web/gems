@@ -128,12 +128,12 @@ def manageIncomingString(jsonObjectString):
     # Figure out whether we need to send this to a different machine
     useGRPC = True
     thePort = os.environ.get("GEMS_GRPC_SLURM_PORT")
-    log.debug("the port is: " + thePort)
+    log.debug("the port is: " + str(thePort))
     if thePort is None:
         log.debug("cant find grpc slurm submission port. using localhost")
         useGRPC = False
     theHost = os.environ.get("GEMS_GRPC_SLURM_HOST")
-    log.debug("the host is: " + theHost)
+    log.debug("the host is: " + str(theHost))
     if theHost is None:
         log.debug("cant find grpc slurm submission host. using localhost")
         useGRPC = False

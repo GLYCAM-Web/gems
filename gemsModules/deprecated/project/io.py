@@ -108,7 +108,7 @@ class Project(BaseModel):
     #    from gemsModules.deprecated.project._defaultInitializeProject import defaultInitializeProject
 
     def setFilesystemPath(self, specifiedPath: str = None, noClobber: bool = True):
-        # If a path exists, and it shouldbot be clobbered, return
+        # If a path exists, and it shouldnot be clobbered, return
         # This **SHOULD** be the case if the incoming JSON object specified a path.
         # For this to be true, ensure that your outgoing project is deep-copied from
         # your incoming project before calling this.
@@ -277,7 +277,8 @@ class Project(BaseModel):
             return
         # If we are still here, set the directory
         self.versions_file_path = os.path.join(
-            project_settings.default_filesystem_output_path,
+            self.filesystem_path,
+            # not sure why this was set:  project_settings.default_filesystem_output_path,
             project_settings.default_versions_file_name,
         )
         log.debug("self.versions_file_path is : >>>" + self.versions_file_path + "<<<")
