@@ -279,15 +279,15 @@ class amberProject(BaseModel):
     
             file.close()
             ## Adding info to:
-            #    Amber-Prolog.bash
-            thisAmberProlog = self.localWorkingDirectory + "/Amber-Prolog.bash"
+            #    Amber-Epilog.bash
+            thisAmberEpilog = self.localWorkingDirectory + "/Amber-Epilog.bash"
             # Check whether this file already exists
-            if os.path.isfile(thisAmberProlog) == True:
-                log.debug(thisAmberProlog + " already exists. Appending info for USE_AMBER_CONDA. Existing data might be overruled.")
+            if os.path.isfile(thisAmberEpilog) == True:
+                log.debug(thisAmberEpilog + " already exists. Appending info for USE_AMBER_CONDA. Existing data might be overruled.")
             try:
-                file = open(thisAmberProlog, "a")
+                file = open(thisAmberEpilog, "a")
             except OSError:
-                log.error("Cannot open file for appending:  " + thisAmberProlog)
+                log.error("Cannot open file for appending:  " + thisAmberEpilog)
                 raise
             file.write(
                       "conda deactivate\n"

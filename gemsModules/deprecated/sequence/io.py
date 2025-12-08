@@ -680,7 +680,7 @@ class sequenceProceduralOptions(commonio.ProceduralOptions):
             )
     number_structures_hard_limit : int = Field(
             None,
-            description="Max number of structures to build.  If =0, then unlimited."
+            description="Max number of structures to build.  If =-1, then unlimited. if =0, then really don't build any: just return info."
             )
 
     @validator('number_structures_hard_limit', pre=True, always=True)
@@ -690,10 +690,13 @@ class sequenceProceduralOptions(commonio.ProceduralOptions):
             transactionContext = os.environ.get('GW_GRPC_ROLE')
             log.debug("transactionContext, per GW_GRPC_ROLE, is : " + str(transactionContext))
             if transactionContext == 'Developer': 
+                log.debug("setting number_structures_hard_limit to 8 per GW_GRPC_ROLE")
                 return 8 
             elif transactionContext == 'Swarm': 
+                log.debug("setting number_structures_hard_limit to 64 per GW_GRPC_ROLE")
                 return 64
             else:
+                log.debug("setting number_structures_hard_limit to 1 per GW_GRPC_ROLE")
                 return 1  # if you only get one structure, check your GRPC Role
         if 'GEMS_MAX_STRUCTURES' in os.environ :
             the_max = os.environ.get('GEMS_MAX_STRUCTURES')
@@ -701,10 +704,17 @@ class sequenceProceduralOptions(commonio.ProceduralOptions):
             try: 
                 max_int = int(the_max)
             except ValueError: 
+                log.debug("setting number_structures_hard_limit per Value Error in GEMS_MAX_STRUCTURES to 1")
                 return 1  # if you only get one structure, your int might be bad
             else:
+                log.debug("setting number_structures_hard_limit per GEMS_MAX_STRUCTURES to " + str(max_int))
                 return max_int
-        return v or 0
+        log.debug("setting number_structures_hard_limit in the final return.")
+        log.debug("The value of v is " + str(v))
+        if v is None:
+            return -1
+        else:
+            return v 
 
 
 class sequenceEntity(commonio.Entity):
@@ -1229,6 +1239,9 @@ class Transaction(commonio.Transaction):
                 the_path = get_default_evaluation_path_from_sequence(self)
                 log.debug("The path returned was : " + str(the_path))
                 if the_path is not None and isBuild3DStructureService :
+                    return
+                if the_path is None and 'GW_GRPC_ROLE' not in os.environ and 'GEMS_MAX_STRUCTURES' not in os.environ:
+                    # This is not in a website context, so we do not need a default build
                     return
                 log.debug("We are going to do a default build")
 
