@@ -1,3 +1,5 @@
+!!! Test 017 depends on test 008. Please see the readme for test 017 as well !!!
+
 Test 008 is complicated.  It checks serveral details of sequence builds.  Some of these details only appear after
 several prior steps have been completed.  
 
