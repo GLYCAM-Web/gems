@@ -1241,8 +1241,16 @@ class Transaction(commonio.Transaction):
                 if the_path is not None and isBuild3DStructureService :
                     return
                 if the_path is None and 'GW_GRPC_ROLE' not in os.environ and 'GEMS_MAX_STRUCTURES' not in os.environ:
-                    # This is not in a website context, so we do not need a default build
-                    return
+                    # This is not in a website context, so we do not need a default build unless this is an evaluation
+                    log.debug("This is not a website. Checking if we are doing an evaluation.")
+                    if len(this_entity.services) == 1:
+                        keys_list=list(this_entity.services.keys())
+                        the_key=keys_list[0]
+                        log.debug("The key for this service is: " + str(the_key))
+                        the_service=this_entity.services[the_key]
+                        log.debug("The typename for this service is: " + str(the_service.typename))
+                        if the_service.typename!='Evaluate':
+                            return
                 log.debug("We are going to do a default build")
 
                 self.manageSequenceBuild3DStructureRequest(defaultOnly=True)
