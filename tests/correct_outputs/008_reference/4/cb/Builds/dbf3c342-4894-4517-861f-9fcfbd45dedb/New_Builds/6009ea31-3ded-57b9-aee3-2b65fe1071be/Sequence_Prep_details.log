@@ -1,0 +1,536 @@
+Run log begun on Sun Dec  7 20:47:06 EST 2025 
+This build appears to be running in a Slurm cluster.:
+The current host is gw-slurm-amber-1:
+The build will run on these hosts:
+gw-slurm-amber-1
+Sourcing amber.sh from /programs/amber 
+...Sourcing of AMBERHOME[now=/programs/amber]/amber.sh completed on Sun Dec  7 20:47:07 EST 2025
+
+Building and minimizing the gas-phase system.
+
+Running tleap to generate gas-phase input files. 
+-I: Adding /programs/amber/dat/leap/prep to search path.
+-I: Adding /programs/amber/dat/leap/lib to search path.
+-I: Adding /programs/amber/dat/leap/parm to search path.
+-I: Adding /programs/amber/dat/leap/cmd to search path.
+-f: Source unminimized-gas.leapin.
+
+Welcome to LEaP!
+(no leaprc in search path)
+Sourcing: ./unminimized-gas.leapin
+Log file: ./unminimized-gas.leaplog
+----- Source: /programs/amber/dat/leap/cmd/leaprc.GLYCAM_06j-1
+----- Source of /programs/amber/dat/leap/cmd/leaprc.GLYCAM_06j-1 done
+Loading parameters: /programs/amber/dat/leap/parm/GLYCAM_06j.dat
+Reading title:
+GLYCAM_06_H PARAMETERS (FOR AMBER 11.0, RESP 0.010), COPYRIGHT CCRC 2011
+Loading Prep file: /programs/amber/dat/leap/prep/GLYCAM_06j-1.prep
+Loading library: /programs/amber/dat/leap/lib/GLYCAM_amino_06j_12SB.lib
+Loading library: /programs/amber/dat/leap/lib/GLYCAM_aminoct_06j_12SB.lib
+Loading library: /programs/amber/dat/leap/lib/GLYCAM_aminont_06j_12SB.lib
+Loading library: /programs/amber/dat/leap/lib/solvents.lib
+Loading library: /programs/amber/dat/leap/lib/atomic_ions.lib
+Loading parameters: /programs/amber/dat/leap/parm/frcmod.ionsjc_tip3p
+Reading force field modification type file (frcmod)
+Reading title:
+Monovalent ion parameters for Ewald and TIP3P water from Joung & Cheatham JPCB (2008)
+Loading parameters: ./frcmod.glycam06_intraring_doublebond_protonatedacids
+Reading force field modification type file (frcmod)
+Reading title:
+MASS
+Loading parameters: ./frcmod.glycam06_bacterial_K3O
+Reading force field modification type file (frcmod)
+Reading title:
+MASS
+Loading library: ./structure.off
+Checking 'CONDENSEDSEQUENCE'....
+
+/programs/amber/bin/teLeap: Warning!
+The unperturbed charge of the unit (-4.000000) is not zero.
+Checking parameters for unit 'CONDENSEDSEQUENCE'.
+Checking for bond parameters.
+Checking for angle parameters.
+check:  Warnings: 1
+Unit is OK.
+Checking Unit.
+
+/programs/amber/bin/teLeap: Warning!
+The unperturbed charge of the unit (-4.000000) is not zero.
+
+/programs/amber/bin/teLeap: Note.
+Ignoring the warning from Unit Checking.
+
+Building topology.
+Building atom parameters.
+Building bond parameters.
+Building angle parameters.
+Building proper torsion parameters.
+Building improper torsion parameters.
+ total 24 improper torsions applied
+Building H-Bond parameters.
+Incorporating Non-Bonded adjustments.
+Not Marking per-residue atom chain types.
+Marking per-residue atom chain types.
+ (no restraints)
+	Quit
+
+Exiting LEaP: Errors = 0; Warnings = 2; Notes = 1.
+...Gas-phase tleap processing completed on Sun Dec  7 20:47:07 EST 2025
+Running the Gas-Phase Minimization 
+/programs/amber/bin:/programs/amber/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+This is the command for part min
+sander -O   -i min-gas.in  -o min-gas.o  -e min-gas.en  -p unminimized-gas.parm7  -c unminimized-gas.rst7  -r min-gas.restrt.nc  -x min-gas.nc  -inf min-gas.info 
+...Gas-phase minimization completed on Sun Dec  7 20:47:07 EST 2025
+
+NOT building and minimizing the solvated systems.
+
+Running cpptraj to convert gas-phase output to convenient formats 
+
+CPPTRAJ: Trajectory Analysis. V18.01
+    ___  ___  ___  ___
+     | \/ | \/ | \/ | 
+    _|_/\_|_/\_|_/\_|_
+
+| Date/time: 12/07/25 20:47:07
+| Available memory: 19.994 GB
+
+INPUT: Reading input from 'min-gas.cpptrajin'
+  [parm unminimized-gas.parm7]
+	Reading 'unminimized-gas.parm7' as Amber Topology
+	Radius Set: modified Bondi radii (mbondi)
+  [trajin min-gas.restrt.nc]
+	Reading 'min-gas.restrt.nc' as Amber NC Restart
+  [trajout min-gas.mol2]
+	Writing 'min-gas.mol2' as Mol2
+  [trajout min-gas.pdb]
+	Writing 'min-gas.pdb' as PDB
+---------- RUN BEGIN -------------------------------------------------
+
+PARAMETER FILES (1 total):
+ 0: unminimized-gas.parm7, 456 atoms, 18 res, box: None, 1 mol
+
+INPUT TRAJECTORIES (1 total):
+ 0: 'min-gas.restrt.nc' is a NetCDF AMBER restart file with coordinates, time, Parm unminimized-gas.parm7 (reading 1 of 1)
+  Coordinate processing will occur on 1 frames.
+
+OUTPUT TRAJECTORIES (2 total):
+  'min-gas.mol2' (1 frames) is a Tripos Mol2 file
+  'min-gas.pdb' (1 frames) is a PDB file
+
+BEGIN TRAJECTORY PROCESSING:
+.....................................................
+ACTIVE OUTPUT TRAJECTORIES (2):
+  min-gas.mol2 (coordinates, time)
+  min-gas.pdb (coordinates, time)
+----- min-gas.restrt.nc (1-1, 1) -----
+100% Complete.
+
+Read 1 frames and processed 1 frames.
+TIME: Avg. throughput= 875.6567 frames / second.
+
+ACTION OUTPUT:
+TIME: Analyses took 0.0000 seconds.
+
+RUN TIMING:
+TIME:		Init               : 0.0000 s (  0.52%)
+TIME:		Trajectory Process : 0.0011 s ( 98.53%)
+TIME:		Action Post        : 0.0000 s (  0.00%)
+TIME:		Analysis           : 0.0000 s (  0.00%)
+TIME:		Data File Write    : 0.0000 s (  0.00%)
+TIME:		Other              : 0.0000 s (  0.01%)
+TIME:	Run Total 0.0012 s
+---------- RUN END ---------------------------------------------------
+TIME: Total execution time: 0.0023 seconds.
+--------------------------------------------------------------------------------
+To cite CPPTRAJ use:
+Daniel R. Roe and Thomas E. Cheatham, III, "PTRAJ and CPPTRAJ: Software for
+  Processing and Analysis of Molecular Dynamics Trajectory Data". J. Chem.
+  Theory Comput., 2013, 9 (7), pp 3084-3095.
+
+...Post-gas-phase cpptraj processing completed on Sun Dec  7 20:47:07 EST 2025
+
+Working on TIP3P solvated version.
+
+Running tleap to build the Tip3P solvated structures 
+-I: Adding /programs/amber/dat/leap/prep to search path.
+-I: Adding /programs/amber/dat/leap/lib to search path.
+-I: Adding /programs/amber/dat/leap/parm to search path.
+-I: Adding /programs/amber/dat/leap/cmd to search path.
+-f: Source unminimized-t3p.leapin.
+
+Welcome to LEaP!
+(no leaprc in search path)
+Sourcing: ./unminimized-t3p.leapin
+Log file: ./unminimized-t3p.leaplog
+----- Source: /programs/amber/dat/leap/cmd/leaprc.GLYCAM_06j-1
+----- Source of /programs/amber/dat/leap/cmd/leaprc.GLYCAM_06j-1 done
+Loading parameters: /programs/amber/dat/leap/parm/GLYCAM_06j.dat
+Reading title:
+GLYCAM_06_H PARAMETERS (FOR AMBER 11.0, RESP 0.010), COPYRIGHT CCRC 2011
+Loading Prep file: /programs/amber/dat/leap/prep/GLYCAM_06j-1.prep
+Loading library: /programs/amber/dat/leap/lib/GLYCAM_amino_06j_12SB.lib
+Loading library: /programs/amber/dat/leap/lib/GLYCAM_aminoct_06j_12SB.lib
+Loading library: /programs/amber/dat/leap/lib/GLYCAM_aminont_06j_12SB.lib
+Loading library: /programs/amber/dat/leap/lib/solvents.lib
+Loading library: /programs/amber/dat/leap/lib/atomic_ions.lib
+Loading parameters: /programs/amber/dat/leap/parm/frcmod.ionsjc_tip3p
+Reading force field modification type file (frcmod)
+Reading title:
+Monovalent ion parameters for Ewald and TIP3P water from Joung & Cheatham JPCB (2008)
+Loading parameters: ./frcmod.glycam06_intraring_doublebond_protonatedacids
+Reading force field modification type file (frcmod)
+Reading title:
+MASS
+Loading parameters: ./frcmod.glycam06_bacterial_K3O
+Reading force field modification type file (frcmod)
+Reading title:
+MASS
+Loading parameters: /programs/amber/dat/leap/parm/frcmod.ionsjc_tip3p
+Reading force field modification type file (frcmod)
+Reading title:
+Monovalent ion parameters for Ewald and TIP3P water from Joung & Cheatham JPCB (2008)
+Loading Mol2 file: ./min-gas.mol2
+Reading MOLECULE named Cpptraj generated mol2 file.
+4 Na+ ions required to neutralize.
+Adding 4 counter ions to "mol" using 1A grid
+Grid extends from solute vdw + 1.37  to  7.28
+Resolution:      1.00 Angstrom.
+ (no solvent present)
+Calculating grid charges
+Placed Na+ in mol at (2.88, 32.61, 0.76).
+Placed Na+ in mol at (-17.12, 24.61, -15.24).
+Placed Na+ in mol at (-19.12, 19.61, 0.76).
+Placed Na+ in mol at (2.88, 27.61, -10.24).
+
+Done adding ions.
+ 0.000000 0 1 0
+0 Cl- ion required to neutralize.
+Adding 0 counter ions to "mol" using 1A grid
+Scaling up box by a factor of 1.376782 to meet diagonal cut criterion
+  Solute vdw bounding box:              43.116 28.830 28.125
+  Total bounding box for atom centers:  76.159 76.159 76.159
+      (box expansion for 'iso' is  53.3%)
+  Solvent unit box:                     18.774 18.774 18.774
+  Volume: 229679.876 A^3 (oct)
+  Total mass 122404.600 amu,  Density 0.885 g/cc
+  Added 6593 residues.
+Checking Unit.
+Building topology.
+Building atom parameters.
+Building bond parameters.
+Building angle parameters.
+Building proper torsion parameters.
+Building improper torsion parameters.
+ total 24 improper torsions applied
+Building H-Bond parameters.
+Incorporating Non-Bonded adjustments.
+Not Marking per-residue atom chain types.
+Marking per-residue atom chain types.
+  (Residues lacking connect0/connect1 - 
+   these don't have chain types marked:
+
+	res	total affected
+
+	0SA	4
+	4YB	6
+	6LB	4
+	ROH	1
+	VMB	1
+	WAT	6593
+	XMA	1
+	YMA	1
+  )
+ (no restraints)
+Writing pdb file: unminimized-t3p.pdb
+   printing CRYST1 record to PDB file with box info
+	Quit
+
+Exiting LEaP: Errors = 0; Warnings = 0; Notes = 0.
+...Solvent-phase (T3P) tleap processing completed on Sun Dec  7 20:47:07 EST 2025
+
+Working on TIP5P solvated version.
+
+Running tleap to build the Tip5P solvated structures 
+-I: Adding /programs/amber/dat/leap/prep to search path.
+-I: Adding /programs/amber/dat/leap/lib to search path.
+-I: Adding /programs/amber/dat/leap/parm to search path.
+-I: Adding /programs/amber/dat/leap/cmd to search path.
+-f: Source unminimized-t5p.leapin.
+
+Welcome to LEaP!
+(no leaprc in search path)
+Sourcing: ./unminimized-t5p.leapin
+Log file: ./unminimized-t5p.leaplog
+----- Source: /programs/amber/dat/leap/cmd/leaprc.GLYCAM_06j-1
+----- Source of /programs/amber/dat/leap/cmd/leaprc.GLYCAM_06j-1 done
+Loading parameters: /programs/amber/dat/leap/parm/GLYCAM_06j.dat
+Reading title:
+GLYCAM_06_H PARAMETERS (FOR AMBER 11.0, RESP 0.010), COPYRIGHT CCRC 2011
+Loading Prep file: /programs/amber/dat/leap/prep/GLYCAM_06j-1.prep
+Loading library: /programs/amber/dat/leap/lib/GLYCAM_amino_06j_12SB.lib
+Loading library: /programs/amber/dat/leap/lib/GLYCAM_aminoct_06j_12SB.lib
+Loading library: /programs/amber/dat/leap/lib/GLYCAM_aminont_06j_12SB.lib
+Loading library: /programs/amber/dat/leap/lib/solvents.lib
+Loading library: /programs/amber/dat/leap/lib/atomic_ions.lib
+Loading parameters: /programs/amber/dat/leap/parm/frcmod.ionsjc_tip3p
+Reading force field modification type file (frcmod)
+Reading title:
+Monovalent ion parameters for Ewald and TIP3P water from Joung & Cheatham JPCB (2008)
+Loading parameters: ./frcmod.glycam06_intraring_doublebond_protonatedacids
+Reading force field modification type file (frcmod)
+Reading title:
+MASS
+Loading parameters: ./frcmod.glycam06_bacterial_K3O
+Reading force field modification type file (frcmod)
+Reading title:
+MASS
+Loading parameters: /programs/amber/dat/leap/parm/frcmod.tip5p
+Reading force field modification type file (frcmod)
+Reading title:
+This is the additional/replacement parameter set for TIP5P
+Loading Mol2 file: ./min-gas.mol2
+Reading MOLECULE named Cpptraj generated mol2 file.
+4 Na+ ions required to neutralize.
+Adding 4 counter ions to "mol" using 1A grid
+Grid extends from solute vdw + 1.37  to  7.28
+Resolution:      1.00 Angstrom.
+ (no solvent present)
+Calculating grid charges
+Placed Na+ in mol at (2.88, 32.61, 0.76).
+Placed Na+ in mol at (-17.12, 24.61, -15.24).
+Placed Na+ in mol at (-19.12, 19.61, 0.76).
+Placed Na+ in mol at (2.88, 27.61, -10.24).
+
+Done adding ions.
+ 0.000000 0 1 0
+0 Cl- ion required to neutralize.
+Adding 0 counter ions to "mol" using 1A grid
+Scaling up box by a factor of 1.376782 to meet diagonal cut criterion
+  Solute vdw bounding box:              43.116 28.830 28.125
+  Total bounding box for atom centers:  76.159 76.159 76.159
+      (box expansion for 'iso' is  53.3%)
+  Solvent unit box:                     21.897 21.897 21.897
+  Volume: 229679.876 A^3 (oct)
+  Total mass 120548.952 amu,  Density 0.872 g/cc
+  Added 6490 residues.
+Checking Unit.
+Building topology.
+Building atom parameters.
+Building bond parameters.
+Building angle parameters.
+Building proper torsion parameters.
+Building improper torsion parameters.
+ total 24 improper torsions applied
+Building H-Bond parameters.
+Incorporating Non-Bonded adjustments.
+Not Marking per-residue atom chain types.
+Marking per-residue atom chain types.
+  (Residues lacking connect0/connect1 - 
+   these don't have chain types marked:
+
+	res	total affected
+
+	0SA	4
+	4YB	6
+	6LB	4
+	ROH	1
+	VMB	1
+	WAT	6490
+	XMA	1
+	YMA	1
+  )
+ (no restraints)
+Writing pdb file: unminimized-t5p.pdb
+   printing CRYST1 record to PDB file with box info
+	Quit
+
+Exiting LEaP: Errors = 0; Warnings = 0; Notes = 0.
+...Solvent-phase (T5P) tleap processing completed on Sun Dec  7 20:47:08 EST 2025
+Generating/updating the zip file for T3P simulation files. 
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-t3p.leapin (deflated 42%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-t3p.leaplog (deflated 80%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-t3p.parm7 (deflated 94%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-t3p.pdb (deflated 77%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-t3p.rst7 (deflated 58%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/min-gas.mol2 (deflated 72%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/response.json (deflated 89%)
+...Simulation files for solvent zip-file creation/updating completed on Sun Dec  7 20:47:08 EST 2025
+Generating/updating the zip file for T5P simulation files. 
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-t5p.leapin (deflated 42%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-t5p.leaplog (deflated 79%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-t5p.parm7 (deflated 94%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-t5p.pdb (deflated 78%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-t5p.rst7 (deflated 57%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/min-gas.mol2 (deflated 72%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/response.json (deflated 89%)
+...Simulation files for solvent zip-file creation/updating completed on Sun Dec  7 20:47:08 EST 2025
+Generating the zip file for the current directory: /website/TESTS/git-ignore-me/pre-push/sequence/cb/Builds/dbf3c342-4894-4517-861f-9fcfbd45dedb/New_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be 
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/ (stored 0%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/min-gas.info (deflated 49%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-t5p.leaplog (deflated 79%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/frcmod.glycam06_bacterial_K3O (deflated 68%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/Minimize.bash (deflated 72%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-t3p.leapin (deflated 42%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/min-gas.in.original (deflated 26%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/min-gas.o (deflated 72%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/min-t5p.in (deflated 30%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-t3p.parm7 (deflated 94%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/min-gas.mol2 (deflated 72%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-t5p.parm7 (deflated 94%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/Run-Gas-Min-Parameters.bash (deflated 49%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/gemsAmberProject.log (deflated 32%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/response.json (deflated 89%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/gemsAmberProject.json (deflated 68%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-t3p.rst7 (deflated 58%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/slurm.hosts (stored 0%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/README.md (deflated 48%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/frcmod.glycam06_intraring_doublebond_protonatedacids (deflated 85%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/Readme-Stopgap.md (deflated 46%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/min-t3p.in (deflated 30%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/details.log (deflated 48%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/min-gas.pdb (deflated 79%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/min-gas.cpptrajin (deflated 31%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/slurm_submit.sh (deflated 49%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/Sequence_Prep_status.log (deflated 70%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/min-t3p.cpptrajin (deflated 31%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/info.json (deflated 66%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-t5p.pdb (deflated 78%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/min-t5p.cpptrajin (deflated 31%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-gas.leapin (deflated 45%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/structure.pdb (deflated 77%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-gas.parm7 (deflated 87%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/Sequence-Prep.bash (deflated 72%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-t5p.rst7 (deflated 57%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-gas.rst7 (deflated 57%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-gas.leaplog (deflated 80%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/status.log (deflated 63%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/Sequence_Prep_details.log (deflated 81%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/T5P-Min-Parameters.bash (deflated 47%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/slurm_Glycan-dbf3c342--26.out (stored 0%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/min-gas.restrt.nc (deflated 8%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/slurm_Glycan-dbf3c342--26.err (stored 0%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-t5p.leapin (deflated 42%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/Run_Multi-Part_Simulation.bash (deflated 73%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-t3p.leaplog (deflated 80%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-t3p.pdb (deflated 77%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/min-gas.in (deflated 24%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/structure.off (deflated 77%)
+  adding: 6009ea31-3ded-57b9-aee3-2b65fe1071be/T3P-Min-Parameters.bash (deflated 47%)
+...Conformer-level zip-file creation completed on Sun Dec  7 20:47:08 EST 2025
+Checking if this process is the last one finished in the project. 
+about to break
+...Check for being the last sub-process completed on Sun Dec  7 20:47:08 EST 2025
+Generating/updating the zip file for the entire project. 
+	zip warning: dbf3c342-4894-4517-861f-9fcfbd45dedb/CB_project_dbf3c342_all.zip not found or empty
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/ (stored 0%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/ (stored 0%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/min-gas.info (deflated 49%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-t5p.leaplog (deflated 79%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/frcmod.glycam06_bacterial_K3O (deflated 68%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/Minimize.bash (deflated 72%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-t3p.leapin (deflated 42%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/min-gas.in.original (deflated 26%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/min-gas.o (deflated 72%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/min-t5p.in (deflated 30%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-t3p.parm7 (deflated 94%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/min-gas.mol2 (deflated 72%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-t5p.parm7 (deflated 94%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/Run-Gas-Min-Parameters.bash (deflated 49%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/gemsAmberProject.log (deflated 32%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/response.json (deflated 89%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/gemsAmberProject.json (deflated 68%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-t3p.rst7 (deflated 58%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/slurm.hosts (stored 0%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/README.md (deflated 48%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/frcmod.glycam06_intraring_doublebond_protonatedacids (deflated 85%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/Readme-Stopgap.md (deflated 46%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/min-t3p.in (deflated 30%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/details.log (deflated 48%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/min-gas.pdb (deflated 79%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/min-gas.cpptrajin (deflated 31%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/slurm_submit.sh (deflated 49%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/Sequence_Prep_status.log (deflated 72%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/min-t3p.cpptrajin (deflated 31%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/info.json (deflated 66%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-t5p.pdb (deflated 78%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/min-t5p.cpptrajin (deflated 31%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-gas.leapin (deflated 45%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/structure.pdb (deflated 77%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-gas.parm7 (deflated 87%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/Sequence-Prep.bash (deflated 72%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-t5p.rst7 (deflated 57%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-gas.rst7 (deflated 57%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-gas.leaplog (deflated 80%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/status.log (deflated 63%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/Sequence_Prep_details.log (deflated 84%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/T5P-Min-Parameters.bash (deflated 47%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/slurm_Glycan-dbf3c342--26.out (stored 0%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/min-gas.restrt.nc (deflated 8%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/slurm_Glycan-dbf3c342--26.err (stored 0%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-t5p.leapin (deflated 42%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/Run_Multi-Part_Simulation.bash (deflated 73%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-t3p.leaplog (deflated 80%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/unminimized-t3p.pdb (deflated 77%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/min-gas.in (deflated 24%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/structure.off (deflated 77%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/T3P-Min-Parameters.bash (deflated 47%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/ (stored 0%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/min-gas.info (deflated 48%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/unminimized-t5p.leaplog (deflated 79%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/frcmod.glycam06_bacterial_K3O (deflated 68%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/Minimize.bash (deflated 72%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/unminimized-t3p.leapin (deflated 42%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/min-gas.in.original (deflated 26%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/min-gas.o (deflated 72%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/min-t5p.in (deflated 30%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/unminimized-t3p.parm7 (deflated 94%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/min-gas.mol2 (deflated 72%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/unminimized-t5p.parm7 (deflated 94%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/Run-Gas-Min-Parameters.bash (deflated 49%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/gemsAmberProject.log (deflated 32%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/response.json (deflated 88%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/gemsAmberProject.json (deflated 68%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/unminimized-t3p.rst7 (deflated 58%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/slurm.hosts (stored 0%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/README.md (deflated 48%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/frcmod.glycam06_intraring_doublebond_protonatedacids (deflated 85%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/Readme-Stopgap.md (deflated 46%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/min-t3p.in (deflated 30%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/details.log (deflated 49%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/min-gas.pdb (deflated 79%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/min-gas.cpptrajin (deflated 31%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/slurm_submit.sh (deflated 49%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/Sequence_Prep_status.log (deflated 73%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/min-t3p.cpptrajin (deflated 31%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/info.json (deflated 67%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/unminimized-t5p.pdb (deflated 78%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/min-t5p.cpptrajin (deflated 31%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/unminimized-gas.leapin (deflated 45%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/structure.pdb (deflated 77%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/unminimized-gas.parm7 (deflated 87%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/Sequence-Prep.bash (deflated 72%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/unminimized-t5p.rst7 (deflated 57%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/unminimized-gas.rst7 (deflated 58%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/unminimized-gas.leaplog (deflated 80%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/status.log (deflated 63%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/Sequence_Prep_details.log (deflated 85%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/slurm_Glycan-3000612d--25.out (stored 0%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/T5P-Min-Parameters.bash (deflated 47%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/min-gas.restrt.nc (deflated 8%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/unminimized-t5p.leapin (deflated 42%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/slurm_Glycan-3000612d--25.err (stored 0%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/Run_Multi-Part_Simulation.bash (deflated 73%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/unminimized-t3p.leaplog (deflated 80%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/unminimized-t3p.pdb (deflated 77%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/min-gas.in (deflated 24%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/structure.off (deflated 77%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/Requested_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/T3P-Min-Parameters.bash (deflated 47%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/logs/ (stored 0%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/logs/response.json (deflated 89%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/logs/request-raw.json (deflated 82%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/logs/ProjectLog.json (deflated 67%)
+  adding: dbf3c342-4894-4517-861f-9fcfbd45dedb/logs/request-initialized.json (deflated 87%)
+...Project-level zip-file creation/updating completed on Sun Dec  7 20:47:10 EST 2025
+
+Got to end of /website/TESTS/git-ignore-me/pre-push/sequence/cb/Builds/dbf3c342-4894-4517-861f-9fcfbd45dedb/New_Builds/6009ea31-3ded-57b9-aee3-2b65fe1071be/Minimize.bash
+

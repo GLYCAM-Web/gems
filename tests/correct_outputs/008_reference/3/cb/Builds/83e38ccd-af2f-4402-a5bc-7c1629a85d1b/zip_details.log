@@ -1,0 +1,11 @@
+Process /website/TESTS/git-ignore-me/pre-push/sequence/cb/Builds/83e38ccd-af2f-4402-a5bc-7c1629a85d1b/New_Builds/c408f40d-28e0-5e8d-86a3-221b74da42f7/Minimize.bash sends this message:
+Processing of conformer c408f40d-28e0-5e8d-86a3-221b74da42f7 completed on Sun Dec  7 20:47:29 EST 2025
+Process /website/TESTS/git-ignore-me/pre-push/sequence/cb/Builds/83e38ccd-af2f-4402-a5bc-7c1629a85d1b/New_Builds/c408f40d-28e0-5e8d-86a3-221b74da42f7/Minimize.bash sends this message:
+Conformer c408f40d-28e0-5e8d-86a3-221b74da42f7 was the last to finish? False
+Process /website/TESTS/git-ignore-me/pre-push/sequence/cb/Builds/83e38ccd-af2f-4402-a5bc-7c1629a85d1b/New_Builds/b90a4d30-822c-5aba-ae5a-10a9ddb1a227/Minimize.bash sends this message:
+Processing of conformer b90a4d30-822c-5aba-ae5a-10a9ddb1a227 completed on Sun Dec  7 20:47:33 EST 2025
+Process /website/TESTS/git-ignore-me/pre-push/sequence/cb/Builds/83e38ccd-af2f-4402-a5bc-7c1629a85d1b/New_Builds/b90a4d30-822c-5aba-ae5a-10a9ddb1a227/Minimize.bash sends this message:
+Conformer b90a4d30-822c-5aba-ae5a-10a9ddb1a227 was the last to finish? True
+Process /website/TESTS/git-ignore-me/pre-push/sequence/cb/Builds/83e38ccd-af2f-4402-a5bc-7c1629a85d1b/New_Builds/b90a4d30-822c-5aba-ae5a-10a9ddb1a227/Minimize.bash sends this message:
+...Project-level zip-file creation/updating for conformer b90a4d30-822c-5aba-ae5a-10a9ddb1a227 completed on Sun Dec  7 20:47:35 EST 2025
+Processing completed on Sun Dec  7 20:47:35 EST 2025 

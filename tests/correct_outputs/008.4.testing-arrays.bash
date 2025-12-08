@@ -47,7 +47,7 @@ response.json"""
 
 	[ExistingSymlink]="""${sequenceBuildsPath}/${eval_2_pUUID}/Existing_Builds/$defaultConformerID: symbolic link to ../../../Sequences/00e7d454-06dd-5067-b6c9-441dd52db586/buildStrategyID1/All_Builds/$defaultConformerID"""
 
-	[DiffCountJsonOutput]="28" # 28 differences between the old and new response. Dates pUUID etc.
+	[DiffCountJsonOutput]="26" # 26 differences between the old and new response. Dates pUUID etc.
 )
 
 ## syntax reminder:
