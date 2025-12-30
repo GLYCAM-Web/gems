@@ -1,6 +1,6 @@
 {
     "entity": {
-        "type": "GpBuilder",
+        "type": "GlycoProtein",
         "services": {
             "default_Evaluate": {
                 "type": "Evaluate",

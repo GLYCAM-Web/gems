@@ -8,7 +8,7 @@ from gemsModules.common.main_api_resources import Resource
 from gemsModules.logging.logger import Set_Up_Logging
 
 from .api import Evaluate_Inputs, Evaluate_Outputs, Evaluate_Options, Glycosite
-from ...main_api_project import GpBuilderProject
+from ...main_api_project import GlycoProteinProject
 
 from  ...tasks import generate_input_file
 from ...tasks.run_gpbuilder import execute_gpbt_wrapper
@@ -23,13 +23,13 @@ def execute(inputs: Evaluate_Inputs, options: Optional[Evaluate_Options]) -> tup
     service_outputs = Evaluate_Outputs()
     service_notices = Notices()
 
-    workdir = GpBuilderProject.get_project_dir_from_pUUID(inputs.pUUID)
+    workdir = GlycoProteinProject.get_project_dir_from_pUUID(inputs.pUUID)
     log.debug(f"workdir: {workdir}")
     if not workdir:
         service_notices.addNotice(
             Brief="Project not found",
             Scope="Service",
-            Messenger="GpBuilder",
+            Messenger="GlycoProtein",
             Type="Error",
             Code="400",
             Message="Project not found",
@@ -42,7 +42,7 @@ def execute(inputs: Evaluate_Inputs, options: Optional[Evaluate_Options]) -> tup
             service_notices.addNotice(
                 Brief="Missing RCSB ID and protein file",
                 Scope="Service",
-                Messenger="GpBuilder",
+                Messenger="GlycoProtein",
                 Type="Warning",
                 Code="400",
                 Message="RCSB ID is required for evaluation if no protein_file is given.",
@@ -59,7 +59,7 @@ def execute(inputs: Evaluate_Inputs, options: Optional[Evaluate_Options]) -> tup
                 service_notices.addNotice(
                     Brief="Missing protein file",
                     Scope="Service",
-                    Messenger="GpBuilder",
+                    Messenger="GlycoProtein",
                     Type="Error",
                     Code="400",
                     Message="Protein file is required for evaluation.",
@@ -67,7 +67,7 @@ def execute(inputs: Evaluate_Inputs, options: Optional[Evaluate_Options]) -> tup
                 log.error("Protein file is required for evaluation.")
                 return service_outputs, service_notices
                 
-    # This generates the glycosites to choose from for GpBuilder
+    # This generates the glycosites to choose from for GlycoProtein
     output_csv = workdir / "the_glycosites.csv"
     gpbt_failed = execute_gpbt_wrapper(
         # TODO: ensure we're using pdb file from the project directory
@@ -100,7 +100,7 @@ def execute(inputs: Evaluate_Inputs, options: Optional[Evaluate_Options]) -> tup
         service_notices.addNotice(
             Brief="Evaluation Failed",
             Scope="Service",
-            Messenger="GpBuilder",
+            Messenger="GlycoProtein",
             Type="Error",
             Code="500",
             Message=f"Evaluation Failed: {gpbt_failed.stderr}",
@@ -110,7 +110,7 @@ def execute(inputs: Evaluate_Inputs, options: Optional[Evaluate_Options]) -> tup
         service_notices.addNotice(
             Brief="Evaluation Successful",
             Scope="Service",
-            Messenger="GpBuilder",
+            Messenger="GlycoProtein",
             Type="Info",
             Code="600",
             Message="Evaluation Successful",

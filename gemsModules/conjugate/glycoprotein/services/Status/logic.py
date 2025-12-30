@@ -33,57 +33,57 @@ def execute(inputs: Status_Inputs, options: Optional[Status_Options]) -> tuple[S
                 service_outputs.status = None
                 log.warning("Status file is empty.")
             
-            # Check for GpBuilder failure and add notice if needed
+            # Check for GlycoProtein failure and add notice if needed
             success = True
             for line in lines:
-                if "GpBuilder finished with: Failure" in line or "GpBuilder execution failed" in line:
+                if "GlycoProtein finished with: Failure" in line or "GlycoProtein execution failed" in line:
                     success = False
-                    error_file_path = inputs.projectDir + "/GpBuilder.err"
+                    error_file_path = inputs.projectDir + "/GlycoProtein.err"
                     try:
                         with open(error_file_path, 'r') as err_f:
                             error_content = err_f.read().strip()
                             error_lines = error_content.split('\n')
                             last_error_line = error_lines[-1]
                             service_notices.append(Notice(
-                                brief="GpBuilder failure detected",
-                                message=f"GpBuilder execution failed with error: {last_error_line}",
+                                brief="GlycoProtein failure detected",
+                                message=f"GlycoProtein execution failed with error: {last_error_line}",
                                 scope="Service",
-                                Messenger="GpBuilder",
+                                Messenger="GlycoProtein",
                                 type="Error",
                                 code="500",
                             ))
-                            log.error(f"GpBuilder failure detected. Error: {last_error_line}")
+                            log.error(f"GlycoProtein failure detected. Error: {last_error_line}")
                     except FileNotFoundError:
-                        log.error(f"GpBuilder.err file not found: {error_file_path}")
+                        log.error(f"GlycoProtein.err file not found: {error_file_path}")
                     break
-                elif "GpBuilder finished with: Success" in line:
+                elif "GlycoProtein finished with: Success" in line:
                     success = True
                     break
             
             if success:
                 service_notices.append(Notice(
-                    brief="GpBuilder success",
-                    message="GpBuilder completed without errors.",
+                    brief="GlycoProtein success",
+                    message="GlycoProtein completed without errors.",
                     scope="Service",
-                    Messenger="GpBuilder",
+                    Messenger="GlycoProtein",
                     type="Info",
                     code="200",
                 ))
-                log.info("GpBuilder finished successfully.")
+                log.info("GlycoProtein finished successfully.")
                 if service_outputs.status is None:
-                    service_outputs.status = "GpBuilder finished successfully."
+                    service_outputs.status = "GlycoProtein finished successfully."
             else:
                 service_notices.append(Notice(
-                    brief="GpBuilder failure",
-                    message="GpBuilder execution failed.",
+                    brief="GlycoProtein failure",
+                    message="GlycoProtein execution failed.",
                     scope="Service",
-                    Messenger="GpBuilder",
+                    Messenger="GlycoProtein",
                     type="Error",
                     code="500",
                 ))
-                log.error("GpBuilder execution failed.")
+                log.error("GlycoProtein execution failed.")
                 if service_outputs.status is None:
-                    service_outputs.status = "GpBuilder execution failed."
+                    service_outputs.status = "GlycoProtein execution failed."
                
                     
     except FileNotFoundError:

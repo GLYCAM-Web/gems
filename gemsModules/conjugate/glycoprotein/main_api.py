@@ -5,9 +5,9 @@ from gemsModules.common import main_api
 from gemsModules.common import main_api_entity
 from gemsModules.common import main_api_services
 
-from gemsModules.complex.GpBuilder.main_api_project import GpBuilderProject
+from gemsModules.conjugate.glycoprotein.main_api_project import GlycoProteinProject
 
-from gemsModules.complex.GpBuilder.main_api_common import GpBuilder_Service_Request, GpBuilder_Service_Response
+from gemsModules.conjugate.glycoprotein.main_api_common import GlycoProtein_Service_Request, GpBuilder_Service_Response
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -15,31 +15,31 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
-class Gpbuilder_Service_Requests(main_api_services.Service_Requests):
-    __root__: Dict[str, GpBuilder_Service_Request] = None
+class GlycoProtein_Service_Requests(main_api_services.Service_Requests):
+    __root__: Dict[str, GlycoProtein_Service_Request] = None
 
 
-class GpBuilder_Service_Responses(main_api_services.Service_Responses):
-    __root__: Dict[str, GpBuilder_Service_Response] = None
+class GlycoProtein_Service_Responses(main_api_services.Service_Responses):
+    __root__: Dict[str, GlycoProtein_Service_Response] = None
     
 
-class Gpbuilder_Entity(main_api_entity.Entity) :
-    entityType : Literal['GpBuilder'] = Field(  # This is the only required field in all of the API
+class GlycoProtein_Entity(main_api_entity.Entity) :
+    entityType : Literal['GlycoProtein'] = Field(  # This is the only required field in all of the API
             ...,
             title='Type',
             alias='type'
             )
-    services : Gpbuilder_Service_Requests = Gpbuilder_Service_Requests()  
-    responses : GpBuilder_Service_Responses = GpBuilder_Service_Responses()
+    services : GlycoProtein_Service_Requests = Gpbuilder_Service_Requests()  
+    responses : GlycoProtein_Service_Responses = GpBuilder_Service_Responses()
 
 
-class GpBuilder_API(main_api.Common_API):
-    entity: Gpbuilder_Entity
-    project: GpBuilderProject = GpBuilderProject()
+class GlycoProtein_API(main_api.Common_API):
+    entity: GlycoProtein_Entity
+    project: GlycoProteinProject = GpBuilderProject()
 
 
-class Gpbuilder_Transaction(main_api.Transaction):
+class GlycoProtein_Transaction(main_api.Transaction):
     def get_API_type(self):  # This allows dependency injection in the children
-        return GpBuilder_API
+        return GlycoProtein_API
 
 

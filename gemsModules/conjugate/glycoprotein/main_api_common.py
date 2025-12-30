@@ -2,22 +2,22 @@
 from pydantic import  Field
 from gemsModules.common import main_api_services
 
-from gemsModules.complex.GpBuilder.services.settings.known_available import Available_Services
+from gemsModules.conjugate.glycoprotein.services.settings.known_available import Available_Services
 
 
-class GpBuilder_Service_Request(main_api_services.Service_Request):
+class GlycoProtein_Service_Request(main_api_services.Service_Request):
     typename : Available_Services = Field(
         None,
         alias='type',
-        title='Services Offered by GpBuilder',
-        description='The service requested of the GpBuilder'
+        title='Services Offered by GlycoProtein',
+        description='The service requested of the GlycoProtein'
     )
 
 
-class GpBuilder_Service_Response(main_api_services.Service_Response):
+class GlycoProtein_Service_Response(main_api_services.Service_Response):
     typename : Available_Services = Field(
         None,
         alias='type',
-        title='Services Offered by GpBuilder',
-        description='The service requested of GpBuilder'
+        title='Services Offered by GlycoProtein',
+        description='The service requested of GlycoProtein'
     )

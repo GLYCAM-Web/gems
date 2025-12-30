@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field, validator
 from typing   import List, Union, Optional
 
 from gemsModules.common.main_api_resources import Resource, Resources
-from gemsModules.complex.GpBuilder.main_api_common import GpBuilder_Service_Request, GpBuilder_Service_Response
+from gemsModules.conjugate.glycoprotein.main_api_common import GlycoProtein_Service_Request, GpBuilder_Service_Response
 
 from gemsModules.logging.logger import Set_Up_Logging 
 
@@ -32,7 +32,7 @@ class Evaluate_Inputs(BaseModel):
     pUUID: Optional[str] = Field(
         None,
         title="Project UUID",
-        description="UUID for this GpBuilder Project, assigned automatically by GEMS",
+        description="UUID for this GlycoProtein Project, assigned automatically by GEMS",
     )
     
     protein_file: Optional[str] = Field(None, description="Path to the protein PDB file")
@@ -78,7 +78,7 @@ class Evaluate_Outputs(BaseModel) :
     )
 
 
-class EvaluateService_Request(GpBuilder_Service_Request) :
+class EvaluateService_Request(GlycoProtein_Service_Request) :
     typename : str  = Field(
         "Evaluate",  
         alias='type'
@@ -91,7 +91,7 @@ class EvaluateService_Request(GpBuilder_Service_Request) :
     )
 
 
-class EvaluateService_Response(GpBuilder_Service_Response) :
+class EvaluateService_Response(GlycoProtein_Service_Response) :
     typename : str  = Field(
         "Evaluate",   
         alias='type'

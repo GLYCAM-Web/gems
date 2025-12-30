@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 from typing   import List, Union, Optional
 
 from gemsModules.common.main_api_resources import Resource, Resources
-from gemsModules.complex.GpBuilder.main_api_common import GpBuilder_Service_Request, GpBuilder_Service_Response
+from gemsModules.conjugate.glycoprotein.main_api_common import GlycoProtein_Service_Request, GpBuilder_Service_Response
 
 from gemsModules.logging.logger import Set_Up_Logging 
 
@@ -32,12 +32,12 @@ class Status_Inputs(BaseModel):
     pUUID: Optional[str] = Field(
         None,
         title="Project UUID",
-        description="UUID for this GpBuilder Project, assigned automatically by GEMS",
+        description="UUID for this GlycoProtein Project, assigned automatically by GEMS",
     )
     projectDir: Optional[str] = Field(
         None,
         title="Project Directory",
-        description="Directory where the GpBuilder project is located (auto-filled)",
+        description="Directory where the GlycoProtein project is located (auto-filled)",
     )
     
 
@@ -45,7 +45,7 @@ class Status_Outputs(BaseModel):
     status: str = Field("")
 
 
-class StatusService_Request(GpBuilder_Service_Request) :
+class StatusService_Request(GlycoProtein_Service_Request) :
     typename : str  = Field(
         "Status",  
         alias='type'
@@ -58,7 +58,7 @@ class StatusService_Request(GpBuilder_Service_Request) :
     )
 
 
-class StatusService_Response(GpBuilder_Service_Response) :
+class StatusService_Response(GlycoProtein_Service_Response) :
     typename : str  = Field(
         "Status",   
         alias='type'

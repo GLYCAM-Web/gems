@@ -8,7 +8,7 @@ from gemsModules.systemoperations.filesystem_ops import separate_path_and_filena
 
 # from gemsModules.complex.glycomimetics.tasks import set_up_build_directory
 # from gemsModules.complex.glycomimetics.tasks import initiate_build
-from gemsModules.complex.GpBuilder.services.ProjectManagement.logic import execute
+from gemsModules.conjugate.glycoprotein.services.ProjectManagement.logic import execute
 from gemsModules.logging.logger import Set_Up_Logging
 
 log = Set_Up_Logging(__name__)

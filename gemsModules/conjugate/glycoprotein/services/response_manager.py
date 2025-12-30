@@ -3,7 +3,7 @@
 from gemsModules.common.services.response_manager import Response_Manager
 from gemsModules.common.main_api_notices import Notices
 
-from gemsModules.complex.GpBuilder.main_api import Gpbuilder_Entity
+from gemsModules.conjugate.glycoprotein.main_api import Gpbuilder_Entity
 
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
@@ -11,7 +11,7 @@ log = Set_Up_Logging(__name__)
 
 class Gpbuilder_Response_Manager(Response_Manager):
     def generate_response_entity(self):
-        self.response_entity = Gpbuilder_Entity(type="GpBuilder")
+        self.response_entity = Gpbuilder_Entity(type="GlycoProtein")
         self.response_entity.notices = Notices()
         request_aaop_list=self.aaop_tree_pair.input_tree.make_linear_list()
         response_aaop_list=self.aaop_tree_pair.output_tree.make_linear_list()

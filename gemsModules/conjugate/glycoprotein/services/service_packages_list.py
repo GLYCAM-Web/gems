@@ -8,7 +8,7 @@ log = Set_Up_Logging(__name__)
 class GpBuilder_Services_Package_List_Manager(Services_Package_List_Manager):
 
     def get_available_services(self) -> List[str]:
-        from gemsModules.complex.GpBuilder.tasks import get_services_list
+        from gemsModules.conjugate.glycoprotein.tasks import get_services_list
         self.available_services = get_services_list.execute()
         return self.available_services
 

@@ -1,4 +1,4 @@
-from gemsModules.complex.GpBuilder.services.settings.known_available import Available_Services
+from gemsModules.conjugate.glycoprotein.services.settings.known_available import Available_Services
 from typing import List
 
 

@@ -3,8 +3,8 @@ from typing import List, Callable
 
 from gemsModules.common.services.duplicate_requests import Duplicate_Requests_Manager
 
-from gemsModules.complex.GpBuilder.tasks import get_services_list
-from gemsModules.complex.GpBuilder.services.settings.duplicates_modules import duplicates_modules 
+from gemsModules.conjugate.glycoprotein.tasks import get_services_list
+from gemsModules.conjugate.glycoprotein.services.settings.duplicates_modules import duplicates_modules 
 
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)

@@ -21,7 +21,7 @@ check_and_format() {
     fi
 }
 
-# Function to check for zip files with glob pattern (Should only ever find one for GpBuilder)
+# Function to check for zip files with glob pattern (Should only ever find one for GlycoProtein Build)
 check_zip_files() {
     local description="$1"
     local zip_files=("${projectDir}"/*.zip)

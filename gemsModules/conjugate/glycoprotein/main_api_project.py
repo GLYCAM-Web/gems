@@ -13,14 +13,14 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
-class GpBuilderProject(Project):
-    """ GpBuilder project for making new entities. """
-    title : str = "GpBuilder project"
+class GlycoProteinProject(Project):
+    """ GlycoProtein project for making new entities. """
+    title : str = "GlycoProtein project"
     parent_entity : str = ""
-    app : str = "GpBuilder"
+    app : str = "GlycoProtein"
     requested_service : str = "Build"
     project_type : PyLiteral["gp"] = Field("gp", title="Type", alias="type")
-    entity_id : str = "complex/GpBuilder"
+    entity_id : str = "conjugate.glycoprotein"
     service_id : str = ""
     requesting_agent : str = ""
     input_type : constr(max_length=25) = "PDB (chemical/pdb) & Glycan Mappings (application/json)"
@@ -36,5 +36,5 @@ class GpBuilderProject(Project):
     @staticmethod
     def get_project_dir_from_pUUID(pUUID: str):
         return Path(
-            InstanceConfig().get_filesystem_path(app="GpBuilder"), pUUID
+            InstanceConfig().get_filesystem_path(app="GlycoProtein"), pUUID
         )

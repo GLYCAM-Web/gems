@@ -9,8 +9,8 @@ from gemsModules.common.services.request_data_filler import Request_Data_Filler
 # TODO: Replace with PM_Resource
 from gemsModules.common.main_api_resources import Resource
 
-from gemsModules.complex.GpBuilder.main_api import Gpbuilder_Entity
-from gemsModules.complex.GpBuilder.main_api_project import GpBuilderProject
+from gemsModules.conjugate.glycoprotein.main_api import Gpbuilder_Entity
+from gemsModules.conjugate.glycoprotein.main_api_project import GpBuilderProject
 
 from gemsModules.logging.logger import Set_Up_Logging
 

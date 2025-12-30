@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from gemsModules.complex.GpBuilder.json_string_manager import Gpbuilder_Json_String_Manager
+from gemsModules.conjuate.glycoprotein.json_string_manager import GlycoProtein_Json_String_Manager
 from gemsModules.logging.logger import Set_Up_Logging
 
 
@@ -7,8 +7,8 @@ log = Set_Up_Logging(__name__)
 
 
 def receive(incomingString: str) -> str:
-    log.info("GpBuilder was called as an entity.  Processing.")
-    json_manager = Gpbuilder_Json_String_Manager()
+    log.info("GlycoProtein was called as an entity.  Processing.")
+    json_manager = GlycoProtein_Json_String_Manager()
     
     maybe_error_response = json_manager.process(incomingString)
     if maybe_error_response:

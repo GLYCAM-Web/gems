@@ -4,8 +4,8 @@ from pydantic import BaseModel, Field, validator
 from typing   import List, Union, Optional
 
 from gemsModules.common.main_api_resources import Resource, Resources
-from gemsModules.complex.GpBuilder.main_api_common import GpBuilder_Service_Request, GpBuilder_Service_Response
-from gemsModules.complex.GpBuilder.services.Evaluate.api import Glycosite
+from gemsModules.conjugate.glycoprotein.main_api_common import GlycoProtein_Service_Request, GlycoProtein_Service_Response
+from gemsModules.conjugate.glycoprotein.services.Evaluate.api import Glycosite
 
 from gemsModules.logging.logger import Set_Up_Logging 
 
@@ -71,7 +71,7 @@ class Build_Inputs(BaseModel):
     pUUID: Optional[str] = Field(
         None,
         title="Project UUID",
-        description="UUID for this GpBuilder Project, assigned automatically by GEMS",
+        description="UUID for this GlycoProtein Project, assigned automatically by GEMS",
     )
     
     protein_file: Optional[str] = Field("", description="Path to the protein PDB file")
@@ -100,7 +100,7 @@ class Build_Outputs(BaseModel) :
     )
 
 
-class BuildService_Request(GpBuilder_Service_Request) :
+class BuildService_Request(GlycoProtein_Service_Request) :
     typename : str  = Field(
         "Build",  
         alias='type'
@@ -120,7 +120,7 @@ class BuildService_Request(GpBuilder_Service_Request) :
             return {}  # Return empty dict, which will be parsed as BuildOptions with defaults
         return v
 
-class BuildService_Response(GpBuilder_Service_Response) :
+class BuildService_Response(GlycoProtein_Service_Response) :
     typename : str  = Field(
         "Build",   
         alias='type'

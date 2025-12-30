@@ -3,8 +3,8 @@ from typing import  List, Callable
 
 from gemsModules.common.services.implied_requests import Implied_Services_Request_Manager
 
-from gemsModules.complex.GpBuilder.tasks import get_services_list
-from gemsModules.complex.GpBuilder.services.settings.implied_modules import implied_modules 
+from gemsModules.conjugate.glycoprotein.tasks import get_services_list
+from gemsModules.conjugate.glycoprotein.services.settings.implied_modules import implied_modules 
 
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)

@@ -1,6 +1,6 @@
 {
     "entity": {
-        "type": "GpBuilder",
+        "type": "GlycoProtein",
         "services": {
             "explicit_Status": {
                 "type": "Status",

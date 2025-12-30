@@ -1,11 +1,11 @@
 {
     "entity": {
-        "type": "GpBuilder",
+        "type": "GlycoProtein",
         "services": {
             "default_Evaluate": {
                 "type": "Evaluate",
                 "inputs": {
-                    "protein_file": "/programs/gems/gemsModules/complex/GpBuilder/tests/inputs/pdbs/1eer_eop_Asn.pdb"
+                    "protein_file": "/programs/gems/gemsModules/conjugate/glycoprotein/tests/inputs/pdbs/1eer_eop_Asn.pdb"
                 }
             }
         }

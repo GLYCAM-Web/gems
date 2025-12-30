@@ -13,18 +13,18 @@ ic = InstanceConfig()
 
 def execute_gpb(project_dir: Path, pUUID) -> bool:
     """
-    Executes the GpBuilder process using the provided input file and project directory.
+    Executes the GlycoProtein Build process using the provided input file and project directory.
 
     Args:
-        input_file (Path): The path to the input file for GpBuilder.
+        input_file (Path): The path to the input file for GlycoProtein Build.
         project_dir (Path): The directory where the project files are located.
 
     Returns:
-        bool: Returns True if something failed while trying to run GpBuilder.
+        bool: Returns True if something failed while trying to run GlycoProtein Build.
               Check produced status.log file for execution status.
     """
     log.debug(
-        f"Executing GpBuilder for this project directory: {project_dir}"
+        f"Executing GlycoProtein Build for this project directory: {project_dir}"
     )
     
     GP_BUILDER = f"$GEMSHOME/gmml2/bin/glycoproteinBuilder"
@@ -43,41 +43,41 @@ def execute_gpb(project_dir: Path, pUUID) -> bool:
     log_file = project_dir / "gpBuilder.log"
     err_file = project_dir / "gpBuilder.err"
 
-    # Create bash script to run GpBuilder in background
+    # Create bash script to run GlycoProtein Build in background
     # TODO: parameterize/don't write to project dir
     bash_script = project_dir / "start_build.sh"
     
     gpbuilder_cmd = f"{GP_BUILDER} \"{input_file}\" \"{outputs_dir}\""
     build_script_str = f"""#!/bin/bash
-# GpBuilder program execution script
+# GlycoProtein Build program execution script
 echo "Working directory: {project_dir}" >>"{log_file}"
 echo "Running command: {gpbuilder_cmd}" >>"{log_file}"
-echo "GpBuilder execution started." >>"{status_file}"
+echo "GlycoProtein Build execution started." >>"{status_file}"
 
 # ensure $GEMSHOME is set
 if [ -z "$GEMSHOME" ]; then
     echo "GEMSHOME environment variable is not set." >>"{err_file}"
-    echo "Cannot run GpBuilder without GEMSHOME, please set it and run this script again." >>"{status_file}"
+    echo "Cannot run GlycoProtein Build without GEMSHOME, please set it and run this script again." >>"{status_file}"
     exit 1
 fi
 
-# Run GpBuilder and capture output
+# Run GlycoProtein Build and capture output
 {gpbuilder_cmd} >>"{log_file}" 2>>"{err_file}"
 exit_code=$?
 
-bash "$GEMSHOME/gemsModules/complex/GpBuilder/tasks/write_README.sh" "{project_dir}"
+bash "$GEMSHOME/gemsModules/conjugate/glycoprotein/tasks/write_README.sh" "{project_dir}"
 
 # Check for success message in run log
 if grep -q "Program got to end ok" "{log_file}"; then
-    echo "GpBuilder finished with: Success" >>"{status_file}"
+    echo "GlycoProtein Build finished with: Success" >>"{status_file}"
 else
-    echo "GpBuilder finished with: Failure" >>"{status_file}"
+    echo "GlycoProtein Build finished with: Failure" >>"{status_file}"
     
-    echo "GpBuilder exit code: $exit_code" >>"{err_file}"
+    echo "GlycoProtein Build exit code: $exit_code" >>"{err_file}"
 fi
 
 # Archive project
-bash "$GEMSHOME/gemsModules/complex/GpBuilder/tasks/create_project_archive.sh" "{project_dir}" "{pUUID}"
+bash "$GEMSHOME/gemsModules/conjugate/glycoprotein/tasks/create_project_archive.sh" "{project_dir}" "{pUUID}"
 zip_error=$?
 if [ $zip_error -ne 0 ]; then
     echo "Failed to create project archive." >>"{status_file}"
@@ -114,7 +114,7 @@ exit $exit_code
         stderr=subprocess.DEVNULL,
     )
 
-    log.info("GpBuilder submitted to background execution")
+    log.info("GlycoProtein Build submitted to background execution")
 
 
 def execute_gpbt_wrapper(project_pdb_file: Path, output_file: Path):
@@ -150,13 +150,13 @@ def execute_gpbt_wrapper(project_pdb_file: Path, output_file: Path):
 
 
 if __name__ == "__main__":
-    """Simplification of the GpBuilder workflow for testing purposes."""
+    """Simplification of the GlycoProtein Build workflow for testing purposes."""
     logging.basicConfig(level=logging.DEBUG)
 
-    from gemsModules.complex.GpBuilder.tasks.generate_input_file import (
+    from gemsModules.conjugate.glycoprotein.tasks.generate_input_file import (
         execute as generate_input_file,
     )
-    from gemsModules.complex.GpBuilder.services.Build.api import (
+    from gemsModules.conjugate.glycoprotein.services.Build.api import (
         Build_Inputs,
         BuildOptions,
         GlycanMapping,
@@ -194,8 +194,8 @@ if __name__ == "__main__":
     )
     options = BuildOptions(number_of_samples=1, persist_cycles=1, seed=0)
 
-    # Generate the input file for GpBuilder
+    # Generate the input file for GlycoProtein Build
     generate_input_file(test_project_dir, inputs, options)
 
-    # Run GpBuilder with the generated input file
+    # Run GlycoProtein Build with the generated input file
     execute_gpb(test_input_file, test_project_dir)
