@@ -37,7 +37,7 @@ Service_Dependencies = {
 }
 
 # TODO: work_flows style or workflow_manager style?
-class GpBuilder_Workflow_Manager(Workflow_Manager):
+class GlycoProtein_Workflow_Manager(Workflow_Manager):
     def get_linear_workflow_list(self) -> list[str]:
         return [
             "Evaluate",

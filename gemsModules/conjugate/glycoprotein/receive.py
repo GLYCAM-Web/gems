@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from gemsModules.conjuate.glycoprotein.json_string_manager import GlycoProtein_Json_String_Manager
+from gemsModules.conjugate.glycoprotein.json_string_manager import GlycoProtein_Json_String_Manager
 from gemsModules.logging.logger import Set_Up_Logging
 
 

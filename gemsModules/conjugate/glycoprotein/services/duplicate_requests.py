@@ -9,7 +9,7 @@ from gemsModules.conjugate.glycoprotein.services.settings.duplicates_modules imp
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
-class Gpbuilder_Duplicate_Requests_Manager(Duplicate_Requests_Manager):
+class GlycoProtein_Duplicate_Requests_Manager(Duplicate_Requests_Manager):
 
     def get_available_services(self) -> List[str]:
         return get_services_list.execute()

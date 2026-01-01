@@ -2,7 +2,7 @@
 from gemsModules.logging.logger import Set_Up_Logging 
 
 from ...services.Status.api import StatusService_Request, StatusService_Response
-from ...main_api_project import GpBuilderProject
+from ...main_api_project import GlycoProteinProject
 
 from .logic import execute
 log = Set_Up_Logging(__name__)

@@ -59,7 +59,7 @@ def execute(inputs: Build_Inputs, options: BuildOptions) -> tuple[Build_Outputs,
         payload=str(input_file),
     ))
     with open(status_log_path, "a") as status_out:
-        status_out.write(f"GpB Input file created.\n")
+        status_out.write(f"GP Input file created.\n")
 
     # TODO: Write status.log with "GlycoProtein finished with: Success|Failure" afterwards or make this a backgrounded process.
     # If backgrounded, write "Submitted".

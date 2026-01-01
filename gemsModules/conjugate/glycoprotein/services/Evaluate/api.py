@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field, validator
 from typing   import List, Union, Optional
 
 from gemsModules.common.main_api_resources import Resource, Resources
-from gemsModules.conjugate.glycoprotein.main_api_common import GlycoProtein_Service_Request, GpBuilder_Service_Response
+from gemsModules.conjugate.glycoprotein.main_api_common import GlycoProtein_Service_Request, GlycoProtein_Service_Response
 
 from gemsModules.logging.logger import Set_Up_Logging 
 

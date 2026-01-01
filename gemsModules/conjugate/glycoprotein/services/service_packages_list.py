@@ -5,7 +5,7 @@ from gemsModules.common.services.service_packages_list import Services_Package_L
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
-class GpBuilder_Services_Package_List_Manager(Services_Package_List_Manager):
+class GlycoProtein_Services_Package_List_Manager(Services_Package_List_Manager):
 
     def get_available_services(self) -> List[str]:
         from gemsModules.conjugate.glycoprotein.tasks import get_services_list

@@ -7,7 +7,7 @@ from gemsModules.common import main_api_services
 
 from gemsModules.conjugate.glycoprotein.main_api_project import GlycoProteinProject
 
-from gemsModules.conjugate.glycoprotein.main_api_common import GlycoProtein_Service_Request, GpBuilder_Service_Response
+from gemsModules.conjugate.glycoprotein.main_api_common import GlycoProtein_Service_Request, GlycoProtein_Service_Response
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -29,13 +29,13 @@ class GlycoProtein_Entity(main_api_entity.Entity) :
             title='Type',
             alias='type'
             )
-    services : GlycoProtein_Service_Requests = Gpbuilder_Service_Requests()  
-    responses : GlycoProtein_Service_Responses = GpBuilder_Service_Responses()
+    services : GlycoProtein_Service_Requests = GlycoProtein_Service_Requests()  
+    responses : GlycoProtein_Service_Responses = GlycoProtein_Service_Responses()
 
 
 class GlycoProtein_API(main_api.Common_API):
     entity: GlycoProtein_Entity
-    project: GlycoProteinProject = GpBuilderProject()
+    project: GlycoProteinProject = GlycoProteinProject()
 
 
 class GlycoProtein_Transaction(main_api.Transaction):

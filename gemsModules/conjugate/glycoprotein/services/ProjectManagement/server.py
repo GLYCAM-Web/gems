@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # This line was originally the following:
-#      from gemsModules.complex.glycomimetics.services.ProjectManagement.api ...
+from gemsModules.complex.glycomimetics.services.ProjectManagement.api import (
 # I think the dependency should be on glycoprotein, not glycomimetics
-from gemsModules.conjugate.glycoprotein.services.ProjectManagement.api import (
+#from gemsModules.conjugate.glycoprotein.services.ProjectManagement.api import (
     ProjectManagement_Request,
     ProjectManagement_Response,
 )

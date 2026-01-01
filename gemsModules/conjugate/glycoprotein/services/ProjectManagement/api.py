@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 
 from gemsModules.logging.logger import Set_Up_Logging
 
-from ...main_api_common import GpBuilder_Service_Request, GpBuilder_Service_Response
+from ...main_api_common import GlycoProtein_Service_Request, GlycoProtein_Service_Response
 from gemsModules.common.main_api_resources import Resource, Resources
 
 ## TODO 
@@ -67,12 +67,12 @@ class ProjectManagement_Outputs(BaseModel):
 
 
 # PM Requests should be based in common.Request, in my mind.
-class ProjectManagement_Request(GpBuilder_Service_Request):
+class ProjectManagement_Request(GlycoProtein_Service_Request):
     typename: str = Field("ProjectManagement", alias="type")
     # Cannot Make a PM request without inputs.
     inputs: ProjectManagement_Inputs = ProjectManagement_Inputs()
 
 
-class ProjectManagement_Response(GpBuilder_Service_Response):
+class ProjectManagement_Response(GlycoProtein_Service_Response):
     typename: str = Field("ProjectManagement", alias="type")
     outputs: ProjectManagement_Outputs = ProjectManagement_Outputs()

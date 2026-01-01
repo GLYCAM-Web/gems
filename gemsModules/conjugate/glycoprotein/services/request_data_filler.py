@@ -9,8 +9,8 @@ from gemsModules.common.services.request_data_filler import Request_Data_Filler
 # TODO: Replace with PM_Resource
 from gemsModules.common.main_api_resources import Resource
 
-from gemsModules.conjugate.glycoprotein.main_api import Gpbuilder_Entity
-from gemsModules.conjugate.glycoprotein.main_api_project import GpBuilderProject
+from gemsModules.conjugate.glycoprotein.main_api import GlycoProtein_Entity
+from gemsModules.conjugate.glycoprotein.main_api_project import GlycoProteinProject
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -18,9 +18,9 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
-class Gpbuilder_Request_Data_Filler(Request_Data_Filler):
+class GlycoProtein_Request_Data_Filler(Request_Data_Filler):
     def process(self) -> List[AAOP]:        
-        this_Project : GpBuilderProject = self.response_project
+        this_Project : GlycoProteinProject = self.response_project
         
         log.debug(f"GpB/Request_Data_Filler now filling data for the request.")
         log.debug(f"GpB/Request_Data_Filler: {this_Project.project_dir=}")
