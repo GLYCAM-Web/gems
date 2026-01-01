@@ -8,6 +8,9 @@ from gemsModules.logging.logger import Set_Up_Logging
 
 from ...main_api_common import GpBuilder_Service_Request, GpBuilder_Service_Response
 from gemsModules.common.main_api_resources import Resource, Resources
+
+## TODO 
+## The following looks like a bug waiting to happen. I will write a report.
 from gemsModules.complex.glycomimetics.services.common_api import PDB_File_Resource
 
 log = Set_Up_Logging(__name__)

@@ -119,6 +119,7 @@ Please see [setup_instance.md](setup_instance.md) for more information on settin
   "filesystem_paths": {
     "MDaaS-RunMD": "/website/userdata/mmservice/md",
     "Glycomimetics": "/website/userdata/complex/gm"
+    "Glycomimetics": "/website/userdata/conjugate/gp"
   }
 }
 ```

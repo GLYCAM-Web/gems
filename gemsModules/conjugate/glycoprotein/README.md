@@ -1,6 +1,8 @@
-# GpBuilder Entity
+# GlycoProtein Entity
 
-The GpBuilder is a tool used to construct glycoproteins with GLYCAM-encoded glycans and a given protein in PDB format by identifying realistic attachment sites for the provided glycans.
+Currently is used exclusively to construct glycoproteins with GLYCAM-encoded glycans and a given protein in PDB format by identifying realistic attachment sites for the provided glycans.
+
+Future directions will allow for analysis of GP structures, simulations, etc.
 
 
 ## Services

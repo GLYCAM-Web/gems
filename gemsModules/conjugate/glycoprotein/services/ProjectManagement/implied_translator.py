@@ -5,7 +5,10 @@ import uuid
 from gemsModules.common.action_associated_objects import AAOP
 
 # from gemsModules.common.services.implied_requests import Implied_Services_Inputs
-from gemsModules.complex.glycomimetics.services.ProjectManagement.api import (
+# This line was originally the following:
+#      from gemsModules.complex.glycomimetics.services.ProjectManagement.api ...
+# I think the dependency should be on glycoprotein, not glycomimetics
+from gemsModules.conjugate.glycoprotein.services.ProjectManagement.api import (
     ProjectManagement_Request,
     ProjectManagement_Inputs,
 )

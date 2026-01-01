@@ -2,7 +2,6 @@
 import os
 from pathlib import Path
 
-# from gemsModules.complex.glycomimetics.tasks import batchcompute
 from gemsModules.common.main_api_resources import Resource, Resources
 from .api import ProjectManagement_Inputs, ProjectManagement_Outputs, PM_Resource, PM_Output_Resources
 from ...tasks import download_pdb_from_rcsb_by_id

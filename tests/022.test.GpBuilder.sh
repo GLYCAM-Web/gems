@@ -1,9 +1,9 @@
 #!/bin/bash
 # GpBuilder v1 test workflow script.
 #
-# This script first delegates an evaluation request to the GpBuilder service,
-# then it crafts the build request using the project UUID from the evaluation response,
-# and finally it delegates the build request to the GpBuilder service.
+# This script first delegates an Evaluation request to the GlycoProtein entity,
+# then it crafts the Build request using the project UUID from the evaluation response,
+# and finally it delegates the Build request.
 #
 # It waits for the build to complete, checking the status service for completion,
 # and verifies that the resulting zip file is non-empty.
@@ -75,14 +75,14 @@ trap exit_handler EXIT
 
 
 # --- Input Files ---
-PDB_FILE="$GEMSHOME/gemsModules/complex/GpBuilder/tests/inputs/pdbs/1eer_eop_Asn.pdb"
-EVALUATE_REQUEST_TEMPLATE_FILE="$GEMSHOME/gemsModules/complex/GpBuilder/tests/inputs/explicit_evaluate_parameterized.json"
-EVALUATE_RCSB_REQUEST_FILE="$GEMSHOME/gemsModules/complex/GpBuilder/tests/inputs/explicit_evaluate_rcsb.json"
+PDB_FILE="$GEMSHOME/gemsModules/conjugate/glycoprotein/tests/inputs/pdbs/1eer_eop_Asn.pdb"
+EVALUATE_REQUEST_TEMPLATE_FILE="$GEMSHOME/gemsModules/conjugate/glycoprotein/tests/inputs/explicit_evaluate_parameterized.json"
+EVALUATE_RCSB_REQUEST_FILE="$GEMSHOME/gemsModules/conjugate/glycoprotein/tests/inputs/explicit_evaluate_rcsb.json"
 
-BUILD_REQUEST_TEMPLATE_FILE="$GEMSHOME/gemsModules/complex/GpBuilder/tests/inputs/explicit_build_parameterized.json"
-BUILD_RCSB_REQUEST_FILE="$GEMSHOME/gemsModules/complex/GpBuilder/tests/inputs/explicit_build_rcsb_param.json"
+BUILD_REQUEST_TEMPLATE_FILE="$GEMSHOME/gemsModules/conjugate/glycoprotein/tests/inputs/explicit_build_parameterized.json"
+BUILD_RCSB_REQUEST_FILE="$GEMSHOME/gemsModules/conjugate/glycoprotein/tests/inputs/explicit_build_rcsb_param.json"
 
-STATUS_REQUEST_TEMPLATE_FILE="$GEMSHOME/gemsModules/complex/GpBuilder/tests/inputs/explicit_status_parameterized.json"
+STATUS_REQUEST_TEMPLATE_FILE="$GEMSHOME/gemsModules/conjugate/glycoprotein/tests/inputs/explicit_status_parameterized.json"
 
 if [ ! -f "$PDB_FILE" ]; then
   echo "PDB file not found: $PDB_FILE" >&2
@@ -143,7 +143,7 @@ BUILD_REQUEST=$(sed "s/<pUUID>/$PUUID/" "$BUILD_TEMPLATE")
 
 debug_log "Build Request: ${BUILD_REQUEST}"
 
-# Delegate the prepared build request to start the GpBuilder Build service.
+# Delegate the prepared build request to start the GlycoProtein Build service.
 BUILD_RESPONSE=$(echo "$BUILD_REQUEST" | $GEMSHOME/bin/delegate)
 debug_log "Build Response: ${BUILD_RESPONSE}"
 
@@ -195,8 +195,8 @@ elif echo "$BUILD_RESPONSE" | grep started -q; then
           exit 0
         fi
       fi
-    elif [[ "$CURRENT_STATUS" == *"GpBuilder execution failed"* ]] || [[ "$CURRENT_STATUS" == *"execution failed"* ]]; then
-      echo "GpBuilder execution failed, final status: $CURRENT_STATUS" >&2
+    elif [[ "$CURRENT_STATUS" == *"GlycoProtein Builder execution failed"* ]] || [[ "$CURRENT_STATUS" == *"execution failed"* ]]; then
+      echo "GlycoProtein Builder execution failed, final status: $CURRENT_STATUS" >&2
       STATUS_RESPONSES="$STATUS_RESPONSES]"
       exit 5
     elif [[ "$CURRENT_STATUS" == *"Completed with errors"* ]] || [[ "$CURRENT_STATUS" == *"with errors"* ]]; then
@@ -204,8 +204,8 @@ elif echo "$BUILD_RESPONSE" | grep started -q; then
       echo "Final status: $CURRENT_STATUS" >&2
       STATUS_RESPONSES="$STATUS_RESPONSES]"
       exit 6
-    elif [[ "$CURRENT_STATUS" == *"GpBuilder execution started"* ]] || [[ "$CURRENT_STATUS" == *"execution started"* ]]; then
-      echo "GpBuilder/Build started."
+    elif [[ "$CURRENT_STATUS" == *"GlycoProtein Builder execution started"* ]] || [[ "$CURRENT_STATUS" == *"execution started"* ]]; then
+      echo "GlycoProtein Builder/Build started."
     elif [[ "$CURRENT_STATUS" == "Status file not found" ]]; then
       echo "Status file not found yet, waiting..."
     fi
