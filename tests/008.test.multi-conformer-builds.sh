@@ -25,7 +25,7 @@ build_3_input="${GEMSHOME}/tests/inputs/008.3.build-request-third-four.json"
 build_5_input="${GEMSHOME}/tests/inputs/008.5.build-request-NotDefault.json"
 build_6_input="${GEMSHOME}/tests/inputs/008.6.build-request-NoRotamers.json"
 
-source 'correct_outputs/008_reference_data.bash'
+#source 'correct_outputs/008_reference_data.bash'
 
 do_the_common_tasks() {	
 	jsonInFile="${1}"
