@@ -1,0 +1,34 @@
+{
+  "entity": {
+    "type": "Glycomimetics",
+    "services": {
+      "GlycoBuildOne": {
+        "type": "Build_Selected_Positions",
+        "inputs": { 
+          "resources": [
+            {
+              "resourceRole": "Complex",
+              "locationType": "filesystem-path-unix",
+              "resourceFormat": "chemical/pdb",
+              "payload": "$GEMSHOME/tests/inputs/2ZG1.pdb"
+            },
+            {
+              "resourceRole": "Selected_Modification_Options",
+              "locationType": "Payload",
+              "resourceFormat": "python-dict",
+              "payload": {
+                "Position": {
+                  "Residue_Identifier": "241",
+                  "Residue_Name": "SIA",
+                  "Chain_Identifier": "A",
+                  "Attachment_Atom": "C9",
+                  "Replaced_Atom": "O9"
+                }
+              }      
+            }
+          ]
+        }
+      }
+    }
+  }
+}

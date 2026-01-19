@@ -1,0 +1,21 @@
+{
+    "entity": {
+        "type": "GlycoProtein",
+        "services": {
+            "default_Build": {
+                "type": "Build",
+                "inputs": {
+                    "protein_file": "/programs/gems/gemsModules/conjugate/glycoprotein/tests/inputs/pdbs/1eer_eop_Asn.pdb",
+                    "glycan_mappings": [
+                        {"Chain": "A", "ResidueNumber": "24", "InsertionCode": "", "Sequence": "DManpa1-2DManpa1-6[DManpa1-2DManpa1-3]DManpa1-6[DManpa1-2DManpa1-2DManpa1-3]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH", "Tags": ""},
+                        {"Chain": "A", "ResidueNumber": "38", "InsertionCode": "", "Sequence": "DManpa1-6[DManpa1-2DManpa1-2DManpa1-3]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH", "Tags": ""},
+                        {"Chain": "A", "ResidueNumber": "83", "InsertionCode": "", "Sequence": "DManp[2S,3Me]a1-6DManpa1-6[DGlcpNAcb1-4][DNeup5Aca2-6DGalpb1-4DGlcpNAc[3S]b1-2DManpa1-3]DManpb1-4DGlcpNAc[6Me]b1-4DGlcpNAcb1-OH", "Tags": ""}
+                    ]
+                },
+                "options": {
+                    "prepare_for_md": true
+                }
+            }
+        }
+    }
+}

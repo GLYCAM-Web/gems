@@ -1,0 +1,6 @@
+{
+    "gems_module": "newgemsmodule",
+    "service_name": "SomeService",
+    "implicit_inputkey": "default",
+    "implicit_inputvalue": ""
+}

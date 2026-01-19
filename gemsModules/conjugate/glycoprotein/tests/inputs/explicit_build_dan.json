@@ -1,0 +1,66 @@
+{
+    "entity": {
+        "type": "GlycoProtein",
+        "services": {
+            "build_glycoprotein": {
+                "type": "Build",
+                "inputs": {
+                    "protein_file": "81b49d90-8134-421e-b415-9c0a84dca940",
+                    "glycan_mappings": [
+                        {
+                            "chain": "A",
+                            "residue_number": "275",
+                            "insertion_code": "A",
+                            "sequence": "DManpa1-2DManpa1-6[DManpa1-2DManpa1-3]DManpa1-6[DManpa1-2DManpa1-2DManpa1-3]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH"
+                        },
+                        {
+                            "chain": "A",
+                            "residue_number": "276",
+                            "insertion_code": "",
+                            "sequence": "DManpa1-2DManpa1-6[DManpa1-2DManpa1-3]DManpa1-6[DManpa1-2DManpa1-2DManpa1-3]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH"
+                        },
+                        {
+                            "chain": "A",
+                            "residue_number": "277",
+                            "insertion_code": "",
+                            "sequence": "DManpa1-2DManpa1-6[DManpa1-2DManpa1-3]DManpa1-6[DManpa1-2DManpa1-2DManpa1-3]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH"
+                        },
+                        {
+                            "chain": "A",
+                            "residue_number": "278",
+                            "insertion_code": "A",
+                            "sequence": "DManpa1-2DManpa1-6[DManpa1-2DManpa1-3]DManpa1-6[DManpa1-2DManpa1-2DManpa1-3]DManpb1-4DGlcpNAcb1-4DGlcpNAcb1-OH"
+                        },
+                        {
+                            "chain": "A",
+                            "residue_number": "25",
+                            "insertion_code": "",
+                            "sequence": "DGalpNAca1-OH"
+                        },
+                        {
+                            "chain": "A",
+                            "residue_number": "37",
+                            "insertion_code": "",
+                            "sequence": "DGalpNAca1-OH"
+                        },
+                        {
+                            "chain": "A",
+                            "residue_number": "43",
+                            "insertion_code": "",
+                            "sequence": "DGalpNAca1-OH"
+                        },
+                        {
+                            "chain": "A",
+                            "residue_number": "272",
+                            "insertion_code": "",
+                            "sequence": "DGalpNAca1-OH"
+                        }
+                    ]
+                }
+            }
+        },
+        "inputs": {},
+        "outputs": {}
+    },
+    "prettyPrint": true
+}

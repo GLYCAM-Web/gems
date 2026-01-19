@@ -89,6 +89,11 @@ class amberProject(BaseModel):
         title = "Control Script Path",
         description = "The full path to the control script for this protocol"
         )
+    simulationControlScriptArguments : str = Field(
+        None,
+        title = "Control Script Arguments",
+        description = "Arguments to the control script"
+    )
     thisProjectLog : str = Field(
         None,
         title = "GEMS AMBER Project Log",

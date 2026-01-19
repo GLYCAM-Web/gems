@@ -1,6 +1,13 @@
 ## Services
 
-Today:  RunMD
+Today:  Design UX for Run_MD
+
+- [ ] netcdf to ascii  - for WinX users, make possible to get an ascii version on demand
+- [ ] evaluation step  - there should, for sure, be an evaluation step (how long will it take, etc)
+- [ ] go to 11  - the 10 Dan Roe steps will always happen, with the minimal MD production.  If someone requests fee-for-service MD, then there will be an 11th step (or more)
+- [ ] allow nc as input is v2  - we will eventually need.  Don't code us out of this.
+- [ ] make suggested input  - design the UX & ask for feedback.  By end of week.
+- [ ] just single step at first to prove flow - get into the live sites ASAP,  single step is fine, just to prove flow
 
 Later: Query
 

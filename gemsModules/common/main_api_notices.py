@@ -15,6 +15,7 @@ class NoticeTypes(GemsStrEnum):
     error = 'Error'
 #    exit = 'Exit' # can't use 'exit' as a variable name.
     fatal = 'Exit'
+    info = 'Info'
 
 
 class Notice(BaseModel):
@@ -79,7 +80,6 @@ class Notices(BaseModel):
     __root__ : List[Notice] = None
     _defaultNoticeTypes : List[Notice] = PrivateAttr(default_factory=makeDefaultNoticesList)
 
-
     def printDefaults(self, sendTo='logs', style='easyRead'):
         self.printNotices(sendTo=sendTo, style=style, whatToPrint='Defaults')
 
@@ -99,10 +99,8 @@ class Notices(BaseModel):
         else :
             log.error("The sendTo option given to Notices.printDefaults() is not known.  Cannot print.")
 
-
     def defaultNoticesString(self, style='easyRead'):
         return self.noticesString(style=style, whatToPrint='Defaults')
-
 
     def noticesString(self, style='easyRead', whatToPrint='Notices'):
         if whatToPrint == 'Notices':
@@ -197,6 +195,44 @@ class Notices(BaseModel):
         if self.__root__ is None:
             self.__root__ : List[Notice] = []
         self.__root__.append(thisNotice)
+
+    def addSimpleInfoNotice(self, message, brief="Info Message", scope="Unknown", messenger="Unknown", additionalInfo=None):
+        self.addNotice(
+            Brief=brief,
+            Scope=scope,
+            Messenger=messenger,
+            Type='Info',
+            Code='0',
+            Message=message,
+            AdditionalInfo=additionalInfo
+        )
+        
+    def __iter__(self):
+        if self.__root__ is None:
+            return iter([])
+        return iter(self.__root__)
+    
+    def __next__(self):
+        if self.__root__ is None:
+            raise StopIteration
+        return next(self.__root__)
+    
+    def __len__(self):
+        if self.__root__ is None:
+            return 0
+        return len(self.__root__)
+    
+    def extend(self, other):
+        if other.__root__ is not None:
+            if self.__root__ is None:
+                self.__root__ = []
+            self.__root__.extend(other.__root__)
+            log.debug(f"Extended Notices, now {self.__root__}")
+    
+    def append(self, notice: Notice):
+        if self.__root__ is None:
+            self.__root__ = []
+        self.__root__.append(notice)
 
 
 def generateSchema():

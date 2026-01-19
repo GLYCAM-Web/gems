@@ -185,7 +185,7 @@ class Single3DStructureBuildDetails(BaseModel):
     #  flexibility:  sequenceConformation : List[RotamerConformation] = None
     #  Oliver says this:
     #      Would be nice to just directly use the gmml level class like this:
-    #      gmmlConformerInfo : gmml.single_rotamer_info_vector = None
+    #      gmmlConformerInfo : gmml2.single_rotamer_info_vector = None
     sequenceConformation: List = []
     #  When there are multiple structures, one is chosen for the default.
     #  The very first combination (typically the all-gg, all-t structure) 
@@ -680,7 +680,7 @@ class sequenceProceduralOptions(commonio.ProceduralOptions):
             )
     number_structures_hard_limit : int = Field(
             None,
-            description="Max number of structures to build.  If =0, then unlimited."
+            description="Max number of structures to build.  If =-1, then unlimited. if =0, then really don't build any: just return info."
             )
 
     @validator('number_structures_hard_limit', pre=True, always=True)
@@ -690,10 +690,13 @@ class sequenceProceduralOptions(commonio.ProceduralOptions):
             transactionContext = os.environ.get('GW_GRPC_ROLE')
             log.debug("transactionContext, per GW_GRPC_ROLE, is : " + str(transactionContext))
             if transactionContext == 'Developer': 
+                log.debug("setting number_structures_hard_limit to 8 per GW_GRPC_ROLE")
                 return 8 
             elif transactionContext == 'Swarm': 
+                log.debug("setting number_structures_hard_limit to 64 per GW_GRPC_ROLE")
                 return 64
             else:
+                log.debug("setting number_structures_hard_limit to 1 per GW_GRPC_ROLE")
                 return 1  # if you only get one structure, check your GRPC Role
         if 'GEMS_MAX_STRUCTURES' in os.environ :
             the_max = os.environ.get('GEMS_MAX_STRUCTURES')
@@ -701,10 +704,17 @@ class sequenceProceduralOptions(commonio.ProceduralOptions):
             try: 
                 max_int = int(the_max)
             except ValueError: 
+                log.debug("setting number_structures_hard_limit per Value Error in GEMS_MAX_STRUCTURES to 1")
                 return 1  # if you only get one structure, your int might be bad
             else:
+                log.debug("setting number_structures_hard_limit per GEMS_MAX_STRUCTURES to " + str(max_int))
                 return max_int
-        return v or 0
+        log.debug("setting number_structures_hard_limit in the final return.")
+        log.debug("The value of v is " + str(v))
+        if v is None:
+            return -1
+        else:
+            return v 
 
 
 class sequenceEntity(commonio.Entity):
@@ -1148,7 +1158,7 @@ class Transaction(commonio.Transaction):
         else:
             return self.transaction_out.getSequenceVariantOut(variant)
 
-    def evaluateCondensedSequence(self, validateOnly : bool = False):
+    def evaluateCondensedSequence(self, validateOnly : bool = False, isBuild3DStructureService : bool = True):
         ## If we got to here, there should be valid inputs including a valid sequence
         if self.transaction_out is None and self.transaction_in is None:
             raise ValueError("No transaction, incoming or outgoing, could not be found.")
@@ -1215,15 +1225,34 @@ class Transaction(commonio.Transaction):
 
         ## If we need to do a default build, then do it now
         if this_entity.procedural_options.build_default_on_evaluation:
-            # log.debug("this_entity.procedural_options.build_default_on_evaluation is true")
+            log.debug("this_entity.procedural_options.build_default_on_evaluation is true")
             if this_entity.outputs.structureBuildInfo is None: 
-                # log.debug("this_entity.outputs.structureBuildInfo is None")
+                log.debug("this_entity.outputs.structureBuildInfo is None")
+
+## OG Jan 2024: This next bit might have been a part of the above idea to return evaluation.json from the Sequences/pUUID/ folder if
+## the structure had been requested before. When doing a build3DStructure request, you need to return here if a 
+## default already exists or wonky things happen. However if doing an evaluate, the structureBuildInfo doesn't get filled out 
+## unless you go further so even if there has been a previous evaluation you can't just leave now. You must go into 
+## self.manageSequenceBuild3DStructureRequest(defaultOnly=True)
+
                 from gemsModules.deprecated.sequence.projects import get_default_evaluation_path_from_sequence
                 the_path = get_default_evaluation_path_from_sequence(self)
-                # log.debug("The path returned was : " + str(the_path))
-                if the_path is not None:
+                log.debug("The path returned was : " + str(the_path))
+                if the_path is not None and isBuild3DStructureService :
                     return
-                # log.debug("the path was None so we are going to do a default build")
+                if the_path is None and 'GW_GRPC_ROLE' not in os.environ and 'GEMS_MAX_STRUCTURES' not in os.environ:
+                    # This is not in a website context, so we do not need a default build unless this is an evaluation
+                    log.debug("This is not a website. Checking if we are doing an evaluation.")
+                    if len(this_entity.services) == 1:
+                        keys_list=list(this_entity.services.keys())
+                        the_key=keys_list[0]
+                        log.debug("The key for this service is: " + str(the_key))
+                        the_service=this_entity.services[the_key]
+                        log.debug("The typename for this service is: " + str(the_service.typename))
+                        if the_service.typename!='Evaluate':
+                            return
+                log.debug("We are going to do a default build")
+
                 self.manageSequenceBuild3DStructureRequest(defaultOnly=True)
                 ## If we're doing this, then ensure that the default evaluation path is made
                 from gemsModules.deprecated.sequence.projects import set_default_evaluation_symlink_in_sequence

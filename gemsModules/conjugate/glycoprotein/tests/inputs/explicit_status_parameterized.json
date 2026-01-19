@@ -1,0 +1,13 @@
+{
+    "entity": {
+        "type": "GlycoProtein",
+        "services": {
+            "explicit_Status": {
+                "type": "Status",
+                "inputs": {
+                    "pUUID": "<pUUID>"
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "glycamweb.grpc.json";
+option java_outer_classname = "JSON";
+option objc_class_prefix = "JSON";
+
+package json;
+
+// The JSON service definition.
+service JSON {
+	rpc JSON_Delegator (JSONRequest) returns (JSONResponse) {}
+}
+
+// The request message containing the JSON object as a string.
+message JSONRequest {
+	string input = 1;
+}
+
+// The response message containing the JSON object as a string.
+message JSONResponse {
+	string output = 1;
+}

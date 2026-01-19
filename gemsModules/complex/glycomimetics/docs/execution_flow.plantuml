@@ -1,0 +1,60 @@
+@startuml execution_flow
+start
+
+:User inputs PDB file or PDB ID (on website);
+
+package "Request Handling" {
+  :Website makes Glycomimetic request to GEMS with PDB file or ID;
+  :GEMS handles PDB file input;
+  if (PDB ID) then (yes)
+    :Sideload PDB ID to fetch PDB file;
+  else (no)
+    :Use uploaded PDB file directly;
+  endif
+}
+
+package "Validation" {
+  :GEMS validates input for an acceptable PDB file;
+  if (PDB file is valid?) then (yes)
+    :GEMS returns Validation Response reporting PDB file validity.;
+  	:Website makes Evaluate request to GEMS;
+  else (no)
+    :GEMS sends error response: Invalid PDB file;
+    :Website displays error;
+    stop
+  endif
+}
+
+package "Evaluation" {
+    :Run Yao's validation to check for sugars and generate positions and R groups;
+
+    if (Contains sugars?) then (yes)
+      :Call Yao's code to run pdb2glycam to get glycam anticharge of each atom;
+
+      if (Parameterization possible?) then (yes)
+        :Call Yao's code to generate possible positions and R group libraries;
+        :GEMS returns possible positions and options to website in Evaluation Response;
+        :Website displays possible modification options to user;
+		    :User selects positions and libraries on website;
+		    :Website makes a GEMS Build Request containing the selected positions and libraries;
+      else (no)
+        :GEMS sends error response: Cannot parameterize;
+        :Website displays error;
+        stop
+      endif
+    else (no)
+      :GEMS sends error response: No sugars found;
+      :Website displays error;
+      stop
+    endif
+}
+
+package "Build and Analyze" {
+  :GEMS runs Build service using selected positions and libraries;
+  :GEMS sends an immediate Build response to the website for polling;
+  :After Build completes, analysis will be done;
+  :Website polls for Build/Analyze results;
+}
+
+stop
+@enduml

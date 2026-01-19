@@ -1,0 +1,19 @@
+MODEL 0
+REMARK FAKE_HEAD_ATOM=C5_C4
+REMARK REAL_HEAD_ATOM=C2_F1
+REMARK DUMMY_ATOM=C5_H9_H10_H11_C4_H7_H8
+ROOT
+HETATM    1  F1  LIG     1      -1.765  -0.303  -0.837  1.00  0.00    -0.171 F 
+HETATM    2  C2  LIG     1      -0.383  -0.358  -0.840  1.00  0.00     0.387 C 
+HETATM    3  F3  LIG     1       0.073  -0.300  -2.146  1.00  0.00    -0.171 F 
+HETATM    4  C4  LIG     1       0.197   0.798  -0.023  1.00  0.00     0.022 C 
+HETATM    5  C5  LIG     1      -0.206   2.160  -0.588  1.00  0.00    -0.069 C 
+HETATM    6  F6  LIG     1       0.017  -1.559  -0.282  1.00  0.00    -0.171 F 
+HETATM    7  H7  LIG     1       1.306   0.723  -0.021  1.00  0.00     0.045 H 
+HETATM    8  H8  LIG     1      -0.164   0.721   1.025  1.00  0.00     0.045 H 
+HETATM    9  H9  LIG     1       0.164   2.275  -1.628  1.00  0.00     0.027 H 
+HETATM   10  H10 LIG     1       0.236   2.965   0.036  1.00  0.00     0.027 H 
+HETATM   11  H11 LIG     1      -1.311   2.273  -0.579  1.00  0.00     0.027 H 
+ENDROOT
+TORSDOF 2
+ENDMDL

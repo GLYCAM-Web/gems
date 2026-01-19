@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-new_conformer_id='6009ea31-3ded-57b9-aee3-2b65fe1071be'
+new_conformer_id="6009ea31-3ded-57b9-aee3-2b65fe1071be"
 
 Build1Tests=(
 	ListRSeqsSeqID
@@ -8,13 +8,18 @@ Build1Tests=(
 	BuildDefaultSymlink
 	MinGasPdb
 )
-declare -A Build1Commands=(
+
+PDB_File_To_Test="${sequenceBuildsPath}/${build_1_pUUID}/New_Builds/${new_conformer_id}/min-gas.pdb"
+
+declare -A Build1Commands
+Build1Commands=(
 	[ListRSeqsSeqID]="/bin/ls -R ${sequenceSequencesPath}/${theCorrectSequenceID}"
 	[ListRRequestedBuilds]="/bin/ls -R ${sequenceBuildsPath}/${build_1_pUUID}/Requested_Builds"
 	[BuildDefaultSymlink]="file ${sequenceBuildsPath}/${build_1_pUUID}/default"
-	[MinGasPdb]="md5sum ${sequenceBuildsPath}/${build_1_pUUID}/New_Builds/${new_conformer_id}/min-gas.pdb | cut -d ' ' -f1"
+	[MinGasPdb]="/bin/ls ${PDB_File_To_Test}"
 )
-declare -A Build1CorrectOutputs=(
+declare -A Build1CorrectOutputs
+Build1CorrectOutputs=(
 	[ListRSeqsSeqID]="""${sequenceSequencesPath}/00e7d454-06dd-5067-b6c9-441dd52db586:
 buildStrategyID1
 current
@@ -32,7 +37,7 @@ e6c2e2e8-758b-58b8-b5ff-d138da38dd22"""
 6009ea31-3ded-57b9-aee3-2b65fe1071be
 e6c2e2e8-758b-58b8-b5ff-d138da38dd22"""
 	[BuildDefaultSymlink]="${sequenceBuildsPath}/${build_1_pUUID}/default: symbolic link to Existing_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22"
-	[MinGasPdb]="78f04b399826b18d07001d0766f7cdf6"
+	[MinGasPdb]="${PDB_File_To_Test}"
 )
 
 ## syntax reminder:

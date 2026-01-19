@@ -38,17 +38,20 @@ class Explicit_Service_Request_Manager():
         log.debug(the_root)
         for supplied_name in the_root:
             log.debug("the supplied name is: " + supplied_name)
-            service_request : Service_Request = the_root[supplied_name].copy(deep=True)
+            service_request: Service_Request = self.validate_service_request(the_root[supplied_name].copy(deep=True))
             log.debug("the service request is: ")
             log.debug(service_request)
             this_aaop = AAOP(Dictionary_Name=supplied_name, 
                     ID_String=uuid.uuid4(),
-                    The_AAO=service_request.copy(deep=True),
+                    The_AAO=service_request,
                     AAO_Type=service_request.typename)
             log.debug("the aaop is: ")
             log.debug(this_aaop)
             log.debug("done printing the aaop")
             self.aaop_list.append(this_aaop)
+
+    def validate_service_request(self, service_request):
+        return service_request
 
 
     def get_aaop_list(self):

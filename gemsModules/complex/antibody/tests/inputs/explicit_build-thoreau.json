@@ -1,0 +1,17 @@
+{
+    "entity": {
+      "type": "AntibodyDocking",
+      "services": {
+        "explicit_build_ad2": {
+          "type": "Build",
+          "inputs": { 
+            "pUUID": "${pUUID}"
+          },
+          "options": {
+            "Glycan_Flexibility": "Partial",
+            "Number_of_Replicas": 2
+          }
+        }
+      }
+    }
+  }

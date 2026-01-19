@@ -1,0 +1,38 @@
+{
+  "entity": {
+    "type": "Glycomimetics",
+    "services": {
+      "GlycoBuildOne": {
+        "type": "Build_Selected_Positions",
+        "inputs": { 
+          "resources": [
+            {
+              "resourceRole": "Complex",
+              "locationType": "filesystem-path-unix",
+              "resourceFormat": "chemical/pdb",
+              "payload": "/programs/gems/gemsModules/complex/glycomimetics/tests/pdbs/1_3ubn_clean.pdb"
+            },
+            {
+              "resourceRole": "Selected_Modification_Options",
+              "locationType": "Payload",
+              "resourceFormat": "python-dict",
+              "payload": {
+                "Position": { 
+                  "Residue_Name": "NAG", 
+                  "Chain_Identifier": "M", 
+                  "Residue_Number": "1", 
+                  "Moiety_Attachment_Atom": "N2", 
+                  "Atom_Number": "2531", 
+                  "Residue_Name_Glycam": "DGlcpNAcb", 
+                  "Residue_Number_Glycam": "324", 
+                  "Atom_Number_Glycam": "2531"
+                },
+                "Libraries": ["Aldehydes", "Ketones", "Sulfonyl_Halides"]
+              }      
+            }
+          ]
+        }
+      }
+    }
+  }
+}

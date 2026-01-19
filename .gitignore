@@ -1,7 +1,8 @@
 ## GEMS-specfic things to ignore
+gmml2
 gmml
-_gmml.so
-gmml.py
+_gmml*.so
+gmml*.py
 gmml_wrap.cxx
 gmml_wrap.o
 log.log
@@ -13,7 +14,9 @@ site
 *VERSIONS.sh
 
 ## general things to ignore
+*.obsidian
 *__pycache__
+*.exe
 *.pyc
 *.pyo
 *.swp
@@ -22,6 +25,12 @@ site
 *git-ignore-me*
 Doxygen/html
 Doxygen/docs_build.log
-
 testing*
 queryLog.txt
+.coverage 
+
+# instance config stuffs
+instance_config.json
+*.json.bak
+
+bin/*.exe

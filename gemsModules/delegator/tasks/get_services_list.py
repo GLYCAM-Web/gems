@@ -6,7 +6,7 @@ def execute() -> List:
     """ Return a list of available services
 
     >>> print(execute())
-    ['Marco', 'Status', 'ListServices', 'KnownEntities']
+    ['Error', 'Marco', 'Status', 'ListServices', 'KnownEntities']
 
     """
 

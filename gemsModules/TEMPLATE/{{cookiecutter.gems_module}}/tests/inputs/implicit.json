@@ -1,0 +1,8 @@
+{
+    "entity": {
+        "type": "{{ cookiecutter.gems_module }}",
+        "inputs": {
+            "{{ cookiecutter.implicit_inputkey }}": "{{ cookiecutter.implicit_inputvalue }}"
+        }
+    }
+}

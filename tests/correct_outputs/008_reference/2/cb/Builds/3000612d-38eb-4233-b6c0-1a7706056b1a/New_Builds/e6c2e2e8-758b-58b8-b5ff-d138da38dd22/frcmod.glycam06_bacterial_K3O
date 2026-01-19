@@ -1,0 +1,26 @@
+MASS
+
+BOND
+
+ANGL
+C -Oh-Ho     50.0     113.00   PARM99 - (not used in tyr anymore)
+Cy-Cg-H1     45.00    111.00   Copy of Cg-Cg-H1 from GLYCAM06
+Oh-Cg-Cy     70.00    107.50   Copy of Oh-Cg-Cg from GLYCAM06
+
+DIHEDRAL
+Oh-Cy-Cg-H1   1    0.05          0.0             3.         SCEE=1.0 SCNB=1.0 tert-butanol
+Oh-Cy-Cg-Oh   1   -0.10          0.0            -1.         SCEE=1.0 SCNB=1.0 2,3-propanediol, 2-methyl-2,3-butanediol, etc
+H1-Cg-Cy-Oy   1    0.05          0.0             3.         SCEE=1.0 SCNB=1.0 COPY OF H1-Cg-Cg-Os NOT DERIVED
+Oy-Cy-Cg-H1   1    0.05          0.0             3.         SCEE=1.0 SCNB=1.0 COPY OF H1-Cg-Cg-Os NOT DERIVED
+Oh-Cg-Cy-Oy   1   -1.10          0.0            -1.         SCEE=1.0 SCNB=1.0 Ether-Alcohols - sialic acid only
+              1    0.25          0.0             2.         SCEE=1.0 SCNB=1.0
+Ho-Oh-Cg-Cy   1    0.18          0.0             3.         SCEE=1.0 SCNB=1.0 Ethanol, propan-2-ol (Isopropanol)
+H1-Cg-Cy-C    1    0.10          0.0             3.         SCEE=1.0 SCNB=1.0 Propane
+Oh-Cg-Cy-C    1    0.1           0.0            -3          SCEE=1.0 SCNB=1.0 3-Hydroxy propanoate
+              1    0.2           0.0            -2          SCEE=1.0 SCNB=1.0
+              1   -2.5           0.0             1          SCEE=1.0 SCNB=1.0
+
+IMPROPER
+
+NONBON
+

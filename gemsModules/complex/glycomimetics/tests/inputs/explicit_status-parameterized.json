@@ -1,0 +1,13 @@
+{
+    "entity": {
+      "type": "Glycomimetics",
+      "services": {
+        "check_build_status": {
+          "type": "Status",
+          "inputs": {
+            "pUUID": "${pUUID}"
+          }
+        }
+      }
+    }
+}

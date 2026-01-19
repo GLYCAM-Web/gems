@@ -1,0 +1,16 @@
+{
+    "entity": {
+        "type": "GlycoProtein",
+        "services": {
+            "default_Build": {
+                "type": "Build",
+                "inputs": {
+                    "pUUID": "<pUUID>",
+                    "glycan_mappings": [
+                        {"Chain": "K", "ResidueNumber": "208", "InsertionCode": "", "Sequence": "DManpa1-OH", "Tags": ""}
+                    ]
+                }
+            }
+        }
+    }
+}

@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 
 ## Who I am
-WhoIAm='Project'
+import os
+
+
+WhoIAm = "Project"
 
 ##Status Report
 status = "Stable"
@@ -9,22 +12,19 @@ moduleStatusDetail = "Creates Gems Projects for MMService, Sequence, and Structu
 
 servicesStatus = [
     {
-        "service" : "StartProject",
-        "status" : "In development.",
-        "statusDetail" : "Currently in focus."
+        "service": "StartProject",
+        "status": "In development.",
+        "statusDetail": "Currently in focus.",
     }
 ]
 
-serviceModules = {
-    "StartProject" : "startProject"
-}
-
+serviceModules = {"StartProject": "startProject"}
 
 
 ###  Filesystem Paths Information
-###  
-###  The format for the path is : 
-###   
+###
+###  The format for the path is :
+###
 ###      /filesystem_path/entity_ID/service_ID/service_organizational_unit(s)
 ###
 ###         filesystem_path =   the path above anything defined within this code.
@@ -41,7 +41,7 @@ serviceModules = {
 ###     be defined in different ways in different entities/services.
 ###
 ###         service_ortanizational_unit(s)
-###                         =   These are any sub-directories or trees of 
+###                         =   These are any sub-directories or trees of
 ###                             sub-directories, that are needed by the entitu
 ###                             while performing the requested service.
 ###
@@ -51,16 +51,24 @@ serviceModules = {
 ###
 
 # Default filesystem path
-output_data_dir = '/website/userdata/'  ## Being deprecated
-default_filesystem_output_path = '/website/userdata/' ## Use this instead of output_data_dir
-default_filesystem_testing_path = '/website/TESTS/'
-default_filesystem_prepush_testing_path = '/website/TESTS/git-ignore-me/pre-push/'
+output_data_dir = "/website/userdata/"  ## Being deprecated
+default_filesystem_output_path = (
+    "/website/userdata/"  ## Use this instead of output_data_dir
+)
+default_filesystem_testing_path = "/website/TESTS/"
+default_filesystem_prepush_testing_path = "/website/TESTS/git-ignore-me/pre-push/"
 default_versions_file_path = default_filesystem_output_path
 default_versions_file_name = "VERSIONS.sh"
 
-allowed_website_filesystem_paths = [default_filesystem_output_path,
-                            default_filesystem_testing_path,
-                            default_filesystem_prepush_testing_path]
+# TODO: deprecated project doesn't actually care about this, but it will be important eventually.
+md_filesystem_output_path = os.getenv("MD_CLUSTER_USERDATA_BASE_PATH")
+
+allowed_website_filesystem_paths = [
+    default_filesystem_output_path,
+    default_filesystem_testing_path,
+    default_filesystem_prepush_testing_path,
+    md_filesystem_output_path,
+]
 
 # Default subdirectories per project type.  Typically, these go
 # under whatever is defined for project_path
@@ -68,9 +76,7 @@ allowed_website_filesystem_paths = [default_filesystem_output_path,
 ##  Old and being deprecated
 ##
 toolPathIdentifier = {
-#        'cb'   :  'tools/cb/git-ignore-me_userdata', # should not be used anywhere now
-        'pdb'  :  'tools/pdb/git-ignore-me_userdata',
-        'gp'   :  'tools/gp/git-ignore-me_userdata'
-        }
-
-
+    #        'cb'   :  'tools/cb/git-ignore-me_userdata', # should not be used anywhere now
+    "pdb": "tools/pdb/git-ignore-me_userdata",
+    "gp": "tools/gp/git-ignore-me_userdata",
+}

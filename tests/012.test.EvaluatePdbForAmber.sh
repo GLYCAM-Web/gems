@@ -9,8 +9,6 @@ echo "
 012: Testing pdb evaluation response.
 " 
 
-
-
 runTest()
 {
     # JSON INPUTS
@@ -19,7 +17,7 @@ runTest()
         echo "Found test input: $jsonInputFile"
     else
         echo "Test 012 failed: Failed to find request input: $jsonInputFile"
-        exit 1
+        return 1
     fi
 
     outputRefFile=$GEMSHOME/tests/correct_outputs/test012_output
@@ -27,7 +25,7 @@ runTest()
         echo "Found correct_outputs reference: $outputRefFile"
     else
         echo "Test 012 failed: Failed to find the correct_outputs reference: $outputRefFile"
-        exit 1
+        return 1
     fi
 
     ## Timestamps and projects will be different.
@@ -36,7 +34,7 @@ runTest()
 
     ## TODO: Move this output file to bad_outputs.
     cat $jsonInputFile | $GEMSHOME/bin/delegate > ${badOutDir}git-ignore-me_test_out_012
-    response=$( sed '/project/q' ${badOutDir}git-ignore-me_test_out_012| grep -v "timestamp" )
+    response=$( sed '/project/q' ${badOutDir}git-ignore-me_test_out_012 | grep -v "timestamp" )
     
     # response=$(cat $jsonInputFile | $GEMSHOME/bin/delegate | grep -v "timestamp" | grep -B "project")
 
@@ -57,15 +55,15 @@ response:
 $response
 "
         echo "Test failed: unexpected response"
-        exit 1
+        return 1
     fi
-
-
     return 0
 }
 
-if runTest; then
-    echo "012 -- passed"
-    exit 0
+if ! runTest; then
+    return 1
 fi
+echo "012 -- passed"
+return 0
+
 

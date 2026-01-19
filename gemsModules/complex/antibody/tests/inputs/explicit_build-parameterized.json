@@ -1,0 +1,17 @@
+{
+    "entity": {
+      "type": "AntibodyDocking",
+      "services": {
+        "evaluation_of_pdb": {
+          "type": "Build",
+          "inputs": { 
+            "pUUID": "${pUUID}"
+          },
+          "options": {
+            "flexibility": "${flexibility}",
+            "count": "${count}"
+          }
+        }
+      }
+    }
+  }

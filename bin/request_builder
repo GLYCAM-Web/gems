@@ -1,0 +1,219 @@
+#!/usr/bin/env python3
+"""
+This script is used to update a JSON request with a resource file at a specific index. 
+
+See ./bin/request_builder --help for usage information.
+
+
+Usage examples:
+
+# Add two resources to a blank MDaaS RunMD request at specific locations. (N.B. MDaaS currently does not use resourceRoles.)
+$ cat gemsModules/mmservice/mdaas/tests/inputs/017_no_inputs.json |\
+./bin/request_builder \
+    --path /programs/gems/tests/temp-inputs/mdinput/unminimized-t5p.parm7 \
+    --format AMBER-7-prmtop \
+    --index entity.services.run_md.inputs.parameter-topology-file |\
+./bin/request_builder \
+    --path /programs/gems/tests/temp-inputs/mdinput/unminimized-t5p.rst7 \
+    --format AMBER-7-restart \
+    --index entity.services.run_md.inputs.input-coordinate-file |\
+./bin/delegate
+
+
+# Append two resources to the Entity-level inputs Resources list for a blank Glycomimetics  request. (N.B. )
+$ ./bin/request_builder \
+    --entity-name Glycomimetics \
+    --index entity.inputs \
+    --create-list \
+    --path /programs/gems/gemsModules/complex/glycomimetics/docs/reference/example_flu_3ubq_aldehyde_library/glycomimetics/3ubq_chainC_64_266.pdbqt \
+    --format chemical/pdbqt \
+    --role cocomplex-input |\
+./bin/request_builder \
+    --path /programs/gems/gemsModules/complex/glycomimetics/docs/reference/example_flu_3ubq_aldehyde_library/glycomimetics/sample_input_file.txt \
+    --index entity.inputs \
+    --format application/json \
+    --role moeity-metadata |\
+./bin/request_builder \
+    --path /programs/gems/gemsModules/complex/glycomimetics/docs/reference/example_flu_3ubq_aldehyde_library/glycomimetics/sample_input_file.txt \
+    --index entity.inputs \
+    --format application/json \
+    --role execution-parameters |\
+./bin/delegate
+
+"""
+import argparse
+import json
+import os
+import sys
+import select
+from pathlib import Path
+
+
+# append $GEMSHOME to sys path in case the script is run from outside the gemsModules directory
+if "GEMSHOME" in os.environ:
+    if os.environ["GEMSHOME"] not in sys.path:
+        sys.path.append(os.environ["GEMSHOME"])
+else:
+    print("GEMSHOME not set. Exiting.")
+    sys.exit(1)
+
+from gemsModules.common.main_api_resources import Resource
+from gemsModules.common.main_api import Common_API
+from gemsModules.common.main_api_entity import Entity
+
+
+def get_blank_entity_json(entity_name, inputs=None):
+    """Return a blank Entity JSON object."""
+    return Common_API(entity=Entity(type=entity_name, inputs=inputs)).json(
+        indent=2, by_alias=True
+    )
+
+
+def set_value_at_json_index(json_dict, json_index, value, create_list=False):
+    """Using a jq-like index, set the value in a JSON dictionary.
+
+    Presumes the existence of all keys in the index.
+
+    If the value is a list, append the value to the list at the index.
+    """
+
+    try:
+        # Split the index into a list of keys
+        json_index, resource_name = json_index.rsplit(".", 1)
+        keys = json_index.split(".")
+
+        # Traverse the JSON dictionary using the keys
+        current_dict = json_dict
+        for key in keys:
+            current_dict = current_dict[key]
+
+        if resource_name in current_dict:
+            if isinstance(current_dict[resource_name], list):
+                current_dict[resource_name].append(value)
+            elif current_dict[resource_name]:
+                current_dict[resource_name] = [current_dict[resource_name], value]
+            else:
+                current_dict[resource_name] = [value]
+        else:
+            if create_list:
+                current_dict[resource_name] = [value]
+            else:
+                current_dict[resource_name] = value
+
+        return json_dict
+
+    except KeyError:
+        print(f"Invalid JSON index: {json_index}")
+        sys.exit(1)
+
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+        sys.exit(1)
+
+
+def argparser():
+    parser = argparse.ArgumentParser(description="JSON Request Builder")
+
+    parser.add_argument(
+        "--request",
+        type=str,
+        help="Path to the JSON request file to update",
+        default=None,
+    )
+
+    # if no request is provided, generate a blank JSON object for the entity
+    parser.add_argument(
+        "--entity-name",
+        type=str,
+        help="The name of the entity to generate a blank JSON object for",
+        default=None,
+    )
+
+    # optional output flag instead of stdout
+    parser.add_argument(
+        "--output", type=str, help="Path to the output file", default=None
+    )
+
+    parser.add_argument(
+        "--path", type=str, help="Path to the resource file to add to the request"
+    )
+    parser.add_argument(
+        "--format",
+        type=str,
+        help="The format of the resource file (e.g. 'AMBER-7-prmtop')",
+        default=None,
+    )
+    parser.add_argument(
+        "--role",
+        type=str,
+        help="The role of the resource file (e.g. 'input-coordinate-file')",
+        default=None,
+    )
+    parser.add_argument(
+        "--index",
+        type=str,
+        help="The jq-like index of the JSON key to add the resource at, separated by periods",
+    )
+    parser.add_argument(
+        "--create-list",
+        action="store_true",
+        help="Create a list of resources at the specified index, if necessary",
+    )
+    parser.add_argument(
+        "--dont-encode-mime",
+        action="store_true",
+        help="Disable the default encapsulation of a resource within a MIME message",
+    )
+    return parser.parse_args()
+
+
+def main():
+    args = argparser()
+    resource_path = args.path
+
+    if args.request:
+        with open(args.request, "r") as f:
+            request_data = f.read()
+    elif args.entity_name:
+        request_data = get_blank_entity_json(args.entity_name)
+    else:
+        request_data = sys.stdin.read()
+
+    # Parse the request
+    if request_data:
+        try:
+            request = json.loads(request_data)
+        except json.JSONDecodeError:
+            print("Error: Invalid JSON input.")
+            sys.exit(1)
+    else:
+        print("Error: No request data provided via stdin or --request.")
+        sys.exit(1)
+
+    if not os.path.isfile(resource_path):
+        print(f"Error: Resource file '{resource_path}' does not exist.")
+        sys.exit(1)
+
+    resource = Resource.payload_from_path(
+        resource_path,
+        args.format,
+        resource_role=args.role,
+        encapulate_mime=not args.dont_encode_mime,
+    )
+
+    updated_request = set_value_at_json_index(
+        request, args.index, resource.dict(), create_list=args.create_list
+    )
+    dumped_request = json.dumps(updated_request, indent=2)
+
+    # Write the updated request to stdout or file
+    if args.output:
+        with open(args.output, "w") as f:
+            f.write(dumped_request)
+    else:
+        sys.stdout.write(dumped_request)
+        sys.stdout.flush()
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,17 @@
+{
+    "entity": {
+        "type": "Sequence",
+        "services": {
+            "evaluation": {
+                "type": "Evaluate"
+            }
+        },
+        "inputs": {
+            "sequence": {
+                "sequenceFormat": "GlycamCondensed",
+                "payload": "XXXXXX"
+            }
+        }
+    },
+    "prettyPrint": true
+}

@@ -1,0 +1,218 @@
+HETATM    1  C1  GAL B   1     -16.954  59.481   0.143  1.00  0.00           C
+HETATM    2  H1  GAL B   1     -16.940  60.038   1.092  1.00  0.00           H
+HETATM    3  C2  GAL B   1     -15.789  58.469   0.126  1.00  0.00           C
+HETATM    4  H2  GAL B   1     -14.869  58.974  -0.199  1.00  0.00           H
+HETATM    5  C3  GAL B   1     -16.062  57.180  -0.710  1.00  0.00           C
+HETATM    6  H3  GAL B   1     -15.113  56.823  -1.132  1.00  0.00           H
+HETATM    7  C4  GAL B   1     -17.146  57.256  -1.839  1.00  0.00           C
+HETATM    8  C5  GAL B   1     -18.437  58.005  -1.372  1.00  0.00           C
+HETATM    9  H5  GAL B   1     -19.284  57.316  -1.289  1.00  0.00           H
+HETATM   10  C6  GAL B   1     -18.310  58.766  -0.022  1.00  0.00           C
+HETATM   11  H6  GAL B   1     -19.128  59.495   0.074  1.00  0.00           H
+HETATM   12  H4  GAL B   1     -16.717  57.884  -2.634  1.00  0.00           H
+HETATM   13  H1  GAL B   1     -16.388  56.414   0.003  1.00  0.00           H
+HETATM   14  H1  GAL B   1     -15.605  58.153   1.162  1.00  0.00           H
+HETATM   15  H2  GAL B   1     -16.821  60.222  -0.658  1.00  0.00           H
+HETATM   16  H1  GAL B   1     -18.428  58.050   0.804  1.00  0.00           H
+HETATM   17  H1  GAL B   1     -18.706  58.736  -2.151  1.00  0.00           H
+HETATM   18  C1  GAL B   2     -18.492  55.204  -7.971  1.00 18.29           C
+ANISOU   18  C1  GAL B   2     1775   2436   2738     67   -256    288       C
+HETATM   19  C2  GAL B   2     -19.054  54.882  -6.561  1.00 21.36           C
+ANISOU   19  C2  GAL B   2     2621   2858   2637    444   -243    588       C
+HETATM   20  C3  GAL B   2     -17.914  54.829  -5.508  1.00 18.89           C
+ANISOU   20  C3  GAL B   2     1937   2535   2704     19     51    721       C
+HETATM   21  C4  GAL B   2     -16.850  53.762  -5.910  1.00 18.64           C
+ANISOU   21  C4  GAL B   2     2007   2524   2551    -10    -75    295       C
+HETATM   22  C5  GAL B   2     -16.305  53.993  -7.341  1.00 18.34           C
+ANISOU   22  C5  GAL B   2     2277   2455   2237    291   -410    406       C
+HETATM   23  O3  GAL B   2     -18.438  54.443  -4.224  1.00 18.86           O
+ANISOU   23  O3  GAL B   2     2229   2571   2364   -393     93    174       O
+HETATM   24  O4  GAL B   2     -17.439  52.442  -5.867  1.00 21.34           O
+ANISOU   24  O4  GAL B   2     2574   2540   2994   -176   -290    433       O
+HETATM   25  C6  GAL B   2     -17.405  54.195  -8.412  1.00 18.97           C
+ANISOU   25  C6  GAL B   2     2423   2088   2696    216   -648    129       C
+HETATM   26  C7  GAL B   2     -18.713  55.385  -3.139  1.00  0.00           C
+HETATM   27  C8  GAL B   2     -19.641  54.614  -2.155  1.00  0.00           C
+HETATM   28  H72 GAL B   2     -19.269  56.255  -3.506  1.00  0.00           H
+HETATM   29  C9  GAL B   2     -17.360  55.810  -2.452  1.00  0.00           C
+HETATM   30  O2  GAL B   2     -20.709  55.129  -1.866  1.00  0.00           O
+HETATM   31  O1  GAL B   2     -19.414  53.431  -1.948  1.00  0.00           O
+HETATM   32  H92 GAL B   2     -16.543  55.654  -3.162  1.00  0.00           H
+HETATM   33  H91 GAL B   2     -17.175  55.078  -1.650  1.00  0.00           H
+HETATM   34  H12 GAL B   2     -19.307  55.202  -8.704  1.00  0.00           H
+HETATM   35  H13 GAL B   2     -18.066  56.215  -7.968  1.00  0.00           H
+HETATM   36  H22 GAL B   2     -19.800  55.633  -6.271  1.00  0.00           H
+HETATM   37  H23 GAL B   2     -19.569  53.911  -6.591  1.00  0.00           H
+HETATM   38  H3  GAL B   2     -17.434  55.813  -5.435  1.00  0.00           H
+HETATM   39  H4  GAL B   2     -16.008  53.821  -5.207  1.00  0.00           H
+HETATM   40  H52 GAL B   2     -15.661  54.877  -7.317  1.00  0.00           H
+HETATM   41  H53 GAL B   2     -15.671  53.142  -7.622  1.00  0.00           H
+HETATM   42  H62 GAL B   2     -17.877  53.229  -8.639  1.00  0.00           H
+HETATM   43  H63 GAL B   2     -16.938  54.545  -9.341  1.00  0.00           H
+HETATM   44  C1  NGA B   3     -17.081  51.684  -4.694  1.00 19.80           C
+ANISOU   44  C1  NGA B   3     2257   2514   2754      3   -169    285       C
+HETATM   45  C2  NGA B   3     -18.221  50.692  -4.355  1.00 20.60           C
+ANISOU   45  C2  NGA B   3     2296   2674   2857     20    153    385       C
+HETATM   46  C3  NGA B   3     -17.731  49.649  -3.325  1.00 18.92           C
+ANISOU   46  C3  NGA B   3     2398   2311   2479     77     51    -10       C
+HETATM   47  C4  NGA B   3     -16.365  49.008  -3.687  1.00 18.56           C
+ANISOU   47  C4  NGA B   3     2578   2659   1816    208    214    -29       C
+HETATM   48  C5  NGA B   3     -15.297  50.079  -4.038  1.00 20.83           C
+ANISOU   48  C5  NGA B   3     2483   2703   2728    300    160    353       C
+HETATM   49  C6  NGA B   3     -14.015  49.442  -4.635  1.00 23.22           C
+ANISOU   49  C6  NGA B   3     2359   2604   3859    108    252    -13       C
+HETATM   50  C7  NGA B   3     -20.649  51.351  -4.421  1.00 20.86           C
+ANISOU   50  C7  NGA B   3     2280   3238   2407     79    -60   -153       C
+HETATM   51  C8  NGA B   3     -21.557  52.522  -4.098  1.00 25.36           C
+ANISOU   51  C8  NGA B   3     2526   3869   3239    681    425    331       C
+HETATM   52  N2  NGA B   3     -19.410  51.413  -3.844  1.00 20.03           N
+ANISOU   52  N2  NGA B   3     2289   2878   2442    185    -77    155       N
+HETATM   53  O3  NGA B   3     -18.715  48.586  -3.239  1.00 18.48           O
+ANISOU   53  O3  NGA B   3     2588   2517   1915   -165   -131    -11       O
+HETATM   54  O4  NGA B   3     -16.568  48.100  -4.775  1.00 25.94           O
+ANISOU   54  O4  NGA B   3     3590   3506   2758    368   -122   -959       O
+HETATM   55  O5  NGA B   3     -15.851  50.988  -5.028  1.00 19.30           O
+ANISOU   55  O5  NGA B   3     2272   2831   2231    -97    -41    184       O
+HETATM   56  O6  NGA B   3     -12.865  50.279  -4.457  1.00 34.06           O
+ANISOU   56  O6  NGA B   3     2997   4706   5239  -1331    111    596       O
+HETATM   57  O7  NGA B   3     -20.978  50.442  -5.169  1.00 33.51           O
+ANISOU   57  O7  NGA B   3     4855   4823   3053   1153  -1396  -1072       O
+HETATM   58  H1  NGA B   3     -16.929  52.346  -3.831  1.00  0.00           H
+HETATM   59  H2  NGA B   3     -18.481  50.165  -5.282  1.00  0.00           H
+HETATM   60  H3  NGA B   3     -17.623  50.161  -2.359  1.00  0.00           H
+HETATM   61  H4  NGA B   3     -16.022  48.446  -2.804  1.00  0.00           H
+HETATM   62  H5  NGA B   3     -15.046  50.628  -3.121  1.00  0.00           H
+HETATM   63  H62 NGA B   3     -13.835  48.473  -4.165  1.00  0.00           H
+HETATM   64  H63 NGA B   3     -14.186  49.262  -5.704  1.00  0.00           H
+HETATM   65  HN2 NGA B   3     -19.275  52.236  -3.230  1.00  0.00           H
+HETATM   66  HO4 NGA B   3     -17.547  48.028  -4.809  1.00  0.00           H
+HETATM   67  H81 NGA B   3     -22.454  52.498  -4.722  1.00  0.00           H
+HETATM   68  H82 NGA B   3     -21.842  52.482  -3.040  1.00  0.00           H
+HETATM   69  H83 NGA B   3     -21.028  53.466  -4.275  1.00  0.00           H
+HETATM   70  HO6 NGA B   3     -12.569  50.522  -5.355  1.00  0.00           H
+HETATM   71  C1  GAL B   4     -19.135  48.332  -1.895  1.00 17.31           C
+ANISOU   71  C1  GAL B   4     1983   2842   1750   -276   -556    -33       C
+HETATM   72  C2  GAL B   4     -20.322  47.341  -1.896  1.00 14.28           C
+ANISOU   72  C2  GAL B   4     1921   1883   1621    180   -662     91       C
+HETATM   73  C3  GAL B   4     -20.669  46.987  -0.417  1.00 14.14           C
+ANISOU   73  C3  GAL B   4     1697   2022   1655    385   -307   -275       C
+HETATM   74  C4  GAL B   4     -19.398  46.566   0.374  1.00 13.05           C
+ANISOU   74  C4  GAL B   4     1698   1774   1488    209   -295     52       C
+HETATM   75  C5  GAL B   4     -18.276  47.624   0.248  1.00 15.75           C
+ANISOU   75  C5  GAL B   4     1945   2096   1943    -98   -325    381       C
+HETATM   76  C6  GAL B   4     -16.960  47.185   0.936  1.00 16.07           C
+ANISOU   76  C6  GAL B   4     1599   2112   2394     -4    -89    351       C
+HETATM   77  O2  GAL B   4     -21.429  47.971  -2.557  1.00 16.82           O
+ANISOU   77  O2  GAL B   4     1558   2522   2312    234   -499    500       O
+HETATM   78  O3  GAL B   4     -21.591  45.900  -0.307  1.00 14.59           O
+ANISOU   78  O3  GAL B   4     1625   1987   1931    415   -272     61       O
+HETATM   79  O4  GAL B   4     -18.876  45.341  -0.161  1.00 13.46           O
+ANISOU   79  O4  GAL B   4     1547   1923   1646    297   -194    -51       O
+HETATM   80  O5  GAL B   4     -18.019  47.777  -1.167  1.00 16.29           O
+ANISOU   80  O5  GAL B   4     1721   2425   2045    -12     -9    113       O
+HETATM   81  O6  GAL B   4     -16.062  48.287   1.057  1.00 17.63           O
+ANISOU   81  O6  GAL B   4     1929   2292   2478   -243   -381    310       O
+HETATM   82  H1  GAL B   4     -19.452  49.276  -1.432  1.00  0.00           H
+HETATM   83  H2  GAL B   4     -20.036  46.425  -2.431  1.00  0.00           H
+HETATM   84  H3  GAL B   4     -21.101  47.886   0.041  1.00  0.00           H
+HETATM   85  H4  GAL B   4     -19.670  46.429   1.429  1.00  0.00           H
+HETATM   86  H5  GAL B   4     -18.610  48.576   0.682  1.00  0.00           H
+HETATM   87  H62 GAL B   4     -16.501  46.380   0.350  1.00  0.00           H
+HETATM   88  H63 GAL B   4     -17.190  46.783   1.931  1.00  0.00           H
+HETATM   89  HO6 GAL B   4     -15.162  47.931   1.166  1.00  0.00           H
+HETATM   90  HO2 GAL B   4     -21.068  48.422  -3.359  1.00  0.00           H
+HETATM   91  HO3 GAL B   4     -21.004  45.116  -0.243  1.00  0.00           H
+HETATM   92  HO4 GAL B   4     -18.215  45.665  -0.820  1.00  0.00           H
+CONECT    1    2   10    3   15
+CONECT    3    5    4    1   14
+CONECT    5    6    7    3   13
+CONECT    7   29    5    8   12
+CONECT    8    7   10    9   17
+CONECT   10    8   11    1   16
+CONECT    2    1
+CONECT   13    5
+CONECT   14    3
+CONECT   16   10
+CONECT   17    8
+CONECT    4    3
+CONECT   15    1
+CONECT    6    5
+CONECT   12    7
+CONECT    9    8
+CONECT   11   10
+CONECT   18   19   25   34   35
+CONECT   19   18   20   36   37
+CONECT   20   19   21   23   38
+CONECT   21   20   22   24   39
+CONECT   22   21   25   41   40
+CONECT   25   18   22   43   42
+CONECT   26   29   23   28   27
+CONECT   27   31   30   26
+CONECT   29    7   32   26   33
+CONECT   34   18
+CONECT   35   18
+CONECT   36   19
+CONECT   37   19
+CONECT   38   20
+CONECT   39   21
+CONECT   40   22
+CONECT   41   22
+CONECT   42   25
+CONECT   43   25
+CONECT   28   26
+CONECT   33   29
+CONECT   32   29
+CONECT   31   27
+CONECT   30   27
+CONECT   23   20   26
+CONECT   24   21   44
+CONECT   44   24   45   55   58
+CONECT   45   46   44   52   59
+CONECT   46   53   47   45   60
+CONECT   47   46   54   48   61
+CONECT   48   49   47   55   62
+CONECT   49   48   56   63   64
+CONECT   50   51   57   52
+CONECT   51   50   69   67   68
+CONECT   58   44
+CONECT   59   45
+CONECT   60   46
+CONECT   61   47
+CONECT   62   48
+CONECT   63   49
+CONECT   64   49
+CONECT   67   51
+CONECT   68   51
+CONECT   69   51
+CONECT   65   52
+CONECT   66   54
+CONECT   70   56
+CONECT   52   50   45   65
+CONECT   53   46   71
+CONECT   54   47   66
+CONECT   55   48   44
+CONECT   56   49   70
+CONECT   57   50
+CONECT   71   53   72   80   82
+CONECT   72   71   77   73   83
+CONECT   73   78   72   74   84
+CONECT   74   73   75   79   85
+CONECT   75   76   80   74   86
+CONECT   76   81   75   87   88
+CONECT   82   71
+CONECT   83   72
+CONECT   84   73
+CONECT   85   74
+CONECT   86   75
+CONECT   87   76
+CONECT   88   76
+CONECT   90   77
+CONECT   91   78
+CONECT   92   79
+CONECT   89   81
+CONECT   77   72   90
+CONECT   78   73   91
+CONECT   79   74   92
+CONECT   80   71   75
+CONECT   81   76   89
+END

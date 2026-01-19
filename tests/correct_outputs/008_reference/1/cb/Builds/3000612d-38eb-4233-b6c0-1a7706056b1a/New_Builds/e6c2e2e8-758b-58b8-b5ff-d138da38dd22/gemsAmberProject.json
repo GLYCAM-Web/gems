@@ -1,0 +1,23 @@
+{
+  "protocolSource": "MD_Utils",
+  "protocolSourceLocation": "/programs/gems/External/MD_Utils",
+  "protocolSourceOrigin": "https://github.com/GLYCAM-Web/MD_Utils.git",
+  "protocolSourceVersion": null,
+  "protocolSourceBranch": "standalone-user",
+  "protocolSourceHash": "16fc4149085bbc29990079467ad60c1c8b2e3907",
+  "protocolDirectory": "/programs/gems/External/MD_Utils/protocols/Glycan/Prep_and_Minimization",
+  "protocolRequiredInputFiles": [
+    "structure.off"
+  ],
+  "protocolControlScriptName": "Minimize.bash",
+  "molecularSystemType": "Glycan",
+  "molecularModelingJobType": "Prep_and_Minimization",
+  "jobID": "3000612d-38eb-4233-b6c0-1a7706056b1a",
+  "localWorkingDirectory": "/website/TESTS/git-ignore-me/pre-push/sequence/cb/Builds/3000612d-38eb-4233-b6c0-1a7706056b1a/New_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22",
+  "simulationWorkingDirectory": "/website/TESTS/git-ignore-me/pre-push/sequence/cb/Builds/3000612d-38eb-4233-b6c0-1a7706056b1a/New_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22",
+  "simulationControlScriptPath": "/website/TESTS/git-ignore-me/pre-push/sequence/cb/Builds/3000612d-38eb-4233-b6c0-1a7706056b1a/New_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/Minimize.bash",
+  "thisProjectLog": "/website/TESTS/git-ignore-me/pre-push/sequence/cb/Builds/3000612d-38eb-4233-b6c0-1a7706056b1a/New_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/gemsAmberProject.log",
+  "thisProjectJson": "/website/TESTS/git-ignore-me/pre-push/sequence/cb/Builds/3000612d-38eb-4233-b6c0-1a7706056b1a/New_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22/gemsAmberProject.json",
+  "submissionName": "Glycan-3000612d-",
+  "comment": "initiated by gemsModules/sequence"
+}

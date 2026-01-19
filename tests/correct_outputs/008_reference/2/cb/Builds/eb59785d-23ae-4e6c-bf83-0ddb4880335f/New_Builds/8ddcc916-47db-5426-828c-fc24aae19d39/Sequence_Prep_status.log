@@ -1,0 +1,13 @@
+[INFO] : Sun Dec  7 20:47:19 EST 2025 : Status log opened.
+[INFO] : Sun Dec  7 20:47:19 EST 2025 : This job is running in a Slurm cluster.
+[INFO] : Sun Dec  7 20:47:20 EST 2025 : Sourcing of AMBERHOME[now=/programs/amber]/amber.sh completed
+[INFO] : Sun Dec  7 20:47:20 EST 2025 : Gas-phase tleap processing completed
+[INFO] : Sun Dec  7 20:47:20 EST 2025 : Gas-phase minimization completed
+[INFO] : Sun Dec  7 20:47:20 EST 2025 : Post-gas-phase cpptraj processing completed
+[INFO] : Sun Dec  7 20:47:20 EST 2025 : Solvent-phase (T3P) tleap processing completed
+[INFO] : Sun Dec  7 20:47:21 EST 2025 : Solvent-phase (T5P) tleap processing completed
+[INFO] : Sun Dec  7 20:47:21 EST 2025 : Simulation files for solvent zip-file creation/updating completed
+[INFO] : Sun Dec  7 20:47:21 EST 2025 : Simulation files for solvent zip-file creation/updating completed
+[INFO] : Sun Dec  7 20:47:22 EST 2025 : Conformer-level zip-file creation completed
+[INFO] : Sun Dec  7 20:47:22 EST 2025 : Check for being the last sub-process completed
+[INFO] : Sun Dec  7 20:47:23 EST 2025 : Project-level zip-file creation/updating completed

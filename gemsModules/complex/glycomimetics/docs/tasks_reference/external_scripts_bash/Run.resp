@@ -1,0 +1,57 @@
+#!/bin/bash -f
+#Runs all resp files in a directory.
+#User should modify the following
+# Set these variables as well as fix the resp.in file before running.
+
+#GAUPREFIX="2-methyltetrahydro-2H-pyran_q"
+#OUTPUTFILE="Ensemble_Charges.out"
+
+gaussian_log_file=$1
+ATOMS=$2
+resp_input_file=$3
+resp_output_file=$4
+pch_output_file=$5
+charge_output_file=$6
+glycomimetic_scripts_dir="/home/yao/glycomimetic_simulations/scripts"
+
+#foreach LOG ('ls $GAUPREFIX*.log')
+rm -f a b c a.out readit.o esp.dat count esout
+
+for LOG in `ls ${gaussian_log_file}`; do
+        echo "Getting ESP charges on $LOG"
+        #sed -n '/points will be used for fitting atomic charges/p' $LOG > count
+        #${glycomimetic_scripts_dir}/formatAtomNumEsp.pl 's/points will be used for fitting atomic charges//g' count
+        #${glycomimetic_scripts_dir}/formatAtomNumEsp.pl 's/  //g' count
+	#echo "$ATOMS" >> count
+	#gfortran ${glycomimetic_scripts_dir}/readit.f >& /dev/null
+	#grep "Atomic Center " $LOG > a
+	#grep "ESP Fit" $LOG > b
+	#grep "Fit    " $LOG > c
+	#./a.out
+	#rm -f a b c a.out readit.o
+	echo "Running Resp"
+        espgen -i ${gaussian_log_file} -o esp.dat
+	#/home/wise/scripts/AUTOMATED_ENSEMBLE_AVERAGING/resp -O \
+		#-i resp.in \
+		#-o $LOG.resp.out \
+		#-p $LOG.resp.pch \
+		#-e esp.dat \
+		#-t $LOG.q.out
+
+        #/cm/shared/apps/amber20/bin/resp -O \
+        /home/yao/glycomimetic_simulations/scripts/resp-2.2/resp -O \
+            -i ${resp_input_file} \
+            -o ${resp_output_file} \
+            -p ${pch_output_file} \
+            -e esp.dat \
+            -t ${charge_output_file}
+        
+	#/bin/rm esp.dat count esout 
+done
+
+
+# Comment out the section below for Non-Averaged Charges
+#echo "Charges developed... Now averaging."
+#/home/wise/scripts/AUTOMATED_ENSEMBLE_AVERAGING/Average_RESP_Charges.pl $GAUPREFIX $OUTPUTFILE $ATOMS
+#echo "Charges averaged in the file: $OUTPUTFILE"
+

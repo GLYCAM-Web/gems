@@ -1,0 +1,28 @@
+MODEL 0
+REMARK FAKE_HEAD_ATOM=C1_N1
+REMARK REAL_HEAD_ATOM=C2_C3
+REMARK DUMMY_ATOM=H1_H2_H3_C1_N1_H4
+REMARK TORSION=H6_C2_C3_C4
+ROOT
+HETATM    1  C1  AAA     1      -7.371   2.371  -0.494  1.00  0.00     0.094 C 
+HETATM    2  N1  AAA     1      -5.910   2.368  -0.411  1.00  0.00     0.083 N 
+HETATM    3  C2  AAA     1      -5.458   1.638   0.781  1.00  0.00     0.134 C 
+HETATM    4  C3  AAA     1      -3.951   1.583   0.831  1.00  0.00    -0.028 A 
+HETATM    5  C4  AAA     1      -3.198   2.762   0.940  1.00  0.00    -0.058 A 
+HETATM    6  C5  AAA     1      -1.804   2.688   0.989  1.00  0.00     0.002 A 
+HETATM    7  N2  AAA     1      -1.181   1.481   0.932  1.00  0.00    -0.273 NA
+HETATM    8  C6  AAA     1      -1.885   0.322   0.829  1.00  0.00     0.002 A 
+HETATM    9  C7  AAA     1      -3.281   0.351   0.778  1.00  0.00    -0.058 A 
+HETATM   10  H1  AAA     1      -7.686   2.925  -1.403  1.00  0.00     0.071 H 
+HETATM   11  H2  AAA     1      -7.816   2.868   0.395  1.00  0.00     0.071 H 
+HETATM   12  H3  AAA     1      -7.757   1.332  -0.574  1.00  0.00     0.071 H 
+HETATM   13  H4  AAA     1      -5.591   3.363  -0.356  1.00  0.00     0.315 HD
+HETATM   14  H5  AAA     1      -5.870   0.604   0.751  1.00  0.00     0.086 H 
+HETATM   15  H6  AAA     1      -5.833   2.130   1.706  1.00  0.00     0.086 H 
+HETATM   16  H7  AAA     1      -3.685   3.728   0.991  1.00  0.00     0.086 H 
+HETATM   17  H8  AAA     1      -1.217   3.593   1.073  1.00  0.00     0.114 H 
+HETATM   18  H9  AAA     1      -1.362  -0.623   0.788  1.00  0.00     0.114 H 
+HETATM   19  H10 AAA     1      -3.833  -0.577   0.697  1.00  0.00     0.086 H 
+ENDROOT
+TORSDOF 3
+ENDMDL

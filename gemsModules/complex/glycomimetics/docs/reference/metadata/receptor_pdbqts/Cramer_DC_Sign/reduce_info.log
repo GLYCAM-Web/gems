@@ -1,0 +1,40 @@
+reduce: version 3.3 06/02/2016, Copyright 1997-2016, J. Michael Word
+Processing file: --standard input--
+Database of HETATM connections: "/cm/shared/apps/amber20//dat/reduce_wwPDB_het_dict.txt"
+WARNING: atom  1HB from LYS will be treated as carbon
+WARNING: atom  2HB from LYS will be treated as carbon
+WARNING: atom  1HG from LYS will be treated as carbon
+WARNING: atom  2HG from LYS will be treated as carbon
+WARNING: atom  1HD from LYS will be treated as carbon
+WARNING: atom  2HD from LYS will be treated as carbon
+WARNING: atom  1HE from LYS will be treated as carbon
+WARNING: atom  2HE from LYS will be treated as carbon
+WARNING: atom  1HZ from LYS will be treated as carbon
+WARNING: atom  2HZ from LYS will be treated as carbon
+WARNING: atom  3HZ from LYS will be treated as carbon
+VDW dot density = 16/A^2
+Orientation penalty scale = 9999 (999900%)
+Eliminate contacts within 3 bonds.
+Ignore atoms with |occupancy| <= 0.01 during adjustments.
+Waters ignored if B-Factor >= 40 or |occupancy| < 0.66
+Aromatic rings in amino acids accept hydrogen bonds.
+Building His ring NH Hydrogens.
+Flipping Asn, Gln and His groups.
+For each flip state, bumps where gap is more than 0.4A are indicated with '!'.
+Building or keeping OH & SH Hydrogens.
+Rotating existing OH & SH Hydrogens
+Rotating NH3 Hydrogens.
+Not processing Met methyls.
+Removing redundant N-terminal N-H hydrogen atom from input model.
+Removing redundant N-terminal N-H hydrogen atom from input model.
+*WARNING*: Res "CA" not in HETATM Connection Database. Hydrogens not added.
+*WARNING*: Res "CA" not in HETATM Connection Database. Hydrogens not added.
+*WARNING*: Res "CA" not in HETATM Connection Database. Hydrogens not added.
+ Singles(size 0)
+Found 982 hydrogens (14 hets)
+Standardized 49 hydrogens (0 hets)
+Added 0 hydrogens (0 hets)
+Removed 2 hydrogens (0 hets)
+If you publish work which uses reduce, please cite:
+Word, et. al. (1999) J. Mol. Biol. 285, 1735-1747.
+For more information see http://kinemage.biochem.duke.edu

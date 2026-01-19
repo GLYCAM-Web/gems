@@ -1,0 +1,13 @@
+{
+    "entity": {
+        "type": "PDBFile",
+        "services": {
+            "any_amber_prep": {
+                "type": "AmberMDPrep",
+                "inputs": {
+                    "pUUID": "pUUID"
+                }
+            }
+        }
+    }
+}

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 THISPYTHON='python3'
 ##################### Test 7 ########################
 echo "Testing DrawGlycan.py..."

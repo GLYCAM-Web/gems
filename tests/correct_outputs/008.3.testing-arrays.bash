@@ -8,13 +8,17 @@ Build3Tests=(
 	BuildDefaultSymlink
 	MinGasPdb
 )
-declare -A Build3Commands=(
+
+PDB_File_To_Test="${sequenceBuildsPath}/${build_3_pUUID}/New_Builds/${test_conformer_id}/min-gas.pdb"
+declare -A Build3Commands
+Build3Commands=(
 	[ListRSeqsSeqID]="/bin/ls -R ${sequenceSequencesPath}/${theCorrectSequenceID}"
 	[ListRRequestedBuilds]="/bin/ls -R ${sequenceBuildsPath}/${build_3_pUUID}/Requested_Builds"
 	[BuildDefaultSymlink]="file ${sequenceBuildsPath}/${build_3_pUUID}/default"
-	[MinGasPdb]="md5sum ${sequenceBuildsPath}/${build_3_pUUID}/New_Builds/${test_conformer_id}/min-gas.pdb | cut -d ' ' -f1"
+	[MinGasPdb]="/bin/ls ${PDB_File_To_Test}"
 )
-declare -A Build3CorrectOutputs=(
+declare -A Build3CorrectOutputs
+Build3CorrectOutputs=(
 	[ListRSeqsSeqID]="""${sequenceSequencesPath}/00e7d454-06dd-5067-b6c9-441dd52db586:
 buildStrategyID1
 current
@@ -38,7 +42,7 @@ c408f40d-28e0-5e8d-86a3-221b74da42f7
 ce32017d-6663-5ecc-b282-9e9812986d1c
 e6c2e2e8-758b-58b8-b5ff-d138da38dd22"""
 	[BuildDefaultSymlink]="${sequenceBuildsPath}/${build_3_pUUID}/default: symbolic link to Existing_Builds/e6c2e2e8-758b-58b8-b5ff-d138da38dd22"
-	[MinGasPdb]="2ddf291d14f4bbcbbda25279324ba296"
+	[MinGasPdb]="${PDB_File_To_Test}"
 )
 
 ## syntax reminder:

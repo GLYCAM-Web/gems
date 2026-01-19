@@ -1,43 +1,110 @@
 #!/usr/bin/env python3
-from pydantic import BaseModel, Field
-from gemsModules.common.main_api_services import Service, Response
+import sys
+import socket
 
-
-from gemsModules. import loggingConfig 
-if loggingConfig.loggers.get(__name__):
-    pass
-else:
-    log = loggingConfig.createLogger(__name__)
-
-
-
-#!/usr/bin/env python3
-from enum import Enum, auto
-from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
-from typing import ForwardRef
-from pydantic import BaseModel,  Field
-from pydantic.schema import schema
-
-from gemsModules.deprecated.common import transaction
 from gemsModules.deprecated.common.loggingConfig import *
+from gemsModules.deprecated.batchcompute.slurm.dataio import *
+from gemsModules.systemoperations.instance_config import InstanceConfig
 
-if loggers.get(__name__):
+from gemsModules.logging.logger import Set_Up_Logging
+
+
+log = Set_Up_Logging(__name__)
+
+
+def should_use_GRPC():
     pass
-else:
-    log = createLogger(__name__)
 
 
+def get_gems_slurm_host_from_env():
+    return os.getenv("GEMS_GRPC_SLURM_HOST", None), os.getenv(
+        "GEMS_GRPC_SLURM_PORT", None
+    )
 
 
-#schedulerGrpcHost: str = Field(
-#    None,
-#    title='Scheduler gRPC server',
-#    description='The server to contact via gRPC for submitting the job.  Normally not required.'
-#    )
-#schedulerGrpcPort: int = Field(
-#    None,
-#    title='Scheduler gRPC port',
-#    description='The port to contact via gRPC for submitting the job.  Normally not required.'
-#    )
+def get_gems_slurm_instance_by_config():
+    pass
 
 
+def is_GEMS_instance_for_SLURM_submission(requested_ctx=None, requested_instance=None):
+    """Uses the GEMS instance_config to determine if this instance is the correct SLURM submitter."""
+    ic = InstanceConfig()
+
+    this_instance_can_run_ctx = False
+    if requested_ctx is not None:
+        if requested_ctx in ic.get_available_contexts():
+            this_instance_can_run_ctx = True
+
+    this_instance_is_requested = True
+    if requested_instance is not None and requested_instance != socket.gethostname():
+        this_instance_is_requested = False
+
+    log.debug(f"Is this instance configured to run SLURM? {this_instance_can_run_ctx}")
+    log.debug(f"Is this instance requested for SLURM? {this_instance_is_requested}")
+    return this_instance_can_run_ctx and this_instance_is_requested
+
+
+def naive_is_GEMS_instance_for_SLURM_submission():
+    """Naive check which just attempts to get the submission to the configured SLURM host.
+
+    This mimics old behviour.
+    """
+    this_host = socket.gethostname()
+    log.debug(f"This hostname is: {this_host}")
+    useGRPC = True
+
+    if this_host is not None and this_host == get_gems_slurm_host_from_env():
+        useGRPC = False
+
+    useSLURM = not useGRPC
+    log.debug(f"Is this a GEMS instance for SLURM submission? {useSLURM}")
+    return useSLURM
+
+
+def import_grpc_slurm_client():
+    global gems_grpc_slurm_client
+    gemsPath = os.environ.get("GEMSHOME")
+    if gemsPath is None:
+        log.warning("GEMSHOME is not set.  Cannot submit via gRPC.")
+        # raise EnvironmentError("Failed to submit via gRPC.  GEMSHOME is not set.")
+    sys.path.append(f"{gemsPath}/gRPC/SLURM")
+    import gems_grpc_slurm_client
+
+def import_grpc_delegator_client():
+    global gems_json_client
+    gemsPath = os.environ.get("GEMSHOME")
+    if gemsPath is None:
+        log.warning("GEMSHOME is not set.  Cannot submit via gRPC.")
+    sys.path.append(f"{gemsPath}/gRPC/JSON")
+    import json_client as gems_json_client
+
+def slurm_grpc_submit(jsonObjectString, host=None, port=None):
+    """Submit a SLURM request to the gRPC server for delegation on another GEMs instance."""
+    import_grpc_slurm_client()
+
+    log.debug(
+        "Sending SLURM request over gRPC to %s:%s... Request: %s",
+        host,
+        port,
+        jsonObjectString,
+    )
+    submission = gems_grpc_slurm_client.GemsGrpcSlurmClient(
+        json=jsonObjectString, host=host, port=port
+    )
+    return submission.response
+
+
+def json_grpc_submit(jsonObjectString, host=None, port=None):
+    """Submit a JSON request to the gRPC server for delegation on another GEMs instance."""
+    import_grpc_delegator_client()
+
+    log.debug(
+        "Sending JSON request over gRPC to %s:%s... Request: %s",
+        host,
+        port,
+        jsonObjectString,
+    )
+    submission = gems_json_client.JSONClient(
+        json=jsonObjectString, host=host, port=port
+    )
+    return submission.response

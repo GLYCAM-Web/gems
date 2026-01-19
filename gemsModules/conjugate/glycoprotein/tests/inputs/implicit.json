@@ -1,0 +1,8 @@
+{
+    "entity": {
+        "type": "GlycoProtein",
+        "inputs": {
+            "pdb": ""
+        }
+    }
+}

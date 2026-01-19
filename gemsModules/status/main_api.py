@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-from pydantic import validator, typing, Field
-from typing import Literal
+from pydantic import validator, Field
+from pydantic.typing import Literal as pyLiteral
 
 from gemsModules.common import main_api
 from gemsModules.common import main_api_entity
@@ -11,7 +11,7 @@ from gemsModules.status.main_settings import WhoIAm
 # extends main_api_entity.Entity 
 class Status_Entity(main_api_entity.Entity):
 
-    entityType : Literal['Status'] = Field(  # This is the only required field in all of the API
+    entityType : pyLiteral['Status'] = Field(  # This is the only required field in all of the API
             ...,
             title='Type',
             alias='type'

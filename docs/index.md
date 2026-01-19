@@ -48,3 +48,7 @@ a file containing a JSON object to be used as input to the delegator module.
 The delegator inspects your JSON object and, based on what it finds, either
 hands the input to the appropriate entity or, if something has gone wrong, 
 returns an error message.
+
+## Instance Configuration
+
+See [Instance Configuration](../gemsModules/systemoperations/instance_config/docs/about_instance_config.md) for more information on setting up your instance_config.json file.

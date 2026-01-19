@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Tests should be about passing invalid inputs to the delegator
 
@@ -13,7 +13,7 @@ run_Invalid_Json_Input_Response_Test()
 	# pipe reponse from delegator to grep
 	# grep for "brief" : "NotAJSONObject"
 	# grep is returning a count (-c flag)
-	if [ $(cat $invalid_Json | $GEMSHOME/bin/delegate | grep -c '"brief" : "NotAJSONObject"') != '0' ] ; then
+	if [ $(cat $invalid_Json | $GEMSHOME/bin/delegate | grep -c '"brief": "NotAJSONObject"') != '0' ] ; then
 		return 1
 	fi
 	return 0
@@ -22,10 +22,8 @@ run_Invalid_Json_Input_Response_Test()
 if run_Invalid_Json_Input_Response_Test; then
 	echo "009a -- grep did not find: brief : NotAJSONObject in response"
 	echo "009a -- exiting"
-	exit 1
-else
-	echo "009a -- passed"
+	return 1
 fi
-
-echo "All 009 tests passed"
-exit 0
+echo "009a -- passed"
+echo "Test 009 sub-tests all passed"
+return 0

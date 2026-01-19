@@ -1,0 +1,13 @@
+{
+    "entity": {
+        "type": "GlycoProtein",
+        "services": {
+            "default_Evaluate": {
+                "type": "Evaluate",
+                "inputs": {
+                    "rcsb_id": "1rvz"
+                }
+            }
+        }
+    }
+}

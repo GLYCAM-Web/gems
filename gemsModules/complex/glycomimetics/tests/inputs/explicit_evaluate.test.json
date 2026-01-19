@@ -1,0 +1,20 @@
+{
+    "entity": {
+      "type": "Glycomimetics",
+      "services": {
+        "evaluation_of_pdb": {
+          "type": "Evaluate",
+          "inputs": { 
+            "resources": [
+              {
+                "locationType": "filesystem-path-unix",
+                "resourceFormat": "chemical/pdb",
+                "resourceRole": "Complex",
+                "payload": "/programs/gems/gemsModules/complex/glycomimetics/tests/pdbs/1_3ubn_clean.pdb"
+              }
+            ] 
+          }
+        }
+      }
+    }
+  }

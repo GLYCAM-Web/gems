@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package testdelegator;
+
+service Unary{
+ rpc GetServerResponse(Message) returns (MessageResponse) {}
+}
+
+message ExecutionResult {
+    string stdout = 1;
+    string stderr = 2;
+    int32 exitCode = 3;
+    string exception = 4;  // Empty string by default if no exception occurred
+    string errorType = 5;  // Empty string by default if no error type
+}
