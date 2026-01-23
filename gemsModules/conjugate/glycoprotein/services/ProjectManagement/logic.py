@@ -12,7 +12,7 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
-def make_resources_project_specific(inputs_resources: Resources, output_resources: Resources, project_dir: Path, status_log_path: Path) -> Resources:
+def make_resources_project_specific(inputs_resources: Resources, output_resources: Resources, project_dir: str, uploads_path: str, status_log_path: Path) -> Resources:
     """ Updates the resources to be project-specific by copying them to the project directory.
     
     Also handles specific resource roles behaviour.
@@ -20,8 +20,8 @@ def make_resources_project_specific(inputs_resources: Resources, output_resource
     while input_resource := inputs_resources.pop():
         if input_resource.resourceRole == "protein-file":
             # Copy the resource to the project directory
-            project_resource = input_resource.copy_to(project_dir)
-            protein_link = project_dir / "OriginalInput.pdb"
+            project_resource = input_resource.copy_to(Path(project_dir))
+            protein_link = Path(project_dir) / "OriginalInput.pdb"
             if not protein_link.exists():
                 log.debug(f"GpB/ProjectManagement: creating symbolic link for protein file: {protein_link}")
                 if project_resource.locationType == "filesystem-path-unix":
@@ -41,7 +41,7 @@ def make_resources_project_specific(inputs_resources: Resources, output_resource
             # Need to update it for protein-file
             download_path = download_pdb_from_rcsb_by_id.execute(
                 pdb_id=input_resource.payload,
-                output_dir="/website/uploads",
+                output_dir=Path(uploads_path),
                 compressed=False
             )
             
@@ -86,7 +86,7 @@ def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
         # Update the project directory with resources and add them to the service output resources.
         log.debug("GpB/ProjectManagement: about to manage and copy input resources to project dir")
         log.debug(f"GpB/ProjectManagement: resources: {inputs.resources}")
-        make_resources_project_specific(inputs.resources, service_outputs.resources, project_dir, status_log_path)
+        make_resources_project_specific(inputs.resources, service_outputs.resources, inputs.projectDir, inputs.uploadsPath, status_log_path)
         
         # Log the initialization of the project directory
         log.debug(f"GpB/ProjectManagement: project directory initialized at {project_dir}")

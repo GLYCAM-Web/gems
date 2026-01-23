@@ -51,6 +51,11 @@ class ProjectManagement_Inputs(BaseModel):
         title="Output File Path",
         description="Full path to output file",
     )
+    uploadsPath: str = Field(
+        None,
+        title="Uploads File Path",
+        description="Parent directory that contains uploads",
+    )
     resources: Optional[Resources] = Field(
         title="Resources",
         description="List of resources to copy to project directory",

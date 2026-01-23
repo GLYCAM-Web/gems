@@ -145,6 +145,12 @@ class Transaction_Manager(ABC):
 
         # update transaction response project
         if self.response_project is not None:
+            # If the project needs updating from the responses, do that
+            self.response_project = self.project_manager.fill_response_project_from_response_entity(
+                    responseProject = self.response_project,
+                    responseEntity  = self.response_entity
+                    )
+            # Copy the finalized response project into the outgoing transaction
             self.transaction.outputs.project = self.response_project.copy(deep=True)
         else:
             log.debug("response project is None!")

@@ -28,7 +28,7 @@ class Project_Manager(ABC):
         pass
 
     @abstractmethod
-    def fill_response_project_from_response_entity(self):
+    def fill_response_project_from_response_entity(self, responseProject: Project, responseEntity: Entity):
         pass
 
 
@@ -37,5 +37,5 @@ class common_Project_Manager(Project_Manager):
         if self.incoming_project is not None:
             self.response_project = self.incoming_project
 
-    def fill_response_project_from_response_entity(self):
+    def fill_response_project_from_response_entity(self, responseProject: Project, responseEntity: Entity):
         pass

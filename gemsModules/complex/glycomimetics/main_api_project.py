@@ -17,11 +17,11 @@ class GlycomimeticsProject(Project):
     """Glycomimetics Project class"""
 
     title: str = "Initial Glycomimetics Project"
-    parent_entity: str = "complex"
-    app: str = "gm"
+    parent_entity: str = "Complex"
+    app: str = "Glycomimetics"
     requested_service: str = ""
     project_type: PyLiteral["gm"] = Field("gm", title="Type", alias="type")
-    entity_id: str = "complex/glycomimetics"
+    entity_id: str = "glycomimetics"
     service_id: constr(max_length=25) = ""  # what should this be?
     gm_utils_version: str = ""
     requesting_agent: str = "tester"

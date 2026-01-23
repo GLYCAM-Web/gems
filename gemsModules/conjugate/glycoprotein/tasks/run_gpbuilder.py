@@ -11,13 +11,12 @@ log = Set_Up_Logging(__name__)
 ic = InstanceConfig()
 
 
-def execute_gpb(project_dir: Path, pUUID) -> bool:
+def execute_gpb(project_dir: str, pUUID) -> bool:
     """
     Executes the GlycoProtein Build process using the provided input file and project directory.
 
     Args:
-        input_file (Path): The path to the input file for GlycoProtein Build.
-        project_dir (Path): The directory where the project files are located.
+        project_dir (str): The directory where the project files are located.
 
     Returns:
         bool: Returns True if something failed while trying to run GlycoProtein Build.
@@ -29,23 +28,23 @@ def execute_gpb(project_dir: Path, pUUID) -> bool:
     
     GP_BUILDER = f"$GEMSHOME/gmml2/bin/glycoproteinBuilder"
 
-    input_file = project_dir / "the_input.txt"
+    input_file = Path(project_dir + "/the_input.txt")
     if not input_file.exists():
         log.error(f"Input file does not exist: {input_file}")
         return True
 
     # Create an outputs directory if it doesn't exist
-    outputs_dir = project_dir / "outputs"
+    outputs_dir = Path(project_dir + "/outputs")
     outputs_dir.mkdir(exist_ok=True)
 
     # Set up log files
-    status_file = project_dir / "status.log"
-    log_file = project_dir / "gpBuilder.log"
-    err_file = project_dir / "gpBuilder.err"
+    status_file = Path(project_dir + "/status.log")
+    log_file = Path(project_dir + "/gpBuilder.log")
+    err_file = Path(project_dir + "/gpBuilder.err")
 
     # Create bash script to run GlycoProtein Build in background
     # TODO: parameterize/don't write to project dir
-    bash_script = project_dir / "start_build.sh"
+    bash_script = Path(project_dir + "/start_build.sh")
     
     gpbuilder_cmd = f"{GP_BUILDER} \"{input_file}\" \"{outputs_dir}\""
     build_script_str = f"""#!/bin/bash

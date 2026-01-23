@@ -29,6 +29,9 @@ class GlycoProtein_Response_Manager(Response_Manager):
             this_response.myUuid = aaop.ID_String
             self.response_entity.responses.add_response(key_string=aaop.Dictionary_Name, response=this_response)
 
+        # Copy the status from the response aaop, if it exists, into the project's status field
+
+
         log.debug("the response entity is: ")
         log.debug(self.response_entity.json(indent=2))
 

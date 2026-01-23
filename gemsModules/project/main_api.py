@@ -14,6 +14,9 @@ from gemsModules.common.main_api_notices import Notice
 
 from gemsModules.project import settings as project_settings
 
+from gemsModules.systemoperations.instance_config import InstanceConfig
+from gemsModules.systemoperations.filesystem_ops import is_directory_writable
+
 # ## TODO - a lot of this info really belongs elsewhere.  It's not really
 #    project information.  For example, 'seqID' only applies to the sequence
 #    entity.  In the GP builder, there might be many sequences, but still 
@@ -44,8 +47,10 @@ class Project(BaseModel):
     entity_id : constr(max_length=25)="project"
     service_id : constr(max_length=25)="project"
 
-    ## The filesystem_path can be used to override settings.default_filesystem_output_path
+    ## The filesystem_path can be used to override settings.default_website_filesystem_output_path
     filesystem_path : constr(max_length=255)="" 
+    ## The uploads_path can be used to override settings.default_website_filesystem_uploads_path
+    uploads_path : constr(max_length=255)="" 
     compute_cluster_filesystem_path : constr(max_length=255)=""
     service_dir : constr(max_length=255)=""
     ## The project path. Used to be output dir, but now that is reserved for subdirs.
@@ -109,61 +114,225 @@ class Project(BaseModel):
 
     def setFilesystemPath(self, specifiedPath : str = None, noClobber : bool = True) :
         log.info("setFilesystemPath was called.")
-        # If a path exists, and it shouldbot be clobbered, return
+        # If a path exists, and it should not be clobbered, return
         # This **SHOULD** be the case if the incoming JSON object specified a path.
         # For this to be true, ensure that your outgoing project is deep-copied from 
         # your incoming project before calling this.
-        if noClobber is True :
-            if self.filesystem_path is not None and self.filesystem_path != ""  :
-                message = "Filesystem Output Path already exists in Project and cannot be clobbered.  It is:\n" + str(self.filesystem_path)
-                log.debug(message)
-                return
+        if self.filesystem_path is None:
+            self.filesystem_path = ""  # shorten later if-thens
+        instanceConfigPath = InstanceConfig().get_filesystem_path(app=self.app)
         context = commonlogic.getGemsExecutionContext()
+        if noClobber is True :
+            if self.filesystem_path != ""  :
+                message = "But Filesystem Output Path already exists in Project and cannot be clobbered.  It is:\n" + str(self.filesystem_path)
+                log.debug(message)
+                if specifiedPath != None :
+                    message = "Not clobbering filesystem path specified in setFilesystemPath.  It is:\n" + str(specifiedPath)
+                    log.debug(message)
+                if instanceConfigPath != None :
+                    message = "Not clobbering filesystem path specified in the instance config.  It is:\n" + str(instanceConfigPath)
+                    log.debug(message)
+                if context == 'website' :
+                    message = "In website context, noClobber is set to True. Not overriding pre-set filesystem path."
+                    log.info(message)
+                return
         # If a path was specified, set it, if allowed, and return
-        if specifiedPath is not None :
-            if context != 'website' :
-              self.filesystem_path = specifiedPath
-              return
-        # Still here?  Try to determine the path using internal logic
-        try :
-            ## this is the userdata dir.
-            (source, path) = commonlogic.getFilesystemOutputPath()
-        except :
-            message = "There was an error while asking common for the  GEMS Filesystem Output Path. \nForgins ahead with Project default anyway."
-            log.error(message)
-            self.filesystem_path = project_settings.default_filesystem_output_path
+        if context == 'website' :
+            # TODO: collapse the next two into a single block
+            if specifiedPath is not None :
+                log.debug("An output path is specified in website context.  Checking to see if it is allowed." )
+                log.debug("The specifiedPath is: " + str(specifiedPath))
+                if specifiedPath in project_settings.allowed_website_filesystem_paths :
+                    message = "The output path is allowed.  Using it."
+                    log.debug(message)
+                    self.filesystem_path = specifiedPath
+                    return
+                else: 
+                    message = "The output path is not allowed."
+                    log.error(message)
+            if instanceConfigPath is not None :
+                log.debug("An output path is specified in website context.  Checking to see if it is allowed." )
+                log.debug("The instanceConfigPath is: " + str(instanceConfigPath))
+                if instanceConfigPath in project_settings.allowed_website_filesystem_paths :
+                    message = "The output path is allowed.  Using it."
+                    log.debug(message)
+                    self.filesystem_path = instanceConfigPath
+                    return
+                else: 
+                    message = "The output path is not allowed."
+                    log.error(message)
+            self.filesystem_path = project_settings.default_website_filesystem_output_path
+            message = "Using the default GEMS Website Filesystem Output Path: " + str(self.filesystem_path)
+            log.debug(message) 
             return
-        # Assign the path based on the return values from common
-        if source == 'Environment' :
-            message = "GEMS Filesystem Output Path was set using an environment variable to: \n" + str(path)
-            log.debug(message)
-            self.filesystem_path = path
-        elif source == 'Default':
-            if context == 'website' :    
-                if specifiedPath is not None :
-                    log.debug("An output path is specified in website context.  Checking to see if it is allowed." )
-                    if specifiedPath not in project_settings.allowed_website_filesystem_paths :
-                        message = "The specified output path is not allowed.  Using default instead."
-                        log.error(message)
-                        self.filesystem_path = project_settings.default_filesystem_output_path
-                    else:
-                        message = "The specified output path is allowed.  Using it."
-                        log.debug(message)
-                        self.filesystem_path = specifiedPath
-                else:
-                    self.filesystem_path = project_settings.default_filesystem_output_path
+        # Still here? We are not a website. See what else we can do.
+        if specifiedPath is not None :
+            if is_directory_writable(specifiedPath) :
+                message = "The specifiedPath is allowed.  Using it."
+                log.debug(message)
+                self.filesystem_path = specifiedPath
             else :
-                message = "Using the default GEMS Filesystem Output Path." 
+                message = "Cannot write to the specifiedPath: " + str(specifiedPath)
+                log.error(message)
+            return
+        if instanceConfigPath is not None :
+            if is_directory_writable(instanceConfigPath) :
+                message = "The instanceConfigPath is allowed.  Using it."
+                log.debug(message)
+                self.filesystem_path = instanceConfigPath
+            else :
+                message = "Cannot write to the instanceConfigPath: " + str(instanceConfigPath)
+                log.error(message)
+            return
+        #
+        # Try: 
+        #     standalone filesystem path
+        #     $GEMSHOME/UserSpace
+        #     $HOME/GEMS_UserSpace
+        #     website filesystem output path
+        #
+        if is_directory_writable(project_settings.default_standalone_filesystem_output_path) :
+            message = "Setting filesystem output path to: " + project_settings.default_standalone_filesystem_output_path
+            log.info(message)
+            self.filesystem_path = project_settings.default_standalone_filesystem_output_path
+            return
+        gemshome = os.environ.get("GEMSHOME")
+        testdir = gemshome + "/UserSpace"
+        if is_directory_writable(testdir) :
+            message = "Setting filesystem output path to: " + testdir
+            log.info(message)
+            self.filesystem_path = testdir
+            return
+        userhome = os.environ.get("HOME")
+        testdir = userhome + "/GEMS_UserSpace"
+        if is_directory_writable(testdir) :
+            message = "Setting filesystem output path to: " + testdir
+            log.info(message)
+            self.filesystem_path = testdir
+            return
+        if is_directory_writable(project_settings.default_standalone_filesystem_output_path) :
+            message = "Setting filesystem output path to: " + project_settings.default_website_filesystem_output_path
+            log.info(message)
+            self.filesystem_path = project_settings.default_standalone_filesystem_output_path
+            return
+        #
+        # Still here? Something went wrong. Complain.
+        message = "Unable to set the GEMS Filesystem Output Path. \nForging ahead, but not optimistic about it."
+        log.error(message)
+
+
+### TODO - Make this not be a copy-pasta of the previous function. They can be merged. For code readability,
+###        these separate names should still exist, but they should point to a single generic function.
+###        I can't do this at the moment, and I'm not sure yet the extent to which these two functions truly
+###        are analogous. (BLF 2026-01-17)
+    def setUploadsPath(self, specifiedPath : str = None, noClobber : bool = True) :
+        log.info("setUploadsPath was called.")
+        # If a path exists, and it should not be clobbered, return
+        # This **SHOULD** be the case if the incoming JSON object specified a path.
+        # For this to be true, ensure that your outgoing project is deep-copied from 
+        # your incoming project before calling this.
+        context = commonlogic.getGemsExecutionContext()
+        if self.uploads_path is None:
+            self.uploads_path = ""  # shorten later if-thens
+        instanceConfigPath = InstanceConfig().get_uploads_path(app=self.app)
+        if noClobber is True :
+            if self.uploads_path != ""  :
+                message = "Uploads Path already exists in Project and cannot be clobbered.  It is:\n" + str(self.uploads_path)
+                log.debug(message)
+                if specifiedPath != None :
+                    message = "Not clobbering uploads path specified in setUploadsPath.  It is:\n" + str(specifiedPath)
+                    log.debug(message)
+                if instanceConfigPath != None :
+                    message = "Not clobbering uploads path specified in the instance config.  It is:\n" + str(instanceConfigPath)
+                    log.debug(message)
+                if context == 'website' :
+                    message = "In website context, noClobber is set to True. Not overriding pre-set uploads_path."
+                    log.info(message)
+                return
+        # If a path was specified, set it, if allowed, and return
+        if context == 'website' :
+            # TODO: collapse the next two into a single block
+            if specifiedPath is not None :
+                log.debug("An uploads path is specified in website context.  Checking to see if it is allowed." )
+                log.debug("The specifiedPath is: " + str(specifiedPath))
+                if specifiedPath == project_settings.default_website_filesystem_uploads_path :
+                    message = "The output path is allowed.  Using it."
+                    log.debug(message)
+                    self.filesystem_path = specifiedPath
+                    return
+                else: 
+                    message = "The output path is not allowed."
+                    log.error(message)
+            if instanceConfigPath is not None :
+                log.debug("An output path is specified in website context.  Checking to see if it is allowed." )
+                log.debug("The instanceConfigPath is: " + str(instanceConfigPath))
+                if instanceConfigPath == project_settings.default_website_filesystem_uploads_path :
+                    message = "The output path is allowed.  Using it."
+                    log.debug(message)
+                    self.filesystem_path = instanceConfigPath
+                    return
+                else: 
+                    message = "The output path is not allowed."
+                    log.error(message)
+            self.uploads_path = project_settings.default_website_filesystem_uploads_path
+            message = "Using the default GEMS Website Uploads Path: " + str(self.uploads_path)
+            log.debug(message) 
+            return
+        # Still here? We are not a website. See what else we can do.
+        if specifiedPath is not None :
+            if is_directory_writable(specifiedPath) :
+                self.uploads_path = specifiedPath
+                message = "The specifiedPath is allowed.  Using it."
                 log.debug(message) 
-                self.filesystem_path = path
-        elif source == 'Error' :
-            message = "Common reported an error trying to determine the GEMS Filesystem Output Path. \nForgins ahead with Project default anyway."
-            log.error(message)
-            self.filesystem_path = project_settings.default_filesystem_output_path
-        else :
-            message = "Unknown source for GEMS Filesystem Output Path.  Using default from Project."
-            log.debug(message)
-            self.filesystem_path = project_settings.default_filesystem_output_path
+            else :
+                message = "Cannot write to the specifiedPath: " + str(specifiedPath)
+                log.error(message)
+            return
+        if instanceConfigPath is not None :
+            if is_directory_writable(instanceConfigPath) :
+                message = "The instanceConfigPath is allowed.  Using it."
+                log.debug(message)
+                self.uploads_path = instanceConfigPath
+            else :
+                message = "Cannot write to the instanceConfigPath: " + str(instanceConfigPath)
+                log.error(message)
+            return
+        #
+        # Try: 
+        #     standalone uploads_path
+        #     $GEMSHOME/UserSpace
+        #     $HOME/GEMS_UserSpace
+        #     website uploads_path
+        #
+        if is_directory_writable(project_settings.default_standalone_filesystem_uploads_path) :
+            message = "Setting uploads path to: " + project_settings.default_standalone_filesystem_uploads_path
+            log.info(message)
+            self.uploads_path = project_settings.default_standalone_filesystem_uploads_path
+            return
+        gemshome = os.environ.get("GEMSHOME")
+        testdir = gemshome + "/UserSpace"
+        if is_directory_writable(testdir) :
+            message = "Setting uploads path to: " + testdir
+            log.info(message)
+            self.uploads_path = testdir
+            return
+        userhome = os.environ.get("HOME")
+        testdir = userhome + "/GEMS_UserSpace"
+        if is_directory_writable(testdir) :
+            message = "Setting uploads path to: " + testdir
+            log.info(message)
+            self.uploads_path = testdir
+            return
+        if is_directory_writable(project_settings.default_standalone_filesystem_uploads_path) :
+            message = "Setting uploads path to: " + project_settings.default_website_filesystem_uploads_path
+            log.info(message)
+            self.uploads_path = project_settings.default_standalone_filesystem_uploads_path
+            return
+        #
+        # Still here? Something went wrong. Complain.
+        message = "Unable to set the GEMS Uploads Path. \nForging ahead, but not optimistic about it."
+        log.error(message)
+
 
 
     def setServiceDir(self, specifiedDirectory : str = None, noClobber : bool = False) :
@@ -195,8 +364,14 @@ class Project(BaseModel):
         #
         self.service_dir = os.path.join(
                 self.filesystem_path,
-                self.entity_id,
+                self.parent_entity.lower(),
                 self.service_id)
+        ### the path used to be defined this way, but that was always a bug
+        ### note that the checks above use the parent entity not the entity id
+        #self.service_dir = os.path.join(
+        #        self.filesystem_path,
+        #        self.entity_id,
+        #        self.service_id)
         message = "Setting the service dir to : " + self.service_dir
         log.debug(message)
 
@@ -234,6 +409,9 @@ class Project(BaseModel):
             return
         # If we are still here, set the directory 
         self.project_dir =  os.path.join(self.service_dir, self.pUUID )
+        if not is_directory_writable(self.project_dir) :
+            message = "Unable to write to the project directory. \nForging ahead, but not optimistic about it."
+            log.error(message)
         log.debug("self.project_dir is : >>>" + self.project_dir + "<<<")
 
     def setVersionsFilePath(self, specifiedPath : str = None, noClobber : bool = False) :
@@ -475,18 +653,18 @@ class PdbProject(Project):
         
 
 
-class GpProject(Project):
-    pdb_project_pUUID : constr(max_length=36)=""
-    status : constr(max_length=10)="submitted"
-
-    
-    def __init__(self, **data : Any):
-       super().__init__(**data)
-       self.has_input_files = False
-       self.project_type = 'gp'
-       self.parent_entity = "Conjugate"
-       self.entity_id = "conjugate"
-       self.service_id = "gp"
+#class GpProject(Project):
+#    pdb_project_pUUID : constr(max_length=36)=""
+#    status : constr(max_length=10)="submitted"
+#
+#    
+#    def __init__(self, **data : Any):
+#       super().__init__(**data)
+#       self.has_input_files = False
+#       self.project_type = 'gp'
+#       self.parent_entity = "Conjugate"
+#       self.entity_id = "glycoprotein"
+#       self.service_id = "gp"
 
 
 class GrProject(Project):

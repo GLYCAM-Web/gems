@@ -23,7 +23,8 @@ def execute(inputs: Evaluate_Inputs, options: Optional[Evaluate_Options]) -> tup
     service_outputs = Evaluate_Outputs()
     service_notices = Notices()
 
-    workdir = GlycoProteinProject.get_project_dir_from_pUUID(inputs.pUUID)
+#    workdir = GlycoProteinProject.get_project_dir_from_pUUID(inputs.pUUID)
+    workdir = inputs.projectDir
     log.debug(f"workdir: {workdir}")
     if not workdir:
         service_notices.addNotice(
@@ -68,7 +69,7 @@ def execute(inputs: Evaluate_Inputs, options: Optional[Evaluate_Options]) -> tup
                 return service_outputs, service_notices
                 
     # This generates the glycosites to choose from for GlycoProtein
-    output_csv = workdir / "the_glycosites.csv"
+    output_csv = workdir + "/the_glycosites.csv"
     gpbt_failed = execute_gpbt_wrapper(
         # TODO: ensure we're using pdb file from the project directory
         inputs.protein_file,

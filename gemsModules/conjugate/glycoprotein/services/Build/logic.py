@@ -32,8 +32,10 @@ def execute(inputs: Build_Inputs, options: BuildOptions) -> tuple[Build_Outputs,
         log.error("pUUID missing, cannot execute GlycoProtein.")
         return service_outputs, service_notices
 
-    job_dir = GlycoProteinProject.get_project_dir_from_pUUID(inputs.pUUID)
-    status_log_path = job_dir / "status.log"
+#  This should be part of inputs:Build_Inputs already
+#    job_dir = GlycoProteinProject.get_project_dir_from_pUUID(inputs.pUUID)
+    job_dir = inputs.projectDir
+    status_log_path = job_dir + "/status.log"
     
     log.debug(f"workdir: {job_dir}")
     if not job_dir:
@@ -49,7 +51,7 @@ def execute(inputs: Build_Inputs, options: BuildOptions) -> tuple[Build_Outputs,
         return service_outputs, service_notices
 
     # generate the input file for GlycoProtein
-    input_file = Path(job_dir) / "the_input.txt"
+    input_file = job_dir + "/the_input.txt"
     
     generate_input_file.execute(input_file, inputs, options)
     service_outputs.resources.append(Resource(

@@ -176,19 +176,20 @@ elif echo "$BUILD_RESPONSE" | grep started -q; then
     fi
     
     # Extract the status from the response
-    CURRENT_STATUS=$(echo "$STATUS_RESPONSE" | grep -o '"status": *"[^"]*' | cut -d'"' -f4)
-    debug_log "Current Status: $CURRENT_STATUS"
+    CURRENT_STATUS=$(echo "$STATUS_RESPONSE" | grep -o '"status": *"[^"]*' | cut -d'"' -f4 | uniq)
+    debug_log "Current Status: >>>${CURRENT_STATUS}<<<"
     
-    if [[ "$CURRENT_STATUS" == "All complete" ]]; then
+    if [[ "${CURRENT_STATUS}" == "All complete" ]]; then
       FINAL_STATUS="$CURRENT_STATUS"
       STATUS_RESPONSES="$STATUS_RESPONSES]"
       ZIP_FILE=$(find "$PROJECT_DIR_PATH" -maxdepth 1 -name "GP_project_*.zip" -print -quit)
-      if [ ! -n "$ZIP_FILE" ]; then
+      debug_log "Looking for zip file: ${ZIP_FILE}"
+      if [ ! -n "${ZIP_FILE}" ]; then
         echo "No zip file found in the project directory." >&2
         exit 3
       else
         # check archive is non-empty
-        if [ ! -s "$ZIP_FILE" ]; then
+        if [ ! -s "${ZIP_FILE}" ]; then
           echo "Zip file is empty." >&2
           exit 4
         else

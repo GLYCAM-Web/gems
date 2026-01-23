@@ -21,6 +21,7 @@ log = Set_Up_Logging(__name__)
 class GlycoProtein_Request_Data_Filler(Request_Data_Filler):
     def process(self) -> List[AAOP]:        
         this_Project : GlycoProteinProject = self.response_project
+        this_Project.add_filesystem_info()
         
         log.debug(f"GpB/Request_Data_Filler now filling data for the request.")
         log.debug(f"GpB/Request_Data_Filler: {this_Project.project_dir=}")
@@ -33,18 +34,24 @@ class GlycoProtein_Request_Data_Filler(Request_Data_Filler):
                     aaop.The_AAO.inputs.pUUID = this_Project.pUUID
                 else:
                     # if the pUUID is already set, we assume it's from a previous Evaluation request.
+                    # Honestly, it should never happen that the aaop's pUUID is different
                     this_Project.pUUID = aaop.The_AAO.inputs.pUUID
-                    this_Project.add_temporary_info()
+                    this_Project.add_filesystem_info()
+                    log.debug(f"Updated project directory: {this_Project.project_dir=}")
+
+                aaop.The_AAO.inputs.projectDir = this_Project.project_dir
                     
                 # copy inputs to resources
                 self.__fill_build_input_resources(aaop, this_Project.project_dir)
             elif aaop.AAO_Type=='Evaluate':
                 aaop.The_AAO.inputs.pUUID = this_Project.pUUID
+                aaop.The_AAO.inputs.projectDir = this_Project.project_dir
                 
                 self.__fill_evaluate_input_resources(aaop)
             elif aaop.AAO_Type=='ProjectManagement':
                 aaop.The_AAO.inputs.pUUID = this_Project.pUUID
                 aaop.The_AAO.inputs.projectDir = this_Project.project_dir
+                aaop.The_AAO.inputs.uploadsPath = this_Project.uploads_path
                 
                 self.__fill_projectman_input_resources(aaop)
                 # copy resources from requester
@@ -55,7 +62,7 @@ class GlycoProtein_Request_Data_Filler(Request_Data_Filler):
                     raise ValueError("GpB/Request_Data_Filler: Status service requires pUUID to be set.")
                 else:
                     this_Project.pUUID = aaop.The_AAO.inputs.pUUID
-                    this_Project.add_temporary_info()
+                    this_Project.add_filesystem_info()
                     aaop.The_AAO.inputs.projectDir = this_Project.project_dir
             
             log.debug(f"GpB/Request_Data_Filler filled: {aaop.The_AAO.inputs=}")

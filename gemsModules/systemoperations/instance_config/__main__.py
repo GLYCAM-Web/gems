@@ -22,26 +22,31 @@ class FileSystemPathsMixin:
     """A mixin for the InstanceConfig class to handle filesystem paths.
 
     - Honestly should have a generic filesystems_paths dict in the instance config..This just avoids breaking people's DevEnv. TODO: Fix this.
-    """
 
-    Filesystem_Paths: List[str] = []
+    This functionality mostly lives in gemsModules/project. Arguably, instance config should be part of that. (BLF 2026-01-22)
+    """
 
     def get_filesystem_path(self, app) -> str:
         """Returns the filesystem path for the given name defined in the instance config's filesystem_paths dict.
-
-        NOTE: This was changed from a single entry to a collection on 2024-4-26. Thiswill force an instance_config.json
-        update for all GEMS instances.
         """
 
         if app in self.config["filesystem_paths"]:
             return self.config["filesystem_paths"][app]
         else:
-            log.error(
-                f"Access attempted but {app} filesystem path not set in instance_config.json."
+            # This used to log and raise an error (commented out), but it should not.
+            # The project module contains safeguards against bad paths being in the instance config.
+            # The project module also has functionality for setting paths internally. And, paths can 
+            #     be set in the JSON objects, etc.
+            log.debug(
+                f"Filesystem path not set for {app} in instance_config.json. If problems occur later, this might be why."
             )
-            raise KeyError(
-                f"{app} not found in instance_config.json, available: {self.config['filesystem_paths']}"
-            )
+            return None
+#            log.error(
+#                f"Access attempted but {app} filesystem path not set in instance_config.json."
+#            )
+#            raise KeyError(
+#                f"{app} not found in instance_config.json, available: {self.config['filesystem_paths']}"
+#            )
 
     def set_filesystem_path(self, app: str, path: str):
         """Sets the filesystem path for the given app in the instance config's filesystem_paths dict."""
@@ -53,10 +58,28 @@ class FileSystemPathsMixin:
             )
             
         self.config["filesystem_paths"][app] = path
-          
 
 
-class InstanceConfig(KeyedArgManager, FileSystemPathsMixin):
+class UploadsPathsMixin:
+    """A mixin for the InstanceConfig class to handle uploads paths.
+    This is brazen copy-pasta for the object above. All of the instance config functionality should probably move to the project module and 
+    should definitely be recast using Pydantic. (BLF 2026-01-22)
+    """
+
+    def get_uploads_path(self, app) -> str:
+        """Returns the uploads path for the given app defined in the instance config's filesystem_paths dict.
+        """
+
+        if app in self.config["filesystem_paths"]:
+            return self.config["filesystem_paths"][app]
+        else:
+            log.debug(
+                f"Uploads path not set for {app} in instance_config.json. If problems occur later, this might be why."
+            )
+            return None
+
+
+class InstanceConfig(KeyedArgManager, FileSystemPathsMixin, UploadsPathsMixin):
     """The main GEMS class for parsing it's active instance configuration file.
 
     This class only has active GEMS instance specific methods and configuration.
@@ -114,6 +137,9 @@ class InstanceConfig(KeyedArgManager, FileSystemPathsMixin):
         return Path(os.getenv("GEMSHOME", "")) / name
 
     # TODO: Context needs an enum.
+    # TODO: Now that there are two competing uses of 'context' in the codebase, it doesn't just need an enum.
+    #       It needs a disambiguating name. Search for getGemsExecutionContext to find other uses.
+    #       The two uses are similar, but probably both can happen at once. (BLF 2026-01-22)
     def get_keyed_arguments(
         self,
         key: KeyedArgManager.ConfigurationKeys,
@@ -125,11 +151,17 @@ class InstanceConfig(KeyedArgManager, FileSystemPathsMixin):
 
         if context is None:
             # TODO: Is this sensible? We also need to generalize it to a systemoperation or combine with one already in use.
+            # I think that the DevEnv and the website should be expected to always declare themselves fully. If they have 
+            # not done so, I think execution should stop. 
+            # But, I will leave the current logic in place and only add an option for STANDALONE
+            # In a standalone user environment, we should grant some leeway. (BLF 2026-01-22)
             if is_GEMS_test_workflow():
                 context = self.Contexts.DEV_ENV
             elif host is not None and self.Context.SWARM in self.get_available_contexts(
                 host
             ):
                 context = self.Contexts.SWARM
+            else:  
+                context = self.Contexts.STANDALONE
 
         return super().get_keyed_arguments(key, host, context)

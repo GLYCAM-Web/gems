@@ -10,8 +10,10 @@ log = Set_Up_Logging(__name__)
 
 
 
-def execute(input_file, inputs, options) -> Path:
-    log.debug(f"Creating GP Builder input file at: {input_file}")
+def execute(input_file_string, inputs, options) -> Path:
+    log.debug(f"Creating GP Builder input file at: {input_file_string}")
+
+    input_file = Path(input_file_string)
 
     with input_file.open("w") as f:
         f.write(f"Protein:{inputs.protein_file}\n")

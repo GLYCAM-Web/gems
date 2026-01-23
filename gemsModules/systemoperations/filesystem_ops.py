@@ -1,6 +1,7 @@
 import os, glob, shutil
 from pathlib import Path
 from typing import Union, List
+import tempfile
 
 
 from gemsModules.logging.logger import Set_Up_Logging
@@ -152,3 +153,24 @@ def replace_bash_variable_in_file(path, vars: dict[str, any]):
         with open(path, "w") as f:
             f.writelines(lines)
             return True
+
+
+def is_directory_writable(directory_path):
+    """Checks if a directory is writable by attempting to create a temporary file."""
+    try:
+        # Create a temporary file in the directory
+        with tempfile.TemporaryFile(dir=directory_path) as temp_file:
+            # Try writing to the file
+            temp_file.write(b"test write")
+        return True
+    except PermissionError:
+        return False
+    except FileNotFoundError:
+        # Parent directory does not exist
+        return False
+    except OSError as e:
+        # Catch other potential OS errors (e.g., full disk, specific Windows issues)
+        print(f"An OS error occurred: {e}")
+        return False
+
+

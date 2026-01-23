@@ -19,13 +19,18 @@ class GlycoProtein_Project_Manager(Project_Manager):
         return self.response_project
 
     def instantiate_response_project(self) -> GlycoProteinProject:
-        self.response_project.add_temporary_info()
+        self.response_project.add_filesystem_info()
 
     def fill_response_project_from_incoming_project(self):
         pass
 
-    def fill_response_project_from_response_entity(self):
-        pass
+    def fill_response_project_from_response_entity(self, responseProject: GlycoProteinProject, responseEntity: GlycoProtein_Entity):
+        self.response_project = responseProject
+        for response in responseEntity.responses.__root__.values():
+            if response.typename == "Status" :
+                self.response_project.status = response.outputs.status
+        return self.response_project
+
 
 
 def testme() -> GlycoProteinProject :

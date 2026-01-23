@@ -34,7 +34,7 @@ class Evaluate_Inputs(BaseModel):
         title="Project UUID",
         description="UUID for this GlycoProtein Project, assigned automatically by GEMS",
     )
-    
+    projectDir: Optional[str] = Field("", description="Path to the project directory (including pUUID)")
     protein_file: Optional[str] = Field(None, description="Path to the protein PDB file")
     rcsb_id: Optional[str] = Field(
         None,
