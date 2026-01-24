@@ -42,7 +42,6 @@ class GlycoProteinProject(Project):
 
     
     def add_filesystem_info(self): 
-        #self.project_dir : str = str(self.get_project_dir_from_pUUID(self.pUUID))
         self.setFilesystemPath(noClobber=False)
         self.setUploadsPath(noClobber=False)
         self.setServiceDir(noClobber=False)

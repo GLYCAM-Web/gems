@@ -16,10 +16,11 @@ log = Set_Up_Logging(__name__)
 
 class mdaas_Project_Manager(Project_Manager):
     def process(self) -> MdProject:
-        self.instantiate_response_project()
+        #self.instantiate_response_project()
         # Broken:
-        # self.fill_response_project_from_incoming_project()
-        self.fill_response_project_from_response_entity()
+        self.fill_response_project_from_incoming_project()
+        ## This has to happen in the transaction manager at the end
+        #self.fill_response_project_from_response_entity()
 
         return self.response_project
 
@@ -36,20 +37,23 @@ class mdaas_Project_Manager(Project_Manager):
         return project
 
     # TODO: can probably be generalized and just pass the Project type.
+    ## There is no reason that the response project type should differ from
+    ## the incoming project type. 
     def fill_response_project_from_incoming_project(self):
-        if self.incoming_project is not None:
-            # need to combine instead of create new
-            # self.response_project = MdProject(**self.incoming_project.dict())
-            if self.response_project is None:
-                self.response_project = self.instantiate_new_project()
+        self.response_project = self.incoming_project.copy(deep=True)
+#        if self.incoming_project is not None:
+#            # need to combine instead of create new
+#            # self.response_project = MdProject(**self.incoming_project.dict())
+#            if self.response_project is None:
+#                self.response_project = self.instantiate_new_project()
+#
+#            for key, value in self.incoming_project.dict().items():
+#                if key in self.response_project.dict().keys():
+#                    self.response_project.dict()[key] = value
+#                else:
+#                    log.warning("Key %s not in response project", key)
 
-            for key, value in self.incoming_project.dict().items():
-                if key in self.response_project.dict().keys():
-                    self.response_project.dict()[key] = value
-                else:
-                    log.warning("Key %s not in response project", key)
-
-    def fill_response_project_from_response_entity(self):
+    def fill_response_project_from_response_entity(self, responseProject: MdProject=None, responseEntity: MDaaS_Entity=None):
         log.debug("fill_response_project_from_response_entity %s", self.incoming_entity)
         # Note: incoming entity may be wrong to use here.
         for service in self.incoming_entity.services.__root__.values():
@@ -68,6 +72,8 @@ class mdaas_Project_Manager(Project_Manager):
                     self.response_project.sim_length = str(
                         service.options["sim_length"]
                     )
+
+            ## TODO - add the status to the project when the Status service is requested
 
     def __handle_runmd_service(self, service):
         # TODO: We don't do any actual fs operations until we finally service ProjectManagement.

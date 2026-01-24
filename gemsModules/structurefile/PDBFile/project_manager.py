@@ -32,13 +32,16 @@ class PDBFile_Project_Manager(Project_Manager):
         return project
 
     def fill_response_project_from_incoming_project(self):
+        pass
         if self.incoming_project is not None:
             self.response_project = PDBFile_Project(**self.incoming_project.dict())
 
-    def fill_response_project_from_response_entity(self):
-        self.response_project = PDBFile_Project()
-        self.response_project.inputs = self.incoming_entity.inputs
-        self.response_project.outputs = self.incoming_entity.outputs
+    def fill_response_project_from_response_entity(self, responseProject: PDBFile_Project, responseEntity: PDBFile_Entity):
+        return super().fill_response_project_from_response_entity(responseProject=responseProject,responseEntity=responseEntity) 
+        ## The following could never have worked. Changes elsewhere made it get called.
+#        self.response_project = PDBFile_Project()
+#        self.response_project.inputs = self.incoming_entity.inputs
+#        self.response_project.outputs = self.incoming_entity.outputs
 
 
 def testme() -> PDBFile_Project:

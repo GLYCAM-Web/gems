@@ -20,16 +20,24 @@ class Project_Manager(ABC):
     def process(self) -> Project:
         self.response_project = Project()
         self.fill_response_project_from_incoming_project()
-        self.fill_response_project_from_response_entity()
+        self.fill_response_project_from_response_entity(responseProject=None, responseEntity=None)
         return self.response_project
 
-    @abstractmethod
+#    @abstractmethod
     def fill_response_project_from_incoming_project(self):
-        pass
+        self.response_project = self.incoming_project.copy(deep=True)
 
-    @abstractmethod
-    def fill_response_project_from_response_entity(self, responseProject: Project, responseEntity: Entity):
-        pass
+#    @abstractmethod
+#    def fill_response_project_from_response_entity(self, responseProject: Project, responseEntity: Entity):
+#    @abstractmethod
+    def fill_response_project_from_response_entity(self, responseProject, responseEntity):
+    ##  I hope that the following is not true.
+    ##  To use this in an entity without making changes to it, you need to declare the method like the following.
+    ##  Note especially where the declaration requires local class types. Here, the example is from the PDBFile
+    ##  entity inside the structurefile parent. It is important to return the correct type of project.
+    #   def fill_response_project_from_response_entity(self, responseProject: PDBFile_Project, responseEntity: PDBFile_Entity):
+    #       return super().fill_response_project_from_response_entity(responseProject=responseProject,responseEntity=responseEntity)
+        return responseProject
 
 
 class common_Project_Manager(Project_Manager):

@@ -21,11 +21,19 @@ class {{cookiecutter.gems_module}}_Project_Manager(Project_Manager):
     def instantiate_response_project(self) -> {{cookiecutter.gems_module}}_Project:
         self.response_project.add_temporary_info()
 
+    ## Override this method if you want to copy the incoming project to the response project.
     def fill_response_project_from_incoming_project(self):
         pass
 
-    def fill_response_project_from_response_entity(self):
-        pass
+    ## This maintains project type and does not make any changes to the project.
+    ## Override this method if you need to add information from the responses objects
+    ## to the response project 
+    def fill_response_project_from_response_entity(self, 
+            responseProject: {{cookiecutter.gems_module}}_Project, 
+            responseEntity:  {{cookiecutter.gems_module}}_Entity):
+            return super().fill_response_project_from_response_entity(
+                    responseProject=responseProject,
+                    responseEntity=responseEntity)
 
 
 def testme() -> {{cookiecutter.gems_module}}_Project :

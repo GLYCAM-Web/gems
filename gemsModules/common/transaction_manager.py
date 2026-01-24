@@ -144,12 +144,22 @@ class Transaction_Manager(ABC):
         self.transaction.outputs = self.transaction.get_API_type().parse_obj(this_json)
 
         # update transaction response project
+        #    log.debug("the pre-test response project is type " + str(type(self.response_project)))
+        #    log.debug("the pre-test response project value is " + str(self.response_project))
         if self.response_project is not None:
             # If the project needs updating from the responses, do that
+            # TODO: See if there is a kinder way to handle this. Not all projects will need to fill
+            #       project data from the responses. But, if they need that, this is the only part of
+            #       the code that has access to both pieces of information at this point in execution.
+            #       The problem is that every entity now needs to add a complex declaration of the
+            #       'project_manager.fill_response_project_from_response_entity' method.
+            #       See also common/project_manager.py.
             self.response_project = self.project_manager.fill_response_project_from_response_entity(
                     responseProject = self.response_project,
                     responseEntity  = self.response_entity
                     )
+            #    log.debug("the response project is type " + str(type(self.response_project)))
+            #    log.debug("the response project value is " + str(self.response_project))
             # Copy the finalized response project into the outgoing transaction
             self.transaction.outputs.project = self.response_project.copy(deep=True)
         else:
