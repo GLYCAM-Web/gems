@@ -4,7 +4,7 @@ from typing import Dict, List
 from gemsModules.systemoperations.instance_config.errors import InstanceConfigError
 from gemsModules.logging.logger import Set_Up_Logging
 
-from . import HostManager
+from gemsModules.systemoperations.instance_config.hosts import HostManager
 
 log = Set_Up_Logging(__name__)
 

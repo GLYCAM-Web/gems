@@ -3,7 +3,7 @@
 import os
 import socket
 
-from gemsModules.systemoperations.instance_config import InstanceConfig
+from gemsModules.systemoperations.instance_config.main import InstanceConfig
 
 from ..slurm_director_settings import Known_Slurm_Submission_Builders
 

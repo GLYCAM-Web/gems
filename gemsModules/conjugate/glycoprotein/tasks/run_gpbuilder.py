@@ -3,7 +3,7 @@ import subprocess
 import logging
 from pathlib import Path
 
-from gemsModules.systemoperations.instance_config import InstanceConfig
+from gemsModules.systemoperations.instance_config.main import InstanceConfig
 from gemsModules.logging.logger import Set_Up_Logging
 
 log = Set_Up_Logging(__name__)

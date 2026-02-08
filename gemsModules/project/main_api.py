@@ -14,7 +14,7 @@ from gemsModules.common.main_api_notices import Notice
 
 from gemsModules.project import settings as project_settings
 
-from gemsModules.systemoperations.instance_config import InstanceConfig
+from gemsModules.systemoperations.instance_config.main import InstanceConfig
 from gemsModules.systemoperations.filesystem_ops import is_directory_writable
 
 # ## TODO - a lot of this info really belongs elsewhere.  It's not really
