@@ -1,0 +1,27 @@
+{
+  "hosts": [
+    {
+      "hostname": "thoreau",
+      "contexts": [
+        "GP"
+      ],
+      "host": "172.16.4.2:42030",
+      "sbatch_arguments": {
+        "GP": {
+          "partition": "amber",
+          "time": "120",
+          "nodes": "1",
+          "tasks-per-node": "4"
+        }
+      },
+      "local_parameters": {
+        "GP": {
+          "numProcs": "4"
+        }
+      }
+    }
+  ],
+  "filesystem_paths": {
+    "GP": ""
+  }
+}

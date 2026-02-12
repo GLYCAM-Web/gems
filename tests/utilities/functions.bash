@@ -80,3 +80,31 @@ wait_for_files()
 	return 0
 }
 
+# run command and log results
+rclr()
+{
+        DoingWhat="${1}"  # Descriptive statement about what COM does, e.g., "Setting up cluster-side networking interface"
+        COM="${2}" # The command to run
+        DidWhat="${3}" # Brief title for what should have happened, e.g., "Cluster networking setup"
+
+        echo "${DoingWhat} " >> ${LOGFILE}
+        echo "The command(s) to be used: ${COM}"  >> ${LOGFILE}
+        if [ "${TEST}" == "True" ] ; then
+                echo "TEST is set to True. ${DidWhat} was not run." >> ${LOGFILE}
+                echo "[INFO] : $(date) : ${DidWhat} was not run due to TEST=True" >> ${STATUSFILE}
+        else
+                eval "${COM}" >> ${LOGFILE} 2>&1
+                returnVal=$?
+
+                if [ "${returnVal}" != "0" ] ; then
+                        echo "...${DidWhat} failed with code ${returnVal}." >> ${LOGFILE}
+                        echo "[ERROR] : $(date) : ${DidWhat} failed with code ${returnVal}" >> ${STATUSFILE}
+                        return 1
+                else
+                        echo "...${DidWhat} completed on $(date)" >> ${LOGFILE}
+                        echo "[INFO] : $(date) : ${DidWhat} completed" >> ${STATUSFILE}
+			return 0
+                fi
+        fi
+}
+

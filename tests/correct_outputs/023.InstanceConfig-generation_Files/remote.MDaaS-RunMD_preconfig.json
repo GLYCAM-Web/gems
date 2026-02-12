@@ -1,0 +1,29 @@
+{
+  "hosts": [
+    {
+      "hostname": "thoreau",
+      "contexts": [
+        "MD"
+      ],
+      "host": "172.16.4.2:42029",
+      "sbatch_arguments": {
+        "MD": {
+          "partition": "mdaas",
+          "time": "120",
+          "nodes": "1",
+          "gres": "gpu:1",
+          "tasks-per-node": "4",
+          "cpus-per-task": "7"
+        }
+      },
+      "local_parameters": {
+        "MD": {
+          "numProcs": "4"
+        }
+      }
+    }
+  ],
+  "filesystem_paths": {
+    "MD": ""
+  }
+}

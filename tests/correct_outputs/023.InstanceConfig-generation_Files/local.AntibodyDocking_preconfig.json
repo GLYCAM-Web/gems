@@ -1,0 +1,27 @@
+{
+  "hosts": [
+    {
+      "hostname": "thoreau",
+      "contexts": [
+        "AD"
+      ],
+      "host": "172.16.4.2:42030",
+      "sbatch_arguments": {
+        "AD": {
+          "partition": "amber",
+          "time": "120",
+          "nodes": "1",
+          "tasks-per-node": "4"
+        }
+      },
+      "local_parameters": {
+        "AD": {
+          "numProcs": "4"
+        }
+      }
+    }
+  ],
+  "filesystem_paths": {
+    "AD": "/website/userdata/complex/ad"
+  }
+}
