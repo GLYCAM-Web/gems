@@ -9,20 +9,20 @@ log = Set_Up_Logging(__name__)
 
 
 class SupportedExecutionContexts(str, Enum) :
-        ad = "AD"                         # Execution relevant to antibody docking (AAD2)
-        devenv = "DevEnv"                     # Execution in the GLYCAM-Web development platform
-        freetier = "FreeTier"                   # Batch computing job that is free
-        gm = "GM"                         # Execution relevant to Glycomimetics
-        gp = "GP"                         # Execution relevant to the GlycoProtein builder
-        gr = "GR"                         # Execution relevant to Grafting / GlySpec
-        md = "MD"                         # Execution relevant to Molecular Dynamics
-        pdb = "PDB"                         # Execution relevant to a PDB file
-        cb = "Sequence-Build3DStructure"  # Sequence builder (CB)
-        shortjob = "ShortJob"                   # Batch computing job that is short
-        swarm = "Swarm"                      # Execution in a cloud
-        standalone = "Standalone"                 # Local execution on command line
-        uploads = "Uploads"                     # Non-project-dir location of input files from somewhere
-        
+        ad = "AD"                  # Execution relevant to antibody docking (AAD2)
+        devenv = "DevEnv"          # Execution in the GLYCAM-Web development platform
+        freetier = "FreeTier"      # Batch computing job that is free
+        gm = "GM"                  # Execution relevant to Glycomimetics
+        gp = "GP"                  # Execution relevant to the GlycoProtein builder
+        gr = "GR"                  # Execution relevant to Grafting / GlySpec
+        md = "MD"                  # Execution relevant to Molecular Dynamics
+        pdb = "PDB"                # Execution relevant to a PDB file
+        cb = "CB"                  # Sequence builder (CB) - used to be "Sequence-Build3DStructure"
+        shortjob = "ShortJob"      # Batch computing job that is short
+        swarm = "Swarm"            # Execution in a cloud
+        standalone = "Standalone"  # Local execution on command line
+        website = "Website"        # Execution in the context of a website
+
 
 class SbatchArguments(BaseModel):
     partition: str = None
@@ -47,7 +47,7 @@ class Host(BaseModel):
 
 
 class Config(BaseModel):
-    date: str
+    date: str = None
     hosts: Optional[Dict[str, Host]] = None
     default_sbatch_arguments: Optional[Dict[str, SbatchArguments]] = None
     default_local_parameters: Optional[Dict[str, LocalParameters]] = None
@@ -55,6 +55,47 @@ class Config(BaseModel):
             default=None,
             Description="Local filesystem paths. If submitting to a cluster, where to drop files locally for transfer/sharing."
             )
+    secure_inputs_paths: Optional[Dict[SupportedExecutionContexts, str]]  = Field(
+            default=None,
+            Description="Local secured space for storing uploads, sideloads, generic input. Assumed not visible to the cluster."
+            )
+
+    def get_filesystem_path_by_service_ID(self, serviceID: str):
+        if self.filesystem_paths is None:
+            return None
+        sID=serviceID.lower()
+        try:
+            SupportedExecutionContexts[sID]
+            log.debug("the serviceID is found in SupportedExecutionContexts.")
+        except KeyError:
+            log.debug("the serviceID is NOT found in SupportedExecutionContexts.")
+            return None
+        try:
+            directory = self.filesystem_paths[sID]
+            log.debug("the serviceID is found in filesystem_paths.")
+            return directory
+        except KeyError:
+            log.debug("the serviceID is NOT found in filesystem_paths.")
+            return None
+
+    def get_secure_inputs_path_by_service_ID(self, serviceID: str):
+        if self.secure_inputs_paths is None:
+            return None
+        sID=serviceID.lower()
+        try:
+            SupportedExecutionContexts[sID]
+            log.debug("the serviceID is found in SupportedExecutionContexts.")
+        except KeyError:
+            log.debug("the serviceID is NOT found in SupportedExecutionContexts.")
+            return None
+        try:
+            directory = self.secure_inputs_paths[sID]
+            log.debug("the serviceID is found in filesystem_paths.")
+            return directory
+        except KeyError:
+            log.debug("the serviceID is NOT found in filesystem_paths.")
+            return None
+
 
 def generateSchema():
     import json

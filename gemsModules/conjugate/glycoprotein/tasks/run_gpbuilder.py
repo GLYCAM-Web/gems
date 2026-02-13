@@ -3,12 +3,13 @@ import subprocess
 import logging
 from pathlib import Path
 
-from gemsModules.deprecated.instance_config.main import InstanceConfig
+## These appear to not bs used
+#from gemsModules.deprecated.instance_config.main import InstanceConfig
+#ic = InstanceConfig()
+
 from gemsModules.logging.logger import Set_Up_Logging
 
 log = Set_Up_Logging(__name__)
-
-ic = InstanceConfig()
 
 
 def execute_gpb(project_dir: str, pUUID) -> bool:
