@@ -4,8 +4,8 @@ from pathlib import Path
 from typing import Dict, List, Optional, Union
 from abc import ABC, abstractmethod
 
-from gemsModules.systemoperations.instance_config.keyedargs import KeyedArgManager
-from gemsModules.systemoperations.instance_config.versions import DateReversioner
+from gemsModules.deprecated.instance_config.keyedargs import KeyedArgManager
+from gemsModules.deprecated.instance_config.versions import DateReversioner
 from gemsModules.systemoperations.environment_ops import (
     is_GEMS_test_workflow,
     is_GEMS_live_swarm,

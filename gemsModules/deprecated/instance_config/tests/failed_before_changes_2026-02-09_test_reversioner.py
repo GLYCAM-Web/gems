@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 import datetime
 import shutil
-from gemsModules.systemoperations.instance_config import DateReversioner
+from gemsModules.deprecated.instance_config import DateReversioner
 
 
 class TestDateReversioner(unittest.TestCase):

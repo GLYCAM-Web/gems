@@ -9,6 +9,7 @@ TEST_INPUT="/programs/gems/gemsModules/complex/glycomimetics/tests/inputs/explic
 
 #OUTPUT=$(/programs/gems/bin/delegate $TEST_INPUT)
 # same as above, but capture stderr seprately
+### THERE SHOULD BE NO STDERR
 OUTPUT=$(/programs/gems/bin/delegate $TEST_INPUT 2>/dev/null)
 
 # Check the output is a valid JSON

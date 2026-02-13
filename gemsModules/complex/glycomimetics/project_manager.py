@@ -23,7 +23,7 @@ class Glycomimetics_Project_Manager(Project_Manager):
         self.instantiate_response_project()
         # Broken:
         # self.fill_response_project_from_incoming_project()
-        self.fill_response_project_from_response_entity()
+        # self.fill_response_project_from_response_entity()
 
         return self.response_project
 
@@ -36,26 +36,32 @@ class Glycomimetics_Project_Manager(Project_Manager):
     def instantiate_new_project() -> GlycomimeticsProject:
         """This is a static method that returns a new project."""
         project = GlycomimeticsProject()
-        project.add_temporary_info()
+        project.add_filesystem_info()
         return project
 
     # TODO: can probably be generalized and just pass the Project type.
     def fill_response_project_from_incoming_project(self):
-        if self.incoming_project is not None:
-            # need to combine instead of create new
-            # self.response_project = GlycomimeticsProject(**self.incoming_project.dict())
-            if self.response_project is None:
-                self.response_project = self.instantiate_new_project()
+        pass
+#        if self.incoming_project is not None:
+#            # need to combine instead of create new
+#            # self.response_project = GlycomimeticsProject(**self.incoming_project.dict())
+#            if self.response_project is None:
+#                self.response_project = self.instantiate_new_project()
+#
+#            for key, value in self.incoming_project.dict().items():
+#                if key in self.response_project.dict().keys():
+#                    self.response_project.dict()[key] = value
+#                else:
+#                    log.warning("Key %s not in response project", key)
 
-            for key, value in self.incoming_project.dict().items():
-                if key in self.response_project.dict().keys():
-                    self.response_project.dict()[key] = value
-                else:
-                    log.warning("Key %s not in response project", key)
-
-    def fill_response_project_from_response_entity(self):
+    def fill_response_project_from_response_entity(self, responseProject: GlycomimeticsProject, responseEntity: Glycomimetics_Entity):
         # TODO: incoming entity may be wrong to use here.
         log.debug("fill_response_project_from_response_entity %s", self.incoming_entity)
+        self.response_project = responseProject
+        for response in responseEntity.responses.__root__.values():
+            if response.typename == "Status" :
+                self.response_project.status = response.outputs.status
+        return self.response_project
 
         # # Bad hack... # TODO: Ensure the IT fills inputs from resources before the PM? and ignore resources here?
         # inputs_needed = ["complex", "receptor", "ligand"]

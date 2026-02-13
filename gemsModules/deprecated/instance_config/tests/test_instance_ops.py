@@ -1,7 +1,7 @@
 import shutil
 import unittest
 import pathlib, os
-from gemsModules.systemoperations.instance_config import InstanceConfig
+from gemsModules.deprecated.instance_config import InstanceConfig
 
 
 # test case

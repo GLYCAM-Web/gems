@@ -14,11 +14,11 @@ log = Set_Up_Logging(__name__)
 class GlycoProtein_Project_Manager(Project_Manager):
 
     def process(self) -> GlycoProteinProject:
-        self.response_project = GlycoProteinProject()
         self.instantiate_response_project()
         return self.response_project
 
     def instantiate_response_project(self) -> GlycoProteinProject:
+        self.response_project = GlycoProteinProject()
         self.response_project.add_filesystem_info()
 
     def fill_response_project_from_incoming_project(self):

@@ -6,7 +6,7 @@ from pydantic import constr, Field
 from pydantic.typing import Literal as PyLiteral
 
 from gemsModules.project.main_api import Project
-from gemsModules.systemoperations.instance_config.main import InstanceConfig
+from gemsModules.deprecated.instance_config.main import InstanceConfig
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -21,7 +21,8 @@ class MdProject(Project):
     app: str = "MDaaS"
     requested_service: str = "mdaas"
     entity_id: str = "md"
-    service_id: str = "RunMD"
+    service_id: str = "md"
+    ## service_id: str = "RunMD" ## this was breaking things
     # filesystem_path unset to find out where defaults come from. TODO/N: We should consider the nature of setting defaults here.
     # filesystem_path: str = "/website/userdata"
     ##  Defaults are managed in the parent class (Project) and are set using 'add_filesystem_info()'.

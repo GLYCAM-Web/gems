@@ -20,7 +20,7 @@ Also see [using_remote_hosts.md](using_remote_hosts.md) for more information on 
 
 ## coder details
 
-Please see `$GEMSHOME/gemsModules/systemoperations/instance_config` for the InstanceConfig Python class which provides helpers for reading and updating the instance_config.json file.
+Please see `$GEMSHOME/gemsModules/deprecated/instance_config` for the InstanceConfig Python class which provides helpers for reading and updating the instance_config.json file.
 
 Curently, the only Services which use this feature are:
 - "RunMD" GEMS requests, which are executed under MDaaS-RunMD contexts. 

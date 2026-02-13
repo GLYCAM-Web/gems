@@ -2,7 +2,7 @@ import socket
 
 from gemsModules.logging.logger import Set_Up_Logging
 
-from gemsModules.systemoperations.instance_config.config import ConfigManager
+from gemsModules.deprecated.instance_config.config import ConfigManager
 
 log = Set_Up_Logging(__name__)
 

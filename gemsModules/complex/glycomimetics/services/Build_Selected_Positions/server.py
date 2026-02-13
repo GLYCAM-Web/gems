@@ -4,7 +4,7 @@ from pathlib import Path
 from .api import Build_Selected_Positions_Request, Build_Selected_Positions_Response
 from ..common_api import Position_Modification_Options
 from .logic import execute
-from gemsModules.systemoperations.instance_config.main import InstanceConfig
+from gemsModules.deprecated.instance_config.main import InstanceConfig
 
 from gemsModules.logging.logger import Set_Up_Logging
 

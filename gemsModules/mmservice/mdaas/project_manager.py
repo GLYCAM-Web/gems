@@ -16,9 +16,10 @@ log = Set_Up_Logging(__name__)
 
 class mdaas_Project_Manager(Project_Manager):
     def process(self) -> MdProject:
-        #self.instantiate_response_project()
-        # Broken:
-        self.fill_response_project_from_incoming_project()
+        # Might not be broken now:
+        self.instantiate_response_project()
+        #self.fill_response_project_from_incoming_project()
+        self.response_project.add_filesystem_info()
         ## This has to happen in the transaction manager at the end
         #self.fill_response_project_from_response_entity()
 
@@ -26,14 +27,13 @@ class mdaas_Project_Manager(Project_Manager):
 
     def instantiate_response_project(self) -> MdProject:
         self.response_project = self.instantiate_new_project()
-
-        return self.response_project
+        #return self.response_project
 
     @staticmethod
     def instantiate_new_project() -> MdProject:
         """This is a static method that returns a new project."""
         project = MdProject()
-        project.add_temporary_info()
+        project.add_filesystem_info()
         return project
 
     # TODO: can probably be generalized and just pass the Project type.
@@ -53,25 +53,31 @@ class mdaas_Project_Manager(Project_Manager):
 #                else:
 #                    log.warning("Key %s not in response project", key)
 
-    def fill_response_project_from_response_entity(self, responseProject: MdProject=None, responseEntity: MDaaS_Entity=None):
+    def fill_response_project_from_response_entity(self, responseProject: MdProject, responseEntity: MDaaS_Entity):
         log.debug("fill_response_project_from_response_entity %s", self.incoming_entity)
-        # Note: incoming entity may be wrong to use here.
-        for service in self.incoming_entity.services.__root__.values():
-            log.debug("fill_response_project_from_response_entity %s", service)
-            
-            #  Note: This may belong part of the WM, IT, or RDF.
-            if service.typename == "RunMD":
-                # TODO: Validate the service correctly within GEMS architecture...
-                log.debug(f"Found RunMD service, it has {service.options=}")
-                self.__handle_runmd_service(service)
+        self.response_project = responseProject
+        for response in responseEntity.responses.__root__.values():
+            if response.typename == "Status" :
+                self.response_project.status = response.outputs.status
+        return self.response_project
 
-            # Add request options to resposne project
-            if hasattr(service, "options") and service.options is not None:
-                log.debug(f"Found MDaaS service.options: {service.options}")
-                if "sim_length" in service.options:
-                    self.response_project.sim_length = str(
-                        service.options["sim_length"]
-                    )
+        # Note: incoming entity may be wrong to use here.
+#        for service in self.incoming_entity.services.__root__.values():
+#            log.debug("fill_response_project_from_response_entity %s", service)
+#            
+#            #  Note: This may belong part of the WM, IT, or RDF.
+#            if service.typename == "RunMD":
+#                # TODO: Validate the service correctly within GEMS architecture...
+#                log.debug(f"Found RunMD service, it has {service.options=}")
+#                self.__handle_runmd_service(service)
+#
+#            # Add request options to resposne project
+#            if hasattr(service, "options") and service.options is not None:
+#                log.debug(f"Found MDaaS service.options: {service.options}")
+#                if "sim_length" in service.options:
+#                    self.response_project.sim_length = str(
+#                        service.options["sim_length"]
+#                    )
 
             ## TODO - add the status to the project when the Status service is requested
 

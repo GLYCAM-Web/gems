@@ -3,7 +3,7 @@
 import os
 import socket
 
-from gemsModules.systemoperations.instance_config.main import InstanceConfig
+from gemsModules.deprecated.instance_config.main import InstanceConfig
 
 from ..slurm_director_settings import Known_Slurm_Submission_Builders
 
@@ -34,7 +34,7 @@ def localize_working_directory(thisSlurmJobInfo):
     return thisSlurmJobInfo
 
 
-# TODO: This is deeply coupled with systemoperations.instance_config.InstanceConfig / instance_config.json
+# TODO: This is deeply coupled with deprecated.instance_config.InstanceConfig / instance_config.json
 def execute(thisSlurmJobInfo):
     """Create a slurm submission script with context-specific sbatch arguments using the InstanceConfig."""
 

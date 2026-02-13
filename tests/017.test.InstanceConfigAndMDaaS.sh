@@ -6,23 +6,32 @@ echo "Testing $0..."
 ACTUAL_CONFIG="$GEMSHOME/instance_config.json"
 EXAMPLE_CONFIG="$ACTUAL_CONFIG.example"
 
+. './utilities/common_environment.bash'
+. './utilities/functions.bash'
+
+
 TEST_INPUTS=(
     "$GEMSHOME/gemsModules/mmservice/mdaas/tests/inputs/017.test.with-all-resources-list.json"
     "$GEMSHOME/gemsModules/mmservice/mdaas/tests/inputs/017.test.json" 
     "$GEMSHOME/gemsModules/mmservice/mdaas/tests/inputs/017.test.with-unmin-gas-and-options.json"
 )
 
+TestNum="1"
+
 # with args now
 function test_runmd() {
-    DELEGATE_TEST_INPUT=$1
-    echo "Running test with input: $DELEGATE_TEST_INPUT"
+    TestID="${1}"
+    DELEGATE_TEST_INPUT=$2
+    echo "Running test ID=${TestID} with input: $DELEGATE_TEST_INPUT"
 
     response="$(cat $DELEGATE_TEST_INPUT | $GEMSHOME/bin/delegate)"
+    echo "${response}" > "${badOutDir}/017_response_TestID_${TestID}.json"
     notices="$(echo $response | $GEMSHOME/tests/utilities/json_ripper.py notices)"
     
     if [ "$notices" != "{}" ]; then
         # TODO/N.B: This will not be a reliable test for much longer.
         printf "Failure: Notices are not empty.\n$notices\n\n"
+        echo "${notices}" > "${badOutDir}/017_notices_TestID_${TestID}.json"
         return 1
     fi
 
@@ -70,12 +79,13 @@ fi
 
 FAILED=false
 for TEST_INPUT in "${TEST_INPUTS[@]}"; do
-    test_runmd $TEST_INPUT
+    test_runmd ${TestNum} ${TEST_INPUT}
     FAILURE=$?
     if [ $FAILURE -ne 0 ]; then
         printf "MDaaS tests failed with input: $TEST_INPUT\n"
         FAILED=true
     fi
+    TestNum="$((TestNum+1))"
 done
 
 if [ $FAILED = true ]; then

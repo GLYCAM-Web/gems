@@ -4,7 +4,7 @@ from pydantic import BaseModel, validate_arguments
 from pathlib import Path
 
 from gemsModules.common.main_api_notices import Notices
-from gemsModules.systemoperations.instance_config.main import InstanceConfig
+from gemsModules.deprecated.instance_config.main import InstanceConfig
 
 from gemsModules.logging.logger import Set_Up_Logging
 

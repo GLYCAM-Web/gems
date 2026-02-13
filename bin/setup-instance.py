@@ -12,7 +12,7 @@ sys.path.append(GEMSHOME)
 sys.path.append(
     GEMSHOME + "/gemsModules"
 )  # Swarm needs /gemsModules. These sys path hacks would be simplified if we used pip to install gems.
-from gemsModules.systemoperations.instance_config import InstanceConfig
+from gemsModules.deprecated.instance_config.main import InstanceConfig
 
 
 def argparser():

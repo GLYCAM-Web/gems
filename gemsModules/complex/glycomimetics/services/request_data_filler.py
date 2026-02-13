@@ -93,15 +93,15 @@ class Glycomimetics_Request_Data_Filler(Request_Data_Filler):
         if aaop.The_AAO.inputs.complex_PDB_Filename:
             complex_filename = aaop.The_AAO.inputs.complex_PDB_Filename
         else:
-            complex_filename = self.response_project.complex
+            complex_filename = self.response_project.complexFile
         if aaop.The_AAO.inputs.ligand_PDB_Filename:
             ligand_filename = aaop.The_AAO.inputs.ligand_PDB_Filename
         else:
-            ligand_filename = self.response_project.ligand
+            ligand_filename = self.response_project.ligandFile
         if aaop.The_AAO.inputs.receptor_PDB_Filename:
             receptor_filename = aaop.The_AAO.inputs.receptor_PDB_Filename
         else:
-            receptor_filename = self.response_project.receptor
+            receptor_filename = self.response_project.receptorFile
 
         if complex_filename:
             pdb = Resource(

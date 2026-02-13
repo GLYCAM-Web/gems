@@ -3,7 +3,7 @@ import json
 import os
 import traceback
 from gemsModules.systemoperations.environment_ops import is_GEMS_test_workflow
-from gemsModules.systemoperations.instance_config.main import InstanceConfig
+from gemsModules.deprecated.instance_config.main import InstanceConfig
 from gemsModules.systemoperations import filesystem_ops
 # from .calculate_time_est_from_parm7 import parse_amber_parm7_pointers
 

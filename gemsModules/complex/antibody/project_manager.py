@@ -40,18 +40,24 @@ class Antibody_Project_Manager(Project_Manager):
         return project
 
     # TODO: can probably be generalized and just pass the Project type.
-    def fill_response_project_from_incoming_project(self):
-        if self.incoming_project is not None:
-            # need to combine instead of create new
-            # self.response_project = AntibodyProject(**self.incoming_project.dict())
-            if self.response_project is None:
-                self.response_project = self.instantiate_new_project()
+    def fill_response_project_from_incoming_project(self, responseProject: AntibodyProject, responseEntity: Antibody_Entity):
+        self.response_project = responseProject
+        for response in responseEntity.responses.__root__.values():
+            if response.typename == "Status" :
+                self.response_project.status = response.outputs.status
+        return self.response_project
 
-            for key, value in self.incoming_project.dict().items():
-                if key in self.response_project.dict().keys():
-                    self.response_project.dict()[key] = value
-                else:
-                    log.warning("Key %s not in response project", key)
+#        if self.incoming_project is not None:
+#            # need to combine instead of create new
+#            # self.response_project = AntibodyProject(**self.incoming_project.dict())
+#            if self.response_project is None:
+#                self.response_project = self.instantiate_new_project()
+#
+#            for key, value in self.incoming_project.dict().items():
+#                if key in self.response_project.dict().keys():
+#                    self.response_project.dict()[key] = value
+#                else:
+#                    log.warning("Key %s not in response project", key)
 
     def fill_response_project_from_response_entity(self):
         log.debug("fill_response_project_from_response_entity %s", self.incoming_entity)

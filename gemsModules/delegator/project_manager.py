@@ -18,6 +18,7 @@ class delegator_Project_Manager(Project_Manager):
     def fill_response_project_from_incoming_project(self):
         return None
 
-    def fill_response_project_from_response_entity(self):
-        return None
+    def fill_response_project_from_response_entity(self, responseProject: Project, responseEntity: Entity):
+        return super().fill_response_project_from_response_entity(responseProject=responseProject,responseEntity=responseEntity)
+
 

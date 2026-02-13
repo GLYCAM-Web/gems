@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from gemsModules.systemoperations.instance_config.main import InstanceConfig
+from gemsModules.deprecated.instance_config.main import InstanceConfig
 from gemsModules.logging.logger import Set_Up_Logging
 
 from .api import Build_Inputs, Build_Outputs
