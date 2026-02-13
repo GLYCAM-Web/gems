@@ -27,7 +27,8 @@ class {{cookiecutter.gems_module}}_Service_Responses(main_api_services.Service_R
 
 class {{cookiecutter.gems_module}}_Entity(main_api_entity.Entity) :
 
-    entityType : Literal['{{cookiecutter.gems_module}}'] = Field(  # This is the only required field in all of the API
+    #entityType : Literal['{{cookiecutter.gems_module}}'] =  not the module - the name of the entity is in upper camel case
+    entityType : Literal['{{cookiecutter.entity_name}}'] = Field(  # This is the only required field in all of the API
             ...,
             title='Type',
             alias='type'

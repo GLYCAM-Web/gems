@@ -12,6 +12,7 @@ TEST_INPUT="/programs/gems/gemsModules/complex/glycomimetics/tests/inputs/explic
 ### THERE SHOULD BE NO STDERR
 OUTPUT=$(/programs/gems/bin/delegate $TEST_INPUT 2>/dev/null)
 
+# TODO - Make this not silently exit on failure. Add hints about what failed and why.
 # Check the output is a valid JSON
 echo $OUTPUT | python -m json.tool >test-20-output-git-ignore-me.json
 if [ $? -ne 0 ]; then

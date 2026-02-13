@@ -48,20 +48,6 @@ class MdProject(Project):
     # TODO need protocol file in mdproject
     protocolFilesPath: str = "/programs/gems/External/MD_Utils/protocols/RoeProtocol"
 
-    ## temporary? (BLF 2026-01-24)
-    def add_temporary_info(self):
-        #ic = InstanceConfig()
-        #self.versions_file_path: str = os.path.join(self.project_dir, "VERSIONS.sh")
-        #self.project_dir: str = os.path.join(
-        #    ic.get_filesystem_path(app="MDaaS-RunMD"), self.pUUID
-        #)
-
-        self.add_filesystem_info()
-        log.debug(f"MdProject location: {self.project_dir}")
-
-        self.logs_dir: str = os.path.join(self.project_dir, "logs")
-        self.site_mode: str = "proof-of-concept"
-
     ## TODO figure out a kind way to make this generic for all methods, even those 
     ##      that do not have all these features.
     def add_filesystem_info(self):

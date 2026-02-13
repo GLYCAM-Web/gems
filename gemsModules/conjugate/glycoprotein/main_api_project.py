@@ -32,27 +32,10 @@ class GlycoProteinProject(Project):
         self.app = "GlycoProtein"
         self.requesting_agent = ""
 
-        ## These were defined, but should have been handled by the parent class
-        #project_type : PyLiteral["gp"] = Field("gp", title="Type", alias="type")  ## This is required by new behavior of pydantic? Not just text?
-        #requested_service : str = "Build"  ## Don't want to override user input
-        #entity_id : str = "conjugate.glycoprotein"  ## should not need both terms
-        #service_id : str = "gp"
-        #pUUID: constr(max_length=36) = ""
-        #project_dir: constr(max_length=255) = ""
-
-    
     def add_filesystem_info(self): 
         self.setFilesystemPath(noClobber=False)
         self.setUploadsPath(noClobber=False)
         self.setServiceDir(noClobber=False)
         self.setProjectDir(noClobber=False)
         self.setVersionsFilePath(noClobber=False)
-
-    # This is handled by the parent class
-    #@staticmethod
-    #def get_project_dir_from_pUUID(pUUID: str):
-        #return Path(
-            #InstanceConfig().get_filesystem_path(app="GlycoProtein"), pUUID
-        #)
-
 

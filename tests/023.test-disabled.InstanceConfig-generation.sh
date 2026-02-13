@@ -6,6 +6,7 @@
 ##
 ##     - The location and name of the output file 'instance_config.json' can be controlled.
 ##         Currently it only overwrites the one in GEMSHOME.
+##     - Actually, worse, it might choose to fail rather than overwrite the one in GEMSHOME.
 ##     - The JSON files output by the IC module are always the same.
 ##         The IC module does not use Pydantic, so order in the json output is not predictable.
 ##         An alternative is to use the 'jq' utility. I am doing that for now, but that's a kluge.

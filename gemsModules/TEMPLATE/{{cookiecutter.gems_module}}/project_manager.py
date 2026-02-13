@@ -19,7 +19,7 @@ class {{cookiecutter.gems_module}}_Project_Manager(Project_Manager):
         return self.response_project
 
     def instantiate_response_project(self) -> {{cookiecutter.gems_module}}_Project:
-        self.response_project.add_temporary_info()
+        self.response_project.add_filesystem_info()
 
     ## Override this method if you want to copy the incoming project to the response project.
     def fill_response_project_from_incoming_project(self):

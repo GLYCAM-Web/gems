@@ -36,7 +36,7 @@ class Antibody_Project_Manager(Project_Manager):
     def instantiate_new_project() -> AntibodyProject:
         """This is a static method that returns a new project."""
         project = AntibodyProject()
-        project.add_temporary_info()
+        project.add_filesystem_info()
         return project
 
     # TODO: can probably be generalized and just pass the Project type.

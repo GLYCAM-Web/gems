@@ -1,4 +1,5 @@
 import os
+from typing import Any
 
 from pydantic import typing, constr, Field
 
@@ -15,40 +16,44 @@ class PDBFile_Project(Project):
     Right now, this only can use the PreparePDB service.
 
     """
-
-    title: str = "very hacky initial AmberMDPrep service"
-    parent_entity: str = "structurefile"
-    app: str = "mdprep"
-    requested_service: str = "AmberMDPrep"
-    entity_id: str = "PDBFile"
-    service_id: str = "AmberMDPrep"
-    filesystem_path: str = "/website/userdata/"
-    service_dir: str = ""
-    requesting_agent: str = "tester"
-    has_input_files: bool = True
-    system_phase: constr(max_length=25) = "In solvent"
-    input_type: constr(max_length=25) = "pdb"
     pdb_filename: constr(max_length=255) = "016.AmberMDPrep.4mbzEdit.pdb"
-    u_uuid: constr(max_length=36) = " "
+    input_type: constr(max_length=25) = "pdb"
     notify: bool = True
-    upload_path: constr(max_length=255) = "/website/TESTS/pdb/"
 
-    project_type: typing.Literal["PDBFile"] = Field(
-        "PDBFile", title="Type", alias="type"
-    )
+    def __init__(self, **data : Any):
+        super().__init__(**data)
+        self.has_input_files = True
+        self.project_type = 'pdb'
+        self.parent_entity = "structurefile"
+        self.entity_id = "glycoprotein"
+        self.service_id = "pdb"
+        self.title = "very hacky initial AmberMDPrep service"
+        self.app = "mdprep"
+        self.requesting_agent = ""
+        self.requested_service = "AmberMDPrep"
+        self.uploads_path = "/website/TESTS/pdb/"
 
-    def add_temporary_info(self):
-        self.project_dir: str = os.path.join(
-            self.filesystem_path,
-            self.parent_entity,
-            self.service_dir,
-            self.project_type,
-            self.pUUID,
-        )
-        # self.compute_cluster_filesystem_path: str = self.project_dir
+    def add_filesystem_info(self):
+        self.setFilesystemPath(noClobber=False)
+        self.setUploadsPath(noClobber=False)
+        self.setServiceDir(noClobber=False)
+        self.setProjectDir(noClobber=False)
+        self.setVersionsFilePath(noClobber=False)
         self.logs_dir: str = os.path.join(self.project_dir, "logs")
         self.site_mode: str = "proof-of-concept"
         self.versions_file_path: str = os.path.join(self.project_dir, "VERSIONS.sh")
 
+    # One day, this should inject REMARK cards providing provenance for the altered PDB file
     def add_pdb_info(self):
         pass
+
+
+#    def add    temporary    info(self):  ## Keeping in case this pattern is somehow different from the above
+#        self.project_dir: str = os.path.join(
+#            self.filesystem_path,
+#            self.parent_entity,
+#            self.service_dir,
+#            self.project_type,
+#            self.pUUID,
+#        )
+#        # self.compute_cluster_filesystem_path: str = self.project_dir

@@ -21,14 +21,14 @@ class PDBFile_Project_Manager(Project_Manager):
 
     def instantiate_response_project(self) -> PDBFile_Project:
         self.response_project = PDBFile_Project()
-        self.response_project.add_temporary_info()
+        self.response_project.add_filesystem_info()
         return self.response_project
 
     @staticmethod
     def instantiate_new_project() -> PDBFile_Project:
         """This is a static method that returns a new project."""
         project = PDBFile_Project()
-        project.add_temporary_info()
+        project.add_filesystem_info()
         return project
 
     def fill_response_project_from_incoming_project(self):

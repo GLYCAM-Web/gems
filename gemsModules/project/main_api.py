@@ -622,35 +622,35 @@ class CbProject(Project):
         self.has_input_files = False
 
 
-
-class PdbProject(Project):
-    #Contains path 
-    uploaded_file_name : constr(max_length=255)=""
-    status : constr(max_length=10)="submitted"
-    u_uuid : constr(max_length=36)=""
-    pdb_id : constr(max_length=4)=""
-    input_source : constr(max_length=25)=""
-    has_input_files : bool = True
-    project_type : constr(max_length=25)='pdb'
-    parent_entity : constr(max_length=25)="StructureFile"
-    entity_id : constr(max_length=25)="structurefile"
-    service_id : constr(max_length=25)="pdb"
-
-    ## Not needed. Marked for deprecation
-    upload_path : constr(max_length=255)=""
-
-
-    def setUploadFile(self, uploadFile:str):
-        log.info("PdbProject setUploadFile was called.")
-        log.debug("uploadFile: " + uploadFile)
-        self.uploaded_file_name = uploadFile
-
-    def __init__(self, **data : Any):
-        super().__init__(**data)
-        #Service dir looks like 'structurefile/pdb'
-        self.setFilesystemPath()
-        self.setServiceDir()
-        self.loadVersionsFileInfo()
+## defined in structurefile/PDBFile/main_api_project.py
+#class PdbProject(Project):
+#    #Contains path 
+#    uploaded_file_name : constr(max_length=255)=""
+#    status : constr(max_length=10)="submitted"
+#    u_uuid : constr(max_length=36)=""
+#    pdb_id : constr(max_length=4)=""
+#    input_source : constr(max_length=25)=""
+#    has_input_files : bool = True
+#    project_type : constr(max_length=25)='pdb'
+#    parent_entity : constr(max_length=25)="StructureFile"
+#    entity_id : constr(max_length=25)="structurefile"
+#    service_id : constr(max_length=25)="pdb"
+#
+#    ## Not needed. Marked for deprecation
+#    upload_path : constr(max_length=255)=""
+#
+#
+#    def setUploadFile(self, uploadFile:str):
+#        log.info("PdbProject setUploadFile was called.")
+#        log.debug("uploadFile: " + uploadFile)
+#        self.uploaded_file_name = uploadFile
+#
+#    def __init__(self, **data : Any):
+#        super().__init__(**data)
+#        #Service dir looks like 'structurefile/pdb'
+#        self.setFilesystemPath()
+#        self.setServiceDir()
+#        self.loadVersionsFileInfo()
         
 
 
