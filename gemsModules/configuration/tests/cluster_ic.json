@@ -1,0 +1,110 @@
+{
+  "date": "2025-02-25T00:00:11.000",
+  "hosts": {
+    "grpc-default": {
+      "contexts": [
+        "DevEnv"
+      ],
+      "host": "gw-grpc-delegator",
+      "routes": [
+        "swarm"
+      ]
+    },
+    "swarm": {
+      "contexts": [
+        "ShortJob",
+        "Swarm",
+        "FreeTier",
+        "Sequence-Build3DStructure",
+        "DevEnv"
+      ],
+      "host": "gw-slurm-head",
+      "slurmport": "50052",
+      "sbatch_arguments": {},
+      "local_parameters": {}
+    },
+    "thoreau": {
+      "host": "172.16.4.2",
+      "slurmport": "42029",
+      "contexts": [
+        "AD",
+        "MD",
+        "GP"
+      ],
+      "sbatch_arguments": {
+        "MD": {
+          "partition": "mdaas",
+          "time": "120",
+          "nodes": "1",
+          "gres": "gpu:1",
+          "tasks-per-node": "4",
+          "cpus-per-task": "7"
+        },
+        "AD": {
+          "partition": "amber",
+          "time": "120",
+          "nodes": "1",
+          "tasks-per-node": "4"
+        },
+        "GP": {
+          "partition": "amber",
+          "time": "120",
+          "nodes": "1",
+          "tasks-per-node": "4"
+        }
+      },
+      "local_parameters": {
+        "MD": {
+          "numProcs": "4"
+        },
+        "AD": {
+          "numProcs": "4"
+        },
+        "GP": {
+          "numProcs": "4"
+        }
+      }
+    },
+    "harper": {
+      "host": "172.16.4.4",
+      "slurmport": "42029",
+      "contexts": [
+        "GM"
+      ],
+      "sbatch_arguments": {
+        "GM": {
+          "partition": "gm",
+          "time": "120",
+          "nodes": "1",
+          "gres": "gpu:1",
+          "tasks-per-node": "4",
+          "cpus-per-task": "7"
+        }
+      },
+      "local_parameters": {
+        "GM": {
+          "numProcs": "4"
+        }
+      }
+    }
+  },
+  "default_sbatch_arguments": {
+    "Default": {
+      "partition": "amber",
+      "time": "120",
+      "nodes": "1",
+      "tasks-per-node": "4"
+    }
+  },
+  "default_local_parameters": {
+    "Default": {
+      "numProcs": "4"
+    }
+  },
+  "filesystem_paths": {
+    "MD": "/website/userdata/mmservice/md",
+    "GM": "/website/userdata/complex/gm",
+    "AD": "/website/userdata/complex/ad",
+    "GP": "/website/userdata/conjugate/gp"
+  }
+}
