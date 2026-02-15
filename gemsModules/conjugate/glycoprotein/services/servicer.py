@@ -14,7 +14,8 @@ log = Set_Up_Logging(__name__)
 class GlycoProtein_Servicer(Servicer):
 
     def get_module_for_this_request(self, this_request_aaop: AAOP) -> Callable:
-        from .settings.service_modules import service_modules
+        from gemsModules.conjugate.glycoprotein.services.settings.service_modules import service_modules
+        log.info("GlycoProtein_Servicer get_module_for_this_request is called.")
         log.debug(f"Getting module for current request: {this_request_aaop}")
         module = service_modules[this_request_aaop.AAO_Type]
         log.debug(f"Got module we will use to serve: {module} for {this_request_aaop.AAO_Type}")       

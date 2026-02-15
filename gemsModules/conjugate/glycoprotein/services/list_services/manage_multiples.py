@@ -10,5 +10,6 @@ log = Set_Up_Logging(__name__)
 class list_services_Multiples_Manager(Multiples_Manager):
 
     def process_multiples(self) -> List[AAOP]:
+        log.info("process_multiples for list_services_Multiples_Manager is called")
         return self.process_multiples_action_First()
 

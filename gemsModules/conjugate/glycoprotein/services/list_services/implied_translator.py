@@ -15,5 +15,6 @@ class list_services_Implied_Translator(Implied_Translator):
 
     # there are no ways to imply this service
     def process(self, input_object : Implied_Services_Inputs) -> List[AAOP]:
+        log.info("process called for list_services_Implied_Translator (empty method)")
         return []
 

@@ -1,5 +1,6 @@
 from pydantic import BaseModel, ValidationError, Field
-from typing import List, Dict, Literal, Optional
+from typing import List, Dict, Literal, Optional, Any
+from pathlib import Path
 from enum import Enum
 
 from gemsModules.logging.logger import Set_Up_Logging
@@ -46,7 +47,7 @@ class Host(BaseModel):
     cluster_filesystem_paths: Optional[Dict[SupportedExecutionContexts, str]]  = None # only needed for batch execution
 
 
-class Config(BaseModel):
+class InstanceConfig(BaseModel):
     date: str = None
     hosts: Optional[Dict[str, Host]] = None
     default_sbatch_arguments: Optional[Dict[str, SbatchArguments]] = None
@@ -71,7 +72,7 @@ class Config(BaseModel):
             log.debug("the serviceID is NOT found in SupportedExecutionContexts.")
             return None
         try:
-            directory = self.filesystem_paths[sID]
+            directory = self.filesystem_paths[SupportedExecutionContexts[sID]]
             log.debug("the serviceID is found in filesystem_paths.")
             return directory
         except KeyError:
@@ -80,8 +81,11 @@ class Config(BaseModel):
 
     def get_secure_inputs_path_by_service_ID(self, serviceID: str):
         if self.secure_inputs_paths is None:
+            log.debug("self.secure_inputs_paths is None")
             return None
         sID=serviceID.lower()
+        message = "the sID is " + sID
+        log.debug(message)
         try:
             SupportedExecutionContexts[sID]
             log.debug("the serviceID is found in SupportedExecutionContexts.")
@@ -89,12 +93,32 @@ class Config(BaseModel):
             log.debug("the serviceID is NOT found in SupportedExecutionContexts.")
             return None
         try:
-            directory = self.secure_inputs_paths[sID]
+            directory = self.secure_inputs_paths[SupportedExecutionContexts[sID]]
             log.debug("the serviceID is found in filesystem_paths.")
             return directory
         except KeyError:
             log.debug("the serviceID is NOT found in filesystem_paths.")
             return None
+
+
+
+def load_instance_config(icFilePath: str = None):
+    import os
+    import json
+    import pathlib
+    if icFilePath is None :
+        icPath =  pathlib.Path(os.getenv("GEMSHOME", "")) / "instance_config.json"
+    else :
+        icPath = pathlib.Path(icFilePath)
+    message = "The path of the file is: " + str(icPath) 
+    log.debug(message)
+    json_string = pathlib.Path(icPath).read_text()
+    log.debug("The json string is:")
+    log.debug(json_string)
+    thisConfig = InstanceConfig.parse_file(icPath)
+    log.debug("This is a dump of the newly read config")
+    log.debug(str(thisConfig.json(indent=2)))
+    return thisConfig
 
 
 def generateSchema():
@@ -103,13 +127,16 @@ def generateSchema():
 
 def read_IC_from_file():
     import pathlib
-    json_string = pathlib.Path('tests/cluster_ic.json').read_text()
-    return Config.model_validate_json(json_string)
+    #json_string = pathlib.Path('tests/cluster_ic.json').read_text()
+    json_string = pathlib.Path('temp.json').read_text()
+    return InstanceConfig.parse_raw(json_string, encoding='json')
     
 
 if __name__ == "__main__":
   #generateSchema()
-  thisConfig = read_IC_from_file()
-  print(thisConfig.model_dump_json(indent=2))
+  #thisConfig = read_IC_from_file()
+  #print(thisConfig.model_dump_json(indent=2))
+  thisConfig = load_instance_config()
+  print(thisConfig.json(indent=2))
 
 

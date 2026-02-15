@@ -17,6 +17,7 @@ def make_resources_project_specific(inputs_resources: Resources, output_resource
     
     Also handles specific resource roles behaviour.
     """
+    log.info("make_resources_project_specific in the ProjectManagement service for GlycoProtein is called")
     while input_resource := inputs_resources.pop():
         if input_resource.resourceRole == "protein-file":
             # Copy the resource to the project directory
@@ -59,6 +60,7 @@ def make_resources_project_specific(inputs_resources: Resources, output_resource
 
 def execute(inputs: ProjectManagement_Inputs) -> ProjectManagement_Outputs:
     """Executes the service."""
+    log.info("execute in logic for the ProjectManagement service in GlycoProtein is called")
     log.debug(f"serviceInputs: {inputs}")
 
     service_outputs = ProjectManagement_Outputs()

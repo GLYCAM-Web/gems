@@ -26,7 +26,8 @@ class Request_Data_Filler(ABC):
         self.response_project = response_project
 
     @abstractmethod
-    def process(self) -> List[AAOP]:
+    def process(self, transaction: Transaction) -> List[AAOP]:
+        ## Needs the transaction so that it can copy in existing info from Entity and Project
         pass
 
     def fill_resources_from_requester_if_exists(self, aaop, deep_copy=False) -> bool:

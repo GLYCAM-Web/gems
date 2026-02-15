@@ -25,7 +25,8 @@ class Project_Manager(ABC):
 
 #    @abstractmethod
     def fill_response_project_from_incoming_project(self):
-        self.response_project = self.incoming_project.copy(deep=True)
+        if self.incoming_project is not None:
+            self.response_project = self.incoming_project.copy(deep=True)
 
 #    @abstractmethod
 #    def fill_response_project_from_response_entity(self, responseProject: Project, responseEntity: Entity):

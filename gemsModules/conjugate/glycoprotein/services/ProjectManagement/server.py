@@ -16,6 +16,7 @@ log = Set_Up_Logging(__name__)
 
 
 def Serve(service: ProjectManagement_Request) -> ProjectManagement_Response:
+    log.info("Serve for the ProjectManagement service in GlycoProtein is called")
     log.debug(f"GP/ProjectManagement service: {service.inputs=}")
     response = ProjectManagement_Response()
     response.outputs = execute(service.inputs)

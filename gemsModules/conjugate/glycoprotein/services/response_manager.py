@@ -11,6 +11,7 @@ log = Set_Up_Logging(__name__)
 
 class GlycoProtein_Response_Manager(Response_Manager):
     def generate_response_entity(self):
+        log.info("generate_response_entity for GlycoProtein_Response_Manager is called")
         self.response_entity = GlycoProtein_Entity(type="GlycoProtein")
         self.response_entity.notices = Notices()
         request_aaop_list=self.aaop_tree_pair.input_tree.make_linear_list()

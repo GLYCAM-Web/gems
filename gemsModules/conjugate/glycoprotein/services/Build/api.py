@@ -74,6 +74,7 @@ class Build_Inputs(BaseModel):
         description="UUID for this GlycoProtein Project, assigned automatically by GEMS",
     )
     projectDir: Optional[str] = Field("", description="Path to the project directory (including pUUID)")
+    uploadsPath: Optional[str] = Field("", description="Path to the uploads directory")
     protein_file: Optional[str] = Field("", description="Path to the protein PDB file")
     glycan_mappings: List[GlycanMapping] = Field(
         ..., description="List of residue to glycan sequence mappings"

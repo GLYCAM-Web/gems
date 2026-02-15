@@ -15,7 +15,7 @@ from gemsModules.common.main_api_notices import Notice
 from gemsModules.project import settings as project_settings
 
 #from gemsModules.deprecated.instance_config.main import InstanceConfig
-from gemsModules.configuration.main_api import Config as InstanceConfig
+from gemsModules.configuration.main_api import InstanceConfig, load_instance_config 
 from gemsModules.systemoperations.filesystem_ops import is_directory_writable
 
 # ## TODO - a lot of this info really belongs elsewhere.  It's not really
@@ -121,7 +121,8 @@ class Project(BaseModel):
         # your incoming project before calling this.
         if self.filesystem_path is None:
             self.filesystem_path = ""  # shorten later if-thens
-        instanceConfigPath = InstanceConfig().get_filesystem_path_by_service_ID(serviceID=self.service_id)
+        IC = load_instance_config()
+        instanceConfigPath = IC.get_filesystem_path_by_service_ID(serviceID=self.service_id)
         # instanceConfigPath = InstanceConfig().get_filesystem_path(app=self.app)
         context = commonlogic.getGemsExecutionContext()
         if noClobber is True :
@@ -237,7 +238,10 @@ class Project(BaseModel):
         if self.uploads_path is None:
             self.uploads_path = ""  # shorten later if-thens
         #instanceConfigPath = InstanceConfig().get_uploads_path(app=self.app)
-        instanceConfigPath = InstanceConfig().get_secure_inputs_path_by_service_ID(serviceID=self.service_id)
+        IC = load_instance_config()
+        instanceConfigPath = IC.get_secure_inputs_path_by_service_ID(serviceID=self.service_id)
+        message = "The instanceConfigPath returned was: "  + str(instanceConfigPath)
+        log.debug(message)
         if noClobber is True :
             if self.uploads_path != ""  :
                 message = "Uploads Path already exists in Project and cannot be clobbered.  It is:\n" + str(self.uploads_path)

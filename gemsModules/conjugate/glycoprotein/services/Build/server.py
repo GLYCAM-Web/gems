@@ -9,6 +9,7 @@ log = Set_Up_Logging(__name__)
 
 
 def Serve(service : BuildService_Request) -> BuildService_Response:
+    log.info("Serve is called for the Build service in GlycoProtein")
     log.debug(f"GpB/Build serving service request: {service=}")
     response = BuildService_Response()
     

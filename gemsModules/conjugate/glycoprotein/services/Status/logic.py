@@ -14,6 +14,7 @@ log = Set_Up_Logging(__name__)
 
 @validate_arguments
 def execute(inputs: Status_Inputs, options: Optional[Status_Options]) -> tuple[Status_Outputs, Notices]:
+    log.info("execute called for service Status in GlycoProtein")
     log.debug(f"serviceInputs: {inputs}")
     service_outputs = Status_Outputs()
     service_notices = Notices()

@@ -12,8 +12,10 @@ log = Set_Up_Logging(__name__)
 class GlycoProtein_Duplicate_Requests_Manager(Duplicate_Requests_Manager):
 
     def get_available_services(self) -> List[str]:
+        log.info("get_available_services in GlycoProtein_Duplicate_Requests_Manager is called")
         return get_services_list.execute()
 
     def get_duplicates_manager(self, service : str) -> Callable:
+        log.info("get_duplicates_manager in GlycoProtein_Duplicate_Requests_Manager is called")
         return duplicates_modules[service]
         

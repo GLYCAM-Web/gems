@@ -16,11 +16,11 @@ class GlycoProtein_Implied_Services_Request_Manager(Implied_Services_Request_Man
     """
 
     def get_available_services(self) -> List[str]:
-        log.debug("In GlycoProtein_Implied_Services_Request_Manager, get_available_services")
+        log.info("In GlycoProtein_Implied_Services_Request_Manager, get_available_services")
         return get_services_list.execute()
 
     def get_implicit_service_manager(self, service : str) -> Callable:
-        log.debug("In GlycoProtein_Implied_Services_Request_Manager, get_implicit_service_manager")
+        log.info("In GlycoProtein_Implied_Services_Request_Manager, get_implicit_service_manager")
         log.debug("service: " + str(service))
         return implied_modules[service]
         

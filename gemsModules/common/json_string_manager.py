@@ -28,12 +28,13 @@ class Json_String_Manager(ABC):
         self.transaction = common_Transaction()
         self.entityType = settings.WhoIAm
         self.transaction_manager_type = common_Transaction_Manager
+        self.initialize_out = False
 
     def process(self, incoming_string: str):
         brief = None
         try:
             return_value = self.transaction.process_incoming_string(
-                in_string=incoming_string, initialize_out=False
+                in_string=incoming_string, initialize_out=self.initialize_out
             )
             if return_value is None or return_value == 0:
                 self.transaction_manager = self.transaction_manager_type(

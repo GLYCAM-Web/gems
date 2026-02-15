@@ -13,6 +13,7 @@ log = Set_Up_Logging(__name__)
 class GlycoProtein_Default_Service_Request_Manager(Default_Service_Request_Manager):
 
     def get_default_services_aaops(self) -> List[AAOP]:
+        log.info("get_default_services_aaops for GlycoProtein_Default_Service_Request_Manager is called")
         this_service = GlycoProtein_Service_Request()
         this_aaop = AAOP(
             AAO_Type="Status",

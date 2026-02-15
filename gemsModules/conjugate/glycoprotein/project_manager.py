@@ -14,17 +14,24 @@ log = Set_Up_Logging(__name__)
 class GlycoProtein_Project_Manager(Project_Manager):
 
     def process(self) -> GlycoProteinProject:
-        self.instantiate_response_project()
+        log.info("Project management for GlycoProtein_Project_Manager is begun")
+        #self.instantiate_response_project()
+        if self.incoming_project is not None:
+            self.response_project = self.fill_response_project_from_incoming_project()
+        else: 
+            self.response_project = GlycoProteinProject()
         return self.response_project
 
-    def instantiate_response_project(self) -> GlycoProteinProject:
-        self.response_project = GlycoProteinProject()
-        self.response_project.add_filesystem_info()
+#    def instantiate_response_project(self) -> GlycoProteinProject:
+#        self.response_project = GlycoProteinProject()
+#        self.response_project.add_filesystem_info()
 
-    def fill_response_project_from_incoming_project(self):
-        pass
+#    def fill_response_project_from_incoming_project(self):
+#        pass
 
+    # This happens at the very end of the transaction's processing
     def fill_response_project_from_response_entity(self, responseProject: GlycoProteinProject, responseEntity: GlycoProtein_Entity):
+        log.info("Final fill of response project for GlycoProtein_Project_Manager is begun")
         self.response_project = responseProject
         for response in responseEntity.responses.__root__.values():
             if response.typename == "Status" :

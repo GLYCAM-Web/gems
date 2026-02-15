@@ -14,3 +14,4 @@ class GlycoProtein_Json_String_Manager(Json_String_Manager):
         self.transaction = GlycoProtein_Transaction()
         self.entityType = WhoIAm
         self.transaction_manager_type = GlycoProtein_Transaction_Manager
+        self.initialize_out = True

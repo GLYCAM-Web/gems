@@ -39,6 +39,7 @@ Service_Dependencies = {
 # TODO: work_flows style or workflow_manager style?
 class GlycoProtein_Workflow_Manager(Workflow_Manager):
     def get_linear_workflow_list(self) -> list[str]:
+        log.info("get_linear_workflow_list for GlycoProtein_Workflow_Manager is called")
         return [
             "Evaluate",
             # "Validate",
@@ -50,6 +51,7 @@ class GlycoProtein_Workflow_Manager(Workflow_Manager):
 
     def process(self, aaop_list):
         """This function takes a list of AAOPs and returns a list of AAOPs in the order they should be executed."""
+        log.info("processing is begun for GlycoProtein_Workflow_Manager")
         log.debug("\tthe service dependencies are: %s", Service_Dependencies)
 
         ordered = Annotated_List(ordered=True)

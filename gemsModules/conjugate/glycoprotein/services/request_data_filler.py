@@ -19,9 +19,12 @@ log = Set_Up_Logging(__name__)
 
 
 class GlycoProtein_Request_Data_Filler(Request_Data_Filler):
-    def process(self) -> List[AAOP]:        
-        this_Project : GlycoProteinProject = self.response_project
-        this_Project.add_filesystem_info()
+    def process(self, transaction) -> List[AAOP]: 
+        log.info("GlycoProtein_Request_Data_Filler process was called")
+        if self.transaction.inputs.project is None:
+            log.error("!! The incoming project is None. This could be a problem")
+            raise ValueError("Data filler requires the transaction's project to be initialized by now.")
+        this_Project = self.transaction.inputs.project.copy(deep=True)
         
         log.debug(f"GpB/Request_Data_Filler now filling data for the request.")
         log.debug(f"GpB/Request_Data_Filler: {this_Project.project_dir=}")
@@ -29,47 +32,52 @@ class GlycoProtein_Request_Data_Filler(Request_Data_Filler):
         for i, aaop in enumerate(reversed(self.aaop_list)):
             log.debug(f"GpB/Request_Data_Filler: {i}: {aaop.AAO_Type=}")
             
-            if aaop.AAO_Type=='Build':
-                if aaop.The_AAO.inputs.pUUID is None:
-                    aaop.The_AAO.inputs.pUUID = this_Project.pUUID
-                else:
-                    # if the pUUID is already set, we assume it's from a previous Evaluation request.
-                    # Honestly, it should never happen that the aaop's pUUID is different
-                    this_Project.pUUID = aaop.The_AAO.inputs.pUUID
-                    this_Project.add_filesystem_info()
-                    log.debug(f"Updated project directory: {this_Project.project_dir=}")
+            if aaop.The_AAO.inputs.pUUID is None:
+                aaop.The_AAO.inputs.pUUID = this_Project.pUUID
+            else:
+                # if the pUUID is already set, we assume it's from a previous Evaluation request.
+                # Honestly, it should never happen that the aaop's pUUID is different
+                # and, the pUUID from the project should win anyway
+                if aaop.The_AAO.inputs.pUUID != this_Project.pUUID :
+                    log.debug(f"Build AAO.inputs has a pre-filled pUUID that is not the same as the project pUUID.")
+                    log.debug(f"the The_AAO.inputs.pUUID: {aaop.The_AAO.inputs.pUUID}")
+                    log.debug(f"the Project pUUID: {this_Project.pUUID}")
+                    log.debug("This is unexpected and might cause trouble.")
+#                this_Project.pUUID = aaop.The_AAO.inputs.pUUID
+#                this_Project.add_filesystem_info()
+#                log.debug(f"Updated project directory: {this_Project.project_dir=}")
+            
+            aaop.The_AAO.inputs.projectDir = this_Project.project_dir
 
-                aaop.The_AAO.inputs.projectDir = this_Project.project_dir
-                    
+            if aaop.AAO_Type=='Build':
                 # copy inputs to resources
+                aaop.The_AAO.inputs.uploadsPath = this_Project.uploads_path
                 self.__fill_build_input_resources(aaop, this_Project.project_dir)
             elif aaop.AAO_Type=='Evaluate':
-                aaop.The_AAO.inputs.pUUID = this_Project.pUUID
-                aaop.The_AAO.inputs.projectDir = this_Project.project_dir
-                
+                aaop.The_AAO.inputs.uploadsPath = this_Project.uploads_path
                 self.__fill_evaluate_input_resources(aaop)
             elif aaop.AAO_Type=='ProjectManagement':
-                aaop.The_AAO.inputs.pUUID = this_Project.pUUID
-                aaop.The_AAO.inputs.projectDir = this_Project.project_dir
                 aaop.The_AAO.inputs.uploadsPath = this_Project.uploads_path
-                
                 self.__fill_projectman_input_resources(aaop)
                 # copy resources from requester
                 self.fill_resources_from_requester_if_exists(aaop, deep_copy=True)
-            elif aaop.AAO_Type=='Status':
-                if aaop.The_AAO.inputs.pUUID is None:
-                    log.error("GpB/Request_Data_Filler: Status service requires pUUID to be set.")
-                    raise ValueError("GpB/Request_Data_Filler: Status service requires pUUID to be set.")
-                else:
-                    this_Project.pUUID = aaop.The_AAO.inputs.pUUID
-                    this_Project.add_filesystem_info()
-                    aaop.The_AAO.inputs.projectDir = this_Project.project_dir
+#
+# Eveything for Status should already exist.
+#            elif aaop.AAO_Type=='Status':
+#                if aaop.The_AAO.inputs.pUUID is None:
+#                    log.error("GpB/Request_Data_Filler: Status service requires pUUID to be set.")
+#                    raise ValueError("GpB/Request_Data_Filler: Status service requires pUUID to be set.")
+#                else:
+#                    this_Project.pUUID = aaop.The_AAO.inputs.pUUID
+#                    this_Project.add_filesystem_info()
+#                    aaop.The_AAO.inputs.projectDir = this_Project.project_dir
             
             log.debug(f"GpB/Request_Data_Filler filled: {aaop.The_AAO.inputs=}")
         
         return self.aaop_list
 
     def __fill_build_input_resources(self, aaop: AAOP, project_dir: str):
+        log.info("GlycoProtein_Request_Data_Filler __fill_build_input_resources was called")
         log.debug(f" Filling build input resources for {aaop=}")
         if aaop.The_AAO.inputs.protein_file not in (None, ""):
             log.debug(f"Protein file found in inputs: {aaop.The_AAO.inputs.protein_file}")
@@ -112,6 +120,7 @@ class GlycoProtein_Request_Data_Filler(Request_Data_Filler):
             aaop.The_AAO.inputs.resources.add_resource(mappings)
 
     def __fill_evaluate_input_resources(self, aaop: AAOP):
+        log.info("GlycoProtein_Request_Data_Filler __fill_evaluate_input_resources was called")
         log.debug(f" Filling evaluate input resources for {aaop=}")
         
         rcsb_id = aaop.The_AAO.inputs.rcsb_id
@@ -153,6 +162,7 @@ class GlycoProtein_Request_Data_Filler(Request_Data_Filler):
         
         
     def __fill_projectman_input_resources(self, aaop: AAOP):
+        log.info("GlycoProtein_Request_Data_Filler __fill_projectman_input_resources was called")
         log.debug(f" Filling project management input resources for {aaop=}")
 
         input_json = Resource(

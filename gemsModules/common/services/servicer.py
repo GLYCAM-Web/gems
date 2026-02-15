@@ -13,6 +13,7 @@ log = Set_Up_Logging(__name__)
 class Servicer(ABC):
 
     def __init__(self, tree_pair: AAOP_Tree_Pair):
+        log.info("A Servicer is initialized")
         self.tree_pair = tree_pair
         log.debug(f"In servicer, tree_pair = {tree_pair}")
 
@@ -23,6 +24,7 @@ class Servicer(ABC):
         return service_modules[this_request_aaop.AAO_Type]
 
     def serve(self) -> AAOP_Tree_Pair:
+        log.info("serve is called for a Servicer")
         I_am_done = False
         while I_am_done == False:
             log.debug("In servicer, about to serve")

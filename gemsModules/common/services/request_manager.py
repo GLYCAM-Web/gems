@@ -33,8 +33,10 @@ log = Set_Up_Logging(__name__)
 
 
 class Request_Manager(ABC):
-    def __init__(self, entity: Entity):
-        self.entity: Entity = entity
+    def __init__(self, transaction):
+        self.transaction=transaction
+        self.entity: Entity = self.transaction.inputs.entity
+        self.incoming_project: Project = self.transaction.inputs.project
         # Project needs to be initialized by the project_manager.
         self.response_project: Project = None
 
@@ -164,7 +166,7 @@ class Request_Manager(ABC):
             transaction=transaction,
             response_project=self.response_project,
         )
-        self.deduplicated_aaop_list = self.data_filler.process()
+        self.deduplicated_aaop_list = self.data_filler.process(self.transaction)
         # RDF would be able to fill dependencies better:
         # However, if we resolve here, it seems then the aoop_list is not complete by the time we start serving
         # self.resolve_dependencies()

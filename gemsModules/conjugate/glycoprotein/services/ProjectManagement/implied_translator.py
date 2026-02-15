@@ -27,5 +27,6 @@ class ProjectManagement_Implied_Translator(Implied_Translator):
     """
 
     def process(self, input_object: ProjectManagement_Inputs) -> List[AAOP]:
+        log.info("process for ProjectManagement_Implied_Translator for Build in GlycoProtein is called")
         self.aaop_list = []
         return self.get_aaop_list()

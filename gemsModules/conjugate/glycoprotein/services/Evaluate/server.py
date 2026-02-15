@@ -10,6 +10,7 @@ log = Set_Up_Logging(__name__)
 
 
 def Serve(service : EvaluateService_Request) -> EvaluateService_Response:
+    log.info("Serve for service Evaluate in GlycoProtein is called")
     log.debug(f"GP/Evaluate serving service request: {service=}")
     response = EvaluateService_Response()
     

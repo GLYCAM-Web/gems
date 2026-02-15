@@ -21,6 +21,7 @@ class Transaction_Manager(ABC):
     """Manages a Transaction."""
 
     def __init__(self, transaction: Transaction):
+        log.info("A transaction manager was initialized")
         # Transaction
         self.transaction = transaction
         self.incoming_entity = transaction.inputs.entity
@@ -46,6 +47,7 @@ class Transaction_Manager(ABC):
 
         Must override this method in a subclass to define your custom Entity's local modules.
         """
+        log.info("Local modules for a transaction manager were set")
         self.request_manager_type = common_Request_Manager
         self.aaop_tree_pair_manager_type = AAOP_Tree_Pair_Generator
         self.this_servicer_type = commonservices_Servicer
@@ -54,7 +56,7 @@ class Transaction_Manager(ABC):
 
     def process(self):
         """Process the incoming entity and project bundled in a new Transaction."""
-        log.debug("Processing transaction")
+        log.info("Processing for a transaction manager is begun")
 
         self.manage_requests()
         self.generate_aaop_tree_pair()
@@ -68,16 +70,16 @@ class Transaction_Manager(ABC):
 
     def manage_requests(self):
         """Manage the Transaction's Requests from the incoming Entity."""
-        log.debug("about to manage requests")
+        log.info("Request management for a transaction manager is begun")
 
-        self.request_manager = self.request_manager_type(entity=self.incoming_entity)
+        self.request_manager = self.request_manager_type(transaction=self.transaction)
         self.aaop_request_list: List[AAOP] = self.request_manager.process()
 
         log.debug("\tthe aaop request list is: %s", self.aaop_request_list)
 
     def generate_aaop_tree_pair(self):
         """Generate the AAOP Tree Pair from the AAOP Request List."""
-        log.debug("about to generate aaop tree pair")
+        log.info("AAOP Tree Pair generation for a transaction manager is begun")
 
         self.aaop_tree_pair_manager = self.aaop_tree_pair_manager_type(
             aaop_request_list=self.aaop_request_list
@@ -89,7 +91,7 @@ class Transaction_Manager(ABC):
 
     def manage_project(self):
         """Manage the Response project using information from the incoming Entity and incoming Project."""
-        log.debug("about to manage project")
+        log.info("Project management for a transaction manager is begun")
 
         self.project_manager = self.project_manager_type(
             incoming_project=self.incoming_project, entity=self.incoming_entity
@@ -110,7 +112,7 @@ class Transaction_Manager(ABC):
 
         This will update the Response Tree in the AAOP Tree Pair by actually running the services on the Request Tree.
         """
-        log.debug("about to invoke the following servicer: %s", self.this_servicer_type)
+        log.info("A servicer of type %s is begun for a transaction manager is begun", self.this_servicer_type)
 
         self.this_servicer = self.this_servicer_type(tree_pair=self.aaop_tree_pair)
         log.debug("\tabout to serve")
@@ -124,7 +126,7 @@ class Transaction_Manager(ABC):
 
         This will generate the Response Entity from the Response Tree in the AAOP Tree Pair.
         """
-        log.debug("about to manage responses")
+        log.info("Response management for a transaction manager is begun")
 
         self.response_manager = self.response_manager_type(
             aaop_tree_pair=self.aaop_tree_pair
@@ -136,7 +138,7 @@ class Transaction_Manager(ABC):
 
     def update_transaction(self):
         """Update the Transaction from the Response Entity."""
-        log.debug("about to update transaction")
+        log.info("Final transaction update is begun")
 
         # get transaction outputs from response entity
         this_json = {"entity": self.response_entity.dict(by_alias=True)}
