@@ -52,7 +52,7 @@ def execute(inputs: Evaluate_Inputs, options: Optional[Evaluate_Options]) -> tup
             log.error("RCSB ID is required for evaluation if no protein_file is given.")
             return service_outputs, service_notices
         else:
-            default_pdb = str(workdir / "OriginalInput.pdb")
+            default_pdb = str(workdir + "/OriginalInput.pdb")
             if Path(default_pdb).exists():
                 log.debug(f"Using default protein file: {default_pdb}")
                 # We update input here because PM service resolved the RCSB ID to a protein file.
