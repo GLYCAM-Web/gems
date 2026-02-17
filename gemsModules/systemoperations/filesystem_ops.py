@@ -174,3 +174,13 @@ def is_directory_writable(directory_path):
         return False
 
 
+def write_string_to_file(theString, filePath, writeMode : str = 'w'):
+    # log.info("writeStringToFile() was called.\n")
+    try:
+        with open(filePath, writeMode, encoding='utf-8') as file:
+           file.write(theString)
+    except Exception as error:
+        log.error("There was a problem writing the request to file.")
+        raise error
+
+

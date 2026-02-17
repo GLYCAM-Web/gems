@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from abc import ABC, abstractmethod
 from typing import List
+import os
 
 from gemsModules.common.action_associated_objects import AAOP
 from gemsModules.common.action_associated_objects import AAOP_Tree_Pair
@@ -11,6 +12,8 @@ from gemsModules.common.services.response_manager import common_Response_Manager
 from gemsModules.common.services.workflow_manager import common_Workflow_Manager
 from gemsModules.common.services.aaop_tree_pair_manager import AAOP_Tree_Pair_Generator
 from gemsModules.common.services.servicer import commonservices_Servicer
+
+from gemsModules.systemoperations.filesystem_ops import is_directory_writable, write_string_to_file
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -105,6 +108,20 @@ class Transaction_Manager(ABC):
 
         self.request_manager.fill_request_data_needs(self.transaction)
 
+        if is_directory_writable(self.incoming_project.logs_dir) :
+            write_string_to_file(
+                    self.transaction.incoming_string,
+                    os.path.join(self.incoming_project.logs_dir, "request-raw.json")
+                    )
+            initialized_request = self.transaction.inputs.json(indent=2, by_alias=True)
+            write_string_to_file(
+                    initialized_request,
+                    os.path.join(self.incoming_project.logs_dir, "request-initialized.json")
+                    )
+        else :
+            log.debug("Unable to write request json files to logs directory.")
+
+
         log.debug(self.aaop_request_list)
 
     def invoke_servicer(self):
@@ -166,6 +183,15 @@ class Transaction_Manager(ABC):
             self.transaction.outputs.project = self.response_project.copy(deep=True)
         else:
             log.debug("response project is None!")
+
+        if is_directory_writable(self.incoming_project.logs_dir) :
+            response_string = self.transaction.outputs.json(indent=2, by_alias=True)
+            write_string_to_file(
+                    response_string,
+                    os.path.join(self.incoming_project.logs_dir, "response.json")
+                    )
+        else :
+            log.debug("Unable to write response json file to logs directory.")
 
         log.debug("\tthe transaction outputs are: ")
         log.debug(self.transaction.outputs.json(indent=2, by_alias=True))
