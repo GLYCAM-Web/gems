@@ -114,7 +114,7 @@ for service in ${Services[@]} ; do
 done
 
 ## This has to wait for the end because I didn't save the interim versions
-if ! filesAreSame "${GEMSHOME}/instance_config.json"  "${correctFilesPath}/instance_config.json" ; then
+if ! filesAreSame "${GEMSHOME}/instance_config.json"  "${correctFilesPath}/not-ignored_instance_config.json" ; then
 	echo "the instance config files are not the same"
 	oFailedOverall="1"
 	passedSum="$((passedSum+oFailedOverall))"

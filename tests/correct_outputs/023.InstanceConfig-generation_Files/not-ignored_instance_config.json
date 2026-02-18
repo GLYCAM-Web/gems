@@ -1,0 +1,166 @@
+{
+  "date": "2025-02-25T00:00:11.000",
+  "hosts": {
+    "grpc-default": {
+      "contexts": [
+        "DevEnv"
+      ],
+      "host": "gw-grpc-delegator",
+      "routes": [
+        "swarm"
+      ]
+    },
+    "swarm": {
+      "contexts": [
+        "DevEnv",
+        "ShortJob",
+        "Sequence-Build3DStructure",
+        "Glycomimetics",
+        "Swarm",
+        "GlycoProtein",
+        "MDaaS-RunMD",
+        "FreeTier"
+      ],
+      "host": "gw-slurm-head",
+      "slurmport": "50052",
+      "sbatch_arguments": {
+        "MDaaS-RunMD": {
+          "partition": "amber",
+          "time": "120",
+          "nodes": "1",
+          "tasks-per-node": "4"
+        },
+        "Glycomimetics": {
+          "partition": "gm",
+          "time": "120",
+          "nodes": "1",
+          "tasks-per-node": "4"
+        },
+        "GlycoProtein": {
+          "partition": "amber",
+          "time": "120",
+          "nodes": "1",
+          "tasks-per-node": "4"
+        }
+      },
+      "local_parameters": {
+        "MDaaS-RunMD": {
+          "numProcs": "4"
+        },
+        "Glycomimetics": {
+          "numProcs": "4"
+        },
+        "GlycoProtein": {
+          "numProcs": "4"
+        }
+      }
+    },
+    "localhost": {
+      "host": "thortunnel",
+      "slurmport": "50052",
+      "contexts": [
+        "AntibodyDocking"
+      ],
+      "sbatch_arguments": {
+        "AntibodyDocking": {
+          "partition": "amber",
+          "time": "120",
+          "nodes": "1",
+          "tasks-per-node": "4"
+        }
+      },
+      "local_parameters": {
+        "AntibodyDocking": {
+          "numProcs": "4"
+        }
+      }
+    },
+    "thoreau": {
+      "host": "172.16.4.2",
+      "slurmport": "42029",
+      "contexts": [
+        "AD",
+        "GP",
+        "MD"
+      ],
+      "sbatch_arguments": {
+        "MD": {
+          "partition": "mdaas",
+          "time": "120",
+          "nodes": "1",
+          "gres": "gpu:1",
+          "tasks-per-node": "4",
+          "cpus-per-task": "7"
+        },
+        "AD": {
+          "partition": "amber",
+          "time": "120",
+          "nodes": "1",
+          "tasks-per-node": "4"
+        },
+        "GP": {
+          "partition": "amber",
+          "time": "120",
+          "nodes": "1",
+          "tasks-per-node": "4"
+        }
+      },
+      "local_parameters": {
+        "MD": {
+          "numProcs": "4"
+        },
+        "AD": {
+          "numProcs": "4"
+        },
+        "GP": {
+          "numProcs": "4"
+        }
+      }
+    },
+    "harper": {
+      "host": "172.16.4.4",
+      "slurmport": "42029",
+      "contexts": [
+        "GM"
+      ],
+      "sbatch_arguments": {
+        "GM": {
+          "partition": "gm",
+          "time": "120",
+          "nodes": "1",
+          "gres": "gpu:1",
+          "tasks-per-node": "4",
+          "cpus-per-task": "7"
+        }
+      },
+      "local_parameters": {
+        "GM": {
+          "numProcs": "4"
+        }
+      }
+    }
+  },
+  "default_sbatch_arguments": {
+    "Default": {
+      "partition": "amber",
+      "time": "120",
+      "nodes": "1",
+      "tasks-per-node": "4"
+    }
+  },
+  "default_local_parameters": {
+    "Default": {
+      "numProcs": "4"
+    }
+  },
+  "filesystem_paths": {
+    "MDaaS-RunMD": "/website/userdata/mmservice/md",
+    "Glycomimetics": "/website/userdata/complex/gm",
+    "AntibodyDocking": "/website/userdata/complex/ad",
+    "GlycoProtein": "/website/userdata/conjugate/gp",
+    "MD": "/website/userdata/mmservice/md",
+    "GM": "/website/userdata/complex/gm",
+    "AD": "/website/userdata/complex/ad",
+    "GP": "/website/userdata/conjugate/gp"
+  }
+}
