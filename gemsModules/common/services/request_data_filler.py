@@ -63,6 +63,6 @@ class Request_Data_Filler(ABC):
 
 
 class common_Request_Data_Filler(Request_Data_Filler):
-    def process(self) -> List[AAOP]:
+    def process(self, transaction: Transaction) -> List[AAOP]:
         log.debug("common_Request_Data_Filler.process() called.")
         return self.aaop_list

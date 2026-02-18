@@ -19,7 +19,7 @@ log = Set_Up_Logging(__name__)
 
 
 class PDBFile_Request_Data_Filler(Request_Data_Filler):
-    def process(self) -> list[AAOP]:
+    def process(self, transaction) -> list[AAOP]:
         """Fill in any data required in the service request aaop_list."""
         for i, aaop in enumerate(reversed(self.aaop_list)):
             log.debug(f"i: {i}, {aaop.AAO_Type=}")

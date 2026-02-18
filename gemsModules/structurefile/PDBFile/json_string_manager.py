@@ -17,3 +17,5 @@ class PDBFile_Json_String_Manager(Json_String_Manager):
         self.transaction = PDBFile_Transaction()
         self.entityType = WhoIAm
         self.transaction_manager_type = PDBFile_Transaction_Manager
+        self.initialize_out = True
+

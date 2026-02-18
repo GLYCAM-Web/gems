@@ -14,3 +14,5 @@ class MDaaS_Json_String_Manager(Json_String_Manager):
         self.transaction = MDaaS_Transaction()
         self.entityType = WhoIAm
         self.transaction_manager_type = mdaas_Transaction_Manager
+        self.initialize_out = True
+

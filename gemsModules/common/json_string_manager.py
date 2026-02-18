@@ -31,6 +31,7 @@ class Json_String_Manager(ABC):
         self.initialize_out = False
 
     def process(self, incoming_string: str):
+        log.info("process for Common's Json_String_Manager is called")
         brief = None
         try:
             return_value = self.transaction.process_incoming_string(

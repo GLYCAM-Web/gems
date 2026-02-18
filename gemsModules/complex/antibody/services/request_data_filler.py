@@ -23,7 +23,7 @@ log = Set_Up_Logging(__name__)
 
 
 class Antibody_Request_Data_Filler(Request_Data_Filler):
-    def process(self) -> list[AAOP]:
+    def process(self, transaction) -> list[AAOP]:
         """Fill in any data required in the service request aaop_list."""
         
         # We will fill all AAOPs in order, ensuring PM aaop exists before we depend on project paths.

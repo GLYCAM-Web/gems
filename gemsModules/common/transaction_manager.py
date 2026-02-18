@@ -108,18 +108,19 @@ class Transaction_Manager(ABC):
 
         self.request_manager.fill_request_data_needs(self.transaction)
 
-        if is_directory_writable(self.incoming_project.logs_dir) :
-            write_string_to_file(
-                    self.transaction.incoming_string,
-                    os.path.join(self.incoming_project.logs_dir, "request-raw.json")
-                    )
-            initialized_request = self.transaction.inputs.json(indent=2, by_alias=True)
-            write_string_to_file(
-                    initialized_request,
-                    os.path.join(self.incoming_project.logs_dir, "request-initialized.json")
-                    )
-        else :
-            log.debug("Unable to write request json files to logs directory.")
+        if self.incoming_project not in (None,""):
+            if is_directory_writable(self.incoming_project.logs_dir) :
+                write_string_to_file(
+                        self.transaction.incoming_string,
+                        os.path.join(self.incoming_project.logs_dir, "request-raw.json")
+                        )
+                initialized_request = self.transaction.inputs.json(indent=2, by_alias=True)
+                write_string_to_file(
+                        initialized_request,
+                        os.path.join(self.incoming_project.logs_dir, "request-initialized.json")
+                        )
+            else :
+                log.debug("Unable to write request json files to logs directory.")
 
 
         log.debug(self.aaop_request_list)
@@ -184,14 +185,15 @@ class Transaction_Manager(ABC):
         else:
             log.debug("response project is None!")
 
-        if is_directory_writable(self.incoming_project.logs_dir) :
-            response_string = self.transaction.outputs.json(indent=2, by_alias=True)
-            write_string_to_file(
-                    response_string,
-                    os.path.join(self.incoming_project.logs_dir, "response.json")
-                    )
-        else :
-            log.debug("Unable to write response json file to logs directory.")
+        if self.incoming_project not in (None,""):
+            if is_directory_writable(self.incoming_project.logs_dir) :
+                response_string = self.transaction.outputs.json(indent=2, by_alias=True)
+                write_string_to_file(
+                        response_string,
+                        os.path.join(self.incoming_project.logs_dir, "response.json")
+                        )
+            else :
+                log.debug("Unable to write response json file to logs directory.")
 
         log.debug("\tthe transaction outputs are: ")
         log.debug(self.transaction.outputs.json(indent=2, by_alias=True))

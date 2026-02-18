@@ -13,11 +13,14 @@ log = Set_Up_Logging(__name__)
 class Redirector_Json_String_Manager(Json_String_Manager):
 
     def get_local_components(self):
+        log.info("get_local_components for Redirector_Json_String_Manager is called")
         self.transaction = Redirector_Transaction()
         self.entityType = WhoIAm
         self.transaction_manager_type = None
+        self.initialize_out = False
 
     def process(self, incoming_string: str):
+        log.info("process for Redirector_Json_String_Manager is called")
         try: 
             return_value=self.transaction.process_incoming_string(in_string=incoming_string, initialize_out=False)
         except ValidationError as e:
@@ -38,6 +41,8 @@ class Redirector_Json_String_Manager(Json_String_Manager):
 class Delegator_Json_String_Manager(Json_String_Manager):
 
     def get_local_components(self):
+        log.info("get_local_components for Delegator_Json_String_Manager is called")
         self.transaction = Delegator_Transaction()
         self.entityType = WhoIAm
         self.transaction_manager_type = delegator_Transaction_Manager
+        self.initialize_out = False

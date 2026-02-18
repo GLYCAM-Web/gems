@@ -23,6 +23,13 @@ class SupportedExecutionContexts(str, Enum) :
         swarm = "Swarm"            # Execution in a cloud
         standalone = "Standalone"  # Local execution on command line
         website = "Website"        # Execution in the context of a website
+        ## The following allow for backwards compatibility and some user-friendly verbosity
+        cbAlso = "Sequence-Build3DStructure"
+        gmAlso = "Glycomimetics"
+        gpAlso = "GlycoProtein"
+        mdAlso = "MDaaS-RunMD"
+        adAlso = "AntibodyDocking"
+
 
 
 class SbatchArguments(BaseModel):

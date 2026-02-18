@@ -27,7 +27,7 @@ class mdaas_Request_Data_Filler(Request_Data_Filler):
     # self.project = project
 
     # No data to fill here.
-    def process(self) -> list[AAOP]:
+    def process(self, transaction) -> list[AAOP]:
         """Fill in any data required in the service request aaop_list."""
         
         # TODO: Ordering and workflow manager compatibility

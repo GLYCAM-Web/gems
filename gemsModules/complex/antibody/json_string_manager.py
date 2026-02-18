@@ -18,3 +18,5 @@ class Antibody_Json_String_Manager(Json_String_Manager):
         self.transaction = Antibody_Transaction()
         self.entityType = WhoIAm
         self.transaction_manager_type = Antibody_Transaction_Manager
+        self.initialize_out = True
+

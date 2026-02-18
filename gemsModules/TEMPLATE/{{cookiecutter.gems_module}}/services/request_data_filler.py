@@ -19,7 +19,7 @@ class {{cookiecutter.gems_module}}_Request_Data_Filler(Request_Data_Filler):
         # self.project = project
 
     # No data to fill here.
-    def process(self) -> List[AAOP]:
+    def process(self, transaction) -> List[AAOP]:
         for aaop in self.aaop_list:
             if aaop.Dictionary_Name=='{{cookiecutter.service_name}}':
                 from gemsModules.{{cookiecutter.gems_module}}.services.{{cookiecutter.service_name}} import api

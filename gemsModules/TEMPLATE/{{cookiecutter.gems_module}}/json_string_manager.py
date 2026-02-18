@@ -14,3 +14,4 @@ class {{cookiecutter.gems_module}}_Json_String_Manager(Json_String_Manager):
         self.transaction = {{cookiecutter.gems_module}}_Transaction()
         self.entityType = WhoIAm
         self.transaction_manager_type = {{cookiecutter.gems_module}}_Transaction_Manager
+        self.initialize_out = True

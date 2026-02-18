@@ -14,5 +14,5 @@ log = Set_Up_Logging(__name__)
 class delegator_Request_Data_Filler(Request_Data_Filler):
         
     # No data to fill here.
-    def process(self) -> List[AAOP]:
+    def process(self, transaction=None) -> List[AAOP]:
         return self.aaop_list
