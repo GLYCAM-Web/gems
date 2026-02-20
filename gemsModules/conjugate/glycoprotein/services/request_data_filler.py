@@ -51,6 +51,7 @@ class GlycoProtein_Request_Data_Filler(Request_Data_Filler):
 
             if aaop.AAO_Type=='Build':
                 # copy inputs to resources
+                aaop.The_AAO.inputs.force_serial_execution = self.transaction.inputs.entity.procedural_options.force_serial_execution
                 aaop.The_AAO.inputs.uploadsPath = this_Project.uploads_path
                 self.__fill_build_input_resources(aaop, this_Project.project_dir)
             elif aaop.AAO_Type=='Evaluate':
@@ -90,7 +91,7 @@ class GlycoProtein_Request_Data_Filler(Request_Data_Filler):
             )
             aaop.The_AAO.inputs.resources.add_resource(protein)
         else:
-            # This is assuming that build doesn't require a protein file to be set in inputs for v1. TODO: Be more explicit in handling protein file 
+            # See if there is a file already in the directory with a sym link
             log.debug(f"Protein file not set in inputs, trying to find OriginalInput.pdb in project directory {project_dir}.")
             # try to grab from the project dir by seeing what OriginalInput.pdb points to
             default_pdb = Path(project_dir) / "OriginalInput.pdb"
@@ -109,7 +110,46 @@ class GlycoProtein_Request_Data_Filler(Request_Data_Filler):
                 aaop.The_AAO.inputs.protein_file = str(default_pdb)
                 log.debug(f"Set protein file to {aaop.The_AAO.inputs.protein_file} from OriginalInput.pdb.")
             else:
-                log.warning(f"OriginalInput.pdb not found in project directory {project_dir}, protein file will not be set.")
+                log.debug(f"OriginalInput.pdb not found in project directory {project_dir}, looking for protein file by PDB ID.")
+                ## TODO - this is a kluge. An evaluate service should be added (implied by Build, especially without a protein_file already).
+                ##        At the moment, the handling of implied services (and responses) is not mature.
+                ##        Earlier services should download the PDB file (if not already present) and copy it to the working directory.
+                for service in self.transaction.inputs.entity.services.__root__.values():
+                    if "rcsb_id" in service.inputs.keys() :
+                        log.debug("Found rcsb_id in incoming request:")
+                        log.debug(str(service.inputs))
+                        if service.inputs["rcsb_id"] not in (None, "") :
+                            log.debug(f"Setting the protein_file to {service.inputs['rcsb_id']}")
+                            rcsb_id = service.inputs["rcsb_id"].strip().lower()
+                            aaop.The_AAO.inputs.resources.add_resource( 
+                                    Resource( 
+                                        payload=rcsb_id, 
+                                        resourceFormat="RCSB-ID", 
+                                        resourceRole="rcsb-id", 
+                                        locationType="Payload"
+                                        )
+                                    )
+                            log.debug(f"Attempting to download the PDB file {service.inputs['rcsb_id']}")
+                            from gemsModules.conjugate.glycoprotein.tasks import download_pdb_from_rcsb_by_id
+                            the_protein_file = download_pdb_from_rcsb_by_id.execute(
+                                pdb_id=rcsb_id,
+                                output_dir=aaop.The_AAO.inputs.projectDir,
+                                #output_dir=aaop.The_AAO.inputs.uploadsPath,
+                                compressed=False
+                                )
+                            if the_protein_file is None :
+                                log.debug("Could not download the PDB from the RCSB.")
+                            else :
+                                aaop.The_AAO.inputs.protein_file = the_protein_file
+                                aaop.The_AAO.inputs.resources.add_resource(
+                                    Resource(
+                                        payload=the_protein_file,
+                                        resourceFormat="PDB",
+                                        resourceRole="protein-file",
+                                        locationType="filesystem-path-unix"
+                                    )
+                                )
+
         if aaop.The_AAO.inputs.glycan_mappings is not None:
             mappings = Resource(
                 payload=aaop.The_AAO.inputs.glycan_mappings,

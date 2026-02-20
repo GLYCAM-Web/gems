@@ -66,7 +66,7 @@ def execute(inputs: Build_Inputs, options: BuildOptions) -> tuple[Build_Outputs,
 
     # TODO: Write status.log with "GlycoProtein finished with: Success|Failure" afterwards or make this a backgrounded process.
     # If backgrounded, write "Submitted".
-    failed = run_gpbuilder.execute_gpb(job_dir, inputs.pUUID)
+    failed = run_gpbuilder.execute_gpb(job_dir, inputs.pUUID, inputs.force_serial_execution)
     if failed:
         service_notices.addNotice(
             Brief="GlycoProtein execution failed",

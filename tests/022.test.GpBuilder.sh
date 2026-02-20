@@ -1,4 +1,14 @@
 #!/bin/bash
+
+##
+## Whoever next needs to work on this:
+##
+## The original coding did not allow this test to play well with the parent script or
+## with other scripts. Please see others, e.g., test 023, for better alignment strategies.
+##
+## Notably, this script should NEVER exit. It should only return.
+##
+
 # GpBuilder v1 test workflow script.
 #
 # This script first delegates an Evaluation request to the GlycoProtein entity,
@@ -25,7 +35,8 @@
 #   - 6 if the build completed with errors
 
 # --- Environment Setup ---
-set -euo pipefail
+#set -euo pipefail ### these tests check for presence of 'unbound variables', so please do not cause them to fail everything
+set -eo pipefail
 DEBUG=${DEBUG:-false}
 debug_log() {
   if [ "$DEBUG" = true ]; then
@@ -33,45 +44,51 @@ debug_log() {
   fi
 }
 
-exit_handler() {
-  exit_code=$?
-
-  echo $EVALUATE_REQUEST >bad_outputs/$(date +%Y%m%d_%H%M)-test-022-evaluate-request-git-ignore-me.json
-  if [ -n "${EVALUATE_RESPONSE:-}" ]; then
-    echo "$EVALUATE_RESPONSE" >bad_outputs/$(date +%Y%m%d_%H%M)-test-022-evaluate-response-git-ignore-me.json
-  fi
-  if [ -n "${BUILD_REQUEST:-}" ]; then
-    echo "$BUILD_REQUEST" >bad_outputs/$(date +%Y%m%d_%H%M)-test-022-build-request-git-ignore-me.json
-  fi
-  if [ -n "${BUILD_RESPONSE:-}" ]; then
-    echo "$BUILD_RESPONSE" >bad_outputs/$(date +%Y%m%d_%H%M)-test-022-build-response-git-ignore-me.json
-  fi
-  if [ -n "${STATUS_RESPONSES:-}" ]; then
-    echo "$STATUS_RESPONSES" >bad_outputs/$(date +%Y%m%d_%H%M)-test-022-status-responses-git-ignore-me.json
-  fi
-
-  if [ $exit_code -ne 0 ]; then
-    echo "❌ An error occurred, saving bad outputs to bad_outputs directory. ($exit_code)"
-    echo -e "\tCheck $GEMSHOME/tests/bad_outputs directory for details." >&2
-  else
-    echo "✅ Test 022 Build completed successfully, final status: $FINAL_STATUS"
-
-    if [[ "${GEMS_KEEP_BAD_OUTPUTS:-}" == "True" ]]; then
-      echo -e "\tGEMS_KEEP_BAD_OUTPUTS is truthy, keeping bad outputs."
-    else
-      echo -e "\tGEMS_KEEP_BAD_OUTPUTS is not truthy, removing bad outputs."
-      rm -rf bad_outputs/*-test-022-*
-    fi
-
-    if [[ "${GEMS_REMOVE_TEST_PROJECT:-}" == "true" || "${GEMS_REMOVE_TEST_PROJECT:-}" == "1" ]]; then
-      rm -rf "$PROJECT_DIR_PATH"
-      echo -e "\tRemoved test project directory, to prevent this set GEMS_REMOVE_TEST_PROJECT to false."
-    else
-      echo -e "\tGEMS_REMOVE_TEST_PROJECT is not set to true, the project directory will be kept."
-    fi
-  fi
-}
-trap exit_handler EXIT
+##
+## These tests rely on RETURN VALUES, not exit codes. Please code accordingly
+##
+## Coded like this, it was preventing the parent from doing the required accouting. 
+## The bad outputs dir also did not get removed or got removed inappropriately (e.g., only if this test passed).
+##
+#exit_handler() {
+#  exit_code=$?
+#
+#  echo $EVALUATE_REQUEST >bad_outputs/$(date +%Y%m%d_%H%M)-test-022-evaluate-request-git-ignore-me.json
+#  if [ -n "${EVALUATE_RESPONSE:-}" ]; then
+#    echo "$EVALUATE_RESPONSE" >bad_outputs/$(date +%Y%m%d_%H%M)-test-022-evaluate-response-git-ignore-me.json
+#  fi
+#  if [ -n "${BUILD_REQUEST:-}" ]; then
+#    echo "$BUILD_REQUEST" >bad_outputs/$(date +%Y%m%d_%H%M)-test-022-build-request-git-ignore-me.json
+#  fi
+#  if [ -n "${BUILD_RESPONSE:-}" ]; then
+#    echo "$BUILD_RESPONSE" >bad_outputs/$(date +%Y%m%d_%H%M)-test-022-build-response-git-ignore-me.json
+#  fi
+#  if [ -n "${STATUS_RESPONSES:-}" ]; then
+#    echo "$STATUS_RESPONSES" >bad_outputs/$(date +%Y%m%d_%H%M)-test-022-status-responses-git-ignore-me.json
+#  fi
+#
+#  if [ $exit_code -ne 0 ]; then
+#    echo "❌ An error occurred, saving bad outputs to bad_outputs directory. ($exit_code)"
+#    echo -e "\tCheck $GEMSHOME/tests/bad_outputs directory for details." >&2
+#  else
+#    echo "✅ Test 022 Build completed successfully, final status: $FINAL_STATUS"
+#
+#    if [[ "${GEMS_KEEP_BAD_OUTPUTS:-}" == "True" ]]; then
+#      echo -e "\tGEMS_KEEP_BAD_OUTPUTS is truthy, keeping bad outputs."
+#    else
+#      echo -e "\tGEMS_KEEP_BAD_OUTPUTS is not truthy, removing bad outputs."
+#      rm -rf bad_outputs/*-test-022-*
+#    fi
+#
+#    if [[ "${GEMS_REMOVE_TEST_PROJECT:-}" == "true" || "${GEMS_REMOVE_TEST_PROJECT:-}" == "1" ]]; then
+#      rm -rf "$PROJECT_DIR_PATH"
+#      echo -e "\tRemoved test project directory, to prevent this set GEMS_REMOVE_TEST_PROJECT to false."
+#    else
+#      echo -e "\tGEMS_REMOVE_TEST_PROJECT is not set to true, the project directory will be kept."
+#    fi
+#  fi
+#}
+#trap exit_handler EXIT
 
 
 # --- Input Files ---
@@ -86,22 +103,22 @@ STATUS_REQUEST_TEMPLATE_FILE="$GEMSHOME/gemsModules/conjugate/glycoprotein/tests
 
 if [ ! -f "$PDB_FILE" ]; then
   echo "PDB file not found: $PDB_FILE" >&2
-  exit 1
+  return 1
 fi
 
 if [ ! -f "$EVALUATE_REQUEST_TEMPLATE_FILE" ]; then
   echo "Evaluate request template not found: $EVALUATE_REQUEST_TEMPLATE_FILE" >&2
-  exit 1
+  return 1
 fi
 
 if [ ! -f "$BUILD_REQUEST_TEMPLATE_FILE" ]; then
   echo "Build request template not found: $BUILD_REQUEST_TEMPLATE_FILE" >&2
-  exit 1
+  return 1
 fi
 
 if [ ! -f "$STATUS_REQUEST_TEMPLATE_FILE" ]; then
   echo "Status request template not found: $STATUS_REQUEST_TEMPLATE_FILE" >&2
-  exit 1
+  return 1
 fi
 
 
@@ -126,10 +143,10 @@ debug_log "pUUID: $PUUID"
 debug_log "Project Directory Path: ${PROJECT_DIR_PATH}"
 if [ -z "$PROJECT_DIR_PATH" ]; then
   echo -e "Error: Could not find 'project_dir' in the evaluation response.\nCheck the bad_outputs dir for more info." >&2
-  exit 1
+  return 1
 elif [ -z "$PUUID" ]; then
   echo -e "Error: Could not find 'pUUID' in the evaluation response.\nCheck the bad_outputs dir for more info." >&2
-  exit 1
+  return 1
 fi
 
 # Substitute the pUUID from the evaluation response into the build request template.
@@ -151,7 +168,7 @@ debug_log "Build Response: ${BUILD_RESPONSE}"
 echo "$BUILD_RESPONSE" | python -m json.tool >/dev/null 2>&1
 if [ $? -ne 0 ]; then
   echo -e "Output is not a valid JSON response.\nCheck the bad_outputs dir for more info." >&2
-  exit 2
+  return 2
 elif echo "$BUILD_RESPONSE" | grep started -q; then
   # Create the status request by substituting the pUUID
   STATUS_REQUEST=$(sed "s/<pUUID>/$PUUID/" "$STATUS_REQUEST_TEMPLATE_FILE")
@@ -186,25 +203,25 @@ elif echo "$BUILD_RESPONSE" | grep started -q; then
       debug_log "Looking for zip file: ${ZIP_FILE}"
       if [ ! -n "${ZIP_FILE}" ]; then
         echo "No zip file found in the project directory." >&2
-        exit 3
+        return 3
       else
         # check archive is non-empty
         if [ ! -s "${ZIP_FILE}" ]; then
           echo "Zip file is empty." >&2
-          exit 4
+          return 4
         else
-          exit 0
+          return 0
         fi
       fi
     elif [[ "$CURRENT_STATUS" == *"GlycoProtein Builder execution failed"* ]] || [[ "$CURRENT_STATUS" == *"execution failed"* ]]; then
       echo "GlycoProtein Builder execution failed, final status: $CURRENT_STATUS" >&2
       STATUS_RESPONSES="$STATUS_RESPONSES]"
-      exit 5
+      return 5
     elif [[ "$CURRENT_STATUS" == *"Completed with errors"* ]] || [[ "$CURRENT_STATUS" == *"with errors"* ]]; then
       echo "Build completed with errors." >&2
       echo "Final status: $CURRENT_STATUS" >&2
       STATUS_RESPONSES="$STATUS_RESPONSES]"
-      exit 6
+      return 6
     elif [[ "$CURRENT_STATUS" == *"GlycoProtein Builder execution started"* ]] || [[ "$CURRENT_STATUS" == *"execution started"* ]]; then
       echo "GlycoProtein Builder/Build started."
     elif [[ "$CURRENT_STATUS" == "Status file not found" ]]; then
@@ -220,9 +237,9 @@ elif echo "$BUILD_RESPONSE" | grep started -q; then
   STATUS_RESPONSES="$STATUS_RESPONSES]"
   if [ $tries -ge $max_tries ]; then
     echo "Build did not complete within the expected time." >&2
-    exit 6
+    return 6
   fi
 else
   echo "Build failed. No submission notice found in the response." >&2
-  exit 5
+  return 5
 fi

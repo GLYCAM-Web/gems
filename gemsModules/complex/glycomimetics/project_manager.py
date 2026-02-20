@@ -3,11 +3,14 @@
 
 from abc import ABC, abstractmethod
 from pathlib import Path
+import os
 
 from gemsModules.common.project_manager import Project_Manager
 
 from gemsModules.complex.glycomimetics.main_api import Glycomimetics_Entity
 from gemsModules.complex.glycomimetics.main_api_project import GlycomimeticsProject
+
+from gemsModules.systemoperations.filesystem_ops import check_make_directory
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -16,32 +19,80 @@ log = Set_Up_Logging(__name__)
 
 class Glycomimetics_Project_Manager(Project_Manager):
     def process(self) -> GlycomimeticsProject:
+        log.info("Project management for Glycomimetics_Project_Manager is begun")
+
+        if self.incoming_project is not None:
+            foundUUID = None
+            serviceType = None
+            for service in self.incoming_entity.services.__root__.values():
+                log.debug("The current service looks like:")
+                log.debug(str(service))
+                if service.inputs.pUUID not in (None, "") :
+                    log.debug("Found pUUID in incoming request:")
+                    log.debug(str(service.inputs))
+                    if service.inputs["pUUID"] not in (None, "") :
+                        log.debug(f"Setting the pUUID to {service.inputs['pUUID']}")
+                        if foundUUID in (None, "") :
+                            foundUUID = service.inputs['pUUID']
+                            serviceType = service.typename
+                        else :
+                            log.error("Conflicting pUUID values found in services. They are:")
+                            log.error(f"service: {serviceType} - pUUID {foundUUID}")
+                            log.error(f"service: {service.typename} - pUUID {service.inputs['pUUID']}")
+                            raise ValueError ("Service inputs have conflicting pUUIDs")
+                        self.incoming_project.pUUID = foundUUID
+
+            self.incoming_project.setProjectDir(noClobber=False)
+            self.incoming_project.logs_dir = str(os.path.join(self.incoming_project.project_dir, "logs"))
+
+            self.fill_response_project_from_incoming_project()
+            log.debug("The incoming project is:")
+            log.debug(self.incoming_project.json(indent=2))
+            log.debug("The response project is:")
+            log.debug(self.response_project.json(indent=2))
+        else:
+            self.response_project = GlycomimeticsProject()
+        if self.incoming_project.project_dir not in (None, "") :
+            check_make_directory(Dir_Path=self.incoming_project.project_dir)
+        else:
+            log.error("Project directory not specified")
+        if self.incoming_project.uploads_path not in (None, "") :
+            check_make_directory(Dir_Path=self.incoming_project.uploads_path)
+        else:
+            log.error("Uploads path not specified")
+        if self.incoming_project.logs_dir not in (None, "") :
+            check_make_directory(Dir_Path=self.incoming_project.logs_dir)
+        else:
+            log.error("Logging directory for the project is not specified")
+        return self.response_project
+
+
         # log.debug("Glycomimetics_Project_Manager.process")
         # log.debug("incoming_entity: %s", self.incoming_entity)
         # log.debug("incoming_project: %s", self.incoming_project)
         
-        self.instantiate_response_project()
-        # Broken:
-        # self.fill_response_project_from_incoming_project()
-        # self.fill_response_project_from_response_entity()
-
-        return self.response_project
-
-    def instantiate_response_project(self) -> GlycomimeticsProject:
-        self.response_project = self.instantiate_new_project()
-
-        return self.response_project
-
-    @staticmethod
-    def instantiate_new_project() -> GlycomimeticsProject:
-        """This is a static method that returns a new project."""
-        project = GlycomimeticsProject()
-        project.add_filesystem_info()
-        return project
-
-    # TODO: can probably be generalized and just pass the Project type.
-    def fill_response_project_from_incoming_project(self):
-        pass
+#        self.instantiate_response_project()
+#        # Broken:
+#        # self.fill_response_project_from_incoming_project()
+#        # self.fill_response_project_from_response_entity()
+#
+#        return self.response_project
+#
+#    def instantiate_response_project(self) -> GlycomimeticsProject:
+#        self.response_project = self.instantiate_new_project()
+#
+#        return self.response_project
+#
+#    @staticmethod
+#    def instantiate_new_project() -> GlycomimeticsProject:
+#        """This is a static method that returns a new project."""
+#        project = GlycomimeticsProject()
+#        project.add_filesystem_info()
+#        return project
+#
+#    # TODO: can probably be generalized and just pass the Project type.
+#    def fill_response_project_from_incoming_project(self):
+#        pass
 #        if self.incoming_project is not None:
 #            # need to combine instead of create new
 #            # self.response_project = GlycomimeticsProject(**self.incoming_project.dict())
