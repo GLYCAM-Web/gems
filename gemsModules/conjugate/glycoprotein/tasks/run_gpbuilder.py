@@ -12,7 +12,7 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 
-def execute_gpb(project_dir: str, pUUID) -> bool:
+def execute_gpb(project_dir: str, pUUID, force_serial_execution: bool = False) -> bool:
     """
     Executes the GlycoProtein Build process using the provided input file and project directory.
 
@@ -101,20 +101,37 @@ exit $exit_code
 
     bash_script.chmod(0o755)
 
-    log.info(
-        f"Submitting command to background: {gpbuilder_cmd}"
-    )
+    if force_serial_execution :
+        # Run the bash script in the foreground and wait for it to finish
+        log.info(
+            f"Submitting command to foreground: {gpbuilder_cmd}"
+        )
+        process = subprocess.Popen(
+            [str(bash_script)],
+            start_new_session=False,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        return_code = process.wait()
+        if return_code != "0" :
+            log.info(
+                f"GlycoProtein Build returned non-zero: {return_code}"
+            )
 
-    # Run the bash script in background, detached from parent
-    subprocess.Popen(
-        [str(bash_script)],
-        start_new_session=True,
-        stdin=subprocess.DEVNULL,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
-
-    log.info("GlycoProtein Build submitted to background execution")
+    else :
+        # Run the bash script in background, detached from parent
+        log.info(
+            f"Submitting command to background: {gpbuilder_cmd}"
+        )
+        subprocess.Popen(
+            [str(bash_script)],
+            start_new_session=True,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        log.info("GlycoProtein Build submitted to background execution")
 
 
 def execute_gpbt_wrapper(project_pdb_file: Path, output_file: Path):

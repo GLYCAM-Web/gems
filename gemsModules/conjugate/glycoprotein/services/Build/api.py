@@ -76,6 +76,10 @@ class Build_Inputs(BaseModel):
     projectDir: Optional[str] = Field("", description="Path to the project directory (including pUUID)")
     uploadsPath: Optional[str] = Field("", description="Path to the uploads directory")
     protein_file: Optional[str] = Field("", description="Path to the protein PDB file")
+    force_serial_execution : bool = Field(
+            False,
+            description="Should GlycoProtein execute serially (no daemons, no parallel)?"
+            )
     glycan_mappings: List[GlycanMapping] = Field(
         ..., description="List of residue to glycan sequence mappings"
     )
