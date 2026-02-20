@@ -4,6 +4,7 @@ import socket
 
 from pydantic import constr, Field
 from pydantic.typing import Literal as PyLiteral
+from typing import Any
 
 from gemsModules.project.main_api import Project
 from gemsModules.deprecated.instance_config.main import InstanceConfig
@@ -16,12 +17,12 @@ log = Set_Up_Logging(__name__)
 class MdProject(Project):
     """This is a very hacky version for proof of concept.  This is not intended for use in production."""
 
-    title: str = "very hacky initial MDaaS service"
-    parent_entity: str = "mmservice"
-    app: str = "MDaaS"
+    #title: str = "very hacky initial MDaaS service"
+    #parent_entity: str = "mmservice"
+    #app: str = "MDaaS"
     requested_service: str = "mdaas"
-    entity_id: str = "md"
-    service_id: str = "md"
+    #entity_id: str = "md"
+    #service_id: str = "md"
     ## service_id: str = "RunMD" ## this was breaking things
     # filesystem_path unset to find out where defaults come from. TODO/N: We should consider the nature of setting defaults here.
     # filesystem_path: str = "/website/userdata"
@@ -43,17 +44,27 @@ class MdProject(Project):
     ##    Why is it this directory? It should not be inside gems.
     upload_path: constr(max_length=255) = ""
 
-    project_type: PyLiteral["md"] = Field("md", title="Type", alias="type")
+    #project_type: PyLiteral["md"] = Field("md", title="Type", alias="type")
 
     # TODO need protocol file in mdproject
     protocolFilesPath: str = "/programs/gems/External/MD_Utils/protocols/RoeProtocol"
 
     ## TODO figure out a kind way to make this generic for all methods, even those 
     ##      that do not have all these features.
-    def add_filesystem_info(self):
+    def __init__(self, **data : Any):
+        super().__init__(**data)
+        self.has_input_files = True
+        self.project_type = 'md'
+        self.parent_entity = "MmService"
+        self.entity_id = "md"
+        self.service_id = "md" # used for lookup in the instance config file
+        self.title = "MD as a service"
+        self.app = "MDaaS"
         self.setFilesystemPath(noClobber=False)
         self.setUploadsPath(noClobber=False)
         self.setServiceDir(noClobber=False)
         self.setProjectDir(noClobber=False)
         self.setVersionsFilePath(noClobber=False)
+        self.logs_dir = str(os.path.join(self.project_dir, "logs"))
+
 

@@ -42,7 +42,6 @@ class GlycoProtein_Project_Manager(Project_Manager):
             self.incoming_project.logs_dir = str(os.path.join(self.incoming_project.project_dir, "logs"))
 
             self.fill_response_project_from_incoming_project()
-            #self.response_project = self.fill_response_project_from_incoming_project()
             log.debug("The incoming project is:")
             log.debug(self.incoming_project.json(indent=2))
             log.debug("The response project is:")

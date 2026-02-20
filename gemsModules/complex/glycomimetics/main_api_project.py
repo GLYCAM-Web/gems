@@ -55,13 +55,13 @@ class GlycomimeticsProject(Project):
         self.app = "Glycomimetics"
         self.requesting_agent = ""
         self.requested_service = "Build"
-
-    def add_filesystem_info(self):
         self.setFilesystemPath(noClobber=False)
         self.setUploadsPath(noClobber=False)
         self.setServiceDir(noClobber=False)
         self.setProjectDir(noClobber=False)
         self.setVersionsFilePath(noClobber=False)
+        self.logs_dir = str(os.path.join(self.project_dir, "logs"))
+
 
 
 ## Some former contents of this class

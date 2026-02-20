@@ -17,12 +17,12 @@ log = Set_Up_Logging(__name__)
 class mdaas_Project_Manager(Project_Manager):
     def process(self) -> MdProject:
         # Might not be broken now:
-        self.instantiate_response_project()
-        #self.fill_response_project_from_incoming_project()
-        self.response_project.add_filesystem_info()
+        #self.instantiate_response_project()
+        #self.response_project.add_filesystem_info()
         ## This has to happen in the transaction manager at the end
         #self.fill_response_project_from_response_entity()
 
+        self.fill_response_project_from_incoming_project()
         return self.response_project
 
     def instantiate_response_project(self) -> MdProject:
@@ -39,8 +39,8 @@ class mdaas_Project_Manager(Project_Manager):
     # TODO: can probably be generalized and just pass the Project type.
     ## There is no reason that the response project type should differ from
     ## the incoming project type. 
-    def fill_response_project_from_incoming_project(self):
-        self.response_project = self.incoming_project.copy(deep=True)
+#    def fill_response_project_from_incoming_project(self):
+#        self.response_project = self.incoming_project.copy(deep=True)
 #        if self.incoming_project is not None:
 #            # need to combine instead of create new
 #            # self.response_project = MdProject(**self.incoming_project.dict())

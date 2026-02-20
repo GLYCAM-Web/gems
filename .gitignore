@@ -8,6 +8,9 @@ gmml_wrap.o
 log.log
 gemsModules/Docs/html
 tests/bad_outputs
+tests/request-initialized.json
+tests/request-raw.json
+tests/response.json
 External
 UserSpace
 site
