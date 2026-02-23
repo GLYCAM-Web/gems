@@ -14,12 +14,28 @@ class Response_Manager(ABC):
         self.response_entity = None
         self.aaop_tree_pair = aaop_tree_pair
 
-    def process(self) -> Entity:
-        self.generate_response_entity()
+    def process(self, existing_response_entity=None) -> Entity:
+        log.info("process for Response_Manager is called.")
+        if existing_response_entity is not None:
+            log.debug("using the existing_response_entity")
+            self.response_entity = existing_response_entity.copy(deep=True)
+        else: 
+            log.debug("existing_response_entity is None; making new")
+            self.response_entity = self.generate_response_entity()
+
+        self.response_entity=self.populate_response_entity(existing_response_entity=self.response_entity)
         return self.response_entity
 
+    # making abstract for now. might remove that later.
+    @abstractmethod 
+    def generate_response_entity(self) -> Entity:
+        # Should look something like this, but customize for your situation
+        # TODO - make customization not be needed
+        log.info("generate_response_entity for Response_Manager is called")
+        self.response_entity = Entity(type="Common_API")
+
     @abstractmethod
-    def generate_response_entity(self):
+    def populate_response_entity(self, existing_response_entity) -> Entity:
         pass
 
 

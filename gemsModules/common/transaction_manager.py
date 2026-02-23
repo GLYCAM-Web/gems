@@ -29,8 +29,15 @@ class Transaction_Manager(ABC):
         self.transaction = transaction
         self.incoming_entity = transaction.inputs.entity
         self.incoming_project = transaction.inputs.project
-        self.response_entity = None
-        self.response_project = None
+        if transaction.outputs.entity is not None:
+            self.response_entity = transaction.outputs.entity 
+        else:
+            self.response_entity = None
+        if transaction.outputs.project is not None:
+            self.response_project = transaction.outputs.project
+        else:
+            self.response_project = None
+
 
         self.aaop_request_list: List[AAOP] = []
         self.aaop_tree_pair: AAOP_Tree_Pair = None
@@ -149,7 +156,9 @@ class Transaction_Manager(ABC):
         self.response_manager = self.response_manager_type(
             aaop_tree_pair=self.aaop_tree_pair
         )
-        self.response_entity = self.response_manager.process()
+        self.response_entity = self.response_manager.process(
+                existing_response_entity=self.response_entity.copy(deep=True)).copy(deep=True)
+#        self.response_entity = self.response_manager.process(existing_response_entity=self.response_entity)
 
         log.debug("\tthe response entity is: ")
         log.debug(self.response_entity)

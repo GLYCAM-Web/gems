@@ -114,11 +114,15 @@ class Transaction(ABC):
     def build_outgoing_string(
         self, prettyPrint=False, indent=2, prune_empty_values=True
     ):
-        if (
-            self.outputs.prettyPrint is True
-        ):  # In case outputs.prettyPrint is None or something else that isn't useful
+#        if (
+#            self.outputs.prettyPrint is True
+#        ):  # In case outputs.prettyPrint is None or something else that isn't useful
+        if True in (self.outputs.prettyPrint, 
+                self.outputs.entity.procedural_options.pretty_print) :
             prettyPrint = True
-        if prettyPrint:
+            self.outputs.prettyPrint = True
+            self.outputs.entity.procedural_options.pretty_print = True
+        if prettyPrint is True:
             self.outgoing_string = self.outputs.json(
                 indent=2, exclude_none=prune_empty_values, by_alias=True
             )

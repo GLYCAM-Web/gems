@@ -10,10 +10,22 @@ log = Set_Up_Logging(__name__)
 
 
 class GlycoProtein_Response_Manager(Response_Manager):
-    def generate_response_entity(self):
-        log.info("generate_response_entity for GlycoProtein_Response_Manager is called")
-        self.response_entity = GlycoProtein_Entity(type="GlycoProtein")
-        self.response_entity.notices = Notices()
+    
+#    def set_response_entity(self, existing_response_entity=None):
+#        if existing_response_entity is None:
+#            log.debug("existing_response_entity is None; making new")
+#            self.response_entity = self.generate_response_entity()
+#        else:
+#            log.debug("using the existing_response_entity")
+#            self.response_entity = existing_response_entity.copy(deep=True)
+
+    def populate_response_entity(self, existing_response_entity):
+        log.info("populate_response_entity for GlycoProtein_Response_Manager is called")
+        if self.response_entity is None:
+            log.debug("in populate_response_entity, existing_response_entity cannot be None")
+            raise ValueError ("In populate_response_entity, existing_response_entity cannot be None")
+        if self.response_entity.notices is None:
+            self.response_entity.notices = Notices()
         request_aaop_list=self.aaop_tree_pair.input_tree.make_linear_list()
         response_aaop_list=self.aaop_tree_pair.output_tree.make_linear_list()
         log.debug("the_request_aaop_list is: ")
@@ -30,10 +42,12 @@ class GlycoProtein_Response_Manager(Response_Manager):
             this_response.myUuid = aaop.ID_String
             self.response_entity.responses.add_response(key_string=aaop.Dictionary_Name, response=this_response)
 
-        # Copy the status from the response aaop, if it exists, into the project's status field
-
-
         log.debug("the response entity is: ")
         log.debug(self.response_entity.json(indent=2))
 
         return self.response_entity
+
+
+    def generate_response_entity(self):
+        log.info("generate_response_entity for GlycoProtein_Response_Manager is called")
+        self.response_entity = GlycoProtein_Entity(type="GlycoProtein")
