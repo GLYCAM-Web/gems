@@ -14,10 +14,21 @@ log = Set_Up_Logging(__name__)
 
 
 class mdaas_Response_Manager(Response_Manager):
-    def generate_response_entity(self):
-        self.response_entity = MDaaS_Entity(type="MDaaS")
-        self.response_entity.notices = Notices()
+
+    def populate_response_entity(self, existing_response_entity):
+        log.info("populate_response_entity for mdaas_Response_Manager is called")
+        if self.response_entity is None:
+            log.debug("in populate_response_entity, existing_response_entity cannot be None")
+            raise ValueError ("In populate_response_entity, existing_response_entity cannot be None")
+        if self.response_entity.notices is None:
+            self.response_entity.notices = Notices()
 
         create_default_entity_aaop_tree_pair.execute(self)
 
         return self.response_entity
+
+
+    def generate_response_entity(self):
+        self.response_entity = MDaaS_Entity(type="MDaaS")
+
+
