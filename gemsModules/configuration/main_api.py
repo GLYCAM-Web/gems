@@ -107,14 +107,25 @@ class InstanceConfig(BaseModel):
             log.debug("the serviceID is NOT found in filesystem_paths.")
             return None
 
+    def localhost_supports_context(self, context_names : List) -> bool :
+        if self.hosts is None :
+            return False
+        for host_object in self.hosts.values() :
+            if host_object.host == "localhost" :
+                if any(item in context_names for item in host_object.contexts) :
+                    return True
+        return False
+
 
 
 def load_instance_config(icFilePath: str = None):
     import os
     import json
     import pathlib
+    from gemsModules.systemoperations.environment_ops import find_instance_config
     if icFilePath is None :
-        icPath =  pathlib.Path(os.getenv("GEMSHOME", "")) / "instance_config.json"
+        #icPath =  pathlib.Path(os.getenv("GEMSHOME", "")) / "instance_config.json"
+        icPath = pathlib.Path(find_instance_config())
     else :
         icPath = pathlib.Path(icFilePath)
     message = "The path of the file is: " + str(icPath) 

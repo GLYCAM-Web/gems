@@ -4,3 +4,9 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 WhoIAm = "AntibodyDocking"
+
+context_names=[
+        "AD",
+        "AntibodyDocking",
+        "AAD2"
+        ]

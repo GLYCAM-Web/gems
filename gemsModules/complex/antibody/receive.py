@@ -8,11 +8,15 @@ from gemsModules.networkconnections.grpc import (
 from gemsModules.networkconnections.seek_correct_host import execute as seek_correct_host
 from gemsModules.systemoperations.environment_ops import get_site_version
 
+#from gemsModules.configuration.main_api import InstanceConfig, load_instance_config
+from gemsModules.configuration.main_api import load_instance_config
+
 from gemsModules.complex.antibody.json_string_manager import (
     Antibody_Json_String_Manager,
 )
-from gemsModules.complex.antibody.main_settings import WhoIAm
+from gemsModules.complex.antibody.main_settings import WhoIAm, context_names
 from gemsModules.logging.logger import Set_Up_Logging
+
 
 
 log = Set_Up_Logging(__name__)
@@ -21,7 +25,9 @@ log = Set_Up_Logging(__name__)
 def receive(incomingString: str) -> str:
     log.info("Antibody was called as an entity.  Processing.")
     # Note: Hardcoded thoreau check; This is because AD2 can only work there for now.
-    if not is_correct_GEMS_instance_for_AAD2(requested_ctx=WhoIAm, requested_instance="thoreau"):
+    #if not is_correct_GEMS_instance_for_AAD2(requested_ctx=WhoIAm, requested_instance="thoreau"):
+    theIC=load_instance_config()
+    if not theIC.localhost_supports_context(context_names=context_names) :
         log.info("This is not the correct host to submit to.")
         
         # Patch the correct uploads paths        

@@ -21,7 +21,14 @@ def gemsModules_is_findable() -> bool:
         return True
     else:
         return False
-    
+
+def find_instance_config() -> str:
+    theICPath = os.getenv("GEMS_INSTANCE_CONFIG") or ""
+    if theICPath in (None, ""):
+        theICPath = os.getenv("GEMSHOME") + "/instance_config.json"
+    return theICPath
+
+
 def get_site_version() -> str:
     GW_DOMAIN = os.getenv("GW_DOMAIN") or ""
     GW_DOMAIN = GW_DOMAIN.lower().strip()
