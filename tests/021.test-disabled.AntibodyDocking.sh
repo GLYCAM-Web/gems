@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-rm -f test-20-output-git-ignore-me.json
-rm -f test-20-invalid-output-git-ignore-me.json
 
 # Run the test
 #TEST_INPUT="/programs/gems/gemsModules/complex/glycomimetics/tests/inputs/entity_evaluate.json"
@@ -9,22 +7,22 @@ TEST_INPUT="/programs/gems/gemsModules/complex/antibody/tests/inputs/explicit_bu
 
 #OUTPUT=$(/programs/gems/bin/delegate $TEST_INPUT)
 # same as above, but capture stderr seprately
-OUTPUT=$(/programs/gems/bin/delegate $TEST_INPUT 2>/dev/null)
+OUTPUT=$(/programs/gems/bin/delegate $TEST_INPUT)
 
 # Check the output is a valid JSON
-echo $OUTPUT | python -m json.tool >test-20-output-git-ignore-me.json
+echo $OUTPUT | python -m json.tool >${badOutDir}/test-21-output-git-ignore-me.json
 if [ $? -ne 0 ]; then
   echo "Output is not a valid JSON"
-  echo $OUTPUT > test-20-invalid-output-git-ignore-me.json
-  exit 1
+  echo $OUTPUT > ${badOutDir}/test-21-invalid-output-git-ignore-me.json
+  return 1
 else
   echo "Output is a valid JSON"
 fi
 
 # Check that it's a GEMS response - look for "entity"
-echo $OUTPUT | grep "entity" || { echo "Error: Output is not a GEMS response"; exit 1; }
+echo $OUTPUT | grep "entity" || { echo "Error: Output is not a GEMS response"; return 1; }
 
 # Inspect as needed
 # tests/utilities/json_ripper.py --json_file ct-output-git-ignore-me.json entity
 # cat ct-output-git-ignore-me.json
-
+return 0
