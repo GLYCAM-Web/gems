@@ -14,10 +14,18 @@ class delegator_Project_Manager(Project_Manager):
 
     def process(self, incoming_string:str = None) -> Project:
         log.info("process for Redirector_Json_String_Manager is called")
-        return None
+        if self.incoming_project is not None:
+            self.fill_response_project_from_incoming_project()
+            log.debug("The incoming project is:")
+            log.debug(self.incoming_project.json(indent=2))
+            log.debug("The response project is:")
+            log.debug(self.response_project.json(indent=2))
 
-    def fill_response_project_from_incoming_project(self):
-        return None
+
+        #return None
+
+#    def fill_response_project_from_incoming_project(self):
+#        return None
 
     def fill_response_project_from_response_entity(self, responseProject: Project, responseEntity: Entity):
         return super().fill_response_project_from_response_entity(responseProject=responseProject,responseEntity=responseEntity)
