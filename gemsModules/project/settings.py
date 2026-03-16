@@ -52,6 +52,8 @@ serviceModules = {
 
 default_versions_file_name = "VERSIONS.sh"
 
+# Default user paths are set in the main_api.py file. They are not enforced, so are not listed here.
+
 # Default standalone filesystem paths
 default_standalone_filesystem_output_path = '/work/' 
 default_standalone_filesystem_uploads_path = '/work/uploads/' 

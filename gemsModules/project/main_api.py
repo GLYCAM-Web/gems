@@ -127,7 +127,7 @@ class Project(BaseModel):
         context = commonlogic.getGemsExecutionContext()
         if noClobber is True :
             if self.filesystem_path != ""  :
-                message = "But Filesystem Output Path already exists in Project and cannot be clobbered.  It is:\n" + str(self.filesystem_path)
+                message = "Filesystem Output Path already exists in Project and cannot be clobbered.  It is:\n" + str(self.filesystem_path)
                 log.debug(message)
                 if specifiedPath != None :
                     message = "Not clobbering filesystem path specified in setFilesystemPath.  It is:\n" + str(specifiedPath)
@@ -190,8 +190,10 @@ class Project(BaseModel):
         #
         # Try: 
         #     standalone filesystem path
-        #     $GEMSHOME/UserSpace
+        #                 Notes: 
+        #                     - Standalone implies dockerized. If not writable, just bail. Don't try to make the directory.
         #     $HOME/GEMS_UserSpace
+        #     $GEMSHOME/UserSpace
         #     website filesystem output path
         #
         if is_directory_writable(project_settings.default_standalone_filesystem_output_path) :
@@ -199,24 +201,24 @@ class Project(BaseModel):
             log.info(message)
             self.filesystem_path = project_settings.default_standalone_filesystem_output_path
             return
-        gemshome = os.environ.get("GEMSHOME")
-        testdir = gemshome + "/UserSpace"
-        if is_directory_writable(testdir) :
-            message = "Setting filesystem output path to: " + testdir
-            log.info(message)
-            self.filesystem_path = testdir
-            return
         userhome = os.environ.get("HOME")
         testdir = userhome + "/GEMS_UserSpace"
-        if is_directory_writable(testdir) :
+        if is_directory_writable(testdir, make_if_needed=True) :
             message = "Setting filesystem output path to: " + testdir
             log.info(message)
             self.filesystem_path = testdir
             return
-        if is_directory_writable(project_settings.default_standalone_filesystem_output_path) :
+        gemshome = os.environ.get("GEMSHOME")
+        testdir = gemshome + "/UserSpace"
+        if is_directory_writable(testdir, make_if_needed=True) :
+            message = "Setting filesystem output path to: " + testdir
+            log.info(message)
+            self.filesystem_path = testdir
+            return
+        if is_directory_writable(project_settings.default_website_filesystem_output_path) :
             message = "Setting filesystem output path to: " + project_settings.default_website_filesystem_output_path
             log.info(message)
-            self.filesystem_path = project_settings.default_standalone_filesystem_output_path
+            self.filesystem_path = project_settings.default_website_filesystem_output_path
             return
         #
         # Still here? Something went wrong. Complain.
@@ -307,8 +309,8 @@ class Project(BaseModel):
         #
         # Try: 
         #     standalone uploads_path
-        #     $GEMSHOME/UserSpace
         #     $HOME/GEMS_UserSpace
+        #     $GEMSHOME/UserSpace
         #     website uploads_path
         #
         if is_directory_writable(project_settings.default_standalone_filesystem_uploads_path) :
@@ -316,24 +318,24 @@ class Project(BaseModel):
             log.info(message)
             self.uploads_path = project_settings.default_standalone_filesystem_uploads_path
             return
-        gemshome = os.environ.get("GEMSHOME")
-        testdir = gemshome + "/UserSpace"
-        if is_directory_writable(testdir) :
-            message = "Setting uploads path to: " + testdir
-            log.info(message)
-            self.uploads_path = testdir
-            return
         userhome = os.environ.get("HOME")
         testdir = userhome + "/GEMS_UserSpace"
-        if is_directory_writable(testdir) :
+        if is_directory_writable(testdir, make_if_needed=True) :
             message = "Setting uploads path to: " + testdir
             log.info(message)
             self.uploads_path = testdir
             return
-        if is_directory_writable(project_settings.default_standalone_filesystem_uploads_path) :
+        gemshome = os.environ.get("GEMSHOME")
+        testdir = gemshome + "/UserSpace"
+        if is_directory_writable(testdir, make_if_needed=True) :
+            message = "Setting uploads path to: " + testdir
+            log.info(message)
+            self.uploads_path = testdir
+            return
+        if is_directory_writable(project_settings.default_website_filesystem_uploads_path) :
             message = "Setting uploads path to: " + project_settings.default_website_filesystem_uploads_path
             log.info(message)
-            self.uploads_path = project_settings.default_standalone_filesystem_uploads_path
+            self.uploads_path = project_settings.default_website_filesystem_uploads_path
             return
         #
         # Still here? Something went wrong. Complain.
