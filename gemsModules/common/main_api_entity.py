@@ -26,7 +26,7 @@ class Entity(ABC, BaseModel):
     )
     outputs: Union[Dict, Resources] = Field(
         None,
-        title="Inputs",
+        title="Outputs",
         description="User-friendly, top-level outputs from the services.",
     )
     services: Service_Requests = Service_Requests()

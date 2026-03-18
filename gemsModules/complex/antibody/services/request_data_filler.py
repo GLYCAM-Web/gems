@@ -10,10 +10,10 @@ from gemsModules.common.main_api_resources import Resource
 from gemsModules.complex.antibody.main_api import Antibody_Entity
 from gemsModules.complex.antibody.main_api_project import AntibodyProject
 
-from .ProjectManagement import api as pm_api
-from .Evaluate import api as evaluate_api
-from .Build import api as build_api
-from .Analyze import api as analyze_api
+from gemsModules.complex.antibody.services.ProjectManagement import api as pm_api
+from gemsModules.complex.antibody.services.Evaluate import api as evaluate_api
+from gemsModules.complex.antibody.services.Build import api as build_api
+from gemsModules.complex.antibody.services.Analyze import api as analyze_api
 
 from gemsModules.common.code_utils import find_aaop_by_id
 

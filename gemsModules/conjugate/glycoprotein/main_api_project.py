@@ -17,7 +17,7 @@ log = Set_Up_Logging(__name__)
 class GlycoProteinProject(Project):
     """ GlycoProtein project for making new entities. """
     pdb_project_pUUID : constr(max_length=36)=""
-    status : constr(max_length=10)="submitted"
+#    status : constr(max_length=10)="submitted" ## Is now part of the main Project, with this default
     gpbuilder_input_file: constr(max_length=255) = "the_input.txt"
     input_type  = "PDB (chemical/pdb) & Glycan Mappings (application/json)"
 

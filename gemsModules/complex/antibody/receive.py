@@ -26,36 +26,66 @@ def receive(incomingString: str) -> str:
     log.info("Antibody was called as an entity.  Processing.")
     # Note: Hardcoded thoreau check; This is because AD2 can only work there for now.
     #if not is_correct_GEMS_instance_for_AAD2(requested_ctx=WhoIAm, requested_instance="thoreau"):
-    theIC=load_instance_config()
-    if not theIC.localhost_supports_context(context_names=context_names) :
-        log.info("This is not the correct host to submit to.")
-        
-        # Patch the correct uploads paths        
-        uploads_dir = ""
-        site_version = get_site_version()
-        if site_version == "swarmtest":
-            uploads_dir = "/website/USERDATA/swarmtest/uploads"
-        elif site_version == "test":
-            uploads_dir = "/website/USERDATA/LiveTest/uploads"
-        elif site_version == "dev":
-            uploads_dir = "/website/USERDATA/LiveDev/uploads"
-        elif site_version == "actual":
-            uploads_dir = "/website/USERDATA/Actual/uploads"
-        
-        log.debug(f"Original Incoming string: {incomingString}")
-        incomingString = incomingString.replace("/website/uploads", uploads_dir)
-        log.debug(f"The replaced uploads_dir: {uploads_dir}")
-        log.debug(f"Modified Incoming string: {incomingString}")
 
+    theIC=load_instance_config()
+    if not theIC.localhost_supports_context(context_names=["AD", "AntibodyDocking"]) :
+        log.info("This is not the correct host to submit to.")
+
+        log.debug("Checking if this is the initial host.")
+        this_config = load_instance_config()
+        local_host_name=str(this_config.get_localhost_hostName())
+        tmp_dict = json.loads(incoming_string)
+        if "initiation_timestamp" not in tmp_dict or not tmp_dict["initiation_timestamp"] :
+            log.error("The incoming string has no initiation_timestamp. I cannot determine my role.")
+            raise ValueError ("Complex/Antibody: The incoming string has no initiation_timestamp. Cannot determine my role.")
+        if tmp_dict["initial_receiver"] == local_host_name :
+            log.debug("This is the initial host. Recording info as needed into the Project.")
+### These should not happen until the correct host is found.
+#        # Patch the correct uploads paths ### READ FROM IC - this happens later in Project
+#        uploads_dir = ""
+#        site_version = get_site_version()
+#        if site_version == "swarmtest":
+#            uploads_dir = "/website/USERDATA/swarmtest/uploads"
+#        elif site_version == "test":
+#            uploads_dir = "/website/USERDATA/LiveTest/uploads"
+#        elif site_version == "dev":
+#            uploads_dir = "/website/USERDATA/LiveDev/uploads"
+#        elif site_version == "actual":
+#            uploads_dir = "/website/USERDATA/Actual/uploads"
+#        
+#        log.debug(f"Original Incoming string: {incomingString}")
+#        incomingString = incomingString.replace("/website/uploads", uploads_dir)
+#        log.debug(f"The replaced uploads_dir: {uploads_dir}")
+#        log.debug(f"Modified Incoming string: {incomingString}")
+
+
+############# might need these, but...
+#            uploads_dir = get_secure_inputs_path_by_service_ID("AD")
+#            filesystem_path = get_filesystem_path_by_service_ID("AD")
+
+            TODO - instantiating the project should pick all this up automatically
+
+            probably do not need to instantiate it separately so that existing project info can be managed.
+            
+incoming_string = dump of the API object now including project
+
+        else :
+            log.debug("This is not the initial host. Making no changes to the request.")
+
+        log.info("Seeking correct host.")
         response = seek_correct_host(incomingString, WhoIAm, submission_fn_type="json")
         # replace the paths in the response from thoreau with the correct paths for the website. TODO: Fix these hacks. help me
         # These replacements correspond to instance config's filesystem paths as per thoreau and swarm paths.
         
         log.debug(f"Original Response: {response}")
+
+
+        ## Should not be needed. 
+        ## The systems should ensure that the correct data are in findable places
         # Should be checking against the instance configs. Problem: Can't get both paths on each instance.
-        response = response.replace("/scratch2/thoreau-web/complex/ad/", "/website/userdata/complex/ad/")
-        response = response.replace(uploads_dir, "/website/uploads")
-        log.debug(f"Modified Response: {response}")
+        #response = response.replace("/scratch2/thoreau-web/complex/ad/", "/website/userdata/complex/ad/")
+        #response = response.replace(uploads_dir, "/website/uploads")
+        #log.debug(f"Modified Response: {response}")
         
         return response
     else:

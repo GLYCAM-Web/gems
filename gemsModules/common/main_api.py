@@ -16,12 +16,22 @@ log = Set_Up_Logging(__name__)
 
 
 class Common_API(BaseModel):
-    timestamp: str = None
+    timestamp: str = None # For the use of the user
     entity: Entity  # The only required part of the JSON is the entity.
     project: Project = None
     notices: Notices = Notices()
     prettyPrint: bool = None  ## this is a change from the original
     mdMinimize: bool = None  ## this is a change from the original
+    ##
+    # These are: identity (IC.host.hostName) of the host when the id is set.
+    # They should not be set by the user (though we can't enforce that)
+    initiation_timestamp: str = Field(
+            "",
+            description = "Users should leave this empty. It will be set by the initial receiver of the request."
+            )# Should NOT be set by the user
+    initial_receiver: str = "" ## Set by the delegator that received the initial delegation request
+    execution_host: str = "" ## Set by the host that fulfilled the request
+    ##
     options: Dict[str, str] = Field(
         None, description="Key-value pairs that apply to the entire transaction."
     )

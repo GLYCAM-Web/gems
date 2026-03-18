@@ -47,6 +47,8 @@ class Project(BaseModel):
     requested_service : constr(max_length=25)="project"
     entity_id : constr(max_length=25)="project"
     service_id : constr(max_length=25)="project"
+    # For reporting statuses
+    status : constr(max_length=10)="submitted"
 
     ## The filesystem_path can be used to override settings.default_website_filesystem_output_path
     filesystem_path : constr(max_length=255)="" 
@@ -90,12 +92,42 @@ class Project(BaseModel):
   
     
     ## In some cases, GEMS will choose to start a new project 
-    ## even if one is provided.  If you don't want to force
+    ## even if one is provided.  If you want to force
     ## GEMS to use this project, set this to True.
     force_use_this_project : bool = False
 
 
+    ## If you need GEMS to use project info from the API JSON rather than from 
+    ## the instance config, set this to true. Depending on the circumstances, 
+    ## this setting might be ignored anyway.
+    use_api_strict : bool = True
+
+
     notices : List[Notice] = []
+
+
+    ## The host that first received the request - copied from central info
+    initial_receiver : str = ""
+    ## The host that fulfilled the request - copied from central info
+    execution_host : str = ""
+    #
+    ## Populated for localhost ONLY 
+    ## App-specific definitions from the instance config will be copied here.
+    ## Mostly, it is up to the app to decide what to do with them.
+    ## Generally, these options will be favored unless use_api_strict=True is set.
+    #
+    initial_reciever_options : Dict[str, str] = {}
+    execution_host_options : Dict[str, str] = {}
+    ## Populated for localhost ONLY 
+    ## This is the list of contexts that are supported in the localhost instance.
+    ## It lets GEMS know whether a certain capability is available locally or how it works.
+    ## For example, it might tell GEMS that this host supports submission to a cluster by 
+    ## noting which scheduler the cluster uses (e.g., Slurm).
+    #
+    initial_receiver_supported_contexts : List[str] = []
+    execution_host_supported_contexts : List[str] = []
+    ## Populated for localhost ONLY 
+    ## Copied in from the instance config
 
 
     def __init__(self, **data : Any):
@@ -109,9 +141,13 @@ class Project(BaseModel):
         if self.timestamp is None : 
             self.timestamp = self.gems_timestamp
 
-    # In file _defaultInitializeProject.py:
-    #    def defaultInitializeProject(self, referenceProject : Project = None, noClobber : bool = True):
-#    from gemsModules.project._defaultInitializeProject import defaultInitializeProject
+    def getLocalhostInstanceConfigContextOptions(self) :
+        log.info("getLocalhostInstanceConfigContextOptions was called")
+        IC = load_instance_config()
+        instanceConfigOptions = IC.get_locahost_context_options_by_service_ID(serviceID=self.service_id)
+        if instanceConfigOptions is not None:
+            self.instance_config_options.append(instanceConfigOptions)
+
 
     def setFilesystemPath(self, specifiedPath : str = None, noClobber : bool = True) :
         log.info("setFilesystemPath was called.")

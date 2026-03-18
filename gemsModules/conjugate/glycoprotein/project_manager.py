@@ -19,24 +19,30 @@ class GlycoProtein_Project_Manager(Project_Manager):
     def process(self) -> GlycoProteinProject:
         log.info("Project management for GlycoProtein_Project_Manager is begun")
 
+### Moved this to common/project_management.py as get_pUUID_from_incoming_project
+#        if self.incoming_project is not None:
+#            foundUUID = None
+#            serviceType = None
+#            for service in self.incoming_entity.services.__root__.values():
+#                if "pUUID" in service.inputs.keys() :
+#                    log.debug("Found pUUID in incoming request:")
+#                    log.debug(str(service.inputs))
+#                    if service.inputs["pUUID"] not in (None, "") :
+#                        log.debug(f"Setting the pUUID to {service.inputs['pUUID']}")
+#                        if foundUUID in (None, "") : 
+#                            foundUUID = service.inputs['pUUID']
+#                            serviceType = service.typename
+#                        else :
+#                            log.error("Conflicting pUUID values found in services. They are:")
+#                            log.error(f"service: {serviceType} - pUUID {foundUUID}")
+#                            log.error(f"service: {service.typename} - pUUID {service.inputs['pUUID']}")
+#                            raise ValueError ("Service inputs have conflicting pUUIDs")
+#                        self.incoming_project.pUUID = foundUUID
+
         if self.incoming_project is not None:
-            foundUUID = None
-            serviceType = None
-            for service in self.incoming_entity.services.__root__.values():
-                if "pUUID" in service.inputs.keys() :
-                    log.debug("Found pUUID in incoming request:")
-                    log.debug(str(service.inputs))
-                    if service.inputs["pUUID"] not in (None, "") :
-                        log.debug(f"Setting the pUUID to {service.inputs['pUUID']}")
-                        if foundUUID in (None, "") : 
-                            foundUUID = service.inputs['pUUID']
-                            serviceType = service.typename
-                        else :
-                            log.error("Conflicting pUUID values found in services. They are:")
-                            log.error(f"service: {serviceType} - pUUID {foundUUID}")
-                            log.error(f"service: {service.typename} - pUUID {service.inputs['pUUID']}")
-                            raise ValueError ("Service inputs have conflicting pUUIDs")
-                        self.incoming_project.pUUID = foundUUID
+            incomingUUID = get_pUUID_from_incoming_project()
+            if incomingUUID is not None:
+                 self.incoming_project.pUUID = foundUUID
 
             self.incoming_project.setProjectDir(noClobber=False)
             self.incoming_project.logs_dir = str(os.path.join(self.incoming_project.project_dir, "logs"))
@@ -47,7 +53,8 @@ class GlycoProtein_Project_Manager(Project_Manager):
             log.debug("The response project is:")
             log.debug(self.response_project.json(indent=2))
         else: 
-            self.response_project = GlycoProteinProject()
+            self.incoming_project = GlycoProteinProject()
+
         if self.incoming_project.project_dir not in (None, "") : 
             check_make_directory(Dir_Path=self.incoming_project.project_dir)
         else:
