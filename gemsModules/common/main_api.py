@@ -22,6 +22,7 @@ class Common_API(BaseModel):
     notices: Notices = Notices()
     prettyPrint: bool = None  ## this is a change from the original
     mdMinimize: bool = None  ## this is a change from the original
+    contexts: List[str] = [] ## List of requested contexts, e.g., "FreeTier". See configuration/main_api.py
     ##
     # These are: identity (IC.host.hostName) of the host when the id is set.
     # They should not be set by the user (though we can't enforce that)

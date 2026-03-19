@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
 import os 
 
-from gemsModules.networkconnections.grpc import (
-    # Note: The name of this function has become a misnomer as it checks contexts regardless of submission method. # TODO: Rename
-    is_GEMS_instance_for_SLURM_submission as is_correct_GEMS_instance_for_AAD2,
-)
 from gemsModules.networkconnections.seek_correct_host import execute as seek_correct_host
 from gemsModules.systemoperations.environment_ops import get_site_version
 
@@ -24,9 +20,6 @@ log = Set_Up_Logging(__name__)
 
 def receive(incomingString: str) -> str:
     log.info("Antibody was called as an entity.  Processing.")
-    # Note: Hardcoded thoreau check; This is because AD2 can only work there for now.
-    #if not is_correct_GEMS_instance_for_AAD2(requested_ctx=WhoIAm, requested_instance="thoreau"):
-
     theIC=load_instance_config()
     if not theIC.localhost_supports_context(context_names=["AD", "AntibodyDocking"]) :
         log.info("This is not the correct host to submit to.")

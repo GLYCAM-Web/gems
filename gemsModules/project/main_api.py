@@ -106,9 +106,9 @@ class Project(BaseModel):
     notices : List[Notice] = []
 
 
-    ## The host that first received the request - copied from central info
+    ## The host that first received the request - copied from instance config info
     initial_receiver : str = ""
-    ## The host that fulfilled the request - copied from central info
+    ## The host that fulfilled the request - copied from instance config info
     execution_host : str = ""
     #
     ## Populated for localhost ONLY 

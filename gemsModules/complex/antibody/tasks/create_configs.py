@@ -11,7 +11,7 @@ def create_ad2config(path, antibodytibody, glycan, siteversion="swarmtest", imag
     
     Note: Build must update Glycan_Flexibility and Number_of_Replicas when it receives options.
     """
-    Default_AD2_CONFIG = textwrap.dedent(f"""#!/usr/bin/env bash
+FIX ME (see paths)    Default_AD2_CONFIG = textwrap.dedent(f"""#!/usr/bin/env bash
 
     Log_File="ad2.log" 
     DOCKING_REPLICA_LOG_FILE="docking.log" 
@@ -29,22 +29,22 @@ def create_ad2config(path, antibodytibody, glycan, siteversion="swarmtest", imag
     AD2_Docking_Batch_Script="submit_docking_to_slurm_with_docker.bash"
     AD2_Docking_Local_Script="gwconfig"
 
-    AAD2_IMAGE_FILE_PATH="/programs/website_aad2/image_files"
+    AAD2_IMAGE_FILE_PATH="/ PATH /image_files"
     Image="{image}"
 
-    AAD2_DOCKER_HOME="/programs/website_aad2/{siteversion}/AAD2_Docker"
-    AAD2_CLI_BIN_PATH="/programs/website_aad2/{siteversion}/AAD2_Docker/image/AAD2/bin"
+    AAD2_DOCKER_HOME="/ PATH /AAD2_Docker"
+    AAD2_CLI_BIN_PATH="/ PATH /AAD2_Docker/image/AAD2/bin"
 
     Use_VMD="True"
-    VMD_HOME="/programs/website_aad2/bin" # Path to the 'vmd' binary, e.g., /programs/bin
-    VMD_LIB="/programs/website_aad2/lib" # Path to the 'vmd' lib directory, e.g., /programs/lib
+    VMD_HOME="/ PATH /bin" # Path to the 'vmd' binary, e.g., /programs/bin
+    VMD_LIB="/ PATH /lib" # Path to the 'vmd' lib directory, e.g., /programs/lib
     """)
     
     with open(path, "w") as f:
         f.write(Default_AD2_CONFIG)
 
 def create_gwconfig(path, puuid):
-    Default_GW_CONFIG = textwrap.dedent(f"""\
+CHECK ME    Default_GW_CONFIG = textwrap.dedent(f"""\
     DOCKING_REPLICA_BATCH_CPUS='56' # can differ from the cpus specified for vina-carb to use
     ##AAD2_BASE_PATH="" # override if needed
     ##AAD2_DOCKER_HOME="" # override if needed

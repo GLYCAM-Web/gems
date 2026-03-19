@@ -19,7 +19,9 @@ def execute(inputs: Evaluate_Inputs) -> tuple[Evaluate_Outputs, Notices]:
     service_outputs = Evaluate_Outputs()
     service_notices = Notices()
 
-    workdir = AntibodyProject.get_project_dir_from_pUUID(inputs.pUUID)
+    #workdir = AntibodyProject.get_project_dir_from_pUUID(inputs.pUUID) deprecated form
+FIX ME
+    workdir = ## should already be visible by the time a service is called
     log.debug(f"workdir: {workdir}")
     if not workdir:
         service_notices.addNotice(
@@ -40,8 +42,8 @@ def execute(inputs: Evaluate_Inputs) -> tuple[Evaluate_Outputs, Notices]:
     # TODO: Delay until gRPC too? (It's a little slow)
     run_detect_sugars.execute(inputs.ligand_path, workdir) 
     
-    # if is_correct_GEMS_instance_for_AAD2():
-        # TODO: Call AD_Evaluate over gRPC here.
+    # if is_correct_GEMS_instance_for_AAD2(): - should not get to this if it is not
+    # TODO: Call AD_Evaluate over gRPC here. - this is ideal, but not a huge priority
     results = run_ad_evaluate.execute(inputs.pUUID, workdir)
     if results.returncode:
         service_notices.addNotice(

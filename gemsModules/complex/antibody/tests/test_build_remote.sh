@@ -40,24 +40,6 @@ else
     rm ad2_remote_test_eval_output-git-ignore-me.txt
 fi
 
-# echo '{
-#  "entity": {
-#    "type": "AntibodyDocking",
-#    "services": {
-#      "aad2_remote_build-thoreau": {
-#        "type": "Build",
-#        "inputs": {
-#          "pUUID": "'"$PUUID"'"
-#        },
-#        "options": {
-#          "flexibility": "rigid",
-#          "count": 5
-#        }
-#      }
-#    }
-#  }
-# }' | ./bin/delegate
-
 echo "Now requesting the build..."
 # replace ${pUUID}, ${flexibility}, and ${count} with the values
 cat gemsModules/complex/antibody/tests/inputs/explicit_build-thoreau.json | \
