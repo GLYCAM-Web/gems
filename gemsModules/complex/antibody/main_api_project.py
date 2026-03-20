@@ -12,8 +12,36 @@ from gemsModules.logging.logger import Set_Up_Logging
 
 log = Set_Up_Logging(__name__)
 
+
+##
+# AAD2 handles submission completely. So, this is not needed
+# 
+# If it is ever needed, the code that uses this should live in 'batchcompute' rather than here.
+# But, this Entity should know what it needs and communicate that to batchcompute.
+##
+#class BatchComputingExecutionData(BaseModel):
+#    """
+#    Indicate needs if execution is via a batch computing scheduler (e.g., Slurm)
+#
+#    Currently, AAD2 runs only on CPU, so there are no GPU options here.
+#
+#    These are all possibly needed, but this class can be instantiated empty.
+#    """
+#    working_directory : str = ""
+#    get_user_environment : bool = True
+#    job_name : str = ""
+#    number_of_nodes : int = ""
+#    cpus_per_node : int = ""
+#    queue : str = "" # also called 'partition' sometimes
+#    time_limit : str = "" # ISO 8601 format. Example: 2 days, 16 hours and 30 minutes: P2DT16H5M
+
+    
+
+
 class AntibodyExecutionHostData(BaseModel):
-    ## These indicate paths are on the execution host
+    """
+    Indicate paths and other environmental needs
+    """
     external_stacks_path : str = Field(
             "" ,
             description = "Path to software stacks that are not just binaries (gems, amber, etc.)"

@@ -10,25 +10,45 @@ log = Set_Up_Logging(__name__)
 
 
 class SupportedExecutionContexts(str, Enum) :
-        ad = "AD"                  # Execution relevant to antibody docking (AAD2)
-        devenv = "DevEnv"          # Execution in the GLYCAM-Web development platform
-        freetier = "FreeTier"      # Batch computing job that is free
-        gm = "GM"                  # Execution relevant to Glycomimetics
-        gp = "GP"                  # Execution relevant to the GlycoProtein builder
-        gr = "GR"                  # Execution relevant to Grafting / GlySpec
-        md = "MD"                  # Execution relevant to Molecular Dynamics
-        pdb = "PDB"                # Execution relevant to a PDB file
-        cb = "CB"                  # Sequence builder (CB) - used to be "Sequence-Build3DStructure"
-        shortjob = "ShortJob"      # Batch computing job that is short
-        swarm = "Swarm"            # Execution in a cloud
-        standalone = "Standalone"  # Local execution on command line
-        website = "Website"        # Execution in the context of a website
-        ## The following allow for backwards compatibility and some user-friendly verbosity
-        cbAlso = "Sequence-Build3DStructure"
-        gmAlso = "Glycomimetics"
-        gpAlso = "GlycoProtein"
-        mdAlso = "MDaaS-RunMD"
-        adAlso = "AntibodyDocking"
+    """ 
+    Tell GEMS about its execution environment.
+    Each of these contexts can have a set of options defined (see Host, below).
+    """
+    #
+    # Services
+    ad = "AD"                  # Execution relevant to antibody docking (AAD2)
+    cb = "CB"                  # Sequence builder (CB) - used to be "Sequence-Build3DStructure"
+    gm = "GM"                  # Execution relevant to Glycomimetics
+    gp = "GP"                  # Execution relevant to the GlycoProtein builder
+    gr = "GR"                  # Execution relevant to Grafting, now known as GlySpec
+    md = "MD"                  # Execution relevant to Molecular Dynamics
+    pdb = "PDB"                # Execution relevant to a PDB file
+    # Services, long forms (backward compatible)
+    adAlso = "AntibodyDocking"
+    cbAlso = "Sequence-Build3DStructure"
+    gmAlso = "Glycomimetics"
+    gpAlso = "GlycoProtein"
+    grAlso = "GlySpec" 
+    mdAlso = "MDaaS-RunMD"
+    pdbAlso = "PDB-File"
+    #
+    # Resource requirements
+    freetier = "FreeTier"      # Batch computing job that is free
+    shortjob = "ShortJob"      # Batch computing job that is short
+    #
+    # Execution environments
+    swarm = "Swarm"            # Execution in a Docker Swarm-mode cloud
+    batch = "Batch"            # Execution via a Batch computing scheduler
+    slurm = "Slurm"            # Execution via a Slurm (batch computing) scheduler
+    standalone = "Standalone"  # Local execution on command line
+    #
+    # Website environments
+    website = "Website"        # Execution on behalf of a website, directly or not
+    actual = "Actual"          # Execution in the context of the main website
+    dev = "Dev"                # Execution in the context of the move-in-swarm-testing website
+    test = "Test"              # Execution in the context of the test website
+    swarmtest = "SwarmTest"    # Execution in the context of the swarmtest website
+    devenv = "DevEnv"          # Execution in the GLYCAM-Web development platform
 
 
 
