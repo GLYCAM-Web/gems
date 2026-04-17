@@ -12,7 +12,7 @@ WRAPPER = Path(__file__).parent / "run_ad_build.sh"
 
 
 def execute(project_dir: Path, use_serial: bool = True):
-    """Execute the AD_Evaluate task."""
+    """Execute the AD_Build task."""
     
     results = subprocess.run(WRAPPER, cwd=project_dir, env={"WD": project_dir, "USE_SERIAL": str(use_serial)}, capture_output=True)
     log.debug(f"results: {results}")

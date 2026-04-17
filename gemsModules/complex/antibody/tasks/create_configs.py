@@ -11,47 +11,47 @@ def create_ad2config(path, antibodytibody, glycan, siteversion="swarmtest", imag
     
     Note: Build must update Glycan_Flexibility and Number_of_Replicas when it receives options.
     """
-FIX ME (see paths)    Default_AD2_CONFIG = textwrap.dedent(f"""#!/usr/bin/env bash
+AAAA FIX ME (see paths)    Default_AD2_CONFIG = textwrap.dedent(f"""#!/usr/bin/env bash
 
-    Log_File="ad2.log" 
-    DOCKING_REPLICA_LOG_FILE="docking.log" 
-    DOCKING_REPLICA_JOB_LOG="ad2_job.log"  
+AAAA    Log_File="ad2.log" 
+AAAA    DOCKING_REPLICA_LOG_FILE="docking.log" 
+AAAA    DOCKING_REPLICA_JOB_LOG="ad2_job.log"  
 
-    Antibody_File_Name="{antibodytibody}"
-    Glycan_File_Name="{glycan}"
-    Glycan_Flexibility="Partial"
-    Number_of_Replicas="5"
-    Computing_Mode="Batch"
+AAAA    Antibody_File_Name="{antibodytibody}"
+AAAA    Glycan_File_Name="{glycan}"
+AAAA    Glycan_Flexibility="Partial"
+AAAA    Number_of_Replicas="5"
+AAAA    Computing_Mode="Batch"
 
-    AD2_Docking_CPUS="28"
-    AD2_Exhaustiveness="56"
-    Use_Docker="True"
-    AD2_Docking_Batch_Script="submit_docking_to_slurm_with_docker.bash"
-    AD2_Docking_Local_Script="gwconfig"
+AAAA    AD2_Docking_CPUS="28"
+AAAA    AD2_Exhaustiveness="56"
+AAAA    Use_Docker="True"
+AAAA    AD2_Docking_Batch_Script="submit_docking_to_slurm_with_docker.bash"
+AAAA    AD2_Docking_Local_Script="gwconfig"
 
-    AAD2_IMAGE_FILE_PATH="/ PATH /image_files"
-    Image="{image}"
+AAAA    AAD2_IMAGE_FILE_PATH="/ PATH /image_files"
+AAAA    Image="{image}"
 
-    AAD2_DOCKER_HOME="/ PATH /AAD2_Docker"
-    AAD2_CLI_BIN_PATH="/ PATH /AAD2_Docker/image/AAD2/bin"
+AAAA    AAD2_DOCKER_HOME="/ PATH /AAD2_Docker"
+AAAA    AAD2_CLI_BIN_PATH="/ PATH /AAD2_Docker/image/AAD2/bin"
 
-    Use_VMD="True"
-    VMD_HOME="/ PATH /bin" # Path to the 'vmd' binary, e.g., /programs/bin
-    VMD_LIB="/ PATH /lib" # Path to the 'vmd' lib directory, e.g., /programs/lib
+AAAA    Use_VMD="True"
+AAAA    VMD_HOME="/ PATH /bin" # Path to the 'vmd' binary, e.g., /programs/bin
+AAAA    VMD_LIB="/ PATH /lib" # Path to the 'vmd' lib directory, e.g., /programs/lib
     """)
     
     with open(path, "w") as f:
         f.write(Default_AD2_CONFIG)
 
 def create_gwconfig(path, puuid):
-CHECK ME    Default_GW_CONFIG = textwrap.dedent(f"""\
-    DOCKING_REPLICA_BATCH_CPUS='56' # can differ from the cpus specified for vina-carb to use
-    ##AAD2_BASE_PATH="" # override if needed
-    ##AAD2_DOCKER_HOME="" # override if needed
-    SUBMIT_FILE_NAME="slurm_submit.bash"
-    CLUSTER_EXE_NAME="run_docking_with_docker_on_cluster_node.bash"
+AAAA CHECK ME    Default_GW_CONFIG = textwrap.dedent(f"""\
+AAAA    DOCKING_REPLICA_BATCH_CPUS='56' # can differ from the cpus specified for vina-carb to use
+AAAA    ##AAD2_BASE_PATH="" # override if needed
+AAAA    ##AAD2_DOCKER_HOME="" # override if needed
+AAAA    SUBMIT_FILE_NAME="slurm_submit.bash"
+AAAA    CLUSTER_EXE_NAME="run_docking_with_docker_on_cluster_node.bash"
 
-    pUUID="{puuid}"
+AAAA    pUUID="{puuid}"
     """)
     
     with open(path, "w") as f:
@@ -76,5 +76,3 @@ def create_vcconfig(path):
     with open(path, "w") as f:
         f.write(Default_VC_CONFIG)
         
-def create_vccconfig(path):
-    pass
