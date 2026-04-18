@@ -69,12 +69,29 @@ class Build_Outputs(BaseModel):
     )
     resources: Build_Output_Resources = Build_Output_Resources()
 
+class Build_Flexibilities(GemsStrEnum):
+    rigid = 0
+    partial = 1
+    flexible = 2 
+AAAA - check that the numbers correspond as needed for pydantic and for AbD
+
+
+class Build_Options(Basemodel}:
+    flexibility: Build_Flexibilities = Field(
+            "partial",
+            description = "How much of the ligand should be flexible?"
+            )
+    count: int = Field(
+            5,
+            description = "How many replicas/experiments to perform."
+            )
 
 class Build_Request(Antibody_Service_Request):
     typename: str = Field("Build", alias="type")
     inputs: Build_Inputs = Build_Inputs()
     # TODO: build options with typing - i.e options.flexibiilty: Literal['Partial', "Rigid", "Flexible"]
-
+    options: Union[Build_Options,Dict[str,str]] = None
+AAAA - these syntaxes are likely imperfect
 
 class Build_Response(Antibody_Service_Response):
     typename: str = Field("Build", alias="type")
