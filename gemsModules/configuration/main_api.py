@@ -1,6 +1,6 @@
+from functools import lru_cache
 from pydantic import BaseModel, ValidationError, Field
 from typing import List, Dict, Literal, Optional, Any
-from pathlib import Path
 from enum import Enum
 
 from gemsModules.logging.logger import Set_Up_Logging
@@ -220,26 +220,34 @@ class InstanceConfig(BaseModel):
         return directory
 
 
-def load_instance_config(icFilePath: str = None):
+@lru_cache(maxsize=1) ## Ensure that this is only loaded once in a given session
+def _load_instance_config(icFilePath: str = None) -> InstanceConfig :
     import os
     import json
     import pathlib
     from gemsModules.systemoperations.environment_ops import find_instance_config
     if icFilePath is None :
-        #icPath =  pathlib.Path(os.getenv("GEMSHOME", "")) / "instance_config.json"
         icPath = pathlib.Path(find_instance_config())
     else :
         icPath = pathlib.Path(icFilePath)
-    message = "The path of the file is: " + str(icPath) 
+    message = "The path (icPath) of the instance config file is: " + str(icPath) 
     log.debug(message)
-    json_string = pathlib.Path(icPath).read_text()
-    log.debug("The json string is:")
-    log.debug(json_string)
-    thisConfig = InstanceConfig.parse_file(icPath)
+    if not icPath.exists():
+        raise ValueError("The instance config file does not exist.")
+    try:
+        json_string = pathlib.Path(icPath).read_text()
+        log.debug("The json string is:")
+        log.debug(json_string)
+        thisConfig = InstanceConfig.parse_file(icPath)
+    except Exception:
+        raise
     log.debug("This is a dump of the newly read config")
     log.debug(str(thisConfig.json(indent=2)))
     return thisConfig
 
+## Instantiate the main instance config (GEMSHOME/instance_config.json)
+## Import this from anywhere else.
+session_instance_config = _load_instance_config()
 
 def generateSchema():
     import json
@@ -256,7 +264,7 @@ if __name__ == "__main__":
   #generateSchema()
   #thisConfig = read_IC_from_file()
   #print(thisConfig.model_dump_json(indent=2))
-  thisConfig = load_instance_config()
+  thisConfig = _load_instance_config()
   print(thisConfig.json(indent=2))
 
 
