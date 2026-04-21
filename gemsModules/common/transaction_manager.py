@@ -13,7 +13,7 @@ from gemsModules.common.services.workflow_manager import common_Workflow_Manager
 from gemsModules.common.services.aaop_tree_pair_manager import AAOP_Tree_Pair_Generator
 from gemsModules.common.services.servicer import commonservices_Servicer
 
-from gemsModules.systemoperations.filesystem_ops import is_directory_writable, write_string_to_file
+from gemsModules.systemoperations.filesystem_ops import directory_is_writable, write_string_to_file
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -116,7 +116,7 @@ class Transaction_Manager(ABC):
         self.request_manager.fill_request_data_needs(self.transaction)
 
         if self.incoming_project not in (None,""):
-            if is_directory_writable(self.incoming_project.logs_dir) :
+            if directory_is_writable(self.incoming_project.logs_dir) :
                 write_string_to_file(
                         self.transaction.incoming_string,
                         os.path.join(self.incoming_project.logs_dir, "request-raw.json")
@@ -195,7 +195,7 @@ class Transaction_Manager(ABC):
             log.debug("response project is None!")
 
         if self.incoming_project not in (None,""):
-            if is_directory_writable(self.incoming_project.logs_dir) :
+            if directory_is_writable(self.incoming_project.logs_dir) :
                 response_string = self.transaction.outputs.json(indent=2, by_alias=True)
                 write_string_to_file(
                         response_string,

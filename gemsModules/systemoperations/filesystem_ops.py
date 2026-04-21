@@ -155,7 +155,7 @@ def replace_bash_variable_in_file(path, vars: dict[str, any]):
             return True
 
 
-def is_directory_writable(directory_path, make_if_needed:bool = False):
+def directory_is_writable(directory_path, make_if_needed:bool = False):
     """Checks if a directory is writable by attempting to create a temporary file."""
     try:
         # If directory does not exist, and if asked to do so, try to make the directory:
