@@ -112,4 +112,160 @@ This operation happened to be important and widely-used. In places where sugar h
 was simple: update a single defined function. But, the other uses had to be found one at a time by looking 
 at every import of the relevant Python library.
 
+## BASH
+
+This is only about BASH. It might not apply to other shells.
+
+### Sourcing: use 'source' or use a dot?
+
+These two operations are identical in BASH:
+
+```
+source somefile.bash
+. somefile.bash
+```
+
+#### A general use convention
+
+- Use `source` when the information in `somefile.bash` is to be used by the code that follows it in the calling script.
+  This is mainly used when `somefile.bash` contains definitions or configurations.
+- Use a dot when the code in `somefile.bash` should be treated as code inserted into the calling script - that is, 
+  the code in `somefile.bash` is likely to depend on the code that preceded it in the calling script.
+
+That is:
+
+```
+source file_containing_definitions.bash
+
+next_steps # do things that use the info in the sourced file.
+
+. file_using_results_from_next_steps.bash
+```
+
+Use case example: file.bash contains code that is to be used in several scripts. Rather than copy the code into all the
+scripts, you can just use `. file.bash`. Using the dot tells the user how the code is being used.
+
+#### The general use convention doesn't always neatly apply
+
+When this convention doesn't apply, or could cause confusion, defaulting to `source` is better for readability.
+
+For example, in the tests, the main script `run_tests.sh` contains this function definition:
+
+```
+run_test() 
+{
+    source $1
+    return $?
+}
+`
+```
+
+In this case, the use of `source` emphasizes sourcing as a delibrate choice and improves readability. Importantly, it 
+signals that `$1` should not contain the command 'exit'.  The preference for 'source' as opposed to running it as a shell 
+script is explained below. 
+
+### Executing other BASH files: use source/return or run/exit?
+
+This mostly corresponds to the tests in GEMS, but the behavior information is general.
+
+#### Brief Overview
+
+Assume you have these three BASH scripts:
+
+- `main_script.bash`
+- `child_sript.bash`
+- `separate_script.bash`
+
+Also assume that `main_script.bash` must cause the other two to be executed. 
+
+There are two ways that this can happen. Main can source the other script or can call it like a command.
+
+The code looks something like:
+
+```
+source file.bash    # source file.bash
+bash file.bash      # run file.bash like a regular script
+```
+
+The difference is important for two reasons: external script completion and variable passing to the external script.
+
+#### External script completion
+
+If file.bash contains an `exit` command, different things happen when that command is accesed.
+
+The following will cause the calling script to also exit (cease processing) immediately:
+
+```
+source file.bash
+```
+
+But, this will not cause the calling script to exit:
+
+```
+bash file.bash
+```
+
+**For this reason, files that are intended to be sourced should only `return` and never `exit`.**
+
+#### Variable passing to the external script
+
+Variables do not need to be exported to scripts that are sourced. They must be exported to scripts that are executed.
+This allows a form of 'private' variable. 
+
+Example:
+
+Here is the calling script:
+```
+$ cat parent.bash 
+#!/usr/bin/env bash
+
+privatevariable="keepme"
+export exportedvariable="exportme"
+
+echo "sourcing child.bash"
+source child.bash
+
+echo "executing child.bash"
+bash child.bash
+```
+
+Here is the script that is called:
+```
+$ cat child.bash 
+#!/usr/bin/env bash
+
+echo "The value of privatevariable is ${privatevariable}"
+echo "The value of exportedvariable is ${exportedvariable}"
+```
+
+Here is the result of running parent.bash:
+```
+$ bash parent.bash 
+sourcing child.bash
+The value of privatevariable is keepme
+The value of exportedvariable is exportme
+executing child.bash
+The value of privatevariable is 
+The value of exportedvariable is exportme
+```
+
+Note that `privatevariable` is only visible to child.bash if child.bash is sourced.
+
+##### How this is useful
+
+Assume that you are running tests. 
+
+You want `testchild.bash` to use `SpecialVariable` as defined in `parent.bash`.  But, you also must execute 
+another file, `otherchild.bash`, that needs `SpecialVariable` to be defined somewhere else. You can use
+this difference to achieve that.
+
+```
+$ cat parent.bash
+#!/usr/bin/env bash
+
+SpecialVariable="test value"
+
+source testchild.bash   # will see SpecialVariable="test value"
+bash otherchild.bash    # will see SpecialVariable as defined elsewhere (or undefined if not)
+```
 
