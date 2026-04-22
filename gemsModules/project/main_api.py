@@ -2,34 +2,29 @@
 import os
 import uuid
 import traceback
-from typing import Any, List
+from typing import Any, List, Dict
 from datetime import datetime
 
 from pydantic import BaseModel, constr
 
-from gemsModules.deprecated.common import logic as commonlogic
-from gemsModules.deprecated.common import settings as commonsettings
-
 from gemsModules.common.main_api_notices import Notice
-
+from gemsModules.configuration.main_api import session_instance_config 
+from gemsModules.systemoperations.filesystem_ops import directory_is_writable
+from gemsModules.systemoperations.environment_ops import getGemsExecutionContext
 from gemsModules.project import settings as project_settings
 
-#from gemsModules.deprecated.instance_config.main import InstanceConfig
-from gemsModules.configuration.main_api import InstanceConfig, load_instance_config 
-from gemsModules.systemoperations.filesystem_ops import is_directory_writable
+from gemsModules.logging.logger import Set_Up_Logging
+log = Set_Up_Logging(__name__)
+
 
 # ## TODO - a lot of this info really belongs elsewhere.  It's not really
 #    project information.  For example, 'seqID' only applies to the sequence
 #    entity.  In the GP builder, there might be many sequences, but still 
 #    only one overall project.  So, one day, clean this up.
 
-from gemsModules.logging.logger import Set_Up_Logging
-log = Set_Up_Logging(__name__)
-
 ##TODO It makes sense that the length of things like a git hash won't change often. System-wide vars could 
 ##  provide constants or single-points-of-edit for types of max-length values. 
 ##  TTITLE_MAX_LENGTH could then be edited in a single place, but applied to all gemsModule classes.
-
 
 ##  @brief The primary way of tracking data related to a project
 #   @detail This is the generic project object. See subtypes for more specific fields
@@ -132,6 +127,7 @@ class Project(BaseModel):
 
     def __init__(self, **data : Any):
         super().__init__(**data)
+        log.debug("Instantiation of a project is called.")
 
         ## Random uuid for the project uuid if none has been specified
         if self.pUUID == "" : 
@@ -143,7 +139,7 @@ class Project(BaseModel):
 
     def getLocalhostInstanceConfigContextOptions(self) :
         log.info("getLocalhostInstanceConfigContextOptions was called")
-        IC = load_instance_config()
+        IC = session_instance_config
         instanceConfigOptions = IC.get_locahost_context_options_by_service_ID(serviceID=self.service_id)
         if instanceConfigOptions is not None:
             self.instance_config_options.append(instanceConfigOptions)
@@ -157,10 +153,12 @@ class Project(BaseModel):
         # your incoming project before calling this.
         if self.filesystem_path is None:
             self.filesystem_path = ""  # shorten later if-thens
-        IC = load_instance_config()
+        IC = session_instance_config
+        message="The service_id is: " + self.service_id
+        log.debug(message)
         instanceConfigPath = IC.get_filesystem_path_by_service_ID(serviceID=self.service_id)
         # instanceConfigPath = InstanceConfig().get_filesystem_path(app=self.app)
-        context = commonlogic.getGemsExecutionContext()
+        context = getGemsExecutionContext()
         if noClobber is True :
             if self.filesystem_path != ""  :
                 message = "Filesystem Output Path already exists in Project and cannot be clobbered.  It is:\n" + str(self.filesystem_path)
@@ -206,7 +204,7 @@ class Project(BaseModel):
             return
         # Still here? We are not a website. See what else we can do.
         if specifiedPath is not None :
-            if is_directory_writable(specifiedPath) :
+            if directory_is_writable(specifiedPath) :
                 message = "The specifiedPath is allowed.  Using it."
                 log.debug(message)
                 self.filesystem_path = specifiedPath
@@ -215,7 +213,7 @@ class Project(BaseModel):
                 log.error(message)
             return
         if instanceConfigPath is not None :
-            if is_directory_writable(instanceConfigPath) :
+            if directory_is_writable(instanceConfigPath) :
                 message = "The instanceConfigPath is allowed.  Using it."
                 log.debug(message)
                 self.filesystem_path = instanceConfigPath
@@ -232,26 +230,26 @@ class Project(BaseModel):
         #     $GEMSHOME/UserSpace
         #     website filesystem output path
         #
-        if is_directory_writable(project_settings.default_standalone_filesystem_output_path) :
+        if directory_is_writable(project_settings.default_standalone_filesystem_output_path) :
             message = "Setting filesystem output path to: " + project_settings.default_standalone_filesystem_output_path
             log.info(message)
             self.filesystem_path = project_settings.default_standalone_filesystem_output_path
             return
         userhome = os.environ.get("HOME")
         testdir = userhome + "/GEMS_UserSpace"
-        if is_directory_writable(testdir, make_if_needed=True) :
+        if directory_is_writable(testdir, make_if_needed=True) :
             message = "Setting filesystem output path to: " + testdir
             log.info(message)
             self.filesystem_path = testdir
             return
         gemshome = os.environ.get("GEMSHOME")
         testdir = gemshome + "/UserSpace"
-        if is_directory_writable(testdir, make_if_needed=True) :
+        if directory_is_writable(testdir, make_if_needed=True) :
             message = "Setting filesystem output path to: " + testdir
             log.info(message)
             self.filesystem_path = testdir
             return
-        if is_directory_writable(project_settings.default_website_filesystem_output_path) :
+        if directory_is_writable(project_settings.default_website_filesystem_output_path) :
             message = "Setting filesystem output path to: " + project_settings.default_website_filesystem_output_path
             log.info(message)
             self.filesystem_path = project_settings.default_website_filesystem_output_path
@@ -272,11 +270,11 @@ class Project(BaseModel):
         # This **SHOULD** be the case if the incoming JSON object specified a path.
         # For this to be true, ensure that your outgoing project is deep-copied from 
         # your incoming project before calling this.
-        context = commonlogic.getGemsExecutionContext()
+        context = getGemsExecutionContext()
         if self.uploads_path is None:
             self.uploads_path = ""  # shorten later if-thens
         #instanceConfigPath = InstanceConfig().get_uploads_path(app=self.app)
-        IC = load_instance_config()
+        IC = session_instance_config
         instanceConfigPath = IC.get_secure_inputs_path_by_service_ID(serviceID=self.service_id)
         message = "The instanceConfigPath returned was: "  + str(instanceConfigPath)
         log.debug(message)
@@ -325,7 +323,7 @@ class Project(BaseModel):
             return
         # Still here? We are not a website. See what else we can do.
         if specifiedPath is not None :
-            if is_directory_writable(specifiedPath) :
+            if directory_is_writable(specifiedPath) :
                 self.uploads_path = specifiedPath
                 message = "The specifiedPath is allowed.  Using it."
                 log.debug(message) 
@@ -334,7 +332,7 @@ class Project(BaseModel):
                 log.error(message)
             return
         if instanceConfigPath is not None :
-            if is_directory_writable(instanceConfigPath) :
+            if directory_is_writable(instanceConfigPath) :
                 message = "The instanceConfigPath is allowed.  Using it."
                 log.debug(message)
                 self.uploads_path = instanceConfigPath
@@ -349,26 +347,26 @@ class Project(BaseModel):
         #     $GEMSHOME/UserSpace
         #     website uploads_path
         #
-        if is_directory_writable(project_settings.default_standalone_filesystem_uploads_path) :
+        if directory_is_writable(project_settings.default_standalone_filesystem_uploads_path) :
             message = "Setting uploads path to: " + project_settings.default_standalone_filesystem_uploads_path
             log.info(message)
             self.uploads_path = project_settings.default_standalone_filesystem_uploads_path
             return
         userhome = os.environ.get("HOME")
         testdir = userhome + "/GEMS_UserSpace"
-        if is_directory_writable(testdir, make_if_needed=True) :
+        if directory_is_writable(testdir, make_if_needed=True) :
             message = "Setting uploads path to: " + testdir
             log.info(message)
             self.uploads_path = testdir
             return
         gemshome = os.environ.get("GEMSHOME")
         testdir = gemshome + "/UserSpace"
-        if is_directory_writable(testdir, make_if_needed=True) :
+        if directory_is_writable(testdir, make_if_needed=True) :
             message = "Setting uploads path to: " + testdir
             log.info(message)
             self.uploads_path = testdir
             return
-        if is_directory_writable(project_settings.default_website_filesystem_uploads_path) :
+        if directory_is_writable(project_settings.default_website_filesystem_uploads_path) :
             message = "Setting uploads path to: " + project_settings.default_website_filesystem_uploads_path
             log.info(message)
             self.uploads_path = project_settings.default_website_filesystem_uploads_path
@@ -454,7 +452,7 @@ class Project(BaseModel):
             return
         # If we are still here, set the directory 
         self.project_dir =  os.path.join(self.service_dir, self.pUUID )
-        if not is_directory_writable(self.project_dir) :
+        if not directory_is_writable(self.project_dir) :
             message = "Unable to write to the project directory. \nForging ahead, but not optimistic about it."
             log.error(message)
         log.debug("self.project_dir is : >>>" + self.project_dir + "<<<")
@@ -491,7 +489,7 @@ class Project(BaseModel):
         if self.versions_file_path is None or self.versions_file_path == "" :
             log.error("There was a problem setting the versions file path.  Cannot load versions file info")
             return
-        from gemsModules.deprecated.project.projectUtilPydantic import getVersionsFileInfo
+        from gemsModules.project.utils import getVersionsFileInfo
         log.debug("About to load the version info.")
         try : 
             theDict = getVersionsFileInfo(self.versions_file_path)
@@ -533,7 +531,7 @@ class Project(BaseModel):
         if self.site_host_name == "" :
             log.error("Sete host name not set.  Cannot set Host Url Base Path.")
             return
-        if commonlogic.getGemsExecutionContext() == 'website' :
+        if getGemsExecutionContext() == 'website' :
             prefix = 'https://'
         else :
             prefix = 'http://'
@@ -568,6 +566,7 @@ class Project(BaseModel):
         return self.download_url_path
         
     def generateCommonParserNotice(self, *args, **kwargs) :
+        from gemsModules.deprecated.common import settings as commonsettings
         self.notices.append(commonsettings.generateCommonParserNotice(*args, **kwargs))
 
     def createDirectories(self) :
@@ -592,7 +591,11 @@ class Project(BaseModel):
         if self.has_input_files != "True":
             log.error("This project says it does NOT have input files, but copyUploadedFiles was called.")
             try:
-                commonlogic.copyPathFileToPath(self.upload_path, self.uploaded_file_name, self.project_dir)
+                from gemsModules.systemoperations.filesystem_ops import build_filesystem_path, copy_file_from_A_to_B
+                source = build_filesystem_path(self.upload_path,self.uploaded_file_name)
+                destination = build_filesystem_path(self.project_dir,self.uploaded_file_name)
+                copy_file_from_A_to_B(source, destination)
+                # was: commonlogic.copyPathFileToPath(self.upload_path, self.uploaded_file_name, self.project_dir)
             except Exception as error:
                 log.error("There was a problem uploading the input: " + str(error))
                 raise error

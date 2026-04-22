@@ -12,12 +12,12 @@ from gemsModules.common.services.response_manager import common_Response_Manager
 from gemsModules.common.services.workflow_manager import common_Workflow_Manager
 from gemsModules.common.services.aaop_tree_pair_manager import AAOP_Tree_Pair_Generator
 from gemsModules.common.services.servicer import commonservices_Servicer
-
+    
 from gemsModules.systemoperations.filesystem_ops import directory_is_writable, write_string_to_file
 
 from gemsModules.logging.logger import Set_Up_Logging
-
 log = Set_Up_Logging(__name__)
+
 
 
 class Transaction_Manager(ABC):

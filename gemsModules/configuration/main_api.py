@@ -3,13 +3,14 @@ from pydantic import BaseModel, ValidationError, Field
 from typing import List, Dict, Literal, Optional, Any
 from enum import Enum
 
-from gemsModules.logging.logger import Set_Up_Logging
+from gemsModules.common.code_utils import GemsStrEnum
 
+from gemsModules.logging.logger import Set_Up_Logging
 
 log = Set_Up_Logging(__name__)
 
 
-class SupportedExecutionContexts(str, Enum) :
+class SupportedExecutionContexts(GemsStrEnum) :
     """ 
     Tell GEMS about its execution environment.
     Each of these contexts can have a set of options defined (see Host, below).
@@ -101,7 +102,7 @@ class InstanceConfig(BaseModel):
             Description="Local secured space for storing uploads, sideloads, generic input. Assumed not visible to the cluster."
             )
 
-    def get_localhost() -> Host :
+    def get_localhost(self) -> Host :
         """ 
         Return the localhost's Host object
         """
@@ -114,7 +115,7 @@ class InstanceConfig(BaseModel):
         log.error("Cannot find localhost.")
         return None
 
-    def get_localhost_hostName() -> str :
+    def get_localhost_hostName(self) -> str :
         """
         Return the hostName in the Host object
         """
@@ -183,11 +184,20 @@ class InstanceConfig(BaseModel):
             message = f"The serviceID {serviceID} is NOT found in SupportedExecutionContexts."
             log.debug(message)
             raise KeyError (message)
+        directory='Not Found'
+        theKeys=SupportedExecutionContexts.get_key_list()
+        print(theKeys)
+        keys_to_check = [ sID, sIDAlso ]
+        for key in keys_to_check:
+            if key in theKeys:
+                print("Found the key! it is: " + key)
+                if self.filesystem_paths[key] not in (None,""):
+                    directory = self.filesystem_paths[key]
+                    print("found a directory")
 
-        keys_to_check = [ sID, SIDAlso ]
-        directory = next((self.filesystem_paths[SupportedExecutionContexts[key]] \
-            for key in keys_to_check if key in self.filesystem_paths[SupportedExecutionContexts]), \
-            'Not Found')
+#        directory = next((self.filesystem_paths[SupportedExecutionContexts[key]] \
+#            for key in keys_to_check if key in self.filesystem_paths[SupportedExecutionContexts.get_key_list()]), \
+#            'Not Found')
         if directory == 'Not Found' :
             log.debug("the serviceID is NOT found in filesystem_paths.")
             return None
@@ -210,7 +220,7 @@ class InstanceConfig(BaseModel):
             log.debug(message)
             raise KeyError (message)
 
-        keys_to_check = [ sID, SIDAlso ]
+        keys_to_check = [ sID, sIDAlso ]
         directory = next((self.secure_inputs_paths[SupportedExecutionContexts[key]] \
             for key in keys_to_check if key in self.secure_inputs_paths[SupportedExecutionContexts]), \
             'Not Found')

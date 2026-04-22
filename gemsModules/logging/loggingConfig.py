@@ -9,6 +9,7 @@ import socket
 
 ## Set the verbosity via the GEMS_LOGGING_LEVEL environment var.
 def getGemsLoggingLevel():
+    #print("get logging level")
     try:
         loggingLevel = os.environ.get("GEMS_LOGGING_LEVEL")
 
@@ -27,7 +28,8 @@ def getGemsLoggingLevel():
             )
         return loggingLevel
     except Exception as error:
-        return logging.ERROR
+        return 100
+        #return logging.ERROR
 
 
 LOGGING_LEVEL = getGemsLoggingLevel()
@@ -41,6 +43,7 @@ we want to write logs to file, send emails, etc...
 
 class HostnameFilter(logging.Filter):
     hostname = socket.gethostname()
+    #print("hostname filter")
 
     def filter(self, record):
         record.hostname = HostnameFilter.hostname
@@ -49,6 +52,7 @@ class HostnameFilter(logging.Filter):
 
 def createLogger(name):
     # print("name: " + name + ", LOGGING_LEVEL: " + str(LOGGING_LEVEL))
+    #print("createlogger")
     if loggers.get(name):
         log.debug("logger already exists with name: " + name)
     else:
@@ -68,6 +72,10 @@ def createLogger(name):
                 logsDir + "/git-ignore-me_gemsDebug.log"
             )
             debugFileHandler.setLevel(logging.DEBUG)
+            infoFileHandler = logging.FileHandler(
+                logsDir + "/git-ignore-me_gemsInfo.log"
+            )
+            infoFileHandler.setLevel(logging.INFO)
         ##Filters
         hostnameFilter = HostnameFilter()
         errorFileHandler.addFilter(hostnameFilter)
@@ -75,6 +83,7 @@ def createLogger(name):
             infoFileHandler.addFilter(hostnameFilter)
         if LOGGING_LEVEL > 0:
             debugFileHandler.addFilter(hostnameFilter)
+            infoFileHandler.addFilter(hostnameFilter)
 
         ##Formatters
         formatter = logging.Formatter(
@@ -87,12 +96,14 @@ def createLogger(name):
             infoFileHandler.setFormatter(formatter)
         if LOGGING_LEVEL > 0:
             debugFileHandler.setFormatter(formatter)
+            infoFileHandler.setFormatter(formatter)
         # log.addHandler(streamHandler)
         log.addHandler(errorFileHandler)
         if LOGGING_LEVEL > 10:
             log.addHandler(infoFileHandler)
         if LOGGING_LEVEL > 0:
             log.addHandler(debugFileHandler)
+            log.addHandler(infoFileHandler)
         loggers[name] = log
         # log.debug("created a new logger for: " + name + ", LOGGING_LEVEL: " + str(LOGGING_LEVEL))
     return log

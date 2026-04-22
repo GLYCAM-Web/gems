@@ -6,10 +6,9 @@ from typing import Dict, Union, Optional
 from gemsModules.common.main_api_notices import Notices
 from gemsModules.common.main_api_procedural_options import Procedural_Options
 from gemsModules.common.main_api_services import Service_Requests, Service_Responses
-from gemsModules.common.main_api_resources import Resource, Resources
+from gemsModules.common.main_api_resources import Resources
 
 from gemsModules.logging.logger import Set_Up_Logging
-
 log = Set_Up_Logging(__name__)
 
 

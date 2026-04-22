@@ -16,9 +16,9 @@ from gemsModules.mmservice.mdaas.services.settings.known_available import (
     Available_Services,
 )
 
-from .services.Evaluate.api import Evaluate_Request, Evaluate_Response
-from .services.ProjectManagement.api import ProjectManagement_Request, ProjectManagement_Response
-from .services.run_md.run_md_api import run_md_Request, run_md_Response
+from gemsModules.mmservice.mdaas.services.Evaluate.api import Evaluate_Request, Evaluate_Response
+from gemsModules.mmservice.mdaas.services.ProjectManagement.api import ProjectManagement_Request, ProjectManagement_Response
+from gemsModules.mmservice.mdaas.services.run_md.run_md_api import run_md_Request, run_md_Response
 
 
 from gemsModules.logging.logger import Set_Up_Logging

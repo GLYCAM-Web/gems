@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
 from abc import ABC, abstractmethod
 from pydantic import BaseModel, Field
-from typing import Dict
-
-from gemsModules.project.main_api import Project
-from gemsModules.common.main_api_entity import Entity
-from gemsModules.common.main_api_notices import Notices
-from gemsModules.common import settings as settings_main
+from typing import Dict, List
 
 import traceback
 
-from gemsModules.logging.logger import Set_Up_Logging
+from gemsModules.common import settings as settings_main
+from gemsModules.common.main_api_entity import Entity
+from gemsModules.common.main_api_notices import Notices
+from gemsModules.project.main_api import Project
 
+from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 

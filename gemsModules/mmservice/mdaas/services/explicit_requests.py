@@ -2,7 +2,7 @@
 from gemsModules.common.services.explicit_requests import Explicit_Service_Request_Manager
 from gemsModules.logging.logger import Set_Up_Logging
 
-from .settings.explicit_modules import explicit_modules
+from gemsModules.mmservice.mdaas.services.settings.explicit_modules import explicit_modules
 
 
 log = Set_Up_Logging(__name__)

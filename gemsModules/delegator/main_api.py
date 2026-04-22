@@ -2,10 +2,8 @@
 from pydantic import validator, Field, typing
 from gemsModules.common import main_api, main_api_entity, main_api_services
 
-from gemsModules.delegator.main_settings import WhoIAm
-from gemsModules.delegator.services.settings.known_available import Available_Services
-from gemsModules.delegator.redirector_settings import Known_Entities
-
+#from gemsModules.delegator.services.settings.known_available import Available_Services
+#from gemsModules.delegator.redirector_settings import Known_Entities
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -14,6 +12,7 @@ log = Set_Up_Logging(__name__)
 
 
 class Delegator_Service_Request(main_api_services.Service_Request):
+    from gemsModules.delegator.services.settings.known_available import Available_Services
     typename: Available_Services = Field(
         "Delegator",
         alias="type",
@@ -23,6 +22,7 @@ class Delegator_Service_Request(main_api_services.Service_Request):
 
 
 class Delegate_Service_Response(main_api_services.Service_Response):
+    from gemsModules.delegator.services.settings.known_available import Available_Services
     typename: Available_Services = Field(
         None,
         alias="type",
@@ -70,6 +70,7 @@ class Redirector_Entity(main_api_entity.Entity):
 
     @validator("entityType")
     def checkEntityType(cls, v):
+        from gemsModules.delegator.known_entities import Known_Entities
         if v not in Known_Entities.__members__.values():
             raise ValueError(
                 f"From Delegator: The requested entity, {v}, is not known. Use entity 'Delegator' and service 'KnownEntities' to get a list of known entities"

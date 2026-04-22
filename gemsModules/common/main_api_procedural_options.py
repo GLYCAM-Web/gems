@@ -28,7 +28,7 @@ class Procedural_Options(ABC, BaseModel):
 
     @validator('context', pre=True, always=True)
     def enforce_website_context(cls, v, values, **kwargs):
-        from gemsModules.deprecated.common.logic import getGemsExecutionContext
+        from gemsModules.systemoperations.environment_ops import getGemsExecutionContext
         apparent_context : str = getGemsExecutionContext()
         if 'context' not in values :
             return apparent_context
@@ -40,7 +40,7 @@ class Procedural_Options(ABC, BaseModel):
 
     @validator('force_serial_execution', pre=True, always=True)
     def enforce_environment_serial_execution_flag(cls, v, values, **kwargs):
-        from gemsModules.deprecated.common.logic import getGemsEnvironmentForceSerialExecution
+        from gemsModules.systemoperations.environment_ops import getGemsEnvironmentForceSerialExecution
         the_flag : str =getGemsEnvironmentForceSerialExecution()
         if the_flag == 'unset':
             return v

@@ -1,34 +1,36 @@
 #!/usr/bin/env python3
-from enum import Enum
-from gemsModules.common.code_utils import GemsStrEnum
+#from enum import Enum
+#from gemsModules.common.code_utils import GemsStrEnum
+
+from gemsModules.delegator.known_entities import Known_Entities
 
 from gemsModules.logging.logger import Set_Up_Logging
 
 log = Set_Up_Logging(__name__)
 
 
-class Known_Entities(GemsStrEnum):
-    """
-    The entities that Delegator knows about.
-    """
-
-    Delegator = "Delegator"
-    DeprecatedDelegator = "DeprecatedDelegator"
-    MDaaS = "MDaaS"
-    Status = "Status"
-    BatchCompute = "BatchCompute"
-    Conjugate = "Conjugate"
-    #CommonServicer = "CommonServicer"
-    MmService = "MmService"
-    Query = "Query"
-    Sequence = "Sequence"
-    DrawGlycan = "DrawGlycan"
-    StructureFile = "StructureFile"
-    PDBFile = "PDBFile"
-    Glycomimetics = "Glycomimetics"
-    AntibodyDocking = "AntibodyDocking"
-    GlycoProtein = "GlycoProtein"
-#    GpBuilder = "GpBuilder" # for backwards compatibility
+#class Known_Entities(GemsStrEnum):
+#    """
+#    The entities that Delegator knows about.
+#    """
+#
+#    Delegator = "Delegator"
+#    DeprecatedDelegator = "DeprecatedDelegator"
+#    MDaaS = "MDaaS"
+#    Status = "Status"
+#    BatchCompute = "BatchCompute"
+#    Conjugate = "Conjugate"
+#    #CommonServicer = "CommonServicer"
+#    MmService = "MmService"
+#    Query = "Query"
+#    Sequence = "Sequence"
+#    DrawGlycan = "DrawGlycan"
+#    StructureFile = "StructureFile"
+#    PDBFile = "PDBFile"
+#    Glycomimetics = "Glycomimetics"
+#    AntibodyDocking = "AntibodyDocking"
+#    GlycoProtein = "GlycoProtein"
+##    GpBuilder = "GpBuilder" # for backwards compatibility
 
 
 from gemsModules.deprecated.delegator.receive import delegate as deprecated_delegator
@@ -51,13 +53,14 @@ from gemsModules.conjugate.glycoprotein.receive import receive as glycoprotein
 Known_Entity_Reception_Modules = {
     #'BatchCompute' : batchcompute, # for now, still deprecated
     #"CommonServicer": common, # No way to call this directly
+#    "Delegator": main_delegator,
     "MDaaS": mdaas,
     "MmService": mmservice,
     "Status": status,
     # Deprecated
     "BatchCompute": deprecated_delegator,
     "Conjugate": deprecated_delegator,
-    "Delegator": deprecated_delegator,
+#    "Delegator": deprecated_delegator,
     "DeprecatedDelegator": deprecated_delegator,
     "DrawGlycan": deprecated_delegator,
     "Query": deprecated_delegator,

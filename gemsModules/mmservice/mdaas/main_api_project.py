@@ -7,7 +7,7 @@ from pydantic.typing import Literal as PyLiteral
 from typing import Any
 
 from gemsModules.project.main_api import Project
-from gemsModules.deprecated.instance_config.main import InstanceConfig
+#from gemsModules.deprecated.instance_config.main import InstanceConfig
 
 from gemsModules.logging.logger import Set_Up_Logging
 

@@ -4,13 +4,11 @@ import traceback
 from pydantic import ValidationError
 from abc import ABC, abstractmethod
 
-from gemsModules.common import settings
-from gemsModules.common.main_api import common_Transaction
 from gemsModules.common.transaction_manager import Transaction_Manager
+from gemsModules.common.main_api import common_Transaction
+from gemsModules.common.settings import WhoIAm
 
 from gemsModules.logging.logger import Set_Up_Logging
-
-
 log = Set_Up_Logging(__name__)
 
 
@@ -26,7 +24,7 @@ class Json_String_Manager(ABC):
     @abstractmethod
     def get_local_components(self):
         self.transaction = common_Transaction()
-        self.entityType = settings.WhoIAm
+        self.entityType = WhoIAm
         self.transaction_manager_type = common_Transaction_Manager
         self.initialize_out = False
 

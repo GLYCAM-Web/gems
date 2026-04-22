@@ -7,7 +7,6 @@ from gemsModules.common.main_api_entity import Entity
 from gemsModules.project.main_api import Project
 
 from gemsModules.logging.logger import Set_Up_Logging
-
 log = Set_Up_Logging(__name__)
 
 
@@ -55,7 +54,7 @@ class Project_Manager(ABC):
                         log.error(f"service: {serviceType} - pUUID {foundUUID}")
                         log.error(f"service: {service.typename} - pUUID {service.inputs['pUUID']}")
                         raise ValueError ("Service inputs have conflicting pUUIDs")
-         return foundUUID
+        return foundUUID
 
 
 

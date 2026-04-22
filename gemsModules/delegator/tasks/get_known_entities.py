@@ -1,4 +1,4 @@
-from gemsModules.delegator.redirector_settings import Known_Entities
+from gemsModules.delegator.known_entities import Known_Entities
 from typing import List
 
 def execute() -> List:

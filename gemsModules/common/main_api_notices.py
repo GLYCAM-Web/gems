@@ -4,6 +4,7 @@ from typing import Dict, List
 from pydantic import BaseModel, Field, PrivateAttr
 
 from gemsModules.common.code_utils import GemsStrEnum
+from gemsModules.common.notice_data import NoticeData
 
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
@@ -61,7 +62,6 @@ class Notice(BaseModel):
 
 
 def makeDefaultNoticesList() :
-    from gemsModules.common.notice_data import NoticeData
     theNotices : List[Notice] = []
     tempNotice : Notice = Notice()   
     for noticedatum in NoticeData :

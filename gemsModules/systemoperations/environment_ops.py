@@ -53,6 +53,30 @@ def add_gems_to_python_path() -> None:
     GemsPath = get_gems_path()
     sys.path.append(GemsPath)
 
+def getGemsExecutionContext() :
+    log.info("getGemsExecutionContext was called.")
+    # Currently, if this variable is set to anything at all, GEMS is
+    # probably operating in support of a wabsite.
+    if 'GW_LIVE_SWARM' in os.environ :
+        log.debug("GW_LIVE_SWARM is defined in the current environment.  Assuming this is a website.")
+        return 'website'
+    else :
+        log.debug("GW_LIVE_SWARM is NOT defined in the current environment.  Assuming this is not a website.")
+        return 'default'
+
+
+
+def getGemsEnvironmentForceSerialExecution() :
+    log.info("getGemsEnvironmentForceSerialExecution was called.")
+    # Currently, if this variable is set to anything at all, GEMS is
+    # probably operating in support of a wabsite.
+    if 'GEMS_FORCE_SERIAL_EXECUTION' in os.environ :
+        log.debug("GEMS_FORCE_SERIAL_EXECUTION is defined in the current environment.")
+        return os.environ.get('GEMS_FORCE_SERIAL_EXECUTION')
+    else :
+        log.debug("GEMS_FORCE_SERIAL_EXECUTION is NOT defined in the current environment.")
+        return 'unset'
+
 
 def is_GEMS_live_swarm() -> bool:
     """For deciding if DevEnv or not.

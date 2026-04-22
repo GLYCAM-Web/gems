@@ -5,10 +5,10 @@ from gemsModules.common.services.request_manager import Request_Manager
 from gemsModules.common.services.service_packages_list import (
     Services_Package_List_Utilities,
 )
-from .implied_requests import mdaas_Implied_Services_Request_Manager
-from .default_requests import mdaas_Default_Service_Request_Manager
-from .duplicate_requests import mdaas_Duplicate_Requests_Manager
-from .explicit_requests import mdaas_Explicit_Request_Manager
+from gemsModules.mmservice.mdaas.services.implied_requests import mdaas_Implied_Services_Request_Manager
+from gemsModules.mmservice.mdaas.services.default_requests import mdaas_Default_Service_Request_Manager
+from gemsModules.mmservice.mdaas.services.duplicate_requests import mdaas_Duplicate_Requests_Manager
+from gemsModules.mmservice.mdaas.services.explicit_requests import mdaas_Explicit_Request_Manager
 
 from gemsModules.mmservice.mdaas.services.workflow_manager import mdaas_Workflow_Manager
 from gemsModules.mmservice.mdaas.services.request_data_filler import (

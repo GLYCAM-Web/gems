@@ -13,7 +13,7 @@ log = Set_Up_Logging(__name__)
 class delegator_Project_Manager(Project_Manager):
 
     def process(self, incoming_string:str = None) -> Project:
-        log.info("process for Redirector_Json_String_Manager is called")
+        log.info("process for delegator_Project_Manager is called")
         if self.incoming_project is not None:
             self.fill_response_project_from_incoming_project()
             log.debug("The incoming project is:")

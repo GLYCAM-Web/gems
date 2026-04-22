@@ -1,24 +1,28 @@
 # Conventions and Normal Practices for gemsModules
 
-Unless something here contradicts a widely-adopted practice, then use a widely-adopted practice.
+If a use case is not addressed here, use a convention from elsewhere in the codebase or something 
+widely used.
+
+Not all of the conventions from the codebase are listed here. Adding them to this document is encouraged.
 
 ## Imports
 
-Goal: minimize the number of imports to greatly reduces the possibility of head-scratcher bugs.
+Minimize the number of imports in a given workflow to greatly reduce the possibility of head-scratcher bugs.
 
-It also makes the code faster.
+Doing that also makes the code faster.
 
 ### Leave `__init__.py` empty.
 
-Keep all imports purposeful, local, and targeted to the need.
+Keep all imports purposeful, local, and targeted to the need. Because each gemsModule is its own 'package',
+and because the packages interact, use of `__init__.py` obfuscates the code more than simplifies it.
 
 ### Use Full Paths
 
-Don't use relative paths (start with dots). Please just accept this and hope you never need to know why.
-As of this writing, this is also the recommended best practice for Python.
+Don't use relative paths (that start with dots). As with the use of `__init__.py`, relative imports tend to 
+obfuscate more than simplify. This is especially so because the gemsModules refer to each other, and sometimes 
+to deprecated code, and package components share names. Namespacing is important, especially when debugging.
 
-The gemsModules refer to each other, and sometimes to deprecated code. Each one is a 'package', and they
-often have identical names other than their paths. Be verbose and unambiguous.
+Be verbose and unambiguous.
 
 ### Place imports as close to the imported code as possible. 
 
@@ -28,14 +32,28 @@ Top-level (file-level) imports should be reserved for:
 - Requirements for defining classes or definitions, e.g., `class MyChildClass(ParentClass):`. 
   In the latter, it is appropriate to import ParentClass at the file-level.
 
-It is also ok to use them for this:
+It is also ok to use file-level imports for:
 
 - Imports that are used in multiple places by many defs/classes.
 - Especially lower-level imports like 'os'.
 
-... but avoid it even then. 
+... but avoid doing that even then. 
 
 Regarding lower-level imports, see also Syntactic Sugar, below.
+
+Examples of proper uses:
+
+```
+## This import must be file-level because it is needed for inheritance at the file level
+from gemsModules.common.main_api import Common_API  
+
+class myAPI(Common_API):
+    ...  
+    def check_directories():
+        ## This import is only needed here, so import it here rather than at the top
+        from gemsModules.systemoperations.filesystem_ops import check_make_directory directory_is_writable
+        ...
+```
 
 ## Variables Related To I/O
 
@@ -53,10 +71,7 @@ then a coder can be sure that it is always a string. Similarly, a coder knows th
 Because the Tasks exist for the purpose of interfacing other software, the coder knows that it might be of whatever 
 variable type is convenient to the particular Task.
 
-Currently, there is no convention for non-API/non-Task naming. For example, `def do_this_thing():` has no predetermined
-convention. It might be useful to add one. Spelling/naming conventions can be added as needed. 
-
-## Use Syntactic Sugar
+## Syntactic Sugar
 
 There is some built-in sugar. Where it exists, please use it. Feel free to add your own.
 
@@ -90,8 +105,32 @@ if os.path.isdir(directory_path):
 
 Example 2:
 
-See the code for `gemsModules.systemoperations.filesystem_ops.directory_is_writable`. The sugar is much 
-better than writing that all over the place.
+Here is the code for `gemsModules.systemoperations.filesystem_ops.directory_is_writable`:
+
+```
+def directory_is_writable(directory_path, make_if_needed:bool = False):
+    """Checks if a directory is writable by attempting to create a temporary file."""
+    try:
+        # If directory does not exist, and if asked to do so, try to make the directory:
+        if make_if_needed:
+            check_make_directory(directory_path)
+        # Create a temporary file in the directory
+        with tempfile.TemporaryFile(dir=directory_path) as temp_file:
+            # Try writing to the file
+            temp_file.write(b"test write")
+        return True
+    except PermissionError:
+        return False
+    except FileNotFoundError:
+        # Parent directory does not exist
+        return False
+    except OSError as e:
+        # Catch other potential OS errors (e.g., full disk, specific Windows issues)
+        print(f"An OS error occurred: {e}")
+        return False
+```
+
+The sugar (`directory_is_writable`) is much better than writing that code all over the place.
 
 #### Searching and Maintenance
 
@@ -103,9 +142,9 @@ This helps for these reasons:
 - The import statement informs the reader/coder where the sugar's code can be found.
 - We often need only a few behaviors from a library (e.g., os.path) rather than all the possible options.
 - If a sugared method must be altered, it needs only be altered in a single location.
-- It is easy to find all instances where the method is used.
+- It is easy to find all instances where the sugar is used.
 
-_A use-case example:_
+_Use case example:_
 
 During an upgrade of the Python version used by the code, the default behavior of a file operation changed. 
 This operation happened to be important and widely-used. In places where sugar had been used, the update
@@ -142,10 +181,12 @@ next_steps # do things that use the info in the sourced file.
 . file_using_results_from_next_steps.bash
 ```
 
-Use case example: file.bash contains code that is to be used in several scripts. Rather than copy the code into all the
+_Use case example:_ 
+
+`file.bash` contains code that is to be used in several scripts. Rather than copy the code into all the
 scripts, you can just use `. file.bash`. Using the dot tells the user how the code is being used.
 
-#### The general use convention doesn't always neatly apply
+#### The general use convention doesn't always apply
 
 When this convention doesn't apply, or could cause confusion, defaulting to `source` is better for readability.
 
@@ -166,7 +207,7 @@ script is explained below.
 
 ### Executing other BASH files: use source/return or run/exit?
 
-This mostly corresponds to the tests in GEMS, but the behavior information is general.
+This mostly concerns the tests in GEMS, but the behavior information is general.
 
 #### Brief Overview
 
@@ -205,12 +246,14 @@ But, this will not cause the calling script to exit:
 bash file.bash
 ```
 
-**For this reason, files that are intended to be sourced should only `return` and never `exit`.**
+!! For this reason, files that are intended to be sourced should only `return` and never `exit`.
+
+If exit is used, it causes everything that sourced the exiting file to also exit immediately.
 
 #### Variable passing to the external script
 
-Variables do not need to be exported to scripts that are sourced. They must be exported to scripts that are executed.
-This allows a form of 'private' variable. 
+Variables can be used by sourced scripts without using `export`. They must be `export`ed to scripts that are executed.
+This allows a method for having 'private' variables. 
 
 Example:
 
@@ -266,6 +309,6 @@ $ cat parent.bash
 SpecialVariable="test value"
 
 source testchild.bash   # will see SpecialVariable="test value"
-bash otherchild.bash    # will see SpecialVariable as defined elsewhere (or undefined if not)
+bash otherchild.bash    # will see SpecialVariable as defined elsewhere (or as undefined if not)
 ```
 

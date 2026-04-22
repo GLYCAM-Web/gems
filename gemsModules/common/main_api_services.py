@@ -3,11 +3,10 @@ from uuid import UUID
 from typing import Dict, Optional
 from pydantic import BaseModel, Field, typing
 
-from gemsModules.common.main_api_notices import Notices
 from gemsModules.common.services.settings.known_available import Available_Services
+from gemsModules.common.main_api_notices import Notices
 
 from gemsModules.logging.logger import Set_Up_Logging
-
 log = Set_Up_Logging(__name__)
 
 
