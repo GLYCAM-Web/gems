@@ -5,6 +5,9 @@ from gemsModules.common.code_utils import GemsStrEnum
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
+AAAA FIX ME !!!  
+
+Use the registry in the redirector settings instead now that imports are sane.
 
 class Known_Entities(GemsStrEnum):
     """

@@ -48,10 +48,13 @@ def receive(incomingString: str) -> str:
         log.debug("Delegating incoming string to entity: " + requested_entity)
         from gemsModules.delegator import redirector_settings
         incoming_string = json.dumps(tmp_dict)
-        entity_module = redirector_settings.Known_Entity_Reception_Modules[
-            requested_entity
-        ]
-        return entity_module(incomingString)
+        #entity_module = redirector_settings.Known_Entity_Reception_Modules[
+        #    requested_entity
+        #]
+        entity_module = redirector_settings.get_receive_module(requested_entity)
+        #import entity_module as receive_entity
+        return entity_module(incoming_string)
+        #return receive_entity(incoming_string)
 
 
 

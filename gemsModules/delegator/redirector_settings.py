@@ -1,75 +1,59 @@
 #!/usr/bin/env python3
-#from enum import Enum
-#from gemsModules.common.code_utils import GemsStrEnum
-
-from gemsModules.delegator.known_entities import Known_Entities
+import importlib
 
 from gemsModules.logging.logger import Set_Up_Logging
-
 log = Set_Up_Logging(__name__)
 
-
-#class Known_Entities(GemsStrEnum):
-#    """
-#    The entities that Delegator knows about.
-#    """
-#
-#    Delegator = "Delegator"
-#    DeprecatedDelegator = "DeprecatedDelegator"
-#    MDaaS = "MDaaS"
-#    Status = "Status"
-#    BatchCompute = "BatchCompute"
-#    Conjugate = "Conjugate"
-#    #CommonServicer = "CommonServicer"
-#    MmService = "MmService"
-#    Query = "Query"
-#    Sequence = "Sequence"
-#    DrawGlycan = "DrawGlycan"
-#    StructureFile = "StructureFile"
-#    PDBFile = "PDBFile"
-#    Glycomimetics = "Glycomimetics"
-#    AntibodyDocking = "AntibodyDocking"
-#    GlycoProtein = "GlycoProtein"
-##    GpBuilder = "GpBuilder" # for backwards compatibility
-
-
-from gemsModules.deprecated.delegator.receive import delegate as deprecated_delegator
-
-# TODO: For now, amber is directly calling slurm, rather than going through delegator.
-# Part of the reason for this is that the grpc_slurm_server does not expect a full GEMS request, but a slurm job submission dict.
-# from gemsModules.batchcompute.slurm.receive import receive as slurm
-from gemsModules.common.receive import receive as common
-
-from gemsModules.mmservice.receive import receive as mmservice
-from gemsModules.mmservice.mdaas.receive import receive as mdaas
-
-from gemsModules.structurefile.PDBFile.receive import receive as pdbfile
-from gemsModules.status.receive import receive as status
-
-from gemsModules.complex.glycomimetics.receive import receive as glycomimetics
-from gemsModules.complex.antibody.receive import receive as antibody
-from gemsModules.conjugate.glycoprotein.receive import receive as glycoprotein
-
-Known_Entity_Reception_Modules = {
-    #'BatchCompute' : batchcompute, # for now, still deprecated
-    #"CommonServicer": common, # No way to call this directly
-#    "Delegator": main_delegator,
-    "MDaaS": mdaas,
-    "MmService": mmservice,
-    "Status": status,
+## Leaving out:     "GpBuilder": glycoprotein, # for backwards compatibility
+##                  replace if needed
+MODULE_REGISTRY = {
+    "MDaaS": "gemsModules.mmservice.mdaas.receive",
+    "MmService": "gemsModules.mmservice.receive",
+    "Status": "gemsModules.status.receive",
+    "PDBFile": "gemsModules.structurefile.PDBFile.receive",
+    "AntibodyDocking": "gemsModules.complex.antibody.receive",
+    "Glycomimetics": "gemsModules.complex.glycomimetics.receive",
+    "GlycoProtein": "gemsModules.conjugate.glycoprotein.receive",
     # Deprecated
-    "BatchCompute": deprecated_delegator,
-    "Conjugate": deprecated_delegator,
-#    "Delegator": deprecated_delegator,
-    "DeprecatedDelegator": deprecated_delegator,
-    "DrawGlycan": deprecated_delegator,
-    "Query": deprecated_delegator,
-    "Sequence": deprecated_delegator,
-    #'Status' : deprecated_delegator,
-    "StructureFile": deprecated_delegator,
-    "PDBFile": pdbfile,
-    "Glycomimetics": glycomimetics,
-    "GlycoProtein": glycoprotein,
-#    "GpBuilder": glycoprotein, # for backwards compatibility
-    "AntibodyDocking": antibody
+    "BatchCompute": "DeprecatedDelegator",
+    "Conjugate": "DeprecatedDelegator",
+    "DeprecatedDelegator": "DeprecatedDelegator",
+    "DrawGlycan": "DeprecatedDelegator",
+    "Query": "DeprecatedDelegator",
+    "Sequence": "DeprecatedDelegator",
+    "StructureFile": "DeprecatedDelegator",
 }
+
+def get_receive_module(choice):
+    module_path = MODULE_REGISTRY.get(choice)
+
+    ############## I HAVE NOT TESTED THIS YET
+    # DEV OVERRIDE: Check if an environment variable is set for this choice
+    # Example: export GEMS_OVERRIDE_Status="gemsModules.dev.status.receive"
+    import os
+    override = os.getenv(f"GEMS_OVERRIDE_{choice}")
+    if override:
+        log.info(f"Using DEV OVERRIDE for {choice}: {override}")
+        module_path = override
+    ##############
+
+    if not module_path:
+        raise ValueError(f"No module found for choice: {choice}")
+
+    try:
+        # Dynamic import only happens here
+        # Subsequent calls for the same choice are fast because 
+        # Python caches imported modules in sys.modules.
+    
+        # If the module is deprecated, forward to the deprecated code
+        if module_path == "DeprecatedDelegator" :
+            module = importlib.import_module("gemsModules.deprecated.delegator.receive")
+            return getattr(module, "delegate")
+        
+        # Otherwise, import as usual
+        module = importlib.import_module(module_path)
+        # Extract the 'receive' function from the loaded module and return that
+        return getattr(module, "receive")
+    except ImportError as e:
+        log.error(f"Failed to load module for {choice} at {module_path}: {e}")
+        raise
