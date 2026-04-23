@@ -1,0 +1,14 @@
+{
+ "entity" : {
+    "type": "Delegator",
+    "services" :
+        { "Marco" :
+                {
+			"type" : "Marco" 
+		 
+		}
+        }
+  },
+  "prettyPrint": true
+}
+

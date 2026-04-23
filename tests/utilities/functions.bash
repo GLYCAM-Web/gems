@@ -108,3 +108,25 @@ rclr()
         fi
 }
 
+# learn if a string is a uuid
+is_string_a_uuid()
+{
+	##  $1 is the possible uuid
+	# Example uuid: "550e8400-e29b-41d4-a716-446655440000"
+	#
+	# Code obtained with help from Gemini
+	#
+	# Note: normally 0=true and !0=false, but this code isn't working that way for some reason.
+
+	# Regex pattern for a standard UUID (case-insensitive)
+	UUID_REGEX='^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
+
+	if [[ "${1}" =~ "${UUID_REGEX}" ]]; then
+    		#echo "The string is a valid UUID."
+    		return 1 # apparently true here
+	else
+    		#echo "Invalid UUID format."
+    		return 0 # apparently false here
+	fi
+}
+

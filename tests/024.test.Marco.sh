@@ -1,141 +1,55 @@
 #!/usr/bin/env bash
 
-echo "Please write this script."
-return 1
-
-
 # If GEMS_KEEP_BAD_OUTPUTS is set to "True", badOutputs will not be removed after testing
 
 . './utilities/common_environment.bash'
 . './utilities/functions.bash'
 
-echo "The output path is: ${GEMS_OUTPUT_PATH}"
-
 ## The variable badOutDir should be defined in the script that calls this one.
-outputFilePrefix='git-ignore-me_test023'
+outputFilePrefix='git-ignore-me_test024'
 badOutputPrefix="${badOutDir}/${now}_${outputFilePrefix}"
 badOutputDir="${badOutDir}/${now}_${outputFilePrefix}_Files"
-correctFilesPath="correct_outputs/023.InstanceConfig-generation_Files"
+correctFilesPath="correct_outputs"
+STATUSFILE="${badOutputPrefix}.txt"
+LOGFILE="${badOutputPrefix}_details.txt"
 
 mkdir -p "${badOutputDir}"
 
 ALL_TESTS_PASSED='true'
 
-echo "Testing Instance Config Generation"
+echo "Testing Marco for Delegator as the Entity."
 
-# Source the inputs for the test
-source "inputs/023.instance_config_input_swarm.bash"
+DELEGATE="$GEMSHOME/bin/delegate"
+inputJSON="inputs/024.marco_delegator_explicit.json"
+outputJSON="${badOutputDir}/marco_delegator_full_output.json"
+compare_outputJSON="${badOutputDir}/marco_delegator_full_output_id_mask.json"
+correct_outputJSON="${correctFilesPath}/024.marco_delegator_explicit_output.json"
 
-filesAreSame()
-{
-	#echo "working on files:"
-	#echo "        ${1}"
-	#echo "        ${2}"
-	jq -S 'walk(if type == "array" then sort else . end)' ${1} > ${badOutputDir}/sort1.json
-	jq -S 'walk(if type == "array" then sort else . end)' ${2} > ${badOutputDir}/sort2.json
-	COMMAND="diff -U 0 ${badOutputDir}/sort1.json ${badOutputDir}/sort2.json | grep -v ^@ | wc -l"
-	DiffCount="$(eval $COMMAND)"
-	result="$?"
-	#echo "DiffCount is ${DiffCount}"
-	#echo "result is ${result}"
-	if [ "${result}" != "0" ] ; then
-		rclr "Saving results diff that exited with code ${result}." "${DiffCount}" "Failed diff logging"
-		rm -f ${badOutputDir}/sort1.json ${badOutputDir}/sort2.json
-		return "${result}"
+COM="${DELEGATE} ${inputJSON} > ${outputJSON}"
+rclr "Requesting Marco with Delegator as the Entity." "${COM}" "Delegator Marco"
+theUUID="$(cat ${outputJSON} | utilities/json_ripper.py entity.services.Marco.myUuid)"
+if ! is_string_a_uuid "${theUUID}" ; then
+        echo "ERROR : Delegator Marco returned invalid response" | tee -a ${STATUSFILE}
+        echo "ERROR : Unable to extract UUID from the delegator response" | tee -a ${LOGFILE}
+	ALL_TESTS_PASSED='false'
+else
+	COM="sed 's/${theUUID}/theUUID/g' ${outputJSON} > ${compare_outputJSON}"
+	rclr "Generating response with UUID removed." "${COM}" "UUID removal"
+	diff_result="$(diff ${compare_outputJSON} ${correct_outputJSON})"
+	if [ "${diff_result}" != "" ] ; then
+        	echo "ERROR : Delegator Marco FAILED" | tee -a ${STATUSFILE}
+        	echo "ERROR : Delegator Marco diff result was not empty" | tee -a ${LOGFILE}
+		echo "The following are the diffs:" >> ${LOGFILE}
+		echo "${diff_result}" >> ${LOGFILE}
+		echo "See this file for more info: ${LOGFILE}"
+		ALL_TESTS_PASSED='false'
 	fi
-	if [ "${DiffCount}" != "0" ] ; then
-		COMMAND="diff ${badOutputDir}/sort1.json ${badOutputDir}/sort2.json "
-		rclr "Saving diffs from failed comparision." "${COMMAND}" "Failed comparison logging"
-		result="$?"
-		rm -f ${badOutputDir}/sort1.json ${badOutputDir}/sort2.json
-		return "$((result+1))"
-	else
-		rm -f ${badOutputDir}/sort1.json ${badOutputDir}/sort2.json
-		return 0
-	fi
-}
-
-declare -A lFailed  # generation of the local preconfig passed
-declare -A oFailed  # updating the main instance config from the local preconfig
-declare -A rFailed  # generation of the remote preconfig passed
-oFailedOverall="0"
-
-export STATUSFILE="${badOutputPrefix}.txt"
-export LOGFILE="${badOutputPrefix}_details.txt"
-#export TEST="True"
-#export GEMS_KEEP_BAD_OUTPUTS="True"
-passedSum="0"
-for service in ${Services[@]} ; do 
-	PreconfName="${PreconfigName[${service}]}"
-	CorrectPreconfName="${PreconfName/-git-ignore-me/}"
-	locICPath="${badOutputDir}/local.${PreconfName}"
-	remICPath="${badOutputDir}/remote.${PreconfName}"
-	IChName="${SubmissionHostNames[${service}]}"
-	IChost="${SubmissionHosts[${service}]}"
-	ICport="${SubmissionHostPorts[${service}]}"
-	ICargs="${BatchSubmissionArgs[${service}]}"
-	locParm="${LocalParameters[${service}]}"
-	locExePath="${LocalWorkingPathHead[${service}]}"
-	remExePath="${RemoteWorkingPathHead[${service}]}"
-
-	## Generate the local preconfig
-        COMMAND="python3 ${GEMSHOME}/bin/setup-instance.py --generate-preconfig '${service}' '${locICPath}' '${IChName}' '${IChost}' '${ICport}' '${ICargs}' '${locParm}' '${locExePath}'"
-	rclr "Generating the local preconfig for service ${service}." "${COMMAND}" "Local IC setup"
-	lFailed[${service}]="$?"
-	if ! filesAreSame "${locICPath}"  "${correctFilesPath}/local.${CorrectPreconfName}" ; then
-		lFailed[${service}]="$((lFailed[${service}]+1))"
-	fi
-	passedSum=$((passedSum+lFailed[${service}]))
-
-	## Update the main instance config with the local information
-        COMMAND="python3 ${GEMSHOME}/bin/setup-instance.py --config '${locICPath}'"
-	rclr "Adding local info to the main instance config." "${COMMAND}" "Add local IC to main IC"
-	oFailed[${service}]="$?"
-	passedSum=$((passedSum+oFailed[${service}]))
-
-	## Generate the remote preconfig
-        COMMAND="python3 ${GEMSHOME}/bin/setup-instance.py --generate-preconfig '${service}' '${remICPath}' '${IChName}' '${IChost}' '${ICport}' '${ICargs}' '${locParm}' '${remEXePath}'"
-	rclr "Generating the remote preconfig for service ${service}." "${COMMAND}" "Remote IC setup"
-	rFailed[${service}]="$?"
-	if ! filesAreSame "${remICPath}"  "${correctFilesPath}/remote.${CorrectPreconfName}" ; then
-		rFailed[${service}]="$((rFailed[${service}]+1))"
-	fi
-	passedSum=$((passedSum+rFailed[${service}]))
-done
-
-## This has to wait for the end because I didn't save the interim versions
-if ! filesAreSame "${GEMSHOME}/instance_config.json"  "${correctFilesPath}/not-ignored_instance_config.json" ; then
-	echo "the instance config files are not the same"
-	oFailedOverall="1"
-	passedSum="$((passedSum+oFailedOverall))"
 fi
 
-if [ "${passedSum}" != "0" ] ; then
-	ALL_TESTS_PASSED='false'
-	for service in ${Services[@]} ; do 
-		echo "For the service ${service}:"
-		echo "        ${lFailed[${service}]} local preconfig actions failed."
-		echo "        ${oFailed[${service}]} update of main instance config actions failed."
-		echo "        ${rFailed[${service}]} remote preconfig actions failed."
-	done
-	if [ "${oFailedOverall}" != "0" ] ; then
-		echo "The final form of the instance config file failed."
-	fi
+
+if [ "${ALL_TESTS_PASSED}" != 'true' ] ; then
 	return 1
 fi
 
 return 0
-
-###
-## The following are records of sample commands that were run in the file I based these tests on. 
-##
-### Generate the preconfig files for the GRPC/Delegator instance and remote hosts.
-##MD_PRECONFIG_NAME="MDaaS-RunMD_preconfig-git-ignore-me.json"
-##MD_LOCAL_PRECONFIG_PATH="${badOutputDir}/local.${MD_PRECONFIG_NAME}"
-##MD_REMOTE_PRECONFIG_PATH="${badOutputDir}/remote.${MD_PRECONFIG_NAME}"
-##
-### TODO: skip this complicated cli and just write preconfig jsons instead.
-##python3 "${GEMSHOME}/bin/setup-instance.py" --generate-preconfig MDaaS-RunMD "${MD_LOCAL_PRECONFIG_PATH}" "${MD_GRPC_HOSTNAME}" "${MD_GRPC_HOST}" "${MD_GRPC_PORT}" "${MD_SBATCH_ARGS}" "${MD_LOCAL_PARAMETERS}" "${MD_LOCAL_CLUSTER_PATH}"
-##python3 "${GEMSHOME}/bin/setup-instance.py" --config "${MD_LOCAL_PRECONFIG_PATH}"
-##python3 "${GEMSHOME}/bin/setup-instance.py" --generate-preconfig MDaaS-RunMD "${MD_REMOTE_PRECONFIG_PATH}" "${MD_GRPC_HOSTNAME}" "${MD_GRPC_HOST}" "${MD_GRPC_PORT}" "${MD_SBATCH_ARGS}" "${MD_LOCAL_PARAMETERS}" "${MD_REMOTE_CLUSTER_PATH}"
 
