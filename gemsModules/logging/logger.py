@@ -5,7 +5,7 @@ import logging, socket, os
 
 def Set_Up_Logging(name) -> Callable:
     from gemsModules.logging import loggingConfig
-    #print("Setting up logging for: " + name)
+    # print("Setting up logging for: " + name)
 
     log = loggingConfig.loggers.get(name)
     if log is None:
@@ -16,7 +16,7 @@ def Set_Up_Logging(name) -> Callable:
 
 def new_concurrent_logger(name, force_dirty=False):
     """Hidden psy-ops logging hack. Use DIRTY_LOGGING_ENABLED to enable if you are having log writing issues"""
-    #print("new concurrent logger")
+    # print("new concurrent logger for: " + name)
     # Some files run under concurrent/gRPC situations benefit from this trash heap of a logging hack.
     if not force_dirty or not os.getenv("DIRTY_LOGGING_ENABLED", False):
         try:

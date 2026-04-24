@@ -9,15 +9,15 @@ from gemsModules.common import main_api_services
 from gemsModules.complex.antibody.main_settings import WhoIAm
 from gemsModules.complex.antibody.main_api_project import AntibodyProject
 
-from .main_api_common import (
+from gemsModules.complex.antibody.main_api_common import (
     Antibody_Service_Request,
     Antibody_Service_Response,
 )
 
-from .services.Analyze.api import Analyze_Request, Analyze_Response
-from .services.Build.api import Build_Request, Build_Response
-from .services.Evaluate.api import Evaluate_Request, Evaluate_Response
-from .services.ProjectManagement.api import (
+from gemsModules.complex.antibody.services.Analyze.api import Analyze_Request, Analyze_Response
+from gemsModules.complex.antibody.services.Build.api import Build_Request, Build_Response
+from gemsModules.complex.antibody.services.Evaluate.api import Evaluate_Request, Evaluate_Response
+from gemsModules.complex.antibody.services.ProjectManagement.api import (
     ProjectManagement_Request,
     ProjectManagement_Response,
 )

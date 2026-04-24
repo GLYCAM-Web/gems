@@ -5,8 +5,11 @@ from gemsModules.common.services.duplicate_requests import Duplicate_Requests_Ma
 
 from gemsModules.complex.antibody.tasks import get_services_list
 from gemsModules.complex.antibody.services.settings.duplicates_modules import (
-    duplicates_modules,
+    module_loader,
 )
+#from gemsModules.complex.antibody.services.settings.duplicates_modules import (
+#    duplicates_modules,
+#)
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -19,4 +22,4 @@ class Antibody_Duplicate_Requests_Manager(Duplicate_Requests_Manager):
         return get_services_list.execute()
 
     def get_duplicates_manager(self, service: str) -> Callable:
-        return duplicates_modules[service]
+        return module_loader.get_module_attr(service)
