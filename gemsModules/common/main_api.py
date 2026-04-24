@@ -99,6 +99,7 @@ class Transaction(ABC):
 
     def populate_inputs(self, in_string: str, no_check_fields=False):
         self.inputs = self.get_API_type().parse_raw(in_string)
+        self.inputs.copy_procedural_options_to_entity()
         log.debug("The inputs are: ")
         log.debug(self.inputs.json(indent=2))
 

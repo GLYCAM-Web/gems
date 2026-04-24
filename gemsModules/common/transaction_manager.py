@@ -168,9 +168,13 @@ class Transaction_Manager(ABC):
         log.info("Final transaction update is begun")
 
         # get transaction outputs from response entity
-        this_json = {"entity": self.response_entity.dict(by_alias=True)}
-        log.debug(f"{this_json=}")
-        self.transaction.outputs = self.transaction.get_API_type().parse_obj(this_json)
+        log.debug("self.transaction.outputs is this BEFORE copying in response:")
+        log.debug(self.transaction.outputs.json(indent=2, by_alias=True))
+        if self.transaction.outputs is None :
+            self.transaction.outputs = self.transaction.get_API_type()
+        self.transaction.outputs.entity = self.response_entity.copy(deep=True)
+        log.debug("self.transaction.outputs is this AFTER copying in response:")
+        log.debug(self.transaction.outputs.json(indent=2, by_alias=True))
 
         # update transaction response project
         #    log.debug("the pre-test response project is type " + str(type(self.response_project)))

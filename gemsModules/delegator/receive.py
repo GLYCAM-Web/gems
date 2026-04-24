@@ -27,22 +27,27 @@ def receive(incomingString: str) -> str:
     import json
     tmp_dict = json.loads(incomingString)
     requested_entity = tmp_dict["entity"]["type"]
-    #print("This entity is : " + requested_entity)
+    log.debug("The requested entity is : " + requested_entity)
     from gemsModules.configuration.main_api import session_instance_config
     local_host_name = session_instance_config.get_localhost_hostName()
     # Check to see if we need to set ourselves as the initial delegator
     # We definitely will need the local host name if so
-    if "initiation_timestamp" not in tmp_dict or not tmp_dict["initiation_timestamp"] :
+    log.debug("The tmp_dict is:")
+    log.debug(tmp_dict)
+    if "initiation_timestamp" not in tmp_dict or not tmp_dict["initiation_timestamp"] or tmp_dict["initiation_timestamp"]=="" :
+        log.info("Set initiation timestamp and receiving host is accessed.")
         from datetime import datetime
         tmp_dict["initial_receiver"]=local_host_name
         tmp_dict["initiation_timestamp"]=str(datetime.now().strftime("%Y-%m-%d_%H:%M:%S"))
 
-
     from gemsModules.delegator.main_settings import WhoIAm
     if requested_entity == WhoIAm:
+        log.info("The requested entity is the delegator. Processing.")
         log.debug("Delegating incoming string to self")
         tmp_dict["execution_host"]=local_host_name
         incoming_string = json.dumps(tmp_dict)
+        log.debug("The incoming string is now:")
+        log.debug(incoming_string)
         return process(incoming_string)
     else:
         log.debug("Delegating incoming string to entity: " + requested_entity)
