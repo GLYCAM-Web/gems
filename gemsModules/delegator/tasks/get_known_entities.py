@@ -1,13 +1,13 @@
-from gemsModules.delegator.known_entities import Known_Entities
+from gemsModules.delegator.redirector_settings import get_known_entities
 from typing import List
 
 def execute() -> List:
     """ Return a list of entities known to the Delegator
     >>> print(execute())
-    ['Delegator', 'DeprecatedDelegator', 'MDaaS', 'Status', 'BatchCompute', 'Conjugate', 'Common', 'MmService', 'Query', 'Sequence', 'DrawGlycan', 'StructureFile']
+    ['MDaaS', 'MmService', 'Status', 'PDBFile', 'AntibodyDocking', 'Glycomimetics', 'GlycoProtein', 'BatchCompute', 'Conjugate', 'DeprecatedDelegator', 'DrawGlycan', 'Query', 'Sequence', 'StructureFile']
     """
 
-    return Known_Entities.get_json_list()
+    return str(get_known_entities())
 
 if __name__ == "__main__":
     import doctest

@@ -26,7 +26,7 @@ class Json_String_Manager(ABC):
         self.transaction = common_Transaction()
         self.entityType = WhoIAm
         self.transaction_manager_type = common_Transaction_Manager
-        self.initialize_out = False
+        self.initialize_out = True
 
     def process(self, incoming_string: str):
         log.info("process for Common's Json_String_Manager is called")

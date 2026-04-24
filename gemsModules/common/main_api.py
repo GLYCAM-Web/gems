@@ -105,7 +105,13 @@ class Transaction(ABC):
     def initialize_outputs_from_inputs(self):
         log.info("initialize_outputs_from_inputs was called")
         self.outputs = self.get_API_type()
+        log.debug("self.inputs is this before copy:")
+        log.debug(self.inputs)
+        log.debug("self.outputs is this before copy:")
+        log.debug(self.outputs)
         self.outputs = self.inputs.copy(deep=True)
+        log.debug("self.outputs is this after copy:")
+        log.debug(self.outputs)
 
     # the use of EntityType here will break elsewhere, I think
     def generate_error_response(

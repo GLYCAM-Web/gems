@@ -17,25 +17,41 @@ MODULE_REGISTRY = {
     # Deprecated
     "BatchCompute": "DeprecatedDelegator",
     "Conjugate": "DeprecatedDelegator",
-    "DeprecatedDelegator": "DeprecatedDelegator",
+#    "DeprecatedDelegator": "DeprecatedDelegator", # generally not useful
     "DrawGlycan": "DeprecatedDelegator",
     "Query": "DeprecatedDelegator",
     "Sequence": "DeprecatedDelegator",
     "StructureFile": "DeprecatedDelegator",
 }
 
+def get_known_entities():
+    return list(MODULE_REGISTRY.keys())
+
 def get_receive_module(choice):
     module_path = MODULE_REGISTRY.get(choice)
 
     ############## I HAVE NOT TESTED THIS YET
-    # DEV OVERRIDE: Check if an environment variable is set for this choice
-    # Example: export GEMS_OVERRIDE_Status="gemsModules.dev.status.receive"
+    #
+    # It allows a developer to use an environment variable to override the 
+    #    module associated with an Entity. This allows easy A/B comparison
+    #    between an old module and a new one. 
+    #
+    # Example Use: 
+    #    You are updating the 'Status' module, working in this dev directory:
+    #      ${GEMSHOME}/gemsModules/dev/status/
+    #
+    #    Be able to run GEMS code in two terminals. 
+    #      * In one terminal, use the default behavior as defined above.
+    #      * In the other, set this:
+    #        export GEMS_OVERRIDE_Status="gemsModules.dev.status.receive"
+    #
+    #     !! Use `unset GEMS_OVERRIDE_Status` to stop the override.
     import os
     override = os.getenv(f"GEMS_OVERRIDE_{choice}")
     if override:
         log.info(f"Using DEV OVERRIDE for {choice}: {override}")
         module_path = override
-    ##############
+    ############## END of untested part
 
     if not module_path:
         raise ValueError(f"No module found for choice: {choice}")

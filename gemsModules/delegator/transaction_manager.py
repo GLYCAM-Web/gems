@@ -14,6 +14,7 @@ log = Set_Up_Logging(__name__)
 class delegator_Transaction_Manager(Transaction_Manager):
 
     def set_local_modules(self):
+        log.info("Local modules for the Delegator's transaction manager were set")
         self.request_manager_type =  delegator_Request_Manager
         self.aaop_tree_pair_manager_type = AAOP_Tree_Pair_Generator
         self.this_servicer_type = delegator_Servicer
