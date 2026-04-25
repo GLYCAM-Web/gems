@@ -61,5 +61,5 @@ class common_Implied_Services_Request_Manager(Implied_Services_Request_Manager):
     
     def get_implicit_service_manager(self, service: str) -> Callable:
         log.debug("In common_Implied_Services_Request_Manager, get_implicit_service_manager")
-        from gemsModules.common.services.settings.implied_modules import implied_modules 
-        return implied_modules[service]
+        from gemsModules.common.services.settings.implied_modules import module_loader 
+        return module_loader.get_module_attr(service)

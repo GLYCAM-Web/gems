@@ -14,6 +14,8 @@ log = Set_Up_Logging(__name__)
 class delegator_Servicer(Servicer):
 
     def get_module_for_this_request(self, this_request_aaop: AAOP) -> Callable:
-        from gemsModules.delegator.services.settings.service_modules import service_modules
-        return service_modules[this_request_aaop.AAO_Type]
+        #from gemsModules.delegator.services.settings.service_modules import service_modules
+        from gemsModules.delegator.services.settings.service_modules import module_loader
+        #return service_modules[this_request_aaop.AAO_Type]
+        return module_loader.get_module_attr(this_request_aaop.AAO_Type)
        

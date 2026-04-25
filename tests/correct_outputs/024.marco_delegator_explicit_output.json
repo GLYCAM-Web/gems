@@ -1,1 +1,34 @@
-{"entity": {"type": "Delegator", "services": {"Marco": {"type": "Marco", "myUuid": "theUUID"}}, "responses": {"Marco": {"type": "Marco", "myUuid": "theUUID", "outputs": {"message": "Polo", "info": null}}}, "procedural_options": {"context": "website", "force_serial_execution": false, "pretty_print": false, "md_minimize": false}}, "notices": {}, "contexts": [], "initiation_timestamp": "", "initial_receiver": "", "execution_host": ""}
+{
+  "entity": {
+    "type": "Delegator",
+    "services": {
+      "Marco": {
+        "type": "Marco",
+        "myUuid": "theUUID"
+      }
+    },
+    "responses": {
+      "Marco": {
+        "type": "Marco",
+        "myUuid": "theUUID",
+        "outputs": {
+          "message": "Polo"
+        },
+        "notices": {}
+      }
+    },
+    "notices": {},
+    "procedural_options": {
+      "context": "website",
+      "force_serial_execution": false,
+      "pretty_print": true,
+      "md_minimize": false
+    }
+  },
+  "notices": {},
+  "prettyPrint": true,
+  "contexts": [],
+  "initiation_timestamp": "theTimeStamp",
+  "initial_receiver": "theHost",
+  "execution_host": "theHost"
+}

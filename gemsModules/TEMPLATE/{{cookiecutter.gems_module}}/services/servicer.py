@@ -14,6 +14,6 @@ log = Set_Up_Logging(__name__)
 class {{cookiecutter.gems_module}}_Servicer(Servicer):
 
     def get_module_for_this_request(self, this_request_aaop: AAOP) -> Callable:
-        from gemsModules.{{cookiecutter.gems_module}}.services.settings.service_modules import service_modules
-        return service_modules[this_request_aaop.AAO_Type]
+        from gemsModules.{{cookiecutter.gems_module}}.services.settings.service_modules import module_loader
+        return module_loader(this_request_aaop.AAO_Type)
        

@@ -19,9 +19,8 @@ class Servicer(ABC):
 
     @abstractmethod
     def get_module_for_this_request(self, this_request_aaop: AAOP) -> Callable:
-        from gemsModules.common.services.settings.service_modules import service_modules
-
-        return service_modules[this_request_aaop.AAO_Type]
+        from gemsModules.common.services.settings.service_modules import module_loader
+        return module_loader.get_module_attr(this_request_aaop.AAO_Type)
 
     def serve(self) -> AAOP_Tree_Pair:
         log.info("serve is called for a Servicer")
@@ -50,6 +49,5 @@ class commonservices_Servicer(Servicer):
     #     super().__init__(tree_pair)
 
     def get_module_for_this_request(self, this_request_aaop: AAOP) -> Callable:
-        from gemsModules.common.services.settings.service_modules import service_modules
-
-        return service_modules[this_request_aaop.AAO_Type]
+        from gemsModules.common.services.settings.service_modules import module_loader
+        return module_loader.get_module_attr(this_request_aaop.AAO_Type)

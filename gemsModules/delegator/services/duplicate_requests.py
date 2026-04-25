@@ -3,8 +3,6 @@ from typing import List, Callable
 
 from gemsModules.common.services.duplicate_requests import Duplicate_Requests_Manager
 
-from gemsModules.delegator.tasks import get_services_list
-from gemsModules.delegator.services.settings.duplicates_modules import duplicates_modules 
 
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
@@ -12,8 +10,10 @@ log = Set_Up_Logging(__name__)
 class delegator_Duplicate_Requests_Manager(Duplicate_Requests_Manager):
 
     def get_available_services(self) -> List[str]:
+        from gemsModules.delegator.tasks import get_services_list
         return get_services_list.execute()
 
     def get_duplicates_manager(self, service : str) -> Callable:
-        return duplicates_modules[service]
+        from gemsModules.delegator.services.settings.duplicates_modules import module_loader
+        return module_loader.get_module_attr(service)
         

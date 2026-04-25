@@ -1,26 +1,22 @@
 #!/usr/bin/env python3
-from typing import Dict, Callable
-from gemsModules.common.services.error.server import Serve as serve_error
-from gemsModules.common.services.list_services.server import (
-    Serve as serve_list_services,
-)
-from gemsModules.common.services.marco.server import Serve as serve_marco
-from gemsModules.common.services.status.server import Serve as serve_status
-
-from gemsModules.delegator.services.known_entities.server import (
-    Serve as serve_known_entities,
-)
+from gemsModules.systemoperations.module_import import ModuleData, ModuleLoader
 
 from gemsModules.logging.logger import Set_Up_Logging
-
 log = Set_Up_Logging(__name__)
 
-service_modules: Dict[str, Callable] = {
-    "Error": serve_error,
-    "listEntities": serve_known_entities,  # json contract compatibility (old)
-    "ListEntities": serve_known_entities,  # json contract compatibility (what it should have been)
-    "KnownEntities": serve_known_entities,
-    "ListServices": serve_list_services,
-    "Marco": serve_marco,
-    "Status": serve_status,
+
+REGISTRY = {
+    "Error": ModuleData('gemsModules.common.services.error.server', 'Serve'),
+    "listEntities": ModuleData('gemsModules.delegator.services.known_entities.server', 'Serve'),
+    # json contract compatibility (old)
+    "ListEntities": ModuleData('gemsModules.delegator.services.known_entities.server', 'Serve'),
+    # json contract compatibility (what it should have been)
+    "KnownEntities": ModuleData('gemsModules.delegator.services.known_entities.server', 'Serve'),
+    "ListServices": ModuleData('gemsModules.common.services.list_services.server', 'Serve'),
+    "Marco": ModuleData('gemsModules.common.services.marco.server', 'Serve'),
+    "Status": ModuleData('gemsModules.common.services.status.server', 'Serve'),
 }
+
+
+module_loader = ModuleLoader(REGISTRY)
+
