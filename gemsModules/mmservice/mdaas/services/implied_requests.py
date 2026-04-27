@@ -3,9 +3,6 @@ from typing import  List, Callable
 
 from gemsModules.common.services.implied_requests import Implied_Services_Request_Manager
 
-from gemsModules.mmservice.mdaas.tasks import get_services_list
-from gemsModules.mmservice.mdaas.services.settings.implied_modules import implied_modules 
-
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
@@ -17,11 +14,12 @@ class mdaas_Implied_Services_Request_Manager(Implied_Services_Request_Manager):
 
     def get_available_services(self) -> List[str]:
         log.debug("In mdaas_Implied_Services_Request_Manager, get_available_services")
+        from gemsModules.mmservice.mdaas.tasks import get_services_list
         return get_services_list.execute()
 
     def get_implicit_service_manager(self, service : str) -> Callable:
         log.debug("In mdaas_Implied_Services_Request_Manager, get_implicit_service_manager")
         log.debug("service: " + str(service))
-        return implied_modules[service]
-        
+        from gemsModules.mmservice.mdaas.services.settings.implied_modules import module_loader
+        return module_loader.get_module_attr(service)
 

@@ -1,21 +1,18 @@
-from typing import Dict, Callable
-
-from gemsModules.common.services.error.manage_multiples import error_Multiples_Manager 
-from gemsModules.common.services.marco.manage_multiples import marco_Multiples_Manager 
-from gemsModules.common.services.status.manage_multiples import status_Multiples_Manager
-
-from gemsModules.mmservice.mdaas.services.list_services.manage_multiples import list_services_Multiples_Manager
-from gemsModules.mmservice.mdaas.services.run_md.manage_multiples import run_md_Multiples_Manager 
-from gemsModules.mmservice.mdaas.services.Evaluate.manage_multiples import Evaluate_Multiples_Manager
+from gemsModules.systemoperations.module_import import ModuleData, ModuleLoader
 
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
-duplicates_modules : Dict[str, Callable] = {
-    'Error': error_Multiples_Manager, 
-    'ListServices': list_services_Multiples_Manager, 
-    'Marco': marco_Multiples_Manager, 
-    'Status': status_Multiples_Manager,
-    'Evaluate': Evaluate_Multiples_Manager,
-    'RunMD': run_md_Multiples_Manager
+
+REGISTRY = {
+    'Error': ModuleData('gemsModules.common.services.error.manage_multiples', 'error_Multiples_Manager'),
+    'Marco': ModuleData('gemsModules.common.services.marco.manage_multiples', 'marco_Multiples_Manager'),
+    'ListServices': ModuleData('gemsModules.mmservice.mdaas.services.list_services.manage_multiples', 'list_services_Multiples_Manager'),
+    'Status': ModuleData('gemsModules.common.services.status.manage_multiples', 'status_Multiples_Manager'),
+    'Evaluate': ModuleData('gemsModules.mmservice.mdaas.services.Evaluate.manage_multiples', 'Evaluate_Multiples_Manager'),
+    'RunMD': ModuleData('gemsModules.mmservice.mdaas.services.run_md.manage_multiples', 'run_md_Multiples_Manager'),
     }
+
+
+module_loader = ModuleLoader(REGISTRY)
+

@@ -5,10 +5,6 @@ from gemsModules.common.services.implied_requests import (
     Implied_Services_Request_Manager,
 )
 
-from gemsModules.complex.glycomimetics.tasks import get_services_list
-from gemsModules.complex.glycomimetics.services.settings.implied_modules import (
-    implied_modules,
-)
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -24,6 +20,7 @@ class Glycomimetics_Implied_Services_Request_Manager(Implied_Services_Request_Ma
         log.debug(
             "In Glycomimetics_Implied_Services_Request_Manager, get_available_services"
         )
+        from gemsModules.complex.glycomimetics.tasks import get_services_list
         return get_services_list.execute()
 
     def get_implicit_service_manager(self, service: str) -> Callable:
@@ -31,4 +28,5 @@ class Glycomimetics_Implied_Services_Request_Manager(Implied_Services_Request_Ma
             "In Glycomimetics_Implied_Services_Request_Manager, get_implicit_service_manager"
         )
         log.debug("service: " + str(service))
-        return implied_modules[service]
+        from gemsModules.complex.glycomimetics.services.settings.implied_modules import module_loader
+        return module_loader.get_module_attr(service)

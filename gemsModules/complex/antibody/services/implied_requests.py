@@ -17,16 +17,12 @@ class Antibody_Implied_Services_Request_Manager(Implied_Services_Request_Manager
     """
 
     def get_available_services(self) -> List[str]:
-        log.debug(
-            "In Antibody_Implied_Services_Request_Manager, get_available_services"
-        )
+        log.info("In Antibody_Implied_Services_Request_Manager, get_available_services")
         from gemsModules.complex.antibody.tasks import get_services_list
         return get_services_list.execute()
 
     def get_implicit_service_manager(self, service: str) -> Callable:
-        log.debug(
-            "In Antibody_Implied_Services_Request_Manager, get_implicit_service_manager"
-        )
+        log.info("In Antibody_Implied_Services_Request_Manager, get_implicit_service_manager")
         log.debug("service: " + str(service))
         from gemsModules.complex.antibody.services.settings.implied_modules import module_loader
         return module_loader.get_module_attr(service)

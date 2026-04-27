@@ -1,37 +1,19 @@
-from typing import Dict, Callable
+from gemsModules.systemoperations.module_import import ModuleData, ModuleLoader
 
-from gemsModules.common.services.error.implied_translator import (
-    error_Implied_Translator,
-)
-from gemsModules.common.services.marco.implied_translator import (
-    marco_Implied_Translator,
-)
-from gemsModules.common.services.status.implied_translator import (
-    status_Implied_Translator,
-)
-
-from gemsModules.mmservice.mdaas.services.list_services.implied_translator import (
-    list_services_Implied_Translator,
-)
-from gemsModules.mmservice.mdaas.services.Evaluate.implied_translator import (
-    Evaluate_Implied_Translator
-)
-from gemsModules.mmservice.mdaas.services.run_md.implied_translator import (
-    run_md_Implied_Translator,
-)
-from gemsModules.mmservice.mdaas.services.ProjectManagement.implied_translator import (
-    ProjectManagement_Implied_Translator,
-)
 from gemsModules.logging.logger import Set_Up_Logging
-
 log = Set_Up_Logging(__name__)
 
-implied_modules: Dict[str, Callable] = {
-    "Error": error_Implied_Translator,
-    "ListServices": list_services_Implied_Translator,
-    "Marco": marco_Implied_Translator,
-    "Status": status_Implied_Translator,
-    "Evaluate": Evaluate_Implied_Translator,
-    "RunMD": run_md_Implied_Translator,
-    "ProjectManagement": ProjectManagement_Implied_Translator,
+
+REGISTRY = {
+    "Error": ModuleData('gemsModules.common.services.error.implied_translator', 'error_Implied_Translator'),
+    "Marco": ModuleData('gemsModules.common.services.marco.implied_translator', 'marco_Implied_Translator'),
+    "ListServices": ModuleData('gemsModules.mmservice.mdaas.services.list_services.implied_translator', 'list_services_Implied_Translator'),
+    "Status": ModuleData('gemsModules.common.services.status.implied_translator', 'status_Implied_Translator'),
+    "Evaluate": ModuleData('gemsModules.mmservice.mdaas.services.Evaluate.implied_translator', 'Evaluate_Implied_Translator'),
+    "RunMD": ModuleData('gemsModules.mmservice.mdaas.services.run_md.implied_translator', 'run_md_Implied_Translator'),
+    "ProjectManagement": ModuleData('gemsModules.mmservice.mdaas.services.ProjectManagement.implied_translator', 'ProjectManagement_Implied_Translator'),
 }
+
+
+module_loader = ModuleLoader(REGISTRY)
+

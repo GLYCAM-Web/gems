@@ -1,27 +1,20 @@
 #!/usr/bin/env python3
-from typing import Dict, Callable
-from gemsModules.common.services.error.server import Serve as serve_error
-from gemsModules.common.services.list_services.server import (
-    Serve as serve_list_services,
-)
-from gemsModules.common.services.marco.server import Serve as serve_marco
-from gemsModules.common.services.status.server import Serve as serve_status
-from gemsModules.mmservice.mdaas.services.run_md.server import Serve as serve_run_md
-from gemsModules.mmservice.mdaas.services.ProjectManagement.server import (
-    Serve as serve_ProjectManagement,
-)
-from gemsModules.mmservice.mdaas.services.Evaluate.server import Serve as serve_evaluate
+from gemsModules.systemoperations.module_import import ModuleData, ModuleLoader
 
 from gemsModules.logging.logger import Set_Up_Logging
-
 log = Set_Up_Logging(__name__)
 
-service_modules: Dict[str, Callable] = {
-    "Error": serve_error,
-    "ListServices": serve_list_services,
-    "Marco": serve_marco,
-    "Status": serve_status,
-    "RunMD": serve_run_md,
-    "Evaluate": serve_evaluate,
-    "ProjectManagement": serve_ProjectManagement,
+
+REGISTRY = { 
+    "Error": ModuleData('gemsModules.common.services.error.server', 'Serve'),
+    "Marco": ModuleData('gemsModules.common.services.marco.server', 'Serve'),
+    "ListServices": ModuleData('gemsModules.common.services.list_services.server', 'Serve'),
+    "Status": ModuleData('gemsModules.common.services.status.server', 'Serve'),
+    "RunMD": ModuleData('gemsModules.mmservice.mdaas.services.run_md.server', 'Serve'),
+    "Evaluate": ModuleData('gemsModules.mmservice.mdaas.services.Evaluate.server', 'Serve'),
+    "ProjectManagement": ModuleData('gemsModules.mmservice.mdaas.services.ProjectManagement.server', 'Serve'),
 }
+
+
+module_loader = ModuleLoader(REGISTRY)
+

@@ -3,9 +3,6 @@ from typing import  List, Callable
 
 from gemsModules.common.services.implied_requests import Implied_Services_Request_Manager
 
-from gemsModules.conjugate.glycoprotein.tasks import get_services_list
-from gemsModules.conjugate.glycoprotein.services.settings.implied_modules import implied_modules 
-
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
@@ -17,11 +14,13 @@ class GlycoProtein_Implied_Services_Request_Manager(Implied_Services_Request_Man
 
     def get_available_services(self) -> List[str]:
         log.info("In GlycoProtein_Implied_Services_Request_Manager, get_available_services")
+        from gemsModules.conjugate.glycoprotein.tasks import get_services_list
         return get_services_list.execute()
 
     def get_implicit_service_manager(self, service : str) -> Callable:
         log.info("In GlycoProtein_Implied_Services_Request_Manager, get_implicit_service_manager")
         log.debug("service: " + str(service))
-        return implied_modules[service]
+        from gemsModules.conjugate.glycoprotein.services.settings.implied_modules import module_loader
+        return module_loader.get_module_attr(service)
         
 
