@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+#####################
+#####################
+## Disabled until IC settles
+#####################
+#####################
+
 # If GEMS_KEEP_BAD_OUTPUTS is set to "True", badOutputs will not be removed after testing
 
 . './utilities/common_environment.bash'

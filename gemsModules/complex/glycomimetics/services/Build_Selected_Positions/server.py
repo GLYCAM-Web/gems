@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
 import time
 from pathlib import Path
-from .api import Build_Selected_Positions_Request, Build_Selected_Positions_Response
-from ..common_api import Position_Modification_Options
-from .logic import execute
-from gemsModules.deprecated.instance_config.main import InstanceConfig
+from gemsModules.complex.glycomimetics.services.Build_Selected_Positions/api import Build_Selected_Positions_Request, Build_Selected_Positions_Response
+from gemsModules.complex.glycomimetics.services.common_api import Position_Modification_Options
+from gemsModules.complex.glycomimetics.services.Build_Selected_Positions/logic import execute
+AAAA from gemsModules.deprecated.instance_config.main import InstanceConfig
 
 from gemsModules.logging.logger import Set_Up_Logging
-
-
 log = Set_Up_Logging(__name__)
-ic = InstanceConfig()
+
+AAAA ic = InstanceConfig()
 
 
 def Serve(
@@ -20,7 +19,7 @@ def Serve(
 
     response = Build_Selected_Positions_Response()
     
-    project_dir = Path(ic.get_filesystem_path("Glycomimetics")) / service.inputs.pUUID
+AAAA project_dir = Path(ic.get_filesystem_path("Glycomimetics")) / service.inputs.pUUID
     selected_position = service.inputs.Selected_Modification_Options
     if selected_position is None:
         # Check resources for a resourceRole: "Selected_Modification_Options"

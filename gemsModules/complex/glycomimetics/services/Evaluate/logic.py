@@ -6,14 +6,12 @@ from typing import Protocol, Dict, Optional
 from pydantic import BaseModel, validate_arguments
 
 from gemsModules.common.main_api_notices import Notices
-from gemsModules.deprecated.instance_config.main import InstanceConfig
+
+from gemsModules.complex.glycomimetics.services.Evaluate.api import Evaluate_Inputs, Evaluate_Outputs, PDB_File_Resource
+# appears to be unused: from gemsModules.complex.glycomimetics.services.common_api import Modification_Position
+# moved to location of use: from gemsModules.complex.glycomimetics.tasks import evaluate_wrapper
+
 from gemsModules.logging.logger import Set_Up_Logging
-
-from .api import Evaluate_Inputs, Evaluate_Outputs, PDB_File_Resource
-from ..common_api import Modification_Position
-
-from ...tasks import evaluate_wrapper
-
 log = Set_Up_Logging(__name__)
 
 
@@ -75,7 +73,7 @@ def execute(inputs: Evaluate_Inputs) -> tuple[Evaluate_Outputs, Notices]:
                     # To ensure various output files are written to the correct directory.
                     parent_dir = str(Path(pdb_fpath).parent)
                     pdb_filename = Path(pdb_fpath).name
-                    
+                    from gemsModules.complex.glycomimetics.tasks import evaluate_wrapper
                     valid, reason, condensed_sequences, all_available_positions = evaluate_wrapper.execute(parent_dir, pdb_filename)
                     # For now, we are only returning the first condensed sequence.
                     first_seq = condensed_sequences[0]

@@ -3,12 +3,10 @@ from typing import Protocol, Dict, Optional
 from pydantic import BaseModel, validate_arguments
 
 from gemsModules.common.main_api_notices import Notices
-from gemsModules.deprecated.instance_config.main import InstanceConfig
+
+from gemsModules.complex.glycomimetics.services.Validate.api import Validate_Inputs, Validate_Outputs
+
 from gemsModules.logging.logger import Set_Up_Logging
-
-from .api import Validate_Inputs, Validate_Outputs
-
-
 log = Set_Up_Logging(__name__)
 
 

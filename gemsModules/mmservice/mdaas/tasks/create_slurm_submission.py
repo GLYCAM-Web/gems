@@ -2,12 +2,11 @@ import json
 import os
 import traceback
 from gemsModules.systemoperations.environment_ops import is_GEMS_test_workflow, get_GEMS_test_workflow_steps
-from gemsModules.deprecated.instance_config.main import InstanceConfig
+AAAA from gemsModules.deprecated.instance_config.main import InstanceConfig
 from gemsModules.systemoperations import filesystem_ops
 # from .calculate_time_est_from_parm7 import parse_amber_parm7_pointers
 
 from gemsModules.logging.logger import Set_Up_Logging
-
 log = Set_Up_Logging(__name__)
 
 
@@ -67,8 +66,8 @@ def update_local_parameters_file(SlurmJobDict):
         )
 
     # lets replace all local parameters configured from the instance config. For example, "numProcs".
-    ic = InstanceConfig()
-    args = ic.get_keyed_arguments("local_parameters", context=SlurmJobDict["context"])
+AAAA     ic = InstanceConfig()
+AAAA     args = ic.get_keyed_arguments("local_parameters", context=SlurmJobDict["context"])
     filesystem_ops.replace_bash_variable_in_file(local_param_file, args)
 
 

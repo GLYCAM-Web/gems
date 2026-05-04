@@ -4,16 +4,14 @@ from pydantic import BaseModel, validate_arguments
 from pathlib import Path
 
 from gemsModules.common.main_api_notices import Notices
-from gemsModules.deprecated.instance_config.main import InstanceConfig
+AAAA from gemsModules.deprecated.instance_config.main import InstanceConfig
+
+from gemsModules.complex.antibody.services.Status.api import Status_Inputs, Status_Outputs
 
 from gemsModules.logging.logger import Set_Up_Logging
-
-from .api import Status_Inputs, Status_Outputs
-
-
 log = Set_Up_Logging(__name__)
 
-GLYCOMIMETICS_PROJECTS_ROOT = InstanceConfig().get_filesystem_path("AntibodyDocking")
+AAAA GLYCOMIMETICS_PROJECTS_ROOT = InstanceConfig().get_filesystem_path("AntibodyDocking")
 
 # TODO: Determine project type, and return status of that project type
 def execute(inputs: Status_Inputs) -> Status_Outputs:

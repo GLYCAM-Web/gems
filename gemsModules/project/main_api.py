@@ -157,7 +157,6 @@ class Project(BaseModel):
         message="The service_id is: " + self.service_id
         log.debug(message)
         instanceConfigPath = IC.get_filesystem_path_by_service_ID(serviceID=self.service_id)
-        # instanceConfigPath = InstanceConfig().get_filesystem_path(app=self.app)
         context = getGemsExecutionContext()
         if noClobber is True :
             if self.filesystem_path != ""  :
@@ -273,7 +272,6 @@ class Project(BaseModel):
         context = getGemsExecutionContext()
         if self.uploads_path is None:
             self.uploads_path = ""  # shorten later if-thens
-        #instanceConfigPath = InstanceConfig().get_uploads_path(app=self.app)
         IC = session_instance_config
         instanceConfigPath = IC.get_secure_inputs_path_by_service_ID(serviceID=self.service_id)
         message = "The instanceConfigPath returned was: "  + str(instanceConfigPath)

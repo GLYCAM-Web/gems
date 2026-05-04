@@ -10,10 +10,8 @@ from gemsModules.mmservice.mdaas.services.Evaluate.api import (
     Evaluate_Inputs,
     Evaluate_Outputs,
 )
-from gemsModules.deprecated.instance_config.main import InstanceConfig
 
 from gemsModules.logging.logger import Set_Up_Logging
-
 log = Set_Up_Logging(__name__)
 
 

@@ -6,10 +6,8 @@ from pydantic.typing import Literal as PyLiteral
 from typing import Literal, Any
 
 from gemsModules.project.main_api import Project
-from gemsModules.deprecated.instance_config.main import InstanceConfig
 
 from gemsModules.logging.logger import Set_Up_Logging
-
 log = Set_Up_Logging(__name__)
 
 
