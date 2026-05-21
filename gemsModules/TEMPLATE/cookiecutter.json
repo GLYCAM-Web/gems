@@ -1,6 +1,9 @@
 {
     "gems_module": "newgemsmodule",
+    "entity_name": "New_Gems_Module",
+    "parent_entity": "",
     "service_name": "SomeService",
+    "service_id": "ss",
     "implicit_inputkey": "default",
     "implicit_inputvalue": ""
 }

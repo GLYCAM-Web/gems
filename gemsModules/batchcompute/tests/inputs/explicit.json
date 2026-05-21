@@ -1,0 +1,10 @@
+{
+    "entity": {
+        "type": "batchcompute",
+        "services": {
+            "default_SubmitJob": {
+                "type": "SubmitJob"
+            }
+        }
+    }
+}

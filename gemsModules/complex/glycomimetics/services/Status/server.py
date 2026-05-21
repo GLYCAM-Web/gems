@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 from pydantic import validate_arguments
 
-from .api import Status_Request, Status_Response, Status_Inputs, Status_Outputs
-from .logic import execute
+from gemsModules.complex.glycomimetics.services.Status.api import Status_Request, Status_Response, Status_Inputs, Status_Outputs
+from gemsModules.complex.glycomimetics.services.Status.logic import execute
+
 from gemsModules.logging.logger import Set_Up_Logging
-
-
 log = Set_Up_Logging(__name__)
 
 

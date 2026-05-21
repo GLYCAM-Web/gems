@@ -4,10 +4,14 @@ import os
 from pydantic import BaseModel, Field
 
 from gemsModules.logging.logger import Set_Up_Logging
-
 log = Set_Up_Logging(__name__)
 
 
+##
+## TODO
+## Move the common parts to the Common entity.
+## Make this a child of 'ExecutionHostData' in Common.
+##
 class AntibodyExecutionHostData(BaseModel):
     """
     Indicate paths and other environmental needs

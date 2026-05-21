@@ -5,6 +5,10 @@ from gemsModules.complex.antibody.services.settings.known_available import (
     Available_Services,
 )
 
+##
+## TODO
+## If the default request is 'Marco', the default response should include 'Polo'.
+##
 
 class Antibody_Service_Request(main_api_services.Service_Request):
     typename: Available_Services = Field(

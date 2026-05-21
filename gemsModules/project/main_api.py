@@ -105,12 +105,15 @@ class Project(BaseModel):
     initial_receiver : str = ""
     ## The host that fulfilled the request - copied from instance config info
     execution_host : str = ""
-    #
-    ## Populated for localhost ONLY 
+
+    ## In the following, 'localhost' refers to whatever machine is doing work.
+    ## That is, when the 'initial receiver' data is entered, it will be from the
+    ## instance config on that host. When an execution host has received the 
+    ## request, it will copy in the info it has for localhost.
+    ##
     ## App-specific definitions from the instance config will be copied here.
     ## Mostly, it is up to the app to decide what to do with them.
     ## Generally, these options will be favored unless use_api_strict=True is set.
-    #
     initial_reciever_options : Dict[str, str] = {}
     execution_host_options : Dict[str, str] = {}
     ## Populated for localhost ONLY 
@@ -118,7 +121,6 @@ class Project(BaseModel):
     ## It lets GEMS know whether a certain capability is available locally or how it works.
     ## For example, it might tell GEMS that this host supports submission to a cluster by 
     ## noting which scheduler the cluster uses (e.g., Slurm).
-    #
     initial_receiver_supported_contexts : List[str] = []
     execution_host_supported_contexts : List[str] = []
     ## Populated for localhost ONLY 

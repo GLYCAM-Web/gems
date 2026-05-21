@@ -1,0 +1,8 @@
+{
+    "entity": {
+        "type": "batchcompute",
+        "inputs": {
+            "default": ""
+        }
+    }
+}
