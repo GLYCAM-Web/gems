@@ -35,7 +35,7 @@ class Service_Request(BaseModel):
         title="My UUID",
         description="ID to allow correlations between services and responses.",
     )
-    inputs: typing.Any = None # [Dict | Resources]
+    inputs: typing.Any = None # A dictionary of objects, possibly including children that are main-api due to internal delegation.
     options: Dict[str, str] = Field(
         None,
         description="Key-value pairs that are specific to each entity, service, etc",
@@ -67,7 +67,7 @@ class Service_Response(BaseModel):
         title="My UUID",
         description="ID to allow correlations between services and responses.",
     )
-    outputs: typing.Any = None
+    outputs: typing.Any = None # A dictionary of objects, possibly including children that are main-api resposes due to internal delegation.
     notices: Optional[Notices] = Field(
         default_factory=Notices
     )

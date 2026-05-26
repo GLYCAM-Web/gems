@@ -1,0 +1,30 @@
+complex/amber_receive.py:from gemsModules.batchcompute.slurm.receive import receive as slurm_receive
+complex/antibody/services/ProjectManagement/logic.py:# from gemsModules.complex.antibody.tasks import batchcompute
+complex/antibody/tasks/create_slurm_submission.py:""" This file is used by the batchcompute/slurm module to 
+complex/antibody/tasks/README.md:	Really - most of this should be in batchcompute/slurm. 
+complex/glycomimetics/tasks/create_slurm_submission.py:""" This file is used by the batchcompute/slurm module to 
+configuration/main_api.py:#    num_cores: int = None      ## they need to go into the BatchCompute module
+
+##
+# Add generic utilities - remove dependence on slurm & let batchcompute tell networkconnections what kind to seek
+#    networkconnections/grpc.py:from gemsModules.deprecated.batchcompute.slurm.dataio import *
+
+
+Things to do:
+
+##  Change code
+##
+# Make this use delegator rather than directly accessing slurm's receive
+#   mmservice/mdaas_amber/amber.py:from gemsModules.batchcompute.slurm.receive import receive as slurm_receive
+
+## Might need attention:
+##
+# complex/antibody/services/ProjectManagement/logic.py # AbD does its own slurm management, but ensure this is flexible
+# complex/glycomimetics/tasks/unused/run_master_submit.py:# TODO: Must be run on a slurm head. need to use batchcompute.
+
+## Do this, too
+##
+# Fix docs once this is all merged into batchcompute:
+#    complex/antibody/tasks/README.md:       Really - most of this should be in batchcompute/slurm.
+#    mmservice/mdaas/README_Dev.md:4. MDaaS then calls the workload manager (batchcompute/slurm in this case) to 
+#

@@ -9,7 +9,7 @@ from gemsModules.systemoperations.filesystem_ops import replace_bash_variable_in
 from gemsModules.systemoperations.environment_ops import get_site_version
 
 # from gemsModules.complex.antibody.tasks import batchcompute
-from .api import ProjectManagement_Inputs, ProjectManagement_Outputs, PM_Resource
+from gemsModules.complex.antibody.services.ProjectManagement.api import ProjectManagement_Inputs, ProjectManagement_Outputs, PM_Resource
 
 from gemsModules.complex.antibody.tasks.create_configs import create_ad2config, create_gwconfig, create_vcconfig
 from gemsModules.logging.logger import Set_Up_Logging
@@ -80,7 +80,8 @@ AAAA FIX ME        "AAD2_DOCKER_HOME": f"/programs/website_aad2/{site_version}/A
         replacements["Image"] = f"{image_name}:{tag_name}"
     replace_bash_variable_in_file(f"{inputs.projectDir}/ad2config", replacements)
     log.debug(f"The AD2 image is: '{image_name}:{tag_name}'")
-        
+
+AAAA In the following, ensure that running locally can happen.
 AAAA FIX ME    slurm_submit_docking = f"/programs/website_aad2/{site_version}/AAD2_Docker/image/AAD2/bin/submit_docking_to_slurm_with_docker.bash"
 AAAA CHECK ME    actual_submit_docking = shutil.copy(slurm_submit_docking, inputs.projectDir)
     if not os.path.exists(actual_submit_docking):

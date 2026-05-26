@@ -3,8 +3,7 @@ import os
 from typing import Protocol, Dict, Optional
 from pydantic import BaseModel
 
-# from gemsModules.complex.glycomimetics.tasks import batchcompute
-from .api import ProjectManagement_Inputs, ProjectManagement_Outputs, PM_Resource
+from gemsModules.complex.glycomimetics.services.ProjetManagement.api import ProjectManagement_Inputs, ProjectManagement_Outputs, PM_Resource
 
 from gemsModules.complex.glycomimetics.tasks import set_up_build_directory
 
