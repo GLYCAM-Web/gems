@@ -20,7 +20,7 @@ class Batchcompute_Service_Request(main_api_services.Service_Request):
     )
 
 
-class batchcompute_Service_Response(main_api_services.Service_Response):
+class Batchcompute_Service_Response(main_api_services.Service_Response):
     typename : Available_Services = Field(
         None,
         alias='type',

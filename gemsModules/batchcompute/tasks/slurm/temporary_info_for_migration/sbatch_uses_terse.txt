@@ -1,0 +1,14 @@
+#SBATCH --chdir
+#SBATCH --cpus-per-task
+#SBATCH -D 
+#SBATCH --error
+#SBATCH --get-user-env
+#SBATCH --gres
+#SBATCH -J 
+#SBATCH --job-name
+#SBATCH --nodes
+#SBATCH --output
+#SBATCH --partition
+#SBATCH --tasks-per-node
+#SBATCH --time
+#SBATCH --uid

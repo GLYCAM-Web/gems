@@ -1,0 +1,230 @@
+deprecated/batchcompute/simulation_deprecated/simulation_class.py:            "
+#SBATCH -D " + os.path.abspath(os.path.curdir) + "\n", ## FIXME
+deprecated/batchcompute/simulation_deprecated/simulation_class.py:            "
+#SBATCH -J " + self.SQUEUE_NAME + "\n",
+deprecated/batchcompute/simulation_deprecated/simulation_class.py:            "
+#SBATCH --partition=" + self.PARTITION_NAME + "\n",
+deprecated/batchcompute/simulation_deprecated/simulation_class.py:            "
+#SBATCH --get-user-env\n",
+deprecated/batchcompute/simulation_deprecated/simulation_class.py:            "
+#SBATCH --nodes=" + self.NUM_NODES + "\n",
+deprecated/batchcompute/simulation_deprecated/simulation_class.py:            "
+#SBATCH --tasks-per-node=" + self.NUM_TASKS + "\n",
+deprecated/batchcompute/simulation_deprecated/simulation_class.py:            "
+#SBATCH --time=" + self.MAX_TIME + "\n\n",
+deprecated/batchcompute/slurm/receive.py:    script.write("
+#SBATCH --chdir=" + incoming_dict["workingDirectory"] + "\n")
+deprecated/batchcompute/slurm/receive.py:    script.write("
+#SBATCH --error=slurm_%x-%A.err" + "\n")
+deprecated/batchcompute/slurm/receive.py:    script.write("
+#SBATCH --get-user-env" + "\n")
+deprecated/batchcompute/slurm/receive.py:    script.write("
+#SBATCH --job-name=" + incoming_dict["name"] + "\n")
+deprecated/batchcompute/slurm/receive.py:    script.write("
+#SBATCH --nodes=1" + "\n")
+deprecated/batchcompute/slurm/receive.py:    script.write("
+#SBATCH --output=slurm_%x-%A.out" + "\n")
+deprecated/batchcompute/slurm/receive.py:    script.write("
+#SBATCH --partition=" + incoming_dict["partition"] + "\n")
+deprecated/batchcompute/slurm/receive.py:    script.write("
+#SBATCH --tasks-per-node=4" + "\n")
+deprecated/batchcompute/slurm/receive.py:    #    script.write("
+#SBATCH --uid=" + incoming_dict["user"] + "\n")
+mmservice/mdaas/tasks/create_slurm_submission.py:        f"
+#SBATCH --chdir={SlurmJobDict['workingDirectory']}\n"
+mmservice/mdaas/tasks/create_slurm_submission.py:        f"
+#SBATCH --error=slurm_%x-%A.err\n"
+mmservice/mdaas/tasks/create_slurm_submission.py:        f"
+#SBATCH --output=slurm_%x-%A.out\n"
+mmservice/mdaas/tasks/create_slurm_submission.py:        f"
+#SBATCH --get-user-env\n"
+mmservice/mdaas/tasks/create_slurm_submission.py:        f"
+#SBATCH --job-name={SlurmJobDict['name']}\n"
+mmservice/mdaas/tasks/create_slurm_submission.py:        f"
+#SBATCH --nodes={SlurmJobDict['nodes']}\n"
+mmservice/mdaas/tasks/create_slurm_submission.py:        f"
+#SBATCH --partition={SlurmJobDict['partition']}\n"
+mmservice/mdaas/tasks/create_slurm_submission.py:        f"
+#SBATCH --time={SlurmJobDict['time']}\n"
+mmservice/mdaas/tasks/create_slurm_submission.py:        script += f"
+#SBATCH --tasks-per-node={SlurmJobDict['tasks-per-node']}\n"
+mmservice/mdaas/tasks/create_slurm_submission.py:        script += f"
+#SBATCH --cpus-per-task={SlurmJobDict['cpus-per-task']}\n"
+mmservice/mdaas/tasks/create_slurm_submission.py:        script += f"
+#SBATCH --gres={SlurmJobDict['gres']}\n"
+complex/antibody/tasks/create_slurm_submission.py:    #     f"
+#SBATCH --chdir={SlurmJobDict['workingDirectory']}\n"
+complex/antibody/tasks/create_slurm_submission.py:    #     f"
+#SBATCH --error=slurm_%x-%A.err\n"
+complex/antibody/tasks/create_slurm_submission.py:    #     f"
+#SBATCH --output=slurm_%x-%A.out\n"
+complex/antibody/tasks/create_slurm_submission.py:    #     f"
+#SBATCH --get-user-env\n"
+complex/antibody/tasks/create_slurm_submission.py:    #     f"
+#SBATCH --job-name={SlurmJobDict['name']}\n"
+complex/antibody/tasks/create_slurm_submission.py:    #     f"
+#SBATCH --nodes={SlurmJobDict['nodes']}\n"
+complex/antibody/tasks/create_slurm_submission.py:    #     f"
+#SBATCH --partition={SlurmJobDict['partition']}\n"
+complex/antibody/tasks/create_slurm_submission.py:    #     f"
+#SBATCH --time={SlurmJobDict['time']}\n"
+complex/antibody/tasks/create_slurm_submission.py:    #     script += f"
+#SBATCH --tasks-per-node={SlurmJobDict['tasks-per-node']}\n"
+complex/antibody/tasks/create_slurm_submission.py:    #     script += f"
+#SBATCH --cpus-per-task={SlurmJobDict['cpus-per-task']}\n"
+complex/antibody/tasks/create_slurm_submission.py:    #     script += f"
+#SBATCH --gres={SlurmJobDict['gres']}\n"
+complex/glycomimetics/docs/tasks_reference/external_scripts_bash/master_submit.sh:
+#SBATCH --partition=CPU
+complex/glycomimetics/docs/tasks_reference/external_scripts_bash/master_submit.sh:
+#SBATCH -D ${job_workdir_absolute}
+complex/glycomimetics/docs/tasks_reference/external_scripts_bash/master_submit.sh:
+#SBATCH -D ${job_workdir_absolute}
+complex/glycomimetics/docs/tasks_reference/external_scripts_bash/master_submit.sh:
+#SBATCH -J glycomimetics
+complex/glycomimetics/docs/tasks_reference/external_scripts_bash/master_submit.sh:
+#SBATCH --get-user-env
+complex/glycomimetics/docs/tasks_reference/external_scripts_bash/master_submit.sh:
+#SBATCH --nodes=1
+complex/glycomimetics/docs/tasks_reference/external_scripts_bash/master_submit.sh:
+#SBATCH --tasks-per-node=${num_cpus_glycomimetics}
+complex/glycomimetics/docs/tasks_reference/external_scripts_bash/make_simulation_scripts.sh:
+#SBATCH --partition=glycomimetics
+complex/glycomimetics/docs/tasks_reference/external_scripts_bash/make_simulation_scripts.sh:
+#SBATCH -D ${dirname}/1_leap
+complex/glycomimetics/docs/tasks_reference/external_scripts_bash/make_simulation_scripts.sh:
+#SBATCH -J E-${analog_name}
+complex/glycomimetics/docs/tasks_reference/external_scripts_bash/make_simulation_scripts.sh:
+#SBATCH --get-user-env
+complex/glycomimetics/docs/tasks_reference/external_scripts_bash/make_simulation_scripts.sh:
+#SBATCH --nodes=1
+complex/glycomimetics/docs/tasks_reference/external_scripts_bash/make_simulation_scripts.sh:
+#SBATCH --tasks-per-node=${num_cpus_emin}
+complex/glycomimetics/docs/tasks_reference/external_scripts_bash/make_simulation_scripts.sh:
+#SBATCH -D .
+complex/glycomimetics/docs/tasks_reference/external_scripts_bash/make_simulation_scripts.sh:
+#SBATCH -J M-${analog_name}
+complex/glycomimetics/docs/tasks_reference/external_scripts_bash/make_simulation_scripts.sh:
+#SBATCH --get-user-env
+complex/glycomimetics/docs/tasks_reference/external_scripts_bash/make_simulation_scripts.sh:
+#SBATCH --nodes=1
+complex/glycomimetics/docs/tasks_reference/external_scripts_bash/make_simulation_scripts.sh:
+#SBATCH --tasks-per-node=1
+complex/glycomimetics/docs/tasks_reference/external_scripts_bash/make_simulation_scripts.sh:
+#SBATCH --gres=gpu:1
+complex/glycomimetics/docs/tasks_reference/external_scripts_bash/make_simulation_scripts.sh:
+#SBATCH -D ../4_gbsa
+complex/glycomimetics/docs/tasks_reference/external_scripts_bash/make_simulation_scripts.sh:
+#SBATCH -J G-${analog_name}
+complex/glycomimetics/docs/tasks_reference/external_scripts_bash/make_simulation_scripts.sh:
+#SBATCH --get-user-env
+complex/glycomimetics/docs/tasks_reference/external_scripts_bash/make_simulation_scripts.sh:
+#SBATCH --nodes=1
+complex/glycomimetics/docs/tasks_reference/external_scripts_bash/make_simulation_scripts.sh:
+#SBATCH --tasks-per-node=${num_cpus_gbsa}
+complex/glycomimetics/docs/tasks_reference/external_scripts_bash/bak_master_submit.sh:
+#SBATCH --partition=CPU
+complex/glycomimetics/docs/tasks_reference/external_scripts_bash/bak_master_submit.sh:
+#SBATCH -D ${simulation_workdir}
+complex/glycomimetics/docs/tasks_reference/external_scripts_bash/bak_master_submit.sh:
+#SBATCH -D .
+complex/glycomimetics/docs/tasks_reference/external_scripts_bash/bak_master_submit.sh:
+#SBATCH -J glycomimetics
+complex/glycomimetics/docs/tasks_reference/external_scripts_bash/bak_master_submit.sh:
+#SBATCH --get-user-env
+complex/glycomimetics/docs/tasks_reference/external_scripts_bash/bak_master_submit.sh:
+#SBATCH --nodes=1
+complex/glycomimetics/docs/tasks_reference/external_scripts_bash/bak_master_submit.sh:
+#SBATCH --tasks-per-node=${num_cpus_glycomimetics}
+complex/glycomimetics/docs/reference/expected_outcome/slurm_submit_glycomimetics.sh:
+#SBATCH -D /home/yao/glycomimetic_simulations/virtual_screening/flu_3ubq_N5_aldehyde_library
+complex/glycomimetics/docs/reference/expected_outcome/slurm_submit_glycomimetics.sh:
+#SBATCH -J glycomimetics
+complex/glycomimetics/docs/reference/expected_outcome/slurm_submit_glycomimetics.sh:
+#SBATCH --get-user-env
+complex/glycomimetics/docs/reference/expected_outcome/slurm_submit_glycomimetics.sh:
+#SBATCH --nodes=1
+complex/glycomimetics/docs/reference/expected_outcome/slurm_submit_glycomimetics.sh:
+#SBATCH --tasks-per-node=8
+complex/glycomimetics/tasks/create_slurm_submission.py:        f"
+#SBATCH --chdir={SlurmJobDict['workingDirectory']}\n"
+complex/glycomimetics/tasks/create_slurm_submission.py:        f"
+#SBATCH --error=slurm_%x-%A.err\n"
+complex/glycomimetics/tasks/create_slurm_submission.py:        f"
+#SBATCH --output=slurm_%x-%A.out\n"
+complex/glycomimetics/tasks/create_slurm_submission.py:        f"
+#SBATCH --get-user-env\n"
+complex/glycomimetics/tasks/create_slurm_submission.py:        f"
+#SBATCH --job-name={SlurmJobDict['name']}\n"
+complex/glycomimetics/tasks/create_slurm_submission.py:        f"
+#SBATCH --nodes={SlurmJobDict['nodes']}\n"
+complex/glycomimetics/tasks/create_slurm_submission.py:        f"
+#SBATCH --partition={SlurmJobDict['partition']}\n"
+complex/glycomimetics/tasks/create_slurm_submission.py:        f"
+#SBATCH --time={SlurmJobDict['time']}\n"
+complex/glycomimetics/tasks/create_slurm_submission.py:        script += f"
+#SBATCH --tasks-per-node={SlurmJobDict['tasks-per-node']}\n"
+complex/glycomimetics/tasks/create_slurm_submission.py:        script += f"
+#SBATCH --cpus-per-task={SlurmJobDict['cpus-per-task']}\n"
+complex/glycomimetics/tasks/create_slurm_submission.py:        script += f"
+#SBATCH --gres={SlurmJobDict['gres']}\n"
+complex/glycomimetics/tasks/unused/simulation_scripts_src/make_2_md.sh:
+#SBATCH -D .
+complex/glycomimetics/tasks/unused/simulation_scripts_src/make_2_md.sh:
+#SBATCH -J M-${analog_name}
+complex/glycomimetics/tasks/unused/simulation_scripts_src/make_2_md.sh:
+#SBATCH --get-user-env
+complex/glycomimetics/tasks/unused/simulation_scripts_src/make_2_md.sh:
+#SBATCH --nodes=1
+complex/glycomimetics/tasks/unused/simulation_scripts_src/make_2_md.sh:
+#SBATCH --tasks-per-node=1
+complex/glycomimetics/tasks/unused/simulation_scripts_src/make_2_md.sh:
+#SBATCH --gres=gpu:1
+complex/glycomimetics/tasks/unused/simulation_scripts_src/make_1_slurm.sh:
+#SBATCH -D ${dirname}/1_leap
+complex/glycomimetics/tasks/unused/simulation_scripts_src/make_1_slurm.sh:
+#SBATCH -J E-${analog_name}
+complex/glycomimetics/tasks/unused/simulation_scripts_src/make_1_slurm.sh:
+#SBATCH --get-user-env
+complex/glycomimetics/tasks/unused/simulation_scripts_src/make_1_slurm.sh:
+#SBATCH --nodes=1
+complex/glycomimetics/tasks/unused/simulation_scripts_src/make_1_slurm.sh:
+#SBATCH --tasks-per-node=${num_cpus_emin}
+complex/glycomimetics/tasks/unused/simulation_scripts_src/make_4_gbsa.sh:
+#SBATCH -D ../4_gbsa
+complex/glycomimetics/tasks/unused/simulation_scripts_src/make_4_gbsa.sh:
+#SBATCH -J G-${analog_name}
+complex/glycomimetics/tasks/unused/simulation_scripts_src/make_4_gbsa.sh:
+#SBATCH --get-user-env
+complex/glycomimetics/tasks/unused/simulation_scripts_src/make_4_gbsa.sh:
+#SBATCH --nodes=1
+complex/glycomimetics/tasks/unused/simulation_scripts_src/make_4_gbsa.sh:
+#SBATCH --tasks-per-node=${num_cpus_gbsa}
+complex/glycomimetics/tasks/unused/make_master_submission_script.py:
+#SBATCH -D {job_workdir_abs}
+complex/glycomimetics/tasks/unused/make_master_submission_script.py:
+#SBATCH -J glycomimetics
+complex/glycomimetics/tasks/unused/make_master_submission_script.py:
+#SBATCH --get-user-env
+complex/glycomimetics/tasks/unused/make_master_submission_script.py:
+#SBATCH --nodes=1
+complex/glycomimetics/tasks/unused/make_master_submission_script.py:
+#SBATCH --tasks-per-node={num_cpus_glycomimetics}
+original_batchcompute/slurm/services/run_job/submission_script_logic.py:    script.write("
+#SBATCH --chdir=" + incoming_dict["workingDirectory"] + "\n")
+original_batchcompute/slurm/services/run_job/submission_script_logic.py:    script.write("
+#SBATCH --error=slurm_%x-%A.err" + "\n")
+original_batchcompute/slurm/services/run_job/submission_script_logic.py:    script.write("
+#SBATCH --get-user-env" + "\n")
+original_batchcompute/slurm/services/run_job/submission_script_logic.py:    script.write("
+#SBATCH --job-name=" + incoming_dict["name"] + "\n")
+original_batchcompute/slurm/services/run_job/submission_script_logic.py:    script.write("
+#SBATCH --nodes=1" + "\n")
+original_batchcompute/slurm/services/run_job/submission_script_logic.py:    script.write("
+#SBATCH --output=slurm_%x-%A.out" + "\n")
+original_batchcompute/slurm/services/run_job/submission_script_logic.py:    script.write("
+#SBATCH --partition=" + incoming_dict["partition"] + "\n")
+original_batchcompute/slurm/services/run_job/submission_script_logic.py:    script.write("
+#SBATCH --tasks-per-node=4" + "\n")
+original_batchcompute/slurm/services/run_job/submission_script_logic.py:#    script.write("
+#SBATCH --uid=" + incoming_dict["user"] + "\n")

@@ -19,6 +19,7 @@ class SupportedServices(GemsStrEnum):
     The value is the form that should appear in the instance_config.json file.
     """
     ad = "AD"                  # Execution relevant to antibody docking (AAD2)
+    bc = "BC"                  # Submit a computationally intensive job to the scheduler of an HPC cluster
     cb = "CB"                  # Sequence builder (CB) - used to be "Sequence-Build3DStructure"
     gm = "GM"                  # Execution relevant to Glycomimetics
     gp = "GP"                  # Execution relevant to the GlycoProtein builder
@@ -69,21 +70,23 @@ class WebsiteEnvironments(GemsStrEnum):
 ######################################################
 
 class BatchComputingResources(BaseModel):
+    cpu_hardware_equivalent: str = "core"   ## is a CPU considered to be a core or a thread?
     partition: str = Field(None, alias='partition')
-    num_nodes: int = None
-#    num_processes: int = None  ## don't need these here
-#    num_cores: int = None      ## they need to go into the BatchCompute module
-#    num_threads: int = None    ## maybe one day there will only be one module doing that job
-#    num_gpus: int = None       ## these variables are about what is requested, not what is available
-#    cpu_alias: str = "cores"   ## is a CPU considered to be a core or a thread?
-    num_processes_per_node: int = None
-    num_cores_per_node: int = None
-    num_threads_per_node: int = None
-    num_gpus_per_node: int = None
+    num_processes: int = None   
+    num_cores: int = None      
+    num_threads: int = None    
+    num_gpus: int = None       
+    num_cpus_per_gpu: int = "1" 
     time_limit: str = Field(
             None,
             description = "Computing time limit in ISO 8601 format. Example: 2 days, 16 hours and 30 minutes = P2DT16H30M "
             )
+
+    ## The following provides information, mostly to the BatchCompute module, so that it knows how to
+    ## generate input files for a specific cluster.
+    ## For example, if a Slurm cluster uses generic resources to track GPUs on the nodes, an entry
+    ## in the dictionary might be: use_gres_for_gpus: bool = "True"
+    scheduler_specific_information: Dict[] = []
 
     @root_validator(pre=True)
     def handle_aliases(cls, values: Dict[str, Any]) -> Dict[str, Any]:

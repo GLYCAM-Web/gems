@@ -2,27 +2,18 @@
 
 Provides entity Batchcompute which has a SubmitJob service.
 
-Purpose:  Manage execution of jobs that happen outside GEMS or that are likely to take a very long time to execute.  
+## Purpose
+
+Manage execution of jobs that happen outside GEMS or that are likely to take a very long time to execute.  
 In particular, this module manages jobs that would reasonably be expected to execute on a high-performance computing
 (HPC) machine or cluster.
 
-Notably, the intention is not that this module should run short, local jobs. 
+Notably, the intention is not that this module should run short, local jobs. But it should be able to run long
+jobs on the local host.
 
+## Services
 
-## Workflow
-
-1. Instantiate the Transaction.
-
-2. If the requested Service requires a computing resource, set it.
-
-   A computing resource might not be required, for example, if a list of Services is requested.
-
-   1. For now, it must be in the Instance Config.
-
-   2. One day, Batchcompute could look for Slurm, etc., on the local machine.
-
-3. Run the Service and return.
-
+##
 
 
 START HERE fixing the docs
