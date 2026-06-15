@@ -57,10 +57,13 @@ class myAPI(Common_API):
 
 ## Variables Related To I/O
 
+### Variables that are part of the Python code
+
 Conventions for variables that inhabit the client-facing API or that inhabit the scientific-software-facing Tasks.
 
 - Client-Facing API Variables: snake case, for example: `project_dir`.
 - Scientific-Software-Facing Task Variables (inlcuding APIs used only in Tasks): camel case, for example: `projectDir`.
+- Prefer long-form to short-form
 
 Doing this makes it easier for coders to identify the expected scope of a specific variable. 
 This ability is also valuable in finding workflow-related bugs.
@@ -70,6 +73,23 @@ a string: JSON does not allow the Python notion of 'Path'. If `project_dir` is o
 then a coder can be sure that it is always a string. Similarly, a coder knows that `projectDir` is used by a Task.
 Because the Tasks exist for the purpose of interfacing other software, the coder knows that it might be of whatever 
 variable type is convenient to the particular Task.
+
+### Variables that are not part of the Python code
+
+This section has in mind situations like command-line arguments and SBATCH directives.
+
+- Prefer the long form to the short form where possible
+
+Example:
+
+In arguments given to Slurm on the command line or as #SBATCH directives in a file, these are equivalent:
+
+```
+-D <working_directory>
+--chidr <working_directory>
+```
+
+To make these purpose of these as unambiguous as possible, always prefer the longer `--chdir` variant.
 
 ## Syntactic Sugar
 
@@ -176,15 +196,16 @@ That is:
 ```
 source file_containing_definitions.bash
 
-next_steps # do things that use the info in the sourced file.
+some_lines_of_code # do things that use the info in the sourced file.
 
-. file_using_results_from_next_steps.bash
+. file_using_results_from_some_lines_of_code.bash
 ```
 
 _Use case example:_ 
 
-`file.bash` contains code that is to be used in several scripts. Rather than copy the code into all the
-scripts, you can just use `. file.bash`. Using the dot tells the user how the code is being used.
+Assume that a file, `file.bash`, contains code that is to be used in several scripts. Rather than copy 
+the code into all the scripts, you can just use `. file.bash`. Using the dot tells the user how the code 
+is being used.
 
 #### The general use convention doesn't always apply
 
@@ -224,8 +245,9 @@ There are two ways that this can happen. Main can source the other script or can
 The code looks something like:
 
 ```
-source file.bash    # source file.bash
-bash file.bash      # run file.bash like a regular script
+source file.bash    # source file.bash as if it were lines of code
+## or
+bash file.bash      # run file.bash like a regular script or separate executable
 ```
 
 The difference is important for two reasons: external script completion and variable passing to the external script.
@@ -252,8 +274,8 @@ If exit is used, it causes everything that sourced the exiting file to also exit
 
 #### Variable passing to the external script
 
-Variables can be used by sourced scripts without using `export`. They must be `export`ed to scripts that are executed.
-This allows a method for having 'private' variables. 
+Variables can be used by sourced scripts without using `export`. However, variables must be exported 
+to scripts that are executed. This provides a method for having 'private' variables. 
 
 Example:
 
@@ -262,7 +284,7 @@ Here is the calling script:
 $ cat parent.bash 
 #!/usr/bin/env bash
 
-privatevariable="keepme"
+privatevariable="keepmelocal"
 export exportedvariable="exportme"
 
 echo "sourcing child.bash"
@@ -284,10 +306,12 @@ echo "The value of exportedvariable is ${exportedvariable}"
 Here is the result of running parent.bash:
 ```
 $ bash parent.bash 
-sourcing child.bash
+##
+# sourcing child.bash
 The value of privatevariable is keepme
 The value of exportedvariable is exportme
-executing child.bash
+##
+# executing child.bash
 The value of privatevariable is 
 The value of exportedvariable is exportme
 ```
@@ -298,9 +322,9 @@ Note that `privatevariable` is only visible to child.bash if child.bash is sourc
 
 Assume that you are running tests. 
 
-You want `testchild.bash` to use `SpecialVariable` as defined in `parent.bash`.  But, you also must execute 
-another file, `otherchild.bash`, that needs `SpecialVariable` to be defined somewhere else. You can use
-this difference to achieve that.
+In the tests, you want `testchild.bash` to use `SpecialVariable` as defined in `parent.bash`.  But, you 
+also must execute another file, `otherchild.bash`, that needs `SpecialVariable` to be defined somewhere 
+else (possibly a pre-existing default). You can use this difference to achieve that.
 
 ```
 $ cat parent.bash
