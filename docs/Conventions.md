@@ -7,6 +7,70 @@ Not all of the conventions from the codebase are listed here. Adding them to thi
 
 ---
 
+## Services
+
+Generally, there should be at least three services: Validate, Evaluate and Status. There can be as many other
+services as needed.
+
+Generally, the minimal three are defined as follows:
+
+- Validate:
+  - Returns information about the form and format of the request. 
+  - It makes no judgments about the appropriateness of the form of any inputs. Its concern is that all the needed
+    inputs are contained in the request.
+    - Example: If a file is part of the inputs, Validate will:
+      - Ensure that a file is included in the inputs.
+      - Possibly ensure that the file exists (if that applies to the Entity).
+      - Not check that the contents of the file for any characteristics.
+    - Example: If a carbohydrate sequence is part of the inputs, Validate will:
+      - Check that the sequence passes the formatting requirements for a sequence.
+      - Not check that the sequence refers to a carbohydrate that is supported by the Entity.
+    - That is, it merely checks that the request is complete and correct.
+  - Should not depend on any other Services and should not imply any other Services (see Implied Services).
+- Evaluate:
+  - Examines the inputs to determine what actions can be performed with those inputs.
+  - Considering our 'file.txt' from above, Evaluate will determine what can be done with the file.
+    - Example: If the Entity requires a carbohydrate sequence, Evaluate will:
+      - Check that all the components of the string are supported by the builder. 
+      - Determine the conformational possibilities of the sequence.
+      - Report the results to the user.
+  - Depends on Validte.
+- Status:
+  - Given sufficent project information to locate the expected output, Status will:
+    - Inspect the expected location of the output.
+    - If the location is accessible, it will provide Service-specific information. 
+      - Examples might include:
+        - Estimated time to completion of a partially-finished project.
+        - Reports of error messages.
+  - Note that Status does not return, investigate or analyze output. It merely reports status.
+
+### Implied Services
+
+Services can be implied in two ways:
+
+1. They can be dependencies of other Services. 
+   - If Service B needs Service A to have run first, then Service A is an Implied Service for Service B.
+2. They can be inferred from certain user inputs. This is a convenience feature.
+   - Example from the Sequence Entity:
+     - Assume that the json input contains only the following:
+```
+{
+    "entity": {
+        "type": "Sequence",
+        "inputs":
+            {
+                "sequence": {
+                    "payload": "DManpa1-OH"
+                }
+    }
+}
+```
+    - In this case, despite a Service not being explicitly requested, these inputs are taken to imply that the 
+      user wants a predicted 3D structure of alpha-D-mannopyranose.
+     
+
+---
+
 ## Imports
 
 Minimize the number of imports in a given workflow to greatly reduce the possibility of head-scratcher bugs.
@@ -56,6 +120,8 @@ class myAPI(Common_API):
         from gemsModules.systemoperations.filesystem_ops import check_make_directory directory_is_writable
         ...
 ```
+
+---
 
 ## Security Concerns
 
@@ -145,6 +211,8 @@ In arguments given to Slurm on the command line or as #SBATCH directives in a fi
 
 To make these purpose of these as unambiguous as possible, always prefer the longer `--chdir` variant.
 
+---
+
 ## Syntactic Sugar
 
 There is some built-in sugar. Where it exists, please use it. Feel free to add your own.
@@ -224,6 +292,8 @@ During an upgrade of the Python version used by the code, the default behavior o
 This operation happened to be important and widely-used. In places where sugar had been used, the update
 was simple: update a single defined function. But, the other uses had to be found one at a time by looking 
 at every import of the relevant Python library.
+
+---
 
 ## BASH
 
