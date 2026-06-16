@@ -72,11 +72,11 @@ class WebsiteEnvironments(GemsStrEnum):
 class BatchComputingResources(BaseModel):
     cpu_hardware_equivalent: str = "core"   ## is a CPU considered to be a core or a thread?
     partition: str = Field(None, alias='partition')
-    num_processes: int = None   
-    num_cores: int = None      
-    num_threads: int = None    
-    num_gpus: int = None       
-    num_cpus_per_gpu: int = "1" 
+    num_processes: str = None   
+    num_cores: str = None      
+    num_threads: str = None    
+    num_gpus: str = None       
+    num_cpus_per_gpu: str = "1" 
     time_limit: str = Field(
             None,
             description = "Computing time limit in ISO 8601 format. Example: 2 days, 16 hours and 30 minutes = P2DT16H30M "
@@ -108,7 +108,7 @@ class Host(BaseModel):
     # Was 'host'
     address: str = "localhost"  # Networking contact information for the host, e.g.: 127.0.0.1, localhost, example.com
     # Was 'slurmport'
-    port: Optional[int] = None
+    port: Optional[str] = None
     # Was 'hostName'
     name: str = "Glycon" # Whatever the humans call this machine
     # Was: 'sbatch_arguments'

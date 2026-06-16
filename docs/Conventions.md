@@ -5,6 +5,8 @@ widely used.
 
 Not all of the conventions from the codebase are listed here. Adding them to this document is encouraged.
 
+---
+
 ## Imports
 
 Minimize the number of imports in a given workflow to greatly reduce the possibility of head-scratcher bugs.
@@ -54,6 +56,58 @@ class myAPI(Common_API):
         from gemsModules.systemoperations.filesystem_ops import check_make_directory directory_is_writable
         ...
 ```
+
+## Security Concerns
+
+Because scientific software is very finicky about inputs, we have some built-in protection from injection
+attacks, but, of course, we do not assume this will always protect us.
+
+### General coding principles
+
+The main coding principle to adopt is:
+
+- Always perform actions on behalf of the inputs.
+- Never use the inputs themselves as instructions to be executed directly by the code.
+
+You will find presumably useless information like this:
+
+```
+REGISTRY = {
+    "MDaaS": ModuleData('gemsModules.mmservice.mdaas.receive', 'receive'),
+    "MmService": ModuleData('gemsModules.mmservice.receive', 'receive'),
+    ...
+}
+```
+
+This has three purposes:
+
+1. When a user requests an entity, for example "MDaaS", the code does not use that as the directive for
+   finding the appropriate module. Instead, the location of the module is always defined by the code.
+2. This enables flexibility. If a specific situation requires a different MDaaS module, possibly due to 
+   a need for backwards-compatibility, the user never needs to worry about that.
+3. Using the registry for importing later (rather than providing a link to a module), means that modules
+   are only loaded when they are needed.
+
+It is point 1 that provides the coding principle above.
+
+### The JSON API
+
+At the moment, GEMS is designed to Python 3.9.17 and Pydantic 1.10.2. These are old and are not as 
+security-aware as more modern implementations. 
+
+We do want to upgrade, and will do so ASAP. It will be a complex task, especially because there are
+significant differences between Pydantic v1 and v2.
+
+In the meantime, these rules should be followed:
+
+- All simple types must be `str`. Do not use `int`, `bool`, etc.
+- Complex types, such as Dict or a reference to another Pydanti class, are allowed.
+
+There are places where a stray `bool`, etc., snuck in. Please do not follow that precedent.
+
+Once we have upgraded the codebase, this requirement will be revisited and possibly revised.
+
+---
 
 ## Variables Related To I/O
 

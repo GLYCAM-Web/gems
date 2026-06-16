@@ -30,12 +30,12 @@ class Batchcompute_Scheduler_Inputs(BaseModel):
     job_name: str = None
     use_user_environment: bool = "True"
     ## For all the 'num_X_per_Y', a value of -1 will assign the maximum available
-    num_nodes_per_job: int = None
-    num_processes_per_node: int = None
-    num_processes_per_job: int = None
-    num_cores_per_job: int = None
-    num_threads_per_job: int = None
-    num_gpus_per_job: int = None
+    num_nodes_per_job: str = None
+    num_processes_per_node: str = None
+    num_processes_per_job: str = None
+    num_cores_per_job: str = None
+    num_threads_per_job: str = None
+    num_gpus_per_job: str = None
     time_limit: str = Field(
             None,
             description = "Computing time limit in ISO 8601 format. Example: 2 days, 16 hours and 30 minutes = P2DT16H30M "
