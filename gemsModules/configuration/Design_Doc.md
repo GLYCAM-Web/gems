@@ -9,9 +9,7 @@ The instance configuration is often called 'instance config' or simply 'IC'.
 
 ---
 
-## Purpose and Goals
-
-Important background: 
+## Important background: 
 
 GEMS is designed to provide communication between computers. If configured properly, a GEMS instance on one 
 computer, _ComputerA_ should be able to send requests to a GEMS instance on another computer, _ComputerB_.
@@ -22,19 +20,31 @@ head node for a computing cluster. It can also allow a person to submit remote j
 The GEMS instances communicate via gRPC. See `GEMSHOME/docs/GEMS_to_GEMS_Communication.md` for details. The 
 use of gRPC comes with advantages beyond mere communication.
 
+---
+
+## Purpose and Goals
+
 The Configuration module provides a way to generate a and query a database of available GEMS instances,
-including the local GEMS. This database, called an _Instance Configuration_, contains information regarding
-the capabilities of the available GEMS instances and how they can be contacted.
+including the local GEMS. This database, called an _Instance Configuration (IC)_, contains information 
+regarding the capabilities of the available GEMS instances and how they can be contacted.
+
+The IC also contains other locally-relevant information, for example the locations of input files and the 
+places to which output files should be written. 
 
 ---
 
 ## Available Services
 
+
+---
+
+## Relation to Other gemsModules
+
 This module does not use the JSON API that most modules use. It exists to serve the other modules in their
 work. It reads and writes the IC files and provides information from them to the modules.
 
-Notably, this module should generally not be used by the normal JSON-API-oriented modules designed for 
-interaction with users. 
+This module should be used directly by only a few modules. Other modules should usually retrieve information 
+from the Project or Batch Compute modules or use Network Connections to manage inter-GEMS communication.
 
 Modules that interact directly with this module:
 - Project : for setting directory paths and such

@@ -62,16 +62,22 @@ See below for Service details.
 
 ## Relation to the gRPC modules
 
+This module should use an abstracted method such as `networkconnections/seek_correct_host` rather than
+interface gRPC directly. Doing this means that if the method of GEMS-to-GEMS communication needs to
+change in the future, this module will not need to be altered.
+
+### Deprecation of the Slurm module in gRPC
+
+The older versions of Batch Compute used the `gRPC/SLURM` module which is being deprecated. As code is u
+pdated, it should be moved away from that module and onto the `gRPC/JSON` module.
+
+That is:
+
 - `JSON`:
-  - BC is a client of this module.
-  - This module allows BC to delegate jobs to GEMS instances on the remote cluster's head node.
-    - It is necessary for the remote cluster to open the relevant ports and advertise them.
-    - The relevant information should be present in the IC.
+  - Batch Compute should become a client of this module.
 - `SLURM`:
-  - This is being deprecated and the current BC should not use it.
-    - It is used by some deprecated Entities.
-  - It can be used as inspiration.
-  - It was the first module used for inter-GEMS communications.
+  - This modules is being deprecated.
+  - It can be used as inspiration, but the JSON module should have all that is needed.
 
 ---
 
