@@ -10,20 +10,20 @@ from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
 class Batchcompute_Project(Project):
-    """ batchcompute project for making new entities. """
+    """ batchcompute project. """
 
     ## These entries are all parts of a JSON object, so use JSON types, e.g., str rather than Path, etc.
     def __init__(self, **data : Any):
         super().__init__(**data)
         self.has_input_files = True
         self.project_type = "bc" # This is the same as service_id, and is used in the deprecated code as such
-        self.parent_entity = "batchcompute" # This is the name of the top directory gemsModule if this is a subModule (initial letter captialized)
+        self.parent_entity = "Batchcompute" # This is the name of the top directory gemsModule if this is a subModule (initial letter captialized)
                                 # Otherwise it is the name of the gemsModule directory for the Entity (initial letter capitalized)
         self.entity_id = "batchcompute" # Do not include the parent directory here - lowercase
         self.service_id = "bc" # This becomes the subdirectory output paths (like cb, gp, ad, gm, pdb, etc)
                                                         # & is used for lookup in instance config
         self.title = "batchcompute project"
-        self.app = "Batchcompute"
+        self.app = "Batchcompute" # first letter capitalized or Pascal case
         # self.requesting_agent = "" # Website, command line, sideload, etc. - should be set by requesting agent
                                      # but can be filled in or overridden if used for security or sanity reasons
         self.requested_service = "SubmitJob"

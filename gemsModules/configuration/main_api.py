@@ -45,59 +45,18 @@ class WebsiteEnvironments(GemsStrEnum):
     devenv = "DevEnv"          # Execution in the GLYCAM-Web development platform
 
 
-######################################################
-######################################################
-##
-## These two classes need to be changed, most likely. 
-## Do that when the rewrite reaches that point.
-## Also, of course, change other classes as needed.
-##
-##  Or...
-## 
-## Just remove them and make them generic.
-#class SbatchArguments(BaseModel): 
-#    """
-#    Slurm-specific arguments
-#    """
-#    partition: str = None      # The partition to which the job should be submitted
-#    time: Optional[str]        # The time limit to set (might be overridden elsewhere)
-#    nodes: str = None          # The number of nodes to request per job
-#    cpus_per_node: str = None  # The number of cpus to reserve - generally, cpus refers to cores not threads
-#    tasks_per_node: str = None # The number of tasks to assign to each node
-#class LocalParameters(BaseModel):
-#    numProcs: str
-######################################################
-######################################################
 
 class BatchComputingResources(BaseModel):
+    partition: str = Field("All", alias='partition') ## by default applies to all partitions
     cpu_hardware_equivalent: str = "core"   ## is a CPU considered to be a core or a thread?
-    partition: str = Field(None, alias='partition')
-    num_processes: str = None   
-    num_cores: str = None      
-    num_threads: str = None    
-    num_gpus: str = None       
-    num_cpus_per_gpu: str = "1" 
-    time_limit: str = Field(
+    max_cores: str = None      
+    max_threads: str = None    
+    max_gpus: str = None       
+    max_cpus_per_gpu: str = "1" 
+    max_time_limit: str = Field(
             None,
             description = "Computing time limit in ISO 8601 format. Example: 2 days, 16 hours and 30 minutes = P2DT16H30M "
             )
-
-    ## The following provides information, mostly to the BatchCompute module, so that it knows how to
-    ## generate input files for a specific cluster.
-    ## For example, if a Slurm cluster uses generic resources to track GPUs on the nodes, an entry
-    ## in the dictionary might be: use_gres_for_gpus: bool = "True"
-    scheduler_specific_information: Dict[] = []
-
-    @root_validator(pre=True)
-    def handle_aliases(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Allow folks who like 'queue' to use that word instead
-        If both are present, partition will be used and queue will be ignored.
-        """
-        # If 'queue' is present but 'partition' is not, map 'queue' to 'partition'
-        if 'queue' in values and 'partition' not in values:
-            values['partition'] = values.pop('queue')
-        return values
 
 
 class Host(BaseModel):
@@ -112,49 +71,20 @@ class Host(BaseModel):
     # Was 'hostName'
     name: str = "Glycon" # Whatever the humans call this machine
     # Was: 'sbatch_arguments'
-    batch_computing_resources: Optional[Dict[str, BatchComputingResources]]  = None  
+    scheduler: Optional[str] = None
+    batch_computing_resources: Optional[List[BatchComputingResources]]  = None  
     ######################################################################
     ######################################################################
-    is_localhost : bool = True  # Be sure to set this for (only!) one host or many things will never happen
+    is_localhost : str = "True"  # Be sure to set this for (only!) one host or many things will never happen
     services_available: List[SupportedServices] = None
     computing_resources: List[ComputingResourcesAvailable] = None
     execution_environments: List[ExecutionEnvironments] = [ "Standalone" ]
     website_environments: List[WebsiteEnvironments] = None
 
 
-#################################################################
-## The following have been changed altogether into things above
-#################################################################
-#    contexts: List[SupportedExecutionContexts] = [ "Standalone" ]
-#    routes: Optional[List[str]] = None
-    ####
-#    context_options: Dict[SupportedExecutionContexts, Dict[str,str]] = None # These will vary with each app.
-    # To be useful, these should correspond to options defined in the API for each entity/app.
-    # They will be copied into the appropriate Project and presented to the entity.
-    #
-    # In general, the values used here will override whatever is found in a JSON object sent to the delegator.
-    #     Caveats:
-    #             - If this GEMS serves a website, 
-    #                 - The values here will clobber values in the JSON if not dictated in the code.
-    #                 - Values enforced in the code override everything.
-    #             - If it is not serving a website, the incoming JSON values can be enforced if "use_api_strict=true".
-    ####
-#    local_parameters: Optional[Dict[str, LocalParameters]]  = None                    # for example, number of procs
-    ## The following should be made generic (e.g., batch_submission_arguments) and not tied to Slurm.
-#    cluster_filesystem_paths: Optional[Dict[SupportedExecutionContexts, str]]  = None # only needed for batch execution
-
-
 class InstanceConfig(BaseModel):
     date: str = None
     hosts: Optional[Dict[str, Host]] = None
-######################################
-######################################
-### dropping these - they need to be in the Host object if nowhere else.
-#    default_sbatch_arguments: Optional[Dict[str, SbatchArguments]] = None
-#    default_local_parameters: Optional[Dict[str, LocalParameters]] = None
-######################################
-######################################
-
     ####
     ##   Design notes for future development
     ##

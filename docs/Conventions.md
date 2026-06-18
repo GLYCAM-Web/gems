@@ -460,3 +460,26 @@ source testchild.bash   # will see SpecialVariable="test value"
 bash otherchild.bash    # will see SpecialVariable as defined elsewhere (or as undefined if not)
 ```
 
+---
+
+## Artifacts
+
+The use of Resources to describe Artifacts is preferred. Resources abstract location and format to simplify
+storage, transmission and retrieval. 
+
+For example, if your code needs a PDB file for input, the code that handles the PDB file does not need to
+know where the PDB file is or the format it is in. That is, whether the file is at rcsb.org or on a local 
+disk or in an object store, the local code does not need to know how to handle all those storage locations. 
+
+Instead it can look like:
+
+```
+def manage_pdb_file(Resource Artifact_in) :
+    ...
+    pdb_file = Artifact_in.copy_to_path(Path(file_destination))
+    ...
+```
+
+The Resource knows how to turn its payload into a file at a certain path.
+
+This functionality is new, so it is a little limited. Please add to it if you can.
