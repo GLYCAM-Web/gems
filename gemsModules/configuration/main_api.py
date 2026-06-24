@@ -26,14 +26,11 @@ class SupportedServices(GemsStrEnum):
     gr = "GR"                  # Execution relevant to Grafting, now known as GlySpec
     md = "MD"                  # Execution relevant to Molecular Dynamics
     pdb = "PDB"                # Execution relevant to a PDB file
-class ComputingResourcesAvailable(GemsStrEnum):
-    freetier = "FreeTier"      # Batch computing job that is free
-    shortjob = "ShortJob"      # Batch computing job that is short
-    slurm = "Slurm"            # Execution via a Slurm (batch computing) scheduler 
-    gpu = "GPU"                # GPUs are available for processing
 class ExecutionEnvironments(GemsStrEnum):
     swarm = "Swarm"            # Execution in a Docker Swarm-mode cloud
     batch = "Batch"            # Execution via a Batch computing scheduler
+    docker = "Docker"          # Execution via Docker
+    nodedocker = "NodeDocker"  # Execution via Docker on the compute nodes
     relay = "Relay"            # Ability to relay jobs to other environments
     standalone = "Standalone"  # Local execution on the command line or as a library
     website = "Website"        # Execution on behalf of a website, directly or not
@@ -48,6 +45,7 @@ class WebsiteEnvironments(GemsStrEnum):
 
 class BatchComputingResources(BaseModel):
     partition: str = Field("All", alias='partition') ## by default applies to all partitions
+    supported_services: List[SupportedServices]: None
     cpu_hardware_equivalent: str = "core"   ## is a CPU considered to be a core or a thread?
     max_cores: str = None      
     max_threads: str = None    
@@ -77,7 +75,6 @@ class Host(BaseModel):
     ######################################################################
     is_localhost : str = "True"  # Be sure to set this for (only!) one host or many things will never happen
     services_available: List[SupportedServices] = None
-    computing_resources: List[ComputingResourcesAvailable] = None
     execution_environments: List[ExecutionEnvironments] = [ "Standalone" ]
     website_environments: List[WebsiteEnvironments] = None
 

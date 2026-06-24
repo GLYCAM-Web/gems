@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##
-## This file should contain dictionaries relevant to specific scheduler needs.
+## This file should contain dictionaries relevant to specific resource manager needs.
 ## 
 
 from pydantic import BaseModel
