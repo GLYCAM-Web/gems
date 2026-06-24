@@ -4,6 +4,7 @@ from typing import List, Dict, Literal, Optional, Any
 from enum import Enum
 
 from gemsModules.common.code_utils import GemsStrEnum
+from gemsModules.configuration.resource_management_api import Resource_Specific_Information_Registry
 
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
@@ -62,15 +63,21 @@ class Host(BaseModel):
     ######################################################################
     ###!!!!! these fields have changed. Update the code.
     #
-    # Was 'host'
+    # Was 'host', but was always really the address of a host. This is a better name.
     address: str = "localhost"  # Networking contact information for the host, e.g.: 127.0.0.1, localhost, example.com
-    # Was 'slurmport'
+    # Was 'slurmport', but we want to stop using 'slurmreceive' and use only gRPC/JSON for comunication,
+    #      so the generic 'port' is better. Any code using gRPC/JSON or gRPC/SLURM should be updated.
     port: Optional[str] = None
     # Was 'hostName'
     name: str = "Glycon" # Whatever the humans call this machine
     # Was: 'sbatch_arguments'
-    scheduler: Optional[str] = None
-    batch_computing_resources: Optional[List[BatchComputingResources]]  = None  
+    #     Because we want to support schedulers other than slurm, we need more information
+    #     The following code is probably incorrect, but perhaps the desired behavior is clear enough
+    #     We still want a nested dictionary, but it needs to be much more flexible
+    #     The presence of "scheduler" helps the code know which dictionary to return and can be used
+    #     in Batch Compute to know which set of tasks should be assigned to a service.
+    scheduler: Optional[str] = None  # e.g., 'slurm' or 'torque'
+    resource_specific_information: Optional[Resource_Specific_Information_Registry(scheduler)]  = None  
     ######################################################################
     ######################################################################
     is_localhost : str = "True"  # Be sure to set this for (only!) one host or many things will never happen
@@ -102,11 +109,11 @@ class InstanceConfig(BaseModel):
     ##   See: gemsModules/common/main_api_resources.py and any code that references it.
     ##
     ####
-    filesystem_paths:Optional[Dict[SupportedExecutionContexts, str]]  = Field(
+    filesystem_paths:Optional[Dict[SupportedServices, str]]  = Field(
             default=None,
             Description="Local filesystem paths. If submitting to a cluster, where to drop files locally for transfer/sharing."
             )
-    secure_inputs_paths: Optional[Dict[SupportedExecutionContexts, str]]  = Field(
+    secure_inputs_paths: Optional[Dict[SupportedServices, str]]  = Field(
             default=None,
             Description="Local secured space for storing uploads, sideloads, generic input. Assumed sanitized for input as needed."
             )
@@ -162,7 +169,7 @@ class InstanceConfig(BaseModel):
         """ 
         Return the localhost's context_options for the requested service
         serviceID is the same as in service_id the Project class.
-        serviceID must be a member of the SupportedExecutionContexts enum.
+        serviceID must be a member of the SupportedServices enum.
         """
         log.info("get_localhost_context_options_by_service_ID was called")
         the_local_host = self.get_localhost()
@@ -190,17 +197,17 @@ class InstanceConfig(BaseModel):
         if self.filesystem_paths is None:
             log.debug("self.filesystem_paths is None")
             return None
-        ## Syntactic sugar to correspond to SupportedExecutionContexts structure
+        ## Syntactic sugar to correspond to SupportedServices structure
         sID_Key   = serviceID
         try:
-            SupportedExecutionContexts[sID] 
-            log.debug("the serviceID is found in SupportedExecutionContexts.")
+            SupportedServices[sID] 
+            log.debug("the serviceID is found in SupportedServices.")
         except KeyError:
-            message = f"The serviceID {serviceID} is NOT found in SupportedExecutionContexts."
+            message = f"The serviceID {serviceID} is NOT found in SupportedServices."
             log.debug(message)
             raise KeyError (message)
         directory='Not Found'
-        the_index = SupportedExecutionContexts[key].value
+        the_index = SupportedServices[key].value
         #print("the index is: " + the_index)
         if self.filesystem_paths[the_index] not in (None,""):
             directory = self.filesystem_paths[the_index]
@@ -220,16 +227,16 @@ class InstanceConfig(BaseModel):
         #message = "the sID is " + sID
         #log.debug(message)
         try:
-            SupportedExecutionContexts[sID] or SupportedExecutionContexts[sIDAlso] 
-            log.debug("the serviceID is found in SupportedExecutionContexts.")
+            SupportedServices[sID] or SupportedServices[sIDAlso] 
+            log.debug("the serviceID is found in SupportedServices.")
         except KeyError:
-            message = f"The serviceID {serviceID} is NOT found in SupportedExecutionContexts."
+            message = f"The serviceID {serviceID} is NOT found in SupportedServices."
             log.debug(message)
             raise KeyError (message)
 
         keys_to_check = [ sID, sIDAlso ]
-        directory = next((self.secure_inputs_paths[SupportedExecutionContexts[key]] \
-            for key in keys_to_check if key in self.secure_inputs_paths[SupportedExecutionContexts]), \
+        directory = next((self.secure_inputs_paths[SupportedServices[key]] \
+            for key in keys_to_check if key in self.secure_inputs_paths[SupportedServices]), \
             'Not Found')
         if directory == 'Not Found' :
             log.debug("the serviceID is NOT found in secure_inputs_paths.")
