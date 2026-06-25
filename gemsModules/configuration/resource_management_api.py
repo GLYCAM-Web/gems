@@ -3,7 +3,7 @@
 ## This file should contain dictionaries relevant to specific resource manager needs.
 ## 
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 ## The current form of this code might not work. Consider it to be pseudo-code
 

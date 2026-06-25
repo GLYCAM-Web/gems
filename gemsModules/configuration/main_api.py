@@ -31,14 +31,14 @@ class SupportedEntities(GemsStrEnum):
     @property
     def description(self) -> str:
         descriptions = {
-            Status.ad: "Execution relevant to antibody docking (AAD2)"
-            Status.bc: "Submit a computationally intensive job to the scheduler of an HPC cluster"
-            Status.cb: "Sequence builder (CB) - used to be 'Sequence-Build3DStructure'"
-            Status.gm: "Execution relevant to Glycomimetics"
-            Status.gp: "Execution relevant to the GlycoProtein Entity"
-            Status.gr: "Execution relevant to Grafting, now known as GlySpec"
-            Status.md: "Execution relevant to Molecular Dynamics"
-            Status.pdb: "Execution relevant to a PDB file"
+            SupportedEntities.ad: "Execution relevant to antibody docking (AAD2)",
+            SupportedEntities.bc: "Submit a computationally intensive job to the scheduler of an HPC cluster",
+            SupportedEntities.cb: "Sequence builder (CB) - used to be 'Sequence-Build3DStructure'",
+            SupportedEntities.gm: "Execution relevant to Glycomimetics",
+            SupportedEntities.gp: "Execution relevant to the GlycoProtein Entity",
+            SupportedEntities.gr: "Execution relevant to Grafting, now known as GlySpec",
+            SupportedEntities.md: "Execution relevant to Molecular Dynamics",
+            SupportedEntities.pdb: "Execution relevant to a PDB file",
         }
         return descriptions[self]
 
@@ -56,13 +56,13 @@ class ExecutionEnvironments(GemsStrEnum):
     @property
     def description(self) -> str:
         descriptions = {
-            Status.swarm: "Execution in a Docker Swarm-mode cloud"
-            Status.batch: "Execution via a Batch computing scheduler"
-            Status.docker: "Execution via Docker"
-            Status.nodedocker: "Execution via Docker on the compute nodes"
-            Status.relay: "Ability to relay jobs to other environments"
-            Status.standalone: "Local execution on the command line or as a library"
-            Status.website: "Execution on behalf of a website, directly or not"
+            ExecutionEnvironments.swarm: "Execution in a Docker Swarm-mode cloud",
+            ExecutionEnvironments.batch: "Execution via a Batch computing scheduler",
+            ExecutionEnvironments.docker: "Execution via Docker",
+            ExecutionEnvironments.nodedocker: "Execution via Docker on the compute nodes",
+            ExecutionEnvironments.relay: "Ability to relay jobs to other environments",
+            ExecutionEnvironments.standalone: "Local execution on the command line or as a library",
+            ExecutionEnvironments.website: "Execution on behalf of a website, directly or not",
         }
         return descriptions[self]
     
@@ -79,51 +79,49 @@ class WebsiteEnvironments(GemsStrEnum):
     @property
     def description(self) -> str:
         descriptions = {
-            Status.actual: "Execution in the context of the main website"
-            Status.dev: "Execution in the context of the move-in-swarm-testing website"
-            Status.test: "Execution in the context of the test website"
-            Status.swarmtest: "Execution in the context of the swarmtest website"
-            Status.devenv: "Execution in the GLYCAM-Web development platform"
+            WebsiteEnvironments.actual: "Execution in the context of the main website",
+            WebsiteEnvironments.dev: "Execution in the context of the move-in-swarm-testing website",
+            WebsiteEnvironments.test: "Execution in the context of the test website",
+            WebsiteEnvironments.swarmtest: "Execution in the context of the swarmtest website",
+            WebsiteEnvironments.devenv: "Execution in the GLYCAM-Web development platform",
         }
         return descriptions[self]
     
 
 class BatchComputingResources(BaseModel):
     partition: str = Field( 
-            None, 
-            alias='partition',
-            description="The partition or queue that provides the resources in this set."
-            ) 
+         None, 
+         alias='partition',
+         description="The partition or queue that provides the resources in this set."
+         ) 
     supported_entities: List[SupportedEntities] = Field(
-            None,
-            description="The list of Entities, in upper-case service_id format, that this partition supports."
-            )
+         None,
+         description="The list of Entities, in upper-case service_id format, that this partition supports."
+         )
     max_nodes_per_job: str = Field(
-            None,
-            description="The maximum number of nodes that can be reserved per job in this partition",
-            )
+         None,
+         description="The maximum number of nodes that can be reserved per job in this partition",
+         )
     max_cores_per_node: str = Field(
-            None,
-            description="The maximum number of cores that can be reserved per node in this partition",
-            )
+         None,
+         description="The maximum number of cores that can be reserved per node in this partition",
+         )
     max_threads_per_node: str = Field(
-            None,
-            description="",
-            description="The maximum number of threads that can be reserved per node in this partition",
-            )
+         None,
+         description="The maximum number of threads that can be reserved per node in this partition",
+         )
     max_gpus_per_node: str = Field(
-            None,
-            description="",
-            description="The maximum number of gpus that can be reserved per node in this partition",
-            )
+         None,
+         description="The maximum number of gpus that can be reserved per node in this partition",
+         )
     max_cpus_per_gpu: str = Field(
-            "1",
-            description="The maximum number of cpus (cores or threads) that can be reserved per gpu in this partition",
-            )
+         "1",
+         description="The maximum number of cpus (cores or threads) that can be reserved per gpu in this partition",
+         )
     max_time_limit: str = Field(
-            None,
-            description = "Computing time limit in ISO 8601 format. Example: 2 days, 16 hours and 30 minutes = P2DT16H30M"
-            )
+         None,
+         description = "Computing time limit in ISO 8601 format. Example: 2 days, 16 hours and 30 minutes = P2DT16H30M"
+         )
 
 
 class Host(BaseModel):
@@ -133,54 +131,67 @@ class Host(BaseModel):
     #
     # Was 'hostName'
     name: str = Field(
-            "Glycon",
-            description="Whatever the humans call this machine.",
-            )
+         "Glycon",
+         description="Whatever the humans call this machine.",
+         )
     # Was 'host', but was always really the address of a host. This is a better name.
     address: str = Field(
-            "localhost",
-            description="Networking contact information for the host, e.g.: 127.0.0.1, 172.16.0.200, example.com"
-            )
+         "localhost",
+         description="Networking contact information for the host, e.g.: 127.0.0.1, 172.16.0.200, example.com"
+         )
     # Was 'slurmport', but we want to stop using 'slurmreceive' and use only gRPC/JSON for comunication,
     #      so the generic 'port' is better. Any code using gRPC/JSON or gRPC/SLURM should be updated.
     port: Optional[str] = Field(
-            None,
-            description="The gRPC port that should be used to connect to this GEMS instance.",
-            )
+         None,
+         description="The gRPC port that should be used to connect to this GEMS instance.",
+         )
     # Was: 'sbatch_arguments'
     scheduler: Optional[str] = Field(
-            None,  
-            description="The type of scheduler used on this host, e.g., 'slurm'.",
-            )
+         None,  
+         description="The type of scheduler used on this host, e.g., 'slurm'.",
+         )
     batch_computing_resources: Optional[List[BatchComputingResources]] = Field(
-            None,
-            description="For each partition/queue, what resources are available and which Entities are supported?",
-            )
+         None,
+         description="For each partition/queue, what resources are available and which Entities are supported?",
+         )
     ## For safety, the following should employ a custom validator based on the value of 'scheduler'
-    ## The pseudo-code below is for clarification only. See also comments in resource_management_api.py
     ## The schema should be imported from resource_management_api.py
-    resource_specific_information: Optional[Resource_Specific_Information_Registry(scheduler)]  = Field(
-            None,
-            description="Information needed by Batch Compute that is set during scheduler configuration and cannot be guessed otherwise.",
-            )
+    resource_specific_information: Optional[Any]  = Field(
+         None,
+         description="Information needed by Batch Compute that is set during scheduler configuration and cannot be guessed otherwise.",
+         )
     ######################################################################
     ######################################################################
     is_localhost : str = Field(
-            "True",
-            description="Be sure to set this to 'true' for (only!) one host or many things will never happen.",
-            )
+         "True",
+         description="Be sure to set this to 'true' for (only!) one host or many things will never happen.",
+         )
     entities_available: List[SupportedEntities] = Field(
-            None,
-            description="The Entities whose services can run on this host.",
-            )
+         None,
+         description="The Entities whose services can run on this host.",
+         )
     execution_environments: List[ExecutionEnvironments] = Field(
-            [ "Standalone" ],
-            description="The ways that Services can be executed on this host.",
-            )
+         [ "Standalone" ],
+         description="The ways that Services can be executed on this host.",
+         )
     website_environments: List[WebsiteEnvironments] = Field(
-            None,
-            description="If this GEMS serves a website, which variant of the website is being served?",
-            )
+         None,
+         description="If this GEMS serves a website, which variant of the website is being served?",
+         )
+
+    from pydantic import validator
+
+    @validator('resource_specific_information', pre=True)
+    def validate_resource_specific_information(cls, v, values):
+        scheduler = values.get('scheduler')
+        if not scheduler or v is None:
+            return v
+        sch_key = scheduler.lower()
+        if sch_key in Resource_Specific_Information_Registry:
+            model_cls = Resource_Specific_Information_Registry[sch_key]
+            if isinstance(v, dict):
+                return model_cls(**v)
+        return v
 
 
 class InstanceConfig(BaseModel):
@@ -192,6 +203,88 @@ class InstanceConfig(BaseModel):
             None,
             description="List of Hosts that are contained in this IC.",
             )
+
+    from pydantic import validator
+
+    @validator('hosts', pre=True)
+    def validate_hosts(cls, v):
+        if isinstance(v, dict):
+            hosts_list = []
+            for name, host_dict in v.items():
+                if not isinstance(host_dict, dict):
+                    continue
+                h = host_dict.copy()
+                if "name" not in h:
+                    h["name"] = name
+                if "host" in h:
+                    h["address"] = h.pop("host")
+                if "slurmport" in h:
+                    h["port"] = h.pop("slurmport")
+                if "contexts" in h:
+                    h["entities_available"] = h.pop("contexts")
+                
+                # Coerce contexts to SupportedEntities enums where possible
+                if h.get("entities_available"):
+                    clean_entities = []
+                    legacy_map = {
+                        "MDaaS-RunMD": "MD",
+                        "Sequence-Build3DStructure": "CB",
+                        "AntibodyDocking": "AD",
+                        "Glycomimetics": "GM",
+                        "GlycoProtein": "GP",
+                    }
+                    for ent in h["entities_available"]:
+                        norm = legacy_map.get(ent, ent)
+                        # Check enum
+                        for enum_member in SupportedEntities:
+                            if enum_member.value == norm or enum_member.name == norm.lower():
+                                clean_entities.append(enum_member)
+                                break
+                    h["entities_available"] = clean_entities
+
+                scheduler = h.get("scheduler")
+                if not scheduler and ("sbatch_arguments" in h or h.get("port") in ("50052", "42029")):
+                    h["scheduler"] = "slurm"
+                    scheduler = "slurm"
+                
+                if scheduler == "slurm" and "resource_specific_information" not in h:
+                    slurm_info = {}
+                    # Look up from old sbatch_arguments or local_parameters if any info is there
+                    sbatch = h.get("sbatch_arguments", {})
+                    # For MD context or defaults
+                    md_args = sbatch.get("MD", {}) or sbatch.get("Default", {})
+                    if md_args:
+                        slurm_info["use_gres_for_gpus"] = "True" if "gres" in md_args else "False"
+                    h["resource_specific_information"] = slurm_info
+                
+                hosts_list.append(h)
+            return hosts_list
+        return v
+
+    @validator('filesystem_paths', 'secure_inputs_paths', pre=True)
+    def validate_paths_dict(cls, v):
+        if isinstance(v, dict):
+            new_dict = {}
+            for k, val in v.items():
+                legacy_map = {
+                    "MDaaS-RunMD": "MD",
+                    "Sequence-Build3DStructure": "CB",
+                    "AntibodyDocking": "AD",
+                    "Glycomimetics": "GM",
+                    "GlycoProtein": "GP",
+                }
+                norm_key = legacy_map.get(k, k)
+                entity = None
+                for e in SupportedEntities:
+                    if e.value == norm_key or e.name == norm_key.lower():
+                        entity = e
+                        break
+                if entity:
+                    new_dict[entity] = val
+                else:
+                    new_dict[k] = val
+            return new_dict
+        return v
     ####
     ##   Design notes for future development
     ##
@@ -228,8 +321,8 @@ class InstanceConfig(BaseModel):
         log.info("get_localhost was called")
         if self.hosts is None :
             return None
-        for host_object in self.hosts.values() :
-            if host_object.is_localhost :
+        for host_object in self.hosts :
+            if str(host_object.is_localhost).lower() == "true":
                 return host_object
         log.error("Cannot find localhost.")
         return None
@@ -242,7 +335,7 @@ class InstanceConfig(BaseModel):
         the_local_host = self.get_localhost()
         if the_local_host is None :
             return None
-        return the_local_host.hostName
+        return the_local_host.name
 
 
     def localhost_supports_context(self, context_names : List) -> bool :
@@ -252,99 +345,175 @@ class InstanceConfig(BaseModel):
         """
         log.info("localhost_supports_context was called")
         the_local_host = self.get_localhost()
-        if the_local_host is None :
+        if the_local_host is None or the_local_host.entities_available is None :
             return False
-        if any(item in context_names for item in the_local_host.contexts) :
-            return True
+        for entity in the_local_host.entities_available:
+            if entity.value in context_names or entity.name in context_names:
+                return True
         return False
 
-    def get_localhost_supported_contexts(self) -> bool :
+    def get_localhost_supported_contexts(self) -> List[str] :
         """ 
         Return the contexts supported by the localhost
         """
         log.info("get_localhost_supported_contexts was called")
         the_local_host = self.get_localhost()
-        if the_local_host is None :
+        if the_local_host is None or the_local_host.entities_available is None :
             return None
-        return host_object.contexts
+        return [entity.value for entity in the_local_host.entities_available]
 
     def get_localhost_context_options_by_service_ID(self, serviceID: str):
         """ 
-        Return the localhost's context_options for the requested service
-        serviceID is the same as in service_id the Project class.
-        serviceID must be a member of the SupportedEntities enum.
+        Return the localhost's context_options for the requested service (Placeholder)
         """
         log.info("get_localhost_context_options_by_service_ID was called")
-        the_local_host = self.get_localhost()
-        if the_local_host is None :
-            return None
-        if the_local_host.context_options is None:
-            log.debug("local host has no context options defined.")
-            return None
-        if serviceID not in the_local_host.context_options.keys() :
-            log.debug(f"local host has no context options defined for serviceID {serviceID}.")
-            return None
-        these_options=the_local_host.context_options[serviceID]
-        log.debug(f"context_options for {serviceID} on {local_host.hostName} are:")
-        log.debug(f"{these_options}")
-        return these_options
+        return None
 
     def get_filesystem_path_by_service_ID(self, serviceID: str):
-
-######
-######  This logic is not quite on target because too many targets
-######
-######  Reducing target count...
-######
         log.info("get_filesystem_path_by_service_ID is called.")
         if self.filesystem_paths is None:
             log.debug("self.filesystem_paths is None")
             return None
-        ## Syntactic sugar to correspond to SupportedEntities structure
-        sID_Key   = serviceID
-        try:
-            SupportedEntities[sID] 
-            log.debug("the serviceID is found in SupportedEntities.")
-        except KeyError:
+        entity = None
+        for e in SupportedEntities:
+            if e.value == serviceID or e.name == serviceID.lower():
+                entity = e
+                break
+        if entity is None:
             message = f"The serviceID {serviceID} is NOT found in SupportedEntities."
             log.debug(message)
-            raise KeyError (message)
-        directory='Not Found'
-        the_index = SupportedEntities[key].value
-        #print("the index is: " + the_index)
-        if self.filesystem_paths[the_index] not in (None,""):
-            directory = self.filesystem_paths[the_index]
-
-        if directory == 'Not Found' :
+            raise KeyError(message)
+        
+        if entity not in self.filesystem_paths:
             log.debug("the serviceID is NOT found in filesystem_paths.")
             return None
-        return directory
+        return self.filesystem_paths[entity]
 
     def get_secure_inputs_path_by_service_ID(self, serviceID: str):
         log.info("get_secure_inputs_path_by_service_ID is called.")
         if self.secure_inputs_paths is None:
             log.debug("self.secure_inputs_paths is None")
             return None
-        sID=serviceID.lower()
-        sIDAlso = f"{sID}Also"
-        #message = "the sID is " + sID
-        #log.debug(message)
-        try:
-            SupportedEntities[sID] or SupportedEntities[sIDAlso] 
-            log.debug("the serviceID is found in SupportedEntities.")
-        except KeyError:
+        entity = None
+        for e in SupportedEntities:
+            if e.value == serviceID or e.name == serviceID.lower():
+                entity = e
+                break
+        if entity is None:
             message = f"The serviceID {serviceID} is NOT found in SupportedEntities."
             log.debug(message)
-            raise KeyError (message)
-
-        keys_to_check = [ sID, sIDAlso ]
-        directory = next((self.secure_inputs_paths[SupportedEntities[key]] \
-            for key in keys_to_check if key in self.secure_inputs_paths[SupportedEntities]), \
-            'Not Found')
-        if directory == 'Not Found' :
+            raise KeyError(message)
+            
+        if entity not in self.secure_inputs_paths:
             log.debug("the serviceID is NOT found in secure_inputs_paths.")
             return None
-        return directory
+        return self.secure_inputs_paths[entity]
+
+    def check_remote_host_connectivity(self, host_name: str) -> Dict[str, Any]:
+        """
+        Check connectivity using gRPC/JSON with Delegator's Marco Service
+        """
+        log.info(f"Checking connectivity for remote host: {host_name}")
+        target_host = None
+        if self.hosts:
+            for host in self.hosts:
+                if host.name == host_name:
+                    target_host = host
+                    break
+        if not target_host:
+            return {"Error": f"Host {host_name} not found in configuration."}
+        
+        if not target_host.port:
+            return {"Error": f"Host {host_name} has no port configured."}
+            
+        from gemsModules.networkconnections.grpc import json_grpc_submit
+        import json
+        
+        # Build a standard Marco explicit request
+        marco_req = {
+            "entity": {
+                "type": "Delegator",
+                "requests": {
+                    "Marco": {
+                        "type": "Marco",
+                        "inputs": {
+                            "message": "Polo"
+                        }
+                    }
+                }
+            }
+        }
+        
+        try:
+            res_str = json_grpc_submit(json.dumps(marco_req), host=target_host.address, port=target_host.port)
+            res = json.loads(res_str)
+            return {"status": "success", "response": res}
+        except Exception as e:
+            return {"status": "failed", "error": str(e)}
+
+    def confirm_remote_host_capabilities(self, host_name: str) -> Dict[str, Any]:
+        """
+        Confirm remote host capabilities using Delegator's Check Configuration Service (placeholder)
+        """
+        log.info(f"Confirming capabilities for remote host: {host_name}")
+        return {"status": "success", "message": f"Placeholder: capabilities confirmed for {host_name}"}
+
+    def get_possible_hosts_for_context(
+        self, context: str, with_slurmport=False, with_jsonport=False, return_names=False
+    ) -> list:
+        # Map legacy/alternate context names to SupportedEntities
+        mapping = {
+            "MDaaS-RunMD": "MD",
+            "Sequence-Build3DStructure": "CB",
+            "AntibodyDocking": "AD",
+            "Glycomimetics": "GM",
+            "GlycoProtein": "GP",
+        }
+        normalized_context = mapping.get(context, context)
+        
+        possible_hosts = []
+        if self.hosts is None:
+            return possible_hosts
+            
+        for host in self.hosts:
+            if host.entities_available:
+                for entity in host.entities_available:
+                    if entity.value == normalized_context or entity.name == normalized_context.lower():
+                        if return_names:
+                            possible_hosts.append(host.name)
+                        else:
+                            if host.port:
+                                possible_hosts.append(f"{host.address}:{host.port}")
+                            else:
+                                possible_hosts.append(host.address)
+                        break
+        return possible_hosts
+
+    def get_available_contexts(self, instance_hostname=None) -> list:
+        import socket
+        if instance_hostname is None:
+            instance_hostname = socket.gethostname()
+            
+        available_contexts = []
+        if self.hosts:
+            for host in self.hosts:
+                # Matches either host name or address
+                if instance_hostname == host.name or instance_hostname == host.address or (instance_hostname == "localhost" and str(host.is_localhost).lower() == "true"):
+                    if host.entities_available:
+                        for e in host.entities_available:
+                            available_contexts.append(e.value)
+                            available_contexts.append(e.name)
+                            # map legacy names
+                            legacy = {
+                                "MD": "MDaaS-RunMD",
+                                "CB": "Sequence-Build3DStructure",
+                                "AD": "AntibodyDocking",
+                                "GM": "Glycomimetics",
+                                "GP": "GlycoProtein",
+                            }
+                            if e.value in legacy:
+                                available_contexts.append(legacy[e.value])
+        return list(set(available_contexts))
 
 
 @lru_cache(maxsize=1) ## Ensure that this is only loaded once in a given session
@@ -353,21 +522,28 @@ def _load_instance_config(icFilePath: str = None) -> InstanceConfig :
     import json
     import pathlib
     from gemsModules.systemoperations.environment_ops import find_instance_config
-    if icFilePath is None :
-        icPath = pathlib.Path(find_instance_config())
-    else :
-        icPath = pathlib.Path(icFilePath)
+    try:
+        if icFilePath is None :
+            icPath = pathlib.Path(find_instance_config())
+        else :
+            icPath = pathlib.Path(icFilePath)
+    except Exception:
+        log.warning("No instance configuration file found. Returning empty InstanceConfig.")
+        return InstanceConfig()
+        
     message = "The path (icPath) of the instance config file is: " + str(icPath) 
     log.debug(message)
     if not icPath.exists():
-        raise ValueError("The instance config file does not exist.")
+        log.warning("The instance config file does not exist. Returning empty InstanceConfig.")
+        return InstanceConfig()
     try:
         json_string = pathlib.Path(icPath).read_text()
         log.debug("The json string is:")
         log.debug(json_string)
         thisConfig = InstanceConfig.parse_file(icPath)
-    except Exception:
-        raise
+    except Exception as e:
+        log.warning(f"Error parsing instance config file: {e}. Returning empty InstanceConfig.")
+        return InstanceConfig()
     log.debug("This is a dump of the newly read config")
     log.debug(str(thisConfig.json(indent=2)))
     return thisConfig

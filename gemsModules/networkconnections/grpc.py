@@ -4,7 +4,7 @@ import socket
 
 from gemsModules.deprecated.common.loggingConfig import *
 from gemsModules.deprecated.batchcompute.slurm.dataio import *
-from gemsModules.deprecated.instance_config.main import InstanceConfig
+from gemsModules.configuration.main_api import InstanceConfig
 
 from gemsModules.logging.logger import Set_Up_Logging
 

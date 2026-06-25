@@ -6,7 +6,7 @@ import json
 from typing import Literal
 
 from gemsModules.networkconnections.grpc import slurm_grpc_submit, json_grpc_submit
-from gemsModules.deprecated.instance_config.main import InstanceConfig
+from gemsModules.configuration.main_api import InstanceConfig
 
 from gemsModules.logging.logger import Set_Up_Logging
 
