@@ -63,7 +63,43 @@ case code (possibly external to GEMS) is found to use it or communicate in its t
 
 ---
 
-## Available Services
+## Supported Entities
+
+This section refers to the Entities that are mentioned in the IC.
+
+The information assigned to them falls into roughly two categories:
+
+1. Connection information related to any remote hosts that are available to perform the service.
+2. Information telling the local host, which might or might not be able to perform a given service, where
+   to place input and where to look for output.
+   - This information is needed even if the local host cannot support an Entity.
+   - Currently, the inputs and outputs are directory paths.
+     - Eventually, they could be any form of storage, e.g., an object store.
+     - Because many of our files are very large, and because I/O might require several or more files, we 
+       avoid passing data stored in files via the JSON Objects.
+     - Once storage options expand, the structure of this information should resemble (perhaps inherit from)
+       the Resource object defined in `gemsmodules/common/main_api_resources.py`.
+
+---
+
+## Computing Resources
+
+These are included in:
+- The `BatchComputingResources` object in `main_api.py`
+  - Reports generic computing resources per partition (queue).
+  - Scheduler-specific language should be avoided here.
+- Various objects in: `resource_management_api.py`
+  - These objects contain information specific to a scheduler/resource-manager that cannot be known simply 
+    by knowing how to use the particular scheduler/manager.
+    - Example: Slurm might use --gres for tracking certain resources even if there are built-in arguments
+      that can also be used, such as --gpus. Because the choice is made when the scheduler is configured,
+      the Batch Compute Entity cannot know this without being told.
+  - All logic for realistically knowable options should reside in Batch Compute.
+  - Logic related to using resource specific information should also reside in Batch Compute.
+
+---
+
+## Provided Services
 
 These are the services available via user-facing scripts in the bin directory. The Delegator and Project
 Entities will be able to query any part of the IC, and some queries might happen via these services. Some
@@ -200,38 +236,83 @@ The script should be called `instance_config.py`. It should work with all/most v
 should replace `setup-instance.py`. In the latter, a 'preconfig' is the equivalent of a remote host config.
 
 ### Capabilities:
+
 - Provide all Services listed above.
 - Command-line arguments for:
   - Alternate file name for read/write of IC.
   - Write minified JSON (unminified is default).
-  - Read and write a simplified human-friendly format for the data (see below).
-    - For managing a proper IC file, this option is not avaialable.
+- Q/A-Style TUI for data entry for new IC
 
-### Friendly format:
-The specific format is irrelevant. A well-known format, e.g. Markdown, is fine. It needs to be easy to 
-parse in Python (and ideally in BASH) as well as easy to read and write by humans. It should be able to 
-represent all of the IC or the specific parts provided in the services.
+See below for command-line options and details regarding Q/A for the TUI.
+
+#### For generating a new IC
+
+The script should accept direct user inputs when configuring a new IC. The user inputs can be in the form of
+input files or answers to TUI questions. The TUI should accept input files in normal IC JSON format.
+
+#### For importing remote data to an existing IC
+
+The script should accept only input files in the JSON format.
+
+#### Direct modification via the TUI
+
+For now, this is not supported. The user can, of course, remake it from scratch or edit the file manually.
+
+## Coding Constraints
+
+The script should not attempt to follow the normal Entity format and it should not import from Common.
+
+The Service API in Delegator can include the InstanceConfig API.
+
+IC manipulations by the script should be capabilities separate from the methods in InstanceConfig and should
+be written into another file, `gemsModules/configuration/control_script.py`. 
+
+The purpose here is to discourage other Entities and Modules from attempting to manipulate the IC. Once the 
+file is created using the script, use of the data should be read-only. 
+
+Once created, where an OS supports it, the file should be marked read-only. The IC, and a command-line user,
+can change the write access, but casual modification should be discouraged.
 
 --- 
 
-## Interactions with Delegator
+## Entity Access to the IC
+
+The function `_load_instance_config` should be loadable only once during a session. Once it is loaded, it should
+become read-only. Entities should only access the IC data via this procedure.
+
+--- 
+
+## Interactions with Delegator via gRPC/JSON
 
 Generally, interacting with Delegator involves sending a JSON string to Delegator's `receive` feature.
 The script `$GEMSHOME/bin/delegate` provides an example of normal use by users and the website.
 
-Delegation within the code generally proceeds something like:
+In this situation, it should be mediated by `json_grpc_submit` in `gemsModules/networkconnections/grpc.py`.
+
+To use that function as defined, the 'host' is the 'address'.  The jsonObjectString should conform to the 
+API as defined in `gemsModules/delegator/main_api.py`.
+
+Sample JSON can be found in `gemsModules/delegator/tests/inputs/` for Delegator-provided services.
+
+### Brief contextual information about Delegator
+
+Submission should occur viat gRPC as described in the statements above. This section provides a brief 
+description of the role of Delegator.
+
+Interaction with any gemsModule that acts as an Entity generally occurs via Delegator. Delegator determines
+which Entity should provide a given service, leaving the Entity to become concerned only with its duties.
+Because of this role, it is also appropriate for Delegator to find the correct execution host.
+
+See `gemsModules/deprecated/delegator/test_in` for samples of JSON objects to be delegated to other Entities.
+Note that not all of the test inputs will work. There is much cleaning to do.
+
+Delegation within the code, not invoving gRPC, generally proceeds something like:
 
 ```
 from gemsModules.delegator.receive import receive
 responseObjectString=receive(jsonObjectString)
 sys.stdout.write(responseObjectString)
 ```
-
-The jsonObjectString should conform to the API as defined in `gemsModules/delegator/main_api.py`.
-
-Samples can be found in `gemsModules/delegator/tests/inputs/` for Delegator-provided services and in
-`gemsModules/deprecated/delegator/test_in` for samples of JSON objects to be delegated to other Entities.
-Note that not all of the test inputs will work. There is much cleaning to do.
 
 ### Marco
 
@@ -284,4 +365,153 @@ Doing this will require:
      for obvious differences such as the queried host not being declared localhost in the local IC.
 
 For now, placeholder methods will be ok.
+
+--- 
+
+## TUI and Q/A Process
+
+The TUI should be called `instance_config` and be located in `GEMSHOME/bin`.
+
+It should have these options:
+
+    # generation of a new IC
+    generate --from-file <filename>
+    generate --use-tui
+    # export part or all of an IC
+    export   localhost [--to-file <filename>]
+    export   host="name" [--to-file <filename>]
+    # import a remote host - re-generates the IC with a new timestamp
+    import   --from-file <filename> 
+
+All the above can be provided with a help statement if 'help' occurs at the end or in the place of 
+a filename or other required input.
+
+Otherwise:
+    '--from-file' and '--to-file' must have a file name as an argument
+    if an output file is not specified, output goes to stdout
+    input files must be specified (no stdin)
+
+### Q/A Process
+
+The Q/A Process should follow the structure of the InstanceConfig object.
+
+The expected text and questions follow. 
+
+All values should be interpreted as strings (extra security due to Pydantic V1).
+
+User replies in angle brackets are required; in square brackets, optional.
+
+In questions, information in curly braces is supplied by the TUI script. 
+Entries in square brackets provide information about default values, if any.
+
+Use the descriptions for each field (see code) for hints to give the user.
+
+Empty square defaults should become "" or None as appropriate.
+
+If any line is longer than 110 characters, split the line.
+
+Please be able to print a summary of this questionnaire if the command line is:
+    `instance_config generate --use-tui help`
+
+```
+Beginning a new Instance Configuration file on {date-time}.
+
+At any prompt, enter '?' for help.
+
+------------------------------------------
+Basic Setup
+------------------------------------------
+
+Instance configuration file name ["instance_config.json"] : [new-name]
+
+First we must gather some local data storage information
+
+Enter the list of Entities that can be delegated from the Local Host (space separated)
+  Note that this is NOT the list of Entities that can run on this host. 
+  It is the list of all entities considered, including those sent to remote hosts.
+  [{SupportedEntities.values()}] : [space separated values]
+  {if ? then supply the value and description for each enum and prompt again} 
+
+For each delegatable Entity, please provide a local filesystem path
+  {if ? at any point, then supply the field description and prompt again}
+  {SupportedEntity entered} [] : [path]
+  {...repeat as needed...}
+
+For each delegatable Entity, please provide a local secure inputs path 
+  {if ? at any point, then supply the field description and prompt again}
+  {SupportedEntity entered} [] : [path]
+  {...repeat as needed...}
+
+
+------------------------------------------
+Local Host Setup
+
+Host information for the local host must be given.
+    You will be prompted for information on other hosts later in this script.
+    Other hosts can be imported after this script is complete.
+-----------------------------------------
+
+{the script should supply "true" to the is_localhost field}
+
+
+Please enter the name by which this host is known ["Glycon"] : [name]
+{if ? show the description}
+
+Please enter the host address. 
+If this host is to be contacted by other hosts, enter a remote address,
+otherwise 'localhost' is sufficient ["localhost"] : [address]
+{if ? show the description}
+
+Please enter the port address if this host is to be contacted by other hosts [] : [port]
+{if ? show the description}
+
+Please enter the list of execution environments supported by this host ["Standalone"] : [env]
+  Notes:
+        If 'Batch' is specified, a scheduler should be entered below.
+        If 'Website' is specified, a website environment should be entered below.
+  {if ? show ExecutionEnvironments.values() and their descriptions} 
+
+If this host serves a website, please enter the website environment that it will serve 
+  [DevEnv] : [environment]
+  {if ? show WebsiteEnvironments.values() and their descriptions} 
+
+Enter the list of Entities that can be Served from the Local Host (space separated)
+  Note that this IS the list of Entities that can run on this host. 
+  Depending on setup, these entities might be delegated to this host.
+  [SupportedEntities.values()] : [space separated values]
+  {if ? then supply the value and description for each enum and prompt again} 
+
+If this host uses a resource scheduler, please give the type [None] 
+  Note that the only possible options right now are "Slurm" and "None" : [scheduler]
+  {if ? show the description}
+
+{Show the following if the scheduer is not None}
+For the resource, please fill in the following information.
+If you are unsure of the answers, give a dummy answer and contact the staff for the resource.
+{show the fields, defaults and descriptions in the BatchComputingResources class,
+asking for answers similar to before}
+
+{Show the following if the scheduer is not None}
+For the resource, please fill in the following information.
+If you are unsure of the answers, give a dummy answer and contact the staff for the resource.
+{show the fields, defaults and descriptions in the relevant resource specific information class,
+asking for answers similar to before}
+
+------------------------------------------
+Remote Host Setup
+
+The best method for doing this is to get the remote host 
+to export its instance_config and then import it here.
+But, you can enter the information by hand if you want.
+-----------------------------------------
+
+Do you want to enter remote host information? [No] : [answer]
+{
+if 'yes'
+Go through the host setup like above but for the remote host.
+Change text to disallow using 'localhost'.
+repeat the entire process until the reply is 'no'.
+}
+
+```
 
