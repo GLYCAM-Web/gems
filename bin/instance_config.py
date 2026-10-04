@@ -189,7 +189,9 @@ def main():
         else:
             host_name = args.target
             
-        export_host(ic_path, host_name, to_file=args.to_file)
+        out_json = export_host(ic_path, host_name, to_file=args.to_file)
+        if not args.to_file:
+            print(out_json)
         
     elif cmd == "import":
         parser = argparse.ArgumentParser(prog="instance_config import")

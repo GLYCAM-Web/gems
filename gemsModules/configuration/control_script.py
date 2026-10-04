@@ -329,8 +329,6 @@ def export_host(ic_path: str, host_name: str, to_file: str = None) -> str:
         with open(to_file, "w") as f:
             f.write(out_str)
         print(f"Exported host '{host_name}' to '{to_file}'.")
-    else:
-        print(out_str)
     return out_str
 
 def import_host(ic_path: str, remote_ic_path: str, out_ic_path: str = None):
