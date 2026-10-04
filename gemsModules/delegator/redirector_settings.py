@@ -13,6 +13,7 @@ REGISTRY = {
     "AntibodyDocking": ModuleData('gemsModules.complex.antibody.receive', 'receive'),
     "Glycomimetics": ModuleData('gemsModules.complex.glycomimetics.receive', 'receive'),
     "GlycoProtein": ModuleData('gemsModules.conjugate.glycoprotein.receive', 'receive'),
+    "Configuration": ModuleData('gemsModules.configuration.receive', 'receive'),
     # Deprecated
     "BatchCompute": ModuleData('gemsModules.deprecated.delegator.receive', 'delegate'),
     "Conjugate": ModuleData('gemsModules.deprecated.delegator.receive', 'delegate'),

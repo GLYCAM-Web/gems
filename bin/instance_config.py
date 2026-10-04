@@ -193,12 +193,33 @@ def main():
         
     elif cmd == "import":
         parser = argparse.ArgumentParser(prog="instance_config import")
-        parser.add_argument("--from-file", required=True, help="Export file from remote host.")
+        group = parser.add_mutually_exclusive_group(required=True)
+        group.add_argument("--from-file", type=str, help="Export file from remote host.")
+        group.add_argument("--from-remote", type=str, help="Remote host gRPC target (e.g. 172.16.4.2:42059 or host_name).")
         parser.add_argument("--ic-file", type=str, help="Alternate output configuration file.")
         args = parser.parse_args(argv[1:])
         
         ic_path = get_ic_path(args.ic_file)
-        import_host(ic_path, args.from_file, out_ic_path=args.ic_file)
+        if args.from_file:
+            import_host(ic_path, args.from_file, out_ic_path=args.ic_file)
+        elif args.from_remote:
+            if ":" in args.from_remote:
+                addr, port = args.from_remote.split(":", 1)
+            else:
+                ic = _load_instance_config(ic_path)
+                target_h = None
+                if ic.hosts:
+                    for h in ic.hosts:
+                        if h.name == args.from_remote:
+                            target_h = h
+                            break
+                if not target_h or not target_h.port:
+                    print(f"Error: Host '{args.from_remote}' not found or missing port in configuration.", file=sys.stderr)
+                    sys.exit(1)
+                addr, port = target_h.address, target_h.port
+            ic = _load_instance_config(ic_path)
+            res = ic.fetch_and_import_remote_host(addr, port, ic_path=ic_path)
+            print(json.dumps(res, indent=2))
         
     else:
         # Standard GEMS services parser

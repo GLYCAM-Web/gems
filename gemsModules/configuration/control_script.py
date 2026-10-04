@@ -283,18 +283,35 @@ def export_host(ic_path: str, host_name: str, to_file: str = None) -> str:
         config = json.load(f)
         
     # We find the host
-    hosts = config.get("hosts", [])
+    hosts_data = config.get("hosts", [])
     target_host = None
-    if host_name.lower() == "localhost":
-        for h in hosts:
-            if str(h.get("is_localhost", "False")).lower() == "true":
-                target_host = h
-                break
-    else:
-        for h in hosts:
-            if h.get("name") == host_name:
-                target_host = h
-                break
+
+    if isinstance(hosts_data, dict):
+        if host_name.lower() == "localhost":
+            for name, h in hosts_data.items():
+                if isinstance(h, dict) and str(h.get("is_localhost", "False")).lower() == "true":
+                    target_host = h.copy()
+                    if "name" not in target_host:
+                        target_host["name"] = name
+                    break
+        else:
+            for name, h in hosts_data.items():
+                if isinstance(h, dict) and (name == host_name or h.get("name") == host_name):
+                    target_host = h.copy()
+                    if "name" not in target_host:
+                        target_host["name"] = name
+                    break
+    elif isinstance(hosts_data, list):
+        if host_name.lower() == "localhost":
+            for h in hosts_data:
+                if isinstance(h, dict) and str(h.get("is_localhost", "False")).lower() == "true":
+                    target_host = h.copy()
+                    break
+        else:
+            for h in hosts_data:
+                if isinstance(h, dict) and h.get("name") == host_name:
+                    target_host = h.copy()
+                    break
                 
     if not target_host:
         print(f"Error: Host '{host_name}' not found.", file=sys.stderr)
@@ -330,14 +347,39 @@ def import_host(ic_path: str, remote_ic_path: str, out_ic_path: str = None):
         remote_config = json.load(f)
         
     # Merge hosts
-    local_hosts = {h["name"]: h for h in local_config.get("hosts", [])}
-    remote_hosts = remote_config.get("hosts", [])
+    local_hosts_data = local_config.get("hosts", [])
+    local_hosts = {}
+    if isinstance(local_hosts_data, dict):
+        for name, h in local_hosts_data.items():
+            if isinstance(h, dict):
+                h_copy = h.copy()
+                if "name" not in h_copy:
+                    h_copy["name"] = name
+                local_hosts[h_copy["name"]] = h_copy
+    elif isinstance(local_hosts_data, list):
+        for h in local_hosts_data:
+            if isinstance(h, dict) and "name" in h:
+                local_hosts[h["name"]] = h
+
+    remote_hosts_data = remote_config.get("hosts", [])
+    remote_hosts = []
+    if isinstance(remote_hosts_data, dict):
+        for name, h in remote_hosts_data.items():
+            if isinstance(h, dict):
+                h_copy = h.copy()
+                if "name" not in h_copy:
+                    h_copy["name"] = name
+                remote_hosts.append(h_copy)
+    elif isinstance(remote_hosts_data, list):
+        remote_hosts = remote_hosts_data
     
     for rh in remote_hosts:
+        if not isinstance(rh, dict):
+            continue
         # Remote hosts should never be marked as localhost in local IC
         rh_copy = rh.copy()
         rh_copy["is_localhost"] = "False"
-        name = rh_copy["name"]
+        name = rh_copy.get("name", "UnknownRemote")
         if name in local_hosts:
             print(f"Overwriting host details for '{name}' with imported information.")
         local_hosts[name] = rh_copy

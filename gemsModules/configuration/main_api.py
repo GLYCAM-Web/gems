@@ -1,6 +1,10 @@
 from functools import lru_cache
 from pydantic import BaseModel, ValidationError, Field
-from typing import List, Dict, Literal, Optional, Any
+from typing import List, Dict, Optional, Any
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 from enum import Enum
 
 from gemsModules.common.code_utils import GemsStrEnum
@@ -445,18 +449,160 @@ class InstanceConfig(BaseModel):
         }
         
         try:
-            res_str = json_grpc_submit(json.dumps(marco_req), host=target_host.address, port=target_host.port)
+            res_obj = json_grpc_submit(json.dumps(marco_req), host=target_host.address, port=target_host.port)
+            res_str = getattr(res_obj, "output", str(res_obj))
             res = json.loads(res_str)
             return {"status": "success", "response": res}
         except Exception as e:
             return {"status": "failed", "error": str(e)}
 
+    def fetch_and_import_remote_host(self, host_address: str, port: str, ic_path: str = None) -> Dict[str, Any]:
+        """
+        Sends a Configuration gRPC request to a remote host, fetches its exported IC,
+        and imports it into the local IC file.
+        """
+        log.info(f"Fetching configuration from remote host at {host_address}:{port}")
+        from gemsModules.networkconnections.grpc import json_grpc_submit
+        from gemsModules.configuration.control_script import import_host
+        from gemsModules.systemoperations.environment_ops import find_instance_config
+        import tempfile
+        import json
+        import os
+
+        config_req = {
+            "entity": {
+                "type": "Configuration",
+                "requests": {
+                    "ExportHost": {
+                        "type": "ExportHost",
+                        "inputs": {
+                            "target": "localhost"
+                        }
+                    }
+                }
+            }
+        }
+
+        try:
+            res_obj = json_grpc_submit(json.dumps(config_req), host=host_address, port=port)
+            res_str = getattr(res_obj, "output", str(res_obj))
+            res_json = json.loads(res_str)
+            
+            # Extract configuration output
+            responses = res_json.get("entity", {}).get("responses", {})
+            export_data = None
+            if isinstance(responses, list):
+                for item in responses:
+                    if isinstance(item, dict) and "ExportHost" in item:
+                        export_data = item["ExportHost"].get("outputs", {}).get("configuration")
+                        break
+            elif isinstance(responses, dict):
+                export_data = responses.get("ExportHost", {}).get("outputs", {}).get("configuration")
+
+            if not export_data:
+                return {"status": "failed", "error": f"Invalid or missing configuration in response: {res_str}"}
+
+            # Save temporary file for import_host
+            target_ic = ic_path if ic_path else find_instance_config()
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as tmp:
+                json.dump(export_data, tmp, indent=2)
+                tmp_path = tmp.name
+
+            try:
+                import_host(target_ic, tmp_path)
+            finally:
+                if os.path.exists(tmp_path):
+                    os.remove(tmp_path)
+
+            return {"status": "success", "message": f"Successfully imported host configuration from {host_address}:{port}"}
+        except Exception as e:
+            log.error(f"Error fetching/importing remote configuration: {e}")
+            return {"status": "failed", "error": str(e)}
+
     def confirm_remote_host_capabilities(self, host_name: str) -> Dict[str, Any]:
         """
-        Confirm remote host capabilities using Delegator's Check Configuration Service (placeholder)
+        Query a remote host over gRPC and compare its advertised capabilities
+        against what is recorded for host_name in the local IC.
         """
         log.info(f"Confirming capabilities for remote host: {host_name}")
-        return {"status": "success", "message": f"Placeholder: capabilities confirmed for {host_name}"}
+        target_host = None
+        if self.hosts:
+            for host in self.hosts:
+                if host.name == host_name:
+                    target_host = host
+                    break
+        if not target_host:
+            return {"status": "failed", "error": f"Host '{host_name}' not found in local configuration."}
+        if not target_host.port:
+            return {"status": "failed", "error": f"Host '{host_name}' has no port configured."}
+
+        from gemsModules.networkconnections.grpc import json_grpc_submit
+        import json
+
+        config_req = {
+            "entity": {
+                "type": "Configuration",
+                "requests": {
+                    "ExportHost": {
+                        "type": "ExportHost",
+                        "inputs": {
+                            "target": "localhost"
+                        }
+                    }
+                }
+            }
+        }
+
+        try:
+            res_obj = json_grpc_submit(json.dumps(config_req), host=target_host.address, port=target_host.port)
+            res_str = getattr(res_obj, "output", str(res_obj))
+            res_json = json.loads(res_str)
+
+            responses = res_json.get("entity", {}).get("responses", {})
+            export_data = None
+            if isinstance(responses, list):
+                for item in responses:
+                    if isinstance(item, dict) and "ExportHost" in item:
+                        export_data = item["ExportHost"].get("outputs", {}).get("configuration")
+                        break
+            elif isinstance(responses, dict):
+                export_data = responses.get("ExportHost", {}).get("outputs", {}).get("configuration")
+
+            if not export_data or "hosts" not in export_data or not export_data["hosts"]:
+                return {"status": "failed", "error": f"Invalid or missing configuration in response: {res_str}"}
+
+            remote_host_info = export_data["hosts"][0]
+
+            # Compare capabilities
+            remote_entities = sorted([e if isinstance(e, str) else str(e) for e in remote_host_info.get("entities_available", [])])
+            local_entities = sorted([e.value for e in target_host.entities_available]) if target_host.entities_available else []
+
+            remote_envs = sorted(remote_host_info.get("execution_environments", []))
+            local_envs = sorted([e.value for e in target_host.execution_environments]) if target_host.execution_environments else []
+
+            remote_scheduler = remote_host_info.get("scheduler")
+            local_scheduler = target_host.scheduler
+
+            matches = (remote_entities == local_entities and remote_envs == local_envs and remote_scheduler == local_scheduler)
+
+            return {
+                "status": "confirmed" if matches else "mismatch",
+                "match": matches,
+                "host_name": host_name,
+                "remote_advertised": {
+                    "entities_available": remote_entities,
+                    "execution_environments": remote_envs,
+                    "scheduler": remote_scheduler
+                },
+                "local_configured": {
+                    "entities_available": local_entities,
+                    "execution_environments": local_envs,
+                    "scheduler": local_scheduler
+                }
+            }
+        except Exception as e:
+            log.error(f"Error confirming capabilities for {host_name}: {e}")
+            return {"status": "failed", "error": str(e)}
 
     def get_possible_hosts_for_context(
         self, context: str, with_slurmport=False, with_jsonport=False, return_names=False
