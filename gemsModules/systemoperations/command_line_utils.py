@@ -8,6 +8,8 @@ import select
 from gemsModules.logging.logger import Set_Up_Logging
 
 
+from typing import Tuple
+
 log = Set_Up_Logging(__name__)
 
 
@@ -110,7 +112,7 @@ def STRING_from_stdin(
     return None
 
 
-def JSON_From_Command_Line(command_line, standard_input) -> tuple[str, int]:
+def JSON_From_Command_Line(command_line, standard_input) -> Tuple[str, int]:
     # Try to get the JSON from the command line
     jsonObjectString = STRING_from_file_named_on_command_line(command_line)
 

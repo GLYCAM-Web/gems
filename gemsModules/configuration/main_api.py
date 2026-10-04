@@ -545,7 +545,10 @@ def _load_instance_config(icFilePath: str = None) -> InstanceConfig :
         log.warning(f"Error parsing instance config file: {e}. Returning empty InstanceConfig.")
         return InstanceConfig()
     log.debug("This is a dump of the newly read config")
-    log.debug(str(thisConfig.json(indent=2)))
+    try:
+        log.debug(json.dumps(json.loads(thisConfig.json()), indent=2))
+    except Exception:
+        log.debug(str(thisConfig.json()))
     return thisConfig
 
 ## Instantiate the main instance config (GEMSHOME/instance_config.json)
@@ -560,6 +563,6 @@ def generateSchema():
 if __name__ == "__main__":
     #generateSchema()
     thisConfig = _load_instance_config()
-    print(thisConfig.json(indent=2))
+    print(json.dumps(json.loads(thisConfig.json()), indent=2))
 
 

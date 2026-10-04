@@ -1,6 +1,25 @@
-"""The Python implementation of the GemsGrpcSlurmReceiver server."""
+import os, sys
 
-import os, sys, subprocess, json, asyncio
+def activate_gems_venv():
+    gems_home = os.environ.get("GEMSHOME")
+    if not gems_home or not os.path.exists(gems_home):
+        file_dir = os.path.dirname(os.path.abspath(__file__))
+        gems_home = os.path.abspath(os.path.join(file_dir, "..", ".."))
+    venv_dir = os.path.join(gems_home, ".venv")
+    if os.path.isdir(venv_dir):
+        venv_bin = os.path.join(venv_dir, "bin")
+        if venv_bin not in os.environ.get("PATH", "").split(os.pathsep):
+            os.environ["PATH"] = venv_bin + os.pathsep + os.environ.get("PATH", "")
+        os.environ["VIRTUAL_ENV"] = venv_dir
+        venv_python = os.path.join(venv_bin, "python")
+        if os.path.exists(venv_python) and not sys.prefix.startswith(venv_dir):
+            if os.environ.get("_GEMS_VENV_ACTIVATED") != "1":
+                os.environ["_GEMS_VENV_ACTIVATED"] = "1"
+                os.execv(venv_python, [venv_python] + sys.argv)
+
+activate_gems_venv()
+
+import subprocess, json, asyncio
 
 from concurrent import futures
 from subprocess import *

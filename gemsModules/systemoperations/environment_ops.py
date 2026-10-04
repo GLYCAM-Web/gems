@@ -29,6 +29,35 @@ def find_instance_config() -> str:
     return theICPath
 
 
+def activate_gems_venv(file_path: str = None) -> None:
+    """
+    Detects if a .venv directory exists in GEMSHOME.
+    If present, sets VIRTUAL_ENV, prepends .venv/bin to PATH for subprocesses,
+    and re-executes the script using .venv/bin/python if not already running in the venv.
+    """
+    gems_home = os.environ.get("GEMSHOME")
+    if not gems_home or not os.path.exists(gems_home):
+        if file_path:
+            file_dir = os.path.dirname(os.path.abspath(file_path))
+            gems_home = os.path.abspath(os.path.join(file_dir, "..", ".."))
+        else:
+            gems_home = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+
+    venv_dir = os.path.join(gems_home, ".venv")
+    if os.path.isdir(venv_dir):
+        venv_bin = os.path.join(venv_dir, "bin")
+        if venv_bin not in os.environ.get("PATH", "").split(os.pathsep):
+            os.environ["PATH"] = venv_bin + os.pathsep + os.environ.get("PATH", "")
+        os.environ["VIRTUAL_ENV"] = venv_dir
+
+        venv_python = os.path.join(venv_bin, "python")
+        if os.path.exists(venv_python) and not sys.prefix.startswith(venv_dir):
+            if os.environ.get("_GEMS_VENV_ACTIVATED") != "1":
+                os.environ["_GEMS_VENV_ACTIVATED"] = "1"
+                os.execv(venv_python, [venv_python] + sys.argv)
+
+
+
 def get_site_version() -> str:
     GW_DOMAIN = os.getenv("GW_DOMAIN") or ""
     GW_DOMAIN = GW_DOMAIN.lower().strip()
