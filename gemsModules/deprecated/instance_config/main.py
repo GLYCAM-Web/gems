@@ -31,6 +31,22 @@ class FileSystemPathsMixin:
 
         if app in self.config["filesystem_paths"]:
             return self.config["filesystem_paths"][app]
+
+        mapping = {
+            "MD": "MDaaS-RunMD",
+            "CB": "Sequence-Build3DStructure",
+            "AD": "AntibodyDocking",
+            "GM": "Glycomimetics",
+            "GP": "GlycoProtein",
+            "MDaaS-RunMD": "MD",
+            "Sequence-Build3DStructure": "CB",
+            "AntibodyDocking": "AD",
+            "Glycomimetics": "GM",
+            "GlycoProtein": "GP",
+        }
+        alt = mapping.get(app)
+        if alt and alt in self.config["filesystem_paths"]:
+            return self.config["filesystem_paths"][alt]
         else:
             # This used to log and raise an error (commented out), but it should not.
             # The project module contains safeguards against bad paths being in the instance config.

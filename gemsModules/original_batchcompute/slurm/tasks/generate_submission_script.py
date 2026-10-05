@@ -26,10 +26,16 @@ def update_job_from_instance_config(SlurmJobDict):
 
 def localize_working_directory(thisSlurmJobInfo):
     """Update the working directory in the SlurmJobInfo object with the context-specific filesystem path."""
-    thisSlurmJobInfo.incoming_dict["workingDirectory"] = os.path.join(
-        InstanceConfig().get_filesystem_path(thisSlurmJobInfo.incoming_dict["context"]),
-        thisSlurmJobInfo.incoming_dict["pUUID"],
-    )
+    current_wd = thisSlurmJobInfo.incoming_dict.get("workingDirectory")
+    if current_wd and os.path.exists(current_wd):
+        return thisSlurmJobInfo
+
+    ic_path = InstanceConfig().get_filesystem_path(thisSlurmJobInfo.incoming_dict["context"])
+    if ic_path and thisSlurmJobInfo.incoming_dict.get("pUUID"):
+        thisSlurmJobInfo.incoming_dict["workingDirectory"] = os.path.join(
+            ic_path,
+            thisSlurmJobInfo.incoming_dict["pUUID"],
+        )
 
     return thisSlurmJobInfo
 
@@ -57,13 +63,17 @@ def execute(thisSlurmJobInfo):
 
     if "sbatchArgument" in SlurmJobDict and SlurmJobDict["sbatchArgument"]:
         log.debug("Prepending workdir to main sbatch command")
-        SlurmJobDict["sbatchArgument"] = (
-            os.path.join(
-                SlurmJobDict["workingDirectory"],
-                SlurmJobDict["sbatchArgument"],
+        if not SlurmJobDict["sbatchArgument"].startswith(SlurmJobDict["workingDirectory"]):
+            SlurmJobDict["sbatchArgument"] = (
+                os.path.join(
+                    SlurmJobDict["workingDirectory"],
+                    SlurmJobDict["sbatchArgument"],
+                )
+                + "\n"
             )
-            + "\n"
-        )
+        else:
+            if not SlurmJobDict["sbatchArgument"].endswith("\n"):
+                SlurmJobDict["sbatchArgument"] += "\n"
 
     log.debug("Slurm runscript path: " + SlurmJobDict["slurm_runscript_name"] + "\n")
     if os.path.exists(SlurmJobDict["slurm_runscript_name"]):

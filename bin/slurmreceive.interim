@@ -59,8 +59,9 @@ else:
 jsonObjectString = utils.JSON_From_Command_Line(sys.argv)
 
 responseObjectString = None
-# check if context is in the incoming string
-if "context" in json.loads(jsonObjectString):
+data = json.loads(jsonObjectString)
+# check if context is in the incoming string (top-level or inside inputs)
+if "context" in data or ("inputs" in data and isinstance(data["inputs"], dict) and "context" in data["inputs"]):
     # if it is, it's a new slurm submission
     from gemsModules.original_batchcompute.slurm.receive import receive
 

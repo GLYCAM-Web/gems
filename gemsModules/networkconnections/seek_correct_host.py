@@ -6,7 +6,7 @@ import json
 from typing import Literal
 
 from gemsModules.networkconnections.grpc import slurm_grpc_submit, json_grpc_submit
-from gemsModules.configuration.main_api import InstanceConfig
+from gemsModules.configuration.main_api import session_instance_config
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -23,12 +23,12 @@ def execute(jsonObjectString, context, submission_fn_type: Literal["slurm", "jso
     
     if submission_fn_type == "slurm":
         submission_fn = slurm_grpc_submit
-        addresses = InstanceConfig().get_possible_hosts_for_context(
+        addresses = session_instance_config.get_possible_hosts_for_context(
             context, with_slurmport=True
         )
     elif submission_fn_type == "json":
         submission_fn = json_grpc_submit
-        addresses = InstanceConfig().get_possible_hosts_for_context(
+        addresses = session_instance_config.get_possible_hosts_for_context(
             context, with_jsonport=True
         )
     else:

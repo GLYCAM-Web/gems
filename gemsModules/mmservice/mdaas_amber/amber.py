@@ -1,6 +1,6 @@
 import json
 
-from gemsModules.original_batchcompute.slurm.receive import receive as slurm_receive
+from gemsModules.batchcompute.receive import receive as slurm_receive
 from gemsModules.mmservice.mdaas_amber import mdaas_io
 
 from gemsModules.logging.logger import Set_Up_Logging
@@ -38,18 +38,23 @@ def manageIncomingString(jsonObjectString: str):
                     "SubmitJob": {
                         "type": "SubmitJob",
                         "inputs": {
-                            "pUUID": amber_job.jobID
+                            "pUUID": amber_job.jobID,
+                            "context": input_json_dict["context"],
+                            "workingDirectory": amber_job.simulationWorkingDirectory,
+                            "sbatchArgument": amber_job.simulationControlScriptPath,
+                            "name": amber_job.submissionName,
+                            "partition": "amber",
+                            "user": "webdev"
                         }
                     }
                 }
             },
             "pUUID": amber_job.jobID,
-            "partition": "amber",  # TODO: Probably invalid in most cases. The IC will handle this later.
-            "user": "webdev",  # TODO: We could remove this and obtain it on demand. This is coupled to our DevEnv/Swarm.
+            "partition": "amber",
+            "user": "webdev",
             "name": amber_job.submissionName,
             "workingDirectory": amber_job.simulationWorkingDirectory,
             "sbatchArgument": amber_job.simulationControlScriptPath,
-            # TODO: THis all needs to be made proper newstyle gemsModules...:(
             "context": input_json_dict["context"],
         }
     )

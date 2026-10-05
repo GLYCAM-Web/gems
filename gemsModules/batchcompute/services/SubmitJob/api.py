@@ -24,16 +24,25 @@ class SubmitJobService_Resources(Resources):
 
 
 class SubmitJobService_Inputs(BaseModel) :
-    pUUID : str = Field(
+    pUUID : Optional[str] = Field(
         None,
         title='Project UUID',
         description='UUID of Project',
     )
+    context: Optional[str] = Field(None, title='Context')
+    workingDirectory: Optional[str] = Field(None, title='Working Directory')
+    sbatchArgument: Optional[str] = Field(None, title='Sbatch Argument')
+    name: Optional[str] = Field(None, title='Job Name')
+    partition: Optional[str] = Field(None, title='Partition')
+    user: Optional[str] = Field(None, title='User')
     resources : Optional[SubmitJobService_Resources] = Field(
         title='Resources',
         description='Resources for SubmitJob',
         default_factory=SubmitJobService_Resources
     )
+
+    class Config:
+        extra = "allow"
     
     
 class SubmitJobService_Outputs(BaseModel) :

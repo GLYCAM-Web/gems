@@ -652,17 +652,42 @@ class InstanceConfig(BaseModel):
             return possible_hosts
             
         for host in self.hosts:
-            if host.entities_available:
+            host_dict = host.dict(by_alias=True) if hasattr(host, "dict") else (host if isinstance(host, dict) else {})
+            matched = False
+
+            # Check new format: entities_available
+            if hasattr(host, "entities_available") and host.entities_available:
                 for entity in host.entities_available:
-                    if entity.value == normalized_context or entity.name == normalized_context.lower():
-                        if return_names:
-                            possible_hosts.append(host.name)
-                        else:
-                            if host.port:
-                                possible_hosts.append(f"{host.address}:{host.port}")
-                            else:
-                                possible_hosts.append(host.address)
+                    ent_val = getattr(entity, "value", str(entity))
+                    ent_name = getattr(entity, "name", str(entity))
+                    if ent_val in (normalized_context, context) or ent_name == normalized_context.lower():
+                        matched = True
                         break
+
+            # Check old format: contexts
+            if not matched:
+                contexts_list = host_dict.get("contexts") or getattr(host, "contexts", None) or []
+                if isinstance(contexts_list, list):
+                    for ctx in contexts_list:
+                        if str(ctx) in (context, normalized_context):
+                            matched = True
+                            break
+
+            if matched:
+                host_name = host_dict.get("name") or getattr(host, "name", "localhost")
+                host_addr = host_dict.get("host") or host_dict.get("address") or getattr(host, "address", "localhost")
+                slurmport = host_dict.get("slurmport") or getattr(host, "slurmport", None)
+                jsonport = host_dict.get("jsonport") or host_dict.get("port") or getattr(host, "port", None)
+
+                if return_names:
+                    possible_hosts.append(host_name)
+                else:
+                    target_port = (slurmport if with_slurmport else None) or (jsonport if with_jsonport else None) or host_dict.get("port") or getattr(host, "port", None)
+                    if target_port:
+                        possible_hosts.append(f"{host_addr}:{target_port}")
+                    else:
+                        possible_hosts.append(host_addr)
+
         return possible_hosts
 
     def get_available_contexts(self, instance_hostname=None) -> list:

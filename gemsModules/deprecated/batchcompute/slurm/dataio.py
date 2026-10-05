@@ -84,6 +84,10 @@ class SlurmJobInfo:
         if self.incoming_dict is None:
             ## TODO Write in something that can happen here.
             pass
+        elif isinstance(self.incoming_dict, dict) and "inputs" in self.incoming_dict and isinstance(self.incoming_dict["inputs"], dict):
+            for k, v in self.incoming_dict["inputs"].items():
+                if k not in self.incoming_dict or self.incoming_dict[k] is None:
+                    self.incoming_dict[k] = v
         try:
             SlurmJobInfoSchema(**self.incoming_dict)
         except ValidationError as e:
