@@ -5,7 +5,7 @@ from pathlib import Path
 
 from gemsModules.common.action_associated_objects import AAOP
 from gemsModules.common.services.request_data_filler import Request_Data_Filler
-from gemsModules.common.main_api_resources import Resource
+from gemsModules.systemoperations.resources_api import Resource, Resources
 
 from gemsModules.complex.antibody.main_api import Antibody_Entity
 from gemsModules.complex.antibody.main_api_project import AntibodyProject
@@ -130,19 +130,17 @@ class Antibody_Request_Data_Filler(Request_Data_Filler):
         ligand_filename = aaop.The_AAO.inputs.ligand_path
 
         if antibody_filename:
-            pdb = Resource(
-                payload=antibody_filename,
-                resourceFormat="chemical/pdb",
-                resourceRole="Antibody",
-                locationType="filesystem-path-unix",
+            pdb = Resource.from_file(
+                path=antibody_filename,
+                role="Antibody",
+                format="chemical/pdb",
             )
             aaop.The_AAO.inputs.resources.add_resource(pdb)
         if ligand_filename:
-            pdb = Resource(
-                payload=ligand_filename,
-                resourceFormat="chemical/pdb",
-                resourceRole="Ligand",
-                locationType="filesystem-path-unix",
+            pdb = Resource.from_file(
+                path=ligand_filename,
+                role="Ligand",
+                format="chemical/pdb",
             )
             aaop.The_AAO.inputs.resources.add_resource(pdb)
             

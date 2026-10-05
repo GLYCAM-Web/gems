@@ -1,5 +1,8 @@
 from functools import lru_cache
-from pydantic import BaseModel, ValidationError, Field
+try:
+    from pydantic.v1 import BaseModel, ValidationError, Field, validator
+except ImportError:
+    from pydantic import BaseModel, ValidationError, Field, validator
 from typing import List, Dict, Optional, Any
 try:
     from typing import Literal
@@ -9,6 +12,7 @@ from enum import Enum
 
 from gemsModules.common.code_utils import GemsStrEnum
 from gemsModules.configuration.resource_management_api import Resource_Specific_Information_Registry
+from gemsModules.systemoperations.resources_api import Resource, Resources
 
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
@@ -182,8 +186,19 @@ class Host(BaseModel):
          None,
          description="If this GEMS serves a website, which variant of the website is being served?",
          )
+    entity_resources: Optional[Dict[SupportedEntities, Resources]] = Field(
+         default=None,
+         description="Resources provided by or assigned to each Entity on this Host.",
+         )
 
-    from pydantic import validator
+    def get_entity_resource(self, entity: SupportedEntities, role: str) -> Optional[Resource]:
+        """Return the Resource assigned to a specific entity and role if present."""
+        if not self.entity_resources:
+            return None
+        res_list = self.entity_resources.get(entity)
+        if not res_list:
+            return None
+        return res_list.get_resource_by_role(role)
 
     @validator('resource_specific_information', pre=True)
     def validate_resource_specific_information(cls, v, values):
@@ -207,8 +222,6 @@ class InstanceConfig(BaseModel):
             None,
             description="List of Hosts that are contained in this IC.",
             )
-
-    from pydantic import validator
 
     @validator('hosts', pre=True)
     def validate_hosts(cls, v):
@@ -375,9 +388,6 @@ class InstanceConfig(BaseModel):
 
     def get_filesystem_path_by_service_ID(self, serviceID: str):
         log.info("get_filesystem_path_by_service_ID is called.")
-        if self.filesystem_paths is None:
-            log.debug("self.filesystem_paths is None")
-            return None
         entity = None
         for e in SupportedEntities:
             if e.value == serviceID or e.name == serviceID.lower():
@@ -387,7 +397,19 @@ class InstanceConfig(BaseModel):
             message = f"The serviceID {serviceID} is NOT found in SupportedEntities."
             log.debug(message)
             raise KeyError(message)
-        
+
+        localhost = self.get_localhost()
+        if localhost and localhost.entity_resources and entity in localhost.entity_resources:
+            res_list = localhost.entity_resources[entity]
+            if res_list:
+                for res in res_list:
+                    if res.locationType in ["filesystem-path-unix", "File"] and res.payload:
+                        return str(res.payload)
+
+        if self.filesystem_paths is None:
+            log.debug("self.filesystem_paths is None")
+            return None
+
         if entity not in self.filesystem_paths:
             log.debug("the serviceID is NOT found in filesystem_paths.")
             return None

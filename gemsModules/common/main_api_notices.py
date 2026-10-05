@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 # ###############################################################
 from typing import Dict, List
-from pydantic import BaseModel, Field, PrivateAttr
+try:
+    from pydantic.v1 import BaseModel, Field, PrivateAttr
+except ImportError:
+    from pydantic import BaseModel, Field, PrivateAttr
 
 from gemsModules.common.code_utils import GemsStrEnum
 from gemsModules.common.notice_data import NoticeData
