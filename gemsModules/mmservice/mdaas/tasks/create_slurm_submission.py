@@ -2,7 +2,7 @@ import json
 import os
 import traceback
 from gemsModules.systemoperations.environment_ops import is_GEMS_test_workflow, get_GEMS_test_workflow_steps
-AAAA from gemsModules.deprecated.instance_config.main import InstanceConfig
+from gemsModules.configuration.main_api import session_instance_config
 from gemsModules.systemoperations import filesystem_ops
 # from .calculate_time_est_from_parm7 import parse_amber_parm7_pointers
 
@@ -38,7 +38,11 @@ def make_slurm_submission_script(SlurmJobDict):
     # TODO: Put this in Local_Run_Parameters instead.
     if is_GEMS_test_workflow():
         steps = get_GEMS_test_workflow_steps()
-        script += f"export MDUtilsTestRunWorkflow={steps}\n\n"
+        script += f"export MDUtilsTestRunWorkflow={steps}\n"
+
+    script += "export AMBERHOME=${AMBERHOME:-/programs/amber}\n"
+    script += "export OMPI_ALLOW_RUN_AS_ROOT=1\n"
+    script += "export OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1\n\n"
 
     # This argument is set to the script we want slurm to execute.
     script += SlurmJobDict["sbatchArgument"] + "\n"
@@ -66,8 +70,9 @@ def update_local_parameters_file(SlurmJobDict):
         )
 
     # lets replace all local parameters configured from the instance config. For example, "numProcs".
-AAAA     ic = InstanceConfig()
-AAAA     args = ic.get_keyed_arguments("local_parameters", context=SlurmJobDict["context"])
+    ic = session_instance_config
+    default_params = getattr(ic, "default_local_parameters", {})
+    args = default_params.get("Default", {"numProcs": "4"}) if isinstance(default_params, dict) else {"numProcs": "4"}
     filesystem_ops.replace_bash_variable_in_file(local_param_file, args)
 
 

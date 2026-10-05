@@ -47,12 +47,14 @@ class Json_String_Manager(ABC):
                 brief = "ValidationError", e
             else:
                 brief = "UnknownError", e
+            import sys
+            print("EXC TRACEBACK:\n" + traceback.format_exc(), file=sys.stderr)
             log.error("Exception in Json_String_Manager: %s", traceback.format_exc())
         finally:
             if brief is not None:
                 self.transaction.generate_error_response(
                     EntityType=self.entityType,
                     Brief=brief[0],
-                    AdditionalInfo={"error": str(brief[1])},
+                    AdditionalInfo={"error": str(brief[1]), "traceback": traceback.format_exc()},
                 )
                 return self.transaction.get_outgoing_string()

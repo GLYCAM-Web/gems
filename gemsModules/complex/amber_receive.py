@@ -1,6 +1,6 @@
 import json
 
-from gemsModules.batchcompute.slurm.receive import receive as slurm_receive
+from gemsModules.original_batchcompute.slurm.receive import receive as slurm_receive
 from gemsModules.mmservice.mdaas_amber import mdaas_io
 
 from gemsModules.logging.logger import Set_Up_Logging
@@ -33,6 +33,17 @@ def manageIncomingString(jsonObjectString: str):
     # This is to become the SLURM job info dict used later for slurm submission.
     outgoing_json_str = json.dumps(
         {
+            "entity": {
+                "type": "Batchcompute",
+                "services": {
+                    "SubmitJob": {
+                        "type": "SubmitJob",
+                        "inputs": {
+                            "pUUID": amber_job.jobID
+                        }
+                    }
+                }
+            },
             "pUUID": amber_job.jobID,
             "partition": "",  # TODO: None? Probably invalid in most cases. The IC will handle this after the submission arrives on the correct remote host for execution.
             "user": "webdev",  # TODO: We could remove this and obtain it on demand. This is coupled to our DevEnv/Swarm.

@@ -15,5 +15,5 @@ class Batchcompute_Servicer(Servicer):
 
     def get_module_for_this_request(self, this_request_aaop: AAOP) -> Callable:
         from gemsModules.batchcompute.services.settings.service_modules import module_loader
-        return module_loader(this_request_aaop.AAO_Type)
+        return module_loader.get_module_attr(this_request_aaop.AAO_Type)
        

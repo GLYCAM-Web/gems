@@ -10,7 +10,7 @@ REGISTRY = {
     'ListServices': ModuleData('gemsModules.common.services.list_services.server', 'Serve'),
     'Marco': ModuleData('gemsModules.common.services.marco.server', 'Serve'),
     'Status': ModuleData('gemsModules.common.services.status.server', 'Serve'),
-    '{{cookiecutter.service_name}}' : ModuleData('gemsModules.{{cookiecutter.gems_module}}.services.{{cookiecutter.service_name}}.server ', 'Serve'),
+    '{{cookiecutter.service_name}}' : ModuleData('gemsModules.{{cookiecutter.gems_module}}.services.{{cookiecutter.service_name}}.server', 'Serve'),
     }
 
 

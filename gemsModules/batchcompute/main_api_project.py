@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from typing import Literal
+from typing import Literal, Any
 import os
 
 from pydantic import constr, Field

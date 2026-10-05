@@ -64,19 +64,6 @@ def receive(jsonObjectString):
 
         log.debug("This is not the correct host to submit to.")
         # Otherwise, we need to seek the correct host to submit to.
-        p = Process(
-            target=seek_correct_host,
-            args=(jsonObjectString, thisSlurmJobInfo.incoming_dict["context"]),
-            # daemon=True,
-        )
-        p.start()
-        # seek_correct_host(jsonObjectString, thisSlurmJobInfo.incoming_dict["context"])
-
-        # TODO: Append this to actual GEMS response.
-        response = {
-            "notices": [
-                "Attempting to find correct host for SLURM submission.  Check back later."
-            ]
-        }
+        response = seek_correct_host(jsonObjectString, thisSlurmJobInfo.incoming_dict["context"])
 
     return response

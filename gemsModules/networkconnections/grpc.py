@@ -4,7 +4,7 @@ import socket
 
 from gemsModules.deprecated.common.loggingConfig import *
 from gemsModules.deprecated.batchcompute.slurm.dataio import *
-from gemsModules.configuration.main_api import InstanceConfig
+from gemsModules.configuration.main_api import session_instance_config
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -28,7 +28,7 @@ def get_gems_slurm_instance_by_config():
 
 def is_GEMS_instance_for_SLURM_submission(requested_ctx=None, requested_instance=None):
     """Uses the GEMS instance_config to determine if this instance is the correct SLURM submitter."""
-    ic = InstanceConfig()
+    ic = session_instance_config
 
     this_instance_can_run_ctx = False
     if requested_ctx is not None:

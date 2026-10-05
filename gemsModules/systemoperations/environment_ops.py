@@ -32,9 +32,16 @@ def find_instance_config() -> str:
 def activate_gems_venv(file_path: str = None) -> None:
     """
     Detects if a .venv directory exists in GEMSHOME.
-    If present, sets VIRTUAL_ENV, prepends .venv/bin to PATH for subprocesses,
-    and re-executes the script using .venv/bin/python if not already running in the venv.
+    If present and current python environment lacks dependencies (e.g. grpc),
+    sets VIRTUAL_ENV, prepends .venv/bin to PATH for subprocesses, and re-executes.
     """
+    try:
+        import grpc
+        # Current python environment already has required dependencies (e.g., container python)
+        return
+    except ImportError:
+        pass
+
     gems_home = os.environ.get("GEMSHOME")
     if not gems_home or not os.path.exists(gems_home):
         if file_path:

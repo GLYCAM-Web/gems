@@ -2,8 +2,11 @@
 import os
 
 from pydantic import constr, Field
-from pydantic.typing import Literal as PyLiteral
-from typing import Literal, Any
+try:
+    from typing import Literal as PyLiteral, Literal, Any
+except ImportError:
+    from typing_extensions import Literal as PyLiteral
+    from typing import Literal, Any
 
 from gemsModules.project.main_api import Project
 

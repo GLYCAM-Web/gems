@@ -24,9 +24,10 @@ class Batchcompute_Request_Data_Filler(Request_Data_Filler):
     # No data to fill here.
     def process(self, transaction) -> List[AAOP]:
         for aaop in self.aaop_list:
-            if aaop.Dictionary_Name=='SubmitJob':
+            if aaop.Dictionary_Name == 'SubmitJob':
                 from gemsModules.batchcompute.services.SubmitJob import api
-                this_Project : Batchcompute_Project = self.project
-                aaop.The_AAO.inputs.pUUID=this_Project.pUUID
+                this_Project = self.response_project or getattr(transaction, "response_project", None)
+                if this_Project:
+                    aaop.The_AAO.inputs.pUUID = this_Project.pUUID
 
         return self.aaop_list

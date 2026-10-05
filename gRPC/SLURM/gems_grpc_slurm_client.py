@@ -12,8 +12,15 @@ log = new_concurrent_logger(__name__)
 
 
 class GemsGrpcSlurmClient:
-    def __init__(self, json, host=None, port=None):
-        self.json = json
+    def __init__(self, json=None, host=None, port=None, json_data=None):
+        data = json if json is not None else json_data
+        if isinstance(data, dict):
+            import json as json_lib
+            self.json = json_lib.dumps(data)
+        elif not isinstance(data, str):
+            self.json = str(data)
+        else:
+            self.json = data
         self.response = self.run(theHost=host, thePort=port)
 
     def run(self, theHost=None, thePort=None):

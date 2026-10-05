@@ -1,6 +1,11 @@
 import os, sys
 
 def activate_gems_venv():
+    try:
+        import grpc
+        return
+    except ImportError:
+        pass
     gems_home = os.environ.get("GEMSHOME")
     if not gems_home or not os.path.exists(gems_home):
         file_dir = os.path.dirname(os.path.abspath(__file__))

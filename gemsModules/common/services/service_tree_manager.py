@@ -11,7 +11,7 @@ class Service_AAOP_Set():
         self.Response_Tree = self.Request_Tree.make_skeleton_copy()
 
     def add_request(self):
-        return self.Request_Tree.
+        pass
 
     def get_response_tree(self):
         return self.Response_Tree

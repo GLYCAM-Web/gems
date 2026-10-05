@@ -1,6 +1,11 @@
 import os, sys
 
 def activate_gems_venv():
+    try:
+        import grpc
+        return
+    except ImportError:
+        pass
     gems_home = os.environ.get("GEMSHOME")
     if not gems_home or not os.path.exists(gems_home):
         file_dir = os.path.dirname(os.path.abspath(__file__))
@@ -114,11 +119,14 @@ class GemsGrpcSlurmReceiver(gems_grpc_slurm_pb2_grpc.GemsGrpcSlurmServicer):
         log.debug("The request input is >>>" + request.input + "<<<")
         log.debug("GEMSHOME is >>>" + GemsPath + "<<<")
         os.environ["GEMS_DEBUG_VERBOSITY"] = "-1"
+        os.environ["PYTHONWARNINGS"] = "ignore"
+        env = os.environ.copy()
+        env["PYTHONWARNINGS"] = "ignore"
         jobsubmissioncommand = GemsPath + "/bin/slurmreceive"
         try:
             print("About to run the subprocess with command:", jobsubmissioncommand)
             p = subprocess.Popen(
-                jobsubmissioncommand, stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=False
+                jobsubmissioncommand, stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=False, env=env
             )
             theStdin = request.input.encode("utf-8")
             print("The stdin is:", theStdin)

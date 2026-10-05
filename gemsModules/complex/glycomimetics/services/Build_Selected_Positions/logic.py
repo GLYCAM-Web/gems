@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-AAAA from gemsModules.deprecated.instance_config.main import InstanceConfig
+from gemsModules.configuration.main_api import session_instance_config
 
 from gemsModules.complex.glycomimetics.services.Build_Selected_Positions.api import Build_Inputs, Build_Outputs
 from gemsModules.complex.glycomimetics.tasks import create_gm_input_file, run_all_glyco, create_system_info_file
@@ -10,10 +10,9 @@ from gemsModules.complex.glycomimetics.tasks import create_gm_input_file, run_al
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
 
-AAAA ic = InstanceConfig()
 # https://github.com/GLYCAM-Web/glycomimeticsWebtool/tree/main/internal
 # TODO: Manage GlycoWebtool path with IC
-AAAA GlycoWebtool_path = Path("/programs/glycomimeticsWebtool")
+GlycoWebtool_path = Path("/programs/glycomimeticsWebtool")
 
 
 def execute(inputs: Build_Inputs) -> Build_Outputs:
@@ -21,7 +20,7 @@ def execute(inputs: Build_Inputs) -> Build_Outputs:
     service_outputs = Build_Outputs(pUUID=inputs.pUUID)
 
     # Normally the Project builds this path. TODO: better helper 
-AAAA    project_dir = Path(ic.get_filesystem_path(app="Glycomimetics")) / inputs.pUUID
+    project_dir = Path(session_instance_config.get_filesystem_path_by_service_ID("GM")) / inputs.pUUID
     if not project_dir.exists():
         log.debug(f"Warning: Project directory {project_dir} does not exist at time of Build_Selected_Positions.")
         raise RuntimeError("No project directory found, cannot run Glycomimetics/Build_Selected_Positions")

@@ -22,6 +22,6 @@ class batchcompute_Implied_Services_Request_Manager(Implied_Services_Request_Man
         log.debug("In batchcompute_Implied_Services_Request_Manager, get_implicit_service_manager")
         log.debug("service: " + str(service))
         from gemsModules.batchcompute.services.settings.implied_modules import module_loader
-        return module_loader(service)
+        return module_loader.get_module_attr(service)
         
 

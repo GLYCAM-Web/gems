@@ -139,6 +139,16 @@ class Project(BaseModel):
         if self.timestamp is None : 
             self.timestamp = self.gems_timestamp
 
+    def add_filesystem_info(self):
+        self.setFilesystemPath(noClobber=False)
+        self.setUploadsPath(noClobber=False)
+        self.setServiceDir(noClobber=False)
+        self.setProjectDir(noClobber=False)
+        self.setVersionsFilePath(noClobber=False)
+        if self.project_dir:
+            self.logs_dir = os.path.join(self.project_dir, "logs")
+            self.versions_file_path = os.path.join(self.project_dir, "VERSIONS.sh")
+
     def getLocalhostInstanceConfigContextOptions(self) :
         log.info("getLocalhostInstanceConfigContextOptions was called")
         IC = session_instance_config
@@ -176,11 +186,20 @@ class Project(BaseModel):
                 return
         # If a path was specified, set it, if allowed, and return
         if context == 'website' :
-            # TODO: collapse the next two into a single block
+            def _is_path_allowed(path_to_check):
+                if not path_to_check:
+                    return False
+                abs_check = os.path.abspath(path_to_check)
+                for allowed in project_settings.allowed_website_filesystem_paths:
+                    abs_allowed = os.path.abspath(allowed)
+                    if abs_check == abs_allowed or abs_check.startswith(abs_allowed.rstrip(os.sep) + os.sep):
+                        return True
+                return False
+
             if specifiedPath is not None :
                 log.debug("An output path is specified in website context.  Checking to see if it is allowed." )
                 log.debug("The specifiedPath is: " + str(specifiedPath))
-                if specifiedPath in project_settings.allowed_website_filesystem_paths :
+                if _is_path_allowed(specifiedPath) :
                     message = "The output path is allowed.  Using it."
                     log.debug(message)
                     self.filesystem_path = specifiedPath
@@ -191,7 +210,7 @@ class Project(BaseModel):
             if instanceConfigPath is not None :
                 log.debug("An output path is specified in website context.  Checking to see if it is allowed." )
                 log.debug("The instanceConfigPath is: " + str(instanceConfigPath))
-                if instanceConfigPath in project_settings.allowed_website_filesystem_paths :
+                if _is_path_allowed(instanceConfigPath) :
                     message = "The output path is allowed.  Using it."
                     log.debug(message)
                     self.filesystem_path = instanceConfigPath
@@ -404,17 +423,14 @@ class Project(BaseModel):
                     noticeBrief = 'GemsError',
                     additionalInfo = {'hint' : message } )
             return
-        #
-        self.service_dir = os.path.join(
-                self.filesystem_path,
-                self.parent_entity.lower(),
-                self.service_id)
-        ### the path used to be defined this way, but that was always a bug
-        ### note that the checks above use the parent entity not the entity id
-        #self.service_dir = os.path.join(
-        #        self.filesystem_path,
-        #        self.entity_id,
-        #        self.service_id)
+        expected_suffix = os.path.join(self.parent_entity.lower(), self.service_id.lower())
+        if self.filesystem_path and self.filesystem_path.rstrip(os.sep).lower().endswith(expected_suffix):
+            self.service_dir = self.filesystem_path
+        else:
+            self.service_dir = os.path.join(
+                    self.filesystem_path,
+                    self.parent_entity.lower(),
+                    self.service_id)
         message = "Setting the service dir to : " + self.service_dir
         log.debug(message)
 

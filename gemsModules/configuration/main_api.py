@@ -171,7 +171,7 @@ class Host(BaseModel):
     ######################################################################
     ######################################################################
     is_localhost : str = Field(
-         "True",
+         "False",
          description="Be sure to set this to 'true' for (only!) one host or many things will never happen.",
          )
     entities_available: List[SupportedEntities] = Field(
@@ -225,20 +225,21 @@ class InstanceConfig(BaseModel):
 
     @validator('hosts', pre=True)
     def validate_hosts(cls, v):
-        if isinstance(v, dict):
+        if isinstance(v, (dict, list)):
             hosts_list = []
-            for name, host_dict in v.items():
+            raw_items = v.items() if isinstance(v, dict) else [(h.get("name", str(i)), h) for i, h in enumerate(v) if isinstance(h, dict)]
+            for name, host_dict in raw_items:
                 if not isinstance(host_dict, dict):
                     continue
                 h = host_dict.copy()
                 if "name" not in h:
                     h["name"] = name
-                if "host" in h:
-                    h["address"] = h.pop("host")
-                if "slurmport" in h:
-                    h["port"] = h.pop("slurmport")
-                if "contexts" in h:
-                    h["entities_available"] = h.pop("contexts")
+                if "host" in h and "address" not in h:
+                    h["address"] = h.get("host")
+                if "slurmport" in h and "port" not in h:
+                    h["port"] = h.get("slurmport")
+                if "contexts" in h and not h.get("entities_available"):
+                    h["entities_available"] = h.get("contexts")
                 
                 # Coerce contexts to SupportedEntities enums where possible
                 if h.get("entities_available"):
@@ -335,12 +336,19 @@ class InstanceConfig(BaseModel):
         """ 
         Return the localhost's Host object
         """
+        import socket
         log.info("get_localhost was called")
         if self.hosts is None :
             return None
         for host_object in self.hosts :
-            if str(host_object.is_localhost).lower() == "true":
+            if str(host_object.is_localhost).lower() in ("true", "1"):
                 return host_object
+        current_hostname = socket.gethostname()
+        for host_object in self.hosts :
+            if current_hostname in (host_object.name, host_object.address):
+                return host_object
+        if self.hosts:
+            return self.hosts[0]
         log.error("Cannot find localhost.")
         return None
 
@@ -664,14 +672,19 @@ class InstanceConfig(BaseModel):
             
         available_contexts = []
         if self.hosts:
+            localhost_obj = self.get_localhost()
             for host in self.hosts:
-                # Matches either host name or address
-                if instance_hostname == host.name or instance_hostname == host.address or (instance_hostname == "localhost" and str(host.is_localhost).lower() == "true"):
+                is_match = (
+                    instance_hostname in (host.name, host.address) or
+                    (localhost_obj is not None and host == localhost_obj and str(host.is_localhost).lower() in ("true", "1"))
+                )
+                if is_match:
                     if host.entities_available:
                         for e in host.entities_available:
-                            available_contexts.append(e.value)
-                            available_contexts.append(e.name)
-                            # map legacy names
+                            val = e.value if hasattr(e, "value") else str(e)
+                            name_val = e.name if hasattr(e, "name") else str(e)
+                            available_contexts.append(val)
+                            available_contexts.append(name_val)
                             legacy = {
                                 "MD": "MDaaS-RunMD",
                                 "CB": "Sequence-Build3DStructure",
@@ -679,8 +692,8 @@ class InstanceConfig(BaseModel):
                                 "GM": "Glycomimetics",
                                 "GP": "GlycoProtein",
                             }
-                            if e.value in legacy:
-                                available_contexts.append(legacy[e.value])
+                            if val in legacy:
+                                available_contexts.append(legacy[val])
         return list(set(available_contexts))
 
 

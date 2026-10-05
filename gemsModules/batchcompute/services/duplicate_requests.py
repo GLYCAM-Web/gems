@@ -15,5 +15,5 @@ class Batchcompute_Duplicate_Requests_Manager(Duplicate_Requests_Manager):
 
     def get_duplicates_manager(self, service : str) -> Callable:
         from gemsModules.batchcompute.services.settings.duplicates_modules import module_loader
-        return module_loader(service)
+        return module_loader.get_module_attr(service)
         

@@ -62,7 +62,7 @@ responseObjectString = None
 # check if context is in the incoming string
 if "context" in json.loads(jsonObjectString):
     # if it is, it's a new slurm submission
-    from gemsModules.batchcompute.slurm.receive import receive
+    from gemsModules.original_batchcompute.slurm.receive import receive
 
     responseObjectString = receive(jsonObjectString)
 else:
@@ -73,4 +73,6 @@ else:
 
 
 # finally:
+if isinstance(responseObjectString, dict):
+    responseObjectString = json.dumps(responseObjectString)
 sys.stdout.write(str(responseObjectString))

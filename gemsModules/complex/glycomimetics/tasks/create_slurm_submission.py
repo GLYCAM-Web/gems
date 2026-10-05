@@ -3,7 +3,7 @@ import json
 import os
 import traceback
 from gemsModules.systemoperations.environment_ops import is_GEMS_test_workflow
-AAAA from gemsModules.deprecated.instance_config.main import InstanceConfig
+from gemsModules.configuration.main_api import session_instance_config
 from gemsModules.systemoperations import filesystem_ops
 # from .calculate_time_est_from_parm7 import parse_amber_parm7_pointers
 
@@ -65,8 +65,9 @@ def update_local_parameters_file(SlurmJobDict):
         )
 
     # lets replace all local parameters configured from the instance config. For example, "numProcs".
-AAAA    ic = InstanceConfig()
-AAAA    args = ic.get_keyed_arguments("local_parameters", context=SlurmJobDict["context"])
+    ic = session_instance_config
+    default_params = getattr(ic, "default_local_parameters", {})
+    args = default_params.get("Default", {"numProcs": "4"}) if isinstance(default_params, dict) else {"numProcs": "4"}
     filesystem_ops.replace_bash_variable_in_file(local_param_file, args)
 
 

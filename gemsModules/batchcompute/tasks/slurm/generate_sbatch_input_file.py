@@ -57,8 +57,7 @@ log = Set_Up_Logging(__name__)
 #                                                            don't take lots of time with this if not necessary
 
 ## All the local imports from the files above
-from gemsModules.batchcompute.slurm.receive import receive as slurm_receive
-AAAA from gemsModules.deprecated.instance_config.main import InstanceConfig
+from gemsModules.batchcompute.receive import receive as slurm_receive
 from gemsModules.mmservice.mdaas_amber import mdaas_io
 from gemsModules.systemoperations.environment_ops import is_GEMS_test_workflow
 from gemsModules.systemoperations import filesystem_ops

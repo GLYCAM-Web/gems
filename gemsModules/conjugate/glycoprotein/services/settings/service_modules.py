@@ -11,7 +11,7 @@ REGISTRY = {
     'ListServices': ModuleData('gemsModules.common.services.list_services.server', 'Serve'),
     'ProjectManagement': ModuleData('gemsModules.conjugate.glycoprotein.services.ProjectManagement.server', 'Serve'),
     'Evaluate': ModuleData('gemsModules.conjugate.glycoprotein.services.Evaluate.server', 'Serve'),
-    'Build' : ModuleData('gemsModules.conjugate.glycoprotein.services.Build.server ', 'Serve'),
+    'Build' : ModuleData('gemsModules.conjugate.glycoprotein.services.Build.server', 'Serve'),
     'Status': ModuleData('gemsModules.conjugate.glycoprotein.services.Status.server', 'Serve'),
 }
 

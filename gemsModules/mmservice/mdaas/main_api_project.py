@@ -3,8 +3,11 @@ import os
 import socket
 
 from pydantic import constr, Field
-from pydantic.typing import Literal as PyLiteral
-from typing import Any
+try:
+    from typing import Literal as PyLiteral, Any
+except ImportError:
+    from typing_extensions import Literal as PyLiteral
+    from typing import Any
 
 from gemsModules.project.main_api import Project
 

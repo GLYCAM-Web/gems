@@ -26,7 +26,7 @@ class ModuleLoader:
             # Returns the specific function/class (e.g., 'error_Multiples_Manager')
             return getattr(module, data.import_this)
         except (ImportError, AttributeError) as e:
-            logger.error(f"Failed to load '{data.import_this}' from '{data.from_this}': {e}")
+            log.error(f"Failed to load '{data.import_this}' from '{data.from_this}': {e}")
             raise
 
 

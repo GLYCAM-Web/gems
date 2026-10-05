@@ -40,9 +40,9 @@ class GlycoProtein_Project_Manager(Project_Manager):
 #                        self.incoming_project.pUUID = foundUUID
 
         if self.incoming_project is not None:
-            incomingUUID = get_pUUID_from_incoming_project()
+            incomingUUID = self.get_pUUID_from_incoming_project()
             if incomingUUID is not None:
-                 self.incoming_project.pUUID = foundUUID
+                 self.incoming_project.pUUID = incomingUUID
 
             self.incoming_project.setProjectDir(noClobber=False)
             self.incoming_project.logs_dir = str(os.path.join(self.incoming_project.project_dir, "logs"))

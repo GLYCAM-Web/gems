@@ -10,7 +10,7 @@ REGISTRY = {
     'ListServices': ModuleData('gemsModules.common.services.list_services.server', 'Serve'),
     'Marco': ModuleData('gemsModules.common.services.marco.server', 'Serve'),
     'Status': ModuleData('gemsModules.common.services.status.server', 'Serve'),
-    'SubmitJob' : ModuleData('gemsModules.batchcompute.services.SubmitJob.server ', 'Serve'),
+    'SubmitJob' : ModuleData('gemsModules.batchcompute.services.SubmitJob.server', 'Serve'),
     }
 
 

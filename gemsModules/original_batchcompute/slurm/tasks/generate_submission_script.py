@@ -55,14 +55,15 @@ def execute(thisSlurmJobInfo):
         SlurmJobDict["slurm_runscript_name"],
     )
 
-    log.debug("Prepending workdir to main sbatch command")
-    SlurmJobDict["sbatchArgument"] = (
-        os.path.join(
-            SlurmJobDict["workingDirectory"],
-            SlurmJobDict["sbatchArgument"],
+    if "sbatchArgument" in SlurmJobDict and SlurmJobDict["sbatchArgument"]:
+        log.debug("Prepending workdir to main sbatch command")
+        SlurmJobDict["sbatchArgument"] = (
+            os.path.join(
+                SlurmJobDict["workingDirectory"],
+                SlurmJobDict["sbatchArgument"],
+            )
+            + "\n"
         )
-        + "\n"
-    )
 
     log.debug("Slurm runscript path: " + SlurmJobDict["slurm_runscript_name"] + "\n")
     if os.path.exists(SlurmJobDict["slurm_runscript_name"]):

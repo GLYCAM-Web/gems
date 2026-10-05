@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 from typing   import List, Union, Optional
 
 from gemsModules.common.main_api_resources import Resource, Resources
-from gemsModules.batchcompute.main_api_common import Batchcompute_Service_Request, batchcompute_Service_Response
+from gemsModules.batchcompute.main_api_common import Batchcompute_Service_Request, Batchcompute_Service_Response
 
 from gemsModules.logging.logger import Set_Up_Logging 
 
@@ -57,7 +57,7 @@ class SubmitJobService_Request(Batchcompute_Service_Request) :
     # the following must be redefined in a child class
     inputs : SubmitJobService_Inputs = SubmitJobService_Inputs()
 
-class SubmitJobService_Response(batchcompute_Service_Response) :
+class SubmitJobService_Response(Batchcompute_Service_Response) :
     typename : str  = Field(
         "SubmitJob",   
         alias='type'
