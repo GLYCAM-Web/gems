@@ -1,0 +1,87 @@
+{
+  "date": "2025-02-25T00:00:11.000",
+  "hosts": {
+    "grpc-default": {
+      "contexts": [
+        "DevEnv"
+      ],
+      "host": "gw-grpc-delegator",
+      "routes": [
+        "swarm"
+      ]
+    },
+    "swarm": {
+      "contexts": [
+        "ShortJob",
+        "MDaaS-RunMD",
+        "FreeTier",
+        "Glycomimetics",
+        "DevEnv",
+        "Swarm",
+        "Sequence-Build3DStructure"
+      ],
+      "host": "gw-slurm-head",
+      "slurmport": "50052",
+      "sbatch_arguments": {
+        "MDaaS-RunMD": {
+          "partition": "amber",
+          "time": "120",
+          "nodes": "1",
+          "tasks-per-node": "4"
+        },
+        "Glycomimetics": {
+          "partition": "gm",
+          "time": "120",
+          "nodes": "1",
+          "tasks-per-node": "4"
+        }
+      },
+      "local_parameters": {
+        "MDaaS-RunMD": {
+          "numProcs": "4"
+        },
+        "Glycomimetics": {
+          "numProcs": "4"
+        }
+      }
+    },
+    "localhost": {
+      "host": "thortunnel",
+      "slurmport": "50052",
+      "contexts": [
+        "AntibodyDocking"
+      ],
+      "sbatch_arguments": {
+        "AntibodyDocking": {
+          "partition": "amber",
+          "time": "120",
+          "nodes": "1",
+          "tasks-per-node": "4"
+        }
+      },
+      "local_parameters": {
+        "AntibodyDocking": {
+          "numProcs": "4"
+        }
+      }
+    }
+  },
+  "default_sbatch_arguments": {
+    "Default": {
+      "partition": "amber",
+      "time": "120",
+      "nodes": "1",
+      "tasks-per-node": "4"
+    }
+  },
+  "default_local_parameters": {
+    "Default": {
+      "numProcs": "4"
+    }
+  },
+  "filesystem_paths": {
+    "MDaaS-RunMD": "/website/userdata/mmservice/md",
+    "Glycomimetics": "/website/userdata/complex/gm",
+    "AntibodyDocking": "/website/userdata/complex/ad"
+  }
+}
