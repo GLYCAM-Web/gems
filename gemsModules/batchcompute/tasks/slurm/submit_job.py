@@ -3,8 +3,8 @@
 import json
 import os
 from gemsModules.deprecated.batchcompute.slurm.dataio import SlurmJobInfo
-from gemsModules.original_batchcompute.slurm.tasks.generate_submission_script import execute as generate_submission_script
-from gemsModules.original_batchcompute.slurm.tasks.run_submission import execute as run_submission
+from .generate_submission_script import execute as generate_submission_script
+from .run_submission import execute as run_submission
 
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)

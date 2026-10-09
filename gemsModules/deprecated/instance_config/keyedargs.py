@@ -34,12 +34,14 @@ class KeyedArgManager(HostManager):
     ) -> List[Dict]:
         """Returns a list of possible keyed arguments per host for a given context."""
         l = []
-        for host in self.config["hosts"].values():
-            if context in host["contexts"] and key in host:
+        hosts_iter = self.config["hosts"].values() if isinstance(self.config.get("hosts"), dict) else (self.config.get("hosts") or [])
+        for host in hosts_iter:
+            if isinstance(host, dict) and context in host.get("contexts", []) and key in host:
                 l.append(host[key])
 
-        if context in self.config[f"default_{key}"]:
-            l.append(self.config[f"default_{key}"][context])
+        def_key = f"default_{key}"
+        if def_key in self.config and context in self.config[def_key]:
+            l.append(self.config[def_key][context])
 
         return l
 

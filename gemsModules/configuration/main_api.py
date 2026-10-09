@@ -227,7 +227,15 @@ class InstanceConfig(BaseModel):
     def validate_hosts(cls, v):
         if isinstance(v, (dict, list)):
             hosts_list = []
-            raw_items = v.items() if isinstance(v, dict) else [(h.get("name", str(i)), h) for i, h in enumerate(v) if isinstance(h, dict)]
+            if isinstance(v, dict):
+                raw_items = list(v.items())
+            else:
+                raw_items = []
+                for i, h in enumerate(v):
+                    if isinstance(h, Host):
+                        raw_items.append((h.name, h.dict(by_alias=True)))
+                    elif isinstance(h, dict):
+                        raw_items.append((h.get("name", str(i)), h))
             for name, host_dict in raw_items:
                 if not isinstance(host_dict, dict):
                     continue
@@ -442,6 +450,73 @@ class InstanceConfig(BaseModel):
             log.debug("the serviceID is NOT found in secure_inputs_paths.")
             return None
         return self.secure_inputs_paths[entity]
+
+    @property
+    def default_local_parameters(self) -> Dict[str, Dict[str, str]]:
+        return {"Default": {"numProcs": "4"}}
+
+    def get_batch_computing_arguments_for_context(self, context: str, host_name: Optional[str] = None) -> Dict[str, str]:
+        """
+        Return batch computing arguments (partition, nodes, time, tasks-per-node, gres, etc.)
+        for a given context/entity on a host.
+        """
+        mapping = {
+            "MDaaS-RunMD": "MD",
+            "Sequence-Build3DStructure": "CB",
+            "AntibodyDocking": "AD",
+            "Glycomimetics": "GM",
+            "GlycoProtein": "GP",
+        }
+        norm_context = mapping.get(context, context)
+        target_entity = None
+        for e in SupportedEntities:
+            if e.value == norm_context or e.name == norm_context.lower():
+                target_entity = e
+                break
+
+        target_host = None
+        if host_name and self.hosts:
+            for h in self.hosts:
+                if h.name == host_name or h.address == host_name:
+                    target_host = h
+                    break
+        elif self.hosts:
+            import socket
+            current_hostname = socket.gethostname()
+            for h in self.hosts:
+                if current_hostname in (h.name, h.address):
+                    target_host = h
+                    break
+            if not target_host:
+                for h in self.hosts:
+                    if h.batch_computing_resources:
+                        target_host = h
+                        break
+
+        args = {}
+        if target_host and target_host.batch_computing_resources and target_entity:
+            for bcr in target_host.batch_computing_resources:
+                if bcr.supported_entities and target_entity in bcr.supported_entities:
+                    if bcr.partition:
+                        args["partition"] = str(bcr.partition)
+                    if bcr.max_nodes_per_job:
+                        args["nodes"] = str(bcr.max_nodes_per_job)
+                    if bcr.max_time_limit:
+                        args["time"] = str(bcr.max_time_limit)
+                    if bcr.max_threads_per_node:
+                        args["tasks-per-node"] = str(bcr.max_threads_per_node)
+                    elif bcr.max_cores_per_node:
+                        args["tasks-per-node"] = str(bcr.max_cores_per_node)
+                    if bcr.max_gpus_per_node and int(bcr.max_gpus_per_node) > 0:
+                        args["gres"] = f"gpu:{bcr.max_gpus_per_node}"
+                    break
+
+        # Fallback defaults for standard entities
+        args.setdefault("partition", "amber" if norm_context in ("MD", "GP", "AD") else ("gm" if norm_context == "GM" else "default"))
+        args.setdefault("nodes", "1")
+        args.setdefault("time", "120")
+        args.setdefault("tasks-per-node", "4")
+        return args
 
     def check_remote_host_connectivity(self, host_name: str) -> Dict[str, Any]:
         """

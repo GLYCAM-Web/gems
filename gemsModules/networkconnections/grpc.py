@@ -30,13 +30,27 @@ def is_GEMS_instance_for_SLURM_submission(requested_ctx=None, requested_instance
     """Uses the GEMS instance_config to determine if this instance is the correct SLURM submitter."""
     ic = session_instance_config
 
+    current_hostname = socket.gethostname()
+    current_host = None
+    if ic.hosts:
+        for host in ic.hosts:
+            if current_hostname in (host.name, host.address):
+                current_host = host
+                break
+        if not current_host:
+            current_host = ic.get_localhost()
+
+    if not current_host or getattr(current_host, "scheduler", None) != "slurm":
+        log.debug(f"Current host {current_hostname} does not have a slurm scheduler configured.")
+        return False
+
     this_instance_can_run_ctx = False
     if requested_ctx is not None:
-        if requested_ctx in ic.get_available_contexts():
+        if requested_ctx in ic.get_available_contexts(current_hostname):
             this_instance_can_run_ctx = True
 
     this_instance_is_requested = True
-    if requested_instance is not None and requested_instance != socket.gethostname():
+    if requested_instance is not None and requested_instance != current_hostname:
         this_instance_is_requested = False
 
     log.debug(f"Is this instance configured to run SLURM? {this_instance_can_run_ctx}")
