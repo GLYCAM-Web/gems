@@ -1,5 +1,5 @@
 #!/bin/bash
-source ~/.bash_profile
+[ -f ~/.bash_profile ] && source ~/.bash_profile
 set -e
 
 cd ${WD}

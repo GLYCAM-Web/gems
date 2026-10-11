@@ -20,7 +20,7 @@ log = Set_Up_Logging(__name__)
 def receive(incomingString: str) -> str:
     log.info("Antibody was called as an entity.  Processing.")
 
-    TODO !!! refactor this to only use seek_corect_host
+    # TODO: refactor this to only use seek_correct_host
 
     if not theIC.localhost_supports_context(context_names=["AD", "AntibodyDocking"]) :
         log.info("This is not the correct host to submit to.")

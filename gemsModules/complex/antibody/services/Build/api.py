@@ -6,7 +6,7 @@ from gemsModules.common.main_api_resources import Resource, Resources
 from gemsModules.common.code_utils import GemsStrEnum
 from gemsModules.common.main_api_notices import Notices
 
-from gemsModules.complex.antibody.main_api import (
+from gemsModules.complex.antibody.main_api_common import (
     Antibody_Service_Request,
     Antibody_Service_Response,
 )
@@ -43,6 +43,11 @@ class Build_Inputs(BaseModel):
         title="Project UUID",
         description="UUID of Project",
     )
+    projectDir: Optional[str] = Field(
+        None,
+        title="Project Directory",
+        description="Full path to project directory",
+    )
 
     # TODO: make sure to update resources with this payload if provided this way
     antibody_path: Optional[str] = Field(
@@ -69,16 +74,16 @@ class Build_Outputs(BaseModel):
     )
     resources: Build_Output_Resources = Build_Output_Resources()
 
+# Note: check that the numbers correspond as needed for pydantic and for AbD
 class Build_Flexibilities(GemsStrEnum):
-    rigid = 0
-    partial = 1
-    flexible = 2 
-AAAA - check that the numbers correspond as needed for pydantic and for AbD
+    rigid = "rigid"
+    partial = "partial"
+    flexible = "flexible"
 
 
-class Build_Options(Basemodel}:
+class Build_Options(BaseModel):
     flexibility: Build_Flexibilities = Field(
-            "partial",
+            Build_Flexibilities.partial,
             description = "How much of the ligand should be flexible?"
             )
     count: int = Field(
@@ -89,9 +94,7 @@ class Build_Options(Basemodel}:
 class Build_Request(Antibody_Service_Request):
     typename: str = Field("Build", alias="type")
     inputs: Build_Inputs = Build_Inputs()
-    # TODO: build options with typing - i.e options.flexibiilty: Literal['Partial', "Rigid", "Flexible"]
-    options: Union[Build_Options,Dict[str,str]] = None
-AAAA - these syntaxes are likely imperfect
+    options: Union[Build_Options, dict] = None
 
 class Build_Response(Antibody_Service_Response):
     typename: str = Field("Build", alias="type")

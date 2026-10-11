@@ -5,7 +5,7 @@ from gemsModules.common.main_api_notices import Notices
 from gemsModules.logging.logger import Set_Up_Logging
 
 from .api import Evaluate_Inputs, Evaluate_Outputs
-from ...main_api_project import AntibodyProject
+# from ...main_api_project import AntibodyProject
 
 from  ...tasks import fix_glycam_glycan, run_detect_sugars, run_ad_evaluate
 
@@ -19,9 +19,7 @@ def execute(inputs: Evaluate_Inputs) -> tuple[Evaluate_Outputs, Notices]:
     service_outputs = Evaluate_Outputs()
     service_notices = Notices()
 
-    #workdir = AntibodyProject.get_project_dir_from_pUUID(inputs.pUUID) deprecated form
-FIX ME
-    workdir = ## should already be visible by the time a service is called
+    workdir = inputs.projectDir
     log.debug(f"workdir: {workdir}")
     if not workdir:
         service_notices.addNotice(
@@ -30,7 +28,7 @@ FIX ME
             Messenger="AntibodyDocking",
             Type="Error",
             Code="400",
-            Message="Project not found",
+            Message="Project directory not provided or found",
         )
         return service_outputs, service_notices
     

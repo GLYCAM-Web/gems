@@ -6,7 +6,7 @@ from gemsModules.common.main_api_resources import Resource, Resources
 from gemsModules.common.code_utils import GemsStrEnum
 from gemsModules.common.main_api_notices import Notices
 
-from gemsModules.complex.antibody.main_api import (
+from gemsModules.complex.antibody.main_api_common import (
     Antibody_Service_Request,
     Antibody_Service_Response,
 )
@@ -42,6 +42,11 @@ class Evaluate_Inputs(BaseModel):
         None,
         title="Project UUID",
         description="UUID of Project",
+    )
+    projectDir: Optional[str] = Field(
+        None,
+        title="Project Directory",
+        description="Full path to project directory",
     )
 
     # TODO: make sure to update resources with this payload if provided this way

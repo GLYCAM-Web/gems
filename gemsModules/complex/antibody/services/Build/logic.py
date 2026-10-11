@@ -6,7 +6,7 @@ from gemsModules.logging.logger import Set_Up_Logging
 from gemsModules.systemoperations.filesystem_ops import check_if_files_exist
 
 
-from ...main_api_project import AntibodyProject
+# from ...main_api_project import AntibodyProject
 from ...tasks import run_ad_build, update_build_options
 
 from .api import Build_Inputs, Build_Outputs
@@ -21,6 +21,19 @@ def execute(inputs: Build_Inputs, options: dict) -> tuple[Build_Outputs, Notices
     service_outputs = Build_Outputs()
     service_notices = Notices()
 
+    workdir = inputs.projectDir
+    log.debug(f"AD/Build active workdir: {workdir}")
+    if not workdir:
+        service_notices.addNotice(
+            Brief="Project not found",
+            Scope="Service",
+            Messenger="AntibodyDocking",
+            Type="Error",
+            Code="400",
+            Message="Project directory not provided to the Build service",
+        )
+        return service_outputs, service_notices
+
     if inputs.pUUID is None:
         service_notices.addNotice(
             Brief="pUUID not provided",
@@ -32,15 +45,15 @@ def execute(inputs: Build_Inputs, options: dict) -> tuple[Build_Outputs, Notices
         )
         return service_outputs, service_notices
     
-    workdir = AntibodyProject.get_project_dir_from_pUUID(inputs.pUUID)
-    log.debug(f"AD/Build active workdir: {workdir}")
     # check if there is a .zip and .png file in the workdir and assume build already ran if they exist
-    files = [f"AD_project_{inputs.pUUID[:5]}.zip", "histogram_sorted.png"]
+    puuid_prefix = inputs.pUUID[:5] if inputs.pUUID else ""
+    files = [f"AD_project_{puuid_prefix}.zip", "histogram_sorted.png"]
     files_exist = check_if_files_exist(files, parent_dir=workdir)
     
     # Do not clobber if no_clobber is set to True and files exist
     NO_CLOBBER_DEFAULT = True
-    no_clobber_project = options.get("no_clobber", NO_CLOBBER_DEFAULT)
+    options_dict = options if isinstance(options, dict) else (options.dict() if hasattr(options, "dict") else {})
+    no_clobber_project = options_dict.get("no_clobber", NO_CLOBBER_DEFAULT)
     log.debug(f"AD2/Build: {no_clobber_project=}")
     if no_clobber_project and files_exist:
         service_notices.addNotice(
@@ -55,7 +68,7 @@ def execute(inputs: Build_Inputs, options: dict) -> tuple[Build_Outputs, Notices
    
     # As we pass the options to build, must update them rather than initializing with PM.
     try:
-        update_build_options.execute(options, workdir)
+        update_build_options.execute(options_dict, workdir)
     except ValueError as e:
         service_notices.addNotice(
             Brief="Invalid Build Options",

@@ -98,18 +98,21 @@ class Antibody_Request_Data_Filler(Request_Data_Filler):
         self.fill_resources_from_requester_if_exists(aaop, deep_copy=True)
 
     def __fill_evaluate_aaop(self, i: int, aaop: AAOP) -> List[AAOP]:
-        aaop.The_AAO.inputs.pUUID = self.response_project.pUUID
+        if aaop.The_AAO.inputs.pUUID is None:
+            aaop.The_AAO.inputs.pUUID = self.response_project.pUUID
+        aaop.The_AAO.inputs.projectDir = self.response_project.project_dir
         
         # TODO: need to handle the case of direct inputs that are not resources.
         if not self.fill_resources_from_requester_if_exists(aaop):
             self.__fill_input_pdb_resources(aaop)
         
         self.__fill_pdb_inputs_from_resources(aaop)
-        # Add the resources to copy to the project output directory by the Project Management service.
+        return self.aaop_list
 
     def __fill_build_aaop(self, i: int, aaop: AAOP) -> List[AAOP]:
-        # Do not fill this, we read it later.
-        # aaop.The_AAO.inputs.pUUID = self.response_project.pUUID
+        if aaop.The_AAO.inputs.pUUID is None:
+            aaop.The_AAO.inputs.pUUID = self.response_project.pUUID
+        aaop.The_AAO.inputs.projectDir = self.response_project.project_dir
   
         if not self.fill_resources_from_requester_if_exists(aaop):
             self.__fill_input_pdb_resources(aaop)
@@ -119,7 +122,13 @@ class Antibody_Request_Data_Filler(Request_Data_Filler):
         return self.aaop_list
     
     def __fill_analyze_aaop(self, i: int, aaop: AAOP) -> List[AAOP]:
-        pass 
+        if aaop.The_AAO.inputs.pUUID is None:
+            aaop.The_AAO.inputs.pUUID = self.response_project.pUUID
+        if hasattr(aaop.The_AAO.inputs, "projectDir"):
+            aaop.The_AAO.inputs.projectDir = self.response_project.project_dir
+        if not self.fill_resources_from_requester_if_exists(aaop):
+            self.__fill_input_pdb_resources(aaop)
+        return self.aaop_list 
             
     def __fill_input_pdb_resources(self, aaop):
         if aaop.AAO_Type not in ["Build", "Evaluate"]:

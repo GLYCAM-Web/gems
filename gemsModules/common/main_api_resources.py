@@ -1,7 +1,3 @@
-#!/usr/bin/env python3
-import email
-from email.message import EmailMessage
-import mimetypes
 from typing import Any, List, Literal, Optional, Union
 from pydantic import BaseModel, Field
 from pathlib import Path

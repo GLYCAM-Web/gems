@@ -1,6 +1,5 @@
 from typing import Literal
 from pydantic import Field
-from pydantic.typing import Literal as pyLiteral
 
 from gemsModules.common import main_api
 from gemsModules.common import main_api_entity

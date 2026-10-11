@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-source ~/.bash_profile
+[ -f ~/.bash_profile ] && source ~/.bash_profile
 source ${WD}/ad2config
 
 export WD

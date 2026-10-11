@@ -10,14 +10,16 @@ def execute(options, workdir):
     
     replacements = {}
     
-    if "Number_of_Replicas" in options:
-        # TODO: Ensure this is an int, add notice if not.
-        replacements["Number_of_Replicas"] = str(options["Number_of_Replicas"])
+    num_replicas = options.get("Number_of_Replicas", options.get("count"))
+    if num_replicas is not None:
+        replacements["Number_of_Replicas"] = str(num_replicas)
     else:
         log.warning("Number_of_Replicas not found in AntibodyDocking/Build options")
         raise ValueError("Number_of_Replicas not found in AntibodyDocking/Build options")
-    if "Glycan_Flexibility" in options:
-        g_flex = str(options["Glycan_Flexibility"])
+
+    glycan_flex = options.get("Glycan_Flexibility", options.get("flexibility"))
+    if glycan_flex is not None:
+        g_flex = str(glycan_flex).capitalize()
         replacements["Glycan_Flexibility"] = g_flex
         if g_flex not in ["Rigid", "Flexible", "Partial"]:
             log.warning(f"Invalid Glycan_Flexibility value: {g_flex}")

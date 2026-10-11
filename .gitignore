@@ -32,9 +32,12 @@ testing*
 queryLog.txt
 .coverage 
 .venv
+.venv-disabled/
+graphify-out/
 
 # instance config stuffs
 instance_config.json
 *.json.bak
+DevEnv/
 
 bin/*.exe

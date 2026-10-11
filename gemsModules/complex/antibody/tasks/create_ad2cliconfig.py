@@ -1,8 +1,9 @@
 import os
 from gemsModules.systemoperations.filesystem_ops import copy_file_from_A_to_B, replace_bash_variable_in_file
 
-AAAA NO LONGER - EXAMPLE_FILE = f"/programs/website_aa d2/test/AAD2_Docker/image/AA D2/99.cluster_utilities/ad2cliconfig.example"
-AAAA Figure out where it is. Likely auto-generated?
+# Note: EXAMPLE_FILE = f"/programs/website_aad2/test/AAD2_Docker/image/AAD2/99.cluster_utilities/ad2cliconfig.example"
+# Figure out where it is. Likely auto-generated?
+EXAMPLE_FILE = "/programs/website_aad2/test/AAD2_Docker/image/AAD2/99.cluster_utilities/ad2cliconfig.example"
 
 
 def execute(workdir):

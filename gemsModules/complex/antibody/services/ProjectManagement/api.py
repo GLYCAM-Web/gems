@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 
 from gemsModules.logging.logger import Set_Up_Logging
 
-from ...main_api import Antibody_Service_Request, Antibody_Service_Response
+from ...main_api_common import Antibody_Service_Request, Antibody_Service_Response
 from gemsModules.common.main_api_resources import Resource, Resources
 from gemsModules.complex.antibody.services.common_api import PDB_File_Resource
 

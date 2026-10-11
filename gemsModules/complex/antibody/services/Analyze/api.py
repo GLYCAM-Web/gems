@@ -4,7 +4,7 @@ from typing import List, Optional, Union
 
 from gemsModules.common.main_api_resources import Resource, Resources
 
-from gemsModules.complex.antibody.main_api import (
+from gemsModules.complex.antibody.main_api_common import (
     Antibody_Service_Request,
     Antibody_Service_Response,
 )
