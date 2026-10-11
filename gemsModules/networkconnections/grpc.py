@@ -77,18 +77,15 @@ def naive_is_GEMS_instance_for_SLURM_submission():
 
 def import_grpc_slurm_client():
     global gems_grpc_slurm_client
-    gemsPath = os.environ.get("GEMSHOME")
-    if gemsPath is None:
-        log.warning("GEMSHOME is not set.  Cannot submit via gRPC.")
-        # raise EnvironmentError("Failed to submit via gRPC.  GEMSHOME is not set.")
+    from gemsModules.systemoperations.environment_ops import get_gems_path
+    gemsPath = get_gems_path()
     sys.path.append(f"{gemsPath}/gRPC/SLURM")
     import gems_grpc_slurm_client
 
 def import_grpc_delegator_client():
     global gems_json_client
-    gemsPath = os.environ.get("GEMSHOME")
-    if gemsPath is None:
-        log.warning("GEMSHOME is not set.  Cannot submit via gRPC.")
+    from gemsModules.systemoperations.environment_ops import get_gems_path
+    gemsPath = get_gems_path()
     sys.path.append(f"{gemsPath}/gRPC/JSON")
     import json_client as gems_json_client
 

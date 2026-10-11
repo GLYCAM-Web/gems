@@ -9,10 +9,10 @@ log = Set_Up_Logging(__name__)
 
 
 def get_gems_path() -> str:
-    path = os.environ.get("GEMSHOME")
+    from gemsModules.configuration.user_config import get_effective_gemshome
+    path = get_effective_gemshome()
     if not os.path.exists(path):
-        log.error("The current GEMSHOME does not exist.")
-        log.error("GEMSHOME: " + path)
+        log.warning("The current GEMSHOME does not exist: " + str(path))
     return path
 
 
@@ -23,15 +23,13 @@ def gemsModules_is_findable() -> bool:
         return False
 
 def find_instance_config() -> str:
-    theICPath = os.getenv("GEMS_INSTANCE_CONFIG") or ""
-    if theICPath in (None, ""):
-        theICPath = os.getenv("GEMSHOME") + "/instance_config.json"
-    return theICPath
+    from gemsModules.configuration.user_config import get_effective_instance_config_path
+    return get_effective_instance_config_path()
 
 
 def activate_gems_venv(file_path: str = None) -> None:
     """
-    Detects if a .venv directory exists in GEMSHOME.
+    Detects if a virtual environment exists in GEMSHOME, user config, or .gemsrc.
     If present and current python environment lacks dependencies (e.g. grpc),
     sets VIRTUAL_ENV, prepends .venv/bin to PATH for subprocesses, and re-executes.
     """
@@ -42,15 +40,16 @@ def activate_gems_venv(file_path: str = None) -> None:
     except ImportError:
         pass
 
-    gems_home = os.environ.get("GEMSHOME")
-    if not gems_home or not os.path.exists(gems_home):
-        if file_path:
-            file_dir = os.path.dirname(os.path.abspath(file_path))
-            gems_home = os.path.abspath(os.path.join(file_dir, "..", ".."))
-        else:
-            gems_home = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    from gemsModules.configuration.user_config import get_effective_gemshome, get_effective_venv_path
 
-    venv_dir = os.path.join(gems_home, ".venv")
+    # Check for user-configured venv
+    custom_venv = get_effective_venv_path()
+    if custom_venv and os.path.isdir(custom_venv):
+        venv_dir = custom_venv
+    else:
+        gems_home = get_effective_gemshome()
+        venv_dir = os.path.join(gems_home, ".venv")
+
     if os.path.isdir(venv_dir):
         venv_bin = os.path.join(venv_dir, "bin")
         if venv_bin not in os.environ.get("PATH", "").split(os.pathsep):

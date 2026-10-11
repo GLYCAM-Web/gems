@@ -21,19 +21,32 @@ def new_concurrent_logger(name, force_dirty=False):
     if not force_dirty or not os.getenv("DIRTY_LOGGING_ENABLED", False):
         try:
             return Set_Up_Logging(name)
-        except PermissionError:
-            print("Unable to create a concurrent logger. Falling back to dirty logger.")
+        except (PermissionError, OSError):
+            if "GW_LIVE_SWARM" not in os.environ and sys.stderr.isatty():
+                print("Unable to create a concurrent logger. Falling back to dirty logger.", file=sys.stderr)
 
     log = logging.getLogger(name)
 
-    logdir = os.path.join(os.getenv("GEMSHOME", "./"), "logs", "dirty")
-    if not os.path.exists(logdir):
-        os.makedirs(logdir)
+    try:
+        from gemsModules.configuration.user_config import get_effective_logs_dir
+        base_logs_dir = get_effective_logs_dir()
+    except Exception:
+        base_logs_dir = os.path.join(os.getenv("GEMSHOME", "./"), "logs")
 
-    logfile = os.path.join(
-        logdir,
-        f"{name}-{socket.gethostname()}-{datetime.now()}-git-ignore-me.log",
-    )
+    logdir = os.path.join(base_logs_dir, "dirty")
+    try:
+        if not os.path.exists(logdir):
+            os.makedirs(logdir, exist_ok=True)
 
-    log.addHandler(logging.FileHandler(logfile))
+        logfile = os.path.join(
+            logdir,
+            f"{name}-{socket.gethostname()}-{datetime.now()}-git-ignore-me.log",
+        )
+        log.addHandler(logging.FileHandler(logfile))
+    except (PermissionError, OSError):
+        if "GW_LIVE_SWARM" in os.environ or os.environ.get("GEMS_NO_STDERR") in ("1", "true", "True"):
+            log.addHandler(logging.NullHandler())
+        else:
+            log.addHandler(logging.StreamHandler(sys.stderr))
+
     return log

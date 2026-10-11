@@ -1,0 +1,63 @@
+{
+  "date": "2026-10-11T00:00:00",
+  "hosts": [
+    {
+      "name": "local-standalone",
+      "address": "localhost",
+      "is_localhost": "True",
+      "execution_environments": [
+        "Standalone"
+      ],
+      "entities_available": [
+        "AD",
+        "BC",
+        "CB",
+        "GM",
+        "GP",
+        "MD",
+        "PDB"
+      ]
+    },
+    {
+      "name": "thortunnel",
+      "address": "localhost",
+      "port": "42099",
+      "is_localhost": "False",
+      "scheduler": "slurm",
+      "execution_environments": [
+        "Batch",
+        "Standalone"
+      ],
+      "entities_available": [
+        "AD",
+        "MD",
+        "GM"
+      ],
+      "batch_computing_resources": [
+        {
+          "partition": "amber",
+          "supported_entities": [
+            "AD",
+            "MD"
+          ],
+          "max_nodes_per_job": "1",
+          "max_cores_per_node": "4",
+          "max_threads_per_node": "4",
+          "max_gpus_per_node": "0",
+          "max_cpus_per_gpu": "0",
+          "max_time_limit": "120"
+        }
+      ]
+    }
+  ],
+  "filesystem_paths": {
+    "AD": "GEMS_UserSpace/AD",
+    "GM": "GEMS_UserSpace/GM",
+    "MD": "GEMS_UserSpace/MD",
+    "GP": "GEMS_UserSpace/GP",
+    "CB": "GEMS_UserSpace/CB"
+  },
+  "secure_inputs_paths": {
+    "AD": "GEMS_UserSpace/AD/inputs"
+  }
+}

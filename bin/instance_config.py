@@ -5,6 +5,12 @@ import argparse
 import json
 
 GEMSHOME = os.environ.get("GEMSHOME", "")
+if not GEMSHOME:
+    candidate = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+    if os.path.isdir(os.path.join(candidate, "gemsModules")):
+        GEMSHOME = candidate
+        os.environ["GEMSHOME"] = GEMSHOME
+
 if GEMSHOME not in sys.path:
     sys.path.append(GEMSHOME)
 
@@ -245,6 +251,11 @@ def main():
         
         subparsers.add_parser("status").add_argument("--ic-file", type=str)
         
+        p_init_rc = subparsers.add_parser("init-gemsrc")
+        p_init_rc.add_argument("--output", "-o", type=str, default=None, help="Target path for .gemsrc (default: ~/.gemsrc)")
+
+        subparsers.add_parser("show-config")
+        
         args = parser.parse_args(argv)
         
         if args.subcommand == "validate":
@@ -259,6 +270,21 @@ def main():
             cmd_confirm_capabilities(args)
         elif args.subcommand == "status":
             cmd_status(args)
+        elif args.subcommand == "init-gemsrc":
+            from gemsModules.configuration.user_config import generate_sample_gemsrc
+            dest = args.output or os.path.expanduser("~/.gemsrc")
+            generate_sample_gemsrc(dest)
+            print(f"Sample .gemsrc created at: {dest}")
+        elif args.subcommand == "show-config":
+            from gemsModules.configuration import user_config
+            rc_file = user_config.find_gemsrc_path()
+            print(f"Active .gemsrc: {rc_file or 'None (using system defaults)'}")
+            print(f"GEMSHOME: {user_config.get_effective_gemshome()}")
+            print(f"Instance Config: {user_config.get_effective_instance_config_path()}")
+            print(f"Logs Directory: {user_config.get_effective_logs_dir()}")
+            print(f"Output Directory: {user_config.get_effective_output_dir() or 'Default'}")
+            print(f"Uploads Directory: {user_config.get_effective_uploads_dir() or 'Default'}")
+            print(f"Log Level: {user_config.get_effective_logging_level() or 'error (default)'}")
 
 if __name__ == "__main__":
     main()
