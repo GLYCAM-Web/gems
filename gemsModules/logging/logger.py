@@ -22,7 +22,8 @@ def new_concurrent_logger(name, force_dirty=False):
         try:
             return Set_Up_Logging(name)
         except (PermissionError, OSError):
-            if "GW_LIVE_SWARM" not in os.environ and sys.stderr.isatty():
+            from gemsModules.logging.loggingConfig import is_stderr_suppressed
+            if not is_stderr_suppressed() and sys.stderr.isatty():
                 print("Unable to create a concurrent logger. Falling back to dirty logger.", file=sys.stderr)
 
     log = logging.getLogger(name)
@@ -44,7 +45,8 @@ def new_concurrent_logger(name, force_dirty=False):
         )
         log.addHandler(logging.FileHandler(logfile))
     except (PermissionError, OSError):
-        if "GW_LIVE_SWARM" in os.environ or os.environ.get("GEMS_NO_STDERR") in ("1", "true", "True"):
+        from gemsModules.logging.loggingConfig import is_stderr_suppressed
+        if is_stderr_suppressed():
             log.addHandler(logging.NullHandler())
         else:
             log.addHandler(logging.StreamHandler(sys.stderr))

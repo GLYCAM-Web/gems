@@ -21,6 +21,12 @@ def is_stderr_suppressed() -> bool:
         return True
     if os.environ.get("GEMS_NO_STDERR") in ("1", "true", "True"):
         return True
+    try:
+        from gemsModules.configuration.main_api import session_instance_config
+        if session_instance_config and session_instance_config.is_website_environment():
+            return True
+    except Exception:
+        pass
     return False
 
 

@@ -204,6 +204,17 @@ class Host(BaseModel):
             return None
         return res_list.get_resource_by_role(role)
 
+    def is_website_environment(self) -> bool:
+        """Return True if this host has Website in execution_environments or has website_environments set."""
+        if self.website_environments:
+            return True
+        if self.execution_environments:
+            for env in self.execution_environments:
+                val = env.value if hasattr(env, "value") else str(env)
+                if str(val).lower() == "website":
+                    return True
+        return False
+
     def get_aad2_configuration(self) -> Optional[AAD2_Configuration]:
         """Return the AAD2_Configuration for this host if present."""
         if not self.resource_specific_information:
@@ -528,6 +539,17 @@ class InstanceConfig(BaseModel):
                 return cfg
 
         return None
+
+    def is_website_environment(self) -> bool:
+        """Return True if localhost (or any configured host) represents a website execution environment."""
+        local_host = self.get_localhost()
+        if local_host and local_host.is_website_environment():
+            return True
+        if self.hosts:
+            for host in self.hosts:
+                if host.is_website_environment():
+                    return True
+        return False
 
     @property
     def default_local_parameters(self) -> Dict[str, Dict[str, str]]:
@@ -913,6 +935,18 @@ def _load_instance_config(icFilePath: str = None) -> InstanceConfig :
 ## Instantiate the main instance config (GEMSHOME/instance_config.json)
 ## Import this from anywhere else.
 session_instance_config = _load_instance_config()
+
+def set_session_instance_config(config: InstanceConfig) -> None:
+    global session_instance_config
+    if session_instance_config is not None:
+        session_instance_config.__dict__.clear()
+        session_instance_config.__dict__.update(config.__dict__)
+        session_instance_config.__fields_set__.clear()
+        session_instance_config.__fields_set__.update(config.__fields_set__)
+    else:
+        session_instance_config = config
+
+
 
 def generateSchema():
     import json

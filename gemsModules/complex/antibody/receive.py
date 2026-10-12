@@ -4,21 +4,20 @@ import os
 from gemsModules.networkconnections.seek_correct_host import execute as seek_correct_host
 from gemsModules.systemoperations.environment_ops import get_site_version
 
-from gemsModules.configuration.main_api import session_instance_config as theIC
-
 from gemsModules.complex.antibody.json_string_manager import (
     Antibody_Json_String_Manager,
 )
 from gemsModules.complex.antibody.main_settings import WhoIAm, context_names
 from gemsModules.logging.logger import Set_Up_Logging
 
-
-
 log = Set_Up_Logging(__name__)
 
 
 def receive(incomingString: str) -> str:
+    from gemsModules.configuration.main_api import session_instance_config as theIC
     log.info("Antibody was called as an entity.  Processing.")
+
+
 
     # TODO: refactor this to only use seek_correct_host
 

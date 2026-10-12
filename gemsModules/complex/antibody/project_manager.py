@@ -1,6 +1,4 @@
-#!/usr/bin/env python3
-## Possibly this should be in gemsModules/project.
-
+import os
 from abc import ABC, abstractmethod
 from pathlib import Path
 
@@ -8,6 +6,7 @@ from gemsModules.common.project_manager import Project_Manager
 
 from gemsModules.complex.antibody.main_api import Antibody_Entity
 from gemsModules.complex.antibody.main_api_project import AntibodyProject
+from gemsModules.systemoperations.filesystem_ops import check_make_directory
 
 from gemsModules.logging.logger import Set_Up_Logging
 
@@ -20,25 +19,32 @@ class Antibody_Project_Manager(Project_Manager):
         log.info("Project management for Antibody_Project_Manager is begun")
 
         # If there is incoming info, use that. Else, make an incoming project.
-        if self.incoming_project is not None:
-            incomingUUID = get_pUUID_from_incoming_project()
-            if incomingUUID is not None:
-                 self.incoming_project.pUUID = foundUUID
-            self.incoming_project.setProjectDir(noClobber=False)
-            self.incoming_project.logs_dir = str(os.path.join(self.incoming_project.project_dir, "logs"))
-        else:
+        if self.incoming_project is None:
             self.incoming_project = AntibodyProject()
 
+        if self.incoming_project.filesystem_path in (None, ""):
+            self.incoming_project.setFilesystemPath(noClobber=False)
+            self.incoming_project.setUploadsPath(noClobber=False)
+            self.incoming_project.setServiceDir(noClobber=False)
+
+        incomingUUID = self.get_pUUID_from_incoming_project()
+        if incomingUUID not in (None, ""):
+            self.incoming_project.pUUID = incomingUUID
+
+        self.incoming_project.setProjectDir(noClobber=False)
+        self.incoming_project.logs_dir = str(os.path.join(self.incoming_project.project_dir, "logs"))
+
+
         # Try to create specified directories as needed and complain if they are not specified
-        if self.incoming_project.project_dir not in (None, "") :
+        if self.incoming_project.project_dir not in (None, ""):
             check_make_directory(Dir_Path=self.incoming_project.project_dir)
         else:
             log.error("Project directory not specified")
-        if self.incoming_project.uploads_path not in (None, "") :
+        if self.incoming_project.uploads_path not in (None, ""):
             check_make_directory(Dir_Path=self.incoming_project.uploads_path)
         else:
             log.error("Uploads path not specified")
-        if self.incoming_project.logs_dir not in (None, "") :
+        if self.incoming_project.logs_dir not in (None, ""):
             check_make_directory(Dir_Path=self.incoming_project.logs_dir)
         else:
             log.error("Logging directory for the project is not specified")

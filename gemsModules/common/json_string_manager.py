@@ -47,8 +47,10 @@ class Json_String_Manager(ABC):
                 brief = "ValidationError", e
             else:
                 brief = "UnknownError", e
-            import sys
-            print("EXC TRACEBACK:\n" + traceback.format_exc(), file=sys.stderr)
+            from gemsModules.logging.loggingConfig import is_stderr_suppressed
+            if not is_stderr_suppressed():
+                import sys
+                print("EXC TRACEBACK:\n" + traceback.format_exc(), file=sys.stderr)
             log.error("Exception in Json_String_Manager: %s", traceback.format_exc())
         finally:
             if brief is not None:

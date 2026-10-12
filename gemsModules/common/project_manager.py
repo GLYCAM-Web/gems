@@ -36,24 +36,31 @@ class Project_Manager(ABC):
         return responseProject
 
     def get_pUUID_from_incoming_project(self) -> str:
-        if self.incoming_project is None:
+        if self.incoming_project is None or self.incoming_entity is None:
+            return None
+        if not self.incoming_entity.services or not self.incoming_entity.services.__root__:
             return None
         foundUUID = None
         serviceType = None
         for service in self.incoming_entity.services.__root__.values():
-            if "pUUID" in service.inputs.keys() :
-                log.debug("Found pUUID in incoming request:")
-                log.debug(str(service.inputs))
-                if service.inputs["pUUID"] not in (None, "") :
-                    log.debug(f"Setting the pUUID to {service.inputs['pUUID']}")
-                    if foundUUID in (None, "") :
-                        foundUUID = service.inputs['pUUID']
-                        serviceType = service.typename
-                    else :
-                        log.error("Conflicting pUUID values found in services. They are:")
-                        log.error(f"service: {serviceType} - pUUID {foundUUID}")
-                        log.error(f"service: {service.typename} - pUUID {service.inputs['pUUID']}")
-                        raise ValueError ("Service inputs have conflicting pUUIDs")
+            inputs = getattr(service, "inputs", None)
+            if inputs is None:
+                continue
+            puuid = None
+            if hasattr(inputs, "pUUID"):
+                puuid = inputs.pUUID
+            elif isinstance(inputs, dict):
+                puuid = inputs.get("pUUID")
+            if puuid not in (None, ""):
+                log.debug("Found pUUID in incoming request: %s", puuid)
+                if foundUUID in (None, ""):
+                    foundUUID = str(puuid)
+                    serviceType = getattr(service, "typename", "Unknown")
+                elif str(foundUUID) != str(puuid):
+                    log.error("Conflicting pUUID values found in services. They are:")
+                    log.error(f"service: {serviceType} - pUUID {foundUUID}")
+                    log.error(f"service: {getattr(service, 'typename', 'Unknown')} - pUUID {puuid}")
+                    raise ValueError("Service inputs have conflicting pUUIDs")
         return foundUUID
 
 
