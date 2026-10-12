@@ -90,11 +90,15 @@ class Build_Options(BaseModel):
             5,
             description = "How many replicas/experiments to perform."
             )
+    class Config:
+        use_enum_values = True
+
 
 class Build_Request(Antibody_Service_Request):
     typename: str = Field("Build", alias="type")
     inputs: Build_Inputs = Build_Inputs()
-    options: Union[Build_Options, dict] = None
+    options: Optional[Union[Build_Options, dict]] = None
+
 
 class Build_Response(Antibody_Service_Response):
     typename: str = Field("Build", alias="type")

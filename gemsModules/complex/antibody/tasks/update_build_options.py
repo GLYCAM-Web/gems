@@ -19,7 +19,8 @@ def execute(options, workdir):
 
     glycan_flex = options.get("Glycan_Flexibility", options.get("flexibility"))
     if glycan_flex is not None:
-        g_flex = str(glycan_flex).capitalize()
+        raw_val = glycan_flex.value if hasattr(glycan_flex, "value") else str(glycan_flex)
+        g_flex = raw_val.capitalize()
         replacements["Glycan_Flexibility"] = g_flex
         if g_flex not in ["Rigid", "Flexible", "Partial"]:
             log.warning(f"Invalid Glycan_Flexibility value: {g_flex}")

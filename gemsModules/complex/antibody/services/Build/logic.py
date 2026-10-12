@@ -7,16 +7,20 @@ from gemsModules.systemoperations.filesystem_ops import check_if_files_exist
 
 
 # from ...main_api_project import AntibodyProject
+from typing import Optional, Union
 from ...tasks import run_ad_build, update_build_options
 
-from .api import Build_Inputs, Build_Outputs
+from .api import Build_Inputs, Build_Outputs, Build_Options
 
 
 log = Set_Up_Logging(__name__)
 
 
 @validate_arguments
-def execute(inputs: Build_Inputs, options: dict) -> tuple[Build_Outputs, Notices]:
+def execute(
+    inputs: Build_Inputs,
+    options: Optional[Union[dict, Build_Options]] = None,
+) -> tuple[Build_Outputs, Notices]:
     log.debug(f"serviceInputs: {inputs}")
     service_outputs = Build_Outputs()
     service_notices = Notices()
@@ -52,8 +56,17 @@ def execute(inputs: Build_Inputs, options: dict) -> tuple[Build_Outputs, Notices
     
     # Do not clobber if no_clobber is set to True and files exist
     NO_CLOBBER_DEFAULT = True
-    options_dict = options if isinstance(options, dict) else (options.dict() if hasattr(options, "dict") else {})
+    default_options = Build_Options().dict()
+    if options is None:
+        options_dict = default_options
+    elif isinstance(options, dict):
+        options_dict = {**default_options, **options}
+    elif hasattr(options, "dict"):
+        options_dict = {**default_options, **options.dict()}
+    else:
+        options_dict = default_options
     no_clobber_project = options_dict.get("no_clobber", NO_CLOBBER_DEFAULT)
+
     log.debug(f"AD2/Build: {no_clobber_project=}")
     if no_clobber_project and files_exist:
         service_notices.addNotice(

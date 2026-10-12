@@ -221,6 +221,32 @@ class TestAntibodyDataFlow(unittest.TestCase):
         self.assertIsNotNone(aggregated)
         self.assertEqual(aggregated.Message, "Test notice message")
 
+    def test_build_logic_accepts_none_or_partial_options(self):
+        from unittest.mock import patch, MagicMock
+        from gemsModules.complex.antibody.services.Build.logic import execute as execute_build
+        from gemsModules.complex.antibody.services.Build.api import Build_Inputs, Build_Options
+
+        pm_inputs = ProjectManagement_Inputs(
+            pUUID=self.puuid,
+            projectDir=self.project_dir,
+            resources=Resources(__root__=[self.ab_resource, self.lig_resource])
+        )
+        execute_pm(pm_inputs)
+
+        build_inputs = Build_Inputs(pUUID=self.puuid, projectDir=self.project_dir)
+
+        mock_result = MagicMock()
+        mock_result.returncode = 0
+        with patch("gemsModules.complex.antibody.services.Build.logic.run_ad_build.execute", return_value=mock_result):
+            # 1. Test with options=None
+            outputs, notices = execute_build(build_inputs, options=None)
+            self.assertTrue(any(n.Brief == "Build Successful" for n in notices.__root__))
+
+            # 2. Test with Build_Options instance
+            outputs, notices = execute_build(build_inputs, options=Build_Options(count=3, flexibility="rigid"))
+            self.assertTrue(any(n.Brief == "Build Successful" for n in notices.__root__))
+
+
 
 if __name__ == "__main__":
     unittest.main()
