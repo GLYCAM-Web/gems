@@ -54,6 +54,7 @@ def execute(pdb_path, workdir):
 
 if __name__ == "__main__":
     print(DETECT_SUGARS_BIN)
-    pdb_path = "/programs/gems/tests/inputs/DManpa1-8DNeup5Acb2-4DFrufa2-OH_structure.pdb"
+    gems_home = os.environ.get("GEMSHOME", ".")
+    pdb_path = os.path.join(gems_home, "tests/inputs/DManpa1-8DNeup5Acb2-4DFrufa2-OH_structure.pdb")
     workdir = os.getcwd()
     execute(pdb_path, workdir)

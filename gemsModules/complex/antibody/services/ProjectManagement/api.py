@@ -8,6 +8,7 @@ from gemsModules.logging.logger import Set_Up_Logging
 
 from ...main_api_common import Antibody_Service_Request, Antibody_Service_Response
 from gemsModules.common.main_api_resources import Resource, Resources
+from gemsModules.common.main_api_notices import Notices
 from gemsModules.complex.antibody.services.common_api import PDB_File_Resource
 
 log = Set_Up_Logging(__name__)
@@ -57,6 +58,10 @@ class ProjectManagement_Inputs(BaseModel):
 
 class ProjectManagement_Outputs(BaseModel):
     resources: PM_Output_Resources = PM_Output_Resources()
+    notices: Optional[Notices] = Field(
+        default_factory=Notices,
+        description="Notices generated during ProjectManagement execution.",
+    )
 
 
 # PM Requests should be based in common.Request, in my mind.

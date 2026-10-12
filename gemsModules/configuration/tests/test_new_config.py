@@ -75,5 +75,74 @@ class TestNewConfig(unittest.TestCase):
         self.assertEqual(host.resource_specific_information.use_gres_for_gpus, "False")
         self.assertEqual(host.resource_specific_information.cpu_hardware_equivalent, "thread")
 
+    def test_aad2_configuration_in_resource_specific_information(self):
+        # Test Host with aad2_configuration in resource_specific_information
+        host_dict = {
+            "name": "thoreau",
+            "address": "172.16.4.2",
+            "scheduler": "slurm",
+            "entities_available": ["AD"],
+            "resource_specific_information": {
+                "use_gres_for_gpus": "True",
+                "cpu_hardware_equivalent": "core",
+                "aad2_configuration": {
+                    "aad2_docker_home": "/custom/path/AAD2_Docker",
+                    "image": "custom-ad2:v1.0"
+                }
+            }
+        }
+        host = Host(**host_dict)
+        cfg = host.get_aad2_configuration()
+        self.assertIsNotNone(cfg)
+        self.assertEqual(cfg.aad2_docker_home, "/custom/path/AAD2_Docker")
+        self.assertEqual(cfg.image, "custom-ad2:v1.0")
+        self.assertEqual(cfg.get_cli_bin_path(), "/custom/path/AAD2_Docker/image/AAD2/bin")
+        self.assertEqual(
+            cfg.get_ad2cliconfig_example_file(),
+            "/custom/path/AAD2_Docker/image/AAD2/99.cluster_utilities/ad2cliconfig.example"
+        )
+        self.assertEqual(
+            cfg.get_submit_docking_script(),
+            "/custom/path/AAD2_Docker/image/AAD2/bin/submit_docking_to_slurm_with_docker.bash"
+        )
+
+    def test_instance_config_get_aad2_configuration(self):
+        ic_data = {
+            "date": "2026-10-11T00:00:00",
+            "hosts": [
+                {
+                    "name": "local",
+                    "address": "localhost",
+                    "is_localhost": "True",
+                    "entities_available": ["GM", "MD"]
+                },
+                {
+                    "name": "thoreau",
+                    "address": "172.16.4.2",
+                    "is_localhost": "False",
+                    "entities_available": ["AD"],
+                    "resource_specific_information": {
+                        "aad2_configuration": {
+                            "aad2_docker_home": "/remote/path/AAD2_Docker"
+                        }
+                    }
+                }
+            ]
+        }
+        ic = InstanceConfig(**ic_data)
+        # Should find it via AD entity host
+        cfg = ic.get_aad2_configuration()
+        self.assertIsNotNone(cfg)
+        self.assertEqual(cfg.aad2_docker_home, "/remote/path/AAD2_Docker")
+
+        # Explicit target host lookup
+        cfg_thoreau = ic.get_aad2_configuration(target_host="thoreau")
+        self.assertIsNotNone(cfg_thoreau)
+        self.assertEqual(cfg_thoreau.aad2_docker_home, "/remote/path/AAD2_Docker")
+
+        # Non-existent host lookup
+        self.assertIsNone(ic.get_aad2_configuration(target_host="nonexistent"))
+
+
 if __name__ == "__main__":
     unittest.main()

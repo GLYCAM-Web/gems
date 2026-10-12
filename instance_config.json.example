@@ -16,7 +16,12 @@
         "GP",
         "MD",
         "PDB"
-      ]
+      ],
+      "resource_specific_information": {
+        "aad2_configuration": {
+          "aad2_docker_home": "/path/to/AAD2_Docker"
+        }
+      }
     },
     {
       "name": "thortunnel",
@@ -47,7 +52,14 @@
           "max_cpus_per_gpu": "0",
           "max_time_limit": "120"
         }
-      ]
+      ],
+      "resource_specific_information": {
+        "use_gres_for_gpus": "True",
+        "cpu_hardware_equivalent": "core",
+        "aad2_configuration": {
+          "aad2_docker_home": "/programs/website_aad2/test/AAD2_Docker"
+        }
+      }
     }
   ],
   "filesystem_paths": {

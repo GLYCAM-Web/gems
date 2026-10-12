@@ -6,11 +6,41 @@ log = Set_Up_Logging(__name__)
 
 
 
-def create_ad2config(path, antibodytibody, glycan, siteversion="swarmtest", image="antibody-docking:2025-03-31-00-22-blf"):
+import os
+from typing import Optional
+
+def create_ad2config(
+    path,
+    antibodytibody,
+    glycan,
+    siteversion=None,
+    image=None,
+    aad2_config=None,
+    aad2_docker_home=None,
+    aad2_cli_bin_path=None,
+    aad2_image_file_path=None,
+    vmd_home=None,
+    vmd_lib=None,
+):
     """ Create the ad2config file.
     
     Note: Build must update Glycan_Flexibility and Number_of_Replicas when it receives options.
     """
+    if aad2_config is None:
+        try:
+            from gemsModules.configuration.main_api import session_instance_config
+            aad2_config = session_instance_config.get_aad2_configuration()
+        except Exception:
+            pass
+
+    env_docker_home = os.environ.get("AAD2_DOCKER_HOME")
+    docker_home = aad2_docker_home or (aad2_config.aad2_docker_home if aad2_config else None) or env_docker_home or ""
+    cli_bin = aad2_cli_bin_path or (aad2_config.get_cli_bin_path() if aad2_config else None) or (os.path.join(docker_home, "image/AAD2/bin") if docker_home else "")
+    img = image or (aad2_config.get_image() if aad2_config else None) or ""
+    img_file_path = aad2_image_file_path or (aad2_config.aad2_image_file_path if aad2_config else None) or (os.path.join(docker_home, "image_files") if docker_home else "")
+    vmd_h = vmd_home or (aad2_config.vmd_home if aad2_config else None) or ""
+    vmd_l = vmd_lib or (aad2_config.vmd_lib if aad2_config else None) or ""
+
     Default_AD2_CONFIG = textwrap.dedent(f"""#!/usr/bin/env bash
 
     Log_File="ad2.log" 
@@ -29,15 +59,15 @@ def create_ad2config(path, antibodytibody, glycan, siteversion="swarmtest", imag
     AD2_Docking_Batch_Script="submit_docking_to_slurm_with_docker.bash"
     AD2_Docking_Local_Script="gwconfig"
 
-    AAD2_IMAGE_FILE_PATH="/programs/website_aad2/{siteversion}/image_files"
-    Image="{image}"
+    AAD2_IMAGE_FILE_PATH="{img_file_path}"
+    Image="{img}"
 
-    AAD2_DOCKER_HOME="/programs/website_aad2/{siteversion}/AAD2_Docker"
-    AAD2_CLI_BIN_PATH="/programs/website_aad2/{siteversion}/AAD2_Docker/image/AAD2/bin"
+    AAD2_DOCKER_HOME="{docker_home}"
+    AAD2_CLI_BIN_PATH="{cli_bin}"
 
     Use_VMD="True"
-    VMD_HOME="/programs/bin" # Path to the 'vmd' binary, e.g., /programs/bin
-    VMD_LIB="/programs/lib" # Path to the 'vmd' lib directory, e.g., /programs/lib
+    VMD_HOME="{vmd_h}"
+    VMD_LIB="{vmd_l}"
     """)
     
     with open(path, "w") as f:

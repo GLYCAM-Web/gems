@@ -100,7 +100,35 @@ For users and developers running GEMS standalone or testing via the CLI, a templ
 ### Key Highlights:
 - **Local Standalone Execution**: Configures `local-standalone` (`localhost`) to support all GEMS entities (`AD`, `BC`, `CB`, `GM`, `GP`, `MD`, `PDB`).
 - **Developer CLI Remote Tunnel (`thortunnel`)**: Pre-configures a remote host entry for `localhost:42099`. When developing or testing remote build/slurm services over an SSH tunnel (e.g., `ssh -L 42099:localhost:42099 webdev@thoreau`), scripts like `test_build_remote.sh` and `./bin/delegate` work immediately without manual JSON editing.
+- **Host Resource-Specific Information (`resource_specific_information`)**: Contains host-specific resources and tool configurations needed for request fulfillment (e.g., batch scheduler settings like Slurm and tool configurations like `aad2_configuration`).
 - **User-Relative Storage Paths**: Points filesystem output directories to `GEMS_UserSpace/` rather than hardcoded `/website/userdata/`.
+
+### Host Resource-Specific Information & `aad2_configuration`
+
+The `resource_specific_information` block on each host in the Instance Configuration holds information required for request fulfillment on that specific machine. For Antibody Docking (AAD2), this eliminates hardcoded host paths:
+
+```json
+{
+  "resource_specific_information": {
+    "use_gres_for_gpus": "True",
+    "cpu_hardware_equivalent": "core",
+    "aad2_configuration": {
+      "aad2_docker_home": "/path/to/AAD2_Docker",
+      "aad2_cli_bin_path": "/path/to/AAD2_Docker/image/AAD2/bin",
+      "image": "antibody-docking:tag",
+      "vmd_home": "/path/to/vmd/bin",
+      "vmd_lib": "/path/to/vmd/lib"
+    }
+  }
+}
+```
+
+#### Fields & Resolution Rules:
+- `aad2_docker_home`: Root path to `AAD2_Docker`. Can also be overridden by the environment variable `AAD2_DOCKER_HOME`.
+- `aad2_cli_bin_path`: Directory containing CLI tools (`submit_docking_to_slurm_with_docker.bash`). Automatically defaults to `{aad2_docker_home}/image/AAD2/bin`.
+- `image`: Docker/Singularity image tag. If omitted, GEMS attempts to discover the image tag from `{aad2_docker_home}/settings.bash`.
+- `ad2cliconfig_example_file`: Template file for CLI configs. Automatically defaults to `{aad2_docker_home}/image/AAD2/99.cluster_utilities/ad2cliconfig.example`.
+- **Notice Handling**: If `aad2_docker_home` is neither configured in the IC nor exported as `AAD2_DOCKER_HOME`, GEMS returns a JSON response containing an Error Notice (`Brief="PathNotConfigured"`, `Code="404"`) rather than crashing or falling back to hardcoded `/programs` or `/home` paths.
 
 ### Quick Setup:
 ```bash

@@ -11,7 +11,11 @@ except ImportError:
 from enum import Enum
 
 from gemsModules.common.code_utils import GemsStrEnum
-from gemsModules.configuration.resource_management_api import Resource_Specific_Information_Registry
+from gemsModules.configuration.resource_management_api import (
+    Resource_Specific_Information_Registry,
+    AAD2_Configuration,
+    ResourceSpecificInformation,
+)
 from gemsModules.systemoperations.resources_api import Resource, Resources
 
 from gemsModules.logging.logger import Set_Up_Logging
@@ -166,7 +170,7 @@ class Host(BaseModel):
     ## The schema should be imported from resource_management_api.py
     resource_specific_information: Optional[Any]  = Field(
          None,
-         description="Information needed by Batch Compute that is set during scheduler configuration and cannot be guessed otherwise.",
+         description="Information needed for request fulfillment that is specific to resources on the host.",
          )
     ######################################################################
     ######################################################################
@@ -200,15 +204,50 @@ class Host(BaseModel):
             return None
         return res_list.get_resource_by_role(role)
 
+    def get_aad2_configuration(self) -> Optional[AAD2_Configuration]:
+        """Return the AAD2_Configuration for this host if present."""
+        if not self.resource_specific_information:
+            return None
+        if isinstance(self.resource_specific_information, AAD2_Configuration):
+            return self.resource_specific_information
+        if hasattr(self.resource_specific_information, "aad2_configuration"):
+            aad2 = self.resource_specific_information.aad2_configuration
+            if isinstance(aad2, dict):
+                return AAD2_Configuration(**aad2)
+            elif isinstance(aad2, AAD2_Configuration):
+                return aad2
+        if isinstance(self.resource_specific_information, dict):
+            aad2_data = self.resource_specific_information.get("aad2_configuration") or self.resource_specific_information.get("aad2")
+            if isinstance(aad2_data, dict):
+                return AAD2_Configuration(**aad2_data)
+            elif isinstance(aad2_data, AAD2_Configuration):
+                return aad2_data
+            elif "aad2_docker_home" in self.resource_specific_information:
+                return AAD2_Configuration(**self.resource_specific_information)
+        return None
+
     @validator('resource_specific_information', pre=True)
     def validate_resource_specific_information(cls, v, values):
-        scheduler = values.get('scheduler')
-        if not scheduler or v is None:
+        if v is None:
             return v
-        sch_key = scheduler.lower()
-        if sch_key in Resource_Specific_Information_Registry:
-            model_cls = Resource_Specific_Information_Registry[sch_key]
-            if isinstance(v, dict):
+        scheduler = values.get('scheduler')
+        sch_key = scheduler.lower() if scheduler else None
+
+        if isinstance(v, dict):
+            if "aad2_configuration" in v or "aad2" in v or sch_key == "slurm":
+                aad2_raw = v.get("aad2_configuration") or v.get("aad2")
+                aad2_obj = None
+                if isinstance(aad2_raw, dict):
+                    aad2_obj = AAD2_Configuration(**aad2_raw)
+                elif isinstance(aad2_raw, AAD2_Configuration):
+                    aad2_obj = aad2_raw
+
+                kwargs = dict(v)
+                if aad2_obj is not None:
+                    kwargs["aad2_configuration"] = aad2_obj
+                return ResourceSpecificInformation(**kwargs)
+            elif sch_key in Resource_Specific_Information_Registry:
+                model_cls = Resource_Specific_Information_Registry[sch_key]
                 return model_cls(**v)
         return v
 
@@ -450,6 +489,45 @@ class InstanceConfig(BaseModel):
             log.debug("the serviceID is NOT found in secure_inputs_paths.")
             return None
         return self.secure_inputs_paths[entity]
+
+    def get_aad2_configuration(self, target_host: Optional[str] = None) -> Optional[AAD2_Configuration]:
+        """
+        Return the AAD2_Configuration for a specific host, or for the host that supports AD,
+        or for localhost.
+        """
+        if not self.hosts:
+            return None
+
+        # 1. If target_host is specified, search for it
+        if target_host:
+            for host in self.hosts:
+                if host.name == target_host or host.address == target_host:
+                    return host.get_aad2_configuration()
+            return None
+
+        # 2. Check localhost
+        local_host = self.get_localhost()
+        if local_host:
+            cfg = local_host.get_aad2_configuration()
+            if cfg:
+                return cfg
+
+        # 3. Check hosts that support AD (AntibodyDocking)
+        for host in self.hosts:
+            if host.entities_available:
+                for ent in host.entities_available:
+                    if (hasattr(ent, "value") and ent.value == "AD") or str(ent) in ("AD", "AntibodyDocking"):
+                        cfg = host.get_aad2_configuration()
+                        if cfg:
+                            return cfg
+
+        # 4. Fall back to any host that has aad2_configuration
+        for host in self.hosts:
+            cfg = host.get_aad2_configuration()
+            if cfg:
+                return cfg
+
+        return None
 
     @property
     def default_local_parameters(self) -> Dict[str, Dict[str, str]]:

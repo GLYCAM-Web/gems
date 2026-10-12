@@ -13,7 +13,7 @@ log = Set_Up_Logging(__name__)
 class Antibody_Response_Manager(Response_Manager):
 
     def populate_response_entity(self, existing_response_entity):
-        log.info("populate_response_entity for GlycoProtein_Response_Manager is called")
+        log.info("populate_response_entity for Antibody_Response_Manager is called")
         if self.response_entity is None:
             log.debug("in populate_response_entity, existing_response_entity cannot be None")
             raise ValueError ("In populate_response_entity, existing_response_entity cannot be None")
@@ -38,6 +38,8 @@ class Antibody_Response_Manager(Response_Manager):
             self.response_entity.responses.add_response(
                 key_string=aaop.Dictionary_Name, response=this_response
             )
+            if hasattr(this_response, "notices") and this_response.notices:
+                self.response_entity.notices.extend(this_response.notices)
 
         log.debug("the response entity is: ")
         log.debug(self.response_entity.json(indent=2))
@@ -47,5 +49,6 @@ class Antibody_Response_Manager(Response_Manager):
 
     def generate_response_entity(self):
         self.response_entity = Antibody_Entity(type="AntibodyDocking")
+        return self.response_entity
 
 

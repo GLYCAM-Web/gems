@@ -131,6 +131,96 @@ class TestAntibodyDataFlow(unittest.TestCase):
         self.assertEqual(eval_aaop.The_AAO.inputs.pUUID, self.puuid)
         self.assertEqual(build_aaop.The_AAO.inputs.pUUID, self.puuid)
 
+    def test_project_management_missing_path_returns_notice(self):
+        from unittest.mock import patch
+        from gemsModules.complex.antibody.services.ProjectManagement.server import Serve
+
+        pm_inputs = ProjectManagement_Inputs(
+            pUUID=self.puuid,
+            projectDir=os.path.join(self.temp_dir, "missing_path_proj"),
+            resources=Resources(__root__=[self.ab_resource, self.lig_resource])
+        )
+
+        with patch.dict(os.environ, {}, clear=True), \
+             patch("gemsModules.complex.antibody.services.ProjectManagement.logic.resolve_aad2_configuration", return_value=None):
+            # 1. Test logic execution directly
+            outputs = execute_pm(pm_inputs)
+            self.assertIsNotNone(outputs.notices)
+            self.assertIsNotNone(outputs.notices.__root__)
+            notice = next((n for n in outputs.notices.__root__ if n.Brief == "PathNotConfigured"), None)
+            self.assertIsNotNone(notice, "Expected PathNotConfigured notice in outputs")
+            self.assertEqual(notice.Type, "Error")
+            self.assertEqual(notice.Code, "404")
+            self.assertIn("not configured", notice.Message)
+
+            # 2. Test through Serve
+            pm_req = ProjectManagement_Request(inputs=pm_inputs)
+            resp = Serve(pm_req)
+            self.assertIsNotNone(resp.notices)
+            self.assertIsNotNone(resp.notices.__root__)
+            resp_notice = next((n for n in resp.notices.__root__ if n.Brief == "PathNotConfigured"), None)
+            self.assertIsNotNone(resp_notice, "Expected PathNotConfigured notice in response")
+            self.assertEqual(resp_notice.Type, "Error")
+
+    def test_project_management_env_override(self):
+        from unittest.mock import patch
+        custom_env_dir = os.path.join(self.temp_dir, "custom_env_aad2")
+        env_proj_dir = os.path.join(self.temp_dir, "env_proj")
+
+        pm_inputs = ProjectManagement_Inputs(
+            pUUID=self.puuid,
+            projectDir=env_proj_dir,
+            resources=Resources(__root__=[self.ab_resource, self.lig_resource])
+        )
+
+        with patch.dict(os.environ, {"AAD2_DOCKER_HOME": custom_env_dir}):
+            outputs = execute_pm(pm_inputs)
+            self.assertTrue(os.path.exists(os.path.join(env_proj_dir, "ad2config")))
+            with open(os.path.join(env_proj_dir, "ad2config"), "r") as f:
+                content = f.read()
+                self.assertTrue(
+                    f'AAD2_DOCKER_HOME="{custom_env_dir}"' in content or
+                    f"AAD2_DOCKER_HOME='{custom_env_dir}'" in content
+                )
+                self.assertTrue(
+                    f'AAD2_CLI_BIN_PATH="{custom_env_dir}/image/AAD2/bin"' in content or
+                    f"AAD2_CLI_BIN_PATH='{custom_env_dir}/image/AAD2/bin'" in content
+                )
+
+    def test_response_manager_aggregates_service_notices(self):
+        from gemsModules.common.action_associated_objects import AAOP_Tree_Pair, AAOP_Tree, Annotated_List
+        from gemsModules.complex.antibody.services.ProjectManagement.api import ProjectManagement_Response
+        from gemsModules.complex.antibody.services.response_manager import Antibody_Response_Manager
+
+        pm_req = ProjectManagement_Request(
+            inputs=ProjectManagement_Inputs(pUUID=self.puuid, projectDir=self.project_dir)
+        )
+        pm_resp = ProjectManagement_Response()
+        pm_resp.notices.addNotice(
+            Brief="TestWarning",
+            Scope="Service",
+            Messenger="AD",
+            Type="Warning",
+            Code="300",
+            Message="Test notice message",
+        )
+
+        req_pkg = AAOP(AAO_Type="ProjectManagement", The_AAO=pm_req, Dictionary_Name="PM")
+        resp_pkg = AAOP(AAO_Type="ProjectManagement", The_AAO=pm_resp, Dictionary_Name="PM")
+
+        tree_pair = AAOP_Tree_Pair(
+            input_tree=AAOP_Tree(packages=Annotated_List([req_pkg])),
+            output_tree=AAOP_Tree(packages=Annotated_List([resp_pkg]))
+        )
+
+        rm = Antibody_Response_Manager(aaop_tree_pair=tree_pair)
+        resp_entity = rm.process()
+        self.assertIsNotNone(resp_entity.notices)
+        self.assertIsNotNone(resp_entity.notices.__root__)
+        aggregated = next((n for n in resp_entity.notices.__root__ if n.Brief == "TestWarning"), None)
+        self.assertIsNotNone(aggregated)
+        self.assertEqual(aggregated.Message, "Test notice message")
+
 
 if __name__ == "__main__":
     unittest.main()
