@@ -41,6 +41,24 @@ def create_ad2config(
     vmd_h = vmd_home or (aad2_config.vmd_home if aad2_config else None) or ""
     vmd_l = vmd_lib or (aad2_config.vmd_lib if aad2_config else None) or ""
 
+    # If the config already exists and incoming names are None or empty, preserve existing values
+    if os.path.exists(path):
+        if not antibodytibody or not glycan:
+            try:
+                with open(path, "r") as f:
+                    for line in f:
+                        line_str = line.strip()
+                        if line_str.startswith("Antibody_File_Name=") and not antibodytibody:
+                            val = line_str.split("=", 1)[1].strip("\"'")
+                            if val and val != "None":
+                                antibodytibody = val
+                        elif line_str.startswith("Glycan_File_Name=") and not glycan:
+                            val = line_str.split("=", 1)[1].strip("\"'")
+                            if val and val != "None":
+                                glycan = val
+            except Exception as e:
+                log.warning(f"Could not read existing ad2config: {e}")
+
     Default_AD2_CONFIG = textwrap.dedent(f"""#!/usr/bin/env bash
 
     Log_File="ad2.log" 
@@ -73,9 +91,24 @@ def create_ad2config(
     with open(path, "w") as f:
         f.write(Default_AD2_CONFIG)
 
-def create_gwconfig(path, puuid):
+def create_gwconfig(path, puuid, partition=None, batch_cpus=None):
+    if partition is None or batch_cpus is None:
+        try:
+            from gemsModules.configuration.main_api import session_instance_config
+            batch_args = session_instance_config.get_batch_computing_arguments_for_context("AD")
+            if partition is None:
+                partition = batch_args.get("partition", "")
+            if batch_cpus is None:
+                batch_cpus = batch_args.get("cpus-per-task", batch_args.get("tasks-per-node", "28"))
+        except Exception as e:
+            log.warning(f"Could not resolve batch computing arguments for gwconfig: {e}")
+
+    partition_line = f"PARTITION='{partition}'" if partition else "PARTITION=''"
+    batch_cpus_val = str(batch_cpus) if batch_cpus else "28"
+
     Default_GW_CONFIG = textwrap.dedent(f"""\
-    DOCKING_REPLICA_BATCH_CPUS='56' # can differ from the cpus specified for vina-carb to use
+    {partition_line}
+    DOCKING_REPLICA_BATCH_CPUS='{batch_cpus_val}' # can differ from the cpus specified for vina-carb to use
     ##AAD2_BASE_PATH="" # override if needed
     ##AAD2_DOCKER_HOME="" # override if needed
     SUBMIT_FILE_NAME="slurm_submit.bash"
@@ -86,6 +119,7 @@ def create_gwconfig(path, puuid):
     
     with open(path, "w") as f:
         f.write(Default_GW_CONFIG)
+
 
 def create_vcconfig(path):
     Default_VC_CONFIG = textwrap.dedent(f"""\

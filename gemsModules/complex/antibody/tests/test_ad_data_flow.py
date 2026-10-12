@@ -77,7 +77,25 @@ class TestAntibodyDataFlow(unittest.TestCase):
             self.assertIn("Antibody_File_Name=\"test_ab.pdb\"", content)
             self.assertIn("Glycan_File_Name=\"test_lig.pdb\"", content)
 
+        with open(os.path.join(self.project_dir, "gwconfig"), "r") as f:
+            gw_content = f.read()
+            self.assertIn("PARTITION=", gw_content)
+            self.assertIn("DOCKING_REPLICA_BATCH_CPUS=", gw_content)
+
+        # Subsequent run without resources should preserve existing filenames in ad2config
+        pm_inputs_no_res = ProjectManagement_Inputs(
+            pUUID=self.puuid,
+            projectDir=self.project_dir,
+            resources=Resources(__root__=[])
+        )
+        execute_pm(pm_inputs_no_res)
+        with open(os.path.join(self.project_dir, "ad2config"), "r") as f:
+            content_after = f.read()
+            self.assertIn("Antibody_File_Name=\"test_ab.pdb\"", content_after)
+            self.assertIn("Glycan_File_Name=\"test_lig.pdb\"", content_after)
+
     def test_update_build_options_supports_aliases(self):
+
         pm_inputs = ProjectManagement_Inputs(
             pUUID=self.puuid,
             projectDir=self.project_dir,

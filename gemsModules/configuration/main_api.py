@@ -595,6 +595,11 @@ class InstanceConfig(BaseModel):
 
         args = {}
         if target_host and target_host.batch_computing_resources and target_entity:
+            cpu_equiv = "core"
+            if target_host.resource_specific_information:
+                cpu_equiv = getattr(target_host.resource_specific_information, "cpu_hardware_equivalent", "core") or "core"
+            cpu_equiv = str(cpu_equiv).lower()
+
             for bcr in target_host.batch_computing_resources:
                 if bcr.supported_entities and target_entity in bcr.supported_entities:
                     if bcr.partition:
@@ -603,10 +608,16 @@ class InstanceConfig(BaseModel):
                         args["nodes"] = str(bcr.max_nodes_per_job)
                     if bcr.max_time_limit:
                         args["time"] = str(bcr.max_time_limit)
-                    if bcr.max_threads_per_node:
-                        args["tasks-per-node"] = str(bcr.max_threads_per_node)
-                    elif bcr.max_cores_per_node:
-                        args["tasks-per-node"] = str(bcr.max_cores_per_node)
+
+                    if cpu_equiv == "core":
+                        cpu_count = bcr.max_cores_per_node or bcr.max_threads_per_node
+                    else:
+                        cpu_count = bcr.max_threads_per_node or bcr.max_cores_per_node
+
+                    if cpu_count:
+                        args["tasks-per-node"] = str(cpu_count)
+                        args["cpus-per-task"] = str(cpu_count)
+
                     if bcr.max_gpus_per_node and int(bcr.max_gpus_per_node) > 0:
                         args["gres"] = f"gpu:{bcr.max_gpus_per_node}"
                     break
@@ -616,7 +627,9 @@ class InstanceConfig(BaseModel):
         args.setdefault("nodes", "1")
         args.setdefault("time", "120")
         args.setdefault("tasks-per-node", "4")
+        args.setdefault("cpus-per-task", args["tasks-per-node"])
         return args
+
 
     def check_remote_host_connectivity(self, host_name: str) -> Dict[str, Any]:
         """
