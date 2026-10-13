@@ -5,6 +5,7 @@ from datetime import datetime
 from gemsModules.logging.logger import Set_Up_Logging
 from gemsModules.configuration.main_api import session_instance_config
 from gemsModules.common.main_api_provenance import (
+    normalize_storage_root,
     translate_request_paths,
     translate_response_paths,
 )
@@ -42,10 +43,14 @@ def receive(incomingString: str) -> str:
     local_fs_path = None
     try:
         local_sec_path = session_instance_config.get_secure_inputs_path_by_service_ID(serviceID=requested_entity)
+        if local_sec_path:
+            local_sec_path = normalize_storage_root(local_sec_path)
     except Exception:
         pass
     try:
         local_fs_path = session_instance_config.get_filesystem_path_by_service_ID(serviceID=requested_entity)
+        if local_fs_path:
+            local_fs_path = normalize_storage_root(local_fs_path)
     except Exception:
         pass
 

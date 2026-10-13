@@ -21,16 +21,34 @@ class Provenance(BaseModel):
     execution_host: Optional[HostContext] = Field(default_factory=HostContext)
 
 
+def normalize_storage_root(prefix: Optional[str]) -> Optional[str]:
+    """
+    Extracts the base storage root up to and including 'uploads' or 'userdata'
+    if present in the prefix, removing any entity/service subdirectories.
+    """
+    if not prefix:
+        return prefix
+    norm = os.path.normpath(prefix)
+    parts = norm.split(os.sep)
+    for root_marker in ("uploads", "userdata"):
+        if root_marker in parts:
+            idx = parts.index(root_marker)
+            return os.sep.join(parts[:idx + 1])
+    return norm
+
+
 def translate_path_prefix(path_str: Optional[str], from_prefix: Optional[str], to_prefix: Optional[str]) -> Optional[str]:
     """
     Translate path prefix from from_prefix to to_prefix.
     Ensures safe prefix boundary checking (directory boundary).
+    Normalizes storage prefixes through 'uploads' or 'userdata' so service/entity
+    subdirectories (e.g. 'complex/ad') remain intact.
     """
     if not path_str or not from_prefix or not to_prefix or from_prefix == to_prefix:
         return path_str
 
-    from_norm = os.path.normpath(from_prefix)
-    to_norm = os.path.normpath(to_prefix)
+    from_norm = normalize_storage_root(from_prefix)
+    to_norm = normalize_storage_root(to_prefix)
     p_norm = os.path.normpath(path_str)
 
     if p_norm == from_norm:
