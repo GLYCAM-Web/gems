@@ -454,9 +454,19 @@ class InstanceConfig(BaseModel):
 
     def get_filesystem_path_by_service_ID(self, serviceID: str):
         log.info("get_filesystem_path_by_service_ID is called.")
+        mapping = {
+            "MDaaS-RunMD": "MD",
+            "MDaaS": "MD",
+            "Sequence-Build3DStructure": "CB",
+            "AntibodyDocking": "AD",
+            "Antibody": "AD",
+            "Glycomimetics": "GM",
+            "GlycoProtein": "GP",
+        }
+        lookup_id = mapping.get(serviceID, serviceID)
         entity = None
         for e in SupportedEntities:
-            if e.value == serviceID or e.name == serviceID.lower():
+            if e.value == lookup_id or e.name == str(lookup_id).lower() or e.value == serviceID or e.name == str(serviceID).lower():
                 entity = e
                 break
         if entity is None:
@@ -486,9 +496,19 @@ class InstanceConfig(BaseModel):
         if self.secure_inputs_paths is None:
             log.debug("self.secure_inputs_paths is None")
             return None
+        mapping = {
+            "MDaaS-RunMD": "MD",
+            "MDaaS": "MD",
+            "Sequence-Build3DStructure": "CB",
+            "AntibodyDocking": "AD",
+            "Antibody": "AD",
+            "Glycomimetics": "GM",
+            "GlycoProtein": "GP",
+        }
+        lookup_id = mapping.get(serviceID, serviceID)
         entity = None
         for e in SupportedEntities:
-            if e.value == serviceID or e.name == serviceID.lower():
+            if e.value == lookup_id or e.name == str(lookup_id).lower() or e.value == serviceID or e.name == str(serviceID).lower():
                 entity = e
                 break
         if entity is None:

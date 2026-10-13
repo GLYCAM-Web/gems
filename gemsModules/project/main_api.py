@@ -2,12 +2,13 @@
 import os
 import uuid
 import traceback
-from typing import Any, List, Dict
+from typing import Any, List, Dict, Optional
 from datetime import datetime
 
 from pydantic import BaseModel, constr
 
 from gemsModules.common.main_api_notices import Notice
+from gemsModules.common.main_api_provenance import Provenance
 from gemsModules.configuration.main_api import session_instance_config 
 from gemsModules.systemoperations.filesystem_ops import directory_is_writable
 from gemsModules.systemoperations.environment_ops import getGemsExecutionContext
@@ -125,6 +126,7 @@ class Project(BaseModel):
     execution_host_supported_contexts : List[str] = []
     ## Populated for localhost ONLY 
     ## Copied in from the instance config
+    provenance : Optional[Provenance] = None
 
 
     def __init__(self, **data : Any):

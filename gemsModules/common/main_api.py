@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 from abc import ABC, abstractmethod
-from pydantic import BaseModel, Field
-from typing import Dict, List
+from pydantic import BaseModel, Field, root_validator
+from typing import Dict, List, Optional
 
 import traceback
 
 from gemsModules.common import settings as settings_main
 from gemsModules.common.main_api_entity import Entity
 from gemsModules.common.main_api_notices import Notices
+from gemsModules.common.main_api_provenance import HostContext, Provenance
 from gemsModules.project.main_api import Project
 
 from gemsModules.logging.logger import Set_Up_Logging
@@ -31,10 +32,32 @@ class Common_API(BaseModel):
             )# Should NOT be set by the user
     initial_receiver: str = "" ## Set by the delegator that received the initial delegation request
     execution_host: str = "" ## Set by the host that fulfilled the request
+    provenance: Optional[Provenance] = None
     ##
     options: Dict[str, str] = Field(
         None, description="Key-value pairs that apply to the entire transaction."
     )
+
+    @root_validator(pre=False)
+    def sync_provenance_and_legacy_fields(cls, values):
+        prov = values.get("provenance")
+        init_rec = values.get("initial_receiver")
+        exec_host = values.get("execution_host")
+        init_ts = values.get("initiation_timestamp")
+
+        if prov is not None:
+            if not init_rec and prov.initial_receiver and prov.initial_receiver.name:
+                values["initial_receiver"] = prov.initial_receiver.name
+            if not exec_host and prov.execution_host and prov.execution_host.name:
+                values["execution_host"] = prov.execution_host.name
+            if not init_ts and prov.initial_receiver and prov.initial_receiver.timestamp:
+                values["initiation_timestamp"] = prov.initial_receiver.timestamp
+        elif init_rec or exec_host or init_ts:
+            values["provenance"] = Provenance(
+                initial_receiver=HostContext(name=init_rec or "", timestamp=init_ts or ""),
+                execution_host=HostContext(name=exec_host or ""),
+            )
+        return values
 
     def copy_procedural_options_to_entity(self):
         if self.prettyPrint is not None:
