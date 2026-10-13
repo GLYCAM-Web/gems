@@ -73,13 +73,39 @@ class ConfigManager(ABC):
                 if isinstance(h, dict):
                     name = h.get("name") or h.get("host") or str(i)
                     h_copy = h.copy()
+                    h_copy["name"] = name
                     if "host" not in h_copy and "address" in h_copy:
                         h_copy["host"] = h_copy["address"]
+                    if "address" not in h_copy and "host" in h_copy:
+                        h_copy["address"] = h_copy["host"]
+                    if "slurmport" not in h_copy and "port" in h_copy:
+                        h_copy["slurmport"] = h_copy["port"]
+                    if "port" not in h_copy and "slurmport" in h_copy:
+                        h_copy["port"] = h_copy["slurmport"]
                     if "contexts" not in h_copy and "entities_available" in h_copy:
                         h_copy["contexts"] = [e.value if hasattr(e, "value") else str(e) for e in h_copy["entities_available"]]
+                    if "entities_available" not in h_copy and "contexts" in h_copy:
+                        h_copy["entities_available"] = h_copy["contexts"]
                     hosts_dict[name] = h_copy
             config = config.copy()
             config["hosts"] = hosts_dict
+        elif isinstance(config, dict) and isinstance(config.get("hosts"), dict):
+            for name, h_copy in config["hosts"].items():
+                if isinstance(h_copy, dict):
+                    if "name" not in h_copy:
+                        h_copy["name"] = name
+                    if "host" not in h_copy and "address" in h_copy:
+                        h_copy["host"] = h_copy["address"]
+                    if "address" not in h_copy and "host" in h_copy:
+                        h_copy["address"] = h_copy["host"]
+                    if "slurmport" not in h_copy and "port" in h_copy:
+                        h_copy["slurmport"] = h_copy["port"]
+                    if "port" not in h_copy and "slurmport" in h_copy:
+                        h_copy["port"] = h_copy["slurmport"]
+                    if "contexts" not in h_copy and "entities_available" in h_copy:
+                        h_copy["contexts"] = [e.value if hasattr(e, "value") else str(e) for e in h_copy["entities_available"]]
+                    if "entities_available" not in h_copy and "contexts" in h_copy:
+                        h_copy["entities_available"] = h_copy["contexts"]
         self._config = config
 
     @abstractmethod
@@ -103,12 +129,38 @@ class ConfigManager(ABC):
                 if isinstance(h, dict):
                     name = h.get("name") or h.get("host") or str(i)
                     h_copy = h.copy()
+                    h_copy["name"] = name
                     if "host" not in h_copy and "address" in h_copy:
                         h_copy["host"] = h_copy["address"]
+                    if "address" not in h_copy and "host" in h_copy:
+                        h_copy["address"] = h_copy["host"]
+                    if "slurmport" not in h_copy and "port" in h_copy:
+                        h_copy["slurmport"] = h_copy["port"]
+                    if "port" not in h_copy and "slurmport" in h_copy:
+                        h_copy["port"] = h_copy["slurmport"]
                     if "contexts" not in h_copy and "entities_available" in h_copy:
                         h_copy["contexts"] = [e.value if hasattr(e, "value") else str(e) for e in h_copy["entities_available"]]
+                    if "entities_available" not in h_copy and "contexts" in h_copy:
+                        h_copy["entities_available"] = h_copy["contexts"]
                     hosts_dict[name] = h_copy
             instance_config["hosts"] = hosts_dict
+        elif isinstance(instance_config, dict) and isinstance(instance_config.get("hosts"), dict):
+            for name, h_copy in instance_config["hosts"].items():
+                if isinstance(h_copy, dict):
+                    if "name" not in h_copy:
+                        h_copy["name"] = name
+                    if "host" not in h_copy and "address" in h_copy:
+                        h_copy["host"] = h_copy["address"]
+                    if "address" not in h_copy and "host" in h_copy:
+                        h_copy["address"] = h_copy["host"]
+                    if "slurmport" not in h_copy and "port" in h_copy:
+                        h_copy["slurmport"] = h_copy["port"]
+                    if "port" not in h_copy and "slurmport" in h_copy:
+                        h_copy["port"] = h_copy["slurmport"]
+                    if "contexts" not in h_copy and "entities_available" in h_copy:
+                        h_copy["contexts"] = [e.value if hasattr(e, "value") else str(e) for e in h_copy["entities_available"]]
+                    if "entities_available" not in h_copy and "contexts" in h_copy:
+                        h_copy["entities_available"] = h_copy["contexts"]
 
         return instance_config
 

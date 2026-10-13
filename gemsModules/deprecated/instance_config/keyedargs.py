@@ -27,7 +27,10 @@ class KeyedArgManager(HostManager):
         self, key: ConfigurationKeys, context="Default"
     ) -> Dict:
         """Returns the default keyed arguments for a given context."""
-        return self.config[f"default_{key}"][context]
+        def_dict = self.config.get(f"default_{key}", {})
+        if isinstance(def_dict, dict) and context in def_dict:
+            return def_dict[context].copy() if isinstance(def_dict[context], dict) else def_dict[context]
+        return {}
 
     def get_keyed_arguments_by_context(
         self, key: ConfigurationKeys, context

@@ -149,7 +149,12 @@ class InstanceConfig(KeyedArgManager, FileSystemPathsMixin, UploadsPathsMixin):
             name += ".template"
         name += ".json"
 
-        return Path(os.getenv("GEMSHOME", "")) / name
+        p = Path(os.getenv("GEMSHOME", "")) / name
+        if template and not p.exists():
+            example_p = Path(os.getenv("GEMSHOME", "")) / "instance_config.json.example"
+            if example_p.exists():
+                return example_p
+        return p
 
     # TODO: Context needs an enum.
     # TODO: Now that there are two competing uses of 'context' in the codebase, it doesn't just need an enum.

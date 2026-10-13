@@ -42,6 +42,10 @@ class DateReversioner:
     def set_new_config_data(self, config: Dict):
         # Because this doesn't use a path, unset it.
         self._new_version = None
+        if isinstance(config, dict) and isinstance(config.get("hosts"), dict):
+            if self.old_version and isinstance(self.old_version.get("hosts"), list):
+                config = config.copy()
+                config["hosts"] = list(config["hosts"].values())
         self._new_version_data = config
 
     def set_new_config_path(self, config_path: Path):
