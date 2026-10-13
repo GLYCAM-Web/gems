@@ -19,7 +19,14 @@ from email.message import EmailMessage
 import mimetypes
 from pathlib import Path
 import tempfile
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import Any, Dict, List, Optional, Union
+try:
+    from typing import Literal
+except ImportError:
+    try:
+        from typing_extensions import Literal
+    except ImportError:
+        from pydantic.typing import Literal
 import urllib.request
 
 try:

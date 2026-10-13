@@ -1,11 +1,9 @@
 import os, sys
 
 def activate_gems_venv():
-    try:
-        import grpc
+    if os.path.exists("/.dockerenv") or os.path.exists("/run/.containerenv"):
+        # Container environment already has required dependencies installed globally
         return
-    except ImportError:
-        pass
     gems_home = os.environ.get("GEMSHOME")
     if not gems_home or not os.path.exists(gems_home):
         file_dir = os.path.dirname(os.path.abspath(__file__))
@@ -115,7 +113,7 @@ class JSON_Delegator(json_pb2_grpc.JSONServicer):
             print("Hello from json_server.py JSON_Delegator() 1000")
             #start = time.time()
             theStdin=request.input.encode('utf-8')
-            p = subprocess.run(jobsubmissioncommand, input=theStdin, capture_output=True, shell=False) 
+            p = subprocess.run([sys.executable, jobsubmissioncommand], input=theStdin, capture_output=True, shell=False) 
             #end1 = time.time()
             outputhere = p.stdout
             errorshere = p.stderr

@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
 from pydantic import BaseModel, Field
-from typing import List, Literal, Optional, Union, Any
+from typing import List, Optional, Union, Any
+try:
+    from typing import Literal
+except ImportError:
+    try:
+        from typing_extensions import Literal
+    except ImportError:
+        from pydantic.typing import Literal
 
 from gemsModules.common.main_api_resources import Resource
 from gemsModules.common.code_utils import GemsStrEnum

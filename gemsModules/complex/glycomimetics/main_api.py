@@ -1,4 +1,10 @@
-from typing import Literal
+try:
+    from typing import Literal
+except ImportError:
+    try:
+        from typing_extensions import Literal
+    except ImportError:
+        from pydantic.typing import Literal
 from pydantic import Field
 from pydantic.typing import Literal as pyLiteral
 

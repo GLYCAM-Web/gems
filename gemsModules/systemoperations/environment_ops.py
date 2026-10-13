@@ -30,15 +30,12 @@ def find_instance_config() -> str:
 def activate_gems_venv(file_path: str = None) -> None:
     """
     Detects if a virtual environment exists in GEMSHOME, user config, or .gemsrc.
-    If present and current python environment lacks dependencies (e.g. grpc),
+    If present and not running in a container,
     sets VIRTUAL_ENV, prepends .venv/bin to PATH for subprocesses, and re-executes.
     """
-    try:
-        import grpc
-        # Current python environment already has required dependencies (e.g., container python)
+    if os.path.exists("/.dockerenv") or os.path.exists("/run/.containerenv"):
+        # Container environment already has required dependencies installed globally
         return
-    except ImportError:
-        pass
 
     from gemsModules.configuration.user_config import get_effective_gemshome, get_effective_venv_path
 
