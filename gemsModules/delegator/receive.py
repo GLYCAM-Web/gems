@@ -31,8 +31,18 @@ def process(incomingString: str) -> str:
 def receive(incomingString: str) -> str:
     log.info("Delegator's receive was called")
 
-    tmp_dict = json.loads(incomingString)
-    requested_entity = tmp_dict["entity"]["type"]
+    try:
+        tmp_dict = json.loads(incomingString)
+        requested_entity = tmp_dict["entity"]["type"]
+    except Exception as e:
+        log.error(f"Failed to parse incoming request JSON or entity type: {e}")
+        from gemsModules.common.main_api import common_Transaction
+        trans = common_Transaction()
+        trans.generate_error_response(
+            Brief="InvalidInput",
+            AdditionalInfo={"error": str(e)}
+        )
+        return trans.get_outgoing_string()
     log.debug("The requested entity is : " + requested_entity)
     local_host_name = session_instance_config.get_localhost_hostName()
     localhost = session_instance_config.get_localhost()
@@ -126,8 +136,19 @@ def receive(incomingString: str) -> str:
         log.info("The requested entity is NOT delegator. Redirecting")
         log.debug("Delegating incoming string to entity: " + requested_entity)
         from gemsModules.delegator.redirector_settings import module_loader
-        entity_module = module_loader.get_module_attr(requested_entity)
-        raw_response = entity_module(incoming_string)
+        try:
+            entity_module = module_loader.get_module_attr(requested_entity)
+        except (ValueError, KeyError) as e:
+            log.error(f"Unknown or invalid entity requested '{requested_entity}': {e}")
+            from gemsModules.common.main_api import common_Transaction
+            trans = common_Transaction()
+            trans.generate_error_response(
+                Brief="InvalidInput",
+                AdditionalInfo={"error": f"Unknown entity: {requested_entity}"}
+            )
+            raw_response = trans.get_outgoing_string()
+        else:
+            raw_response = entity_module(incoming_string)
 
     # Translate paths in reverse (execution_host -> initial_receiver)
     try:

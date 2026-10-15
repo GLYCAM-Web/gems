@@ -132,6 +132,8 @@ def buildEach3DStructureInStructureInfo(thisTransaction: sequenceio.Transaction)
             # add symLink in Existing to Sequences/SequenceID/defaults/All_builds/conformerID.
             log.debug("Found an existing structure for " + buildState.structureDirectoryName)
             buildDir = "Existing_Builds/"
+            buildState.setIsNewBuild(False)
+            buildState.setAbsoluteConformerPath(buildDir)
             sequenceProjects.addBuildFolderSymLinkToExistingConformer(
                 thisServiceDir, thisSeqID, thisBuildStrategyID, thisPuuID, buildState.structureDirectoryName
             )
@@ -150,7 +152,11 @@ def buildEach3DStructureInStructureInfo(thisTransaction: sequenceio.Transaction)
         
     if len(newBuildsOnly) == 0:
         log.debug("No new builds to process, zipping the top level project directory.")
-        
+        thisTransaction.build_outgoing_string()
+        outgoingPath = os.path.join(thisProjectDir, "logs", "response.json")
+        log.debug("Updating response.json for existing builds: " + outgoingPath)
+        writeStringToFile(thisTransaction.outgoing_string, outgoingPath)
+
         # Normally MD_Utils handles this, but if no new builds are created, then it never gets called.
         # So we do it here when there are no new builds.
         zip_toplevel_dir_wrapper(
@@ -192,6 +198,7 @@ def buildEach3DStructureInStructureInfo(thisTransaction: sequenceio.Transaction)
 
             buildDir = "New_Builds/"
             buildState.setIsNewBuild(True)
+            buildState.setAbsoluteConformerPath(buildDir)
             outputDirPath = buildState.getAbsoluteConformerPath()
             sequenceProjects.createConformerDirectoryInBuildsDirectory(
                 thisProjectDir, buildState.structureDirectoryName
@@ -244,6 +251,11 @@ def buildEach3DStructureInStructureInfo(thisTransaction: sequenceio.Transaction)
                 thisBuildStrategyID,
                 thisTransaction
             )
+
+        thisTransaction.build_outgoing_string()
+        outgoingPath = os.path.join(thisProjectDir, "logs", "response.json")
+        log.debug("Updating response.json for new builds: " + outgoingPath)
+        writeStringToFile(thisTransaction.outgoing_string, outgoingPath)
 
 # TODO: Replace this with more generically useful: build3DStructure(transaction, service)
 # Needs to work whether default structure or specific rotamers are requested.

@@ -40,6 +40,8 @@ def create_ad2config(
     img_file_path = aad2_image_file_path or (aad2_config.aad2_image_file_path if aad2_config else None) or (os.path.join(docker_home, "image_files") if docker_home else "")
     vmd_h = vmd_home or (aad2_config.vmd_home if aad2_config else None) or ""
     vmd_l = vmd_lib or (aad2_config.vmd_lib if aad2_config else None) or ""
+    if vmd_l and (vmd_l.rstrip("/").endswith("/vmd") or vmd_l.rstrip("/").endswith(os.sep + "vmd")):
+        vmd_l = os.path.dirname(vmd_l.rstrip("/"))
 
     # If the config already exists and incoming names are None or empty, preserve existing values
     if os.path.exists(path):

@@ -14,7 +14,9 @@ REGISTRY = {
     "Glycomimetics": ModuleData('gemsModules.complex.glycomimetics.receive', 'receive'),
     "GlycoProtein": ModuleData('gemsModules.conjugate.glycoprotein.receive', 'receive'),
     "Configuration": ModuleData('gemsModules.configuration.receive', 'receive'),
-    # Deprecated
+    # Delegator & Deprecated
+    "Delegator": ModuleData('gemsModules.delegator.receive', 'receive'),
+    "DeprecatedDelegator": ModuleData('gemsModules.deprecated.delegator.receive', 'delegate'),
     "BatchCompute": ModuleData('gemsModules.deprecated.delegator.receive', 'delegate'),
     "Conjugate": ModuleData('gemsModules.deprecated.delegator.receive', 'delegate'),
     "DrawGlycan": ModuleData('gemsModules.deprecated.delegator.receive', 'delegate'),
