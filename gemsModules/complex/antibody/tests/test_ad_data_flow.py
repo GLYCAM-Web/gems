@@ -48,7 +48,16 @@ class TestAntibodyDataFlow(unittest.TestCase):
             options={"filename": "test_lig.pdb"},
         )
 
+        self.orig_aad2_docker_home = os.environ.get("AAD2_DOCKER_HOME")
+        self.mock_aad2_home = os.path.join(self.temp_dir, "mock_aad2")
+        os.makedirs(self.mock_aad2_home, exist_ok=True)
+        os.environ["AAD2_DOCKER_HOME"] = self.mock_aad2_home
+
     def tearDown(self):
+        if self.orig_aad2_docker_home is not None:
+            os.environ["AAD2_DOCKER_HOME"] = self.orig_aad2_docker_home
+        else:
+            os.environ.pop("AAD2_DOCKER_HOME", None)
         shutil.rmtree(self.temp_dir, ignore_errors=True)
 
     def test_evaluate_and_build_inputs_have_project_dir(self):
@@ -264,6 +273,126 @@ class TestAntibodyDataFlow(unittest.TestCase):
             outputs, notices = execute_build(build_inputs, options=Build_Options(count=3, flexibility="rigid"))
             self.assertTrue(any(n.Brief == "Build Successful" for n in notices.__root__))
 
+    def test_interface_evaluation_followed_by_build(self):
+        """
+        End-to-end interface test:
+        1. Submits evaluation request JSON through Antibody_Json_String_Manager.
+           Verifies ProjectManagement creates ad2config, gwconfig, vcconfig,
+           and Evaluate returns success without running actual AAD2 evaluate execution.
+        2. Submits build request JSON using the assigned pUUID and options.
+           Verifies Build updates options in ad2config and returns success
+           without running actual AAD2 build execution.
+        """
+        import json
+        from unittest.mock import patch, MagicMock
+        from gemsModules.complex.antibody.json_string_manager import Antibody_Json_String_Manager
+
+        # Step 1: Evaluation request matching website / GEMS schema
+        eval_request_json = {
+            "entity": {
+                "type": "AntibodyDocking",
+                "services": {
+                    "evaluation_of_pdb": {
+                        "type": "Evaluate",
+                        "inputs": {
+                            "resources": [
+                                {
+                                    "locationType": "filesystem-path-unix",
+                                    "resourceFormat": "chemical/pdb",
+                                    "resourceRole": "Antibody",
+                                    "payload": self.ab_file,
+                                },
+                                {
+                                    "locationType": "filesystem-path-unix",
+                                    "resourceFormat": "chemical/pdb",
+                                    "resourceRole": "Ligand",
+                                    "payload": self.lig_file,
+                                },
+                            ],
+                        },
+                    }
+                },
+            },
+            "prettyPrint": True,
+        }
+
+        mock_eval_res = MagicMock(returncode=0, stderr="")
+        mock_build_res = MagicMock(returncode=0, stderr="")
+
+        with patch("gemsModules.complex.antibody.tasks.run_ad_evaluate.execute", return_value=mock_eval_res), \
+             patch("gemsModules.complex.antibody.tasks.run_detect_sugars.execute", return_value="/tmp/fake_ring.txt"):
+            eval_manager = Antibody_Json_String_Manager()
+            err = eval_manager.process(incoming_string=json.dumps(eval_request_json))
+            self.assertIsNone(err, f"Evaluation processing failed: {err}")
+
+            eval_resp_str = eval_manager.transaction.get_outgoing_string()
+            eval_resp = json.loads(eval_resp_str)
+            self.assertEqual(eval_resp["entity"]["type"], "AntibodyDocking")
+
+            proj_info = eval_resp.get("project", {})
+            assigned_puuid = proj_info.get("pUUID")
+            self.assertIsNotNone(assigned_puuid)
+            project_dir = proj_info.get("project_dir")
+            self.assertIsNotNone(project_dir)
+            self.assertTrue(os.path.isdir(project_dir))
+
+            # Verify that ProjectManagement created all required config files
+            self.assertTrue(os.path.exists(os.path.join(project_dir, "ad2config")))
+            self.assertTrue(os.path.exists(os.path.join(project_dir, "gwconfig")))
+            self.assertTrue(os.path.exists(os.path.join(project_dir, "vcconfig")))
+
+        # Step 2: Build request following evaluation
+        build_request_json = {
+            "entity": {
+                "type": "AntibodyDocking",
+                "services": {
+                    "build": {
+                        "type": "Build",
+                        "inputs": {
+                            "pUUID": assigned_puuid,
+                            "resources": [
+                                {
+                                    "locationType": "filesystem-path-unix",
+                                    "resourceFormat": "chemical/pdb",
+                                    "resourceRole": "Antibody",
+                                    "payload": self.ab_file,
+                                },
+                                {
+                                    "locationType": "filesystem-path-unix",
+                                    "resourceFormat": "chemical/pdb",
+                                    "resourceRole": "Ligand",
+                                    "payload": self.lig_file,
+                                },
+                            ],
+                        },
+                        "options": {
+                            "Glycan_Flexibility": "Rigid",
+                            "Number_of_Replicas": 5,
+                        },
+                    }
+                },
+            },
+            "prettyPrint": True,
+        }
+
+        with patch("gemsModules.complex.antibody.tasks.run_ad_build.execute", return_value=mock_build_res):
+            build_manager = Antibody_Json_String_Manager()
+            berr = build_manager.process(incoming_string=json.dumps(build_request_json))
+            self.assertIsNone(berr, f"Build processing failed: {berr}")
+
+            build_resp_str = build_manager.transaction.get_outgoing_string()
+            build_resp = json.loads(build_resp_str)
+            self.assertEqual(build_resp["entity"]["type"], "AntibodyDocking")
+
+            # Verify that options in ad2config were updated
+            with open(os.path.join(project_dir, "ad2config"), "r") as f:
+                ad2_content = f.read()
+                self.assertTrue(
+                    'Glycan_Flexibility="Rigid"' in ad2_content or "Glycan_Flexibility='Rigid'" in ad2_content
+                )
+                self.assertTrue(
+                    'Number_of_Replicas="5"' in ad2_content or "Number_of_Replicas='5'" in ad2_content
+                )
 
 
 if __name__ == "__main__":

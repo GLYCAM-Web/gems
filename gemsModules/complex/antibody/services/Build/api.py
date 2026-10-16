@@ -83,15 +83,36 @@ class Build_Flexibilities(GemsStrEnum):
 
 class Build_Options(BaseModel):
     flexibility: Build_Flexibilities = Field(
-            Build_Flexibilities.partial,
-            description = "How much of the ligand should be flexible?"
-            )
+        Build_Flexibilities.partial,
+        description="How much of the ligand should be flexible?",
+        alias="Glycan_Flexibility",
+    )
     count: int = Field(
-            5,
-            description = "How many replicas/experiments to perform."
-            )
+        5,
+        description="How many replicas/experiments to perform.",
+        alias="Number_of_Replicas",
+    )
+
     class Config:
         use_enum_values = True
+        allow_population_by_field_name = True
+
+    @root_validator(pre=True)
+    def normalize_keys(cls, values):
+        if isinstance(values, dict):
+            if "flexibility" in values and "Glycan_Flexibility" not in values:
+                values["Glycan_Flexibility"] = values["flexibility"]
+            if "count" in values and "Number_of_Replicas" not in values:
+                values["Number_of_Replicas"] = values["count"]
+            # Convert string counts to int if needed
+            num_rep = values.get("Number_of_Replicas")
+            if isinstance(num_rep, str) and num_rep.isdigit():
+                values["Number_of_Replicas"] = int(num_rep)
+            # Normalize flexibility value (e.g. Rigid -> rigid)
+            flex_val = values.get("Glycan_Flexibility")
+            if isinstance(flex_val, str):
+                values["Glycan_Flexibility"] = flex_val.lower()
+        return values
 
 
 class Build_Request(Antibody_Service_Request):
