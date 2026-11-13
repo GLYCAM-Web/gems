@@ -3,14 +3,11 @@ from typing import Protocol, Dict, Optional
 from pydantic import BaseModel, validate_arguments
 from pathlib import Path
 
-from gemsModules.configuration.main_api import session_instance_config
-
+from gemsModules.complex.glycomimetics.services.common_api import get_gm_projects_root
 from gemsModules.complex.glycomimetics.services.Status.api import Status_Inputs, Status_Outputs
 
 from gemsModules.logging.logger import Set_Up_Logging
 log = Set_Up_Logging(__name__)
-
-GLYCOMIMETICS_PROJECTS_ROOT = session_instance_config.get_filesystem_path_by_service_ID("GM")
 
 # TODO: Determine project type, and return status of that project type
 def execute(inputs: Status_Inputs) -> Status_Outputs:
@@ -19,7 +16,7 @@ def execute(inputs: Status_Inputs) -> Status_Outputs:
     service_notices = Notices()
 
     # Check if the project exists
-    project_path = Path(GLYCOMIMETICS_PROJECTS_ROOT, inputs.pUUID)
+    project_path = get_gm_projects_root() / inputs.pUUID
     if not project_path.exists():
         service_outputs.status = "NotFound"
         service_outputs.details = f"Project not found at {project_path}"

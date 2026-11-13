@@ -636,7 +636,6 @@ class InstanceConfig(BaseModel):
 
                     if cpu_count:
                         args["tasks-per-node"] = str(cpu_count)
-                        args["cpus-per-task"] = str(cpu_count)
 
                     if bcr.max_gpus_per_node and int(bcr.max_gpus_per_node) > 0:
                         args["gres"] = f"gpu:{bcr.max_gpus_per_node}"
@@ -647,7 +646,6 @@ class InstanceConfig(BaseModel):
         args.setdefault("nodes", "1")
         args.setdefault("time", "120")
         args.setdefault("tasks-per-node", "4")
-        args.setdefault("cpus-per-task", args["tasks-per-node"])
         return args
 
 

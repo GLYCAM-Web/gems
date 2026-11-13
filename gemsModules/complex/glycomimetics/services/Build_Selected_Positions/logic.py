@@ -1,8 +1,7 @@
 import os
 from pathlib import Path
 
-from gemsModules.configuration.main_api import session_instance_config
-
+from gemsModules.complex.glycomimetics.services.common_api import get_gm_projects_root
 from gemsModules.complex.glycomimetics.services.Build_Selected_Positions.api import Build_Inputs, Build_Outputs
 from gemsModules.complex.glycomimetics.tasks import create_gm_input_file, run_all_glyco, create_system_info_file
 
@@ -20,7 +19,7 @@ def execute(inputs: Build_Inputs) -> Build_Outputs:
     service_outputs = Build_Outputs(pUUID=inputs.pUUID)
 
     # Normally the Project builds this path. TODO: better helper 
-    project_dir = Path(session_instance_config.get_filesystem_path_by_service_ID("GM")) / inputs.pUUID
+    project_dir = get_gm_projects_root() / inputs.pUUID
     if not project_dir.exists():
         log.debug(f"Warning: Project directory {project_dir} does not exist at time of Build_Selected_Positions.")
         raise RuntimeError("No project directory found, cannot run Glycomimetics/Build_Selected_Positions")

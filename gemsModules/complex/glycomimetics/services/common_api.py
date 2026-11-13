@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from pathlib import Path
 from pydantic import BaseModel, Field
 from typing import List, Optional, Union, Any
 try:
@@ -102,6 +103,19 @@ class Position_Modification_Options(BaseModel):
 			- If not included, all available libraries will be used.
 			- If included, only the specified libraries will be used
     """
+
+
+def get_gm_projects_root() -> Path:
+    """Return the Glycomimetics service directory from the instance configuration."""
+    from gemsModules.configuration.main_api import session_instance_config
+
+    fs_path = Path(session_instance_config.get_filesystem_path_by_service_ID("GM"))
+    # Delegator/slurm-head ICs store the base userdata path (/website/userdata),
+    # while compute-node ICs may store the service path (/website/userdata/complex/gm).
+    if fs_path.parts[-2:] != ("complex", "gm"):
+        fs_path = fs_path / "complex" / "gm"
+    return fs_path
+
 
 if __name__ == "__main__":
     with open("PDBFile_Resource_Example.json", "w") as f:
