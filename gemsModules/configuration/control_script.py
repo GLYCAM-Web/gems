@@ -2,8 +2,9 @@
 import sys
 import os
 import json
+import copy
 import datetime
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 
 # Adjust paths if run as script
 GEMSHOME = os.environ.get("GEMSHOME", "")
@@ -419,3 +420,360 @@ def import_host(ic_path: str, remote_ic_path: str, out_ic_path: str = None):
         pass
         
     print(f"Import complete. Written to '{dest_path}'.")
+
+
+class _SafeFormatDict(dict):
+    def __missing__(self, key):
+        return "{" + key + "}"
+
+
+def _format_templates(obj: Any, context: Dict[str, Any]) -> Any:
+    """Recursively format string values in dicts/lists using context."""
+    if isinstance(obj, str):
+        return obj.format_map(_SafeFormatDict(context))
+    if isinstance(obj, list):
+        return [_format_templates(item, context) for item in obj]
+    if isinstance(obj, dict):
+        return {k: _format_templates(v, context) for k, v in obj.items()}
+    return obj
+
+
+def _deep_merge(base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any]:
+    """Recursively merge override dict into a copy of base dict."""
+    result = copy.deepcopy(base)
+    for k, v in override.items():
+        if isinstance(v, dict) and isinstance(result.get(k), dict):
+            result[k] = _deep_merge(result[k], v)
+        else:
+            result[k] = copy.deepcopy(v)
+    return result
+
+
+def _normalize_hosts_list(hosts_data: Any) -> List[Dict[str, Any]]:
+    """Normalize hosts from either dict or list format into a list of host dicts."""
+    hosts = []
+    if isinstance(hosts_data, dict):
+        for name, h in hosts_data.items():
+            if isinstance(h, dict):
+                h_copy = copy.deepcopy(h)
+                if "name" not in h_copy:
+                    h_copy["name"] = name
+                hosts.append(h_copy)
+    elif isinstance(hosts_data, list):
+        for h in hosts_data:
+            if isinstance(h, dict):
+                hosts.append(copy.deepcopy(h))
+    return hosts
+
+
+def _write_ic_file(dest_path: str, ic_dict: Dict[str, Any], minify: bool = False) -> None:
+    """Validate ic_dict with InstanceConfig and write it to dest_path (read-only 0o444)."""
+    try:
+        InstanceConfig(**ic_dict)
+    except Exception as e:
+        print(f"Validation failed for '{dest_path}': {e}", file=sys.stderr)
+        sys.exit(1)
+
+    parent = os.path.dirname(os.path.abspath(dest_path))
+    if parent and not os.path.exists(parent):
+        os.makedirs(parent, exist_ok=True)
+
+    if os.path.exists(dest_path):
+        try:
+            os.chmod(dest_path, 0o644)
+        except Exception:
+            pass
+
+    indent = None if minify else 2
+    with open(dest_path, "w") as f:
+        json.dump(ic_dict, f, indent=indent)
+
+    try:
+        os.chmod(dest_path, 0o444)
+    except Exception:
+        pass
+
+
+def _expand_entity_paths(
+    template: Optional[str],
+    entities: List[str],
+    context: Dict[str, Any],
+) -> Dict[str, str]:
+    """Expand a path template (e.g. '/scratch/{id}/{entity}') across entities."""
+    if not template:
+        return {}
+    has_entity_placeholder = "{entity}" in template
+    paths = {}
+    for ent in entities:
+        ctx = dict(context)
+        ctx["entity"] = ent
+        formatted = template.format_map(_SafeFormatDict(ctx))
+        if not has_entity_placeholder:
+            formatted = os.path.join(formatted, ent)
+        paths[ent] = formatted
+    return paths
+
+
+def _filter_by_entities(
+    host_dict: Dict[str, Any],
+    fs_paths: Dict[str, str],
+    sec_paths: Dict[str, str],
+    entities: List[str],
+) -> None:
+    """Scope host_dict, batch_computing_resources, and path dicts to the given entities."""
+    entity_set = set(entities)
+    host_dict["entities_available"] = list(entities)
+
+    bcr = host_dict.get("batch_computing_resources")
+    if isinstance(bcr, list):
+        filtered_bcr = []
+        for part in bcr:
+            if not isinstance(part, dict):
+                continue
+            part_copy = copy.deepcopy(part)
+            supported = part_copy.get("supported_entities")
+            if supported is not None:
+                kept = [e for e in supported if e in entity_set]
+                if not kept:
+                    continue
+                part_copy["supported_entities"] = kept
+            filtered_bcr.append(part_copy)
+        host_dict["batch_computing_resources"] = filtered_bcr
+
+    for path_dict in (fs_paths, sec_paths):
+        for k in list(path_dict.keys()):
+            if k not in entity_set:
+                del path_dict[k]
+
+
+def generate_from_matrix(
+    matrix_path: str,
+    output_dir: Optional[str] = None,
+    minify: bool = False,
+) -> List[str]:
+    """Generate a family of Instance Config files from a cluster matrix JSON file."""
+    if not os.path.exists(matrix_path):
+        print(f"Error: Matrix file '{matrix_path}' does not exist.", file=sys.stderr)
+        sys.exit(1)
+
+    with open(matrix_path) as f:
+        matrix = json.load(f)
+
+    base = matrix.get("base", {})
+    variants = matrix.get("variants", [])
+    if not isinstance(variants, list) or not variants:
+        print("Error: Matrix JSON must contain a non-empty 'variants' list.", file=sys.stderr)
+        sys.exit(1)
+
+    HOST_FIELDS = {
+        "name",
+        "address",
+        "port",
+        "is_localhost",
+        "scheduler",
+        "execution_environments",
+        "website_environments",
+        "entities_available",
+        "batch_computing_resources",
+        "resource_specific_information",
+        "entity_resources",
+    }
+
+    base_host = {k: copy.deepcopy(v) for k, v in base.items() if k in HOST_FIELDS}
+    base_host.setdefault("is_localhost", "True")
+
+    generated_files = []
+    now_str = datetime.datetime.now().isoformat()
+
+    for idx, var in enumerate(variants):
+        if not isinstance(var, dict):
+            print(f"Error: Variant at index {idx} must be a JSON object.", file=sys.stderr)
+            sys.exit(1)
+
+        var_id = var.get("id", f"variant{idx}")
+        ctx: Dict[str, Any] = {"id": var_id, "env": var.get("env", var_id)}
+        for k, v in var.items():
+            if isinstance(v, (str, int, float)):
+                ctx[k] = v
+
+        # Resolve host name
+        base_name = base.get("name", "Glycon")
+        if "name" in var:
+            host_name = _format_templates(var["name"], ctx)
+        elif "name_template" in base:
+            host_name = _format_templates(base["name_template"], ctx)
+        elif "{" in base_name:
+            host_name = _format_templates(base_name, ctx)
+        elif "id" in var:
+            host_name = f"{base_name}-{var_id}"
+        else:
+            host_name = base_name
+        ctx["name"] = host_name
+
+        var_host_overrides = {k: v for k, v in var.items() if k in HOST_FIELDS}
+        if "entities" in var and "entities_available" not in var_host_overrides:
+            var_host_overrides["entities_available"] = var["entities"]
+
+        local_host = _deep_merge(base_host, var_host_overrides)
+        local_host["name"] = host_name
+        local_host = _format_templates(local_host, ctx)
+
+        entities = local_host.get("entities_available") or []
+
+        # Build filesystem_paths and secure_inputs_paths
+        fs_template = var.get("filesystem_path_template", base.get("filesystem_path_template"))
+        sec_template = var.get("secure_inputs_path_template", base.get("secure_inputs_path_template"))
+
+        fs_paths = _expand_entity_paths(fs_template, entities, ctx)
+        sec_paths = _expand_entity_paths(sec_template, entities, ctx)
+
+        explicit_fs = _deep_merge(base.get("filesystem_paths", {}), var.get("filesystem_paths", {}))
+        explicit_sec = _deep_merge(base.get("secure_inputs_paths", {}), var.get("secure_inputs_paths", {}))
+        fs_paths.update(_format_templates(explicit_fs, ctx))
+        sec_paths.update(_format_templates(explicit_sec, ctx))
+
+        if entities:
+            _filter_by_entities(local_host, fs_paths, sec_paths, entities)
+
+        hosts = [local_host]
+        remote_hosts = var.get("remote_hosts", base.get("remote_hosts", []))
+        if isinstance(remote_hosts, list):
+            for rh in remote_hosts:
+                rh_copy = _format_templates(copy.deepcopy(rh), ctx)
+                rh_copy["is_localhost"] = "False"
+                hosts.append(rh_copy)
+
+        ic_dict: Dict[str, Any] = {
+            "date": now_str,
+            "hosts": hosts,
+            "filesystem_paths": fs_paths,
+            "secure_inputs_paths": sec_paths,
+        }
+
+        out_name = var.get("output") or f"instance_config.{var_id}.json"
+        dest_path = os.path.join(output_dir, out_name) if output_dir else out_name
+
+        _write_ic_file(dest_path, ic_dict, minify=minify)
+        generated_files.append(dest_path)
+        print(f"Generated '{dest_path}' (host='{host_name}', port={local_host.get('port')}, entities={entities})")
+
+    return generated_files
+
+
+def _apply_dotted_set(target: Dict[str, Any], key_path: str, raw_value: str) -> None:
+    """Set a dotted key path (e.g. 'resource_specific_information.use_gres_for_gpus=False') on target."""
+    parts = key_path.split(".")
+    cur = target
+    for p in parts[:-1]:
+        if p not in cur or not isinstance(cur[p], dict):
+            cur[p] = {}
+        cur = cur[p]
+    # Try JSON parse for lists/dicts/null, fallback to raw string
+    val: Any = raw_value
+    if raw_value.lower() == "none" or raw_value.lower() == "null":
+        val = None
+    elif raw_value.startswith("[") or raw_value.startswith("{"):
+        try:
+            val = json.loads(raw_value)
+        except Exception:
+            val = raw_value
+    cur[parts[-1]] = val
+
+
+def clone_ic(
+    source_path: str,
+    dest_path: str,
+    name: Optional[str] = None,
+    address: Optional[str] = None,
+    port: Optional[str] = None,
+    entities: Optional[List[str]] = None,
+    fs_template: Optional[str] = None,
+    inputs_template: Optional[str] = None,
+    website_envs: Optional[List[str]] = None,
+    exec_envs: Optional[List[str]] = None,
+    aad2_home: Optional[str] = None,
+    sets: Optional[List[str]] = None,
+    drop_remote_hosts: bool = False,
+    minify: bool = False,
+) -> str:
+    """Clone an existing Instance Config file with targeted overrides."""
+    if not os.path.exists(source_path):
+        print(f"Error: Source configuration file '{source_path}' does not exist.", file=sys.stderr)
+        sys.exit(1)
+
+    with open(source_path) as f:
+        src_data = json.load(f)
+
+    hosts = _normalize_hosts_list(src_data.get("hosts", []))
+    if not hosts:
+        print(f"Error: No hosts found in '{source_path}'.", file=sys.stderr)
+        sys.exit(1)
+
+    local_idx = None
+    for i, h in enumerate(hosts):
+        if str(h.get("is_localhost", "False")).lower() == "true":
+            local_idx = i
+            break
+    if local_idx is None:
+        local_idx = 0
+        hosts[0]["is_localhost"] = "True"
+
+    local_host = hosts[local_idx]
+
+    if name is not None:
+        local_host["name"] = name
+    if address is not None:
+        local_host["address"] = address
+    if port is not None:
+        local_host["port"] = None if port.lower() in ("none", "null", "") else port
+    if website_envs is not None:
+        local_host["website_environments"] = website_envs
+    if exec_envs is not None:
+        local_host["execution_environments"] = exec_envs
+
+    if aad2_home is not None:
+        rsi = local_host.setdefault("resource_specific_information", {})
+        if not isinstance(rsi, dict):
+            rsi = {}
+            local_host["resource_specific_information"] = rsi
+        aad2_cfg = rsi.setdefault("aad2_configuration", {})
+        if not isinstance(aad2_cfg, dict):
+            aad2_cfg = {}
+            rsi["aad2_configuration"] = aad2_cfg
+        aad2_cfg["aad2_docker_home"] = aad2_home
+
+    if sets:
+        for item in sets:
+            if "=" not in item:
+                print(f"Error: Invalid --set '{item}'. Expected KEY=VALUE.", file=sys.stderr)
+                sys.exit(1)
+            k, v = item.split("=", 1)
+            _apply_dotted_set(local_host, k.strip(), v.strip())
+
+    fs_paths = copy.deepcopy(src_data.get("filesystem_paths") or {})
+    sec_paths = copy.deepcopy(src_data.get("secure_inputs_paths") or {})
+
+    active_entities = entities if entities is not None else (local_host.get("entities_available") or [])
+    ctx = {"name": local_host.get("name", ""), "port": local_host.get("port") or ""}
+
+    if fs_template is not None:
+        fs_paths.update(_expand_entity_paths(fs_template, active_entities, ctx))
+    if inputs_template is not None:
+        sec_paths.update(_expand_entity_paths(inputs_template, active_entities, ctx))
+
+    if entities is not None:
+        _filter_by_entities(local_host, fs_paths, sec_paths, entities)
+
+    if drop_remote_hosts:
+        hosts = [local_host]
+
+    cloned_dict: Dict[str, Any] = {
+        "date": datetime.datetime.now().isoformat(),
+        "hosts": hosts,
+        "filesystem_paths": fs_paths,
+        "secure_inputs_paths": sec_paths,
+    }
+
+    _write_ic_file(dest_path, cloned_dict, minify=minify)
+    print(f"Cloned '{source_path}' -> '{dest_path}' (host='{local_host.get('name')}', port={local_host.get('port')}).")
+    return dest_path

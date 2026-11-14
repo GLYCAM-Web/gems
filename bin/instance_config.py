@@ -17,6 +17,8 @@ if GEMSHOME not in sys.path:
 from gemsModules.configuration.main_api import InstanceConfig, _load_instance_config
 from gemsModules.configuration.control_script import (
     generate_from_tui,
+    generate_from_matrix,
+    clone_ic,
     export_host,
     import_host,
     print_tui_help
@@ -149,7 +151,7 @@ def main():
     
     if not argv:
         print("Usage: instance_config <command> [args...]")
-        print("Commands: generate, export, import, validate, evaluate, report, check-connectivity, confirm-capabilities, status")
+        print("Commands: generate, clone, export, import, validate, evaluate, report, check-connectivity, confirm-capabilities, status, init-gemsrc, show-config")
         sys.exit(1)
         
     cmd = argv[0]
@@ -166,12 +168,16 @@ def main():
         group = parser.add_mutually_exclusive_group(required=True)
         group.add_argument("--from-file", type=str, help="Path to input configuration JSON file.")
         group.add_argument("--use-tui", action="store_true", help="Start the interactive Q/A configuration tool.")
-        parser.add_argument("--ic-file", type=str, help="Alternate output file name.")
+        group.add_argument("--matrix", type=str, help="Path to cluster matrix JSON file to generate multiple IC variants.")
+        parser.add_argument("--ic-file", type=str, help="Alternate output file name (used with --from-file).")
+        parser.add_argument("--output-dir", type=str, help="Output directory for files generated with --matrix.")
         parser.add_argument("--minify", action="store_true", help="Write minified JSON (default is unminified).")
         args = parser.parse_args(argv[1:])
         
         if args.use_tui:
             generate_from_tui()
+        elif args.matrix:
+            generate_from_matrix(args.matrix, output_dir=args.output_dir, minify=args.minify)
         elif args.from_file:
             # Read from file and save
             with open(args.from_file) as f:
@@ -181,6 +187,46 @@ def main():
             with open(dest, "w") as f:
                 json.dump(data, f, indent=indent)
             print(f"Configuration written to {dest}")
+
+    elif cmd == "clone":
+        parser = argparse.ArgumentParser(prog="instance_config clone")
+        parser.add_argument("source", help="Path to source Instance Config JSON file.")
+        parser.add_argument("--to", "--ic-file", dest="dest", required=True, help="Output path for the cloned IC file.")
+        parser.add_argument("--name", type=str, default=None, help="Override localhost name.")
+        parser.add_argument("--address", type=str, default=None, help="Override localhost address.")
+        parser.add_argument("--port", type=str, default=None, help="Override localhost port (use 'none' to clear).")
+        parser.add_argument("--entities", type=str, default=None, help="Comma- or space-separated list of entities_available (scopes partitions and paths).")
+        parser.add_argument("--fs-template", type=str, default=None, help="Template for filesystem_paths (e.g. '/scratch/gems/ad/{entity}').")
+        parser.add_argument("--inputs-template", type=str, default=None, help="Template for secure_inputs_paths (e.g. '/scratch/gems/ad/{entity}/inputs').")
+        parser.add_argument("--website-envs", type=str, default=None, help="Comma- or space-separated website_environments.")
+        parser.add_argument("--exec-envs", type=str, default=None, help="Comma- or space-separated execution_environments.")
+        parser.add_argument("--aad2-home", type=str, default=None, help="Override resource_specific_information.aad2_configuration.aad2_docker_home.")
+        parser.add_argument("--set", dest="sets", action="append", default=None, help="Override any localhost field using dotted path KEY=VALUE (repeatable).")
+        parser.add_argument("--drop-remote-hosts", action="store_true", help="Drop non-localhost hosts from the cloned IC.")
+        parser.add_argument("--minify", action="store_true", help="Write minified JSON.")
+        args = parser.parse_args(argv[1:])
+
+        def _split_list(val):
+            if val is None:
+                return None
+            return [p for p in val.replace(",", " ").split() if p]
+
+        clone_ic(
+            source_path=args.source,
+            dest_path=args.dest,
+            name=args.name,
+            address=args.address,
+            port=args.port,
+            entities=_split_list(args.entities),
+            fs_template=args.fs_template,
+            inputs_template=args.inputs_template,
+            website_envs=_split_list(args.website_envs),
+            exec_envs=_split_list(args.exec_envs),
+            aad2_home=args.aad2_home,
+            sets=args.sets,
+            drop_remote_hosts=args.drop_remote_hosts,
+            minify=args.minify,
+        )
             
     elif cmd == "export":
         parser = argparse.ArgumentParser(prog="instance_config export")
