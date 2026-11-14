@@ -125,23 +125,13 @@ def manageIncomingString(jsonObjectString):
     thisSlurmJobInfo = SlurmJobInfo(jsonObjectString)
     thisSlurmJobInfo.parseIncomingString()
 
-    # Figure out whether we need to send this to a different machine
-    useGRPC = True
-    thePort = os.environ.get("GEMS_GRPC_SLURM_PORT")
-    log.debug("the port is: " + str(thePort))
-    if thePort is None:
-        log.debug("cant find grpc slurm submission port. using localhost")
-        useGRPC = False
-    theHost = os.environ.get("GEMS_GRPC_SLURM_HOST")
-    log.debug("the host is: " + str(theHost))
-    if theHost is None:
-        log.debug("cant find grpc slurm submission host. using localhost")
-        useGRPC = False
-    else:
-        localHost = socket.gethostname()
-        log.debug("the local host is: " + localHost)
-        if theHost == localHost:
-            useGRPC = False
+    import json
+    from gemsModules.networkconnections.grpc import is_GEMS_instance_for_SLURM_submission
+    from gemsModules.networkconnections.seek_correct_host import execute as seek_correct_host
+
+    context = thisSlurmJobInfo.incoming_dict.get("context") or "MDaaS-RunMD"
+    useGRPC = not is_GEMS_instance_for_SLURM_submission(context)
+
     thisSlurmJobInfo.incoming_dict["slurm_runscript_name"] = "slurm_submit.sh"
     slurm_runscript_path = (
         thisSlurmJobInfo.incoming_dict["workingDirectory"]
@@ -157,16 +147,34 @@ def manageIncomingString(jsonObjectString):
 
     log.debug("useGRPC: " + str(useGRPC))
     if useGRPC:
-        gemsPath = os.environ.get("GEMSHOME")
-        if gemsPath is None:
-            return "Cannot determine GEMSHOME."
-        sys.path.append(gemsPath + "/gRPC/SLURM")
-        import grpc
-        import gems_grpc_slurm_client
-
-        log.debug("submitting to gems_grpc_slurm_client.")
-        submission = gems_grpc_slurm_client.GemsGrpcSlurmClient(json=jsonObjectString)
-        return submission.response
+        wrapped_request = json.dumps(
+            {
+                "entity": {
+                    "type": "Batchcompute",
+                    "services": {
+                        "SubmitJob": {
+                            "type": "SubmitJob",
+                            "inputs": {
+                                "context": context,
+                                "workingDirectory": thisSlurmJobInfo.incoming_dict.get("workingDirectory"),
+                                "sbatchArgument": thisSlurmJobInfo.incoming_dict.get("sbatchArgument"),
+                                "name": thisSlurmJobInfo.incoming_dict.get("name"),
+                                "partition": thisSlurmJobInfo.incoming_dict.get("partition"),
+                                "user": thisSlurmJobInfo.incoming_dict.get("user"),
+                            },
+                        }
+                    },
+                },
+                "context": context,
+                "workingDirectory": thisSlurmJobInfo.incoming_dict.get("workingDirectory"),
+                "sbatchArgument": thisSlurmJobInfo.incoming_dict.get("sbatchArgument"),
+                "name": thisSlurmJobInfo.incoming_dict.get("name"),
+                "partition": thisSlurmJobInfo.incoming_dict.get("partition"),
+                "user": thisSlurmJobInfo.incoming_dict.get("user"),
+            }
+        )
+        log.debug("Submitting wrapped deprecated SLURM request via gRPC/JSON.")
+        return seek_correct_host(wrapped_request, context, submission_fn_type="json")
 
     else:
         log.debug("not using grpc.")

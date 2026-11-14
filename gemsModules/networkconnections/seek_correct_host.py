@@ -15,18 +15,14 @@ log = Set_Up_Logging(__name__)
 
 
 
-def execute(jsonObjectString, context, submission_fn_type: Literal["slurm", "json"]="slurm"):
-    """Using gRPC, try to reroute the request to the correct host given a context, usually the current one."""
-    
-    submission_fn = None
-    addresses = []
-    
+def execute(jsonObjectString, context, submission_fn_type: Literal["slurm", "json"] = "json"):
+    """Using gRPC/JSON, try to reroute the request to the correct host given a context, usually the current one."""
+
     if submission_fn_type == "slurm":
-        submission_fn = slurm_grpc_submit
-        addresses = session_instance_config.get_possible_hosts_for_context(
-            context, with_slurmport=True
-        )
-    elif submission_fn_type == "json":
+        log.warning("submission_fn_type='slurm' is deprecated; routing via gRPC/JSON instead.")
+        submission_fn_type = "json"
+
+    if submission_fn_type == "json":
         submission_fn = json_grpc_submit
         addresses = session_instance_config.get_possible_hosts_for_context(
             context, with_jsonport=True

@@ -25,24 +25,28 @@ def batch_compute_delegation(incoming_json_dict):
     minimal_json_dict = incoming_json_dict
     output_str = json.dumps(minimal_json_dict)
 
-    useSLURM = True
-    thePort = os.environ.get("GEMS_GRPC_SLURM_PORT")
-    log.debug("the port is: " + str(thePort))
-    if thePort is None:
-        log.debug("cant find grpc slurm submission port. using localhost")
-        useSLURM = False
-    theHost = os.environ.get("GEMS_GRPC_SLURM_HOST")
-    log.debug("the host is: " + str(theHost))
-    if theHost is None:
-        log.debug("cant find grpc slurm submission host. using localhost")
-        useSLURM = False
+    context = minimal_json_dict.get("context") or "MDaaS-RunMD"
+    useSLURM = False
+    try:
+        from gemsModules.configuration.main_api import session_instance_config
+        from gemsModules.networkconnections.grpc import is_GEMS_instance_for_SLURM_submission
 
+        if is_GEMS_instance_for_SLURM_submission(context) or session_instance_config.get_possible_hosts_for_context(
+            context, with_jsonport=True
+        ):
+            useSLURM = True
+    except Exception as error:
+        log.debug("Could not check instance_config for SLURM hosts: %s", error)
 
-    if useSLURM: 
+    if not useSLURM:
+        thePort = os.environ.get("GEMS_GRPC_SLURM_PORT")
+        theHost = os.environ.get("GEMS_GRPC_SLURM_HOST")
+        if thePort is not None and theHost is not None:
+            useSLURM = True
+
+    if useSLURM:
         slurm_receive.manageIncomingString(output_str)
-    else: 
-        #workdir = incoming_json_dict["workingDirectory"]
-        #sbatch_argument = incoming_json_dict["sbatchArgument"]
+    else:
         runLocally.manageIncomingString(output_str)
 
 

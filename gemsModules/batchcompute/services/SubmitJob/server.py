@@ -25,8 +25,17 @@ def Serve(service: SubmitJobService_Request) -> SubmitJobService_Response:
     request_json = service.json(by_alias=True)
 
     if not is_GEMS_instance_for_SLURM_submission(context):
+        import json
         log.debug("Host is not configured for Slurm execution of context '%s'. Rerouting via gRPC/JSON...", context)
-        grpc_response = seek_correct_host(request_json, context, submission_fn_type="slurm")
+        wrapped_request = json.dumps({
+            "entity": {
+                "type": "Batchcompute",
+                "services": {
+                    "SubmitJob": json.loads(request_json)
+                },
+            }
+        })
+        grpc_response = seek_correct_host(wrapped_request, context, submission_fn_type="json")
         response.outputs.message = str(grpc_response)
         return response
 
