@@ -38,6 +38,6 @@ graphify-out/
 # instance config stuffs
 instance_config.json
 *.json.bak
-DevEnv/
+IC/
 
 bin/*.exe

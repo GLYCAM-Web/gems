@@ -284,7 +284,13 @@ def get_effective_instance_config_path() -> str:
     """
     env_path = os.environ.get("GEMS_INSTANCE_CONFIG")
     if env_path and env_path.strip():
-        return str(Path(env_path).expanduser().resolve())
+        p = Path(env_path.strip()).expanduser()
+        if p.is_absolute() or p.is_file():
+            return str(p.resolve())
+        ic_dir_cand = Path(get_effective_gemshome()) / "IC" / p
+        if ic_dir_cand.is_file():
+            return str(ic_dir_cand.resolve())
+        return str(p.resolve())
 
     rc_path = get_gemsrc_value("instance_config") or get_gemsrc_value("instance_config_path")
     if rc_path:

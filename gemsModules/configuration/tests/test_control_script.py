@@ -215,6 +215,187 @@ class TestControlScriptMatrixAndClone(unittest.TestCase):
         self.assertEqual(ic.get_localhost().name, "thoreau-actual")
         self.assertEqual(ic.get_localhost().port, "42053")
 
+    def test_ports_to_matrix_and_generate(self):
+        gems_root = Path(__file__).resolve().parents[3]
+        cli = gems_root / "bin" / "instance_config.py"
+        base_dir = self.tmp_path / "deployments"
+        abs_ic = self.tmp_path / "custom_abs_ic.json"
+
+        ports_content = f"""#!/usr/bin/env bash
+ServerName="Thoreau"
+ServerAddress="172.16.4.2"
+base_entities_available="AD GM GP MD"
+GEMS_BASE_PATH="{base_dir}"
+declare -a serviceIDs
+serviceIDs=(
+    "alice"
+    "bob"
+    "actual"
+    "paid"
+#   "dev"
+)
+declare -A deploymentID
+deploymentID=(
+    ["alice"]="visceral-vanbruggen"
+    ["bob"]="visceral-vanbruggen"
+    ["actual"]="visceral-vanbruggen"
+    ["paid"]="sweet-cake"
+)
+declare -A port_number
+port_number=(
+    ["alice"]="42050"
+    ["bob"]="42050"
+    ["actual"]="42054"
+    ["paid"]="42060"
+)
+declare -A gemshome
+gemshome=(
+    ["alice"]="${{GEMS_BASE_PATH}}/${{deploymentID["alice"]}}/gems"
+    ["bob"]="${{GEMS_BASE_PATH}}/${{deploymentID["bob"]}}/gems"
+    ["actual"]="${{GEMS_BASE_PATH}}/${{deploymentID["actual"]}}/gems"
+    ["paid"]="${{GEMS_BASE_PATH}}/${{deploymentID["paid"]}}/gems"
+)
+declare -A services
+services=(
+    ["alice"]="MD"
+    ["bob"]="AD"
+    ["actual"]=""
+    ["paid"]="MD"
+)
+declare -A instanceconfig
+instanceconfig=(
+    ["alice"]=""
+    ["bob"]=""
+    ["actual"]="{abs_ic}"
+    ["paid"]="PaidTier/MDaaS.config"
+)
+"""
+        ports_path = self.tmp_path / "PORTS_dat.bash"
+        ports_path.write_text(ports_content)
+        matrix_path = self.tmp_path / "from_ports_matrix.json"
+
+        subprocess.run(
+            [
+                sys.executable,
+                str(cli),
+                "ports-to-matrix",
+                str(ports_path),
+                "--to",
+                str(matrix_path),
+            ],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+
+        matrix = json.loads(matrix_path.read_text())
+        self.assertEqual(matrix["base"]["name"], "Thoreau")
+        self.assertEqual(matrix["base"]["address"], "172.16.4.2")
+        # alice and bob share gemshome, port, and instanceconfig -> grouped into 1 variant
+        self.assertEqual(len(matrix["variants"]), 3)
+
+        v_test = matrix["variants"][0]
+        self.assertEqual(v_test["entities"], ["MD", "AD"])
+        self.assertEqual(v_test["port"], "42050")
+        self.assertEqual(
+            v_test["output"],
+            str(base_dir / "visceral-vanbruggen" / "gems" / "instance_config.json"),
+        )
+
+        v_actual = matrix["variants"][1]
+        self.assertEqual(v_actual["output"], str(abs_ic))
+
+        v_paid = matrix["variants"][2]
+        self.assertEqual(
+            v_paid["output"],
+            str(base_dir / "sweet-cake" / "gems" / "IC" / "PaidTier" / "MDaaS.config"),
+        )
+
+        # Feed the generated matrix straight into generate --matrix
+        subprocess.run(
+            [sys.executable, str(cli), "generate", "--matrix", str(matrix_path)],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        self.assertTrue(abs_ic.exists())
+        paid_ic_path = base_dir / "sweet-cake" / "gems" / "IC" / "PaidTier" / "MDaaS.config"
+        self.assertTrue(paid_ic_path.exists())
+        paid_ic = InstanceConfig.parse_file(paid_ic_path)
+        self.assertEqual(paid_ic.get_localhost().port, "42060")
+        self.assertEqual([e.value for e in paid_ic.get_localhost().entities_available], ["MD"])
+
+        # Verify relative GEMS_INSTANCE_CONFIG resolves against $GEMSHOME/IC/
+        from gemsModules.configuration.user_config import get_effective_instance_config_path
+        old_gh = os.environ.get("GEMSHOME")
+        old_ic = os.environ.get("GEMS_INSTANCE_CONFIG")
+        try:
+            os.environ["GEMSHOME"] = str(base_dir / "sweet-cake" / "gems")
+            os.environ["GEMS_INSTANCE_CONFIG"] = "PaidTier/MDaaS.config"
+            self.assertEqual(get_effective_instance_config_path(), str(paid_ic_path.resolve()))
+        finally:
+            if old_gh is None:
+                os.environ.pop("GEMSHOME", None)
+            else:
+                os.environ["GEMSHOME"] = old_gh
+            if old_ic is None:
+                os.environ.pop("GEMS_INSTANCE_CONFIG", None)
+            else:
+                os.environ["GEMS_INSTANCE_CONFIG"] = old_ic
+
+    def test_ports_to_matrix_single_server_ids(self):
+        gems_root = Path(__file__).resolve().parents[3]
+        cli = gems_root / "bin" / "instance_config.py"
+        base_dir = self.tmp_path / "deployments"
+
+        ports_content = f"""#!/usr/bin/env bash
+GEMS_BASE_PATH="{base_dir}"
+declare -a serviceIDs
+serviceIDs=(
+    "devenv"
+    "swarmtest"
+)
+declare -A deploymentID
+deploymentID=(
+    ["devenv"]="developer-environment"
+    ["swarmtest"]="sweet-cake"
+)
+declare -A port_number
+port_number=(
+    ["devenv"]="42054"
+    ["swarmtest"]="42053"
+)
+declare -A gemshome
+gemshome=(
+    ["devenv"]="${{GEMS_BASE_PATH}}/${{deploymentID["devenv"]}}/gems"
+    ["swarmtest"]="${{GEMS_BASE_PATH}}/${{deploymentID["swarmtest"]}}/gems"
+)
+declare -A instanceconfig
+instanceconfig=(
+    ["devenv"]=""
+    ["swarmtest"]=""
+)
+"""
+        ports_path = self.tmp_path / "PORTS_simple.bash"
+        ports_path.write_text(ports_content)
+        matrix_path = self.tmp_path / "simple_matrix.json"
+
+        subprocess.run(
+            [sys.executable, str(cli), "ports-to-matrix", str(ports_path), "--to", str(matrix_path), "--cluster-name", "Thoreau"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        subprocess.run(
+            [sys.executable, str(cli), "generate", "--matrix", str(matrix_path)],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        st_ic = InstanceConfig.parse_file(base_dir / "sweet-cake" / "gems" / "instance_config.json")
+        self.assertEqual(st_ic.get_localhost().port, "42053")
+        self.assertEqual([e.value for e in st_ic.get_localhost().entities_available], ["AD", "GM", "GP", "MD"])
+
 
 if __name__ == "__main__":
     unittest.main()

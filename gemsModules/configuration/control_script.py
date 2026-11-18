@@ -3,6 +3,7 @@ import sys
 import os
 import json
 import copy
+import re
 import datetime
 from typing import Dict, List, Any, Optional
 
@@ -777,3 +778,318 @@ def clone_ic(
     _write_ic_file(dest_path, cloned_dict, minify=minify)
     print(f"Cloned '{source_path}' -> '{dest_path}' (host='{local_host.get('name')}', port={local_host.get('port')}).")
     return dest_path
+
+
+def _strip_bash_comment(line: str) -> str:
+    """Remove unquoted '#' comments from a bash line."""
+    in_single = False
+    in_double = False
+    escaped = False
+    for i, ch in enumerate(line):
+        if escaped:
+            escaped = False
+            continue
+        if ch == "\\" and not in_single:
+            escaped = True
+            continue
+        if ch == "'" and not in_double:
+            in_single = not in_single
+        elif ch == '"' and not in_single:
+            in_double = not in_double
+        elif ch == "#" and not in_single and not in_double:
+            return line[:i]
+    return line
+
+
+def _expand_bash_vars(val: str, scalars: Dict[str, str], assoc: Dict[str, Dict[str, str]]) -> str:
+    """Expand ${arr["key"]} and ${VAR} / $VAR references in a bash string."""
+    def _repl_assoc(match):
+        arr_name = match.group(1)
+        key = match.group(2).strip().strip('"').strip("'")
+        return assoc.get(arr_name, {}).get(key, "")
+
+    def _repl_scalar(match):
+        var_name = match.group(1) or match.group(2)
+        return scalars.get(var_name, "")
+
+    prev = None
+    cur = val
+    for _ in range(5):
+        if cur == prev:
+            break
+        prev = cur
+        cur = re.sub(r'\$\{([A-Za-z_][A-Za-z0-9_]*)\[([^\]]+)\]\}', _repl_assoc, cur)
+        cur = re.sub(r'\$\{([A-Za-z_][A-Za-z0-9_]*)\}|\$([A-Za-z_][A-Za-z0-9_]*)', _repl_scalar, cur)
+    return cur
+
+
+def _store_array_block(
+    arr_name: str,
+    block: str,
+    scalars: Dict[str, str],
+    arrays: Dict[str, List[str]],
+    assoc: Dict[str, Dict[str, str]],
+) -> None:
+    """Parse an associative or indexed bash array body and store it in assoc or arrays."""
+    # Check if this is an associative array (contains [key]=value)
+    if re.search(r'\[[^\]]+\]\s*=', block):
+        target = assoc.setdefault(arr_name, {})
+        i = 0
+        n = len(block)
+        while i < n:
+            m = re.search(r'\[([^\]]+)\]\s*=\s*', block[i:])
+            if not m:
+                break
+            k = m.group(1).strip().strip('"').strip("'")
+            val_start = i + m.end()
+            if val_start >= n:
+                target[k] = ""
+                break
+            ch = block[val_start]
+            if ch in ('"', "'"):
+                quote = ch
+                j = val_start + 1
+                brace_depth = 0
+                while j < n:
+                    c = block[j]
+                    if c == "\\" and quote == '"' and j + 1 < n:
+                        j += 2
+                        continue
+                    if quote == '"' and c == "$" and j + 1 < n and block[j + 1] == "{":
+                        brace_depth += 1
+                        j += 2
+                        continue
+                    if brace_depth > 0:
+                        if c == "{":
+                            brace_depth += 1
+                        elif c == "}":
+                            brace_depth -= 1
+                        j += 1
+                        continue
+                    if c == quote:
+                        break
+                    j += 1
+                raw_val = block[val_start + 1 : j]
+                i = j + 1
+            else:
+                m_unq = re.match(r'(\S+)', block[val_start:])
+                raw_val = m_unq.group(1) if m_unq else ""
+                i = val_start + len(raw_val)
+            target[k] = _expand_bash_vars(raw_val, scalars, assoc)
+    else:
+        items = re.findall(r'"([^"]*)"|\'([^\']*)\'|(\S+)', block)
+        parsed = [_expand_bash_vars(a or b or c, scalars, assoc) for a, b, c in items]
+        arrays[arr_name] = [x for x in parsed if x]
+
+
+def parse_ports_file(ports_path: str) -> Dict[str, Any]:
+    """Parse a bash PORTS_dat.bash file into scalars, indexed arrays, and associative arrays."""
+    if not os.path.exists(ports_path):
+        print(f"Error: PORTS file '{ports_path}' does not exist.", file=sys.stderr)
+        sys.exit(1)
+
+    with open(ports_path) as f:
+        raw_lines = f.readlines()
+
+    scalars: Dict[str, str] = {}
+    arrays: Dict[str, List[str]] = {}
+    assoc: Dict[str, Dict[str, str]] = {}
+
+    current_array: Optional[str] = None
+    buffer_lines: List[str] = []
+
+    for raw in raw_lines:
+        line = _strip_bash_comment(raw).strip()
+        if not line:
+            continue
+
+        if current_array is not None:
+            if line == ")" or line.endswith(")"):
+                if line != ")":
+                    buffer_lines.append(line[:-1].strip())
+                _store_array_block(current_array, "\n".join(buffer_lines), scalars, arrays, assoc)
+                current_array = None
+                buffer_lines = []
+            else:
+                buffer_lines.append(line)
+            continue
+
+        # Ignore 'declare -a name' or 'declare -A name' declarations
+        if re.match(r'^declare\s+-[aA]\s+[A-Za-z_][A-Za-z0-9_]*\s*$', line):
+            continue
+
+        # Array start: name=( ... ) or name=(
+        m_arr = re.match(r'^(?:declare\s+-[aA]\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*\((.*)$', line)
+        if m_arr:
+            arr_name = m_arr.group(1)
+            rest = m_arr.group(2).strip()
+            if rest.endswith(")"):
+                _store_array_block(arr_name, rest[:-1].strip(), scalars, arrays, assoc)
+            else:
+                current_array = arr_name
+                buffer_lines = [rest] if rest else []
+            continue
+
+        # Scalar assignment: VAR="val" or VAR='val' or VAR=val
+        m_sc = re.match(r'^(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.+)$', line)
+        if m_sc:
+            k = m_sc.group(1)
+            v = m_sc.group(2).strip()
+            if (v.startswith('"') and v.endswith('"')) or (v.startswith("'") and v.endswith("'")):
+                v = v[1:-1]
+            scalars[k] = _expand_bash_vars(v, scalars, assoc)
+
+    return {"scalars": scalars, "arrays": arrays, "assoc": assoc}
+
+
+def _resolve_ports_ic_output(gemshome: str, ic_spec: str) -> str:
+    """Resolve an instanceconfig field from PORTS_dat.bash.
+
+    Empty -> $GEMSHOME/instance_config.json
+    Relative -> $GEMSHOME/IC/<ic_spec>
+    Absolute -> <ic_spec>
+    """
+    ic_spec = (ic_spec or "").strip()
+    if not ic_spec:
+        if gemshome:
+            return os.path.join(gemshome, "instance_config.json")
+        return "instance_config.json"
+    if os.path.isabs(ic_spec):
+        return ic_spec
+    if gemshome:
+        return os.path.join(gemshome, "IC", ic_spec)
+    return os.path.join("IC", ic_spec)
+
+
+def ports_to_matrix(
+    ports_path: str,
+    to_path: Optional[str] = None,
+    base_path: Optional[str] = None,
+    cluster_name: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Convert a bash PORTS_dat.bash file into a cluster matrix JSON skeleton."""
+    parsed = parse_ports_file(ports_path)
+    scalars = parsed["scalars"]
+    arrays = parsed["arrays"]
+    assoc = parsed["assoc"]
+
+    service_ids = arrays.get("serviceIDs", [])
+    if not service_ids:
+        print(f"Error: No 'serviceIDs' found in '{ports_path}'.", file=sys.stderr)
+        sys.exit(1)
+
+    ports_map = assoc.get("port_number", {})
+    gemshome_map = assoc.get("gemshome", {})
+    ic_map = assoc.get("instanceconfig", {})
+    deploy_map = assoc.get("deploymentID", {})
+    services_map = assoc.get("services", {})
+
+    raw_base_entities = scalars.get("base_entities_available")
+    if raw_base_entities is not None:
+        base_entities = [e for e in raw_base_entities.replace(",", " ").split() if e]
+    else:
+        base_entities = ["AD", "GM", "GP", "MD"]
+
+    base_section: Dict[str, Any] = {
+        "name": cluster_name or scalars.get("ServerName") or scalars.get("ClusterName") or "CLUSTER_NAME",
+        "address": scalars.get("ServerAddress") or "CLUSTER_ADDRESS",
+        "scheduler": "slurm",
+        "execution_environments": ["Batch", "Standalone"],
+        "entities_available": base_entities if base_entities else ["AD", "GM", "GP", "MD"],
+        "batch_computing_resources": [
+            {
+                "partition": "amber",
+                "supported_entities": base_entities if base_entities else ["AD", "GM", "GP", "MD"],
+                "max_nodes_per_job": "1",
+                "max_cores_per_node": "4",
+                "max_threads_per_node": "4",
+                "max_gpus_per_node": "0",
+                "max_cpus_per_gpu": "1",
+                "max_time_limit": "120",
+            }
+        ],
+        "resource_specific_information": {
+            "use_gres_for_gpus": "True",
+            "cpu_hardware_equivalent": "core",
+            "aad2_configuration": {
+                "aad2_docker_home": "/path/to/AAD2_Docker/{site}"
+            },
+        },
+        "filesystem_path_template": "/scratch/gems/{site}/{entity}",
+        "secure_inputs_path_template": "/scratch/gems/{site}/{entity}/inputs",
+    }
+
+    if base_path:
+        if not os.path.exists(base_path):
+            print(f"Error: Base JSON file '{base_path}' does not exist.", file=sys.stderr)
+            sys.exit(1)
+        with open(base_path) as f:
+            user_base = json.load(f)
+        if "base" in user_base and isinstance(user_base["base"], dict):
+            user_base = user_base["base"]
+        base_section = _deep_merge(base_section, user_base)
+
+    effective_base_entities = base_section.get("entities_available") or []
+    if raw_base_entities is not None and not base_entities and not base_path:
+        missing_svc = [sid for sid in service_ids if not (services_map.get(sid) or "").strip()]
+        if missing_svc:
+            print(
+                f"Error: 'base_entities_available' is empty and 'services' is empty for {missing_svc}.",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+
+    # Group serviceIDs by (gemshome, port, output_path) so shared endpoints merge entities
+    # while distinct ports/gemshomes/instanceconfigs remain separate variants.
+    grouped: Dict[tuple, Dict[str, Any]] = {}
+    for sid in service_ids:
+        raw_svc = (services_map.get(sid) or "").strip()
+        svc_list: Optional[List[str]] = (
+            [e for e in raw_svc.replace(",", " ").split() if e] if raw_svc else None
+        )
+
+        port = ports_map.get(sid)
+        gh = gemshome_map.get(sid, "")
+        ic_spec = ic_map.get(sid, "")
+        out_path = _resolve_ports_ic_output(gh, ic_spec)
+        dep_id = deploy_map.get(sid)
+
+        key = (gh, str(port or ""), out_path)
+        if key not in grouped:
+            var_entry: Dict[str, Any] = {
+                "id": sid,
+                "site": sid,
+                "env": sid,
+                "port": port,
+                "output": out_path,
+            }
+            if svc_list is not None:
+                var_entry["entities"] = svc_list
+            if dep_id:
+                var_entry["deploymentID"] = dep_id
+            grouped[key] = var_entry
+        else:
+            existing = grouped[key]
+            if svc_list is not None:
+                ents = existing.setdefault("entities", list(effective_base_entities))
+                for s in svc_list:
+                    if s not in ents:
+                        ents.append(s)
+
+    matrix_dict = {
+        "base": base_section,
+        "variants": list(grouped.values()),
+    }
+
+    out_str = json.dumps(matrix_dict, indent=2)
+    if to_path:
+        parent = os.path.dirname(os.path.abspath(to_path))
+        if parent and not os.path.exists(parent):
+            os.makedirs(parent, exist_ok=True)
+        with open(to_path, "w") as f:
+            f.write(out_str + "\n")
+        print(f"Matrix skeleton with {len(matrix_dict['variants'])} variant(s) written to '{to_path}'.")
+    else:
+        print(out_str)
+
+    return matrix_dict

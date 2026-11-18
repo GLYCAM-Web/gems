@@ -19,6 +19,7 @@ from gemsModules.configuration.control_script import (
     generate_from_tui,
     generate_from_matrix,
     clone_ic,
+    ports_to_matrix,
     export_host,
     import_host,
     print_tui_help
@@ -151,7 +152,7 @@ def main():
     
     if not argv:
         print("Usage: instance_config <command> [args...]")
-        print("Commands: generate, clone, export, import, validate, evaluate, report, check-connectivity, confirm-capabilities, status, init-gemsrc, show-config")
+        print("Commands: generate, clone, ports-to-matrix, export, import, validate, evaluate, report, check-connectivity, confirm-capabilities, status, init-gemsrc, show-config")
         sys.exit(1)
         
     cmd = argv[0]
@@ -161,8 +162,22 @@ def main():
         if cmd == "generate":
             print_tui_help()
             sys.exit(0)
-            
-    if cmd == "generate":
+
+    if cmd == "ports-to-matrix":
+        parser = argparse.ArgumentParser(prog="instance_config ports-to-matrix")
+        parser.add_argument("ports_file", help="Path to PORTS_dat.bash file.")
+        parser.add_argument("--to", dest="to_path", default=None, help="Output matrix JSON file path (default: stdout).")
+        parser.add_argument("--base", dest="base_path", default=None, help="Optional base JSON file to merge into the matrix 'base' section.")
+        parser.add_argument("--cluster-name", dest="cluster_name", default=None, help="Override cluster name in matrix 'base'.")
+        args = parser.parse_args(argv[1:])
+        ports_to_matrix(
+            ports_path=args.ports_file,
+            to_path=args.to_path,
+            base_path=args.base_path,
+            cluster_name=args.cluster_name,
+        )
+
+    elif cmd == "generate":
         # Parse generate arguments
         parser = argparse.ArgumentParser(prog="instance_config generate")
         group = parser.add_mutually_exclusive_group(required=True)
