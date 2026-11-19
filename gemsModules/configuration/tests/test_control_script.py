@@ -396,6 +396,131 @@ instanceconfig=(
         self.assertEqual(st_ic.get_localhost().port, "42053")
         self.assertEqual([e.value for e in st_ic.get_localhost().entities_available], ["AD", "GM", "GP", "MD"])
 
+    def test_cluster_base_website_dict_and_service_id_filter(self):
+        gems_root = Path(__file__).resolve().parents[3]
+        cli = gems_root / "bin" / "instance_config.py"
+        base_dir = self.tmp_path / "deployments"
+
+        cluster_base = {
+            "name": "Thoreau",
+            "name_template": "Thoreau-{id}",
+            "address": "172.16.4.2",
+            "scheduler": "slurm",
+            "execution_environments": ["Batch", "Standalone"],
+            "entities_available": ["AD", "GM", "GP", "MD"],
+            "batch_computing_resources": [
+                {
+                    "partition": "wCPU",
+                    "supported_entities": ["AD", "GM", "GP"],
+                    "max_nodes_per_job": "1",
+                    "max_cores_per_node": "28",
+                    "max_threads_per_node": "28",
+                    "max_gpus_per_node": "0",
+                    "max_cpus_per_gpu": "0",
+                    "max_time_limit": "P2D",
+                },
+                {
+                    "partition": "wGPU",
+                    "supported_entities": ["MD"],
+                    "max_nodes_per_job": "1",
+                    "max_cores_per_node": "4",
+                    "max_threads_per_node": "4",
+                    "max_gpus_per_node": "4",
+                    "max_cpus_per_gpu": "1",
+                    "max_time_limit": "P2DT16H30M",
+                },
+            ],
+            "filesystem_path_template": "/scratch1/thoreau-web/userdata/{site}/{entity}",
+            "secure_inputs_path_template": "/scratch1/thoreau-web/uploads/{site}/{entity}",
+        }
+        base_path = self.tmp_path / "thoreau_base.json"
+        base_path.write_text(json.dumps(cluster_base))
+
+        ports_content = f"""#!/usr/bin/env bash
+ServerName="Thoreau"
+ServerAddress="172.16.4.2"
+base_entities_available="AD GM GP MD"
+GEMS_BASE_PATH="{base_dir}"
+declare -a serviceIDs
+serviceIDs=(
+    "test"
+    "test-tmp"
+)
+declare -A port_number
+port_number=(
+    ["test"]="42050"
+    ["test-tmp"]="42060"
+)
+declare -A gemshome
+gemshome=(
+    ["test"]="${{GEMS_BASE_PATH}}/xenial-xa/gems"
+    ["test-tmp"]="${{GEMS_BASE_PATH}}/xenial-xa-temp/gems"
+)
+declare -A services
+services=(
+    ["test"]="GM GP MD"
+    ["test-tmp"]="AD"
+)
+declare -A website
+website=(
+    ["test-tmp"]="test"
+)
+declare -A instanceconfig
+instanceconfig=(
+    ["test"]=""
+    ["test-tmp"]=""
+)
+"""
+        ports_path = self.tmp_path / "PORTS_dat.bash"
+        ports_path.write_text(ports_content)
+        matrix_path = self.tmp_path / "filtered_matrix.json"
+
+        subprocess.run(
+            [
+                sys.executable,
+                str(cli),
+                "ports-to-matrix",
+                str(ports_path),
+                "--cluster-base",
+                str(base_path),
+                "--service-id",
+                "test-tmp",
+                "--to",
+                str(matrix_path),
+            ],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        subprocess.run(
+            [
+                sys.executable,
+                str(cli),
+                "generate",
+                "--matrix",
+                str(matrix_path),
+                "--service-id",
+                "test-tmp",
+            ],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+
+        # Only test-tmp should be generated; test should not exist
+        self.assertFalse((base_dir / "xenial-xa" / "gems" / "instance_config.json").exists())
+        tmp_ic = InstanceConfig.parse_file(base_dir / "xenial-xa-temp" / "gems" / "instance_config.json")
+        lh = tmp_ic.get_localhost()
+        self.assertEqual(lh.name, "Thoreau-test-tmp")
+        self.assertEqual(lh.port, "42060")
+        self.assertEqual([e.value for e in lh.entities_available], ["AD"])
+        self.assertEqual(len(lh.batch_computing_resources), 1)
+        self.assertEqual(lh.batch_computing_resources[0].partition, "wCPU")
+        self.assertEqual(lh.batch_computing_resources[0].max_time_limit, "P2D")
+        # website["test-tmp"]="test" -> {site} resolves to "test", not "test-tmp"
+        self.assertEqual(tmp_ic.get_filesystem_path_by_service_ID("AD"), "/scratch1/thoreau-web/userdata/test/AD")
+        self.assertEqual(tmp_ic.get_secure_inputs_path_by_service_ID("AD"), "/scratch1/thoreau-web/uploads/test/AD")
+
 
 if __name__ == "__main__":
     unittest.main()

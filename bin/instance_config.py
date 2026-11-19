@@ -167,14 +167,16 @@ def main():
         parser = argparse.ArgumentParser(prog="instance_config ports-to-matrix")
         parser.add_argument("ports_file", help="Path to PORTS_dat.bash file.")
         parser.add_argument("--to", dest="to_path", default=None, help="Output matrix JSON file path (default: stdout).")
-        parser.add_argument("--base", dest="base_path", default=None, help="Optional base JSON file to merge into the matrix 'base' section.")
+        parser.add_argument("--base", "--cluster-base", dest="base_path", default=None, help="Optional cluster base JSON file to merge into the matrix 'base' section.")
         parser.add_argument("--cluster-name", dest="cluster_name", default=None, help="Override cluster name in matrix 'base'.")
+        parser.add_argument("--service-id", dest="service_ids", action="append", default=None, help="Filter to specific serviceID(s) from PORTS_dat.bash (repeatable).")
         args = parser.parse_args(argv[1:])
         ports_to_matrix(
             ports_path=args.ports_file,
             to_path=args.to_path,
             base_path=args.base_path,
             cluster_name=args.cluster_name,
+            service_ids_filter=args.service_ids,
         )
 
     elif cmd == "generate":
@@ -186,13 +188,14 @@ def main():
         group.add_argument("--matrix", type=str, help="Path to cluster matrix JSON file to generate multiple IC variants.")
         parser.add_argument("--ic-file", type=str, help="Alternate output file name (used with --from-file).")
         parser.add_argument("--output-dir", type=str, help="Output directory for files generated with --matrix.")
+        parser.add_argument("--service-id", dest="service_ids", action="append", default=None, help="Filter to specific variant id(s) when using --matrix (repeatable).")
         parser.add_argument("--minify", action="store_true", help="Write minified JSON (default is unminified).")
         args = parser.parse_args(argv[1:])
         
         if args.use_tui:
             generate_from_tui()
         elif args.matrix:
-            generate_from_matrix(args.matrix, output_dir=args.output_dir, minify=args.minify)
+            generate_from_matrix(args.matrix, output_dir=args.output_dir, minify=args.minify, service_ids_filter=args.service_ids)
         elif args.from_file:
             # Read from file and save
             with open(args.from_file) as f:

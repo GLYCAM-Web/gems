@@ -135,6 +135,52 @@ class BatchComputingResources(BaseModel):
          description = "Computing time limit in ISO 8601 format. Example: 2 days, 16 hours and 30 minutes = P2DT16H30M"
          )
 
+    @validator("max_time_limit")
+    def validate_max_time_limit(cls, v):
+        if v is None:
+            return v
+        s = str(v).strip()
+        if not s:
+            return None
+        import re
+        # Accept ISO 8601 durations (e.g. P2DT16H30M, PT2H, P1D) as well as legacy numeric minutes or Slurm D-HH:MM:SS / HH:MM:SS
+        iso_match = re.fullmatch(r"P(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?", s)
+        if iso_match:
+            if not any(iso_match.groups()):
+                raise ValueError(f"Invalid ISO 8601 duration '{s}': must specify at least one of D, H, M, or S.")
+            return s
+        if re.fullmatch(r"\d+", s) or re.fullmatch(r"(?:\d+-)?\d{1,2}:\d{2}(?::\d{2})?", s):
+            return s
+        raise ValueError(
+            f"Invalid max_time_limit '{s}'. Expected ISO 8601 duration (e.g. 'P2DT16H30M', 'PT2H') or Slurm time."
+        )
+
+
+def iso8601_duration_to_slurm_time(value: str) -> str:
+    """Convert an ISO 8601 duration string (e.g. 'P2DT16H30M', 'PT2H') to Slurm --time format.
+
+    Legacy numeric minutes (e.g. '120') or Slurm time strings are returned unchanged.
+    """
+    import re
+    s = str(value).strip()
+    m = re.fullmatch(r"P(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?", s)
+    if not m or not any(m.groups()):
+        return s
+    days = int(m.group(1) or 0)
+    hours = int(m.group(2) or 0)
+    minutes = int(m.group(3) or 0)
+    seconds = int(m.group(4) or 0)
+    # Normalize overflow
+    minutes += seconds // 60
+    seconds %= 60
+    hours += minutes // 60
+    minutes %= 60
+    days += hours // 24
+    hours %= 24
+    if days > 0:
+        return f"{days}-{hours:02d}:{minutes:02d}:{seconds:02d}"
+    return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+
 
 class Host(BaseModel):
     ######################################################################
@@ -627,7 +673,7 @@ class InstanceConfig(BaseModel):
                     if bcr.max_nodes_per_job:
                         args["nodes"] = str(bcr.max_nodes_per_job)
                     if bcr.max_time_limit:
-                        args["time"] = str(bcr.max_time_limit)
+                        args["time"] = iso8601_duration_to_slurm_time(str(bcr.max_time_limit))
 
                     if cpu_equiv == "core":
                         cpu_count = bcr.max_cores_per_node or bcr.max_threads_per_node

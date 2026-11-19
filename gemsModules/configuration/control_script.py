@@ -551,6 +551,7 @@ def generate_from_matrix(
     matrix_path: str,
     output_dir: Optional[str] = None,
     minify: bool = False,
+    service_ids_filter: Optional[List[str]] = None,
 ) -> List[str]:
     """Generate a family of Instance Config files from a cluster matrix JSON file."""
     if not os.path.exists(matrix_path):
@@ -565,6 +566,13 @@ def generate_from_matrix(
     if not isinstance(variants, list) or not variants:
         print("Error: Matrix JSON must contain a non-empty 'variants' list.", file=sys.stderr)
         sys.exit(1)
+
+    if service_ids_filter:
+        wanted = set(service_ids_filter)
+        variants = [v for v in variants if isinstance(v, dict) and v.get("id") in wanted]
+        if not variants:
+            print(f"Error: No variants matched --service-id {sorted(wanted)} in '{matrix_path}'.", file=sys.stderr)
+            sys.exit(1)
 
     HOST_FIELDS = {
         "name",
@@ -966,6 +974,7 @@ def ports_to_matrix(
     to_path: Optional[str] = None,
     base_path: Optional[str] = None,
     cluster_name: Optional[str] = None,
+    service_ids_filter: Optional[List[str]] = None,
 ) -> Dict[str, Any]:
     """Convert a bash PORTS_dat.bash file into a cluster matrix JSON skeleton."""
     parsed = parse_ports_file(ports_path)
@@ -978,11 +987,20 @@ def ports_to_matrix(
         print(f"Error: No 'serviceIDs' found in '{ports_path}'.", file=sys.stderr)
         sys.exit(1)
 
+    if service_ids_filter:
+        wanted = set(service_ids_filter)
+        missing = [sid for sid in service_ids_filter if sid not in service_ids]
+        if missing:
+            print(f"Error: Requested --service-id {missing} not found in active serviceIDs {service_ids}.", file=sys.stderr)
+            sys.exit(1)
+        service_ids = [sid for sid in service_ids if sid in wanted]
+
     ports_map = assoc.get("port_number", {})
     gemshome_map = assoc.get("gemshome", {})
     ic_map = assoc.get("instanceconfig", {})
     deploy_map = assoc.get("deploymentID", {})
     services_map = assoc.get("services", {})
+    website_map = assoc.get("website", {})
 
     raw_base_entities = scalars.get("base_entities_available")
     if raw_base_entities is not None:
@@ -1005,7 +1023,7 @@ def ports_to_matrix(
                 "max_threads_per_node": "4",
                 "max_gpus_per_node": "0",
                 "max_cpus_per_gpu": "1",
-                "max_time_limit": "120",
+                "max_time_limit": "PT2H",
             }
         ],
         "resource_specific_information": {
@@ -1048,6 +1066,7 @@ def ports_to_matrix(
             [e for e in raw_svc.replace(",", " ").split() if e] if raw_svc else None
         )
 
+        site = (website_map.get(sid) or "").strip() or sid
         port = ports_map.get(sid)
         gh = gemshome_map.get(sid, "")
         ic_spec = ic_map.get(sid, "")
@@ -1058,8 +1077,8 @@ def ports_to_matrix(
         if key not in grouped:
             var_entry: Dict[str, Any] = {
                 "id": sid,
-                "site": sid,
-                "env": sid,
+                "site": site,
+                "env": site,
                 "port": port,
                 "output": out_path,
             }

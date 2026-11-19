@@ -143,6 +143,40 @@ class TestNewConfig(unittest.TestCase):
         # Non-existent host lookup
         self.assertIsNone(ic.get_aad2_configuration(target_host="nonexistent"))
 
+    def test_iso8601_max_time_limit_conversion_and_validation(self):
+        from gemsModules.configuration.main_api import BatchComputingResources, iso8601_duration_to_slurm_time
+        from pydantic.v1 import ValidationError
+
+        self.assertEqual(iso8601_duration_to_slurm_time("P2DT16H30M"), "2-16:30:00")
+        self.assertEqual(iso8601_duration_to_slurm_time("PT2H"), "02:00:00")
+        self.assertEqual(iso8601_duration_to_slurm_time("P1D"), "1-00:00:00")
+        self.assertEqual(iso8601_duration_to_slurm_time("120"), "120")
+
+        ic = InstanceConfig(
+            hosts=[
+                {
+                    "name": "thoreau",
+                    "address": "172.16.4.2",
+                    "is_localhost": "True",
+                    "scheduler": "slurm",
+                    "entities_available": ["MD"],
+                    "batch_computing_resources": [
+                        {
+                            "partition": "wGPU",
+                            "supported_entities": ["MD"],
+                            "max_time_limit": "P2DT16H30M",
+                        }
+                    ],
+                }
+            ]
+        )
+        args = ic.get_batch_computing_arguments_for_context("MD")
+        self.assertEqual(args["partition"], "wGPU")
+        self.assertEqual(args["time"], "2-16:30:00")
+
+        with self.assertRaises(ValidationError):
+            BatchComputingResources(partition="wCPU", max_time_limit="not-a-duration")
+
 
 if __name__ == "__main__":
     unittest.main()
