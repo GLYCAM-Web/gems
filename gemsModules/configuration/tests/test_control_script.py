@@ -74,7 +74,7 @@ class TestControlScriptMatrixAndClone(unittest.TestCase):
         matrix_path = self.tmp_path / "matrix.json"
         matrix_path.write_text(json.dumps(matrix))
 
-        generated = generate_from_matrix(str(matrix_path), output_dir=str(self.tmp_path))
+        generated = generate_from_matrix(str(matrix_path), output_dir=str(self.tmp_path), allow_missing_paths=True)
         self.assertEqual(len(generated), 3)
 
         # Verify swarmtest variant
@@ -155,6 +155,7 @@ class TestControlScriptMatrixAndClone(unittest.TestCase):
             aad2_home="/programs/website_aad2/test/AAD2_Docker",
             sets=["resource_specific_information.cpu_hardware_equivalent=thread"],
             drop_remote_hosts=True,
+            allow_missing_paths=True,
         )
 
         cloned = InstanceConfig.parse_file(dest_path)
@@ -184,8 +185,18 @@ class TestControlScriptMatrixAndClone(unittest.TestCase):
         matrix_path = self.tmp_path / "cli_matrix.json"
         matrix_path.write_text(json.dumps(matrix))
 
-        res1 = subprocess.run(
+        # Without --allow-missing-paths, missing /scratch/... paths abort
+        res_abort = subprocess.run(
             [sys.executable, str(cli), "generate", "--matrix", str(matrix_path), "--output-dir", str(self.tmp_path)],
+            stdin=subprocess.DEVNULL,
+            capture_output=True,
+            text=True,
+        )
+        self.assertNotEqual(res_abort.returncode, 0)
+        self.assertIn("do not exist on this host", res_abort.stderr)
+
+        res1 = subprocess.run(
+            [sys.executable, str(cli), "generate", "--matrix", str(matrix_path), "--output-dir", str(self.tmp_path), "--allow-missing-paths"],
             capture_output=True,
             text=True,
             check=True,
@@ -205,6 +216,7 @@ class TestControlScriptMatrixAndClone(unittest.TestCase):
                 "thoreau-actual",
                 "--port",
                 "42053",
+                "--allow-missing-paths",
             ],
             capture_output=True,
             text=True,
@@ -313,7 +325,7 @@ instanceconfig=(
 
         # Feed the generated matrix straight into generate --matrix
         subprocess.run(
-            [sys.executable, str(cli), "generate", "--matrix", str(matrix_path)],
+            [sys.executable, str(cli), "generate", "--matrix", str(matrix_path), "--allow-missing-paths"],
             capture_output=True,
             text=True,
             check=True,
@@ -387,7 +399,7 @@ instanceconfig=(
             check=True,
         )
         subprocess.run(
-            [sys.executable, str(cli), "generate", "--matrix", str(matrix_path)],
+            [sys.executable, str(cli), "generate", "--matrix", str(matrix_path), "--allow-missing-paths"],
             capture_output=True,
             text=True,
             check=True,
@@ -501,6 +513,7 @@ instanceconfig=(
                 str(matrix_path),
                 "--service-id",
                 "test-tmp",
+                "--allow-missing-paths",
             ],
             capture_output=True,
             text=True,

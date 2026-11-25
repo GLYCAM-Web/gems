@@ -20,6 +20,7 @@ from gemsModules.configuration.control_script import (
     generate_from_matrix,
     clone_ic,
     ports_to_matrix,
+    parse_ports_file,
     export_host,
     import_host,
     print_tui_help
@@ -27,6 +28,10 @@ from gemsModules.configuration.control_script import (
 
 def get_ic_path(custom_path=None):
     if custom_path:
+        if not os.path.isabs(custom_path) and not os.path.exists(custom_path):
+            ic_dir_cand = os.path.join(GEMSHOME, "IC", custom_path)
+            if os.path.exists(ic_dir_cand):
+                return ic_dir_cand
         return custom_path
     from gemsModules.systemoperations.environment_ops import find_instance_config
     try:
@@ -189,13 +194,20 @@ def main():
         parser.add_argument("--ic-file", type=str, help="Alternate output file name (used with --from-file).")
         parser.add_argument("--output-dir", type=str, help="Output directory for files generated with --matrix.")
         parser.add_argument("--service-id", dest="service_ids", action="append", default=None, help="Filter to specific variant id(s) when using --matrix (repeatable).")
+        parser.add_argument("--allow-missing-paths", action="store_true", help="Write IC even if local filesystem/uploads/AAD2 paths do not exist on disk.")
         parser.add_argument("--minify", action="store_true", help="Write minified JSON (default is unminified).")
         args = parser.parse_args(argv[1:])
         
         if args.use_tui:
             generate_from_tui()
         elif args.matrix:
-            generate_from_matrix(args.matrix, output_dir=args.output_dir, minify=args.minify, service_ids_filter=args.service_ids)
+            generate_from_matrix(
+                args.matrix,
+                output_dir=args.output_dir,
+                minify=args.minify,
+                service_ids_filter=args.service_ids,
+                allow_missing_paths=args.allow_missing_paths,
+            )
         elif args.from_file:
             # Read from file and save
             with open(args.from_file) as f:
@@ -221,6 +233,7 @@ def main():
         parser.add_argument("--aad2-home", type=str, default=None, help="Override resource_specific_information.aad2_configuration.aad2_docker_home.")
         parser.add_argument("--set", dest="sets", action="append", default=None, help="Override any localhost field using dotted path KEY=VALUE (repeatable).")
         parser.add_argument("--drop-remote-hosts", action="store_true", help="Drop non-localhost hosts from the cloned IC.")
+        parser.add_argument("--allow-missing-paths", action="store_true", help="Write IC even if local filesystem/uploads/AAD2 paths do not exist on disk.")
         parser.add_argument("--minify", action="store_true", help="Write minified JSON.")
         args = parser.parse_args(argv[1:])
 
@@ -244,6 +257,7 @@ def main():
             sets=args.sets,
             drop_remote_hosts=args.drop_remote_hosts,
             minify=args.minify,
+            allow_missing_paths=args.allow_missing_paths,
         )
             
     elif cmd == "export":
@@ -268,12 +282,37 @@ def main():
         group = parser.add_mutually_exclusive_group(required=True)
         group.add_argument("--from-file", type=str, help="Export file from remote host.")
         group.add_argument("--from-remote", type=str, help="Remote host gRPC target (e.g. 172.16.4.2:42059 or host_name).")
-        parser.add_argument("--ic-file", type=str, help="Alternate output configuration file.")
+        group.add_argument("--from-ports", type=str, help="Import remote host(s) from a PORTS_dat.bash file (uses ServerAddress and port_number).")
+        parser.add_argument("--service-id", dest="service_ids", action="append", default=None, help="Filter to specific serviceID(s) when using --from-ports (repeatable).")
+        parser.add_argument("--ic-file", "--using-ic", dest="ic_file", type=str, help="Target IC file (absolute, relative to CWD, or relative to $GEMSHOME/IC/).")
         args = parser.parse_args(argv[1:])
         
         ic_path = get_ic_path(args.ic_file)
         if args.from_file:
-            import_host(ic_path, args.from_file, out_ic_path=args.ic_file)
+            import_host(ic_path, args.from_file, out_ic_path=ic_path)
+        elif args.from_ports:
+            parsed = parse_ports_file(args.from_ports)
+            addr = parsed["scalars"].get("ServerAddress")
+            if not addr:
+                print(f"Error: 'ServerAddress' is not defined in '{args.from_ports}'.", file=sys.stderr)
+                sys.exit(1)
+            sids = parsed["arrays"].get("serviceIDs", [])
+            if args.service_ids:
+                wanted = set(args.service_ids)
+                sids = [s for s in sids if s in wanted]
+            if not sids:
+                print(f"Error: No matching serviceIDs found in '{args.from_ports}'.", file=sys.stderr)
+                sys.exit(1)
+            ports_map = parsed["assoc"].get("port_number", {})
+            ic = _load_instance_config(ic_path)
+            for sid in sids:
+                port = ports_map.get(sid)
+                if not port:
+                    print(f"Warning: Skipping '{sid}' (missing port_number).", file=sys.stderr)
+                    continue
+                res = ic.fetch_and_import_remote_host(addr, port, ic_path=ic_path)
+                print(json.dumps({"service_id": sid, **res}, indent=2))
+                ic = _load_instance_config(ic_path)
         elif args.from_remote:
             if ":" in args.from_remote:
                 addr, port = args.from_remote.split(":", 1)

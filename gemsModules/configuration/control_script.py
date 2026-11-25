@@ -89,9 +89,28 @@ def run_tui() -> Dict[str, Any]:
     print("Basic Setup")
     print("-" * 42)
 
-    ic_filename = ask_question('Instance configuration file name ["instance_config.json"] :', 
-                               default="instance_config.json",
-                               help_text="The name of the file to save the Instance Configuration to.")
+    while True:
+        ic_filename = ask_question('Instance configuration file name ["instance_config.json"] :',
+                                   default="instance_config.json",
+                                   help_text="The name of the file to save the Instance Configuration to.")
+        if os.path.exists(ic_filename):
+            if not os.access(ic_filename, os.W_OK):
+                print(f"Error: '{ic_filename}' already exists and is not writable (e.g. read-only 0444).", file=sys.stderr)
+                ans = ask_question("Choose a different filename? [Y/n] :", default="Y")
+                if ans.lower() in ("n", "no"):
+                    print("Exiting TUI without overwriting.")
+                    sys.exit(1)
+                continue
+        else:
+            parent_dir = os.path.dirname(os.path.abspath(ic_filename)) or "."
+            if not os.path.isdir(parent_dir) or not os.access(parent_dir, os.W_OK):
+                print(f"Error: Parent directory '{parent_dir}' does not exist or is not writable.", file=sys.stderr)
+                ans = ask_question("Choose a different filename? [Y/n] :", default="Y")
+                if ans.lower() in ("n", "no"):
+                    print("Exiting TUI.")
+                    sys.exit(1)
+                continue
+        break
 
     print("\nFirst we must gather some local data storage information\n")
     
@@ -467,13 +486,66 @@ def _normalize_hosts_list(hosts_data: Any) -> List[Dict[str, Any]]:
     return hosts
 
 
-def _write_ic_file(dest_path: str, ic_dict: Dict[str, Any], minify: bool = False) -> None:
+def _check_local_paths_exist(ic_dict: Dict[str, Any], allow_missing: bool = False) -> None:
+    """Verify local filesystem_paths, secure_inputs_paths, and aad2_docker_home exist on disk.
+
+    If any paths are missing and allow_missing is False, warn and ask for confirmation
+    when interactive (defaulting to exit), or exit immediately in non-interactive mode.
+    """
+    missing = []
+    for section in ("filesystem_paths", "secure_inputs_paths"):
+        paths_map = ic_dict.get(section) or {}
+        if isinstance(paths_map, dict):
+            for ent, p in paths_map.items():
+                if p and not os.path.exists(p):
+                    missing.append(f"  {section}.{ent}: {p}")
+
+    for h in _normalize_hosts_list(ic_dict.get("hosts", [])):
+        if str(h.get("is_localhost", "False")).lower() == "true":
+            rsi = h.get("resource_specific_information") or {}
+            if isinstance(rsi, dict):
+                aad2 = rsi.get("aad2_configuration") or rsi.get("aad2") or {}
+                if isinstance(aad2, dict):
+                    home = aad2.get("aad2_docker_home")
+                    if home and not os.path.exists(home):
+                        missing.append(f"  localhost.aad2_docker_home: {home}")
+
+    if not missing:
+        return
+
+    print("Warning: The following local paths do not exist on this host:", file=sys.stderr)
+    for item in missing:
+        print(item, file=sys.stderr)
+
+    if allow_missing:
+        return
+
+    if sys.stdin.isatty():
+        try:
+            ans = input("Continue writing IC anyway? [y/N]: ").strip()
+        except (KeyboardInterrupt, EOFError):
+            ans = ""
+        if ans.lower() in ("y", "yes"):
+            return
+
+    print("Aborting IC generation due to missing local paths (pass --allow-missing-paths to override).", file=sys.stderr)
+    sys.exit(1)
+
+
+def _write_ic_file(
+    dest_path: str,
+    ic_dict: Dict[str, Any],
+    minify: bool = False,
+    allow_missing_paths: bool = False,
+) -> None:
     """Validate ic_dict with InstanceConfig and write it to dest_path (read-only 0o444)."""
     try:
         InstanceConfig(**ic_dict)
     except Exception as e:
         print(f"Validation failed for '{dest_path}': {e}", file=sys.stderr)
         sys.exit(1)
+
+    _check_local_paths_exist(ic_dict, allow_missing=allow_missing_paths)
 
     parent = os.path.dirname(os.path.abspath(dest_path))
     if parent and not os.path.exists(parent):
@@ -552,6 +624,7 @@ def generate_from_matrix(
     output_dir: Optional[str] = None,
     minify: bool = False,
     service_ids_filter: Optional[List[str]] = None,
+    allow_missing_paths: bool = False,
 ) -> List[str]:
     """Generate a family of Instance Config files from a cluster matrix JSON file."""
     if not os.path.exists(matrix_path):
@@ -662,7 +735,7 @@ def generate_from_matrix(
         out_name = var.get("output") or f"instance_config.{var_id}.json"
         dest_path = os.path.join(output_dir, out_name) if output_dir else out_name
 
-        _write_ic_file(dest_path, ic_dict, minify=minify)
+        _write_ic_file(dest_path, ic_dict, minify=minify, allow_missing_paths=allow_missing_paths)
         generated_files.append(dest_path)
         print(f"Generated '{dest_path}' (host='{host_name}', port={local_host.get('port')}, entities={entities})")
 
@@ -704,6 +777,7 @@ def clone_ic(
     sets: Optional[List[str]] = None,
     drop_remote_hosts: bool = False,
     minify: bool = False,
+    allow_missing_paths: bool = False,
 ) -> str:
     """Clone an existing Instance Config file with targeted overrides."""
     if not os.path.exists(source_path):
@@ -783,7 +857,7 @@ def clone_ic(
         "secure_inputs_paths": sec_paths,
     }
 
-    _write_ic_file(dest_path, cloned_dict, minify=minify)
+    _write_ic_file(dest_path, cloned_dict, minify=minify, allow_missing_paths=allow_missing_paths)
     print(f"Cloned '{source_path}' -> '{dest_path}' (host='{local_host.get('name')}', port={local_host.get('port')}).")
     return dest_path
 

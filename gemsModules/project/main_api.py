@@ -11,7 +11,7 @@ from gemsModules.common.main_api_notices import Notice
 from gemsModules.common.main_api_provenance import Provenance
 from gemsModules.configuration.main_api import session_instance_config 
 from gemsModules.systemoperations.filesystem_ops import directory_is_writable
-from gemsModules.systemoperations.environment_ops import getGemsExecutionContext
+from gemsModules.systemoperations.environment_ops import getGemsExecutionContext, is_serving_website
 from gemsModules.project import settings as project_settings
 
 from gemsModules.logging.logger import Set_Up_Logging
@@ -245,6 +245,9 @@ class Project(BaseModel):
                 message = "Cannot write to the instanceConfigPath: " + str(instanceConfigPath)
                 log.error(message)
             return
+        if is_serving_website():
+            log.error("GEMS_SERVES_WEBSITE is enabled, but no writable IC or specified filesystem_path was found. Refusing to fall back to standalone/home directories.")
+            return
         #
         # Try: 
         #     user-configured output path (.gemsrc or GEMS_OUTPUT_DIR)
@@ -379,6 +382,9 @@ class Project(BaseModel):
                 message = "Cannot write to the instanceConfigPath: " + str(instanceConfigPath)
                 log.error(message)
             return
+        if is_serving_website():
+            log.error("GEMS_SERVES_WEBSITE is enabled, but no writable IC or specified secure_inputs_path was found. Refusing to fall back to standalone/home directories.")
+            return
         #
         # Try: 
         #     user-configured uploads path (.gemsrc or GEMS_UPLOADS_DIR)
@@ -501,9 +507,18 @@ class Project(BaseModel):
                     )
             return
         # If we are still here, set the directory 
-        self.project_dir =  os.path.join(self.service_dir, self.pUUID )
-        if not directory_is_writable(self.project_dir) :
-            message = "Unable to write to the project directory. \nForging ahead, but not optimistic about it."
+        self.project_dir = os.path.join(self.service_dir, self.pUUID)
+        if os.path.exists(self.project_dir):
+            if not directory_is_writable(self.project_dir):
+                message = "Unable to write to the project directory. \nForging ahead, but not optimistic about it."
+                log.error(message)
+        elif directory_is_writable(self.service_dir):
+            log.debug(
+                "Project directory does not exist yet, but parent service_dir is writable: "
+                + str(self.service_dir)
+            )
+        else:
+            message = "Unable to write to the project directory or its parent service_dir. \nForging ahead, but not optimistic about it."
             log.error(message)
         log.debug("self.project_dir is : >>>" + self.project_dir + "<<<")
 

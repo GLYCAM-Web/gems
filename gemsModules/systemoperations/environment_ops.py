@@ -85,13 +85,22 @@ def add_gems_to_python_path() -> None:
     GemsPath = get_gems_path()
     sys.path.append(GemsPath)
 
+def is_serving_website() -> bool:
+    """Return True if GEMS is serving a website (either in Swarm via GW_LIVE_SWARM or on a cluster via GEMS_SERVES_WEBSITE=true)."""
+    if 'GW_LIVE_SWARM' in os.environ:
+        return True
+    return os.environ.get('GEMS_SERVES_WEBSITE', '').strip().lower() in ('1', 'true', 'yes')
+
+
 def getGemsExecutionContext() :
     log.info("getGemsExecutionContext was called.")
-    # Currently, if this variable is set to anything at all, GEMS is
-    # probably operating in support of a wabsite.
+    # GW_LIVE_SWARM indicates running inside a Swarm/Docker website deployment.
     if 'GW_LIVE_SWARM' in os.environ :
         log.debug("GW_LIVE_SWARM is defined in the current environment.  Assuming this is a website.")
         return 'website'
+    elif is_serving_website():
+        log.debug("GEMS_SERVES_WEBSITE is enabled in the current environment.  Serving a website outside Swarm.")
+        return 'default'
     else :
         log.debug("GW_LIVE_SWARM is NOT defined in the current environment.  Assuming this is not a website.")
         return 'default'

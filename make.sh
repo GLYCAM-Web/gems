@@ -111,22 +111,24 @@ check_pull_repo() {
     local baseDir="$3"
     local stableBranch="$4"
     local devBranchName="$5"
-    local 
     local theDir="${baseDir}/${repoName}"
 
     if [ ! -d "${theDir}" ]; then
-        mkdir -p ${theDir}
+        mkdir -p "${theDir}"
     fi
 
-    if [ "${GW_GRPC_ROLE}" == "Swarm" ]; then
+    local envVarName="${repoName}_BRANCH"
+    local envBranch="${!envVarName:-}"
+
+    if [ "${GW_GRPC_ROLE:-}" == "Swarm" ]; then
         echo "Swarm deployment detected. ${repoName} should be controlled by upstream processes."
         echo "!!!  NOT ALTERING ${repoName} !!!"
-        return 0;
-    elif [ "${GW_GRPC_ROLE}" == "Developer" ]; then
+        return 0
+    elif [ -n "${envBranch}" ]; then
+        stableBranch="${envBranch}"
+    elif [ "${GW_GRPC_ROLE:-}" == "Developer" ]; then
         echo "Developer environment detected; pulling ${repoName} from the development branch."
         stableBranch="${devBranchName}"
-    else
-        stableBranch=""
     fi
 
     if [ ! -d "${theDir}/.git" ]; then
@@ -250,6 +252,10 @@ check_pull_repo() {
 
 gemshome=`pwd`
 check_gemshome $gemshome
+if [ -f "${GEMSHOME}/subrepo_branches.sh" ]; then
+    # shellcheck disable=SC1091
+    source "${GEMSHOME}/subrepo_branches.sh"
+fi
 check_gmmldir $GEMSHOME/gmml
 check_gmmldir $GEMSHOME/gmml2
 check_pull_repo "MD_Utils" "https://github.com/GLYCAM-Web/MD_Utils.git" "$GEMSHOME/External" "stable" "md-test" 

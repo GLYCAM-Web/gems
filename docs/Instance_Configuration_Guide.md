@@ -136,15 +136,22 @@ The website's GEMS needs its own local `instance_config.json` defining itself as
 
 Once the website's base `instance_config.json` exists and Thoreau's gRPC server(s) are running, import Thoreau's host entry into the website's IC using either **gRPC pull** or **file export/import**.
 
-### Option A: Pull Directly Over gRPC (`import --from-remote`)
+### Option A: Pull Directly Over gRPC (`import --from-remote` or `import --from-ports`)
 
-Run this on the **website GEMS**:
+Run this on the **website GEMS** (use `--ic-file` / `--using-ic` to target a non-default IC such as `IC/IC_delegator.json`; relative names are resolved against CWD or `$GEMSHOME/IC/`):
 ```bash
-./bin/instance_config.py import --from-remote 172.16.4.2:42050
+./bin/instance_config.py import --from-remote 172.16.4.2:42053 --ic-file IC/IC_delegator.json
+# Or using a relative name inside $GEMSHOME/IC/:
+./bin/instance_config.py import --from-remote 172.16.4.2:42053 --using-ic IC_delegator.json
 ```
 
-- This sends a gRPC `ExportHost` (`target: "localhost"`) request to Thoreau, receives Thoreau's host capabilities, forces `is_localhost` to `"False"`, merges it into the website's `instance_config.json`, and validates the result.
-- If `AD` and `MD` are served by two separate gRPC ports on Thoreau (e.g., `42050` and `42060`), run `import --from-remote` once per port (making sure each has a distinct host `name` in its IC).
+If `PORTS_dat.bash` (containing `ServerAddress` and `port_number`) is visible to the website, you can import directly from it:
+```bash
+./bin/instance_config.py import --from-ports /path/to/PORTS_dat.bash --service-id swarmtest --using-ic IC_delegator.json
+```
+
+- If `GEMS_INSTANCE_CONFIG` is set and `--ic-file` / `--using-ic` is omitted, `import`, `export`, `validate`, `evaluate`, `report`, `check-connectivity`, `confirm-capabilities`, and `status` all pick up `GEMS_INSTANCE_CONFIG` automatically.
+- `import` sends a gRPC `ExportHost` (`target: "localhost"`) request to the remote GEMS, receives its host capabilities, forces `is_localhost` to `"False"`, merges it into the target IC, and validates the result.
 
 ### Option B: Offline File Export / Import (`export` → `import --from-file`)
 
@@ -156,16 +163,27 @@ If the website cannot reach Thoreau directly while staging configs:
    ```
 2. Copy `thoreau_export.json` to the **website GEMS** and run:
    ```bash
-   ./bin/instance_config.py import --from-file thoreau_export.json
+   ./bin/instance_config.py import --from-file thoreau_export.json --ic-file IC/IC_delegator.json
    ```
 
 ### Verify From the Website GEMS
 ```bash
-./bin/instance_config.py evaluate
-./bin/instance_config.py check-connectivity Thoreau
-./bin/instance_config.py confirm-capabilities Thoreau
-./bin/instance_config.py status
+./bin/instance_config.py evaluate --ic-file IC/IC_delegator.json
+./bin/instance_config.py check-connectivity Thoreau-swarmtest --ic-file IC/IC_delegator.json
+./bin/instance_config.py confirm-capabilities Thoreau-swarmtest --ic-file IC/IC_delegator.json
+./bin/instance_config.py status --ic-file IC/IC_delegator.json
 ```
+
+---
+
+## Troubleshooting
+
+- **`ModuleNotFoundError: No module named 'pydantic'` when `json_server.py` invokes `bin/delegate`**:
+  `bin/delegate` automatically activates `$GEMSHOME/.venv` if present, otherwise falling back to system `python3`. Run `bash bin/setup-venv.sh` (or `bash bin/setup-venv.sh --python python3.11`) in `$GEMSHOME` on the cluster.
+- **`ImportError: /lib64/libstdc++.so.6: version 'GLIBCXX_3.4.xx' not found` (required by `_gmml.so`)**:
+  `gmml` was compiled with a newer GCC than the OS system `libstdc++`. Add that GCC's `lib64` directory (e.g. `/opt/ohpc/pub/compiler/gcc/12.4.0/lib64`) to `LD_LIBRARY_PATH` in the systemd service unit (or `PORTS_dat.bash` `ld_library_path`).
+- **Missing local paths during `generate --matrix` / `clone`**:
+  By default, IC generation aborts if configured local `filesystem_paths`, `secure_inputs_paths`, or `aad2_docker_home` do not exist on disk. Create the directories first or pass `--allow-missing-paths` if staging offline.
 
 ---
 

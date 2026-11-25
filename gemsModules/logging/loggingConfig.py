@@ -19,6 +19,8 @@ def is_stderr_suppressed() -> bool:
     """Check if stderr must remain completely clean (e.g. website or gRPC delegation)."""
     if "GW_LIVE_SWARM" in os.environ or "GW_DOMAIN" in os.environ:
         return True
+    if os.environ.get("GEMS_SERVES_WEBSITE", "").strip().lower() in ("1", "true", "yes"):
+        return True
     if os.environ.get("GEMS_NO_STDERR") in ("1", "true", "True"):
         return True
     try:
